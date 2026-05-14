@@ -56,16 +56,15 @@
     "memo"
   ],
   "dependencies": {
-    "@solid-primitives/scheduled": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solid-primitives/mouse": "workspace:^",
-    "@solidjs/router": "^0.8.4",
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.10"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.10",
+    "solid-js": "^2.0.0-beta.10"
   },
   "typesVersions": {}
 }

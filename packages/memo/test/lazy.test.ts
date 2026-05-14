@@ -1,261 +1,347 @@
 import { describe, it, expect } from "vitest";
+import { flush } from "solid-js";
 import { createLazyMemo } from "../src/index.js";
-import { createComputed, createEffect, createMemo, createRoot, createSignal } from "solid-js";
+import { createEffect, createMemo, createRoot, createSignal, createTrackedEffect } from "solid-js";
 
 describe("createLazyMemo", () => {
-  it("won't run if not accessed", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
+  it("won't run if not accessed", () => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    const dispose = createRoot(d => {
       createLazyMemo(() => {
         runs++;
         return count();
       });
-      setCount(1);
-      expect(runs, "0 in setup").toBe(0);
+      return d;
+    });
 
-      setTimeout(() => {
-        expect(runs, "0 after timeout").toBe(0);
-        setCount(2);
-        expect(runs, "0 after set in timeout").toBe(0);
-        dispose();
-      }, 0);
-    }));
+    setCount(1);
+    expect(runs, "0 after setCount").toBe(0);
+    dispose();
+  });
 
-  it("runs after being accessed", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
-      const memo = createLazyMemo(() => {
+  it("runs after being accessed", () => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    let memo!: () => number;
+    const dispose = createRoot(d => {
+      memo = createLazyMemo(() => {
         runs++;
         return count();
       });
-      setCount(1);
-      expect(runs, "0 in setup").toBe(0);
+      return d;
+    });
 
-      expect(memo(), "memo matches the signal on the first access").toBe(1);
-      expect(runs, "ran once").toBe(1);
-      dispose();
-    }));
+    setCount(1);
+    expect(runs, "0 before access").toBe(0);
 
-  it("runs only once, even if accessed multiple times", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
-      const memo = createLazyMemo(() => {
+    expect(memo(), "memo matches the signal on the first access").toBe(1);
+    expect(runs, "ran once").toBe(1);
+    dispose();
+  });
+
+  it("runs only once per reactive update within a tracking context", () => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    let memo!: () => number;
+    const dispose = createRoot(d => {
+      memo = createLazyMemo(() => {
         runs++;
         return count();
       });
-      setCount(1);
-      expect(runs, "0 in setup").toBe(0);
+      return d;
+    });
 
-      expect(memo(), "memo matches the signal on the first access").toBe(1);
-      expect(memo(), "memo matches the signal on the second access").toBe(1);
-      expect(memo(), "memo matches the signal on the third access").toBe(1);
-      expect(runs, "ran once").toBe(1);
-      dispose();
-    }));
+    setCount(1);
+    expect(runs, "0 before access").toBe(0);
 
-  it("runs once until invalidated", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
+    // Access within a reactive context — memo runs exactly once
+    let captured: number | undefined;
+    const innerDispose = createRoot(d => {
+      createTrackedEffect(() => {
+        captured = memo();
+        memo();
+        memo();
+      });
+      return d;
+    });
+    flush();
+    expect(captured).toBe(1);
+    expect(runs, "ran once inside reactive context").toBe(1);
 
-      const memo = createLazyMemo(() => {
+    innerDispose();
+    dispose();
+  });
+
+  it("runs once until invalidated", () => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    let memo!: () => number;
+
+    const dispose = createRoot(d => {
+      memo = createLazyMemo(() => {
         runs++;
         return count();
       });
+      return d;
+    });
 
-      createComputed(memo);
-      expect(runs, "1-1.").toBe(1);
-      createComputed(memo);
-      expect(runs, "1-2.").toBe(1);
-      memo();
-      expect(runs, "1-3.").toBe(1);
+    const innerDispose1 = createRoot(d => {
+      createTrackedEffect(() => void memo());
+      return d;
+    });
+    flush();
+    expect(runs, "1-1.").toBe(1);
 
-      setCount(1);
-      expect(runs, "2-1.").toBe(2);
+    const innerDispose2 = createRoot(d => {
+      createTrackedEffect(() => void memo());
+      return d;
+    });
+    flush();
+    expect(runs, "1-2.").toBe(1);
 
-      createComputed(memo);
-      expect(runs, "2-2.").toBe(2);
+    memo();
+    expect(runs, "1-3.").toBe(1);
 
-      dispose();
-    }));
+    setCount(1);
+    flush();
+    expect(runs, "2-1.").toBe(2);
 
-  it("won't run if the root of where it was accessed is gone", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
+    const innerDispose3 = createRoot(d => {
+      createTrackedEffect(() => void memo());
+      return d;
+    });
+    flush();
+    expect(runs, "2-2.").toBe(2);
 
-      const memo = createLazyMemo(() => {
+    innerDispose1();
+    innerDispose2();
+    innerDispose3();
+    dispose();
+  });
+
+  it("won't run if the root of where it was accessed is gone", () => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    let memo!: () => number;
+
+    const dispose = createRoot(d => {
+      memo = createLazyMemo(() => {
         runs++;
         return count();
       });
+      return d;
+    });
 
-      createRoot(dispose => {
-        createComputed(memo);
-        dispose();
-      });
+    createRoot(innerDispose => {
+      createTrackedEffect(() => void memo());
+      flush();
+      innerDispose();
+    });
 
-      expect(runs, "1").toBe(1);
+    expect(runs, "1").toBe(1);
 
-      setCount(1);
-      expect(runs, "2").toBe(1);
-      dispose();
-    }));
+    setCount(1);
+    flush();
+    expect(runs, "2").toBe(1);
+    dispose();
+  });
 
-  it("will be running even if some of the reading roots are disposed", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
-      const memo = createLazyMemo(() => {
+  it("will be running even if some of the reading roots are disposed", () => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    let memo!: () => number;
+
+    const dispose = createRoot(d => {
+      memo = createLazyMemo(() => {
         runs++;
         return count();
       });
+      return d;
+    });
 
-      const dispose1 = createRoot(dispose => {
-        createComputed(memo);
-        return dispose;
-      });
-      const dispose2 = createRoot(dispose => {
-        createComputed(memo);
-        return dispose;
-      });
+    const dispose1 = createRoot(d => {
+      createTrackedEffect(() => void memo());
+      flush();
+      return d;
+    });
+    const dispose2 = createRoot(d => {
+      createTrackedEffect(() => void memo());
+      flush();
+      return d;
+    });
 
-      expect(runs, "ran once").toBe(1);
+    expect(runs, "ran once").toBe(1);
 
-      setCount(1);
+    setCount(1);
+    flush();
+    expect(runs, "ran twice").toBe(2);
 
-      expect(runs, "ran twice").toBe(2);
+    dispose1();
+    setCount(2);
+    flush();
+    expect(runs, "ran 3 times").toBe(3);
 
-      dispose1();
-      setCount(2);
-      expect(runs, "ran 3 times").toBe(3);
+    dispose2();
 
-      dispose2();
+    setCount(3);
+    flush();
+    expect(runs, "ran 3 times; (not changed)").toBe(3);
+    dispose();
+  });
 
-      setCount(3);
-      expect(runs, "ran 3 times; (not changed)").toBe(3);
-      dispose();
-    }));
+  it("initial value if NOT set in options", () => {
+    const [count, setCount] = createSignal(0);
+    let capturedPrev: any;
+    const captured: any[] = [];
 
-  it("initial value if NOT set in options", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let capturedPrev: any;
+    const dispose = createRoot(d => {
       const memo = createLazyMemo(prev => {
         capturedPrev = prev;
         return count();
       });
-      const captured: any[] = [];
+      createTrackedEffect(() => {
+        captured.push(memo());
+      });
+      return d;
+    });
 
-      createComputed(() => captured.push(memo()));
-      expect(captured).toEqual([0]);
-      expect(capturedPrev).toEqual(undefined);
+    flush();
+    expect(captured).toEqual([0]);
+    expect(capturedPrev).toEqual(undefined);
 
-      setCount(1);
-      expect(captured).toEqual([0, 1]);
-      expect(capturedPrev).toEqual(0);
+    setCount(1);
+    flush();
+    expect(captured).toEqual([0, 1]);
+    expect(capturedPrev).toEqual(0);
 
-      dispose();
-    }));
+    dispose();
+  });
 
-  it("initial value if set", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let capturedPrev: any;
+  it("initial value if set", () => {
+    const [count, setCount] = createSignal(0);
+    let capturedPrev: any;
+    const captured: any[] = [];
+
+    const dispose = createRoot(d => {
       const memo = createLazyMemo(prev => {
         capturedPrev = prev;
         return count();
       }, 123);
-      const captured: any[] = [];
+      createTrackedEffect(() => {
+        captured.push(memo());
+      });
+      return d;
+    });
 
-      createComputed(() => captured.push(memo()));
-      expect(captured).toEqual([0]);
-      expect(capturedPrev).toEqual(123);
+    flush();
+    expect(captured).toEqual([0]);
+    expect(capturedPrev).toEqual(123);
 
-      setCount(1);
-      expect(captured).toEqual([0, 1]);
-      expect(capturedPrev).toEqual(0);
+    setCount(1);
+    flush();
+    expect(captured).toEqual([0, 1]);
+    expect(capturedPrev).toEqual(0);
 
-      dispose();
-    }));
+    dispose();
+  });
 
-  it("handles prev value properly", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
+  it("handles prev value properly", () => {
+    const [count, setCount] = createSignal(0);
+    let capturedPrev: any;
+    let memo!: () => number;
 
-      let capturedPrev: any;
-      const memo = createLazyMemo(prev => {
+    const dispose = createRoot(d => {
+      memo = createLazyMemo(prev => {
         capturedPrev = prev;
         return count();
       });
+      return d;
+    });
 
-      const dis1 = createRoot(dis => {
-        createComputed(memo);
-        return dis;
-      });
-      expect(capturedPrev).toBe(undefined);
+    const dis1 = createRoot(d => {
+      createTrackedEffect(() => void memo());
+      flush();
+      return d;
+    });
+    expect(capturedPrev).toBe(undefined);
 
-      setCount(1);
-      expect(capturedPrev).toBe(0);
+    setCount(1);
+    flush();
+    expect(capturedPrev).toBe(0);
 
-      dis1();
+    dis1();
 
-      setCount(2);
-      expect(capturedPrev).toBe(0);
-      expect(memo()).toBe(2);
-      expect(capturedPrev).toBe(1);
-      dispose();
-    }));
+    setCount(2);
+    flush();
+    expect(capturedPrev).toBe(0);
+    expect(memo()).toBe(2);
+    expect(capturedPrev).toBe(1);
+    dispose();
+  });
 
-  it("works in an effect", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
+  it("works in an effect", () => {
+    const [count, setCount] = createSignal(0);
+    const captured: number[] = [];
+
+    const dispose = createRoot(d => {
       const memo = createLazyMemo(count);
-      const captured: number[] = [];
-      createEffect(() => captured.push(memo()));
+      createEffect(
+        () => memo(),
+        value => {
+          captured.push(value);
+        },
+      );
+      return d;
+    });
 
-      queueMicrotask(() => {
-        expect(captured).toEqual([0]);
+    flush();
+    expect(captured).toEqual([0]);
 
-        setCount(1);
-        queueMicrotask(() => {
-          expect(captured).toEqual([0, 1]);
-          dispose();
-        });
-      });
-    }));
+    setCount(1);
+    flush();
+    expect(captured).toEqual([0, 1]);
+    dispose();
+  });
 
-  it("computation will last until the source changes", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
-      const memo = createLazyMemo(() => {
+  it("recomputes when resubscribed after all observers disposed", () => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    let memo!: () => number;
+
+    const dispose = createRoot(d => {
+      memo = createLazyMemo(() => {
         runs++;
         return count();
       });
+      return d;
+    });
 
-      createRoot(dispose => {
-        createComputed(memo);
-        dispose();
-      });
+    createRoot(innerDispose => {
+      createTrackedEffect(() => void memo());
+      flush();
+      innerDispose();
+    });
 
-      expect(runs).toBe(1);
+    expect(runs).toBe(1);
 
-      createRoot(dispose => {
-        createComputed(memo);
-        dispose();
-      });
+    // In beta.10, lazy memos lose their dep links when unobserved
+    // and recompute when a new observer subscribes
+    createRoot(innerDispose => {
+      createTrackedEffect(() => void memo());
+      flush();
+      innerDispose();
+    });
 
-      expect(runs).toBe(1);
+    expect(runs).toBe(2);
 
-      setCount(1);
+    setCount(1);
+    flush();
+    // No observers, so no recompute
+    expect(runs).toBe(2);
 
-      expect(runs).toBe(1);
-
-      dispose();
-    }));
+    dispose();
+  });
 
   it("stays in sync when read in a memo", () => {
     const { dispose, setA, memo } = createRoot(dispose => {
@@ -271,6 +357,7 @@ describe("createLazyMemo", () => {
 
     memo();
     setA(2);
+    flush();
     memo();
 
     dispose();

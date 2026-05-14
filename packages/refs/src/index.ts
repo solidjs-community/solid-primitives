@@ -2,16 +2,12 @@ import { chain, arrayEquals } from "@solid-primitives/utils";
 import {
   type Accessor,
   children,
-  createComputed,
+  createEffect,
   createMemo,
   type JSX,
   onCleanup,
-  untrack,
 } from "solid-js";
-import { isServer } from "solid-js/web";
-
-// TODO delete in next major version
-export type { ResolvedChildren, ResolvedJSXElement } from "solid-js/types/reactive/signal.js";
+import { isServer } from "@solidjs/web";
 
 /**
  * Type for the `ref` prop
@@ -235,11 +231,13 @@ export function Refs(props: { ref: Ref<Element[]>; children: JSX.Element }): JSX
 
   let prev: Element[] = [];
 
-  createComputed(() => {
-    const els = resolved.toArray().filter(defaultElementPredicate);
-    if (!arrayEquals(prev, els)) untrack(() => cb(els));
-    prev = els;
-  }, []);
+  createEffect(
+    () => resolved.toArray().filter(defaultElementPredicate),
+    (els: Element[]) => {
+      if (!arrayEquals(prev, els)) cb(els);
+      prev = els;
+    },
+  );
   onCleanup(() => prev.length && cb([]));
 
   return resolved as unknown as JSX.Element;
@@ -267,11 +265,13 @@ export function Ref(props: { ref: Ref<Element | undefined>; children: JSX.Elemen
 
   let prev: Element | undefined;
 
-  createComputed(() => {
-    const el = resolved.toArray().find(defaultElementPredicate);
-    if (el !== prev) untrack(() => cb(el));
-    prev = el;
-  });
+  createEffect(
+    () => resolved.toArray().find(defaultElementPredicate),
+    (el: Element | undefined) => {
+      if (el !== prev) cb(el);
+      prev = el;
+    },
+  );
 
   onCleanup(() => prev && cb(undefined));
 
