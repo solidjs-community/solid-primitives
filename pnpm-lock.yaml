@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@babel/core':
+        specifier: ^7.27.0
+        version: 7.29.0
       '@changesets/cli':
         specifier: ^2.29.4
         version: 2.29.4
@@ -29,6 +32,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.34.0
         version: 8.34.0(eslint@9.28.0(jiti@2.6.1))(typescript@5.8.3)
+      babel-preset-solid:
+        specifier: 2.0.0-beta.12
+        version: 2.0.0-beta.12(@babel/core@7.29.0)(solid-js@2.0.0-beta.10)
       esbuild:
         specifier: ^0.25.5
         version: 0.25.5
@@ -10545,6 +10551,13 @@ snapshots:
     dependencies:
       '@babel/core': 7.29.0
       babel-plugin-jsx-dom-expressions: 0.39.8(@babel/core@7.29.0)
+
+  babel-preset-solid@2.0.0-beta.12(@babel/core@7.29.0)(solid-js@2.0.0-beta.10):
+    dependencies:
+      '@babel/core': 7.29.0
+      babel-plugin-jsx-dom-expressions: 0.50.0-next.10(@babel/core@7.29.0)
+    optionalDependencies:
+      solid-js: 2.0.0-beta.10
 
   babel-preset-solid@2.0.0-beta.12(@babel/core@7.29.0)(solid-js@2.0.0-beta.12):
     dependencies:

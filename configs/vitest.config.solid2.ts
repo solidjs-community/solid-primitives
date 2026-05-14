@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import type { Plugin } from "vite";
+import * as utils from "../scripts/utils/index.js";
 
 function solidBabelPlugin(testSSR: boolean): Plugin {
   return {
@@ -44,6 +45,16 @@ function solidBabelPlugin(testSSR: boolean): Plugin {
   };
 }
 
+const package_name = utils.getPackageNameFromCWD();
+
+if (package_name == null) {
+  utils.log_info("Testing ALL packages (Solid 2.0 mode)...");
+} else {
+  utils.log_info("Testing " + package_name + " package (Solid 2.0 mode)...");
+}
+
+const from_root = package_name == null;
+
 export default defineConfig(({ mode }) => {
   const testSSR = mode === "test:ssr" || mode === "ssr";
 
@@ -57,11 +68,22 @@ export default defineConfig(({ mode }) => {
       transformMode: {
         web: [/\.[jt]sx$/],
       },
-      ...(testSSR
-        ? { include: ["test/server.test.{ts,tsx}"] }
-        : {
-            include: ["test/*.test.{ts,tsx}"],
-            exclude: ["test/server.test.{ts,tsx}"],
+      ...(from_root
+        ? // Testing all packages from root
+          {
+            ...(testSSR && { include: ["packages/*/test/server.test.{ts,tsx}"] }),
+            ...(!testSSR && {
+              include: ["packages/*/test/*.test.{ts,tsx}"],
+              exclude: ["packages/*/test/server.test.{ts,tsx}"],
+            }),
+          }
+        : // Testing a single package
+          {
+            ...(testSSR && { include: ["test/server.test.{ts,tsx}"] }),
+            ...(!testSSR && {
+              include: ["test/*.test.{ts,tsx}"],
+              exclude: ["test/server.test.{ts,tsx}"],
+            }),
           }),
     },
     resolve: {
