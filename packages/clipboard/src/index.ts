@@ -1,13 +1,7 @@
 import { access, type MaybeAccessor } from "@solid-primitives/utils";
-import {
-  type Accessor,
-  createEffect,
-  createResource,
-  type InitializedResource,
-  on,
-  onCleanup,
-} from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+
+import { isServer } from "@solidjs/web";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (
@@ -28,23 +22,12 @@ export type ClipboardResourceItem = {
   readonly blob: Blob;
 };
 
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      copyToClipboard: CopyToClipboardOptions | true;
-    }
-  }
-}
-
 /**
  * Async write to the clipboard
  * @param data - Data to write to the clipboard - either a string or ClipboardItem array.
  */
 export const writeClipboard: ClipboardSetter = async data => {
-  if (isServer) {
-    return;
-  }
-
+  if (isServer) return;
   typeof data === "string"
     ? await navigator.clipboard.writeText(data)
     : await navigator.clipboard.write(data);
@@ -55,10 +38,7 @@ export const writeClipboard: ClipboardSetter = async data => {
  * @return Promise of ClipboardItem array
  */
 export function readClipboard(): Promise<ClipboardItem[]> {
-  if (isServer) {
-    return Promise.resolve([]);
-  }
-
+  if (isServer) return Promise.resolve([]);
   return navigator.clipboard.read();
 }
 
@@ -73,109 +53,147 @@ export const makeClipboard = (): [
   return [writeClipboard, readClipboard, newClipboardItem];
 };
 
+async function readClipboardItems(): Promise<ClipboardResourceItem[]> {
+  try {
+    const items = await readClipboard();
+    if (!items.length) return [];
+    return Promise.all(
+      items.map(async item => {
+        const type = item.types[item.types.length - 1]!;
+        const blob = await item.getType(type);
+        const text = blob.type === "text/plain" ? await blob.text() : undefined;
+        return { type, blob, text };
+      }),
+    );
+  } catch {
+    return [];
+  }
+}
+
 /**
- * Creates a new reactive primitive for managing the clipboard.
+ * Creates a reactive primitive for managing the clipboard.
  *
- * @param data - Data signal to write to the clipboard.
- * @param deferInitial - Sets the value of the clipboard from the signal. defaults to false.
- * @return Returns a resource representing the clipboard elements and children.
+ * Returns an async `Accessor<ClipboardResourceItem[]>` backed by a Solid 2.0
+ * async memo. The accessor starts with an empty array synchronously (no initial
+ * suspension). After calling `refetch()`, it reads from the clipboard
+ * asynchronously. During a pending read, the previous value remains visible
+ * and `isPending(() => clipboard())` returns true.
+ *
+ * Wrap usage in a `<Loading>` boundary only if you need a fallback for the
+ * initial page load (the accessor never suspends before the first refetch).
+ *
+ * @param data - Optional signal; when provided its value is written to the
+ *   clipboard reactively on every change after the first (deferred by default).
+ * @param deferInitial - When false, also writes the initial signal value on
+ *   mount. Defaults to true (skip first write).
  *
  * @example
- * const [data, setData] = createSignal('Foo bar');
- * const [ clipboard, read ] = createClipboard(data);
+ * ```tsx
+ * const [data, setData] = createSignal("Hello");
+ * const [clipboard, refetch] = createClipboard(data);
+ *
+ * setData("World"); // writes "World" to clipboard
+ * refetch();        // reads current clipboard into clipboard()
+ *
+ * return (
+ *   <For each={clipboard()}>
+ *     {item => <Match when={item.type === "text/plain"}>{item.text}</Match>}
+ *   </For>
+ * );
+ * ```
  */
 export const createClipboard = (
   data?: Accessor<string | ClipboardItem[]>,
   deferInitial?: boolean,
 ): [
-  clipboardItems: InitializedResource<ClipboardResourceItem[]>,
+  clipboardItems: Accessor<ClipboardResourceItem[]>,
   refetch: VoidFunction,
   write: ClipboardSetter,
 ] => {
   if (isServer) {
-    return [
-      Object.assign(() => [], { loading: false, error: undefined }) as any,
-      () => void 0,
-      async () => void 0,
-    ];
+    return [() => [], () => void 0, async () => void 0];
   }
 
-  let init = true;
-  const [clipboard, { refetch }] = createResource<ClipboardResourceItem[]>(
-    async (_, info) => {
-      if (init) {
-        init = false;
-        return info.value!;
-      }
+  // equals: false so that setTrigger() always triggers a re-run, even if
+  // called multiple times with the same (undefined) value.
+  const [trigger, setTrigger] = createSignal<undefined>(undefined, { equals: false });
 
-      try {
-        const items = await readClipboard();
-        if (!items.length) return [];
+  const clipboard = createMemo<ClipboardResourceItem[]>(prev => {
+    trigger(); // track for manual refetch
+    // First evaluation: return [] synchronously so the accessor never suspends
+    // on initial render. Subsequent evaluations read the clipboard asynchronously.
+    if (prev === undefined) return [];
+    return readClipboardItems();
+  });
 
-        return Promise.all(
-          items.map(async item => {
-            const type = item.types[item.types.length - 1]!;
-            const blob = await item.getType(type);
-            const text = blob.type === "text/plain" ? await blob.text() : undefined;
-            return { type, blob, text };
-          }),
-        );
-      } catch {
-        return [];
-      }
-    },
-    { initialValue: [] },
-  );
+  const refetch = () => setTrigger();
 
   navigator.clipboard.addEventListener("clipboardchange", refetch);
   onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", refetch));
+
   if (data) {
-    createEffect(on(data, () => writeClipboard(data()), { defer: deferInitial || true }));
+    // Skip the first effect run by default — writing to clipboard should be
+    // triggered by explicit data changes, not by component mount.
+    let skip = deferInitial !== false;
+    createEffect(
+      () => data(),
+      value => {
+        if (skip) {
+          skip = false;
+          return;
+        }
+        writeClipboard(value);
+      },
+    );
   }
 
   return [clipboard, refetch, writeClipboard];
 };
 
 /**
- * A helpful directive that makes it easy to copy data to clipboard directly.
- * Using it on input should capture it's value, on an HTMLElement will use innerHTML.
+ * A directive factory for writing to clipboard on click.
  *
- * @param el - Element to bind to
- * @param options - Options to supply the directive with:
- * - `value` — Value to override the clipboard with.
- * - `write` — Optional write method to use for the clipboard action.
- * - `highlight` — The highlight modifier to use for the current element.
+ * Solid 2.0 replaced `use:directive` with `ref` directive factories.
+ * Apply as: `<input ref={copyToClipboard()} />`
+ *
+ * On an `<input>` or `<textarea>`, captures the element's `value`.
+ * On any other element, captures `innerHTML`.
+ * Both can be overridden via `options.value`.
  *
  * @example
- * ```ts
- * <input type="text" use:copyToClipboard />
+ * ```tsx
+ * // Simplest form — copies input value on click
+ * <input type="text" ref={copyToClipboard()} />
+ *
+ * // With explicit value
+ * <button ref={copyToClipboard({ value: "copy me" })}>Copy</button>
+ *
+ * // With reactive options
+ * <button ref={copyToClipboard(() => ({ value: text() }))}>Copy</button>
  * ```
  */
-export const copyToClipboard = (
-  el: HTMLElement,
-  options: MaybeAccessor<CopyToClipboardOptions>,
-) => {
-  if (isServer) {
-    return undefined;
-  }
+export const copyToClipboard = (options?: MaybeAccessor<CopyToClipboardOptions>) => {
+  let _el: HTMLElement | undefined;
+
   const setValue = () => {
-    const opts: CopyToClipboardOptions = access(options);
+    if (!_el) return;
+    const opts = access(options ?? ({} as CopyToClipboardOptions));
     let data = opts.value;
     if (!data) {
-      // @ts-ignore
-      data = el[["input", "texfield"].includes(el.tagName.toLowerCase()) ? "value" : "innerHTML"];
+      // @ts-expect-error — indexing with a computed key
+      data = _el[["input", "textarea"].includes(_el.tagName.toLowerCase()) ? "value" : "innerHTML"];
     }
-    let write;
-    if (opts.setter) {
-      write = opts.setter;
-    } else {
-      write = async (data: any) => await navigator.clipboard.writeText(data);
-    }
-    if (opts.highlight) opts.highlight(el);
+    const write = opts.setter ?? ((d: any) => navigator.clipboard.writeText(d));
+    if (opts.highlight) opts.highlight(_el);
     write(data);
   };
-  el.addEventListener("click", setValue);
-  onCleanup(() => el.removeEventListener("click", setValue));
+
+  onCleanup(() => _el?.removeEventListener("click", setValue));
+
+  return (el: HTMLElement) => {
+    _el = el;
+    el.addEventListener("click", setValue);
+  };
 };
 
 /**
@@ -195,10 +213,6 @@ export const newItem = newClipboardItem;
 
 /**
  * A modifier that highlights/selects a range on an HTML element.
- *
- * @param start - Starting point to highlight
- * @param end - Ending point to highlight
- * @returns Returns a modifier function.
  */
 export const element: Highlighter = (start: number = 0, end: number = 0) => {
   return (node: HTMLElement) => {
@@ -214,10 +228,6 @@ export const element: Highlighter = (start: number = 0, end: number = 0) => {
 
 /**
  * A modifier that highlights/selects a range on an HTML input element.
- *
- * @param start - Starting point to highlight
- * @param end - Ending point to highlight
- * @returns Returns a modifier function.
  */
 export const input: Highlighter = (start?: number, end?: number) => {
   return (node: HTMLInputElement) => {
