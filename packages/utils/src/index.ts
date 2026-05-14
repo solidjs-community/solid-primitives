@@ -2,12 +2,18 @@ import {
   getOwner,
   onCleanup,
   createSignal,
+  createStore,
   type Accessor,
   untrack,
   type AccessorArray,
   type EffectFunction,
+  type ComputeFunction,
   type NoInfer,
+  type Setter,
   type SignalOptions,
+  type Signal,
+  type Store,
+  type StoreSetter,
   sharedConfig,
   onMount,
   DEV,
@@ -158,17 +164,17 @@ export function defer<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue: Next,
-): EffectFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
+): ComputeFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: undefined,
-): EffectFunction<undefined | NoInfer<Next>>;
+): ComputeFunction<undefined | NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: Next,
-): EffectFunction<undefined | NoInfer<Next>> {
+): ComputeFunction<undefined | NoInfer<Next>> {
   const isArray = Array.isArray(deps);
   let prevInput: S;
   let shouldDefer = true;
@@ -176,7 +182,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
-      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]!();
     } else input = deps();
     if (shouldDefer) {
       shouldDefer = false;
@@ -256,14 +262,14 @@ export function createHydratableSignal<T>(
   options?: SignalOptions<T>,
 ): ReturnType<typeof createSignal<T>> {
   if (isServer) {
-    return createSignal(serverValue, options);
+    return createSignal(serverValue as Exclude<T, Function>, options);
   }
-  if (sharedConfig.context) {
-    const [state, setState] = createSignal(serverValue, options);
-    onMount(() => setState(() => update()));
+  if (sharedConfig.hydrating) {
+    const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
+    onSettled(() => { setState(() => update()); });
     return [state, setState];
   }
-  return createSignal(update(), options);
+  return createSignal(update() as Exclude<T, Function>, options);
 }
 
 /** @deprecated use {@link createHydratableSignal} instead */
@@ -398,4 +404,32 @@ export function safe<T>(
  */
 export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string) => B {
   return (raw: string): B => b(a(raw));
+}
+
+/**
+ * Wraps a setter function of any signal or store
+ *
+ * ```ts
+ * const [data, setData] = wrapSetter(
+ *   createSignal(initialData), 
+ *   (setter) => (next) => { console.log(next); return setter(next); },
+ * );
+ * ```
+ * If you destructure signal or store in a longer tuple, you need to use a const assertion for the types to work.
+ */
+export function wrapSetter<T>(signal: Signal<T>, wrapper: (setter: Setter<T>) => Setter<T>): Signal<T>;
+export function wrapSetter<T>(store: [Store<T>, StoreSetter<T>], wrapper: (setter: StoreSetter<T>) => StoreSetter<T>): [Store<T>, StoreSetter<T>];
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S;
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | readonly [...Signal<T>, ...any[]] | readonly [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S;
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S {
+  return [signalOrStore[0], wrapper(signalOrStore[1]), ...signalOrStore.slice(2)] as S;
 }

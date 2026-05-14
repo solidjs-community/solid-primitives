@@ -3,10 +3,9 @@ import {
   type Accessor,
   createMemo,
   createSignal,
-  type EffectFunction,
+  type ComputeFunction,
   getObserver,
   getOwner,
-  type MemoOptions,
   type NoInfer,
   onSettled,
   runWithOwner,
@@ -54,7 +53,8 @@ export function createStaticStore<T extends object>(
     let signal = cache[key];
     if (!signal) {
       if (!getObserver()) return copy[key];
-      cache[key] = signal = createSignal(copy[key], { pureWrite: true });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cache[key] = signal = createSignal(copy[key] as any, { ownedWrite: true });
       delete copy[key];
     }
     return signal[0]();
@@ -103,7 +103,7 @@ export function createHydratableStaticStore<T extends object>(
 
   if (sharedConfig.hydrating) {
     const [state, setState] = createStaticStore(serverValue);
-    onSettled(() => setState(update()));
+    onSettled(() => { setState(update()); });
     return [state, setState];
   }
 
@@ -131,35 +131,27 @@ export function createHydratableStaticStore<T extends object>(
  * ```
  */
 export function createDerivedStaticStore<Next extends Prev & object, Prev = Next>(
-  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
-): Next;
-export function createDerivedStaticStore<Next extends Prev & object, Init = Next, Prev = Next>(
-  fn: EffectFunction<Init | Prev, Next>,
-  value: Init,
-  options?: MemoOptions<Next>,
-): Next;
-export function createDerivedStaticStore<T extends object>(
-  fn: EffectFunction<T | undefined, T>,
-  value?: T,
-  options?: MemoOptions<T>,
-): T {
+  fn: ComputeFunction<undefined | NoInfer<Prev>, Next>,
+): Next {
   const o = getOwner(),
-    fnMemo = createMemo(fn, value, options),
-    store = { ...untrack(fnMemo) },
-    cache: Partial<Record<keyof T, Accessor<T[keyof T]>>> = {};
+    fnMemo = createMemo(fn as ComputeFunction<undefined | NoInfer<Next>, Next>),
+    store = { ...untrack(fnMemo) } as Next,
+    cache: Partial<Record<keyof Next, Accessor<Next[keyof Next]>>> = {};
 
-  for (const key in store)
-    Object.defineProperty(store, key, {
+  for (const key in store) {
+    const k = key as keyof Next;
+    Object.defineProperty(store, k, {
       get() {
-        let keyMemo = cache[key];
+        let keyMemo = cache[k];
         if (!keyMemo) {
-          if (!getObserver()) return fnMemo()[key];
-          runWithOwner(o, () => (cache[key] = keyMemo = createMemo(() => fnMemo()[key])));
+          if (!getObserver()) return fnMemo()![k];
+          runWithOwner(o, () => (cache[k] = keyMemo = createMemo(() => fnMemo()![k])));
         }
         return keyMemo!();
       },
       enumerable: true,
     });
+  }
 
   return store;
 }
