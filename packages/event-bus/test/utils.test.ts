@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, getOwner } from "solid-js";
+import { createRoot, flush, getOwner } from "solid-js";
 import { createEventBus, once, toEffect, toPromise } from "../src/index.js";
 
 describe("toPromise", () => {
@@ -38,31 +38,35 @@ describe("once", () => {
 
 describe("toEffect", () => {
   test("toEffect()", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      let capturedOwner: any;
-      const { listen, emit } = createEventBus<string>();
-      const emitInEffect = toEffect(emit);
-      listen(e => {
-        captured.push(e);
-        capturedOwner = getOwner();
-      });
+    new Promise<void>(resolve =>
+      createRoot(dispose => {
+        const captured: any[] = [];
+        let capturedOwner: any;
+        const { listen, emit } = createEventBus<string>();
+        const emitInEffect = toEffect(emit);
+        listen(e => {
+          captured.push(e);
+          capturedOwner = getOwner();
+        });
 
-      // owner gets set to null synchronously after root executes
-      setTimeout(() => {
-        emit("foo");
-        expect(
-          capturedOwner,
-          "owner will should not be available inside listener after using normal emit",
-        ).toBe(null);
+        // owner is null after the synchronous root callback returns
+        setTimeout(() => {
+          emit("foo");
+          expect(
+            capturedOwner,
+            "owner should not be available inside listener after using normal emit",
+          ).toBe(null);
 
-        emitInEffect("bar");
-        expect(captured).toEqual(["foo", "bar"]);
-        expect(
-          capturedOwner,
-          "owner will should be available inside listener after using emitInEffect",
-        ).not.toBe(null);
-        dispose();
-      }, 0);
-    }));
+          emitInEffect("bar");
+          flush();
+          expect(captured).toEqual(["foo", "bar"]);
+          expect(
+            capturedOwner,
+            "owner should be available inside listener after using emitInEffect",
+          ).not.toBe(null);
+          dispose();
+          resolve();
+        }, 0);
+      }),
+    ));
 });

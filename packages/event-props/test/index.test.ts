@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createEffect, createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createEventProps } from "../src/index.js";
 
 describe("event-props", () => {
@@ -17,19 +17,21 @@ describe("event-props", () => {
   //@ts-expect-error
   props.onclick?.(new MouseEvent("click"));
 
-  it("it will support multiple events", () =>
-    new Promise<void>(resolve =>
-      createRoot(dispose => {
-        const [store, props] = createEventProps("keydown", "keyup");
-        props.onkeydown(new KeyboardEvent("keydown", { key: "A" }));
-        props.onkeyup(new KeyboardEvent("keyup", { key: "A" }));
-        const expected = [undefined, "A"];
-        createEffect(() => {
-          expect(store.keydown?.key).toBe("A");
-          expect(store.keyup?.key).toBe("A");
-          dispose();
-          resolve();
-        });
-      }),
-    ));
+  it("it will support multiple events", () => {
+    // Signal writes from event handlers are always outside any reactive scope
+    // in production (DOM events fire asynchronously). Mirror that here by
+    // returning the primitives from createRoot and calling handlers outside it.
+    const [[store, props], dispose] = createRoot(
+      d => [createEventProps("keydown", "keyup"), d] as const,
+    );
+
+    props.onkeydown(new KeyboardEvent("keydown", { key: "A" }));
+    props.onkeyup(new KeyboardEvent("keyup", { key: "A" }));
+    flush();
+
+    expect(store.keydown?.key).toBe("A");
+    expect(store.keyup?.key).toBe("A");
+
+    dispose();
+  });
 });
