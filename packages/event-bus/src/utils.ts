@@ -79,6 +79,7 @@ export function toEffect<T>(emit: Emit<T>): Emit<T> {
  * In Solid 2.0 all signal writes are automatically batched via microtask. This function
  * is kept for backwards compatibility but is now a no-op — it simply returns the bus unchanged.
  *
+ * @deprecated No-op in Solid 2.0 — batching is automatic. Remove the wrapper.
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#batchEmits
  */
 export function batchEmits<T extends { emit: AnyFunction }>(bus: T): T {
