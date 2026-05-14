@@ -12,13 +12,24 @@
 
 import { createEffect, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { contains, INTERNAL_OPTIONS, access, type MaybeAccessor } from "@solid-primitives/utils";
+import { access, type MaybeAccessor } from "@solid-primitives/utils";
+
+function contains(wrapper: HTMLElement, target: HTMLElement): boolean {
+  if (wrapper.contains(target)) return true;
+  let current: HTMLElement | null = target;
+  while (current) {
+    if (current === wrapper) return true;
+    // @ts-expect-error: _$host is a SolidJS-internal property set on portal roots
+    current = current._$host ?? current.parentElement;
+  }
+  return false;
+}
 
 type Axis = "x" | "y";
 
 export type CreatePreventScrollProps = {
   /** Element that is allowed to scroll. Wheel/touch events inside it are passed through. *Default = `null`* */
-  element?: MaybeAccessor<HTMLElement | null>;
+  element?: MaybeAccessor<HTMLElement | undefined>;
   /** Whether scroll prevention is active. *Default = `true`* */
   enabled?: MaybeAccessor<boolean>;
   /** Hide the `<body>` scrollbar while active. *Default = `true`* */
@@ -36,7 +47,9 @@ export type CreatePreventScrollProps = {
 // ─── Module-level stack ───────────────────────────────────────────────────────
 // Tracks active instances; only the topmost one installs wheel/touch handlers.
 
-const [preventScrollStack, setPreventScrollStack] = createSignal<string[]>([], INTERNAL_OPTIONS);
+const [preventScrollStack, setPreventScrollStack] = createSignal<string[]>([], {
+  ownedWrite: true,
+});
 
 const isActive = (id: string): boolean => {
   const stack = preventScrollStack();
@@ -129,7 +142,7 @@ function getScrollAtLocation(
   const directionFactor =
     axis === "x" && window.getComputedStyle(location).direction === "rtl" ? -1 : 1;
 
-  let currentElement: HTMLElement | null = location;
+  let currentElement: HTMLElement | undefined = location;
   let availableScroll = 0;
   let availableScrollTop = 0;
   let wrapperReached = false;
@@ -158,9 +171,9 @@ function wouldScroll(
   target: HTMLElement,
   axis: Axis,
   delta: number,
-  wrapper: HTMLElement | null,
+  wrapper: HTMLElement | undefined,
 ): boolean {
-  const targetInWrapper = wrapper !== null && contains(wrapper, target);
+  const targetInWrapper = wrapper && contains(wrapper, target);
   const [availableScroll, availableScrollTop] = getScrollAtLocation(
     target,
     axis,
@@ -188,8 +201,8 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
   const id = String(_nextId++);
 
   let currentTouchStart: [number, number] = [0, 0];
-  let currentTouchStartAxis: Axis | null = null;
-  let currentTouchStartDelta: number | null = null;
+  let currentTouchStartAxis: Axis | undefined;
+  let currentTouchStartDelta: number | undefined;
 
   // 1. Manage the active-instance stack.
   createEffect(
@@ -210,7 +223,13 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
       preventScrollbarShiftMode: access(props.preventScrollbarShiftMode) ?? "padding",
       restoreScrollPosition: access(props.restoreScrollPosition) ?? true,
     }),
-    ({ enabled, hideScrollbar, preventScrollbarShift, preventScrollbarShiftMode, restoreScrollPosition }) => {
+    ({
+      enabled,
+      hideScrollbar,
+      preventScrollbarShift,
+      preventScrollbarShiftMode,
+      restoreScrollPosition,
+    }) => {
       if (!enabled || !hideScrollbar) return;
 
       const { body } = document;
@@ -246,7 +265,7 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
     () => ({
       active: isActive(id),
       enabled: access(props.enabled) ?? true,
-      wrapper: access(props.element) ?? null,
+      wrapper: access(props.element) ?? undefined,
       allowPinchZoom: access(props.allowPinchZoom) ?? false,
     }),
     ({ active, enabled, wrapper, allowPinchZoom }) => {
@@ -269,8 +288,8 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
       const logTouchStart = (event: TouchEvent) => {
         const touch = event.changedTouches[0];
         currentTouchStart = touch ? [touch.clientX, touch.clientY] : [0, 0];
-        currentTouchStartAxis = null;
-        currentTouchStartDelta = null;
+        currentTouchStartAxis = undefined;
+        currentTouchStartDelta = undefined;
       };
 
       const maybePreventTouch = (event: TouchEvent) => {
@@ -280,7 +299,7 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
         if (event.touches.length === 2) {
           shouldCancel = !allowPinchZoom;
         } else {
-          if (currentTouchStartAxis === null || currentTouchStartDelta === null) {
+          if (currentTouchStartAxis === undefined || currentTouchStartDelta === undefined) {
             const touch = event.changedTouches[0];
             const curr: [number, number] = touch ? [touch.clientX, touch.clientY] : [0, 0];
             const delta: [number, number] = [
@@ -301,8 +320,7 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
               currentTouchStartDelta,
               wrapper,
             );
-            shouldCancel =
-              wrapper && contains(wrapper, target) ? !wouldResultInScroll : true;
+            shouldCancel = wrapper && contains(wrapper, target) ? !wouldResultInScroll : true;
           }
         }
 

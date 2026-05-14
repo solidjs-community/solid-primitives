@@ -1,15 +1,15 @@
+import { type Accessor, createSignal, onSettled, sharedConfig } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore } from "@solid-primitives/static-store";
-import { type Accessor, createSignal, onSettled, sharedConfig } from "solid-js";
-import { isServer } from "@solidjs/web";
 
-export function getScrollParent(node: Element | null): Element {
+export function getScrollParent(node: Element | undefined): Element {
   if (isServer) {
     return {} as Element;
   }
   while (node && !isScrollable(node)) {
-    node = node.parentElement;
+    node = node.parentElement ?? undefined;
   }
 
   return node || document.scrollingElement || document.documentElement;
