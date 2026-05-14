@@ -9,16 +9,12 @@ import {
   runWithOwner,
   type Setter,
   type ComputeFunction,
+  type MemoOptions,
   type NoInfer,
   type Owner,
   type SignalOptions,
   DEV,
 } from "solid-js";
-
-type MemoOptions<T> = {
-  name?: string;
-  equals?: false | ((prev: T, next: T) => boolean);
-};
 import { isServer } from "@solidjs/web";
 import { type EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
 
@@ -117,11 +113,11 @@ export function createLatest<T extends readonly Accessor<any>[]>(
  */
 export function createLatestMany<T extends readonly Accessor<any>[]>(
   sources: T,
-  options?: EffectOptions,
+  options?: MemoOptions<ReturnType<T[number]>[]>,
 ): Accessor<ReturnType<T[number]>[]>;
 export function createLatestMany<T>(
   sources: readonly Accessor<T>[],
-  options?: EffectOptions,
+  options?: MemoOptions<T[]>,
 ): Accessor<T[]> {
   const memos = sources.map((source, i) => {
     const obj = { dirty: true, get: null as any as Accessor<T> };
@@ -208,19 +204,19 @@ export function createWritableMemo<T>(
 export function createLazyMemo<T>(
   calc: (prev: T) => T,
   value: T,
-  options?: EffectOptions,
+  options?: MemoOptions<T>,
 ): Accessor<T>;
 
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: undefined,
-  options?: EffectOptions,
+  options?: MemoOptions<T>,
 ): Accessor<T>;
 
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: T,
-  options?: EffectOptions,
+  options?: MemoOptions<T>,
 ): Accessor<T> {
   if (isServer) {
     let calculated = false;
