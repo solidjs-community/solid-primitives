@@ -156,13 +156,17 @@ export function createMasonry<T>(
 ): Accessor<any[]> & { height: Accessor<number> } {
   const { source, mapHeight, mapElement } = options,
     [memo, setMemo] = createSignal<VoidFunction | undefined>(undefined, { ownedWrite: true }),
-    mapped = createMemo(
-      mapArray(
-        source,
-        mapElement && mapElement.length > 1
-          ? (source, index) => mapData(source(), () => memo()?.(), mapHeight, mapElement, index)
-          : source => mapData(source(), () => memo()?.(), mapHeight, mapElement, noopIndex),
-      ),
+    mapped = mapArray<T, any>(
+      source,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (item: any, index: any) =>
+        mapData(
+          item,
+          () => memo()?.(),
+          mapHeight,
+          mapElement,
+          mapElement && mapElement.length > 1 ? index : noopIndex,
+        ),
     ),
     columns = asAccessor(options.columns),
     getColumns = createMemo(
