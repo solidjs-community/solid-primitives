@@ -3,8 +3,8 @@ packages:
   - site
 
 allowBuilds:
-  '@parcel/watcher': set this to true or false
-  esbuild: set this to true or false
+  '@parcel/watcher': true
+  esbuild: true
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
