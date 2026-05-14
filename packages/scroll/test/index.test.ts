@@ -194,6 +194,32 @@ describe("createPreventScroll", () => {
       dispose();
     }));
 
+  it("accepts a signal ref as element — wrapper updates reactively", () =>
+    createRoot(dispose => {
+      const container = document.createElement("div");
+      const [ref, setRef] = createSignal<HTMLElement | undefined>(undefined, {
+        ownedWrite: true,
+      });
+
+      const addSpy = vi.spyOn(document, "addEventListener");
+
+      createPreventScroll({ element: ref });
+      flush();
+
+      const wheelCallsAfterInit = addSpy.mock.calls.filter(([e]) => e === "wheel").length;
+      expect(wheelCallsAfterInit).toBe(1);
+
+      // Changing the signal causes the effect to re-run and reinstall listeners with the new wrapper
+      setRef(container);
+      flush();
+
+      const wheelCallsAfterUpdate = addSpy.mock.calls.filter(([e]) => e === "wheel").length;
+      expect(wheelCallsAfterUpdate).toBe(2);
+
+      addSpy.mockRestore();
+      dispose();
+    }));
+
   it("stacks multiple instances — only top one handles events", () =>
     createRoot(dispose1 => {
       createPreventScroll();

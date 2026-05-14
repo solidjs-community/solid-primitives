@@ -128,7 +128,7 @@ Adapted from [solid-prevent-scroll](https://github.com/corvudev/corvu/tree/main/
 
 ### How to use it
 
-```ts
+```tsx
 import { createPreventScroll } from "@solid-primitives/scroll";
 
 // Prevent all page scroll (no element specified)
@@ -136,6 +136,12 @@ createPreventScroll();
 
 // Prevent scroll outside a specific element
 createPreventScroll({ element: () => myElement });
+
+// Using a signal ref — preferred pattern for JSX refs
+const [ref, setRef] = createSignal<HTMLElement>();
+createPreventScroll({ element: ref });
+
+<div ref={setRef} />;
 
 // Reactive enabled toggle
 const [open, setOpen] = createSignal(false);
@@ -146,7 +152,7 @@ createPreventScroll({ enabled: open });
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `element` | `MaybeAccessor<HTMLElement \| null>` | `null` | Allow scroll inside this element. Events outside it are cancelled. |
+| `element` | `MaybeAccessor<HTMLElement \| undefined>` | `undefined` | Allow scroll inside this element. Events outside it are cancelled. |
 | `enabled` | `MaybeAccessor<boolean>` | `true` | Whether scroll prevention is active. |
 | `hideScrollbar` | `MaybeAccessor<boolean>` | `true` | Hide the `<body>` scrollbar while active. |
 | `preventScrollbarShift` | `MaybeAccessor<boolean>` | `true` | Compensate for the hidden scrollbar width to avoid layout shift. |
