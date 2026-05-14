@@ -691,9 +691,12 @@ importers:
 
   packages/platform:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/pointer:
     dependencies:
@@ -2939,6 +2942,11 @@ packages:
     resolution: {integrity: sha512-ma1TBYqoTju87tkqrHExMReM5Z/+DTXSmi30CCTavtwuR73Bsn4rVGqm528p4sL2koRMfAuBMkrhuttjzhL68g==}
     peerDependencies:
       vinxi: ^0.5.3
+
+  '@solidjs/web@2.0.0-beta.10':
+    resolution: {integrity: sha512-Ox7MBv19kuxHoHhWoLCCcc6aykSgaqzWvWT7RB66VqlFnQ8Lid2ncd30g5L4XC0GB+MN/WZVb68tiYrAFUDIAg==}
+    peerDependencies:
+      solid-js: ^2.0.0-beta.10
 
   '@solidjs/web@2.0.0-beta.12':
     resolution: {integrity: sha512-Wc+/LctUqfNQs98VnijoEu4gWFOSu/kUcZiBIjQ+S9ZUuT6Z77CRkmiZ0C8dyOhNPbTgpU2JYH6B5wqY2eqS0A==}
@@ -9624,6 +9632,12 @@ snapshots:
       - solid-js
       - supports-color
       - vite
+
+  '@solidjs/web@2.0.0-beta.10(solid-js@2.0.0-beta.10)':
+    dependencies:
+      seroval: 1.5.2
+      seroval-plugins: 1.5.2(seroval@1.5.2)
+      solid-js: 2.0.0-beta.10
 
   '@solidjs/web@2.0.0-beta.12(solid-js@2.0.0-beta.12)':
     dependencies:
