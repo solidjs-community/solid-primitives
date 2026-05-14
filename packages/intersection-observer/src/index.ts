@@ -5,7 +5,6 @@ import {
   createStore,
   runWithOwner,
   untrack,
-  NotReadyError,
   DEV,
 } from "solid-js";
 import type { Accessor } from "solid-js";
@@ -112,12 +111,7 @@ export function createIntersectionObserver(
   elements: Accessor<Element[]>,
   options?: MaybeAccessor<IntersectionObserverInit>,
 ): readonly [entries: readonly IntersectionObserverEntry[], isVisible: (el: Element) => boolean] {
-  if (isServer) {
-    const isVisible = (_el: Element): boolean => {
-      throw new NotReadyError("IntersectionObserver not available on server");
-    };
-    return [[], isVisible] as const;
-  }
+  if (isServer) return [[], () => false] as const;
 
   const [entries, setEntries] = createStore<IntersectionObserverEntry[]>([]);
   const indexMap = new WeakMap<Element, number>();
@@ -309,12 +303,7 @@ export function createVisibilityObserver(
   options?: IntersectionObserverInit & { initialValue?: boolean },
   setter?: MaybeAccessor<VisibilitySetter>,
 ): Accessor<boolean> {
-  if (isServer) {
-    if (options?.initialValue !== undefined) return () => options.initialValue!;
-    return () => {
-      throw new NotReadyError("Visibility not yet observed");
-    };
-  }
+  if (isServer) return () => options?.initialValue ?? false;
 
   // rawVisible tracks the actual observed value; NOT_SET means "first IO hasn't fired yet".
   const [rawVisible, setRawVisible] = createSignal<boolean | typeof NOT_SET>(

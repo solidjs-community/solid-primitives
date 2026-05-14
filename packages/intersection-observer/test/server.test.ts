@@ -20,20 +20,20 @@ describe("API works in SSR", () => {
     expect(options).not.toBeCalled();
   });
 
-  test("createIntersectionObserver() - SSR returns tuple with throwing isVisible", () => {
+  test("createIntersectionObserver() - SSR returns tuple with isVisible returning false", () => {
     const [entries, isVisible] = createIntersectionObserver(() => []);
     expect(entries).toEqual([]);
-    expect(() => isVisible({} as Element)).toThrow();
+    expect(isVisible({} as Element)).toBe(false);
   });
 
   test("createViewportObserver() - SSR", () => {
     expect(() => createViewportObserver()).not.toThrow();
   });
 
-  test("createVisibilityObserver() - SSR throws before first observation without initialValue", () => {
+  test("createVisibilityObserver() - SSR returns false without initialValue", () => {
     const div = {} as Element;
     const isVisible = createVisibilityObserver(div);
-    expect(() => isVisible()).toThrow();
+    expect(isVisible()).toBe(false);
   });
 
   test("createVisibilityObserver() - SSR returns initialValue when provided", () => {
