@@ -9,7 +9,7 @@ import {
   DEV,
 } from "solid-js";
 import type { Accessor } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import {
   access,
   type FalsyValue,
@@ -111,10 +111,7 @@ export function makeIntersectionObserver(
 export function createIntersectionObserver(
   elements: Accessor<Element[]>,
   options?: MaybeAccessor<IntersectionObserverInit>,
-): readonly [
-  entries: readonly IntersectionObserverEntry[],
-  isVisible: (el: Element) => boolean,
-] {
+): readonly [entries: readonly IntersectionObserverEntry[], isVisible: (el: Element) => boolean] {
   if (isServer) {
     const isVisible = (_el: Element): boolean => {
       throw new NotReadyError("IntersectionObserver not available on server");
@@ -144,7 +141,10 @@ export function createIntersectionObserver(
     }
   };
 
-  let io = new IntersectionObserver(ioCallback, untrack(() => access(options)));
+  let io = new IntersectionObserver(
+    ioCallback,
+    untrack(() => access(options)),
+  );
   onCleanup(() => io.disconnect());
 
   if (typeof options === "function") {
@@ -158,10 +158,14 @@ export function createIntersectionObserver(
   createEffect(
     () => elements(),
     (list: Element[], prev: Element[] = []) => {
-      handleDiffArray(list, prev, el => observe(el, io), el => io.unobserve(el));
+      handleDiffArray(
+        list,
+        prev,
+        el => observe(el, io),
+        el => io.unobserve(el),
+      );
       trackedEls = list;
     },
-    [] as Element[],
   );
 
   // Reads the entry for the given element from the store. Throws NotReadyError
@@ -258,7 +262,12 @@ export function createViewportObserver(...a: any) {
     remove(el);
   };
   const start = () => initial.forEach(([el, cb]) => addEntry(el, cb));
-  createEffect(() => {}, () => { start(); });
+  createEffect(
+    () => {},
+    () => {
+      start();
+    },
+  );
   return [addEntry, { remove: removeEntry, start, stop, instance }];
 }
 
