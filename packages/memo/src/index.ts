@@ -1,29 +1,22 @@
 import {
   type Accessor,
   createSignal,
-  createComputed,
   untrack,
   getOwner,
   onCleanup,
   createMemo,
+  createReaction,
   runWithOwner,
   type Setter,
-  on,
-  createRoot,
-  type AccessorArray,
-  type EffectFunction,
+  type ComputeFunction,
   type MemoOptions,
   type NoInfer,
   type Owner,
   type SignalOptions,
   DEV,
 } from "solid-js";
-import { isServer } from "solid-js/web";
-import { debounce, throttle } from "@solid-primitives/scheduled";
-import { noop, type EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
-
-export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
-export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
+import { isServer } from "@solidjs/web";
+import { type EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
 
 const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
   fn.length > 0 ? () => fn(untrack(v)) : (fn as () => T);
@@ -56,12 +49,9 @@ export function createPureReaction(
   }
 
   const owner = getOwner()!;
-  const disposers = new Set<VoidFunction>();
   let trackers = 0;
   let disposed = false;
   onCleanup(() => {
-    for (const fn of disposers) fn();
-    disposers.clear();
     disposed = true;
   });
 
@@ -72,19 +62,12 @@ export function createPureReaction(
       return;
     }
     trackers++;
-    createRoot(dispose => {
-      disposers.add(dispose);
-      let init = true;
-      createComputed(() => {
-        if (init) {
-          init = false;
-          return tracking();
-        }
+    const r = runWithOwner(owner, () =>
+      createReaction(() => {
         if (--trackers === 0) untrack(onInvalidate);
-        dispose();
-        disposers.delete(dispose);
-      }, options);
-    }, owner);
+      }, options),
+    );
+    r(tracking);
   };
 }
 
@@ -109,11 +92,10 @@ export function createLatest<T extends readonly Accessor<any>[]>(
   const memos = sources.map((source, i) =>
     createMemo(
       () => ((index = i), source()),
-      undefined,
       DEV ? { name: i + 1 + ". source", equals: false } : EQUALS_FALSE_OPTIONS,
     ),
   );
-  return createMemo(() => memos.map(m => m())[index]!, undefined, options);
+  return createMemo(() => memos.map(m => m())[index]!, options);
 }
 
 /**
@@ -131,18 +113,17 @@ export function createLatest<T extends readonly Accessor<any>[]>(
  */
 export function createLatestMany<T extends readonly Accessor<any>[]>(
   sources: T,
-  options?: EffectOptions,
+  options?: MemoOptions<ReturnType<T[number]>[]>,
 ): Accessor<ReturnType<T[number]>[]>;
 export function createLatestMany<T>(
   sources: readonly Accessor<T>[],
-  options?: EffectOptions,
+  options?: MemoOptions<T[]>,
 ): Accessor<T[]> {
   const memos = sources.map((source, i) => {
     const obj = { dirty: true, get: null as any as Accessor<T> };
 
     obj.get = createMemo(
       () => ((obj.dirty = true), source()),
-      undefined,
       DEV ? { name: i + 1 + ". source", equals: false } : EQUALS_FALSE_OPTIONS,
     );
 
@@ -178,10 +159,10 @@ export function createLatestMany<T>(
  * setResult(5) // overwrites calculation result
  */
 export function createWritableMemo<Next extends Prev, Prev = Next>(
-  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
+  fn: ComputeFunction<undefined | NoInfer<Prev>, Next>,
 ): [signal: Accessor<Next>, setter: Setter<Next>];
 export function createWritableMemo<Next extends Prev, Init = Next, Prev = Next>(
-  fn: EffectFunction<Init | Prev, Next>,
+  fn: ComputeFunction<Init | Prev, Next>,
   value: Init,
   options?: MemoOptions<Next>,
 ): [signal: Accessor<Next>, setter: Setter<Next>];
@@ -192,10 +173,9 @@ export function createWritableMemo<T>(
 ): [signal: Accessor<T>, setter: Setter<T>] {
   let combined: Accessor<T> = () => value as T;
 
-  const [signal, setSignal] = createSignal(value as T, EQUALS_FALSE_OPTIONS),
+  const [signal, setSignal] = createSignal(value as Exclude<T, Function>, { equals: false, ownedWrite: true }),
     memo = createMemo(
       callbackWith(fn, () => combined()),
-      value,
       EQUALS_FALSE_OPTIONS,
     );
 
@@ -206,161 +186,6 @@ export function createWritableMemo<T>(
         typeof setter === "function" ? setter(untrack(combined)) : setter,
       )) as Setter<T>,
   ];
-}
-
-/**
- * @deprecated Please use `createSchedule` from `@solid-primitives/schedule` instead.
- */
-export function createDebouncedMemo<Next extends Prev, Prev = Next>(
-  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
-  timeoutMs: number,
-): Accessor<Next>;
-export function createDebouncedMemo<Next extends Prev, Init = Next, Prev = Next>(
-  fn: EffectFunction<Init | Prev, Next>,
-  timeoutMs: number,
-  value: Init,
-  options?: MemoOptions<Next>,
-): Accessor<Next>;
-export function createDebouncedMemo<T>(
-  fn: (prev: T | undefined) => T,
-  timeoutMs: number,
-  value?: T,
-  options?: MemoOptions<T | undefined>,
-): Accessor<T> {
-  const memo = createMemo(() => fn(value), undefined, options);
-  if (isServer) {
-    return memo;
-  }
-  const [signal, setSignal] = createSignal(untrack(memo));
-  const updateSignal = debounce(() => (value = setSignal(memo)), timeoutMs);
-  createComputed(on(memo, updateSignal, { defer: true }));
-  return signal;
-}
-
-/**
- * @deprecated Please use `createSchedule` from `@solid-primitives/schedule` instead.
- */
-export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
-  deps: AccessorArray<S> | Accessor<S>,
-  fn: (input: S, prevInput: S | undefined, prev: undefined | NoInfer<Prev>) => Next,
-  timeoutMs: number,
-): Accessor<Next>;
-export function createDebouncedMemoOn<S, Next extends Prev, Init = Next, Prev = Next>(
-  deps: AccessorArray<S> | Accessor<S>,
-  fn: (input: S, prevInput: S | undefined, prev: Prev | Init) => Next,
-  timeoutMs: number,
-  value: Init,
-  options?: MemoOptions<Next>,
-): Accessor<Next>;
-export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
-  deps: AccessorArray<S> | Accessor<S>,
-  fn: (input: S, prevInput: S | undefined, prev: Prev | undefined) => Next,
-  timeoutMs: number,
-  value?: Prev,
-  options?: MemoOptions<Next | undefined>,
-): Accessor<Next> {
-  if (isServer) {
-    return createMemo(on(deps, fn as any) as () => any, value);
-  }
-  let init = true;
-  const [signal, setSignal] = createSignal(
-    (() => {
-      let v!: Next;
-      createComputed(
-        on(deps, (input, prevInput) => {
-          if (init) {
-            v = fn(input, prevInput, value);
-            init = false;
-          } else updateSignal(input, prevInput);
-        }),
-      );
-      return v;
-    })(),
-    options,
-  );
-  const updateSignal = debounce((input: S, prevInput: S | undefined) => {
-    setSignal(() => fn(input, prevInput, signal()));
-  }, timeoutMs);
-  return signal;
-}
-
-/**
- * @deprecated Please use `createSchedule` from `@solid-primitives/schedule` instead.
- */
-export function createThrottledMemo<Next extends Prev, Prev = Next>(
-  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
-  timeoutMs: number,
-): Accessor<Next>;
-export function createThrottledMemo<Next extends Prev, Init = Next, Prev = Next>(
-  fn: EffectFunction<Init | Prev, Next>,
-  timeoutMs: number,
-  value: Init,
-  options?: MemoOptions<Next>,
-): Accessor<Next>;
-export function createThrottledMemo<T>(
-  fn: (prev: T | undefined) => T,
-  timeoutMs: number,
-  value?: T,
-  options?: MemoOptions<T | undefined>,
-): Accessor<T> {
-  if (isServer) {
-    return createMemo(fn);
-  }
-  let onInvalidate: VoidFunction = noop;
-  const track = createPureReaction(() => onInvalidate());
-  const [state, setState] = createSignal(
-    (() => {
-      let v!: T;
-      track(() => (v = fn(value)));
-      return v;
-    })(),
-    options,
-  );
-  onInvalidate = throttle(() => track(() => setState(fn)), timeoutMs);
-  return state;
-}
-
-/**
- * @deprecated Please just use `createResource` instead.
- */
-export function createAsyncMemo<T>(
-  calc: AsyncMemoCalculation<T, T>,
-  options: MemoOptionsWithValue<T> & { value: T },
-): Accessor<T>;
-export function createAsyncMemo<T>(
-  calc: AsyncMemoCalculation<T>,
-  options?: MemoOptionsWithValue<T>,
-): Accessor<T | undefined>;
-export function createAsyncMemo<T>(
-  calc: AsyncMemoCalculation<T>,
-  options: MemoOptionsWithValue<T | undefined> = {},
-): Accessor<T | undefined> {
-  if (isServer) {
-    return () => options.value;
-  }
-  const [state, setState] = createSignal(options.value, options);
-  /** pending promises from oldest to newest */
-  const order: Promise<T>[] = [];
-
-  // prettier-ignore
-  createComputed(async () => {
-    const value = calc(untrack(state));
-    if (value instanceof Promise) {
-      order.push(value);
-      // resolved value will only be written to the signal,
-      // if the promise wasn't removed from the array
-      value.then(r => order.includes(value) && setState(() => r))
-      // when a promise finishes, it removes itself, and every older promise from array,
-      // blocking them from overwriting the state if they finish after
-      value.finally(() => {
-        const index = order.indexOf(value);
-        order.splice(0, index + 1);
-      });
-    }
-    else setState(() => value);
-  }, undefined, options);
-
-  return state;
 }
 
 /**
@@ -379,19 +204,19 @@ export function createAsyncMemo<T>(
 export function createLazyMemo<T>(
   calc: (prev: T) => T,
   value: T,
-  options?: EffectOptions,
+  options?: MemoOptions<T>,
 ): Accessor<T>;
 
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: undefined,
-  options?: EffectOptions,
+  options?: MemoOptions<T>,
 ): Accessor<T>;
 
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: T,
-  options?: EffectOptions,
+  options?: MemoOptions<T>,
 ): Accessor<T> {
   if (isServer) {
     let calculated = false;
@@ -404,23 +229,15 @@ export function createLazyMemo<T>(
     };
   }
 
-  let isReading = false,
-    isStale: boolean | undefined = true;
+  let prevValue: T | undefined = value;
 
-  const [track, trigger] = createSignal(void 0, EQUALS_FALSE_OPTIONS),
-    memo = createMemo<T>(
-      p => (isReading ? calc(p) : ((isStale = !track()), p)),
-      value as T,
-      DEV ? { name: options?.name, equals: false } : EQUALS_FALSE_OPTIONS,
-    );
-
-  return (): T => {
-    isReading = true;
-    if (isStale) isStale = trigger();
-    const v = memo();
-    isReading = false;
-    return v;
-  };
+  return createMemo<T>(
+    (): T => {
+      prevValue = calc(prevValue);
+      return prevValue;
+    },
+    DEV ? { lazy: true, name: options?.name, equals: false } : { lazy: true, equals: false },
+  );
 }
 
 export type CacheCalculation<Key, Value> = (key: Key, prev: Value | undefined) => Value;
@@ -475,9 +292,14 @@ export function createMemoCache<Key, Value>(
 
   const run: CacheKeyAccessor<Key, Value> = key => {
     if (cache.has(key)) return (cache.get(key) as Accessor<Value>)();
+    let prevVal: Value | undefined;
     const memo = runWithOwner(owner, () =>
-      createLazyMemo<Value>(prev => calc(key, prev), undefined, options),
-    )!;
+      createMemo<Value>((): Value => {
+        const v = calc(key, prevVal);
+        prevVal = v;
+        return v;
+      }, options),
+    );
     if (options.size === undefined || cache.size < options.size) cache.set(key, memo);
     return memo();
   };
@@ -502,7 +324,7 @@ export function createReducer<T, ActionData extends Array<any>>(
   initialValue: T,
   options?: SignalOptions<T>,
 ): [accessor: Accessor<T>, dispatch: (...args: ActionData) => void] {
-  const [state, setState] = createSignal(initialValue, options);
+  const [state, setState] = createSignal(initialValue as Exclude<T, Function>, { ownedWrite: true, ...options });
 
   return [state, (...args: ActionData) => void setState(state => dispatcher(state, ...args))];
 }
