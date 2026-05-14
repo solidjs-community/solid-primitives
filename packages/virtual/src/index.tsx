@@ -1,5 +1,6 @@
 import { For, createSignal } from "solid-js";
-import type { Accessor, JSX } from "solid-js";
+import type { Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { access } from "@solid-primitives/utils";
 import type { MaybeAccessor } from "@solid-primitives/utils";
 
@@ -34,36 +35,39 @@ export function createVirtualList<T extends readonly any[]>({
   rowHeight,
   overscanCount,
 }: VirtualListConfig<T>): VirtualListReturn<T> {
-  items = access(items) || ([] as any as T);
-  rootHeight = access(rootHeight);
-  rowHeight = access(rowHeight);
-  overscanCount = access(overscanCount) || 1;
+  const [offset, setOffset] = createSignal(0, { ownedWrite: true });
 
-  const [offset, setOffset] = createSignal(0);
-
-  const getFirstIdx = () => Math.max(0, Math.floor(offset() / rowHeight) - overscanCount);
-
-  const getLastIdx = () =>
-    Math.min(
-      items.length,
-      Math.floor(offset() / rowHeight) + Math.ceil(rootHeight / rowHeight) + overscanCount,
-    );
+  const getItems = () => (access(items) || []) as unknown as T;
+  const getRootHeight = () => access(rootHeight);
+  const getRowHeight = () => access(rowHeight);
+  const getOverscanCount = () => access(overscanCount) || 1;
 
   return [
-    () => ({
-      containerHeight: items.length * rowHeight,
-      viewerTop: getFirstIdx() * rowHeight,
-      visibleItems: items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
-    }),
+    () => {
+      const resolvedItems = getItems();
+      const rowH = getRowHeight();
+      const currentOffset = offset();
+      const overscan = getOverscanCount();
+      const firstIdx = Math.max(0, Math.floor(currentOffset / rowH) - overscan);
+      const lastIdx = Math.min(
+        resolvedItems.length,
+        Math.floor(currentOffset / rowH) + Math.ceil(getRootHeight() / rowH) + overscan,
+      );
+      return {
+        containerHeight: resolvedItems.length * rowH,
+        viewerTop: firstIdx * rowH,
+        visibleItems: resolvedItems.slice(firstIdx, lastIdx) as unknown as T,
+      };
+    },
     e => {
-      // @ts-expect-error
-      if (e.target?.scrollTop !== undefined) setOffset(e.target.scrollTop);
+      const target = e.target as HTMLElement | null;
+      if (target?.scrollTop !== undefined) setOffset(target.scrollTop);
     },
   ];
 }
 
 type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
-  children: (item: T[number], index: Accessor<number>) => U;
+  children: (item: Accessor<T[number]>, index: Accessor<number>) => U;
   each: T | undefined | null | false;
   fallback?: JSX.Element;
   overscanCount?: number;

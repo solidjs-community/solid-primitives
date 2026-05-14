@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { type Accessor, createRoot, createSignal, flush } from "solid-js";
 import { createPresence } from "../src/index.js";
 
 beforeAll(() => {
@@ -74,64 +74,71 @@ describe("createPresence", () => {
       dispose();
     }));
 
-  it("is in a mounted & animating state for the transitionDuration and then it is only in a mounted state", () =>
-    createRoot(async dispose => {
-      const [shouldRender, setShouldRender] = createSignal(false);
-      const transitionDuration = 50;
-      const { isMounted, isAnimating } = createPresence(shouldRender, {
-        transitionDuration,
-      });
-      expect(isMounted()).toBe(false);
-      expect(isAnimating()).toBe(false);
-      setShouldRender(true);
-      await vi.advanceTimersByTimeAsync(0);
-      expect(isMounted()).toBe(true);
-      expect(isAnimating()).toBe(true);
-      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
-      expect(isMounted()).toBe(true);
-      expect(isAnimating()).toBe(false);
-      setShouldRender(false);
-      await vi.advanceTimersByTimeAsync(0);
-      expect(isMounted()).toBe(true);
-      expect(isAnimating()).toBe(true);
-      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
-      expect(isMounted()).toBe(false);
-      expect(isAnimating()).toBe(false);
-      dispose();
-    }));
+  it("is in a mounted & animating state for the transitionDuration and then it is only in a mounted state", async () => {
+    const [shouldRender, setShouldRender] = createSignal(false);
+    const transitionDuration = 50;
 
-  it("swaps between a mounted & unmounted state based on unique enter & exit transition states", () =>
-    createRoot(async dispose => {
-      const [shouldRender, setShouldRender] = createSignal(false);
-      // using longer durations to ensure that the transitionTimeOffset
-      // is doesn't play into the test timings
-      const enterDuration = 300;
-      const exitDuration = 150;
-      const { isMounted, isAnimating } = createPresence(shouldRender, {
-        enterDuration,
-        exitDuration,
-      });
-      expect(isMounted()).toBe(false);
-      expect(isAnimating()).toBe(false);
-      setShouldRender(true);
-      await vi.advanceTimersByTimeAsync(0);
-      expect(isMounted()).toBe(true);
-      expect(isAnimating()).toBe(true);
-      // ensure that we're not done animating after the shorter time
-      await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
-      expect(isAnimating()).toBe(true);
-      await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
-      expect(isMounted()).toBe(true);
-      expect(isAnimating()).toBe(false);
-      setShouldRender(false);
-      await vi.advanceTimersByTimeAsync(0);
-      expect(isMounted()).toBe(true);
-      expect(isAnimating()).toBe(true);
-      await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
-      expect(isMounted()).toBe(false);
-      expect(isAnimating()).toBe(false);
-      dispose();
-    }));
+    let isMounted!: Accessor<boolean>;
+    let isAnimating!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ isMounted, isAnimating } = createPresence(shouldRender, { transitionDuration }));
+      return d;
+    });
+
+    expect(isMounted()).toBe(false);
+    expect(isAnimating()).toBe(false);
+    setShouldRender(true);
+    flush();
+    expect(isMounted()).toBe(true);
+    expect(isAnimating()).toBe(true);
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(isMounted()).toBe(true);
+    expect(isAnimating()).toBe(false);
+    setShouldRender(false);
+    flush();
+    expect(isMounted()).toBe(true);
+    expect(isAnimating()).toBe(true);
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(isMounted()).toBe(false);
+    expect(isAnimating()).toBe(false);
+    dispose();
+  });
+
+  it("swaps between a mounted & unmounted state based on unique enter & exit transition states", async () => {
+    const [shouldRender, setShouldRender] = createSignal(false);
+    // using longer durations to ensure that the transitionTimeOffset
+    // doesn't play into the test timings
+    const enterDuration = 300;
+    const exitDuration = 150;
+
+    let isMounted!: Accessor<boolean>;
+    let isAnimating!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ isMounted, isAnimating } = createPresence(shouldRender, { enterDuration, exitDuration }));
+      return d;
+    });
+
+    expect(isMounted()).toBe(false);
+    expect(isAnimating()).toBe(false);
+    setShouldRender(true);
+    flush();
+    expect(isMounted()).toBe(true);
+    expect(isAnimating()).toBe(true);
+    // ensure that we're not done animating after the shorter time
+    await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
+    expect(isAnimating()).toBe(true);
+    await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
+    expect(isMounted()).toBe(true);
+    expect(isAnimating()).toBe(false);
+    setShouldRender(false);
+    flush();
+    expect(isMounted()).toBe(true);
+    expect(isAnimating()).toBe(true);
+    await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
+    expect(isMounted()).toBe(false);
+    expect(isAnimating()).toBe(false);
+    dispose();
+  });
 
   // data switching tests
 
@@ -174,29 +181,37 @@ describe("createPresence", () => {
       dispose();
     }));
 
-  it("initially exchanges the data over the transition time", () =>
-    createRoot(async dispose => {
-      const [data, setData] = createSignal<Data>("foo");
-      const transitionDuration = 150;
-      const { mountedItem, isAnimating, isEntering, isExiting } = createPresence(data, {
+  it("initially exchanges the data over the transition time", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 150;
+
+    let mountedItem!: Accessor<Data | undefined>;
+    let isAnimating!: Accessor<boolean>;
+    let isEntering!: Accessor<boolean>;
+    let isExiting!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ mountedItem, isAnimating, isEntering, isExiting } = createPresence(data, {
         transitionDuration,
-      });
-      expect(isAnimating()).toBe(false);
-      setData("bar");
-      await vi.advanceTimersByTimeAsync(0);
-      expect(isAnimating()).toBe(true);
-      expect(mountedItem()).toBe("foo");
-      expect(isExiting()).toBe(true);
-      expect(isEntering()).toBe(false);
-      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
-      expect(isAnimating()).toBe(true);
-      expect(mountedItem()).toBe("bar");
-      expect(isEntering()).toBe(true);
-      expect(isExiting()).toBe(false);
-      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
-      expect(isAnimating()).toBe(false);
-      expect(isEntering()).toBe(false);
-      expect(isExiting()).toBe(false);
-      dispose();
-    }));
+      }));
+      return d;
+    });
+
+    expect(isAnimating()).toBe(false);
+    setData("bar");
+    flush();
+    expect(isAnimating()).toBe(true);
+    expect(mountedItem()).toBe("foo");
+    expect(isExiting()).toBe(true);
+    expect(isEntering()).toBe(false);
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(isAnimating()).toBe(true);
+    expect(mountedItem()).toBe("bar");
+    expect(isEntering()).toBe(true);
+    expect(isExiting()).toBe(false);
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(isAnimating()).toBe(false);
+    expect(isEntering()).toBe(false);
+    expect(isExiting()).toBe(false);
+    dispose();
+  });
 });
