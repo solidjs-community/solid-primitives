@@ -135,5 +135,5 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
     }
   };
 
-  return { active, setActive, onKeyDown };
+  return { active, setActive: (value: T | null) => updateActive(value), onKeyDown };
 }

@@ -1,4 +1,4 @@
-import type { Accessor, Setter } from "solid-js";
+import type { Accessor } from "solid-js";
 import type { MaybeAccessor } from "@solid-primitives/utils";
 
 export type VimKeys = {
@@ -34,7 +34,7 @@ export interface ListStateProps<T> {
 
 export interface ListStateReturn<T> {
   active: Accessor<T | null>;
-  setActive: Setter<T | null>;
+  setActive: (value: T | null) => void;
   onKeyDown: (event: KeyboardEvent) => void;
 }
 
@@ -69,12 +69,12 @@ export interface MultiSelectListStateProps<T> {
 
 export interface MultiSelectListStateReturn<T> {
   cursor: Accessor<T | null>;
-  setCursor: Setter<T | null>;
+  setCursor: (value: T | null) => void;
   active: Accessor<T[]>;
-  setActive: Setter<T[]>;
+  setActive: (value: T[]) => void;
   setCursorActive: (item: T | null) => void;
   selected: Accessor<T[]>;
-  setSelected: Setter<T[]>;
+  setSelected: (value: T[]) => void;
   toggleSelected: (item: T) => void;
   onKeyDown: (event: KeyboardEvent) => void;
 }

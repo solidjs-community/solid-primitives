@@ -104,7 +104,7 @@ interface ListStateProps<T> {
 ```ts
 interface ListStateReturn<T> {
   active: Accessor<T | null>;
-  setActive: Setter<T | null>;
+  setActive: (value: T | null) => void;
   onKeyDown: (event: KeyboardEvent) => void;
 }
 ```
@@ -186,12 +186,12 @@ interface MultiSelectListStateProps<T> {
 ```ts
 interface MultiSelectListStateReturn<T> {
   cursor: Accessor<T | null>;
-  setCursor: Setter<T | null>;
+  setCursor: (value: T | null) => void;
   active: Accessor<T[]>;
-  setActive: Setter<T[]>;
+  setActive: (value: T[]) => void;
   setCursorActive: (item: T | null) => void;
   selected: Accessor<T[]>;
-  setSelected: Setter<T[]>;
+  setSelected: (value: T[]) => void;
   toggleSelected: (item: T) => void;
   onKeyDown: (event: KeyboardEvent) => void;
 }
@@ -204,8 +204,6 @@ All shortcuts from `createListState` plus:
 | Key | Action |
 |-----|--------|
 | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> | Expand/contract selection range |
-| <kbd>Shift</kbd>+<kbd>Home</kbd> | Select from cursor to first item |
-| <kbd>Shift</kbd>+<kbd>End</kbd> | Select from cursor to last item |
 
 ## Types
 

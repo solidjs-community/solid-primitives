@@ -231,12 +231,12 @@ export function createMultiSelectListState<T>(
 
   return {
     cursor,
-    setCursor,
+    setCursor: (value: T | null) => updateCursor(value),
     active,
-    setActive,
+    setActive: (value: T[]) => updateActive(value),
     setCursorActive,
     selected,
-    setSelected,
+    setSelected: (value: T[]) => updateSelected(value),
     toggleSelected,
     onKeyDown,
   };
