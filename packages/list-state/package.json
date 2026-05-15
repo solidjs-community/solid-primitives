@@ -1,0 +1,77 @@
+{
+  "name": "@solid-primitives/list-state",
+  "version": "0.1.0",
+  "description": "Keyboard navigable list state management primitives",
+  "author": {
+    "name": "Jasmin Noetzli",
+    "email": "code@jasi.dev",
+    "url": "https://github.com/GiyoMoon"
+  },
+  "contributors": [
+    {
+      "name": "David Di Biase",
+      "email": "dave@solidjs.com"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/list-state",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "list-state",
+    "stage": 1,
+    "list": [
+      "createListState",
+      "createMultiSelectListState"
+    ],
+    "category": "Inputs"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "list",
+    "keyboard",
+    "navigation",
+    "state"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "^2.0.0-beta.12",
+    "solid-js": "^2.0.0-beta.12"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "devDependencies": {
+    "@solidjs/web": "2.0.0-beta.12",
+    "solid-js": "2.0.0-beta.12"
+  }
+}
