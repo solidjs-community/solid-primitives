@@ -1,4 +1,4 @@
-import { createSignal, createEffect, untrack } from "solid-js";
+import { createSignal, createEffect } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 export type TweenProps = {
@@ -27,7 +27,7 @@ export type TweenProps = {
  * </button>
  * ```
  */
-export default function createTween(
+export function createTween(
   target: () => number,
   { ease = (t: number) => t, duration = 100 }: TweenProps,
 ): () => number {
@@ -56,7 +56,7 @@ export default function createTween(
     () => target(),
     newTarget => {
       start = performance.now();
-      startValue = untrack(current);
+      startValue = current();
       delta = newTarget - startValue;
       cancelId = requestAnimationFrame(tick);
       return () => cancelAnimationFrame(cancelId);
@@ -66,6 +66,3 @@ export default function createTween(
 
   return current;
 }
-
-// TODO: in a major release, remove the default export
-export { createTween };
