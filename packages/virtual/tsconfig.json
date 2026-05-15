@@ -4,6 +4,7 @@
     "composite": true,
     "outDir": "dist",
     "rootDir": "src",
+    "jsx": "preserve",
     "jsxImportSource": "@solidjs/web"
   },
   "references": [

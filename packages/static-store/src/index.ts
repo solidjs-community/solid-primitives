@@ -57,7 +57,7 @@ export function createStaticStore<T extends Record<string, Exclude<unknown, Func
     let signal = cache[key];
     if (!signal) {
       if (!getObserver()) return copy[key];
-      cache[key] = signal = createSignal(copy[key] as Exclude<T[keyof T], Function>, { pureWrite: true } as SignalOptions<T[keyof T]>);
+      cache[key] = signal = createSignal(copy[key] as Exclude<T[keyof T], Function>, { ownedWrite: true } as SignalOptions<T[keyof T]>);
       delete copy[key];
     }
     return signal[0]();
@@ -135,34 +135,26 @@ export function createHydratableStaticStore<T extends Record<string, Exclude<unk
  */
 export function createDerivedStaticStore<Next extends Prev & object, Prev = Next>(
   fn: ComputeFunction<undefined | NoInfer<Prev>, Next>,
-): Next;
-export function createDerivedStaticStore<Next extends Prev & object, Init = Next, Prev = Next>(
-  fn: ComputeFunction<Init | Prev, Next>,
-  value: Init,
-  options?: MemoOptions<Next>,
-): Next;
-export function createDerivedStaticStore<T extends Record<string, Exclude<unknown, Function>>>(
-  fn: ComputeFunction<T | undefined, T>,
-  value?: T,
-  options?: MemoOptions<T>,
-): T {
+): Next {
   const o = getOwner(),
-    fnMemo = createMemo((prev = value) => fn(prev), options),
-    store = { ...untrack(fnMemo) },
-    cache: Partial<Record<keyof T, Accessor<T[keyof T]>>> = {};
+    fnMemo = createMemo(fn as ComputeFunction<undefined | NoInfer<Next>, Next>),
+    store = { ...untrack(fnMemo) } as Next,
+    cache: Partial<Record<keyof Next, Accessor<Next[keyof Next]>>> = {};
 
-  for (const key in store)
-    Object.defineProperty(store, key, {
+  for (const key in store) {
+    const k = key as keyof Next;
+    Object.defineProperty(store, k, {
       get() {
-        let keyMemo = cache[key];
+        let keyMemo = cache[k];
         if (!keyMemo) {
-          if (!getObserver()) return fnMemo()[key];
-          runWithOwner(o, () => (cache[key] = keyMemo = createMemo(() => fnMemo()[key])));
+          if (!getObserver()) return fnMemo()![k];
+          runWithOwner(o, () => (cache[k] = keyMemo = createMemo(() => fnMemo()![k])));
         }
         return keyMemo!();
       },
       enumerable: true,
     });
+  }
 
   return store;
 }

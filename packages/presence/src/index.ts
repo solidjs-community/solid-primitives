@@ -49,9 +49,9 @@ function createPresenceBase(
 
   const initialSource = untrack(source);
   const initialState = options.initialEnter ? false : initialSource;
-  const [isVisible, setIsVisible] = createSignal(initialState, INTERNAL_OPTIONS);
-  const [isMounted, setIsMounted] = createSignal(initialSource, INTERNAL_OPTIONS);
-  const [hasEntered, setHasEntered] = createSignal(initialState, INTERNAL_OPTIONS);
+  const [isVisible, setIsVisible] = createSignal<boolean>(initialState, INTERNAL_OPTIONS);
+  const [isMounted, setIsMounted] = createSignal<boolean>(initialSource, INTERNAL_OPTIONS);
+  const [hasEntered, setHasEntered] = createSignal<boolean>(initialState, INTERNAL_OPTIONS);
 
   const isExiting = createMemo(() => isMounted() && !source());
   const isEntering = createMemo(() => source() && !hasEntered());
@@ -145,7 +145,7 @@ export function createPresence<TItem>(
 ): PresenceResult<TItem> {
   const initial = untrack(item);
   const [mountedItem, setMountedItem] = createSignal<TItem | undefined>(initial as Exclude<TItem, Function>, INTERNAL_OPTIONS);
-  const [shouldBeMounted, setShouldBeMounted] = createSignal(itemShouldBeMounted(initial), INTERNAL_OPTIONS);
+  const [shouldBeMounted, setShouldBeMounted] = createSignal<boolean>(itemShouldBeMounted(initial), INTERNAL_OPTIONS);
   const { isMounted, ...rest } = createPresenceBase(shouldBeMounted, options);
 
   createEffect(

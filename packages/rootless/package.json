@@ -56,11 +56,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.10",
-    "solid-js": "^2.0.0-beta.10"
+    "@solidjs/web": "^2.0.0-beta.12",
+    "solid-js": "^2.0.0-beta.12"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.10",
-    "solid-js": "2.0.0-beta.10"
+    "@solidjs/web": "2.0.0-beta.13",
+    "solid-js": "2.0.0-beta.13"
   }
 }
