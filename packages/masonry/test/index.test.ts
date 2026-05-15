@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { createMasonry } from "../src/index.js";
 
 describe("createMasonry", () => {
@@ -21,6 +21,7 @@ describe("createMasonry", () => {
     expect(masonry.height()).toBe(4);
 
     setSource([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    flush();
 
     expect(masonry().map(i => i.source)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     expect(masonry().map(i => i.order())).toEqual([0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7]);
@@ -102,45 +103,47 @@ describe("createMasonry", () => {
   });
 
   test("changing columns", () => {
-    createRoot(dispose => {
-      const [source] = createSignal([1, 2, 3, 4, 5, 6]);
+    const source = [1, 2, 3, 4, 5, 6];
+    const { dispose, masonry, setColumns } = createRoot(dispose => {
       const [columns, setColumns] = createSignal(3);
       const masonry = createMasonry({
-        source,
+        source: () => source,
         columns,
         mapHeight: () => 1,
       });
-
-      /*
-      1 2 3
-      4 5 6
-      */
-
-      expect(masonry().map(i => i.source)).toEqual(source());
-      expect(masonry().map(i => i.order())).toEqual([
-        /* 1 */ 0, /* 2 */ 2, /* 3 */ 4, /* 4 */ 1, /* 5 */ 3, /* 6 */ 5,
-      ]);
-      expect(masonry().map(i => i.margin())).toEqual([0, 0, 0, 0, 0, 0]);
-      expect(masonry().map(i => i.column())).toEqual([0, 1, 2, 0, 1, 2]);
-      expect(masonry.height()).toBe(2);
-
-      setColumns(2);
-
-      /*
-      1 2
-      3 4
-      5 6
-      */
-
-      expect(masonry().map(i => i.source)).toEqual(source());
-      expect(masonry().map(i => i.order())).toEqual([
-        /* 1 */ 0, /* 2 */ 3, /* 3 */ 1, /* 4 */ 4, /* 5 */ 2, /* 6 */ 5,
-      ]);
-      expect(masonry().map(i => i.margin())).toEqual([0, 0, 0, 0, 0, 0]);
-      expect(masonry().map(i => i.column())).toEqual([0, 1, 0, 1, 0, 1]);
-      expect(masonry.height()).toBe(3);
-
-      dispose();
+      return { dispose, masonry, setColumns };
     });
+
+    /*
+    1 2 3
+    4 5 6
+    */
+
+    expect(masonry().map(i => i.source)).toEqual(source);
+    expect(masonry().map(i => i.order())).toEqual([
+      /* 1 */ 0, /* 2 */ 2, /* 3 */ 4, /* 4 */ 1, /* 5 */ 3, /* 6 */ 5,
+    ]);
+    expect(masonry().map(i => i.margin())).toEqual([0, 0, 0, 0, 0, 0]);
+    expect(masonry().map(i => i.column())).toEqual([0, 1, 2, 0, 1, 2]);
+    expect(masonry.height()).toBe(2);
+
+    setColumns(2);
+    flush();
+
+    /*
+    1 2
+    3 4
+    5 6
+    */
+
+    expect(masonry().map(i => i.source)).toEqual(source);
+    expect(masonry().map(i => i.order())).toEqual([
+      /* 1 */ 0, /* 2 */ 3, /* 3 */ 1, /* 4 */ 4, /* 5 */ 2, /* 6 */ 5,
+    ]);
+    expect(masonry().map(i => i.margin())).toEqual([0, 0, 0, 0, 0, 0]);
+    expect(masonry().map(i => i.column())).toEqual([0, 1, 0, 1, 0, 1]);
+    expect(masonry.height()).toBe(3);
+
+    dispose();
   });
 });
