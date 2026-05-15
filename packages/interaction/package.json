@@ -1,0 +1,65 @@
+{
+  "name": "@solid-primitives/interaction",
+  "version": "0.0.100",
+  "description": "SolidJS primitive for detecting interactions outside a given element.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/interaction",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "interaction",
+    "stage": 0,
+    "list": [
+      "createInteractOutside",
+      "ariaHideOutside",
+      "createHideOutside"
+    ],
+    "category": "Browser APIs"
+  },
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "browser": {},
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "vitest": "vitest -c vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "keywords": [
+    "interaction",
+    "outside",
+    "focus",
+    "pointer",
+    "solid",
+    "primitives"
+  ],
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "^2.0.0-beta.12",
+    "solid-js": "^2.0.0-beta.12"
+  },
+  "typesVersions": {},
+  "devDependencies": {
+    "@solidjs/web": "2.0.0-beta.12",
+    "solid-js": "2.0.0-beta.12"
+  }
+}
