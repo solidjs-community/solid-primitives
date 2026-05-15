@@ -152,75 +152,9 @@ function Dropdown() {
 }
 ```
 
-## `ariaHideOutside`
-
-```ts
-function ariaHideOutside(targets: Element[], root?: HTMLElement): () => void
-```
-
-Imperatively hides all elements in the DOM outside the given `targets` from screen readers by setting `aria-hidden="true"`. Returns a cleanup function that reverts all changes.
-
-A `MutationObserver` watches for new elements added to `root` after the call and hides them automatically. Multiple concurrent calls are handled with a ref-count stack — stacked calls each track their own set of hidden nodes and the cleanup is fully independent.
-
-```ts
-import { ariaHideOutside } from "@solid-primitives/interaction";
-
-const restore = ariaHideOutside([dialogEl]);
-// ... when done:
-restore();
-```
-
-### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `targets` | `Element[]` | Elements that should remain visible (not aria-hidden). |
-| `root` | `HTMLElement` | Root to search from. Defaults to `document.body`. |
-
----
-
-## `createHideOutside`
-
-```ts
-function createHideOutside(props: CreateHideOutsideProps): void
-```
-
-Reactive wrapper around `ariaHideOutside`. Re-runs automatically whenever any accessor in `props` changes, and cleans up the previous call before re-running.
-
-### Props
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `targets` | `MaybeAccessor<Element[]>` | Elements that should remain visible. Reactive. |
-| `root` | `MaybeAccessor<HTMLElement \| undefined>` | Root to hide within. Defaults to `document.body`. |
-| `isDisabled` | `MaybeAccessor<boolean \| undefined>` | Disables hiding when `true`. Reactive. |
-
-### Usage
-
-```tsx
-import { createSignal, Show } from "solid-js";
-import { createHideOutside } from "@solid-primitives/interaction";
-
-function Dialog() {
-  let ref: HTMLDivElement | undefined;
-  const [open, setOpen] = createSignal(false);
-
-  createHideOutside({
-    targets: () => (ref ? [ref] : []),
-    isDisabled: () => !open(),
-  });
-
-  return (
-    <Show when={open()}>
-      <div ref={ref} role="dialog">
-        Dialog content — everything else is aria-hidden
-      </div>
-    </Show>
-  );
-}
-```
-
----
+> **Tip:** To hide content outside a dialog from screen readers, you don't need a library.
+> Set `ariaModal="true"` on your dialog or popover element and assistive technologies will
+> automatically scope navigation to it. See [`Element.ariaModal`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaModal) on MDN.
 
 ## Demo
 
@@ -235,10 +169,8 @@ See [CHANGELOG.md](./CHANGELOG.md)
 Based on primitives from [Kobalte](https://kobalte.dev), adapted for Solid 2.0 and the Solid Primitives ecosystem:
 
 - [`createInteractOutside`](https://github.com/kobaltedev/kobalte/blob/main/packages/core/src/primitives/create-interact-outside/create-interact-outside.ts) — Kobalte, MIT, Copyright (c) 2022 Kobalte contributors
-- [`ariaHideOutside`](https://github.com/kobaltedev/kobalte/blob/main/packages/core/src/primitives/create-hide-outside/create-hide-outside.ts) — Kobalte, MIT, Copyright (c) 2022 Kobalte contributors
 
-Kobalte's implementations draw from:
+Kobalte's implementation draws from:
 
 - [Radix UI Primitives](https://github.com/radix-ui/primitives) — MIT, Copyright (c) 2022 WorkOS
 - [Zag by Chakra UI](https://github.com/chakra-ui/zag) — MIT, Copyright (c) 2021 Chakra UI
-- [React Spectrum (`ariaHideOutside`)](https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/overlays/src/ariaHideOutside.ts) — Apache 2.0, Copyright (c) 2020 Adobe
