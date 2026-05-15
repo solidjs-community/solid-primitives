@@ -1,11 +1,11 @@
 import {
   getOwner,
   onCleanup,
+  onSettled,
   createSignal,
   createStore,
   type Accessor,
   untrack,
-  type AccessorArray,
   type EffectFunction,
   type ComputeFunction,
   type NoInfer,
@@ -15,10 +15,11 @@ import {
   type Store,
   type StoreSetter,
   sharedConfig,
-  onMount,
   DEV,
-  equalFn,
+  isEqual,
 } from "solid-js";
+
+type AccessorArray<T> = Accessor<T>[];
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer = typeof window === "undefined";
@@ -47,11 +48,11 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** @deprecated use {@link equalFn} from "solid-js" */
-export const defaultEquals = equalFn;
+/** @deprecated use {@link isEqual} from "solid-js" */
+export const defaultEquals = isEqual;
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { internal: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = {} as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___

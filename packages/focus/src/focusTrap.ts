@@ -16,7 +16,7 @@ const EVENT_OPTIONS = { bubbles: false, cancelable: true } as const;
 
 export type CreateFocusTrapProps = {
   /** Element to trap focus within. */
-  element: MaybeAccessor<HTMLElement | null>;
+  element: MaybeAccessor<HTMLElement | undefined>;
   /** Whether the focus trap is active. Default: `true` */
   enabled?: MaybeAccessor<boolean>;
   /**
@@ -28,7 +28,7 @@ export type CreateFocusTrapProps = {
    * Element to focus when the trap activates.
    * Default: the first focusable element inside `element`.
    */
-  initialFocusElement?: MaybeAccessor<HTMLElement | null>;
+  initialFocusElement?: MaybeAccessor<HTMLElement | undefined>;
   /**
    * Restore focus to the element that was focused before the trap activated
    * when the trap is deactivated. Default: `true`
@@ -38,7 +38,7 @@ export type CreateFocusTrapProps = {
    * Element to focus when the trap deactivates.
    * Default: the element that was focused before the trap activated.
    */
-  finalFocusElement?: MaybeAccessor<HTMLElement | null>;
+  finalFocusElement?: MaybeAccessor<HTMLElement | undefined>;
   /**
    * Callback fired when focus moves into the trap.
    * Call `event.preventDefault()` to suppress the focus move.
@@ -66,8 +66,8 @@ export type CreateFocusTrapProps = {
  * ```
  */
 export const createFocusTrap = (props: CreateFocusTrapProps): void => {
-  const [focusableElements, setFocusableElements] = createSignal<HTMLElement[] | null>(
-    null,
+  const [focusableElements, setFocusableElements] = createSignal<HTMLElement[] | undefined>(
+    undefined,
     INTERNAL_OPTIONS,
   );
 
@@ -176,7 +176,7 @@ export const createFocusTrap = (props: CreateFocusTrapProps): void => {
 
       return () => {
         if (observeChanges) observer.disconnect();
-        setFocusableElements(null);
+        setFocusableElements(undefined);
         triggerRestoreFocus(container);
       };
     },
@@ -186,7 +186,7 @@ export const createFocusTrap = (props: CreateFocusTrapProps): void => {
   createEffect(
     () => focusableElements(),
     elements => {
-      if (elements === null || elements.length !== 0) return;
+      if (!elements || elements.length !== 0) return;
       document.addEventListener("keydown", preventTab);
       return () => document.removeEventListener("keydown", preventTab);
     },
