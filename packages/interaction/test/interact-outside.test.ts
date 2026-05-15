@@ -242,6 +242,41 @@ describe("createInteractOutside", () => {
       cleanup();
     });
 
+    it("registers listeners when ref resolves from undefined to an element", () => {
+      const onFocusOutside = vi.fn();
+      const [ref, setRef] = createSignal<HTMLDivElement | undefined>(undefined);
+
+      const container = document.createElement("div");
+      const outside = document.createElement("div");
+      container.appendChild(outside);
+      document.body.appendChild(container);
+
+      const dispose = createRoot(d => {
+        createInteractOutside({ onFocusOutside }, ref);
+        return d;
+      });
+
+      flush();
+      vi.runAllTimers();
+
+      // ref is still undefined — no listeners registered
+      outside.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+      expect(onFocusOutside).not.toHaveBeenCalled();
+
+      // ref resolves — effect re-runs and registers listeners
+      const inside = document.createElement("div");
+      container.insertBefore(inside, outside);
+      setRef(inside as HTMLDivElement);
+      flush();
+      vi.runAllTimers();
+
+      outside.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+      expect(onFocusOutside).toHaveBeenCalledTimes(1);
+
+      dispose();
+      document.body.removeChild(container);
+    });
+
     it("cleans up listeners when reactive root is disposed", () => {
       const { mocks, outside, cleanup } = setupTest("div", "div");
       cleanup();

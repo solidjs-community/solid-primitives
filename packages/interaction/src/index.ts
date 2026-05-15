@@ -194,12 +194,9 @@ export function createInteractOutside<T extends Element>(
   // The apply function returns a teardown function; Solid 2.0 calls it before
   // re-running apply or when the owner is disposed (no onCleanup needed).
   createEffect(
-    () => access(props.isDisabled),
-    (disabled: boolean | undefined) => {
-      if (disabled) return;
-
-      const el = ref();
-      if (!el) return;
+    () => ({ disabled: access(props.isDisabled), el: ref() }),
+    ({ disabled, el }: { disabled: boolean | undefined; el: T | undefined }) => {
+      if (disabled || !el) return;
 
       const ownerDoc = el.ownerDocument;
 
