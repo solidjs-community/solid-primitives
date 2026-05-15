@@ -20,7 +20,7 @@ yarn add @solid-primitives/mutation-observer
 pnpm add @solid-primitives/mutation-observer
 ```
 
-**Requires** `solid-js` and `@solidjs/web` >= `2.0.0-beta.10` as peer dependencies.
+**Requires** `solid-js` and `@solidjs/web` >= `2.0.0-beta.13` as peer dependencies.
 
 ## How to use it
 
@@ -62,24 +62,14 @@ stop()
 
 The primitive automatically starts observing after the component settles (via `onSettled`) and disconnects on cleanup. You can also control observation manually with `start()` and `stop()`.
 
-### Directive Usage
+### Ref Usage
 
-```tsx
-// You have to name it as "mutationObserver" when using typescript
-const [mutationObserver] = createMutationObserver([], e => {...})
-
-<div use:mutationObserver={{ childList: true }}>...</div>
-```
-
-### Standalone Directive Usage
+`mutationObserver` is a ref factory for observing a single element. Pass it to an element's `ref` prop:
 
 ```tsx
 import { mutationObserver } from "@solid-primitives/mutation-observer";
 
-// has to be used in code to avoid tree-shaking it:
-mutationObserver;
-
-<div use:mutationObserver={[{ childList: true }, e => {...}]}></div>
+<div ref={mutationObserver({ childList: true }, e => {...})} />
 ```
 
 ### Types
@@ -106,6 +96,11 @@ type MutationObserverReturn = [
 ];
 
 type MutationObserverAdd = (target: Node, options?: MaybeAccessor<MutationObserverInit>) => void;
+
+function mutationObserver(
+  options: MutationObserverInit,
+  callback: MutationCallback,
+): (target: Element) => void;
 ```
 
 ## Demo

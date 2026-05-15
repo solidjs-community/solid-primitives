@@ -1,5 +1,4 @@
 import { onCleanup, onSettled } from "solid-js";
-import type { JSX } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, asArray, type MaybeAccessor } from "@solid-primitives/utils";
 
@@ -18,20 +17,10 @@ export type MutationObserverReturn = [
   },
 ];
 
-export type MutationObserverStandaloneDirectiveProps = [
+export type MutationObserverStandaloneProps = [
   options: MutationObserverInit,
   callback: MutationCallback,
 ];
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      mutationObserver: MutationObserverInit | MutationObserverStandaloneDirectiveProps;
-    }
-  }
-}
-// this ensures the `JSX` import won't fall victim to tree shaking before typescript can use it
-export type E = JSX.Element;
 
 /**
  * Primitive providing the ability to watch for changes being made to the DOM tree.
@@ -110,24 +99,23 @@ export function createMutationObserver(
 }
 
 /**
- * Primitive providing the ability to watch for changes being made to the DOM tree.
- * A Standalone Directive.
+ * A ref factory for observing mutations on a single element.
  *
- * @param props [MutationObserver options, callback]
+ * @param options MutationObserver options
+ * @param callback function called when mutations are observed
+ * @returns a ref callback to pass to an element's `ref` prop
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutation-observer
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  *
  * @example
  * ```tsx
- * <div use:mutationObserver={[{ childList: true }, e => {...}]}></div>
+ * <div ref={mutationObserver({ childList: true }, e => {...})} />
  * ```
  */
-export const mutationObserver = (
-  target: Element,
-  props: () => MutationObserverStandaloneDirectiveProps,
-): void => {
-  const [config, cb] = props();
-  const [add] = createMutationObserver([], cb);
-  add(target, config);
-};
+export const mutationObserver =
+  (options: MutationObserverInit, callback: MutationCallback) =>
+  (target: Element): void => {
+    const [add] = createMutationObserver([], callback);
+    add(target, options);
+  };
