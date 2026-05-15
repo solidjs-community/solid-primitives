@@ -22,10 +22,10 @@ export function makeFocusListener(
   useCapture = true,
 ): VoidFunction {
   if (isServer) {
-    return () => void 0;
+    return () => {};
   }
-  const clear1 = makeEventListener(target, "blur", callback.bind(void 0, false), useCapture);
-  const clear2 = makeEventListener(target, "focus", callback.bind(void 0, true), useCapture);
+  const clear1 = makeEventListener(target, "blur", callback.bind(undefined, false), useCapture);
+  const clear2 = makeEventListener(target, "focus", callback.bind(undefined, true), useCapture);
   return () => (clear1(), clear2());
 }
 

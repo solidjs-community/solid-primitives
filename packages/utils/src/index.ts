@@ -44,7 +44,7 @@ export const isDev = isClient && !!DEV;
 export const isProd = !isDev;
 
 /** no operation */
-export const noop = (() => void 0) as Noop;
+export const noop = (() => {}) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
