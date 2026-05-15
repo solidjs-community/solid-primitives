@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, type Plugin } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 import * as utils from "../../scripts/utils/index.js";
 
@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
           omitNestedClosingTags: false,
           moduleName: "@solidjs/web",
         },
-      }),
+      }) as unknown as Plugin,
     ],
     test: {
       watch: false,
