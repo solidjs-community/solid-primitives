@@ -101,6 +101,7 @@ describe("createResizeObserver", () => {
     setRefs([div2, div3]);
     flush();
     expect(targets.size).toBe(2);
+    expect(targets.has(div1)).toBeFalsy();
     expect(targets.has(div2)).toBeTruthy();
     expect(targets.has(div3)).toBeTruthy();
 
@@ -123,6 +124,7 @@ describe("createResizeObserver", () => {
     setRefs(() => [div2, div3]);
     flush();
     expect(targets.size).toBe(2);
+    expect(targets.has(div1)).toBeFalsy();
     expect(targets.has(div2)).toBeTruthy();
     expect(targets.has(div3)).toBeTruthy();
 
