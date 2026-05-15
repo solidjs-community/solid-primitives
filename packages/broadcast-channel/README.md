@@ -107,13 +107,12 @@ postMessage({ id: 2, message: "hi" });
 const { message } = createBroadcastChannel("test_channel");
 
 createEffect(
-  on(
-    message,
-    data => {
+  () => message(),
+  data => {
+    if (data !== null) {
       console.log(data); // { id: 2, message: "hi" }
-    },
-    { defer: true },
-  ),
+    }
+  },
 );
 ```
 
@@ -143,19 +142,18 @@ postMessage({ id: "wrong type", message: "hi" }); // ❌
 postMessage({ id: 5, message: "hi" }); // ✅
 
 createEffect(
-  on(
-    message,
-    data => {
-      consumeDataIncorrect(data!); // ❌
-      //                    ^^^
+  () => message(),
+  data => {
+    if (data !== null) {
+      consumeDataIncorrect(data); // ❌
+      //                   ^^^
       // Argument of type 'TData' is not assignable to parameter of type '{ id: string; message: string; }'.
       // Types of property 'id' are incompatible.
       // Type 'number' is not assignable to type 'string'.
 
-      consumeDataCorrect(data!); // ✅
-    },
-    { defer: true },
-  ),
+      consumeDataCorrect(data); // ✅
+    }
+  },
 );
 
 const consumeDataIncorrect = (data: { id: string; message: string }) => {
