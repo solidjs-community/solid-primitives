@@ -2,11 +2,8 @@ import {
   getOwner,
   onCleanup,
   createSignal,
-  createStore,
   type Accessor,
   untrack,
-  type AccessorArray,
-  type EffectFunction,
   type ComputeFunction,
   type NoInfer,
   type Setter,
@@ -15,10 +12,12 @@ import {
   type Store,
   type StoreSetter,
   sharedConfig,
-  onMount,
+  onSettled,
   DEV,
-  equalFn,
 } from "solid-js";
+
+// AccessorArray was removed in Solid 2.0 — define locally
+type AccessorArray<S> = Accessor<S>[];
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer = typeof window === "undefined";
@@ -47,11 +46,11 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** @deprecated use {@link equalFn} from "solid-js" */
-export const defaultEquals = equalFn;
+/** @deprecated use Object.is instead */
+export const defaultEquals: (a: unknown, b: unknown) => boolean = Object.is;
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { internal: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___
@@ -266,7 +265,9 @@ export function createHydratableSignal<T>(
   }
   if (sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
-    onSettled(() => { setState(() => update()); });
+    onSettled(() => {
+      setState(() => update());
+    });
     return [state, setState];
   }
   return createSignal(update() as Exclude<T, Function>, options);
@@ -411,25 +412,43 @@ export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string)
  *
  * ```ts
  * const [data, setData] = wrapSetter(
- *   createSignal(initialData), 
+ *   createSignal(initialData),
  *   (setter) => (next) => { console.log(next); return setter(next); },
  * );
  * ```
  * If you destructure signal or store in a longer tuple, you need to use a const assertion for the types to work.
  */
-export function wrapSetter<T>(signal: Signal<T>, wrapper: (setter: Setter<T>) => Setter<T>): Signal<T>;
-export function wrapSetter<T>(store: [Store<T>, StoreSetter<T>], wrapper: (setter: StoreSetter<T>) => StoreSetter<T>): [Store<T>, StoreSetter<T>];
-export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
-  signalOrStore: S,
-  wrapper: (setter: S[1]) => S[1]
-): S;
-export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | readonly [...Signal<T>, ...any[]] | readonly [Store<T>, StoreSetter<T>, ...any[]]>(
-  signalOrStore: S,
-  wrapper: (setter: S[1]) => S[1]
-): S;
-export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
-  signalOrStore: S,
-  wrapper: (setter: S[1]) => S[1]
-): S {
+export function wrapSetter<T>(
+  signal: Signal<T>,
+  wrapper: (setter: Setter<T>) => Setter<T>,
+): Signal<T>;
+export function wrapSetter<T>(
+  store: [Store<T>, StoreSetter<T>],
+  wrapper: (setter: StoreSetter<T>) => StoreSetter<T>,
+): [Store<T>, StoreSetter<T>];
+export function wrapSetter<
+  T,
+  S extends
+    | Signal<T>
+    | [Store<T>, StoreSetter<T>]
+    | [...Signal<T>, ...any[]]
+    | [Store<T>, StoreSetter<T>, ...any[]],
+>(signalOrStore: S, wrapper: (setter: S[1]) => S[1]): S;
+export function wrapSetter<
+  T,
+  S extends
+    | Signal<T>
+    | [Store<T>, StoreSetter<T>]
+    | readonly [...Signal<T>, ...any[]]
+    | readonly [Store<T>, StoreSetter<T>, ...any[]],
+>(signalOrStore: S, wrapper: (setter: S[1]) => S[1]): S;
+export function wrapSetter<
+  T,
+  S extends
+    | Signal<T>
+    | [Store<T>, StoreSetter<T>]
+    | [...Signal<T>, ...any[]]
+    | [Store<T>, StoreSetter<T>, ...any[]],
+>(signalOrStore: S, wrapper: (setter: S[1]) => S[1]): S {
   return [signalOrStore[0], wrapper(signalOrStore[1]), ...signalOrStore.slice(2)] as S;
 }
