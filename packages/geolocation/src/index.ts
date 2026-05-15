@@ -1,4 +1,4 @@
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import {
   type Accessor,
   createEffect,
@@ -21,6 +21,20 @@ const mergeOptions = (options?: PositionOptions): PositionOptions =>
 
 // Sentinel for the "not yet observed" pending state.
 const NOT_SET: unique symbol = Symbol();
+
+const seedToCoords = (seed: GeolocationCoord): GeolocationCoordinates =>
+  ({
+    latitude: seed.latitude,
+    longitude: seed.longitude,
+    altitude: null,
+    accuracy: 0,
+    altitudeAccuracy: null,
+    heading: null,
+    speed: null,
+    toJSON() {
+      return this;
+    },
+  }) as GeolocationCoordinates;
 
 /**
  * Performs a single geolocation query. Non-reactive — no Solid owner required.
@@ -103,6 +117,9 @@ export const makeGeolocationWatcher = (
  * Re-queries when `options` changes or when `refetch` is called.
  *
  * @param options - Reactive position options
+ * @param initialLocation - Optional seed coordinates (e.g. from IP geolocation on the server).
+ *   On the server: resolves immediately with these coords instead of throwing `NotReadyError`.
+ *   On the client: ignored — GPS is always queried directly.
  * @returns Tuple of `[location, refetch]`
  *
  * @example
@@ -118,8 +135,13 @@ export const makeGeolocationWatcher = (
  */
 export const createGeolocation = (
   options?: MaybeAccessor<PositionOptions>,
+  initialLocation?: GeolocationCoord,
 ): [location: () => Promise<GeolocationCoordinates>, refetch: VoidFunction] => {
   if (isServer) {
+    if (initialLocation) {
+      const coords = seedToCoords(initialLocation);
+      return [() => Promise.resolve(coords), noop];
+    }
     const stub = () => {
       throw new NotReadyError("Geolocation is not available on the server.");
     };
@@ -154,6 +176,10 @@ export const createGeolocation = (
  *
  * @param enabled - Whether the watcher should be active
  * @param options - Reactive position options
+ * @param initialLocation - Optional seed coordinates (e.g. from IP geolocation on the server).
+ *   On the server: `location()` returns these coords instead of throwing `NotReadyError`.
+ *   On the client: used as the initial signal value so `location()` never throws before the
+ *   first GPS fix — real coords replace the seed as soon as the watcher fires.
  * @returns `{ location, error }` — both are signal accessors
  *
  * @example
@@ -171,11 +197,16 @@ export const createGeolocation = (
 export const createGeolocationWatcher = (
   enabled: MaybeAccessor<boolean>,
   options?: MaybeAccessor<PositionOptions>,
+  initialLocation?: GeolocationCoord,
 ): {
   location: Accessor<GeolocationCoordinates>;
   error: Accessor<GeolocationPositionError | null>;
 } => {
   if (isServer) {
+    if (initialLocation) {
+      const coords = seedToCoords(initialLocation);
+      return { location: () => coords, error: () => null };
+    }
     return {
       location: () => {
         throw new NotReadyError("Geolocation is not available on the server.");
@@ -186,7 +217,10 @@ export const createGeolocationWatcher = (
 
   // NOT_SET causes location() to throw NotReadyError until the first fix —
   // integrates with <Loading> for a natural pending state.
-  const [rawLocation, setLocation] = createSignal<GeolocationCoordinates | typeof NOT_SET>(NOT_SET);
+  // When a seed is provided it is used as the initial value so location() never throws.
+  const [rawLocation, setLocation] = createSignal<GeolocationCoordinates | typeof NOT_SET>(
+    initialLocation ? seedToCoords(initialLocation) : NOT_SET,
+  );
   const [error, setError] = createSignal<GeolocationPositionError | null>(null);
 
   // Plain wrapper: throws NotReadyError when pending, returns coordinates when set.
@@ -250,7 +284,7 @@ const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): nu
  * coordinate using the Haversine formula. Returns `null` until the first GPS fix arrives.
  *
  * @param target - Target coordinate (static or reactive)
- * @param options - `unit` ("km" | "m", default "km"), `enabled`, `watcherOptions`
+ * @param options - `unit` ("km" | "m", default "km"), `enabled`, `watcherOptions`, `initialLocation`
  * @returns Signal accessor for the distance, or `null` while pending
  *
  * @example
@@ -265,12 +299,14 @@ export const createDistance = (
     unit?: "km" | "m";
     enabled?: MaybeAccessor<boolean>;
     watcherOptions?: MaybeAccessor<PositionOptions>;
+    initialLocation?: GeolocationCoord;
   },
 ): Accessor<number | null> => {
-  if (isServer) return () => null;
+  const { unit = "km", enabled = true, watcherOptions, initialLocation } = options ?? {};
 
-  const { unit = "km", enabled = true, watcherOptions } = options ?? {};
-  const { location } = createGeolocationWatcher(enabled, watcherOptions);
+  if (isServer && !initialLocation) return () => null;
+
+  const { location } = createGeolocationWatcher(enabled, watcherOptions, initialLocation);
 
   return (): number | null => {
     let coords: GeolocationCoordinates;
@@ -291,7 +327,7 @@ export const createDistance = (
  *
  * @param center - Centre coordinate (static or reactive)
  * @param radius - Radius in metres (static or reactive)
- * @param options - `enabled`, `watcherOptions`
+ * @param options - `enabled`, `watcherOptions`, `initialLocation`
  * @returns Signal accessor that is `true` when inside the radius
  *
  * @example
@@ -306,9 +342,12 @@ export const createWithinRadius = (
   options?: {
     enabled?: MaybeAccessor<boolean>;
     watcherOptions?: MaybeAccessor<PositionOptions>;
+    initialLocation?: GeolocationCoord;
   },
 ): Accessor<boolean> => {
-  if (isServer) return () => false;
+  const { initialLocation } = options ?? {};
+
+  if (isServer && !initialLocation) return () => false;
 
   const distance = createDistance(center, { unit: "m", ...options });
   return (): boolean => {

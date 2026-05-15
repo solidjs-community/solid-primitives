@@ -124,6 +124,20 @@ describe("createGeolocation", () => {
     }));
 });
 
+// ── createGeolocation — initialLocation ──────────────────────────────────────
+
+describe("createGeolocation — initialLocation (client)", () => {
+  it("initialLocation is ignored on the client — GPS is still queried", () =>
+    createRoot(async dispose => {
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const [location] = createGeolocation(undefined, seed);
+      const coords = await location();
+      // Mock always returns mockCoordinates, not the seed
+      expect(coords).toBe(mockCoordinates);
+      dispose();
+    }));
+});
+
 // ── createGeolocationWatcher ──────────────────────────────────────────────────
 
 describe("createGeolocationWatcher", () => {
@@ -188,6 +202,41 @@ describe("createGeolocationWatcher", () => {
       clearWatch.mockRestore();
       dispose();
     }));
+
+  it("initialLocation: location() returns seed immediately without waiting for GPS", () =>
+    createRoot(dispose => {
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const { location } = createGeolocationWatcher(true, undefined, seed);
+      const coords = location();
+      expect(coords.latitude).toBe(seed.latitude);
+      expect(coords.longitude).toBe(seed.longitude);
+      dispose();
+    }));
+
+  it("initialLocation: GPS fix replaces seed value", () =>
+    createRoot(async dispose => {
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const { location } = createGeolocationWatcher(true, undefined, seed);
+      expect(location().latitude).toBe(seed.latitude);
+      await Promise.resolve();
+      await Promise.resolve();
+      // After GPS fires, real coords replace the seed
+      expect(location()).toBe(mockCoordinates);
+      dispose();
+    }));
+
+  it("initialLocation: fills non-lat/lng fields with defaults", () =>
+    createRoot(dispose => {
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const { location } = createGeolocationWatcher(false, undefined, seed);
+      const coords = location();
+      expect(coords.altitude).toBeNull();
+      expect(coords.accuracy).toBe(0);
+      expect(coords.altitudeAccuracy).toBeNull();
+      expect(coords.heading).toBeNull();
+      expect(coords.speed).toBeNull();
+      dispose();
+    }));
 });
 
 // ── createDistance ────────────────────────────────────────────────────────────
@@ -240,6 +289,16 @@ describe("createDistance", () => {
       setTarget({ latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude });
       flush();
       expect(distance()).toBeGreaterThan(0);
+      dispose();
+    }));
+
+  it("initialLocation: returns distance from seed immediately", () =>
+    createRoot(dispose => {
+      const seed = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      // Target is at seed position; user seed is 1° north of mockCoordinates
+      const distance = createDistance(mockCoordinates, { enabled: false, initialLocation: seed });
+      expect(distance()).toBeGreaterThan(100);
+      expect(distance()).toBeLessThan(120);
       dispose();
     }));
 });
@@ -296,6 +355,28 @@ describe("createWithinRadius", () => {
       setRadius(200_000); // 200 km
       flush();
       expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("initialLocation: returns true when seed is within radius", () =>
+    createRoot(dispose => {
+      // Seed is at mockCoordinates; centre is also mockCoordinates; 1 km radius
+      const within = createWithinRadius(mockCoordinates, 1000, {
+        enabled: false,
+        initialLocation: mockCoordinates,
+      });
+      expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("initialLocation: returns false when seed is outside radius", () =>
+    createRoot(dispose => {
+      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const within = createWithinRadius(farCenter, 1000, {
+        enabled: false,
+        initialLocation: mockCoordinates,
+      });
+      expect(within()).toBe(false);
       dispose();
     }));
 });
