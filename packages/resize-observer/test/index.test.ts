@@ -130,6 +130,30 @@ describe("createResizeObserver", () => {
 
     dispose();
   });
+
+  test("unobserves removed targets", () => {
+    const targets = (_targets = new Set<Element>());
+    const { dispose, setRefs } = createRoot(dispose => {
+      const [refs, setRefs] = createSignal([div1, div2, div3]);
+      createResizeObserver(refs, () => {});
+      return { dispose, setRefs };
+    });
+    flush();
+    expect(targets.size).toBe(3);
+
+    setRefs([div1]);
+    flush();
+    expect(targets.size).toBe(1);
+    expect(targets.has(div1)).toBeTruthy();
+    expect(targets.has(div2)).toBeFalsy();
+    expect(targets.has(div3)).toBeFalsy();
+
+    setRefs([]);
+    flush();
+    expect(targets.size).toBe(0);
+
+    dispose();
+  });
 });
 
 describe("getWindowSize", () => {
