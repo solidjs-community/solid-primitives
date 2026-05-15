@@ -1,5 +1,4 @@
 import { tryOnCleanup } from "@solid-primitives/utils";
-import { onCleanup } from "solid-js";
 
 export type Listener<T = void> = (payload: T) => void;
 
@@ -48,6 +47,6 @@ export function createEventBus<T>(): EventBus<T> {
       return tryOnCleanup(bus.delete.bind(bus, listener));
     },
     emit: bus.emit.bind(bus),
-    clear: onCleanup(bus.clear.bind(bus)),
+    clear: tryOnCleanup(bus.clear.bind(bus)),
   };
 }
