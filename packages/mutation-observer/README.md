@@ -29,47 +29,34 @@ pnpm add @solid-primitives/mutation-observer
 ```ts
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
 
-// Simple usage with on a single parent element.
-let ref!: HTMLElement;
-createMutationObserver(
-  () => ref,
+// Use the returned `add` as a ref — options are set at creation time:
+const [add] = createMutationObserver([], { childList: true }, records => console.log(records));
+<div ref={add} />
+
+// Observe multiple elements:
+const [add, { start, stop }] = createMutationObserver(
+  () => [el1, el2, el3],
   { attributes: true, subtree: true },
   records => console.log(records)
 );
 
-// Observing multiple parent elements:
+// Per-element options:
 createMutationObserver(
-  () => [el1, el2, el3],
-  { attributes: true, subtree: true },
-  e => {...}
+  [[el, { attributes: true }], [el1, { childList: true }]],
+  records => console.log(records)
 );
-
-// Set individual MutationObserver options:
-createMutationObserver(
-  [
-    [el, { attributes: true, subtree: true }],
-    [el1, { childList: true }]
-  ],
-  e => {...}
-);
-
-// Primitive return useful values:
-const [observe, {start, stop, instance}] = createMutationObserver(el, options, handler)
-
-observe(el1, { childList: true })
-stop()
 ```
 
-The primitive automatically starts observing after the component settles (via `onSettled`) and disconnects on cleanup. You can also control observation manually with `start()` and `stop()`.
+Automatically starts observing after the component settles (via `onSettled`) and disconnects on cleanup. You can also control observation manually with `start()` and `stop()`.
 
-### Ref Usage
+### Standalone Ref
 
-`mutationObserver` is a ref factory for observing a single element. Pass it to an element's `ref` prop:
+`mutationObserver` is a convenience for observing a single element without calling `createMutationObserver` separately:
 
 ```tsx
 import { mutationObserver } from "@solid-primitives/mutation-observer";
 
-<div ref={mutationObserver({ childList: true }, e => {...})} />
+<div ref={mutationObserver({ childList: true }, records => console.log(records))} />
 ```
 
 ### Types
@@ -97,10 +84,10 @@ type MutationObserverReturn = [
 
 type MutationObserverAdd = (target: Node, options?: MaybeAccessor<MutationObserverInit>) => void;
 
-function mutationObserver(
+const mutationObserver: (
   options: MutationObserverInit,
   callback: MutationCallback,
-): (target: Element) => void;
+) => (target: Element) => void;
 ```
 
 ## Demo

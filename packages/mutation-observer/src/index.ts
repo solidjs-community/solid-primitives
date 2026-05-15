@@ -17,13 +17,11 @@ export type MutationObserverReturn = [
   },
 ];
 
-export type MutationObserverStandaloneProps = [
-  options: MutationObserverInit,
-  callback: MutationCallback,
-];
-
 /**
  * Primitive providing the ability to watch for changes being made to the DOM tree.
+ *
+ * Automatically starts observing after the component settles and disconnects on cleanup.
+ * The returned `add` function can be used directly as a ref to observe a single element.
  *
  * @param initial html elements to be observed by the MutationObserver
  * @param options MutationObserver options
@@ -34,16 +32,22 @@ export type MutationObserverStandaloneProps = [
  *
  * @example
  * ```ts
- * let ref: HTMLElement;
- * const [observe, { start, stop, instance }] = createMutationObserver(
- *   () => ref,
+ * // Observe a single element via ref
+ * const [add] = createMutationObserver([], { childList: true }, records => console.log(records));
+ * <div ref={add} />
+ *
+ * // Observe multiple elements
+ * const [add, { start, stop }] = createMutationObserver(
+ *   () => [el1, el2],
  *   { attributes: true, subtree: true },
  *   records => console.log(records)
  * );
  *
- * // Usage as a directive
- * const [mutationObserver] = createMutationObserver([], e => {...})
- * <div use:mutationObserver={{ childList: true }}>...</div>
+ * // Per-element options
+ * createMutationObserver(
+ *   [[el, { childList: true }], [el2, { attributes: true }]],
+ *   records => console.log(records)
+ * );
  * ```
  */
 export function createMutationObserver(
@@ -99,7 +103,9 @@ export function createMutationObserver(
 }
 
 /**
- * A ref factory for observing mutations on a single element.
+ * A standalone ref factory for observing mutations on a single element without needing
+ * to call `createMutationObserver` separately. For most cases, prefer using the `add`
+ * ref returned by `createMutationObserver` directly.
  *
  * @param options MutationObserver options
  * @param callback function called when mutations are observed
@@ -110,7 +116,7 @@ export function createMutationObserver(
  *
  * @example
  * ```tsx
- * <div ref={mutationObserver({ childList: true }, e => {...})} />
+ * <div ref={mutationObserver({ childList: true }, records => console.log(records))} />
  * ```
  */
 export const mutationObserver =
