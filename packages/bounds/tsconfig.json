@@ -10,12 +10,6 @@
       "path": "../event-listener"
     },
     {
-      "path": "../resize-observer"
-    },
-    {
-      "path": "../static-store"
-    },
-    {
       "path": "../utils"
     }
   ],
