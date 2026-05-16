@@ -181,7 +181,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
-      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]!();
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
     } else input = deps();
     if (shouldDefer) {
       shouldDefer = false;

@@ -5,7 +5,7 @@ describe("mergeRefs", () => {
   test("chains multiple ref callbacks", () => {
     let local: HTMLButtonElement | undefined;
     let forwarded: HTMLButtonElement | undefined;
-    const el = document.createElement("button") as HTMLButtonElement;
+    const el = document.createElement("button");
 
     const merged = mergeRefs<HTMLButtonElement>(
       e => (local = e),
@@ -20,9 +20,9 @@ describe("mergeRefs", () => {
   });
 
   test("ignores undefined refs", () => {
-    const el = document.createElement("button") as HTMLButtonElement;
+    const el = document.createElement("button");
     let called = false;
-    const merged = mergeRefs<HTMLButtonElement>(undefined, e => {
+    const merged = mergeRefs<HTMLButtonElement>(undefined, _e => {
       called = true;
     });
     merged(el);

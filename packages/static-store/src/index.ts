@@ -138,7 +138,7 @@ export function createDerivedStaticStore<Next extends Prev & object, Prev = Next
 ): Next {
   const o = getOwner(),
     fnMemo = createMemo(fn as ComputeFunction<undefined | NoInfer<Next>, Next>),
-    store = { ...untrack(fnMemo) } as Next,
+    store = { ...untrack(fnMemo) },
     cache: Partial<Record<keyof Next, Accessor<Next[keyof Next]>>> = {};
 
   for (const key in store) {
@@ -147,8 +147,8 @@ export function createDerivedStaticStore<Next extends Prev & object, Prev = Next
       get() {
         let keyMemo = cache[k];
         if (!keyMemo) {
-          if (!getObserver()) return fnMemo()![k];
-          runWithOwner(o, () => (cache[k] = keyMemo = createMemo(() => fnMemo()![k])));
+          if (!getObserver()) return fnMemo()[k];
+          runWithOwner(o, () => (cache[k] = keyMemo = createMemo(() => fnMemo()[k])));
         }
         return keyMemo!();
       },
