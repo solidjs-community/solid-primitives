@@ -51,7 +51,7 @@ export const falseFn: () => boolean = () => false;
 export const defaultEquals = equalFn;
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { internal: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { internal: true, ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___
