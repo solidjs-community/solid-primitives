@@ -102,9 +102,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.12
+        version: 2.0.0-beta.12(solid-js@2.0.0-beta.12)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.12
+        version: 2.0.0-beta.12
 
   packages/analytics:
     devDependencies:
@@ -124,19 +127,6 @@ importers:
       solid-js:
         specifier: ^1.9.7
         version: 1.9.7
-
-  packages/autofocus:
-    dependencies:
-      '@solid-primitives/utils':
-        specifier: workspace:^
-        version: link:../utils
-    devDependencies:
-      '@solidjs/web':
-        specifier: 2.0.0-beta.13
-        version: 2.0.0-beta.13(solid-js@2.0.0-beta.13)
-      solid-js:
-        specifier: 2.0.0-beta.13
-        version: 2.0.0-beta.13
 
   packages/bounds:
     dependencies:
@@ -353,6 +343,22 @@ importers:
       solid-js:
         specifier: ^1.9.7
         version: 1.9.7
+
+  packages/focus:
+    dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13(solid-js@2.0.0-beta.13)
+      solid-js:
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13
 
   packages/fullscreen:
     dependencies:

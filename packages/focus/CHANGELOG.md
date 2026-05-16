@@ -1,4 +1,4 @@
-# @solid-primitives/autofocus
+# @solid-primitives/focus
 
 ## 0.1.4
 

@@ -1,11 +1,20 @@
 {
-  "name": "@solid-primitives/autofocus",
+  "name": "@solid-primitives/focus",
   "version": "0.2.0",
-  "description": "Primitives for autofocusing HTML elements",
+  "description": "Primitives for autofocusing HTML elements and trapping focus within a container",
   "author": "jer3m01 <jer3m01@jer3m01.com>",
-  "contributors": [],
+  "contributors": [
+    {
+      "name": "Jasmin Noetzli",
+      "url": "https://github.com/GiyoMoon"
+    },
+    {
+      "name": "David Di Biase",
+      "url": "https://github.com/davedbase"
+    }
+  ],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/autofocus",
+  "homepage": "https://primitives.solidjs.community/package/focus",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,11 +23,14 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "autofocus",
+    "name": "focus",
     "stage": 1,
     "list": [
       "autofocus",
-      "createAutofocus"
+      "createAutofocus",
+      "createFocusTrap",
+      "makeFocusListener",
+      "createFocusSignal"
     ],
     "category": "Inputs"
   },
@@ -26,7 +38,11 @@
     "solid",
     "primitives",
     "focus",
-    "autofocus"
+    "autofocus",
+    "focus-trap",
+    "trap",
+    "accessibility",
+    "a11y"
   ],
   "private": false,
   "sideEffects": false,
@@ -56,6 +72,7 @@
     "solid-js": "^2.0.0-beta.13"
   },
   "dependencies": {
+    "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "typesVersions": {},
