@@ -35,7 +35,7 @@ const FALLBACK_SCROLL_POSITION = { x: 0, y: 0 } as const satisfies Position;
  */
 export function getScrollPosition(target: Element | Window | undefined): Position {
   if (isServer || !target) {
-    return { ...FALLBACK_SCROLL_POSITION };
+    return FALLBACK_SCROLL_POSITION;
   }
   if (target instanceof Window)
     return {
