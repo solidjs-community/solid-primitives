@@ -666,7 +666,7 @@ importers:
         specifier: 2.0.0-beta.13
         version: 2.0.0-beta.13
 
-  packages/page-visibility:
+  packages/page-utilities:
     dependencies:
       '@solid-primitives/event-listener':
         specifier: workspace:^
@@ -678,9 +678,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13(solid-js@2.0.0-beta.13)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13
 
   packages/pagination:
     dependencies:
