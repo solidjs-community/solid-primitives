@@ -376,6 +376,9 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       '@types/leaflet':
         specifier: ^1.9.8
         version: 1.9.12
@@ -383,8 +386,8 @@ importers:
         specifier: ^1.9.4
         version: 1.9.4
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/gestures:
     devDependencies:
@@ -2977,6 +2980,16 @@ packages:
     resolution: {integrity: sha512-ma1TBYqoTju87tkqrHExMReM5Z/+DTXSmi30CCTavtwuR73Bsn4rVGqm528p4sL2koRMfAuBMkrhuttjzhL68g==}
     peerDependencies:
       vinxi: ^0.5.3
+
+  '@solidjs/web@2.0.0-beta.10':
+    resolution: {integrity: sha512-Ox7MBv19kuxHoHhWoLCCcc6aykSgaqzWvWT7RB66VqlFnQ8Lid2ncd30g5L4XC0GB+MN/WZVb68tiYrAFUDIAg==}
+    peerDependencies:
+      solid-js: ^2.0.0-beta.10
+
+  '@solidjs/web@2.0.0-beta.12':
+    resolution: {integrity: sha512-Wc+/LctUqfNQs98VnijoEu4gWFOSu/kUcZiBIjQ+S9ZUuT6Z77CRkmiZ0C8dyOhNPbTgpU2JYH6B5wqY2eqS0A==}
+    peerDependencies:
+      solid-js: ^2.0.0-beta.12
 
   '@solidjs/web@2.0.0-beta.13':
     resolution: {integrity: sha512-ugSnWcNc18osJZ24+op7mQpm6LlyHSgTnvSaYqEwL9PVmLxXpmAS7/dt5nc7MLLZtwgf1J1rmRfZb7mT8fTL2w==}
@@ -6711,6 +6724,12 @@ packages:
   solid-js@1.9.7:
     resolution: {integrity: sha512-/saTKi8iWEM233n5OSi1YHCCuh66ZIQ7aK2hsToPe4tqGm7qAejU1SwNuTPivbWAYq7SjuHVVYxxuZQNRbICiw==}
 
+  solid-js@2.0.0-beta.10:
+    resolution: {integrity: sha512-EAfV6b1SC4c3wEBAoX4dMy063uTb4nfL5uXnN8yse4InH7RTw1LoB0I9HAy+pj3/GHqQE2tYZurlZtqU4pGyog==}
+
+  solid-js@2.0.0-beta.12:
+    resolution: {integrity: sha512-UJC4gc0Dgbm6BTBFhUdrfIEXiQ/jaQuUGxYfZnEkywwD5FX16MhlM/e6bq2+94mhXUExYI9VJoGBh7CpOZ/1XA==}
+
   solid-js@2.0.0-beta.13:
     resolution: {integrity: sha512-uAknr7Xkn25zAufBrYko4eOCbcg/gkrwnmE9KVb2Kb3vVZw2ibqseNxpjslnwJkT4gFScmFniqJtzRp7vO2klA==}
 
@@ -9714,6 +9733,18 @@ snapshots:
       - solid-js
       - supports-color
       - vite
+
+  '@solidjs/web@2.0.0-beta.10(solid-js@2.0.0-beta.10)':
+    dependencies:
+      seroval: 1.5.4
+      seroval-plugins: 1.5.4(seroval@1.5.4)
+      solid-js: 2.0.0-beta.10
+
+  '@solidjs/web@2.0.0-beta.12(solid-js@2.0.0-beta.12)':
+    dependencies:
+      seroval: 1.5.4
+      seroval-plugins: 1.5.4(seroval@1.5.4)
+      solid-js: 2.0.0-beta.12
 
   '@solidjs/web@2.0.0-beta.13(solid-js@2.0.0-beta.13)':
     dependencies:
@@ -14066,6 +14097,20 @@ snapshots:
       csstype: 3.1.3
       seroval: 1.3.2
       seroval-plugins: 1.3.2(seroval@1.3.2)
+
+  solid-js@2.0.0-beta.10:
+    dependencies:
+      '@solidjs/signals': 2.0.0-beta.13
+      csstype: 3.1.3
+      seroval: 1.5.4
+      seroval-plugins: 1.5.4(seroval@1.5.4)
+
+  solid-js@2.0.0-beta.12:
+    dependencies:
+      '@solidjs/signals': 2.0.0-beta.13
+      csstype: 3.1.3
+      seroval: 1.5.4
+      seroval-plugins: 1.5.4(seroval@1.5.4)
 
   solid-js@2.0.0-beta.13:
     dependencies:
