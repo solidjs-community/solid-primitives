@@ -3,9 +3,9 @@ import {
   onCleanup,
   createSignal,
   createStore,
+  createEffect,
   type Accessor,
   untrack,
-  type AccessorArray,
   type EffectFunction,
   type ComputeFunction,
   type NoInfer,
@@ -15,10 +15,10 @@ import {
   type Store,
   type StoreSetter,
   sharedConfig,
-  onMount,
   DEV,
-  equalFn,
 } from "solid-js";
+
+type AccessorArray<T> = { readonly [K in keyof T]: Accessor<T[K]> };
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer = typeof window === "undefined";
@@ -47,11 +47,11 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** @deprecated use {@link equalFn} from "solid-js" */
-export const defaultEquals = equalFn;
+/** @deprecated use reference equality `(a, b) => a === b` instead */
+export const defaultEquals = (a: unknown, b: unknown): boolean => a === b;
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { internal: true, ownedWrite: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___
@@ -183,7 +183,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     if (isArray) {
       input = Array(deps.length) as S;
       for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]!();
-    } else input = deps();
+    } else input = (deps as Accessor<S>)();
     if (shouldDefer) {
       shouldDefer = false;
       prevInput = input;
@@ -266,7 +266,10 @@ export function createHydratableSignal<T>(
   }
   if (sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
-    onSettled(() => { setState(() => update()); });
+    createEffect(
+      () => {},
+      () => { setState(() => update()); },
+    );
     return [state, setState];
   }
   return createSignal(update() as Exclude<T, Function>, options);
