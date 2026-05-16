@@ -814,11 +814,11 @@ importers:
         version: link:../utils
     devDependencies:
       '@solidjs/web':
-        specifier: 2.0.0-beta.12
-        version: 2.0.0-beta.12(solid-js@2.0.0-beta.12)
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13(solid-js@2.0.0-beta.13)
       solid-js:
-        specifier: 2.0.0-beta.12
-        version: 2.0.0-beta.12
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13
 
   packages/resource:
     devDependencies:
