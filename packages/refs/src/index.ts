@@ -4,10 +4,9 @@ import {
   children,
   createEffect,
   createMemo,
-  type JSX,
   onCleanup,
 } from "solid-js";
-import { isServer } from "@solidjs/web";
+import { isServer, type JSX } from "@solidjs/web";
 
 /**
  * Type for the `ref` prop
@@ -132,10 +131,9 @@ export function resolveElements(
   predicate = defaultElementPredicate,
   serverPredicate = defaultElementPredicate,
 ): ResolveChildrenReturn<Element> {
-  const children = createMemo(fn);
   const memo = createMemo(() =>
-    getResolvedElements(children(), isServer ? serverPredicate : predicate),
-  ) as ResolveChildrenReturn<Element>;
+    getResolvedElements(fn(), isServer ? serverPredicate : predicate),
+  ) as unknown as ResolveChildrenReturn<Element>;
   memo.toArray = () => {
     const value = memo();
     return Array.isArray(value) ? value : value ? [value] : [];

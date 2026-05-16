@@ -45,7 +45,7 @@ export function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (O
       );
       return fn(dispose);
     }),
-  )!;
+  );
 }
 
 /** @deprecated Renamed to `createSubRoot` */
@@ -165,7 +165,7 @@ export const createSharedRoot = createSingletonRoot;
 export function createHydratableSingletonRoot<T>(factory: (dispose: VoidFunction) => T): () => T {
   const owner = getOwner();
   const singleton = createSingletonRoot(factory, owner);
-  return () => (isServer || sharedConfig.hydrating ? runWithOwner(owner, () => createRoot(factory))! : singleton());
+  return () => (isServer || sharedConfig.hydrating ? runWithOwner(owner, () => createRoot(factory)) : singleton());
 }
 
 /**
@@ -242,7 +242,7 @@ export function createRootPool<TArg, TResult>(
   // don't cache roots on the server
   if (isServer) {
     const owner = getOwner();
-    return args => runWithOwner(owner, () => createRoot(dispose => factory(() => args, trueFn, dispose)))!;
+    return args => runWithOwner(owner, () => createRoot(dispose => factory(() => args, trueFn, dispose)));
   }
 
   type Root = {

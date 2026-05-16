@@ -169,7 +169,7 @@ export function createIntersectionObserver(
     const idx = indexMap.get(el);
     if (idx === undefined || !entries[idx])
       throw new NotReadyError("Element has not yet been observed");
-    return entries[idx]!.isIntersecting;
+    return entries[idx].isIntersecting;
   };
 
   return [entries, isVisible] as const;
