@@ -30,7 +30,7 @@ describe("makeActiveElementListener", () => {
       dispatchFocusEvent();
       expect(events).toBe(1);
 
-      const clear = makeActiveElementListener(e => events++);
+      const clear = makeActiveElementListener(_e => events++);
       dispatchFocusEvent();
       expect(events).toBe(2);
 

@@ -1,10 +1,5 @@
 import type { Accessor, Setter } from "solid-js";
 
-export type { EffectOptions } from "solid-js";
-
-// TODO delete in next major version
-export type { ResolvedJSXElement, ResolvedChildren } from "solid-js/types/reactive/signal.js";
-
 /**
  * Can be single or in an array
  */
@@ -43,6 +38,10 @@ export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends () => a
   ? ReturnType<T>
   : T;
 
+// not exposed by solid-js in current version, replace once available again
+export type AccessorArray<T> = [...Extract<{ [K in keyof T]: Accessor<T[K]> }, readonly unknown[]>];
+
+  
 export type OnAccessEffectFunction<S, Prev, Next extends Prev = Prev> = (
   input: AccessReturnTypes<S>,
   prevInput: AccessReturnTypes<S>,

@@ -53,11 +53,11 @@
     "rehype-highlight": "^7.0.2",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "solid-js": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.13",
     "typescript": "^5.8.3",
     "vinxi": "^0.5.7",
     "vite": "^6.3.5",
-    "babel-preset-solid": "2.0.0-beta.12",
+    "babel-preset-solid": "2.0.0-beta.13",
     "vite-plugin-solid": "^2.11.6",
     "vitest": "^2.1.9"
   },

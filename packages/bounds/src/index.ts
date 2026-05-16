@@ -120,16 +120,16 @@ export function createElementBounds(
     );
     if (isFn) {
       createEffect(
-        () => (target as Accessor<Element | FalsyValue>)() || null,
+        () => target() || null,
         el => {
-          if (el) ro.observe(el as Element);
+          if (el) ro.observe(el);
           return () => {
-            if (el) ro.unobserve(el as Element);
+            if (el) ro.unobserve(el);
           };
         },
       );
     } else {
-      ro.observe(target as Element);
+      ro.observe(target);
     }
     onCleanup(() => ro.disconnect());
   }

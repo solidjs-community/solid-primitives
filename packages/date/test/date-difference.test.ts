@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
 import {
   createTimeAgo,
-  RelativeFormatMessages,
+  type RelativeFormatMessages,
   DAY,
   HOUR,
   MINUTE,
@@ -110,8 +110,8 @@ describe("createTimeAgo", () => {
       const messages: Partial<RelativeFormatMessages> = {
         justNow: "NOW",
         future: n => `in the next ${n}`,
-        day: (n, past) => `${n} DAY${n > 1 ? "S" : ""}`,
-        week: (n, past) => (n === 1 ? "week" : `${n} weeks`),
+        day: (n, _past) => `${n} DAY${n > 1 ? "S" : ""}`,
+        week: (n, _past) => (n === 1 ? "week" : `${n} weeks`),
       };
 
       const [timeago] = createTimeAgo(date, {
