@@ -3,9 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
-    "rootDir": "src",
-    "jsx": "preserve",
-    "jsxImportSource": "@solidjs/web"
+    "rootDir": "src"
   },
   "references": [
     {

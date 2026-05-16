@@ -54,8 +54,8 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.12",
-    "solid-js": "^2.0.0-beta.12"
+    "@solidjs/web": "^2.0.0-beta.13",
+    "solid-js": "^2.0.0-beta.13"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
