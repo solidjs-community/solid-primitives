@@ -50,7 +50,7 @@ export const falseFn: () => boolean = () => false;
 export const defaultEquals = Object.is.bind(Object);
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { internal: true, ownedWrite: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___
@@ -265,7 +265,10 @@ export function createHydratableSignal<T>(
   }
   if (sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
-    onSettled(() => { setState(() => update()); });
+    createEffect(
+      () => {},
+      () => { setState(() => update()); },
+    );
     return [state, setState];
   }
   return createSignal(update() as Exclude<T, Function>, options);
