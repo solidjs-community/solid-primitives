@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect } from "vitest";
 import { createTrigger, createTriggerCache } from "../src/index.js";
 
 describe("createTrigger", () => {

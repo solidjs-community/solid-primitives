@@ -15,7 +15,7 @@ function _progress_time(by: number) {
   _raf_callbacks_old.clear();
 }
 
-let _now = performance.now;
+const _now = performance.now;
 performance.now = () => _time;
 afterAll(() => {
   performance.now = _now;
@@ -32,7 +32,7 @@ vi.stubGlobal("cancelAnimationFrame", function (id: number): void {
 
 describe("createSpring", () => {
   it("returns values", () => {
-    const [[spring, setSpring], dispose] = createRoot(d => [createSpring({ progress: 0 }), d]);
+    const [[spring, _setSpring], dispose] = createRoot(d => [createSpring({ progress: 0 }), d]);
     expect(spring().progress).toBe(0);
     dispose();
   });

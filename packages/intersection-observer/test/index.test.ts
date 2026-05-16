@@ -1,4 +1,4 @@
-import { createRoot, createSignal, createEffect, flush } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, test, expect, beforeEach } from "vitest";
 
 import {
