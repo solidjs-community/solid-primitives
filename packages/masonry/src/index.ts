@@ -158,7 +158,7 @@ export function createMasonry<T>(
     [memo, setMemo] = createSignal<VoidFunction | undefined>(undefined, { ownedWrite: true }),
     mapped = mapArray<T, any>(
       source,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       (item: any, index: any) =>
         mapData(
           item,

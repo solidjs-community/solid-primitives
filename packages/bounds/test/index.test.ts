@@ -4,8 +4,8 @@ import { createElementBounds, getElementBounds } from "../src/index.js";
 
 class TestResizeObserver {
   constructor() {}
-  observe(target: Element, options?: ResizeObserverOptions): void {}
-  unobserve(target: Element): void {}
+  observe(_target: Element, _options?: ResizeObserverOptions): void {}
+  unobserve(_target: Element): void {}
   disconnect() {}
 }
 global.ResizeObserver = TestResizeObserver;

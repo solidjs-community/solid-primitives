@@ -15,6 +15,7 @@ import {
   type SignalOptions,
   DEV,
 } from "solid-js";
+
 import { isServer } from "@solidjs/web";
 import { type EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
 

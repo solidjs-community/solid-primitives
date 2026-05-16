@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createComputed, createRoot, createSignal, mergeProps, ValidComponent } from "solid-js";
-import { DynamicProps, Dynamic } from "solid-js/web";
+import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
 import { combineProps } from "../src/index.js";
 
 describe("combineProps", () => {
