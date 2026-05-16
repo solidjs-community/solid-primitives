@@ -25,6 +25,7 @@ afterAll(() => {
 
 let _targets: Set<Element>;
 let disconnect_count = 0;
+let _observe_calls: Element[] = [];
 class TestResizeObserver {
   _targets: Set<Element>;
   constructor() {
@@ -32,6 +33,7 @@ class TestResizeObserver {
   }
   observe(target: Element): void {
     this._targets.add(target);
+    _observe_calls.push(target);
   }
   unobserve(target: Element): void {
     this._targets.delete(target);
@@ -178,6 +180,26 @@ describe("createResizeObserver", () => {
     setRefs([]);
     flush();
     expect(targets.size).toBe(0);
+
+    dispose();
+  });
+
+  test("observe is called only once per node", () => {
+    _targets = new Set<Element>();
+    _observe_calls = [];
+    const { dispose, setRefs } = createRoot(dispose => {
+      const [refs, setRefs] = createSignal([div1, div2]);
+      createResizeObserver(refs, () => {});
+      return { dispose, setRefs };
+    });
+    flush();
+    expect(_observe_calls.filter(t => t === div1).length).toBe(1);
+    expect(_observe_calls.filter(t => t === div2).length).toBe(1);
+
+    setRefs([div1, div3]);
+    flush();
+    expect(_observe_calls.filter(t => t === div1).length).toBe(1);
+    expect(_observe_calls.filter(t => t === div3).length).toBe(1);
 
     dispose();
   });
