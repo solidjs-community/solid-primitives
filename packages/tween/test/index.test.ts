@@ -1,6 +1,6 @@
 import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it, vi, afterEach } from "vitest";
-import createTween from "../src/index.js";
+import { createTween } from "../src/index.js";
 
 let _last_id = 0;
 let _raf_callbacks_old = new Map<number, FrameRequestCallback>();
