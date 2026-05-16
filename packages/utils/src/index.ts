@@ -1,11 +1,10 @@
 import {
   getOwner,
+  onSettled,
   onCleanup,
   createSignal,
-  createStore,
   type Accessor,
   untrack,
-  type AccessorArray,
   type EffectFunction,
   type ComputeFunction,
   type NoInfer,
@@ -15,14 +14,14 @@ import {
   type Store,
   type StoreSetter,
   sharedConfig,
-  onMount,
   DEV,
-  equalFn,
 } from "solid-js";
+
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer = typeof window === "undefined";
 import type {
+  AccessorArray,
   AnyClass,
   MaybeAccessor,
   MaybeAccessorValue,
@@ -48,10 +47,10 @@ export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
 /** @deprecated use {@link equalFn} from "solid-js" */
-export const defaultEquals = equalFn;
+export const defaultEquals = Object.is.bind(Object);
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { internal: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___
@@ -178,11 +177,11 @@ export function defer<S, Next extends Prev, Prev = Next>(
   const isArray = Array.isArray(deps);
   let prevInput: S;
   let shouldDefer = true;
-  return prevValue => {
+  return ((prevValue: Prev | undefined) => {
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
-      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]!();
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
     } else input = deps();
     if (shouldDefer) {
       shouldDefer = false;
@@ -192,7 +191,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     const result = untrack(() => fn(input, prevInput, prevValue));
     prevInput = input;
     return result;
-  };
+  }) as unknown as EffectFunction<NoInfer<Next> | undefined>;
 }
 
 /**
@@ -266,7 +265,10 @@ export function createHydratableSignal<T>(
   }
   if (sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
-    onSettled(() => { setState(() => update()); });
+    createEffect(
+      () => {},
+      () => { setState(() => update()); },
+    );
     return [state, setState];
   }
   return createSignal(update() as Exclude<T, Function>, options);
@@ -406,6 +408,23 @@ export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string)
   return (raw: string): B => b(a(raw));
 }
 
+// ─── DOM helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Check if a wrapper element contains a target element.
+ * Portal-aware: follows SolidJS `_$host` links so elements rendered inside
+ * a `<Portal>` are correctly treated as children of the portal's anchor.
+ */
+export const contains = (wrapper: HTMLElement, target: HTMLElement): boolean => {
+  if (wrapper.contains(target)) return true;
+  let current: HTMLElement | null = target;
+  while (current) {
+    if (current === wrapper) return true;
+    // @ts-expect-error: _$host is a SolidJS-internal property set on portal roots
+    current = current._$host ?? current.parentElement;
+  }
+  return false;
+};
 /**
  * Wraps a setter function of any signal or store
  *

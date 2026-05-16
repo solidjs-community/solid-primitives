@@ -98,7 +98,7 @@ export function createVibrate(
   }
 
   const { interval } = options;
-  const [vibrating, setVibrating] = createSignal(false, INTERNAL_OPTIONS);
+  const [vibrating, setVibrating] = createSignal<boolean>(false, INTERNAL_OPTIONS);
   let isVibrating = false;
   let intervalId: ReturnType<typeof setInterval> | undefined;
 
@@ -255,7 +255,7 @@ export function createPulse(
   }
 
   const { dutyCycle = 0.5 } = options;
-  const [pulsing, setPulsing] = createSignal(false, INTERNAL_OPTIONS);
+  const [pulsing, setPulsing] = createSignal<boolean>(false, INTERNAL_OPTIONS);
   let isPulsing = false;
   let intervalId: ReturnType<typeof setInterval> | undefined;
 
