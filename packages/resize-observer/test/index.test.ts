@@ -193,12 +193,14 @@ describe("createResizeObserver", () => {
       return { dispose, setRefs };
     });
     flush();
+    expect(_observe_calls.length).toBe(2);
     expect(_observe_calls.filter(t => t === div1).length).toBe(1);
     expect(_observe_calls.filter(t => t === div2).length).toBe(1);
 
+    _observe_calls = [];
     setRefs([div1, div3]);
     flush();
-    expect(_observe_calls.filter(t => t === div1).length).toBe(1);
+    expect(_observe_calls.length).toBe(1);
     expect(_observe_calls.filter(t => t === div3).length).toBe(1);
 
     dispose();
