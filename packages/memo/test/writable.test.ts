@@ -5,8 +5,9 @@ import { createRoot, createSignal, flush } from "solid-js";
 describe("createWritableMemo", () => {
   test("behaves like a memo", () => {
     const [count, setCount] = createSignal(1);
-    const result = createRoot(d => {
+    const result = createRoot(dispatch => {
       const [result] = createWritableMemo(() => count() * 2);
+      queueMicrotask(dispatch);
       return result;
     });
     flush();

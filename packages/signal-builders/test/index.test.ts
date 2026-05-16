@@ -29,13 +29,13 @@ describe("signal builders", () => {
       expect(a()).toEqual([num, el, svg]);
       const b = filterOutInstance(() => list, Element, Number);
       expect(b()).toEqual([string, string]);
-      expect(list).toEqual(copy, "nonmutable");
+      expect(list, "nonmutable").toEqual(copy);
       dispose();
     }));
 
   it("template", () =>
     createRoot(dispose => {
-      const [a, setA] = createSignal("Hello");
+      const [a, _setA] = createSignal("Hello");
       const [b, setB] = createSignal("World");
       const result = template`${a} ${b}!!!`;
       expect(result()).toBe("Hello World!!!");
