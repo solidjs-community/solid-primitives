@@ -27,7 +27,7 @@ pnpm add @solid-primitives/page-utilities
 
 ## `createPageVisibility`
 
-Returns a reactive boolean signal reflecting the [Page Utilities API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) — `true` when the page is visible, `false` when hidden or in a prerender state. On the server it always returns `true`.
+Returns a reactive boolean signal reflecting the [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) — `true` when the page is visible, `false` when hidden or in a prerender state. On the server it always returns `true`.
 
 ```ts
 import { createPageVisibility } from "@solid-primitives/page-utilities";
