@@ -877,10 +877,16 @@ importers:
       '@solid-primitives/static-store':
         specifier: workspace:^
         version: link:../static-store
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.12
+        version: 2.0.0-beta.12(solid-js@2.0.0-beta.12)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.12
+        version: 2.0.0-beta.12
 
   packages/selection:
     devDependencies:
