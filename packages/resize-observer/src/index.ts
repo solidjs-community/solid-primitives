@@ -186,7 +186,7 @@ export function createElementSize(
 
   if (isFn) {
     createEffect(
-      () => (target as Accessor<Element | false | undefined | null>)(),
+      () => target(),
       (el: Element | false | null | undefined) => {
         if (el) {
           setSize(getElementSize(el));
