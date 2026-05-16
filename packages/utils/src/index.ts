@@ -1,9 +1,8 @@
 import {
   getOwner,
   onCleanup,
-  createSignal,
-  isEqual,
   createEffect,
+  createSignal,
   type Accessor,
   untrack,
   type ComputeFunction,
@@ -17,11 +16,11 @@ import {
   DEV,
 } from "solid-js";
 
-type AccessorArray<T> = { readonly [K in keyof T]: Accessor<T[K]> };
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer = typeof window === "undefined";
 import type {
+  AccessorArray,
   AnyClass,
   MaybeAccessor,
   MaybeAccessorValue,
@@ -46,8 +45,8 @@ export const noop = (() => {}) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** @deprecated use reference equality `(a, b) => a === b` instead */
-export const defaultEquals = isEqual;
+/** @deprecated use {@link equalFn} from "solid-js" */
+export const defaultEquals = Object.is.bind(Object);
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
 export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
@@ -177,12 +176,12 @@ export function defer<S, Next extends Prev, Prev = Next>(
   const isArray = Array.isArray(deps);
   let prevInput: S;
   let shouldDefer = true;
-  return prevValue => {
+  return ((prevValue: Prev | undefined) => {
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
-      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]!();
-    } else input = (deps as Accessor<S>)();
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
+    } else input = deps();
     if (shouldDefer) {
       shouldDefer = false;
       prevInput = input;
@@ -191,7 +190,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     const result = untrack(() => fn(input, prevInput, prevValue));
     prevInput = input;
     return result;
-  };
+  }) as unknown as ComputeFunction<NoInfer<Next> | undefined>;
 }
 
 /**

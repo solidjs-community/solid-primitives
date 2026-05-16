@@ -94,7 +94,7 @@ describe("createControlledProp", () => {
       expect(label).instanceOf(HTMLLabelElement);
       const select = label.querySelector("select")!;
       expect(select).instanceOf(HTMLSelectElement);
-      expect(select.selectedOptions[0].innerHTML).toBe("One");
+      expect(select.selectedOptions[0]?.innerHTML).toBe("One");
       select.selectedIndex = 0;
       select.dispatchEvent(new Event("change"));
       expect(value()).toBe(Test.Zero);
@@ -159,5 +159,6 @@ describe("createControlledProp", () => {
       enumSelect.selectedIndex = 1;
       enumSelect.dispatchEvent(new Event("change"));
       expect(props.enum()).toBe(Test.One);
+      dispose();
     }));
 });

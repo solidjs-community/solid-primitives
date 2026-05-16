@@ -11,9 +11,13 @@ import {
   runWithOwner,
   sharedConfig,
   type Signal,
+  type SignalOptions,
   untrack,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
+
+type Defined<T> = T extends undefined ? never : T;
+export type MemoOptions<T> = Defined<Parameters<typeof createMemo<T>>[1]>;
 
 export type StaticStoreSetter<T extends object> = {
   (setter: (prev: T) => Partial<T>): T;
@@ -42,7 +46,7 @@ export type StaticStoreSetter<T extends object> = {
  * })
  * ```
  */
-export function createStaticStore<T extends object>(
+export function createStaticStore<T extends Record<string, Exclude<unknown, Function>>>(
   init: T,
 ): [access: T, write: StaticStoreSetter<T>] {
   const copy = { ...init },
@@ -53,8 +57,7 @@ export function createStaticStore<T extends object>(
     let signal = cache[key];
     if (!signal) {
       if (!getObserver()) return copy[key];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cache[key] = signal = createSignal(copy[key] as any, { ownedWrite: true });
+      cache[key] = signal = createSignal(copy[key] as Exclude<T[keyof T], Function>, { ownedWrite: true } as SignalOptions<T[keyof T]>);
       delete copy[key];
     }
     return signal[0]();
@@ -95,7 +98,7 @@ export function createStaticStore<T extends object>(
  * ```
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createHydratableStaticStore
  */
-export function createHydratableStaticStore<T extends object>(
+export function createHydratableStaticStore<T extends Record<string, Exclude<unknown, Function>>>(
   serverValue: T,
   update: () => T,
 ): ReturnType<typeof createStaticStore<T>> {
@@ -135,7 +138,7 @@ export function createDerivedStaticStore<Next extends Prev & object, Prev = Next
 ): Next {
   const o = getOwner(),
     fnMemo = createMemo(fn as ComputeFunction<undefined | NoInfer<Next>, Next>),
-    store = { ...untrack(fnMemo) } as Next,
+    store = { ...untrack(fnMemo) },
     cache: Partial<Record<keyof Next, Accessor<Next[keyof Next]>>> = {};
 
   for (const key in store) {
@@ -144,8 +147,8 @@ export function createDerivedStaticStore<Next extends Prev & object, Prev = Next
       get() {
         let keyMemo = cache[k];
         if (!keyMemo) {
-          if (!getObserver()) return fnMemo()![k];
-          runWithOwner(o, () => (cache[k] = keyMemo = createMemo(() => fnMemo()![k])));
+          if (!getObserver()) return fnMemo()[k];
+          runWithOwner(o, () => (cache[k] = keyMemo = createMemo(() => fnMemo()[k])));
         }
         return keyMemo!();
       },
