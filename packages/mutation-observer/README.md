@@ -16,7 +16,11 @@ Primitive providing the ability to watch for changes made to the DOM tree. A wra
 npm install @solid-primitives/mutation-observer
 # or
 yarn add @solid-primitives/mutation-observer
+# or
+pnpm add @solid-primitives/mutation-observer
 ```
+
+**Requires** `solid-js` and `@solidjs/web` >= `2.0.0-beta.13` as peer dependencies.
 
 ## How to use it
 
@@ -25,55 +29,34 @@ yarn add @solid-primitives/mutation-observer
 ```ts
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
 
-// Simple usage with on a single parent element.
-let ref!: HTMLElement;
-createMutationObserver(
-  () => ref,
+// Use the returned `add` as a ref — options are set at creation time:
+const [add] = createMutationObserver([], { childList: true }, records => console.log(records));
+<div ref={add} />
+
+// Observe multiple elements:
+const [add, { start, stop }] = createMutationObserver(
+  () => [el1, el2, el3],
   { attributes: true, subtree: true },
   records => console.log(records)
 );
 
-// Observing multiple parent elements:
+// Per-element options:
 createMutationObserver(
-  () => [el1, el2, el3],
-  { attributes: true, subtree: true },
-  e => {...}
+  [[el, { attributes: true }], [el1, { childList: true }]],
+  records => console.log(records)
 );
-
-// Set individual MutationObserver options:
-createMutationObserver(
-  [
-    [el, { attributes: true, subtree: true }],
-    [el1, { childList: true }]
-  ],
-  e => {...}
-);
-
-// Primitive return usefull values:
-const [observe, {start, stop, instance}] = createMutationObserver(el, options, handler)
-
-observe(el1, { childList: true })
-stop()
 ```
 
-### Directive Usage
+Automatically starts observing after the component settles (via `onSettled`) and disconnects on cleanup. You can also control observation manually with `start()` and `stop()`.
 
-```tsx
-// You have to name it as "mutationObserver" when using typescript
-const [mutationObserver] = createMutationObserver([], e => {...})
+### Standalone Ref
 
-<div use:mutationObserver={{ childList: true }}>...</div>
-```
-
-### Standalone Directive Usage
+`mutationObserver` is a convenience for observing a single element without calling `createMutationObserver` separately:
 
 ```tsx
 import { mutationObserver } from "@solid-primitives/mutation-observer";
 
-// has to be used in code to avoid tree-shaking it:
-mutationObserver;
-
-<div use:mutationObserver={[{ childList: true }, e => {...}]}>...</div>
+<div ref={mutationObserver({ childList: true }, records => console.log(records))} />
 ```
 
 ### Types
@@ -100,6 +83,11 @@ type MutationObserverReturn = [
 ];
 
 type MutationObserverAdd = (target: Node, options?: MaybeAccessor<MutationObserverInit>) => void;
+
+const mutationObserver: (
+  options: MutationObserverInit,
+  callback: MutationCallback,
+) => (target: Element) => void;
 ```
 
 ## Demo
