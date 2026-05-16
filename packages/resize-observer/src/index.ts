@@ -88,10 +88,12 @@ export function createResizeObserver<T extends Element>(
       }
     }, options);
 
+  let prev: T[] = [];
   createEffect(
     () => filterNonNullable(asArray(access(targets))),
-    (refs: T[], prev?: T[]) => {
-      handleDiffArray(refs, prev ?? [], observe, unobserve);
+    (refs: T[]) => {
+      handleDiffArray(refs, prev, observe, unobserve);
+      prev = refs;
     },
   );
 }
