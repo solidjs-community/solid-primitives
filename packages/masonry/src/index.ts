@@ -155,19 +155,22 @@ export function createMasonry<T>(
   options: MasonryOptionsNoElements<T> | MasonryOptions<T, any>,
 ): Accessor<any[]> & { height: Accessor<number> } {
   const { source, mapHeight, mapElement } = options,
-    [memo, setMemo] = createSignal<VoidFunction>(),
-    mapped = createMemo(
-      mapArray(
-        source,
-        mapElement && mapElement.length > 1
-          ? (source, index) => mapData(source, () => memo()?.(), mapHeight, mapElement, index)
-          : source => mapData(source, () => memo()?.(), mapHeight, mapElement, noopIndex),
-      ),
+    [memo, setMemo] = createSignal<VoidFunction | undefined>(undefined, { ownedWrite: true }),
+    mapped = mapArray<T, any>(
+      source,
+       
+      (item: any, index: any) =>
+        mapData(
+          item,
+          () => memo()?.(),
+          mapHeight,
+          mapElement,
+          mapElement && mapElement.length > 1 ? index : noopIndex,
+        ),
     ),
     columns = asAccessor(options.columns),
     getColumns = createMemo(
       () => Array.from({ length: columns() }, (): ReturnType<typeof mapped> => []),
-      void 0,
       { equals: (a, b) => a.length === b.length },
     ),
     height = setMemo(() =>

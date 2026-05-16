@@ -19,6 +19,8 @@ npm install @solid-primitives/tween
 yarn add @solid-primitives/tween
 ```
 
+Requires `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`.
+
 ## How to use it
 
 ```ts

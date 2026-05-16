@@ -61,7 +61,12 @@ export async function getModuleData(name: string): Promise<ModuleData | Error> {
     primitive: pkg.primitive ?? null,
     workspace_deps,
     peer_deps,
-    solid_peer_version: pkg.peerDependencies?.["solid-js"] ?? null,
+    solid_peer_version:
+      [
+        pkg.peerDependencies?.["solid-js"],
+        pkg.dependencies?.["solid-js"],
+        pkg.devDependencies?.["solid-js"],
+      ].find(v => v != null && /^[\^~]?2\./.test(v)) ?? null,
   };
 }
 
