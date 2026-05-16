@@ -1,5 +1,6 @@
 import {
   getOwner,
+  onSettled,
   onCleanup,
   createSignal,
   type Accessor,
@@ -12,16 +13,15 @@ import {
   type Store,
   type StoreSetter,
   sharedConfig,
-  onSettled,
   DEV,
 } from "solid-js";
 
-// AccessorArray was removed in Solid 2.0 — define locally
-type AccessorArray<S> = Accessor<S>[];
+
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer = typeof window === "undefined";
 import type {
+  AccessorArray,
   AnyClass,
   MaybeAccessor,
   MaybeAccessorValue,
@@ -46,8 +46,8 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** @deprecated use Object.is instead */
-export const defaultEquals: (a: unknown, b: unknown) => boolean = Object.is;
+/** @deprecated use {@link equalFn} from "solid-js" */
+export const defaultEquals = Object.is.bind(Object);
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
 export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
@@ -177,11 +177,11 @@ export function defer<S, Next extends Prev, Prev = Next>(
   const isArray = Array.isArray(deps);
   let prevInput: S;
   let shouldDefer = true;
-  return prevValue => {
+  return ((prevValue: Prev | undefined) => {
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
-      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]!();
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
     } else input = deps();
     if (shouldDefer) {
       shouldDefer = false;
@@ -191,7 +191,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     const result = untrack(() => fn(input, prevInput, prevValue));
     prevInput = input;
     return result;
-  };
+  }) as unknown as ComputeFunction<NoInfer<Next> | undefined>;
 }
 
 /**

@@ -1,5 +1,5 @@
 import { describe, test, expect, assert, vi } from "vitest";
-import { createSignal, createStore, flush, type Signal } from "solid-js";
+import { createSignal, createStore, flush } from "solid-js";
 import { handleDiffArray, arrayEquals, createHydratableSignal, wrapSetter } from "../src/index.js";
 
 describe("handleDiffArray", () => {

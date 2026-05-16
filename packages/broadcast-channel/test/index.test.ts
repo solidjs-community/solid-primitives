@@ -21,7 +21,7 @@ class BroadcastChannel {
     if (!_all_listeners[channel_name]) {
       _all_listeners[channel_name] = [this.listeners];
     } else {
-      _all_listeners[channel_name]!.push(this.listeners);
+      _all_listeners[channel_name].push(this.listeners);
     }
   }
 
@@ -167,7 +167,7 @@ describe("makeBroadcastChannel", () => {
     data.dispose();
   });
 
-  test("sending messages", async t => {
+  test("sending messages", async _t => {
     const channelName = "channel-1";
 
     const data = createRoot(dispose => {
