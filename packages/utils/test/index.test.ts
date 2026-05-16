@@ -1,5 +1,6 @@
-import { describe, test, expect, assert } from "vitest";
-import { handleDiffArray, arrayEquals, createHydratableSignal } from "../src/index.js";
+import { describe, test, expect, assert, vi } from "vitest";
+import { createSignal, createStore, flush } from "solid-js";
+import { handleDiffArray, arrayEquals, createHydratableSignal, wrapSetter } from "../src/index.js";
 
 describe("handleDiffArray", () => {
   test("handleAdded called for new array", () => {
@@ -100,5 +101,36 @@ describe("createHydratableSignal", () => {
     const [state, setState] = createHydratableSignal("server", () => "client");
     expect(state()).toEqual("client");
     expect(setState).toBeInstanceOf(Function);
+  });
+});
+
+describe("wrapSetter", () => {
+  test("wraps a signal", () => {
+    const wrapped = vi.fn((x) => x);
+    const [state, setState] = wrapSetter(createSignal(0), (setter) => (next) => wrapped(setter(next)));
+    setState(1);
+    flush();
+    expect(state()).toBe(1);
+    expect(wrapped).toHaveBeenCalledWith(1);
+    setState(c => c + 1);
+    flush();
+    expect(state()).toBe(2);
+  });
+  test("wraps a store", () => {
+    const wrapped = vi.fn((x) => x);
+    const [state, setState] = wrapSetter(createStore({ on: false }), (setter) => (next) => wrapped(setter(next)));
+    setState((s) => { s.on = !s.on; });
+    flush();
+    expect(state.on).toBe(true);
+    expect(wrapped).toHaveBeenCalled();
+  });
+  test("leaves additional values in the new tuple", () => {
+    const wrapped = vi.fn((x) => x);
+    const modifiedSignal = [...createSignal(0), {} as Record<string, number>, [] as string[]] as const;
+    const wrappedSignal = wrapSetter(modifiedSignal, (setter) => (next) => wrapped(setter(next)));
+    expect(wrappedSignal[0]).toBe(modifiedSignal[0]);
+    expect(wrappedSignal[2]).toBe(modifiedSignal[2]);
+    expect(wrappedSignal[3]).toBe(modifiedSignal[3]);
+    expect(wrappedSignal).toHaveLength(modifiedSignal.length);
   });
 });

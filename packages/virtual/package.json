@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/virtual",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "A virtualized list component for performantly rendering lists with many elements",
   "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
   "contributors": [],
@@ -49,16 +49,21 @@
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
-    "test": "pnpm run vitest",
-    "test:ssr": "pnpm run vitest --mode ssr"
+    "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
+    "test": "pnpm run vitest2",
+    "test:ssr": "pnpm run vitest2 --mode ssr"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.13",
+    "solid-js": "^2.0.0-beta.13"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@babel/core": "^7.27.0",
+    "@solidjs/web": "2.0.0-beta.13",
+    "babel-preset-solid": "2.0.0-beta.13",
+    "solid-js": "2.0.0-beta.13"
   }
 }

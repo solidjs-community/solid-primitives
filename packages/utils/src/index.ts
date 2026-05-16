@@ -1,19 +1,27 @@
 import {
   getOwner,
+  onSettled,
   onCleanup,
   createSignal,
   type Accessor,
   untrack,
   type EffectFunction,
+  type ComputeFunction,
   type NoInfer,
+  type Setter,
   type SignalOptions,
+  type Signal,
+  type Store,
+  type StoreSetter,
   sharedConfig,
-  onSettled,
   DEV,
-  isEqual,
 } from "solid-js";
-import { isServer } from "@solidjs/web";
+
+// isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
+// typeof window is a universal fallback compatible with both versions.
+const isServer = typeof window === "undefined";
 import type {
+  AccessorArray,
   AnyClass,
   MaybeAccessor,
   MaybeAccessorValue,
@@ -38,8 +46,8 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** @deprecated use {@link isEqual} from "solid-js" */
-export const defaultEquals = isEqual;
+/** @deprecated use {@link equalFn} from "solid-js" */
+export const defaultEquals = Object.is.bind(Object);
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
 export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
@@ -152,24 +160,24 @@ export function accessWith<T>(
  * @param initialValue
  */
 export function defer<S, Next extends Prev, Prev = Next>(
-  deps: Accessor<S>[] | Accessor<S>,
+  deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue: Next,
-): EffectFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
+): ComputeFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
-  deps: Accessor<S>[] | Accessor<S>,
+  deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: undefined,
-): EffectFunction<undefined | NoInfer<Next>>;
+): ComputeFunction<undefined | NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
-  deps: Accessor<S>[] | Accessor<S>,
+  deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: Next,
-): EffectFunction<undefined | NoInfer<Next>> {
+): ComputeFunction<undefined | NoInfer<Next>> {
   const isArray = Array.isArray(deps);
   let prevInput: S;
   let shouldDefer = true;
-  return prevValue => {
+  return ((prevValue: Prev | undefined) => {
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
@@ -183,7 +191,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     const result = untrack(() => fn(input, prevInput, prevValue));
     prevInput = input;
     return result;
-  };
+  }) as unknown as EffectFunction<NoInfer<Next> | undefined>;
 }
 
 /**
@@ -253,14 +261,17 @@ export function createHydratableSignal<T>(
   options?: SignalOptions<T>,
 ): ReturnType<typeof createSignal<T>> {
   if (isServer) {
-    return createSignal(serverValue, options);
+    return createSignal(serverValue as Exclude<T, Function>, options);
   }
   if (sharedConfig.hydrating) {
-    const [state, setState] = createSignal(serverValue, options);
-    onSettled(() => setState(() => update()));
+    const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
+    createEffect(
+      () => {},
+      () => { setState(() => update()); },
+    );
     return [state, setState];
   }
-  return createSignal(update(), options);
+  return createSignal(update() as Exclude<T, Function>, options);
 }
 
 /** @deprecated use {@link createHydratableSignal} instead */
@@ -395,4 +406,32 @@ export function safe<T>(
  */
 export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string) => B {
   return (raw: string): B => b(a(raw));
+}
+
+/**
+ * Wraps a setter function of any signal or store
+ *
+ * ```ts
+ * const [data, setData] = wrapSetter(
+ *   createSignal(initialData), 
+ *   (setter) => (next) => { console.log(next); return setter(next); },
+ * );
+ * ```
+ * If you destructure signal or store in a longer tuple, you need to use a const assertion for the types to work.
+ */
+export function wrapSetter<T>(signal: Signal<T>, wrapper: (setter: Setter<T>) => Setter<T>): Signal<T>;
+export function wrapSetter<T>(store: [Store<T>, StoreSetter<T>], wrapper: (setter: StoreSetter<T>) => StoreSetter<T>): [Store<T>, StoreSetter<T>];
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S;
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | readonly [...Signal<T>, ...any[]] | readonly [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S;
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S {
+  return [signalOrStore[0], wrapper(signalOrStore[1]), ...signalOrStore.slice(2)] as S;
 }
