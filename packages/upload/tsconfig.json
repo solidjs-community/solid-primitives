@@ -5,11 +5,7 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "references": [
-    {
-      "path": "../utils"
-    }
-  ],
+  "references": [],
   "include": [
     "src"
   ]
