@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createRoot, flush } from "solid-js";
-import { createForm } from "../src/index.js";
+import { createForm, toFormData } from "../src/index.js";
 
 // ─── Inline validators used across tests ──────────────────────────────────────
 
@@ -646,6 +646,45 @@ describe("validate", () => {
     await submitPromise!;
     expect(onSubmit).not.toHaveBeenCalled();
     dispose();
+  });
+});
+
+// ─── toFormData ───────────────────────────────────────────────────────────────
+
+describe("toFormData", () => {
+  it("returns a FormData with all current field values", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: { initial: "user@example.com" },
+          name: { initial: "Alice" },
+        },
+      });
+
+      const fd = toFormData(form.values());
+      expect(fd.get("email")).toBe("user@example.com");
+      expect(fd.get("name")).toBe("Alice");
+      dispose();
+    });
+  });
+
+  it("reflects updated values", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { name: { initial: "" } } });
+
+      form.fields.name.setValue("Bob");
+      flush();
+
+      expect(toFormData(form.values()).get("name")).toBe("Bob");
+      dispose();
+    });
+  });
+
+  it("omits null and undefined values", () => {
+    const fd = toFormData({ tag: null, label: undefined, name: "Alice" });
+    expect(fd.get("tag")).toBeNull();
+    expect(fd.get("label")).toBeNull();
+    expect(fd.get("name")).toBe("Alice");
   });
 });
 

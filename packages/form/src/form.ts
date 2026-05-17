@@ -2,8 +2,6 @@ import { createSignal, createMemo, onCleanup, untrack, createEffect, type Access
 import { isServer } from "@solidjs/web";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export type ValidatorFn<V = string> = (value: V) => string | null;
 
 export type FieldConfig<V = string> = {
@@ -43,8 +41,6 @@ export type FormConfig<C extends FieldsConfig> = {
   onSubmit?: (values: { [K in keyof C]: InferValue<C[K]> }) => void | Promise<void>;
 };
 
-// ─── Internal helpers ─────────────────────────────────────────────────────────
-
 function runValidators<V>(value: V, validators: ValidatorFn<V>[]): string | null {
   for (const v of validators) {
     const err = v(value);
@@ -53,12 +49,10 @@ function runValidators<V>(value: V, validators: ValidatorFn<V>[]): string | null
   return null;
 }
 
-// ─── createForm ───────────────────────────────────────────────────────────────
-
 export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormReturn<C> {
   type Values = { [K in keyof C]: InferValue<C[K]> };
 
-  // ── SSR stub ──────────────────────────────────────────────────────────────
+  // On the server, return static stubs with initial values and no-op setters.
   if (isServer) {
     const initialValues = Object.fromEntries(
       Object.entries(config.fields).map(([k, f]) => [k, f.initial]),
@@ -93,7 +87,8 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     };
   }
 
-  // ── Internal field state ──────────────────────────────────────────────────
+  // Internal shape that holds both the public accessors and the private setters
+  // needed by bind(), reset(), and submit().
   type InternalField = {
     initial: any;
     validators: ValidatorFn<any>[];
@@ -113,8 +108,8 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
         : [fc.validate]
       : [];
 
-    // ownedWrite: true — these signals are written from reset() and bind
-    // callbacks, which may be called from within reactive contexts
+    // ownedWrite: true because reset() and bind callbacks write these signals
+    // and may be called from within a reactive scope.
     const [value, setValue] = createSignal<any>(fc.initial, { ownedWrite: true });
     const [touched, setTouched] = createSignal(false, { ownedWrite: true });
     const error = createMemo(() => runValidators(value(), validators));
@@ -132,7 +127,6 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
   const fieldEntries = Object.entries(internalFields);
 
-  // ── Public fields API ─────────────────────────────────────────────────────
   const fields = Object.fromEntries(
     fieldEntries.map(([name, f]) => [
       name,
@@ -150,7 +144,6 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     ]),
   ) as unknown as FormReturn<C>["fields"];
 
-  // ── Derived state ─────────────────────────────────────────────────────────
   const values = createMemo(
     () => Object.fromEntries(fieldEntries.map(([k, f]) => [k, f.value()])) as Values,
   );
@@ -166,11 +159,14 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
   const dirty = createMemo(() => fieldEntries.some(([, f]) => f.value() !== f.initial));
 
-  // Populated by validate() calls during rendering, before valid is first read.
-  // lazy: true defers the first computation until the first read, so validate()
-  // calls that happen in the same component body are already registered.
+  // Cross-field validators registered via validate(). Populated during rendering
+  // before valid is first read, so a plain array is sufficient — no reactive
+  // signal needed for the list itself.
   const formValidators: Accessor<string | null>[] = [];
 
+  // lazy: true so the memo isn't computed at createForm time. By the time any
+  // JSX expression reads valid(), all validate() calls in the component body
+  // have already pushed their memos into formValidators.
   const valid = createMemo(
     () =>
       fieldEntries.every(([, f]) => f.error() === null) &&
@@ -178,9 +174,8 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     { lazy: true },
   );
 
-  // ── Form-level validate ───────────────────────────────────────────────────
-  // Call during rendering (same phase as bind) to register a cross-field rule.
-  // Returns a reactive accessor for that rule's error and factors into valid().
+  // Registers a cross-field rule. Returns a reactive accessor for that rule's
+  // error and factors the result into valid().
   const validate = (fn: (v: Values) => string | null): Accessor<string | null> => {
     const error = createMemo(() => fn(values()));
     formValidators.push(error);
@@ -190,11 +185,10 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
   const [submitting, setSubmitting] = createSignal(false, { ownedWrite: true });
 
   // Plain boolean guard for synchronous concurrent-submit prevention.
-  // setSubmitting(true) is microtask-batched, so untrack(submitting) would
-  // still read false on a second synchronous call before the batch flushes.
+  // setSubmitting(true) is microtask-batched, so a second synchronous submit()
+  // call would read the stale false value before the batch flushes.
   let _isSubmitting = false;
 
-  // ── Reset ─────────────────────────────────────────────────────────────────
   const reset = () => {
     for (const [, f] of fieldEntries) {
       f._setValue(f.initial);
@@ -204,14 +198,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     setSubmitting(false);
   };
 
-  // ── Submit ────────────────────────────────────────────────────────────────
   const submit = async () => {
     if (_isSubmitting) return;
 
-    // Touch all fields so validation errors become visible
+    // Touch all fields so validation errors become visible in the UI.
     for (const [, f] of fieldEntries) f._setTouched(true);
 
-    // Read validity from untracked memos (not reactive reads)
     if (!untrack(valid)) return;
 
     _isSubmitting = true;
@@ -224,16 +216,16 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     }
   };
 
-  // ── Bind (two-phase ref directive) ────────────────────────────────────────
-  // Phase 1 runs in the component's reactive scope (when bind() is called
-  // during JSX evaluation). Phase 2 returns the ref callback that receives el.
+  // bind() follows the Solid 2.0 two-phase ref directive pattern.
+  // Phase 1 runs in the component's reactive scope when bind() is called during
+  // JSX evaluation. Phase 2 is the ref callback that receives the element.
   const bind = (name: string) => {
     const f = internalFields[name];
     if (!f) throw new Error(`createForm: unknown field "${name}"`);
 
     let el: HTMLInputElement | undefined;
 
-    // Phase 1: reactive sync signal → DOM (runs in caller's owner scope)
+    // Phase 1: keep the DOM input in sync with the signal.
     createEffect(
       () => f.value() as string,
       value => {
@@ -241,7 +233,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       },
     );
 
-    // Phase 2: attach to element, return teardown
+    // Phase 2: wire up the element and return a teardown.
     return (nextEl: HTMLInputElement) => {
       el = nextEl;
       el.value = untrack(() => f.value() as string);
@@ -259,7 +251,6 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     };
   };
 
-  // ── Form ref ──────────────────────────────────────────────────────────────
   const ref = (el: HTMLFormElement) =>
     makeEventListener(el, "submit", (e: SubmitEvent) => {
       e.preventDefault();
@@ -281,4 +272,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     reset,
     submit,
   };
+}
+
+export function toFormData(values: Record<string, unknown>): FormData {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(values)) {
+    if (v != null) fd.append(k, String(v));
+  }
+  return fd;
 }

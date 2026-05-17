@@ -190,6 +190,35 @@ Attach to a `<form>` element to intercept the native submit event:
 
 This calls `e.preventDefault()` and runs the submit flow: touches all fields, validates, then calls `onSubmit` if the form is valid.
 
+### `toFormData(values)`
+
+A standalone helper that converts a plain values object into a `FormData` instance. Useful when passing form data to Solid Router actions or server functions that expect `FormData`:
+
+```ts
+import { createForm, toFormData } from "@solid-primitives/form";
+import { action, useAction } from "@solidjs/router";
+
+const saveProfile = action(async (fd: FormData) => {
+  await api.save(Object.fromEntries(fd));
+});
+
+function ProfileForm() {
+  const save = useAction(saveProfile);
+  const form = createForm({
+    fields: { name: { initial: "" }, bio: { initial: "" } },
+    onSubmit: values => save(toFormData(values)),
+  });
+
+  return <form ref={form.ref}>...</form>;
+}
+```
+
+`null` and `undefined` values are omitted. All other values are coerced to strings via `String(value)`.
+
+```ts
+function toFormData(values: Record<string, unknown>): FormData;
+```
+
 ### Optimistic updates
 
 `createForm` works naturally with Solid 2.0's `action` primitive for optimistic mutations:
@@ -353,6 +382,27 @@ const form = createForm({
   },
 });
 ```
+
+---
+
+## Future work
+
+### Field sanitizers
+
+A `sanitize` option on `FieldConfig`, mirroring `validate`, that transforms a field's value rather than inspecting it:
+
+```ts
+type SanitizerFn<V = string> = (value: V) => V;
+
+// proposed config shape
+email: {
+  initial: "",
+  sanitize: v => v.trim().toLowerCase(), // or an array, run as a chain
+  validate: isEmail,
+}
+```
+
+Sanitizers would run on `blur` (better UX than on every keystroke — trimming mid-input prevents typing a space), producing the cleaned value before validation sees it. `form.fields.email.value()` would always return the sanitized value.
 
 ---
 

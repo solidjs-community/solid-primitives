@@ -1,4 +1,4 @@
-export { createForm } from "./form.js";
+export { createForm, toFormData } from "./form.js";
 
 export type {
   ValidatorFn,
