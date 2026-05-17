@@ -1,36 +1,21 @@
-import { createEffect, createSignal, onCleanup, type JSX, getOwner } from "solid-js";
-import { isServer } from "solid-js/web";
+import { createEffect, createSignal, onCleanup, getOwner } from "solid-js";
+import { isServer } from "@solidjs/web";
 import type { Accessor } from "solid-js";
 import { access } from "@solid-primitives/utils";
 
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      createFullscreen: (
-        ref?: HTMLElement | Accessor<HTMLElement | undefined>,
-        active?: Accessor<FullscreenOptions | boolean>,
-      ) => Accessor<boolean>;
-    }
-  }
-}
-
-// only here so the `JSX` import won't be shaken off the tree:
-export type E = JSX.Element;
-
 /**
- * createFullscreen - reactively toggle fullscreen
+ * Reactively toggles fullscreen on a target element.
+ *
  * ```ts
  * const [fs, setFs] = createSignal(false);
  *
  * // via ref signal
  * const [ref, setRef] = createSignal<HTMLElement>();
  * createFullscreen(ref, fs);
- * return <div ref={setRef} onClick={setFs(f => !f)}>click me</div>
+ * return <div ref={setRef} onClick={() => setFs(f => !f)}>click me</div>
  *
- * // via directive:
- * return <div use:createFullscreen={fs} onClick={setFs(f => !f)}>
- *   click me
- * </div>
+ * // via ref directive factory (Solid 2.0)
+ * return <div ref={fullscreen(fs)} onClick={() => setFs(f => !f)}>click me</div>
  * ```
  */
 export const createFullscreen = (
@@ -43,21 +28,27 @@ export const createFullscreen = (
   }
 
   const [isActive, setActive] = createSignal(false);
-  createEffect(() => {
-    const node = access(ref);
-    if (node) {
-      const activeOutput = active?.() ?? true;
-      if (!isActive() && activeOutput) {
+
+  createEffect(
+    () => ({
+      node: access(ref),
+      activeOutput: active?.() ?? true,
+      currentActive: isActive(),
+    }),
+    ({ node, activeOutput, currentActive }) => {
+      if (!node) return;
+      if (!currentActive && activeOutput) {
         node
           .requestFullscreen(typeof activeOutput === "object" ? activeOutput : options)
           .then(() => setActive(true))
           .catch(() => {});
-      } else if (!activeOutput && isActive()) {
+      } else if (!activeOutput && currentActive) {
         setActive(false);
         document.exitFullscreen();
       }
-    }
-  });
+    },
+  );
+
   const listener = () => setActive(document.fullscreenElement === access(ref));
   document.addEventListener("fullscreenchange", listener);
   getOwner() &&
@@ -69,4 +60,21 @@ export const createFullscreen = (
     });
 
   return isActive;
+};
+
+/**
+ * Ref directive factory for toggling fullscreen. For use with Solid 2.0's `ref` prop.
+ *
+ * ```tsx
+ * const [fs, setFs] = createSignal(false);
+ * return <div ref={fullscreen(fs)} onClick={() => setFs(f => !f)}>click me</div>
+ * ```
+ */
+export const fullscreen = (
+  active?: Accessor<FullscreenOptions | boolean>,
+  options?: FullscreenOptions,
+) => {
+  const [ref, setRef] = createSignal<HTMLElement>();
+  createFullscreen(ref, active, options);
+  return setRef as (el: HTMLElement) => void;
 };
