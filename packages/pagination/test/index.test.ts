@@ -4,9 +4,8 @@ import {
   createInfiniteScroll,
   createPagination,
   createSegment,
-  PaginationOptions,
+  type PaginationOptions,
 } from "../src/index.js";
-import { testEffect } from "../../resource/test/index.test.js";
 
 describe("createPagination", () => {
   test("createPagination returns page getter and setter", () =>
@@ -89,7 +88,7 @@ describe("createPagination", () => {
 
   test("createPagination next back", () => {
     createRoot(dispose => {
-      const [paginationProps, page, setPage] = createPagination({
+      const [paginationProps, _page, _setPage] = createPagination({
         pages: 100,
         maxPages: 1,
         showFirst: false,
@@ -107,7 +106,7 @@ describe("createPagination", () => {
 
   test("setting page below one will yield the first page", () => {
     createRoot(dispose => {
-      const [paginationProps, page, setPage] = createPagination({
+      const [_paginationProps, page, setPage] = createPagination({
         pages: 10,
         maxPages: 5,
       });
@@ -124,7 +123,7 @@ describe("createPagination", () => {
 
   test("setting page beyond the number pages will yield the last page", () => {
     createRoot(dispose => {
-      const [paginationProps, page, setPage] = createPagination({
+      const [_paginationProps, page, setPage] = createPagination({
         pages: 10,
         maxPages: 5,
         initialPage: 10,
@@ -147,7 +146,7 @@ describe("createPagination", () => {
         maxPages: 5,
         initialPage: 10,
       });
-      const [paginationProps, page, setPage] = createPagination(options);
+      const [_paginationProps, page, _setPage] = createPagination(options);
 
       expect(page()).toBe(10);
       setOptions({ pages: 8, maxPages: 5 });
@@ -200,7 +199,7 @@ describe("createSegment", () => {
     createRoot(dispose => {
       const [length, setLength] = createSignal(55);
       const items = createMemo(() => Array.from({ length: length() }, (_, i) => i + 1));
-      const [page, setPage] = createSignal(6);
+      const [page, _setPage] = createSignal(6);
       const segment = createSegment(items, 10, page);
 
       const seg1 = segment();

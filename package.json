@@ -20,6 +20,8 @@
     "test:client": "vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
+    "test:client2": "vitest -c ./configs/vitest.config.solid2.ts",
+    "test:ssr2": "pnpm run test:client2 --mode ssr",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/build.ts",
     "new-package": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/new-package.ts",
     "update-readme": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/update-readme.ts",
@@ -30,6 +32,7 @@
     "postinstall": "pnpm update-tsconfigs"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.0",
     "@changesets/cli": "^2.29.4",
     "@nothing-but/node-resolve-ts": "^1.0.1",
     "@solidjs/start": "^1.1.4",
@@ -50,14 +53,15 @@
     "rehype-highlight": "^7.0.2",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "solid-js": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.13",
     "typescript": "^5.8.3",
     "vinxi": "^0.5.7",
     "vite": "^6.3.5",
+    "babel-preset-solid": "2.0.0-beta.13",
     "vite-plugin-solid": "^2.11.6",
     "vitest": "^2.1.9"
   },
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@11.1.1",
   "engines": {
     "node": ">=22.0.0"
   }
