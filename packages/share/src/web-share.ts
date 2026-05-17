@@ -77,7 +77,7 @@ export const createWebShare = (
   let skipFirst = deferInitial;
   createEffect(
     () => data(),
-    dataValue => {
+    (dataValue: ShareData) => {
       if (skipFirst) {
         skipFirst = false;
         return;
