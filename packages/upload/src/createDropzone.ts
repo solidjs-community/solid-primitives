@@ -1,4 +1,4 @@
-import { createSignal, type JSX, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { createSignal, getOwner, onCleanup, runWithOwner } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { transformFiles } from "./helpers.js";
 import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
@@ -9,6 +9,7 @@ import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
  * @returns `setRef`
  * @returns `files`
  * @returns `error` - Reactive error from the last drag callback, cleared on next drop
+ * @returns `isLoading` - True while the `onDrop` callback is pending
  * @returns `isDragging`
  * @returns `removeFile`
  * @returns `clearFiles`
@@ -33,6 +34,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
       setRef: () => {},
       files: () => [],
       error: () => null,
+      isLoading: () => false,
       isDragging: () => false,
       removeFile: () => {},
       clearFiles: () => {},
@@ -40,6 +42,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
   const [error, setError] = createSignal<unknown>(null);
+  const [isLoading, setIsLoading] = createSignal(false);
   const [isDragging, setIsDragging] = createSignal(false);
 
   // Capture owner in the Phase-1 (owned) scope so cleanup can be registered later
@@ -56,55 +59,64 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     }
   };
 
-  const onDragStart: JSX.EventHandler<T, DragEvent> = event => {
+  const onDragStart = (event: DragEvent) => {
     setIsDragging(true);
     void runCallback(options?.onDragStart, transformFiles(event.dataTransfer?.files || null));
   };
-  const onDragEnd: JSX.EventHandler<T, DragEvent> = event => {
+  const onDragEnd = (event: DragEvent) => {
     setIsDragging(false);
     void runCallback(options?.onDragEnd, transformFiles(event.dataTransfer?.files || null));
   };
-  const onDragEnter: JSX.EventHandler<T, DragEvent> = event => {
+  const onDragEnter = (event: DragEvent) => {
     void runCallback(options?.onDragEnter, transformFiles(event.dataTransfer?.files || null));
   };
-  const onDragLeave: JSX.EventHandler<T, DragEvent> = event => {
+  const onDragLeave = (event: DragEvent) => {
     void runCallback(options?.onDragLeave, transformFiles(event.dataTransfer?.files || null));
   };
-  const onDragOver: JSX.EventHandler<T, DragEvent> = event => {
+  const onDragOver = (event: DragEvent) => {
     event.preventDefault();
     void runCallback(options?.onDragOver, transformFiles(event.dataTransfer?.files || null));
   };
-  const onDrag: JSX.EventHandler<T, DragEvent> = event => {
+  const onDrag = (event: DragEvent) => {
     void runCallback(options?.onDrag, transformFiles(event.dataTransfer?.files || null));
   };
-  const onDrop: JSX.EventHandler<T, DragEvent> = event => {
+  const onDrop = (event: DragEvent) => {
     event.preventDefault();
     const parsedFiles = transformFiles(event.dataTransfer?.files || null);
     setFiles(parsedFiles);
     setError(null);
-    void runCallback(options?.onDrop, parsedFiles);
+    setIsLoading(true);
+    void (async () => {
+      try {
+        await options?.onDrop?.(parsedFiles);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   };
 
   // setRef is the Phase-2 ref callback: called synchronously when the element is created.
   // Listeners are attached immediately; cleanup is registered back in the owner scope.
   const setRef = (ref: T) => {
-    ref.addEventListener("dragstart", onDragStart as any);
-    ref.addEventListener("dragenter", onDragEnter as any);
-    ref.addEventListener("dragend", onDragEnd as any);
-    ref.addEventListener("dragleave", onDragLeave as any);
-    ref.addEventListener("dragover", onDragOver as any);
-    ref.addEventListener("drag", onDrag as any);
-    ref.addEventListener("drop", onDrop as any);
+    ref.addEventListener("dragstart", onDragStart);
+    ref.addEventListener("dragenter", onDragEnter);
+    ref.addEventListener("dragend", onDragEnd);
+    ref.addEventListener("dragleave", onDragLeave);
+    ref.addEventListener("dragover", onDragOver);
+    ref.addEventListener("drag", onDrag);
+    ref.addEventListener("drop", onDrop);
 
     runWithOwner(owner, () => {
       onCleanup(() => {
-        ref.removeEventListener("dragstart", onDragStart as any);
-        ref.removeEventListener("dragenter", onDragEnter as any);
-        ref.removeEventListener("dragend", onDragEnd as any);
-        ref.removeEventListener("dragleave", onDragLeave as any);
-        ref.removeEventListener("dragover", onDragOver as any);
-        ref.removeEventListener("drag", onDrag as any);
-        ref.removeEventListener("drop", onDrop as any);
+        ref.removeEventListener("dragstart", onDragStart);
+        ref.removeEventListener("dragenter", onDragEnter);
+        ref.removeEventListener("dragend", onDragEnd);
+        ref.removeEventListener("dragleave", onDragLeave);
+        ref.removeEventListener("dragover", onDragOver);
+        ref.removeEventListener("drag", onDrag);
+        ref.removeEventListener("drop", onDrop);
       });
     });
   };
@@ -121,6 +133,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     setRef,
     files,
     error,
+    isLoading,
     isDragging,
     removeFile,
     clearFiles,

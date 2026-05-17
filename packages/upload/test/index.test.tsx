@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeAll } from "vitest";
-import { createRoot } from "solid-js";
-import { createFileUploader, createDropzone, fileUploader } from "../src/index.js";
+import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
+import { createRoot, flush } from "solid-js";
+import { createFilePicker, createFileUploader, fileSender, createDropzone, fileUploader } from "../src/index.js";
 import { transformFiles } from "../src/helpers.js";
 import type { UploadFile } from "../src/types.js";
 
@@ -55,22 +55,23 @@ describe("transformFiles", () => {
   });
 });
 
-// ── createFileUploader ────────────────────────────────────────────────────────
+// ── createFilePicker ────────────────────────────────────────────────────────
 
-describe("createFileUploader", () => {
-  it("initialises with empty file list and no error", () => {
-    const { files, error, dispose } = createRoot(dispose => ({
-      ...createFileUploader(),
+describe("createFilePicker", () => {
+  it("initialises with empty file list, no error, and isLoading=false", () => {
+    const { files, error, isLoading, dispose } = createRoot(dispose => ({
+      ...createFilePicker(),
       dispose,
     }));
     expect(files()).toEqual([]);
     expect(error()).toBeNull();
+    expect(isLoading()).toBe(false);
     dispose();
   });
 
   it("initialises with empty file list (multiple mode)", () => {
     const { files, dispose } = createRoot(dispose => ({
-      ...createFileUploader({ multiple: true }),
+      ...createFilePicker({ multiple: true }),
       dispose,
     }));
     expect(files()).toEqual([]);
@@ -79,7 +80,7 @@ describe("createFileUploader", () => {
 
   it("removeFile is a no-op on an empty list", () => {
     const { files, removeFile, dispose } = createRoot(dispose => ({
-      ...createFileUploader(),
+      ...createFilePicker(),
       dispose,
     }));
     removeFile("nonexistent.png");
@@ -89,7 +90,7 @@ describe("createFileUploader", () => {
 
   it("clearFiles empties the list", () => {
     const { files, clearFiles, dispose } = createRoot(dispose => ({
-      ...createFileUploader(),
+      ...createFilePicker(),
       dispose,
     }));
     clearFiles();
@@ -99,7 +100,7 @@ describe("createFileUploader", () => {
 
   it("selectFiles triggers a file input click", () => {
     const { selectFiles, dispose } = createRoot(dispose => ({
-      ...createFileUploader(),
+      ...createFilePicker(),
       dispose,
     }));
 
@@ -120,7 +121,7 @@ describe("createFileUploader", () => {
 
   it("error() is null when callback succeeds", async () => {
     const { error, selectFiles, dispose } = createRoot(dispose => ({
-      ...createFileUploader(),
+      ...createFilePicker(),
       dispose,
     }));
 
@@ -148,10 +149,78 @@ describe("createFileUploader", () => {
     dispose();
   });
 
+  it("isLoading is true while callback is pending, false after it resolves", async () => {
+    let resolve!: () => void;
+    const blocker = new Promise<void>(r => {
+      resolve = r;
+    });
+
+    const { isLoading, selectFiles, dispose } = createRoot(dispose => ({
+      ...createFilePicker(),
+      dispose,
+    }));
+
+    const origCreate = document.createElement.bind(document);
+    let createdInput: HTMLInputElement | undefined;
+    vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+      const el = origCreate(tag);
+      if (tag === "input") {
+        createdInput = el as HTMLInputElement;
+        vi.spyOn(createdInput, "click").mockImplementation(() => {
+          dispatchChange(createdInput!, makeFileList(makeFile()));
+        });
+      }
+      return el;
+    });
+
+    selectFiles(() => blocker);
+    await Promise.resolve(); // flush setIsLoading(true) from onChange sync section
+
+    expect(isLoading()).toBe(true);
+
+    resolve();
+    await blocker;
+    await Promise.resolve(); // flush setIsLoading(false) from finally
+
+    expect(isLoading()).toBe(false);
+    vi.restoreAllMocks();
+    dispose();
+  });
+
+  it("isLoading is false after callback throws", async () => {
+    const { isLoading, selectFiles, dispose } = createRoot(dispose => ({
+      ...createFilePicker(),
+      dispose,
+    }));
+
+    const origCreate = document.createElement.bind(document);
+    let createdInput: HTMLInputElement | undefined;
+    vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+      const el = origCreate(tag);
+      if (tag === "input") {
+        createdInput = el as HTMLInputElement;
+        vi.spyOn(createdInput, "click").mockImplementation(() => {
+          dispatchChange(createdInput!, makeFileList(makeFile()));
+        });
+      }
+      return el;
+    });
+
+    selectFiles(async () => {
+      throw new Error("oops");
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(isLoading()).toBe(false);
+    vi.restoreAllMocks();
+    dispose();
+  });
+
   it("error() captures a thrown callback error", async () => {
     const boom = new Error("upload failed");
     const { error, selectFiles, dispose } = createRoot(dispose => ({
-      ...createFileUploader(),
+      ...createFilePicker(),
       dispose,
     }));
 
@@ -183,13 +252,14 @@ describe("createFileUploader", () => {
 // ── createDropzone ────────────────────────────────────────────────────────────
 
 describe("createDropzone", () => {
-  it("initialises with empty files, no error, and isDragging=false", () => {
-    const { files, error, isDragging, dispose } = createRoot(dispose => ({
+  it("initialises with empty files, no error, isLoading=false, and isDragging=false", () => {
+    const { files, error, isLoading, isDragging, dispose } = createRoot(dispose => ({
       ...createDropzone(),
       dispose,
     }));
     expect(files()).toEqual([]);
     expect(error()).toBeNull();
+    expect(isLoading()).toBe(false);
     expect(isDragging()).toBe(false);
     dispose();
   });
@@ -231,6 +301,63 @@ describe("createDropzone", () => {
       });
       dispose();
     }).not.toThrow();
+  });
+
+  it("isLoading is true while onDrop callback is pending, false after it resolves", async () => {
+    let resolve!: () => void;
+    const blocker = new Promise<void>(r => {
+      resolve = r;
+    });
+
+    // Capture isLoading via closure — onDrop is passed before the primitive returns
+    let getIsLoading!: () => boolean;
+    const { setRef, dispose } = createRoot(dispose => {
+      const dz = createDropzone({ onDrop: () => blocker });
+      getIsLoading = dz.isLoading;
+      return { ...dz, dispose };
+    });
+
+    const div = document.createElement("div");
+    setRef(div);
+
+    const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(dropEvent, "dataTransfer", {
+      value: { files: makeFileList(makeFile()) },
+      configurable: true,
+    });
+    div.dispatchEvent(dropEvent);
+    await Promise.resolve(); // flush setIsLoading(true)
+
+    expect(getIsLoading()).toBe(true);
+
+    resolve();
+    await blocker;
+    await Promise.resolve(); // flush setIsLoading(false) from finally
+
+    expect(getIsLoading()).toBe(false);
+    dispose();
+  });
+
+  it("isLoading is false after onDrop throws", async () => {
+    const { isLoading, setRef, dispose } = createRoot(dispose => ({
+      ...createDropzone({ onDrop: async () => { throw new Error("oops"); } }),
+      dispose,
+    }));
+
+    const div = document.createElement("div");
+    setRef(div);
+
+    const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(dropEvent, "dataTransfer", {
+      value: { files: makeFileList(makeFile()) },
+      configurable: true,
+    });
+    div.dispatchEvent(dropEvent);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(isLoading()).toBe(false);
+    dispose();
   });
 
   it("error() captures a thrown onDrop callback", async () => {
@@ -337,5 +464,446 @@ describe("fileUploader", () => {
     await Promise.resolve();
 
     expect(onError).toHaveBeenCalledWith(boom);
+  });
+});
+
+// ── createFileUploader ──────────────────────────────────────────────────────────
+
+// Builds a minimal UploadFile without needing a real picker
+function makeUploadFile(name = "test.png"): UploadFile {
+  const file = makeFile(name);
+  return { source: `blob:${name}`, name, size: file.size, file };
+}
+
+// Custom send helper: called once per file; tracks all concurrent calls for multi-file tests.
+function makeBlockingSend() {
+  type ProgressCb = (p: { loaded: number; total: number; percentage: number }) => void;
+  type Call = { file: UploadFile; resolve: (v: unknown) => void; reject: (e: unknown) => void; onProgress: ProgressCb };
+  const calls: Call[] = [];
+
+  const send = vi.fn((file: UploadFile, onProgress: ProgressCb, signal: AbortSignal) =>
+    new Promise<unknown>((res, rej) => {
+      calls.push({ file, resolve: res, reject: rej, onProgress });
+      signal.addEventListener("abort", () => rej(new DOMException("Upload aborted", "AbortError")));
+    }),
+  );
+
+  const emitProgressCall = (i: number, loaded: number, total: number) =>
+    calls[i]!.onProgress({ loaded, total, percentage: Math.round((loaded / total) * 100) });
+
+  return {
+    send,
+    resolve: (val: unknown = "ok") => calls[0]!.resolve(val),
+    reject: (err: unknown) => calls[0]!.reject(err),
+    emitProgress: (loaded: number, total: number) => emitProgressCall(0, loaded, total),
+    resolveCall: (i: number, val: unknown = "ok") => calls[i]!.resolve(val),
+    rejectCall: (i: number, err: unknown) => calls[i]!.reject(err),
+    emitProgressCall,
+    callCount: () => calls.length,
+  };
+}
+
+describe("createFileUploader", () => {
+  it("starts with idle status, zero progress, and empty files array", () => {
+    const { status, progress, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(makeBlockingSend().send),
+      dispose,
+    }));
+    expect(status()).toBe("idle");
+    expect(progress()).toEqual({ loaded: 0, total: 0, percentage: 0 });
+    expect(files.length).toBe(0);
+    dispose();
+  });
+
+  it("status: idle → uploading → success", async () => {
+    const { send, resolve } = makeBlockingSend();
+    const { upload, status, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    expect(status()).toBe("idle");
+
+    const uploadPromise = upload([makeUploadFile()]).catch(() => {});
+    await Promise.resolve();
+    flush();
+    expect(status()).toBe("uploading");
+
+    resolve("response-data");
+    await uploadPromise;
+    flush();
+    expect(status()).toBe("success");
+    dispose();
+  });
+
+  it("per-file response is set after a successful upload", async () => {
+    const { send, resolve } = makeBlockingSend();
+    const { upload, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile()]);
+    resolve({ id: 42 });
+    await uploadPromise;
+    flush();
+    expect(files[0]!.response).toEqual({ id: 42 });
+    expect(files[0]!.status).toBe("success");
+    dispose();
+  });
+
+  it("aggregate progress updates across all files during transfer", async () => {
+    const { send, resolve, emitProgress } = makeBlockingSend();
+    const { upload, progress, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile()]);
+
+    emitProgress(512, 1024);
+    flush();
+    expect(progress()).toEqual({ loaded: 512, total: 1024, percentage: 50 });
+
+    emitProgress(1024, 1024);
+    flush();
+    expect(progress()).toEqual({ loaded: 1024, total: 1024, percentage: 100 });
+
+    resolve();
+    await uploadPromise;
+    dispose();
+  });
+
+  it("per-file error is set and aggregate status → error when send rejects", async () => {
+    const boom = new Error("network failure");
+    const { send, reject } = makeBlockingSend();
+    const { upload, status, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile()]).catch(() => {});
+    reject(boom);
+    await uploadPromise;
+    flush();
+
+    expect(status()).toBe("error");
+    expect(files[0]!.status).toBe("error");
+    expect((files[0]!.error as Error).message).toBe(boom.message);
+    dispose();
+  });
+
+  it("status → aborted when abort() is called", async () => {
+    const { send } = makeBlockingSend();
+    const { upload, abort, status, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile()]).catch(() => {});
+    await Promise.resolve();
+    abort();
+    await uploadPromise;
+    flush();
+
+    expect(status()).toBe("aborted");
+    expect(files[0]!.status).toBe("aborted");
+    expect(files[0]!.error).toBeNull();
+    dispose();
+  });
+
+  it("progress resets to zero when a new upload starts", async () => {
+    const blocker1 = makeBlockingSend();
+    const blocker2 = makeBlockingSend();
+    const sendFn = vi.fn()
+      .mockImplementationOnce(blocker1.send)
+      .mockImplementationOnce(blocker2.send);
+
+    const { upload, progress, dispose } = createRoot(dispose => ({
+      ...createFileUploader(sendFn),
+      dispose,
+    }));
+
+    const first = upload([makeUploadFile()]).catch(() => {});
+    blocker1.emitProgress(1024, 1024);
+    flush();
+    expect(progress().percentage).toBe(100);
+
+    // Start second upload — aborts first and resets progress
+    upload([makeUploadFile()]).catch(() => {});
+    await first;
+    flush();
+    expect(progress()).toEqual({ loaded: 0, total: 0, percentage: 0 });
+
+    dispose();
+  });
+
+  it("dispatches a separate send call per file", async () => {
+    const { send, resolveCall } = makeBlockingSend();
+    const { upload, status, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]);
+    await Promise.resolve();
+
+    expect(send).toHaveBeenCalledTimes(2);
+    expect(send.mock.calls[0]![0]).toMatchObject({ name: "a.png" });
+    expect(send.mock.calls[1]![0]).toMatchObject({ name: "b.png" });
+    expect(files.length).toBe(2);
+
+    resolveCall(0, "res-a");
+    resolveCall(1, "res-b");
+    await uploadPromise;
+    flush();
+
+    expect(status()).toBe("success");
+    expect(files[0]!.response).toBe("res-a");
+    expect(files[1]!.response).toBe("res-b");
+    dispose();
+  });
+
+  it("partial failure: one file errors while the other succeeds", async () => {
+    const { send, resolveCall, rejectCall } = makeBlockingSend();
+    const { upload, status, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const boom = new Error("file b failed");
+    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]);
+    await Promise.resolve();
+
+    resolveCall(0, "ok-a");
+    rejectCall(1, boom);
+    await uploadPromise;
+    flush();
+
+    expect(status()).toBe("error");
+    expect(files[0]!.status).toBe("success");
+    expect(files[0]!.response).toBe("ok-a");
+    expect(files[1]!.status).toBe("error");
+    expect((files[1]!.error as Error).message).toBe(boom.message);
+    dispose();
+  });
+
+  it("per-file progress tracked independently for multiple files", async () => {
+    const { send, resolveCall, emitProgressCall } = makeBlockingSend();
+    const { upload, progress, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]);
+    await Promise.resolve();
+
+    emitProgressCall(0, 256, 1024); // file a: 25%
+    emitProgressCall(1, 512, 1024); // file b: 50%
+    flush();
+
+    expect(files[0]!.progress.percentage).toBe(25);
+    expect(files[1]!.progress.percentage).toBe(50);
+    // aggregate: (256+512) / (1024+1024) = 768/2048 = 37.5 → 38%
+    expect(progress().percentage).toBe(38);
+
+    resolveCall(0);
+    resolveCall(1);
+    await uploadPromise;
+    dispose();
+  });
+
+  it("clearFiles empties the files list and aborts in-flight uploads", async () => {
+    const { send } = makeBlockingSend();
+    const { upload, files, status, clearFiles, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]).catch(() => {});
+    await Promise.resolve();
+    flush();
+    expect(files.length).toBe(2);
+
+    clearFiles();
+    await uploadPromise;
+    flush();
+    expect(files.length).toBe(0);
+    expect(status()).toBe("idle");
+    dispose();
+  });
+
+  it("removeFile removes a single entry and aborts in-flight uploads", async () => {
+    const { send } = makeBlockingSend();
+    const { upload, files, removeFile, dispose } = createRoot(dispose => ({
+      ...createFileUploader(send),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]).catch(() => {});
+    await Promise.resolve();
+    flush();
+    expect(files.length).toBe(2);
+
+    removeFile("a.png");
+    await uploadPromise;
+    flush();
+    expect(files.length).toBe(1);
+    expect(files[0]!.file.name).toBe("b.png");
+    dispose();
+  });
+
+  it("clearFiles on an already-empty list is a no-op", () => {
+    const { status, clearFiles, dispose } = createRoot(dispose => ({
+      ...createFileUploader(makeBlockingSend().send),
+      dispose,
+    }));
+    clearFiles();
+    expect(status()).toBe("idle");
+    dispose();
+  });
+});
+
+// ── createFileUploader — XHR path ───────────────────────────────────────────────
+
+function makeMockXhr() {
+  const uploadListeners: Record<string, (e: ProgressEvent) => void> = {};
+  const xhrListeners: Record<string, (e: Event) => void> = {};
+
+  const xhr = {
+    open: vi.fn(),
+    send: vi.fn(),
+    setRequestHeader: vi.fn(),
+    abort: vi.fn(() => xhrListeners["abort"]?.(new Event("abort"))),
+    status: 200,
+    statusText: "OK",
+    responseText: '{"ok":true}',
+    upload: {
+      addEventListener: vi.fn((type: string, fn: (e: ProgressEvent) => void) => {
+        uploadListeners[type] = fn;
+      }),
+    },
+    addEventListener: vi.fn((type: string, fn: (e: Event) => void) => {
+      xhrListeners[type] = fn;
+    }),
+  };
+
+  return {
+    xhr,
+    triggerProgress: (loaded: number, total: number) =>
+      uploadListeners["progress"]?.({ lengthComputable: true, loaded, total } as ProgressEvent),
+    triggerLoad: () => xhrListeners["load"]?.(new Event("load")),
+    triggerError: () => xhrListeners["error"]?.(new Event("error")),
+    triggerAbort: () => xhrListeners["abort"]?.(new Event("abort")),
+  };
+}
+
+describe("createFileUploader — XHR", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("opens a POST to the provided URL and sends FormData", () => {
+    const { xhr } = makeMockXhr();
+    vi.stubGlobal("XMLHttpRequest", vi.fn(() => xhr));
+
+    const { upload } = createRoot(dispose => ({
+      ...createFileUploader(fileSender("/api/upload")),
+      dispose,
+    }));
+
+    upload([makeUploadFile()]).catch(() => {});
+
+    expect(xhr.open).toHaveBeenCalledWith("POST", "/api/upload");
+    expect(xhr.send).toHaveBeenCalledWith(expect.any(FormData));
+  });
+
+  it("resolves with parsed JSON on 200 load", async () => {
+    const mock = makeMockXhr();
+    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+
+    const { upload, status, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(fileSender("/api/upload")),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile()]);
+    mock.triggerLoad();
+    await uploadPromise;
+    flush();
+
+    expect(status()).toBe("success");
+    expect(files[0]!.response).toEqual({ ok: true });
+    dispose();
+  });
+
+  it("rejects with an HTTP error for non-2xx responses", async () => {
+    const mock = makeMockXhr();
+    mock.xhr.status = 413;
+    mock.xhr.statusText = "Payload Too Large";
+    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+
+    const { upload, status, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(fileSender("/api/upload")),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile()]).catch(() => {});
+    mock.triggerLoad();
+    await uploadPromise;
+    flush();
+
+    expect(status()).toBe("error");
+    expect((files[0]!.error as Error).message).toMatch("HTTP 413");
+    dispose();
+  });
+
+  it("sets network error status when XHR fires error", async () => {
+    const mock = makeMockXhr();
+    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+
+    const { upload, status, files, dispose } = createRoot(dispose => ({
+      ...createFileUploader(fileSender("/api/upload")),
+      dispose,
+    }));
+
+    const uploadPromise = upload([makeUploadFile()]).catch(() => {});
+    mock.triggerError();
+    await uploadPromise;
+    flush();
+
+    expect(status()).toBe("error");
+    expect((files[0]!.error as Error).message).toMatch("Network error");
+    dispose();
+  });
+
+  it("forwards progress events to the progress signal", async () => {
+    const mock = makeMockXhr();
+    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+
+    const { upload, progress, dispose } = createRoot(dispose => ({
+      ...createFileUploader(fileSender("/api/upload")),
+      dispose,
+    }));
+
+    upload([makeUploadFile()]).catch(() => {});
+
+    mock.triggerProgress(256, 1024);
+    flush();
+    expect(progress()).toEqual({ loaded: 256, total: 1024, percentage: 25 });
+
+    mock.triggerLoad();
+    dispose();
+  });
+
+  it("sets custom headers on the XHR request", () => {
+    const { xhr } = makeMockXhr();
+    vi.stubGlobal("XMLHttpRequest", vi.fn(() => xhr));
+
+    const { upload } = createRoot(dispose => ({
+      ...createFileUploader(fileSender("/api/upload", { headers: { "X-Auth": "token123" } })),
+      dispose,
+    }));
+
+    upload([makeUploadFile()]).catch(() => {});
+    expect(xhr.setRequestHeader).toHaveBeenCalledWith("X-Auth", "token123");
   });
 });

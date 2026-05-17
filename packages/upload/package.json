@@ -13,7 +13,10 @@
     "name": "upload",
     "stage": 0,
     "list": [
+      "createFilePicker",
       "createFileUploader",
+      "fileSender",
+      "fileUploader",
       "createDropzone"
     ],
     "category": "Browser APIs"
