@@ -18,7 +18,8 @@
     "stage": 3,
     "list": [
       "createSocialShare",
-      "createWebShare"
+      "createWebShare",
+      "makeWebShare"
     ],
     "category": "Utilities"
   },
