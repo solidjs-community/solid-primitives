@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createReducer } from "../src/index.js";
 
 describe("createReducer", () => {
@@ -17,6 +17,7 @@ describe("createReducer", () => {
         expectedCounter *= 2;
       }
 
+      flush();
       expect(counter()).toEqual(expectedCounter);
 
       dispose();
