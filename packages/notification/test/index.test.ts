@@ -487,15 +487,51 @@ describe("createNotificationPermission", () => {
     dispose();
   });
 
-  test("requestPermission returns the resolved permission value", async () => {
+  test("permission reflects resolved value after requestPermission", async () => {
+    mockPermStatus.state = "granted";
     MockNotification.requestPermission.mockResolvedValue("granted");
 
-    const { requestPermission, dispose } = createRoot(dispose => {
-      const { requestPermission } = createNotificationPermission();
-      return { requestPermission, dispose };
+    const { permission, requestPermission, dispose } = createRoot(dispose => {
+      const { permission, requestPermission } = createNotificationPermission();
+      return { permission, requestPermission, dispose };
     });
 
-    expect(await requestPermission()).toBe("granted");
+    await Promise.resolve();
+    flush();
+    await requestPermission();
+    flush();
+    expect(permission()).toBe("granted");
+
+    dispose();
+  });
+
+  test("pending is false initially", () => {
+    createRoot(dispose => {
+      const { pending } = createNotificationPermission();
+      expect(pending()).toBe(false);
+      dispose();
+    });
+  });
+
+  test("pending is true while requestPermission is in flight", async () => {
+    let resolve!: (v: NotificationPermission) => void;
+    MockNotification.requestPermission.mockImplementation(
+      () => new Promise<NotificationPermission>(r => (resolve = r)),
+    );
+
+    const { requestPermission, pending, dispose } = createRoot(dispose => {
+      const { requestPermission, pending } = createNotificationPermission();
+      return { requestPermission, pending, dispose };
+    });
+
+    const promise = requestPermission();
+    flush();
+    expect(pending()).toBe(true);
+
+    resolve("granted");
+    await promise;
+    flush();
+    expect(pending()).toBe(false);
 
     dispose();
   });

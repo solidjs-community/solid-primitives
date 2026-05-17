@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, type Accessor } from "solid-js";
+import { action, createOptimistic, createSignal, onCleanup, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS, isDev, noop, access, type MaybeAccessor } from "@solid-primitives/utils";
 import { createPermission } from "@solid-primitives/permission";
@@ -207,20 +207,30 @@ export function createNotification(
  */
 export function createNotificationPermission(): {
   permission: Accessor<PermissionState | "unknown">;
-  requestPermission: () => Promise<NotificationPermission>;
+  requestPermission: () => Promise<void>;
+  pending: Accessor<boolean>;
 } {
   if (!isNotificationSupported()) {
     return {
       permission: () => "unknown" as const,
-      requestPermission: () => Promise.resolve("denied" as NotificationPermission),
+      requestPermission: () => Promise.resolve(),
+      pending: () => false,
     };
   }
 
   const permission = createPermission("notifications");
+  const [pending, setPending] = createOptimistic(false, INTERNAL_OPTIONS);
 
   // createPermission tracks state via the change event — no manual update needed
-  const requestPermission = async (): Promise<NotificationPermission> =>
-    Notification.requestPermission();
+  const requestPermission = action(function* () {
+    setPending(true);
+    try {
+      yield Notification.requestPermission();
+    } catch {
+      // swallow — permission updates reactively via createPermission
+    }
+    setPending(false);
+  });
 
-  return { permission, requestPermission };
+  return { permission, requestPermission, pending };
 }
