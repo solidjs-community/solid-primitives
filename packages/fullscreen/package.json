@@ -13,7 +13,9 @@
     "name": "fullscreen",
     "stage": 3,
     "list": [
-      "createFullscreen"
+      "makeFullscreen",
+      "createFullscreen",
+      "fullscreen"
     ],
     "category": "Browser APIs"
   },
@@ -47,6 +49,7 @@
     "primitives"
   ],
   "dependencies": {
+    "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {

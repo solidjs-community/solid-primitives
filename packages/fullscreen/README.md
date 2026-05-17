@@ -8,7 +8,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/fullscreen?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/fullscreen)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Reactive wrapper around the [Fullscreen API](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that integrates with Solid's reactive system.
+Reactive wrapper around the [Fullscreen API](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API).
 
 ## Installation
 
@@ -18,67 +18,89 @@ npm install @solid-primitives/fullscreen
 pnpm add @solid-primitives/fullscreen
 ```
 
-## How to use it
+## Primitives
+
+### `makeFullscreen`
+
+Non-reactive base primitive. No Solid lifecycle dependency — safe to use outside components.
+
+```ts
+const [enter, exit] = makeFullscreen(element, options?: FullscreenOptions);
+```
+
+`enter(options?)` calls `element.requestFullscreen()`. Call-time options override creation-time options. `exit()` calls `document.exitFullscreen()`.
+
+```ts
+const [enter, exit] = makeFullscreen(videoEl, { navigationUI: "hide" });
+button.addEventListener("click", enter);
+```
+
+---
 
 ### `createFullscreen`
 
-Reactively toggles fullscreen on a target element. Returns an `Accessor<boolean>` reflecting whether the element is currently in fullscreen.
+Reactive primitive that binds `enter`/`exit` to an element and tracks fullscreen state via the `fullscreenchange` event.
 
 ```ts
-const isActive: Accessor<boolean> = createFullscreen(
+const { enter, exit, isActive } = createFullscreen(
   ref: HTMLElement | Accessor<HTMLElement | undefined>,
-  active?: Accessor<FullscreenOptions | boolean>,
-  options?: FullscreenOptions
+  options?: FullscreenPrimitiveOptions,
 );
 ```
 
-**Via ref signal:**
+`enter()` and `exit()` must be called from a direct user gesture — the browser requires it. `isActive` is an `Accessor<boolean>` that reflects the live fullscreen state.
 
 ```tsx
-const MyComponent: Component = () => {
-  const [fs, setFs] = createSignal(false);
-  const [ref, setRef] = createSignal<HTMLDivElement>();
-  const active = createFullscreen(ref, fs);
+const { enter, exit, isActive } = createFullscreen(ref);
 
-  return (
-    <div ref={setRef} onClick={() => setFs(f => !f)}>
-      {active() ? "click to exit fullscreen" : "click to fullscreen"}
-    </div>
-  );
-};
+<button onClick={enter}>Go fullscreen</button>
+<Show when={isActive()}>
+  <button onClick={exit}>Exit</button>
+</Show>
 ```
 
-The ref must be a signal so the element is captured reactively rather than in a stale closure.
-
-You can pass `FullscreenOptions` either inside the `active` accessor return value or as a third argument:
+`ref` can be a reactive accessor — `createFullscreen` rebinds when the element changes:
 
 ```tsx
-// Options via active accessor (useful for programmatic control):
-createFullscreen(ref, () => ({ navigationUI: "hide" }));
+const [ref, setRef] = createSignal<HTMLDivElement>();
+const { enter, isActive } = createFullscreen(ref);
 
-// Options as third argument:
-createFullscreen(ref, isActive, { navigationUI: "hide" });
+<div ref={setRef}>...</div>
+```
+
+#### `FullscreenPrimitiveOptions`
+
+Extends the standard [`FullscreenOptions`](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#options) with:
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `exitOnCleanup` | `boolean` | `true` | Exit fullscreen when the reactive scope is disposed. |
+| `navigationUI` | `string` | — | Passed to `requestFullscreen`. |
+
+```ts
+const { enter } = createFullscreen(ref, { exitOnCleanup: false, navigationUI: "hide" });
 ```
 
 ---
 
 ### `fullscreen` (ref directive factory)
 
-A convenience factory that creates a ref callback for use directly in JSX. Solid 2.0 uses `ref` callbacks in place of the old `use:` directive syntax.
+A ref factory that wires click-to-toggle fullscreen onto any element. Clicking enters fullscreen; clicking again exits. Must be called inside a reactive owner (component body or `createRoot`).
 
-```tsx
-const MyComponent: Component = () => {
-  const [fs, setFs] = createSignal(false);
-
-  return (
-    <div ref={fullscreen(fs)} onClick={() => setFs(f => !f)}>
-      {fs() ? "click to exit fullscreen" : "click to fullscreen"}
-    </div>
-  );
-};
+```ts
+const attach = fullscreen(options?: FullscreenOptions);
+// attach is a ref callback: (el: HTMLElement) => void
 ```
 
-`fullscreen` must be called during component render (inside a reactive owner) — the same constraint as any Solid primitive.
+```tsx
+// Simple toggle
+<div ref={fullscreen()}>Click to go fullscreen</div>
+
+// With options
+<div ref={fullscreen({ navigationUI: "hide" })}>Click to go fullscreen</div>
+```
+
+The click listener is removed automatically when the component unmounts.
 
 ## Demo
 

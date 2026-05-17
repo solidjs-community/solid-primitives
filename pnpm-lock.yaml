@@ -359,6 +359,9 @@ importers:
 
   packages/fullscreen:
     dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils

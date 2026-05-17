@@ -1,80 +1,133 @@
-import { createEffect, createSignal, onCleanup, getOwner } from "solid-js";
+import { createEffect, createSignal, onCleanup, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
-import type { Accessor } from "solid-js";
-import { access } from "@solid-primitives/utils";
+import { makeEventListener } from "@solid-primitives/event-listener";
+import { access, INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 /**
- * Reactively toggles fullscreen on a target element.
+ * Non-reactive fullscreen helper. No Solid lifecycle dependency.
  *
+ * @param element The element to make fullscreen.
+ * @param options Standard `FullscreenOptions`.
+ * @returns `[enter, exit]` — `enter()` requests fullscreen, `exit()` leaves it.
+ *   Options passed to `enter()` override the creation-time options.
+ *
+ * @example
  * ```ts
- * const [fs, setFs] = createSignal(false);
+ * const [enter, exit] = makeFullscreen(ref);
+ * button.addEventListener("click", enter);
+ * ```
+ */
+export const makeFullscreen = (
+  element: HTMLElement,
+  options?: FullscreenOptions,
+): [enter: (options?: FullscreenOptions) => Promise<void>, exit: () => Promise<void>] => {
+  const enter = (callOptions?: FullscreenOptions) =>
+    element.requestFullscreen(callOptions ?? options);
+  const exit = () => document.exitFullscreen();
+  return [enter, exit];
+};
+
+export interface FullscreenPrimitiveOptions extends FullscreenOptions {
+  /** Exit fullscreen when the reactive scope is disposed. Default: `true`. */
+  exitOnCleanup?: boolean;
+}
+
+/**
+ * Reactive fullscreen primitive. Call `enter()` and `exit()` imperatively
+ * from user gesture handlers — the browser requires a direct user interaction
+ * to allow fullscreen. `isActive` tracks the real fullscreen state via the
+ * `fullscreenchange` event and initializes to `true` if the element is already
+ * fullscreen when the primitive is created.
  *
- * // via ref signal
- * const [ref, setRef] = createSignal<HTMLElement>();
- * createFullscreen(ref, fs);
- * return <div ref={setRef} onClick={() => setFs(f => !f)}>click me</div>
+ * @param ref The element to fullscreen, or a reactive accessor returning one.
+ * @param options Extends `FullscreenOptions` with `exitOnCleanup` (default `true`).
+ * @returns `{ enter, exit, isActive }`
  *
- * // via ref directive factory (Solid 2.0)
- * return <div ref={fullscreen(fs)} onClick={() => setFs(f => !f)}>click me</div>
+ * @example
+ * ```tsx
+ * const { enter, exit, isActive } = createFullscreen(ref);
+ *
+ * <button onClick={enter}>Go fullscreen</button>
+ * <Show when={isActive()}>
+ *   <button onClick={exit}>Exit</button>
+ * </Show>
  * ```
  */
 export const createFullscreen = (
-  ref: HTMLElement | undefined | Accessor<HTMLElement | undefined>,
-  active?: Accessor<FullscreenOptions | boolean>,
-  options?: FullscreenOptions,
-): Accessor<boolean> => {
+  ref: HTMLElement | Accessor<HTMLElement | undefined>,
+  options?: FullscreenPrimitiveOptions,
+): {
+  enter: (options?: FullscreenOptions) => Promise<void>;
+  exit: () => Promise<void>;
+  isActive: Accessor<boolean>;
+} => {
   if (isServer) {
-    return () => false;
+    return {
+      enter: () => Promise.resolve(),
+      exit: () => Promise.resolve(),
+      isActive: () => false,
+    };
   }
 
-  const [isActive, setActive] = createSignal(false);
+  const { exitOnCleanup = true, ...nativeOptions } = options ?? {};
+  const initial = access(ref);
 
-  createEffect(
-    () => ({
-      node: access(ref),
-      activeOutput: active?.() ?? true,
-      currentActive: isActive(),
-    }),
-    ({ node, activeOutput, currentActive }) => {
-      if (!node) return;
-      if (!currentActive && activeOutput) {
-        node
-          .requestFullscreen(typeof activeOutput === "object" ? activeOutput : options)
-          .then(() => setActive(true))
-          .catch(() => {});
-      } else if (!activeOutput && currentActive) {
-        setActive(false);
-        document.exitFullscreen();
-      }
-    },
+  let bound: ReturnType<typeof makeFullscreen> | null = initial
+    ? makeFullscreen(initial, nativeOptions)
+    : null;
+
+  const [isActive, setActive] = createSignal(
+    document.fullscreenElement != null && document.fullscreenElement === initial,
+    INTERNAL_OPTIONS,
   );
 
-  const listener = () => setActive(document.fullscreenElement === access(ref));
-  document.addEventListener("fullscreenchange", listener);
-  getOwner() &&
-    onCleanup(() => {
-      document.removeEventListener("fullscreenchange", listener);
-      if (isActive()) {
-        document.exitFullscreen();
-      }
-    });
+  // makeEventListener registers onCleanup automatically; reads access(ref) dynamically
+  // so no rebinding is needed when the element changes
+  makeEventListener(document, "fullscreenchange", () =>
+    setActive(document.fullscreenElement === access(ref)),
+  );
 
-  return isActive;
+  if (typeof ref === "function") {
+    createEffect(
+      () => (ref as Accessor<HTMLElement | undefined>)(),
+      node => {
+        bound = node ? makeFullscreen(node, nativeOptions) : null;
+      },
+    );
+  }
+
+  onCleanup(() => {
+    if (exitOnCleanup && isActive()) document.exitFullscreen();
+  });
+
+  return {
+    enter: (callOptions?: FullscreenOptions): Promise<void> =>
+      bound?.[0](callOptions) ?? Promise.resolve(),
+    exit: (): Promise<void> => bound?.[1]() ?? Promise.resolve(),
+    isActive,
+  };
 };
 
 /**
- * Ref directive factory for toggling fullscreen. For use with Solid 2.0's `ref` prop.
+ * Ref directive that toggles fullscreen when the element is clicked.
+ * Attach to any element — clicking it enters fullscreen; clicking again exits.
  *
+ * @example
  * ```tsx
- * const [fs, setFs] = createSignal(false);
- * return <div ref={fullscreen(fs)} onClick={() => setFs(f => !f)}>click me</div>
+ * <div ref={fullscreen()}>Click to go fullscreen</div>
+ * <div ref={fullscreen({ navigationUI: "hide" })}>Click to go fullscreen</div>
  * ```
  */
-export const fullscreen = (
-  active?: Accessor<FullscreenOptions | boolean>,
-  options?: FullscreenOptions,
-) => {
-  const [ref, setRef] = createSignal<HTMLElement>();
-  createFullscreen(ref, active, options);
-  return setRef as (el: HTMLElement) => void;
+export const fullscreen = (options?: FullscreenOptions): ((el: HTMLElement) => void) => {
+  if (isServer) return () => {};
+
+  let removeListener: (() => void) | undefined;
+  onCleanup(() => removeListener?.());
+
+  return (el: HTMLElement) => {
+    const [enter, exit] = makeFullscreen(el, options);
+    const toggle = () => (document.fullscreenElement === el ? exit() : enter());
+    el.addEventListener("click", toggle);
+    removeListener = () => el.removeEventListener("click", toggle);
+  };
 };
