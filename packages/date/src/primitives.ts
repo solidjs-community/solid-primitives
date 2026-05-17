@@ -231,7 +231,7 @@ export function createCountdown(
   const [countdown, setCountdown] = createStore<Countdown>(getCountdown(difference()));
   createRenderEffect(
     () => difference(),
-    diff => setCountdown(getCountdown(diff)),
+    diff => setCountdown(() => getCountdown(diff)),
   );
   return countdown;
 }

@@ -1,5 +1,4 @@
 import type { TimeoutSource } from "@solid-primitives/timer";
-import type { Accessor } from "solid-js";
 
 export type { TimeoutSource };
 
