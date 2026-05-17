@@ -3,7 +3,7 @@ import {
   createSignal,
   type FlowComponent,
   type JSX,
-  onMount,
+  onSettled,
   sharedConfig,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
@@ -14,7 +14,7 @@ export const ClientOnly: FlowComponent = props => {
   if (isServer) return undefined;
   if (sharedConfig.context) {
     const [flag, setFlag] = createSignal(false);
-    onMount(() => setFlag(true));
+    onSettled(() => setFlag(true));
     return createMemo(() =>
       flag() ? createMemo(() => props.children) : undefined,
     ) as unknown as JSX.Element;

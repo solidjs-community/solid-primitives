@@ -8,7 +8,7 @@ import {
   createSignal,
   type JSX,
   onCleanup,
-  onMount,
+  onSettled,
 } from "solid-js";
 import { render } from "@solidjs/web";
 import { BASE } from "~/constants.js";
@@ -297,7 +297,7 @@ export function createPrimitiveNameTooltips(props: {
   target: HTMLElement;
   primitives: BundlesizeItem[];
 }): void {
-  onMount(() => {
+  onSettled(() => {
     const codeAttributeName = "data-code-primitive-name";
     const els = props.target.querySelectorAll<HTMLElement>(`[${codeAttributeName}]`);
 

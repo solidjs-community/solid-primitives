@@ -1,9 +1,25 @@
-import Dismiss from "solid-dismiss";
-import { FiX } from "solid-icons/fi";
-import { type Accessor, onMount, type ParentComponent } from "solid-js";
+import { type Accessor, createEffect, onSettled, type ParentComponent, Show } from "solid-js";
 import * as Header from "../Header/Header.js";
 import * as Table from "~/components/table.jsx";
 import { NoHydration } from "@solidjs/web";
+
+const XIcon = (props: { size?: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={props.size ?? "1em"}
+    height={props.size ?? "1em"}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </svg>
+);
 
 const SlideModal: ParentComponent<{
   menuButton: Element;
@@ -82,76 +98,64 @@ const SlideModal: ParentComponent<{
     document.documentElement.style.setProperty("--slide-exit-y", `${value}px`);
   };
 
-  onMount(() => {
+  onSettled(() => {
     rootApp = document.getElementById("root")!;
   });
 
+  createEffect(
+    () => open(),
+    open => {
+      if (!open) return;
+      rootApp ||= document.getElementById("root")!;
+      Header.setScrollEnabled(false);
+      requestAnimationFrame(() => {
+        changePageLayout();
+      });
+
+      return () => {
+        updateModalSlideExitDirectionCSSVariable();
+        Header.setScrollEnabled(true);
+        restorePageLayout();
+      };
+    },
+  );
+
   return (
-    <Dismiss
-      menuButton={menuButton}
-      modal
-      open={open}
-      setOpen={setOpen}
-      removeScrollbar={false}
-      menuPopup={`[role="dialog"]`}
-      overlayElement={{
-        element: (
+    <Show when={open()}>
+      <div ref={containerEl}>
+        <div>
           <NoHydration>
             <div
               class="fixed inset-0 z-[1000] h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-[2px] dark:bg-[#001627bd]"
               onClick={() => setOpen(false)}
             ></div>
           </NoHydration>
-        ),
-        animation: {
-          enterClass: "opacity-0",
-          enterToClass: "opacity-100 transition duration-200",
-          exitClass: "opacity-100",
-          exitToClass: "opacity-0 transition duration-200",
-        },
-      }}
-      animation={{
-        name: "slide-modal",
-        onEnter: () => {
-          Header.setScrollEnabled(false);
-          requestAnimationFrame(() => {
-            changePageLayout();
-          });
-        },
-        onBeforeExit: () => {
-          updateModalSlideExitDirectionCSSVariable();
-        },
-        onAfterExit: () => {
-          Header.setScrollEnabled(true);
-          restorePageLayout();
-        },
-      }}
-      ref={containerEl}
-    >
-      <div
-        class="pointer-events-none mb-[60px] mt-[100px] flex justify-center px-2"
-        role="presentation"
-      >
+        </div>
         <div
-          class="xxs:w-auto pointer-events-auto relative w-full outline-none"
-          role="dialog"
-          aria-modal="true"
-          tabindex="-1"
-          ref={dialogEl}
+          class="pointer-events-none mb-[60px] mt-[100px] flex justify-center px-2"
+          role="presentation"
         >
-          {props.children}
-          <button
-            class="absolute right-0 top-0 flex h-[45px] w-[45px] items-center justify-center rounded-lg text-[#306FC4] dark:text-[#c2d5ee] dark:hover:text-white"
-            onClick={() => {
-              setOpen(false);
-            }}
-            aria-label="Close Modal"
+          <div
+            class="xxs:w-auto pointer-events-auto relative w-full outline-none"
+            role="dialog"
+            aria-modal="true"
+            tabindex="-1"
+            ref={dialogEl}
           >
-            <FiX size={25} />
-          </button>
+            {props.children}
+            <button
+              class="absolute right-0 top-0 flex h-[45px] w-[45px] items-center justify-center rounded-lg text-[#306FC4] dark:text-[#c2d5ee] dark:hover:text-white"
+              onClick={() => {
+                setOpen(false);
+              }}
+              aria-label="Close Modal"
+            >
+              <XIcon size={25} />
+            </button>
+          </div>
         </div>
       </div>
-    </Dismiss>
+    </Show>
   );
 };
 

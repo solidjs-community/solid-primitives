@@ -1,7 +1,7 @@
 import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createResizeObserver } from "@solid-primitives/resize-observer";
-import { type Component, createSignal, For, onMount } from "solid-js";
+import { type Component, createSignal, For, onSettled } from "solid-js";
 import type { Bundlesize, BundlesizeItem } from "~/types.js";
 
 const SHARED_HEADERS = ["Minified", "Minified + GZipped"] as const;
@@ -81,7 +81,7 @@ const BundleSizeModal: Component<{
     });
   };
 
-  onMount(() => {
+  onSettled(() => {
     fitFont();
   });
 
@@ -106,7 +106,9 @@ const BundleSizeModal: Component<{
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
                 <For each={PACKAGE_TH_HEADERS}>
                   {item => (
-                    <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">{item}</th>
+                    <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">
+                      {item()}
+                    </th>
                   )}
                 </For>
               </tr>
@@ -151,7 +153,9 @@ const BundleSizeModal: Component<{
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
                 <For each={PRIMITIVE_TH_HEADERS}>
                   {item => (
-                    <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">{item}</th>
+                    <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">
+                      {item()}
+                    </th>
                   )}
                 </For>
                 <th
@@ -163,21 +167,24 @@ const BundleSizeModal: Component<{
             </thead>
             <tbody>
               <For each={props.primitives}>
-                {item => (
-                  <tr class="word-spacing-[-2px] even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
-                    <td class="p-1 text-sm md:px-3 md:text-base" data-primitive-td>
-                      <span class="inline-block" data-primitive-span>
-                        {item.name}
-                      </span>
-                    </td>
-                    <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                      {item.min.join(" ")}
-                    </td>
-                    <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                      {item.gzip.join(" ")}
-                    </td>
-                  </tr>
-                )}
+                {item => {
+                  const primitive = item();
+                  return (
+                    <tr class="word-spacing-[-2px] even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
+                      <td class="p-1 text-sm md:px-3 md:text-base" data-primitive-td>
+                        <span class="inline-block" data-primitive-span>
+                          {primitive.name}
+                        </span>
+                      </td>
+                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
+                        {primitive.min.join(" ")}
+                      </td>
+                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
+                        {primitive.gzip.join(" ")}
+                      </td>
+                    </tr>
+                  );
+                }}
               </For>
             </tbody>
           </table>

@@ -2,8 +2,7 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
-import Dismiss from "solid-dismiss";
-import { type Component, createEffect, onMount } from "solid-js";
+import { type Component, createEffect, onSettled, Show } from "solid-js";
 import { createShortcut } from "~/primitives/createShortcut.js";
 import { doesPathnameMatchBase, scrollIntoView } from "~/utils.js";
 import * as Header from "../Header/Header.js";
@@ -72,7 +71,7 @@ const ClientSearchModal: Component<{
     });
   };
 
-  onMount(() => {
+  onSettled(() => {
     rootApp = document.getElementById("root-subcontainer")!;
   });
 
@@ -100,84 +99,58 @@ const ClientSearchModal: Component<{
     ),
   );
 
+  createEffect(
+    () => props.open,
+    open => {
+      if (!open) return;
+      rootApp ||= document.getElementById("root-subcontainer")!;
+      Header.setScrollEnabled(false);
+      changePageLayout();
+      if (!isIOS) dialogEl?.querySelector<HTMLElement>("input,button,a")?.focus();
+
+      return () => {
+        restorePageLayout();
+        scrollToLink();
+        Header.setScrollEnabled(true);
+      };
+    },
+  );
+
   return (
-    <Dismiss
-      menuButton={props.menuButton}
-      modal
-      open={() => props.open}
-      setOpen={props.setOpen}
-      removeScrollbar={false}
-      overlayElement={{
-        element: (
-          <div>
-            <div
-              class="fixed left-0 right-0 top-0 z-[1002] h-[60px]"
-              classList={{ hidden: isSmall() }}
-              onClick={onClickClose}
-            />
-            <div
-              class="fixed inset-0 z-[1000] will-change-transform"
-              data-overlay-backdrop
-              onClick={onClickClose}
-            >
-              <div
-                class="h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-sm dark:bg-[#001627bd]"
-                classList={{ "mt-[60px]": !isSmall() }}
-              />
-            </div>
-          </div>
-        ),
-        animation: {
-          enterClass: "opacity-0",
-          enterToClass: "opacity-100 transition duration-200",
-          exitClass: "opacity-100",
-          exitToClass: "opacity-0 transition duration-200",
-          appendToElement: "[data-overlay-backdrop]",
-        },
-      }}
-      animation={{
-        enterClass: "opacity-0",
-        enterToClass: "opacity-100 transition-opacity duration-200",
-        exitClass: "opacity-100",
-        exitToClass: "opacity-0 transition-opacity duration-200",
-        appendToElement: "menuPopup",
-        onBeforeEnter: () => {
-          Header.setScrollEnabled(false);
-        },
-        onEnter: () => {
-          changePageLayout();
-        },
-        onExit: () => {
-          rootApp.style.top = "1";
-        },
-        onAfterExit: () => {
-          restorePageLayout();
-          scrollToLink();
-          Header.setScrollEnabled(true);
-        },
-      }}
-      focusElementOnOpen={{ target: isIOS ? "none" : "firstChild", preventScroll: true }}
-      focusMenuButtonOnMouseDown={!isIOS}
-      ref={containerEl}
-    >
-      <div
-        class="pointer-events-none mb-[60px] flex justify-center p-4"
-        classList={{ "mt-[80px]": !isSmall() }}
-        role="presentation"
-      >
-        <div class="flex-grow">
+    <Show when={props.open}>
+      <div ref={containerEl}>
+        <div>
           <div
-            class="!pointer-events-none flex justify-center [&>div]:pointer-events-auto"
-            role="dialog"
-            aria-modal="true"
-            tabindex="-1"
-            ref={dialogEl}
-          >
-            <Search setOpen={props.setOpen} />
+            class="fixed left-0 right-0 top-0 z-[1002] h-[60px]"
+            classList={{ hidden: isSmall() }}
+            onClick={onClickClose}
+          />
+          <div class="fixed inset-0 z-[1000] will-change-transform" onClick={onClickClose}>
+            <div
+              class="h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-sm dark:bg-[#001627bd]"
+              classList={{ "mt-[60px]": !isSmall() }}
+            />
+          </div>
+        </div>
+        <div
+          class="pointer-events-none mb-[60px] flex justify-center p-4"
+          classList={{ "mt-[80px]": !isSmall() }}
+          role="presentation"
+        >
+          <div class="flex-grow">
+            <div
+              class="!pointer-events-none flex justify-center [&>div]:pointer-events-auto"
+              role="dialog"
+              aria-modal="true"
+              tabindex="-1"
+              ref={dialogEl}
+            >
+              <Search setOpen={props.setOpen} />
+            </div>
           </div>
         </div>
       </div>
-    </Dismiss>
+    </Show>
   );
 };
 

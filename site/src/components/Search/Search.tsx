@@ -2,12 +2,64 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
 import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
 import Fuse from "fuse.js";
-import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
 import { type Component, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { fetchPackageList } from "~/api.js";
 import { type PackageListItem } from "~/types.js";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils.js";
 import { Link } from "@tanstack/solid-router";
+
+const SearchIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="1em"
+    height="1em"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.35-4.35" />
+  </svg>
+);
+
+const XIcon = (props: { size?: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={props.size ?? "1em"}
+    height={props.size ?? "1em"}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </svg>
+);
+
+const ChevronLeftIcon = (props: { size?: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={props.size ?? "1em"}
+    height={props.size ?? "1em"}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m15 18-6-6 6-6" />
+  </svg>
+);
 
 let inputEl: HTMLInputElement | undefined;
 
@@ -110,7 +162,7 @@ const Search: Component<{
               onFocus={() => inputEl?.focus()}
             >
               <div class="mr-2">
-                <FiSearch />
+                <SearchIcon />
               </div>
               <input
                 class="dark:bg-page-main-bg flex-grow outline-none"
@@ -125,7 +177,7 @@ const Search: Component<{
               class="flex h-[45px] w-[45px] items-center justify-center rounded-lg text-[#306FC4] dark:text-[#c2d5ee] dark:hover:text-white"
               onClick={() => props.setOpen(false)}
             >
-              <FiX size={25} />
+              <XIcon size={25} />
             </button>
           </div>
 
@@ -147,6 +199,7 @@ const Search: Component<{
           <ul class="flex flex-col gap-y-6">
             <For each={result()}>
               {match => {
+                const item = match();
                 const [showRest, setShowRest] = createSignal(false);
                 const toggleShowRest = () => setShowRest(p => !p);
 
@@ -156,39 +209,39 @@ const Search: Component<{
                       class="text-lg font-semibold text-[#49494B] dark:text-[#bec5cf]"
                       data-ignore-mark-title
                     >
-                      <Link to={`/package/${match.name.toLowerCase()}` as any}>
-                        {highlight(match.name)}
+                      <Link to={`/package/${item.name.toLowerCase()}` as any}>
+                        {highlight(item.name)}
                       </Link>
                     </h4>
-                    <p class="my-[6px] text-[14px]">{highlight(match.description)}</p>
+                    <p class="my-[6px] text-[14px]">{highlight(item.description)}</p>
 
                     <div class="flex justify-between gap-2">
                       <ul class="flex flex-wrap gap-2 self-start">
-                        <For each={match.primitives}>
+                        <For each={item.primitives}>
                           {(primitive, idx) => (
                             <Show when={showRest() || idx() < MAX_PRIMITIVES_COUNT}>
                               <li>
                                 <Link
                                   to={
-                                    `/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}` as any
+                                    `/package/${item.name.toLowerCase()}#${primitive().toLowerCase()}` as any
                                   }
                                   class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black sm:text-base dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff]"
                                 >
-                                  {highlight(primitive)}
+                                  {highlight(primitive())}
                                 </Link>
                               </li>
                             </Show>
                           )}
                         </For>
-                        <Show when={!showRest() && MAX_PRIMITIVES_COUNT < match.primitives.length}>
+                        <Show when={!showRest() && MAX_PRIMITIVES_COUNT < item.primitives.length}>
                           <li class="flex items-center text-[14px] text-slate-500 transition hover:text-black dark:text-white">
                             <button onClick={toggleShowRest}>
-                              + {match.primitives.length - MAX_PRIMITIVES_COUNT}
+                              + {item.primitives.length - MAX_PRIMITIVES_COUNT}
                             </button>
                           </li>
                         </Show>
                       </ul>
-                      <Show when={MAX_PRIMITIVES_COUNT < match.primitives.length}>
+                      <Show when={MAX_PRIMITIVES_COUNT < item.primitives.length}>
                         <button
                           class="flex h-[28px] w-[45px] flex-shrink-0 items-center justify-center rounded-md text-[#063983] hover:bg-[#f4f9ff] hover:text-black dark:text-[#b9d6ff] dark:hover:bg-[#3c5364]"
                           onClick={toggleShowRest}
@@ -199,19 +252,19 @@ const Search: Component<{
                               "-rotate-90": showRest(),
                             }}
                           >
-                            <FiChevronLeft size={24} />
+                            <ChevronLeftIcon size={24} />
                           </div>
                         </button>
                       </Show>
                     </div>
-                    <Show when={match.tags.length}>
+                    <Show when={item.tags.length}>
                       <ul class="flex flex-wrap gap-4 gap-y-2 self-start pt-2">
-                        <For each={match.tags}>
-                          {item => (
+                        <For each={item.tags}>
+                          {tag => (
                             <li>
                               <span class="text-[12px] text-slate-500 sm:text-[14px] dark:text-slate-400">
                                 <span class="opacity-50">{"#"}</span>
-                                {highlight(item)}
+                                {highlight(tag())}
                               </span>
                             </li>
                           )}

@@ -1,7 +1,7 @@
 import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
-import { createEffect, createSignal, onMount, type ParentComponent } from "solid-js";
+import { createEffect, createSignal, onSettled, type ParentComponent } from "solid-js";
 import { pageWidthClass } from "~/constants.js";
 import { doesPathnameMatchBase, reflow } from "~/utils.js";
 import * as Header from "./Header/Header.js";
@@ -277,7 +277,7 @@ export const Table: ParentComponent = props => {
     }
   };
 
-  onMount(() => {
+  onSettled(() => {
     queryTableElements(tableEl);
     if (isSafari || isIOS) {
       // Safari doesn't take borders into account, so subtrack 2px
