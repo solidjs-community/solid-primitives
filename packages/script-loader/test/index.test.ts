@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { createScriptLoader } from "../src/index.js";
 import { JSDOM } from "jsdom";
@@ -97,23 +97,20 @@ describe("createScriptLoader", () => {
 
   it("will update the url from an accessor", async () => {
     const actualSrcUrls: (string | undefined)[] = [];
-    await new Promise<void>(resolve =>
-      createRoot(async dispose => {
-        const [src, setSrc] = createSignal("http://127.0.0.1:12345/script.js");
-        const script = createScriptLoader({
-          src: src,
-          onLoad: () => setSrc("http://127.0.0.1:12345/script2.js"),
-        });
-        vi.runAllTimers();
-        actualSrcUrls.push(script?.src);
-        await dispatchAndWait(script, "load");
-        queueMicrotask(() => {
-          actualSrcUrls.push(script?.src);
-          dispose();
-          resolve();
-        });
-      }),
-    );
+    const [src, setSrc] = createSignal("http://127.0.0.1:12345/script.js");
+    let dispose!: () => void;
+    const script = createRoot(d => {
+      dispose = d;
+      return createScriptLoader({
+        src: src,
+        onLoad: () => setSrc("http://127.0.0.1:12345/script2.js"),
+      });
+    });
+    actualSrcUrls.push(script?.src);
+    await dispatchAndWait(script, "load");
+    flush();
+    actualSrcUrls.push(script?.src);
+    dispose();
     expect(actualSrcUrls).toEqual([
       "http://127.0.0.1:12345/script.js",
       "http://127.0.0.1:12345/script2.js",

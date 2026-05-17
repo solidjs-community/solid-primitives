@@ -36,14 +36,16 @@ import {
  *    return [dispose, memo]
  * }, owner, owner2);
  */
-export function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (typeof Owner)[]): T {
+export function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (Owner | null)[]): T {
   if (owners.length === 0) owners = [getOwner()];
-  return createRoot(dispose => {
-    asArray(access(owners)).forEach(
-      owner => owner && runWithOwner(owner, onCleanup.bind(void 0, dispose)),
-    );
-    return fn(dispose);
-  }, owners[0]);
+  return runWithOwner(owners[0] ?? null, () =>
+    createRoot(dispose => {
+      asArray(access(owners)).forEach(
+        owner => owner && runWithOwner(owner, onCleanup.bind(void 0, dispose)),
+      );
+      return fn(dispose);
+    }),
+  );
 }
 
 /** @deprecated Renamed to `createSubRoot` */
@@ -163,7 +165,7 @@ export const createSharedRoot = createSingletonRoot;
 export function createHydratableSingletonRoot<T>(factory: (dispose: VoidFunction) => T): () => T {
   const owner = getOwner();
   const singleton = createSingletonRoot(factory, owner);
-  return () => (isServer || sharedConfig.hydrating ? createRoot(factory, owner) : singleton());
+  return () => (isServer || sharedConfig.hydrating ? runWithOwner(owner, () => createRoot(factory)) : singleton());
 }
 
 /**
@@ -240,7 +242,7 @@ export function createRootPool<TArg, TResult>(
   // don't cache roots on the server
   if (isServer) {
     const owner = getOwner();
-    return args => createRoot(dispose => factory(() => args, trueFn, dispose), owner);
+    return args => runWithOwner(owner, () => createRoot(dispose => factory(() => args, trueFn, dispose)));
   }
 
   type Root = {
@@ -317,7 +319,7 @@ export function createRootPool<TArg, TResult>(
       root.setA(true);
     } else
       root = runWithOwner(owner, () =>
-        createRoot(dispose => mapRoot(dispose, createSignal(arg, INTERNAL_OPTIONS))),
+        createRoot(dispose => mapRoot(dispose, createSignal(arg as Exclude<TArg, Function>, INTERNAL_OPTIONS))),
       );
 
     onCleanup(() => cleanupRoot(root));
