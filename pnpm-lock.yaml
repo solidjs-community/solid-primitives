@@ -909,6 +909,9 @@ importers:
 
   packages/share:
     devDependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
       '@solidjs/web':
         specifier: 2.0.0-beta.10
         version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)

@@ -1,5 +1,6 @@
-import { type Accessor, createEffect, createSignal } from "solid-js";
+import { type Accessor, action, createOptimistic, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 /**
  * Generates a simple non-reactive WebShare primitive for sharing.
@@ -40,61 +41,60 @@ export const makeWebShare = () => {
   return share;
 };
 
-export type ShareStatus = {
-  /** The status of sharing success, failed or pending. */
-  status?: boolean;
-
-  /** The reason why sharing failed. */
-  message?: string;
+export type WebShareResult = {
+  /** Imperatively trigger the Web Share API with the provided data. */
+  share: (data: ShareData) => Promise<void>;
+  /** True while the share dialog is open / the promise is pending. */
+  pending: Accessor<boolean>;
+  /** True on success, false on failure, undefined before first share. */
+  status: Accessor<boolean | undefined>;
+  /** The error message if the share failed, otherwise undefined. */
+  message: Accessor<string | undefined>;
 };
 
 /**
- * Creates a reactive status about web share.
+ * Creates an action-based Web Share primitive with reactive status tracking.
  *
- * @param data Data signal to share on web.
- * @param deferInitial - Sets the value of the web share data from the signal. defaults to false.
- * @return A store shows sharing status and failing message.
+ * @returns An object with a `share` action and reactive `pending`, `status`, and `message` accessors.
  *
  * @example
  * ```ts
- * const [data, setData] = createSignal<ShareData>({});
- * const shareStatus = createWebShare(data);
+ * const { share, pending, status, message } = createWebShare();
  *
- * createEffect(() => {
- *   console.log(shareStatus.status, shareStatus.message)
- * })
+ * // Call imperatively on user gesture:
+ * <button onClick={() => share({ url: location.href, title: document.title })}>
+ *   Share
+ * </button>
  * ```
  */
-export const createWebShare = (
-  data: Accessor<ShareData>,
-  deferInitial = false,
-): ShareStatus => {
+export const createWebShare = (): WebShareResult => {
   if (isServer) {
-    return {};
+    return {
+      share: () => Promise.resolve(),
+      pending: () => false,
+      status: () => undefined,
+      message: () => undefined,
+    };
   }
-  const [status, setStatus] = createSignal<ShareStatus>({});
-  const share = makeWebShare();
-  let skipFirst = deferInitial;
-  createEffect(
-    () => data(),
-    (dataValue: ShareData) => {
-      if (skipFirst) {
-        skipFirst = false;
-        return;
-      }
-      setStatus({});
-      share(dataValue)
-        .then(() => setStatus({ status: true }))
-        .catch(e => setStatus({ status: false, message: e.toString() }));
-    },
-  );
 
-  return {
-    get status() {
-      return status().status;
-    },
-    get message() {
-      return status().message;
-    },
-  };
+  const [pending, setPending] = createOptimistic(false, INTERNAL_OPTIONS);
+  const [status, setStatus] = createSignal<boolean | undefined>(undefined, INTERNAL_OPTIONS);
+  const [message, setMessage] = createSignal<string | undefined>(undefined, INTERNAL_OPTIONS);
+  const baseShare = makeWebShare();
+
+  const share = action(function* (data: ShareData) {
+    setPending(true);
+    setStatus(undefined);
+    setMessage(undefined);
+    try {
+      yield baseShare(data);
+      setStatus(true);
+    } catch (e: unknown) {
+      setStatus(false);
+      setMessage(String(e));
+    }
+    setPending(false);
+  });
+
+  return { share, pending, status, message };
 };
