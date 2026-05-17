@@ -10,7 +10,7 @@
 
 Reactive form primitive for Solid.js. Tracks field values, validation errors, touched state, and submission status — all as fine-grained signals that compose naturally with the rest of the Solid reactive graph.
 
-Bring your own validation: validators are plain functions `(value) => string | null`, so any schema library (Zod, Valibot, Arktype, …) wires in with a one-line adapter.
+Bring your own validation: validators are plain functions `(value) => string | null | Promise<string | null>`, so any schema library (Zod, Valibot, Arktype, …) wires in with a one-line adapter. Async validators (uniqueness checks, server-side rules) are first-class.
 
 ## Installation
 
@@ -68,6 +68,7 @@ function LoginForm() {
 |----------|------|-------------|
 | `fields` | `Record<string, FieldConfig>` | Field definitions (see below) |
 | `onSubmit` | `(values) => void \| Promise<void>` | Called with all field values when the form submits and all fields are valid |
+| `validateOn` | `"change" \| "blur" \| "submit"` | Default display timing for field errors. Defaults to `"change"`. |
 
 **`FieldConfig`**
 
@@ -75,8 +76,9 @@ function LoginForm() {
 |----------|------|-------------|
 | `initial` | `V` | Initial value for the field |
 | `validate` | `ValidatorFn \| ValidatorFn[]` | One or more validator functions. Validators run in order; the first failure is the error. |
+| `validateOn` | `"change" \| "blur" \| "submit"` | When to display this field's error in the UI. Overrides the form-level `validateOn`. |
 
-A **`ValidatorFn`** is any function with the signature `(value: V) => string | null` — returning an error message string on failure, or `null` when valid.
+A **`ValidatorFn`** is any function with the signature `(value: V) => string | null | Promise<string | null>` — returning an error message string on failure, `null` when valid, or a Promise that resolves to either.
 
 ### Per-field API
 
@@ -85,8 +87,9 @@ Each entry in `form.fields` exposes:
 | Member | Type | Description |
 |--------|------|-------------|
 | `value()` | `Accessor<V>` | Current field value |
-| `error()` | `Accessor<string \| null>` | First validation error, or `null` if valid |
+| `error()` | `Accessor<string \| null>` | First validation error, or `null` if valid. Respects `validateOn`. |
 | `touched()` | `Accessor<boolean>` | Whether the field has been blurred |
+| `pending()` | `Accessor<boolean>` | `true` while an async validator is in flight for this field |
 | `setValue(v)` | `(v: V) => void` | Imperatively set the value |
 | `setTouched(v)` | `(v: boolean) => void` | Imperatively set the touched flag |
 | `reset()` | `() => void` | Reset this field to its initial value and clear touched |
@@ -96,26 +99,65 @@ Each entry in `form.fields` exposes:
 | Member | Type | Description |
 |--------|------|-------------|
 | `dirty()` | `Accessor<boolean>` | `true` when any field differs from its initial value |
-| `valid()` | `Accessor<boolean>` | `true` when all fields pass validation |
+| `valid()` | `Accessor<boolean>` | `true` when all fields pass validation and no async validators are pending |
+| `pending()` | `Accessor<boolean>` | `true` while any field has an async validator in flight |
 | `submitting()` | `Accessor<boolean>` | `true` while `onSubmit` is in flight |
+| `submitted()` | `Accessor<boolean>` | `true` after the first submit attempt; reset by `reset()` |
 | `values()` | `Accessor<Values>` | Plain object of all current field values |
-| `errors()` | `Accessor<Partial<Record<...>>>` | Object containing only fields that currently have errors |
-| `bind(name)` | Ref directive factory | Wires an `<input>` to the named field (see below) |
+| `errors()` | `Accessor<Partial<Record<...>>>` | Object containing only fields that currently have errors (always reflects true validity, regardless of `validateOn`) |
+| `bind(name)` | Ref directive factory | Wires an `<input>` or `<select>` to the named field (see below) |
 | `ref` | Ref callback | Attaches submit handling to a `<form>` element |
-| `reset()` | `() => void` | Reset all fields to their initial values |
+| `validate(fn)` | Cross-field rule | Registers a form-level validation rule (see below) |
+| `formData()` | `() => FormData` | Snapshot of current field values as a `FormData` instance |
+| `reset()` | `() => void` | Reset all fields to their initial values and clear submitted |
 | `submit()` | `() => Promise<void>` | Programmatically trigger submission |
+
+### `validateOn`
+
+Controls when field errors become visible to the user. Can be set at the form level (applies to all fields) or overridden per field.
+
+| Mode | Error appears when… |
+|------|---------------------|
+| `"change"` (default) | Immediately as the user types |
+| `"blur"` | After the field loses focus |
+| `"submit"` | After the first submit attempt |
+
+```tsx
+// All fields only show errors after blur
+const form = createForm({
+  fields: {
+    email:    { initial: "", validate: isEmail },
+    password: { initial: "", validate: minLength(8) },
+  },
+  validateOn: "blur",
+});
+
+// Mix modes per field
+const form = createForm({
+  fields: {
+    username: { initial: "", validate: isAvailable, validateOn: "blur" },
+    email:    { initial: "", validate: isEmail,     validateOn: "submit" },
+  },
+});
+```
+
+> **Note:** `errors()` and `valid()` always reflect the true validation state, regardless of `validateOn`. The mode only controls when `field.error()` becomes non-null in the UI. This means `form.valid()` is a reliable gate for enabling the submit button even when errors aren't shown yet.
 
 ### `form.bind(name)`
 
-`bind` follows the Solid 2.0 two-phase ref directive pattern. Call it during JSX rendering to wire a field to an `<input>`:
+`bind` follows the Solid 2.0 two-phase ref directive pattern. Call it during JSX rendering to wire a field to an input element:
 
 ```tsx
-<input ref={form.bind("email")} />
+<input ref={form.bind("email")} type="email" />
+<input ref={form.bind("agreed")} type="checkbox" />
+<select ref={form.bind("country")}>...</select>
 ```
 
 This sets up bidirectional sync:
-- **Signal → DOM:** the input's value stays in sync with the field signal
+- **Signal → DOM:** the input's value (or `checked` state for checkboxes/radios) stays in sync with the field signal
 - **DOM → signal:** `input` events update the field value; `blur` events mark the field as touched
+
+For checkboxes and radios, `bind` reads and writes `el.checked` (a boolean) and listens on `change` rather than `input`.
 
 You can also apply the ref imperatively (e.g. in tests):
 
@@ -126,6 +168,48 @@ cleanup(); // removes event listeners
 ```
 
 > **Note:** `bind` must be called during component rendering (inside a reactive owner). Calling it at module level or outside a reactive context will warn.
+
+### Async validators
+
+A validator can return a `Promise<string | null>`. While the promise is pending, `field.pending()` and `form.pending()` are `true`, and `form.valid()` returns `false`.
+
+```tsx
+const isAvailable = async (username: string): Promise<string | null> => {
+  const taken = await api.checkUsername(username);
+  return taken ? "Username is taken" : null;
+};
+
+const form = createForm({
+  fields: {
+    username: {
+      initial: "",
+      validate: [required, isAvailable],
+      validateOn: "blur", // avoid checking on every keystroke
+    },
+  },
+});
+
+return (
+  <form ref={form.ref}>
+    <input ref={form.bind("username")} />
+    <Show when={form.fields.username.pending()}>
+      <span>Checking availability…</span>
+    </Show>
+    <Show when={form.fields.username.error()}>
+      <span>{form.fields.username.error()}</span>
+    </Show>
+    <button type="submit" disabled={!form.valid() || form.pending()}>
+      Sign up
+    </button>
+  </form>
+);
+```
+
+Sync and async validators can coexist in a single `validate` array. Sync validators run first and short-circuit immediately — the async validator is only awaited if all preceding sync validators pass.
+
+Stale async results are automatically discarded: if the field value changes while a validator is in flight, the in-flight result is ignored.
+
+> **Tip:** Debounce noisy async validators yourself before passing them to `validate`, so network requests don't fire on every keystroke.
 
 ### `form.validate(fn)`
 
@@ -188,7 +272,22 @@ Attach to a `<form>` element to intercept the native submit event:
 <form ref={form.ref}>...</form>
 ```
 
-This calls `e.preventDefault()` and runs the submit flow: touches all fields, validates, then calls `onSubmit` if the form is valid.
+This calls `e.preventDefault()` and runs the submit flow: touches all fields, sets `submitted` to `true`, validates, then calls `onSubmit` if the form is valid.
+
+### `submitted`
+
+`form.submitted()` becomes `true` on the first submit attempt and stays `true` until `form.reset()` is called. Combined with `validateOn: "submit"`, this lets you reveal all errors only after the user first tries to submit:
+
+```tsx
+const form = createForm({
+  fields: {
+    email:    { initial: "", validate: isEmail,    validateOn: "submit" },
+    password: { initial: "", validate: minLength(8), validateOn: "submit" },
+  },
+});
+
+// errors are hidden until form.submitted() becomes true
+```
 
 ### `toFormData(values)`
 
@@ -258,11 +357,28 @@ form.fields.name.value();  // string
 ```ts
 function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormReturn<C>;
 
-type ValidatorFn<V = string> = (value: V) => string | null;
+type ValidatorFn<V = string> = (value: V) => string | null | Promise<string | null>;
 
 type FormConfig<C extends FieldsConfig> = {
   fields: C;
   onSubmit?: (values: { [K in keyof C]: InferValue<C[K]> }) => void | Promise<void>;
+  validateOn?: "change" | "blur" | "submit";
+};
+
+type FieldConfig<V = string> = {
+  initial: V;
+  validate?: ValidatorFn<V> | ValidatorFn<V>[];
+  validateOn?: "change" | "blur" | "submit";
+};
+
+type FormField<V = string> = {
+  value:      Accessor<V>;
+  error:      Accessor<string | null>;
+  touched:    Accessor<boolean>;
+  pending:    Accessor<boolean>;
+  setValue:   (v: V) => void;
+  setTouched: (v: boolean) => void;
+  reset:      () => void;
 };
 
 type FormReturn<C extends FieldsConfig> = {
@@ -271,10 +387,13 @@ type FormReturn<C extends FieldsConfig> = {
   errors:     Accessor<Partial<Record<keyof C & string, string>>>;
   dirty:      Accessor<boolean>;
   valid:      Accessor<boolean>;
+  pending:    Accessor<boolean>;
   submitting: Accessor<boolean>;
-  bind:       (name: keyof C & string) => (el: HTMLInputElement) => () => void;
+  submitted:  Accessor<boolean>;
+  bind:       (name: keyof C & string) => (el: HTMLInputElement | HTMLSelectElement) => () => void;
   ref:        (el: HTMLFormElement) => () => void;
   validate:   (fn: (values: Values) => string | null) => Accessor<string | null>;
+  formData:   () => FormData;
   reset:      () => void;
   submit:     () => Promise<void>;
 };
@@ -284,7 +403,7 @@ type FormReturn<C extends FieldsConfig> = {
 
 ## Validation
 
-`createForm` has no built-in validators. A validator is any function `(value: V) => string | null`. This makes it trivial to use your preferred schema library.
+`createForm` has no built-in validators. A validator is any function `(value: V) => string | null | Promise<string | null>`. This makes it trivial to use your preferred schema library.
 
 ### Using Valibot
 
@@ -357,7 +476,6 @@ const form = createForm({
   onSubmit: values => {
     const result = v.safeParse(SignupSchema, values);
     if (!result.success) {
-      // surface the first cross-field issue however you need
       throw new Error(result.issues[0].message);
     }
     return api.signup(result.output);

@@ -25,12 +25,13 @@ describe("createForm (SSR)", () => {
     expect(form.fields.email.error()).toBe(null);
   });
 
-  it("touched always returns false on server", () => {
+  it("touched and pending always return false on server", () => {
     const form = createForm({
       fields: { email: { initial: "" } },
     });
 
     expect(form.fields.email.touched()).toBe(false);
+    expect(form.fields.email.pending()).toBe(false);
   });
 
   it("form-level state is neutral on server", () => {
@@ -43,7 +44,9 @@ describe("createForm (SSR)", () => {
 
     expect(form.dirty()).toBe(false);
     expect(form.valid()).toBe(true);
+    expect(form.pending()).toBe(false);
     expect(form.submitting()).toBe(false);
+    expect(form.submitted()).toBe(false);
     expect(form.errors()).toEqual({});
   });
 

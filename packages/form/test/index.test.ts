@@ -434,6 +434,299 @@ describe("submit", () => {
   });
 });
 
+// ─── submitted flag ───────────────────────────────────────────────────────────
+
+describe("submitted", () => {
+  it("starts false", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { name: { initial: "" } } });
+
+      expect(form.submitted()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("becomes true after any submit attempt, including invalid", async () => {
+    let submitPromise: Promise<void>;
+    let submittedAfter = false;
+
+    const dispose = createRoot(d => {
+      const form = createForm({
+        fields: { email: { initial: "", validate: isEmail } },
+      });
+      submitPromise = form.submit().then(() => {
+        flush();
+        submittedAfter = form.submitted();
+      });
+      return d;
+    });
+
+    await submitPromise!;
+    expect(submittedAfter).toBe(true);
+    dispose();
+  });
+
+  it("resets to false on form.reset()", async () => {
+    let submitPromise: Promise<void>;
+
+    const dispose = createRoot(d => {
+      const form = createForm({ fields: { name: { initial: "Alice" } } });
+      submitPromise = form.submit().then(() => {
+        flush();
+        expect(form.submitted()).toBe(true);
+        form.reset();
+        flush();
+        expect(form.submitted()).toBe(false);
+      });
+      return d;
+    });
+
+    await submitPromise!;
+    dispose();
+  });
+});
+
+// ─── validateOn ───────────────────────────────────────────────────────────────
+
+describe("validateOn", () => {
+  it("change (default): error() shows immediately", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: { email: { initial: "", validate: isEmail } },
+      });
+
+      expect(form.fields.email.error()).toBe("Invalid email");
+      dispose();
+    });
+  });
+
+  it("blur: error() is null until field is touched", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: { email: { initial: "", validate: isEmail, validateOn: "blur" } },
+      });
+
+      expect(form.fields.email.error()).toBe(null);
+
+      form.fields.email.setTouched(true);
+      flush();
+      expect(form.fields.email.error()).toBe("Invalid email");
+      dispose();
+    });
+  });
+
+  it("submit: error() is null until form.submit() is called", async () => {
+    let submitPromise: Promise<void>;
+    let errorBefore: string | null;
+    let errorAfter: string | null;
+
+    const dispose = createRoot(d => {
+      const form = createForm({
+        fields: { email: { initial: "", validate: isEmail, validateOn: "submit" } },
+      });
+
+      errorBefore = form.fields.email.error();
+      submitPromise = form.submit().then(() => {
+        flush();
+        errorAfter = form.fields.email.error();
+      });
+      return d;
+    });
+
+    await submitPromise!;
+    expect(errorBefore!).toBe(null);
+    expect(errorAfter!).toBe("Invalid email");
+    dispose();
+  });
+
+  it("form-level validateOn applies to all fields", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: { email: { initial: "", validate: isEmail } },
+        validateOn: "blur",
+      });
+
+      expect(form.fields.email.error()).toBe(null);
+
+      form.fields.email.setTouched(true);
+      flush();
+      expect(form.fields.email.error()).toBe("Invalid email");
+      dispose();
+    });
+  });
+
+  it("per-field validateOn overrides form-level", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: { initial: "", validate: isEmail },
+          name: {
+            initial: "",
+            validate: (v: string) => (v ? null : "Required"),
+            validateOn: "blur",
+          },
+        },
+        validateOn: "submit",
+      });
+
+      // email inherits "submit" → hidden; name is "blur" → also hidden
+      expect(form.fields.email.error()).toBe(null);
+      expect(form.fields.name.error()).toBe(null);
+
+      // touching name reveals its error; email stays hidden
+      form.fields.name.setTouched(true);
+      flush();
+      expect(form.fields.name.error()).toBe("Required");
+      expect(form.fields.email.error()).toBe(null);
+      dispose();
+    });
+  });
+
+  it("valid() always uses raw error regardless of validateOn", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: { email: { initial: "", validate: isEmail, validateOn: "blur" } },
+      });
+
+      // error() is null (not yet touched) but the field is actually invalid
+      expect(form.fields.email.error()).toBe(null);
+      expect(form.valid()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("errors() always uses raw error regardless of validateOn", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: { email: { initial: "", validate: isEmail, validateOn: "blur" } },
+      });
+
+      expect(form.fields.email.error()).toBe(null);
+      expect(form.errors().email).toBe("Invalid email");
+      dispose();
+    });
+  });
+});
+
+// ─── Async validators ─────────────────────────────────────────────────────────
+
+describe("async validators", () => {
+  it("pending becomes true while an async validator is in flight", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: {
+            initial: "test@example.com",
+            validate: async () => {
+              await new Promise(r => setTimeout(r, 50));
+              return null;
+            },
+          },
+        },
+      });
+
+      flush();
+      expect(form.fields.email.pending()).toBe(true);
+      expect(form.pending()).toBe(true);
+      dispose();
+    });
+  });
+
+  it("sets error after async validation resolves", async () => {
+    const form = createRoot(() =>
+      createForm({
+        fields: {
+          email: {
+            initial: "taken@example.com",
+            validate: async (v: string) =>
+              v === "taken@example.com" ? "Email already taken" : null,
+          },
+        },
+      }),
+    );
+
+    flush();
+    await new Promise(r => setTimeout(r, 20));
+    flush();
+    expect(form.fields.email.error()).toBe("Email already taken");
+    expect(form.fields.email.pending()).toBe(false);
+  });
+
+  it("sync and async validators coexist in one validate array", async () => {
+    const form = createRoot(() =>
+      createForm({
+        fields: {
+          email: {
+            initial: "",
+            validate: [
+              isEmail,
+              async (v: string) => (v === "taken@example.com" ? "Email already taken" : null),
+            ],
+          },
+        },
+      }),
+    );
+
+    // Sync validator fires immediately
+    expect(form.fields.email.error()).toBe("Invalid email");
+
+    form.fields.email.setValue("taken@example.com");
+    flush();
+    // Sync passes, async is in flight
+    expect(form.fields.email.error()).toBe(null);
+    expect(form.fields.email.pending()).toBe(true);
+
+    await new Promise(r => setTimeout(r, 20));
+    flush();
+    expect(form.fields.email.error()).toBe("Email already taken");
+  });
+
+  it("valid() is false while any async validator is pending", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: {
+            initial: "test@example.com",
+            validate: async () => {
+              await new Promise(r => setTimeout(r, 50));
+              return null;
+            },
+          },
+        },
+      });
+
+      flush();
+      expect(form.valid()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("stale results are discarded when value changes mid-flight", async () => {
+    const form = createRoot(() =>
+      createForm({
+        fields: {
+          username: {
+            initial: "first",
+            validate: async (v: string) => {
+              await new Promise(r => setTimeout(r, 10));
+              return v === "first" ? "taken" : null;
+            },
+          },
+        },
+      }),
+    );
+
+    flush();
+    form.fields.username.setValue("second");
+    flush();
+
+    await new Promise(r => setTimeout(r, 30));
+    flush();
+
+    expect(form.fields.username.error()).toBe(null);
+  });
+});
+
 // ─── Bind ─────────────────────────────────────────────────────────────────────
 
 describe("bind", () => {
@@ -509,6 +802,38 @@ describe("bind", () => {
       expect(() => form.bind("nonexistent" as any)).toThrow(
         'createForm: unknown field "nonexistent"',
       );
+      dispose();
+    });
+  });
+
+  it("checkbox: sets initial checked from boolean signal", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { agree: { initial: false } } });
+
+      const el = document.createElement("input");
+      el.type = "checkbox";
+      const cleanup = form.bind("agree" as any)(el);
+
+      expect(el.checked).toBe(false);
+      cleanup();
+      dispose();
+    });
+  });
+
+  it("checkbox: updates signal with boolean on change event", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { agree: { initial: false } } });
+
+      const el = document.createElement("input");
+      el.type = "checkbox";
+      const cleanup = form.bind("agree" as any)(el);
+
+      el.checked = true;
+      el.dispatchEvent(new Event("change"));
+      flush();
+
+      expect(form.fields.agree.value()).toBe(true);
+      cleanup();
       dispose();
     });
   });

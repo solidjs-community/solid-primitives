@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/form",
   "version": "0.0.100",
-  "description": "Reactive form primitive for Solid.js with field-level validation, dirty tracking, and DOM binding.",
+  "description": "Reactive form primitive for Solid.js with per-field signals, sync/async validation, validateOn control, and DOM binding.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -10,14 +10,12 @@
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
-  "bugs": {
-    "url": "https://github.com/solidjs-community/solid-primitives/issues"
-  },
   "primitive": {
     "name": "form",
     "stage": 0,
     "list": [
-      "createForm"
+      "createForm",
+      "toFormData"
     ],
     "category": "Reactivity"
   },
@@ -26,7 +24,8 @@
     "primitives",
     "form",
     "validation",
-    "reactive"
+    "reactive",
+    "async"
   ],
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^"
