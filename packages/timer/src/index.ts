@@ -5,20 +5,19 @@ import {
   untrack,
   type Accessor,
   type SignalOptions,
-  createMemo,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 export type TimeoutSource = number | Accessor<number | false>;
 
 /**
- * Create a timer ({@link setTimeout} or {@link setInterval})
- * which automatically clears when the reactive scope is disposed.
+ * Create a timer ({@link setTimeout} or {@link setInterval}) and return a function to clear it.
+ * Does not integrate with the reactive lifecycle — the caller is responsible for cleanup.
  *
  * @param fn Function to be called every {@link delay}.
  * @param delay Number representing the time between executions of {@link fn} in ms.
  * @param timer The timer to create: {@link setTimeout} or {@link setInterval}.
- * @returns Function to manually clear the interval.
+ * @returns Function to clear the timer.
  */
 export const makeTimer = (
   fn: VoidFunction,
@@ -28,9 +27,8 @@ export const makeTimer = (
   if (isServer) {
     return () => void 0;
   }
-  const intervalId = timer(fn, delay);
-  const clear = () => clearInterval(intervalId);
-  return onCleanup(clear);
+  const id = timer(fn, delay);
+  return () => clearInterval(id);
 };
 
 /**
@@ -53,61 +51,67 @@ export const createTimer = (
     return void 0;
   }
   if (typeof delay === "number") {
-    makeTimer(fn, delay, timer);
+    onCleanup(makeTimer(fn, delay, timer));
     return;
   }
 
   let done = false;
   let prevTime = performance.now();
-  let fractionDone: number = 0;
+  let fractionDone = 0;
   let shouldHandleFraction = false;
+
   const callHandler = () => {
     untrack(fn);
     prevTime = performance.now();
     done = timer === setTimeout;
   };
 
-  createEffect((prevDelay?: number | false) => {
-    if (done) return;
-    const currDelay = delay();
-    if (currDelay === false) {
-      // if false, update fractionDone and pause
-      if (prevDelay) fractionDone += (performance.now() - prevTime) / prevDelay;
-      return currDelay;
-    }
+  createEffect(
+    () => delay(),
+    (currDelay: number | false, prevDelay?: number | false) => {
+      if (done) return;
 
-    // if resuming from pause, set prevTime to now
-    if (prevDelay === false) prevTime = performance.now();
-
-    if (shouldHandleFraction) {
-      if (prevDelay) fractionDone += (performance.now() - prevTime) / prevDelay;
-      prevTime = performance.now();
-      if (fractionDone >= 1) {
-        fractionDone = 0;
-        callHandler();
-      } else if (fractionDone > 0) {
-        // 0 < fractionDone < 1, need to reconcile the delay
-        // signal to rerun this effect when we're done reconciling the delay
-        const [listen, rerunEffect] = createSignal(undefined, { equals: false });
-        listen();
-        makeTimer(
-          () => {
-            fractionDone = 0;
-            shouldHandleFraction = false;
-            rerunEffect();
-            callHandler();
-          },
-          (1 - fractionDone) * currDelay,
-          setTimeout,
-        );
-        return currDelay;
+      if (currDelay === false) {
+        if (typeof prevDelay === "number") {
+          fractionDone += (performance.now() - prevTime) / prevDelay;
+        }
+        return;
       }
-    }
 
-    shouldHandleFraction = true;
-    makeTimer(callHandler, currDelay, timer);
-    return currDelay;
-  });
+      if (prevDelay === false) prevTime = performance.now();
+
+      if (shouldHandleFraction) {
+        if (typeof prevDelay === "number") {
+          fractionDone += (performance.now() - prevTime) / prevDelay;
+        }
+        prevTime = performance.now();
+        if (fractionDone >= 1) {
+          fractionDone = 0;
+          callHandler();
+        } else if (fractionDone > 0) {
+          const reconcileDelay = (1 - fractionDone) * currDelay;
+          fractionDone = 0;
+          let mainId: ReturnType<typeof timer> | undefined;
+          const reconcileId = setTimeout(() => {
+            shouldHandleFraction = false;
+            callHandler();
+            if (!done) {
+              mainId = timer(callHandler, currDelay);
+            }
+          }, reconcileDelay);
+          return () => {
+            clearTimeout(reconcileId);
+            if (mainId !== undefined) clearInterval(mainId);
+          };
+        }
+      }
+
+      fractionDone = 0;
+      shouldHandleFraction = true;
+      const id = timer(callHandler, currDelay);
+      return () => clearInterval(id);
+    },
+  );
 };
 
 /**
@@ -123,22 +127,21 @@ export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource)
     return void 0;
   }
   if (typeof timeout === "number") {
-    makeTimer(handler, timeout, setInterval);
+    onCleanup(makeTimer(handler, timeout, setInterval));
     return;
   }
   const [currentTimeout, setCurrentTimeout] = createSignal(untrack(timeout));
-  createEffect(() => {
-    const currTimeout = currentTimeout();
-    if (currTimeout === false) return;
-    makeTimer(
-      () => {
+  createEffect(
+    () => currentTimeout(),
+    (currTimeout: number | false) => {
+      if (currTimeout === false) return;
+      const id = setInterval(() => {
         handler();
-        setCurrentTimeout(timeout);
-      },
-      currTimeout,
-      setInterval,
-    );
-  });
+        setCurrentTimeout(timeout());
+      }, currTimeout);
+      return () => clearInterval(id);
+    },
+  );
 };
 
 /**
@@ -176,11 +179,27 @@ export function createPolled<T>(
   options?: SignalOptions<T>,
 ): Accessor<T> {
   if (isServer) {
-    return fn as Accessor<T>;
+    const v = fn(value);
+    return () => v;
   }
-  const memo = createMemo(() => createSignal(fn(value), options));
-  createTimer(() => memo()[1](fn), timeout, setInterval);
-  return () => memo()[0]();
+  // depSignal tracks `tick` (timer) and fn's own reactive deps. Using a plain
+  // signal for the public accessor avoids the REACTIVE_DISPOSED re-run issue
+  // that compute signals exhibit when read after their owner scope is disposed.
+  // TODO: Investigate other options, this feels wrong.
+  const [tick, setTick] = createSignal(0);
+  const [depSignal] = createSignal<T>((prev: T | undefined) => {
+    tick();
+    return fn(prev !== undefined ? (prev as T) : value);
+  });
+  const [polled, setPolled] = createSignal<T>(depSignal() as Exclude<T, Function>, options);
+  createEffect(
+    () => depSignal(),
+    (newValue: T) => {
+      setPolled(() => newValue);
+    },
+  );
+  createTimer(() => setTick(t => t + 1), timeout, setInterval);
+  return polled;
 }
 
 /**
