@@ -157,14 +157,20 @@ const scheduled = createScheduled(fn => debounce(fn, 1000));
 
 const [count, setCount] = createSignal(0);
 
-createEffect(() => {
-  // track source signal
-  const value = count();
-  // track the debounced signal and check if it's dirty
-  if (scheduled()) {
-    console.log("count", value);
-  }
-});
+// In Solid 2.0, use the two-arg createEffect: compute (tracked) + apply (side effects)
+createEffect(
+  () => {
+    // compute: track both source signal and the scheduled signal
+    const value = count();
+    const dirty = scheduled();
+    return { value, dirty };
+  },
+  ({ value, dirty }) => {
+    if (dirty) {
+      console.log("count", value);
+    }
+  },
+);
 
 // or with createMemo
 const debouncedCount = createMemo((p: number = 0) => {

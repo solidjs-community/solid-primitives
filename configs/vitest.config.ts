@@ -1,16 +1,16 @@
 import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
-import * as utils from "../scripts/utils/index.js"
+import * as utils from "../scripts/utils/index.js";
 
-const package_name = utils.getPackageNameFromCWD()
+const package_name = utils.getPackageNameFromCWD();
 
 if (package_name == null) {
-  utils.log_info("Testing ALL packages...")
+  utils.log_info("Testing ALL packages...");
 } else {
-  utils.log_info("Testing "+package_name+" package...")
+  utils.log_info("Testing " + package_name + " package...");
 }
 
-const from_root = package_name == null
+const from_root = package_name == null;
 
 export default defineConfig(({ mode }) => {
   // test in server environment
@@ -53,6 +53,9 @@ export default defineConfig(({ mode }) => {
           }),
     },
     resolve: {
+      alias: {
+        "solid-js/web": "@solidjs/web",
+      },
       conditions: testSSR
         ? ["@solid-primitives/source", "node"]
         : ["@solid-primitives/source", "browser", "development"],

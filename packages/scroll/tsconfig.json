@@ -14,6 +14,9 @@
     },
     {
       "path": "../static-store"
+    },
+    {
+      "path": "../utils"
     }
   ],
   "include": [
