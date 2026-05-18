@@ -32,7 +32,7 @@ export type PointerDownOutsideEvent = CustomEvent<EventDetails<PointerEvent>>;
 export type FocusOutsideEvent = CustomEvent<EventDetails<FocusEvent>>;
 export type InteractOutsideEvent = PointerDownOutsideEvent | FocusOutsideEvent;
 
-export interface CreateInteractOutsideProps {
+export interface CreateInteractOutsideOptions {
   /** Whether the interact outside events should be listened or not. */
   isDisabled?: MaybeAccessor<boolean | undefined>;
 
@@ -92,7 +92,7 @@ const isCtrlKey = (e: PointerEvent): boolean => e.ctrlKey || (isMacPlatform() &&
  * Each event is a `CustomEvent` that wraps the original DOM event and can be cancelled
  * with `event.preventDefault()` to stop subsequent handlers from firing.
  *
- * @param props - Configuration and event handlers.
+ * @param options - Configuration and event handlers.
  * @param ref - Accessor returning the element to watch.
  *
  * @example
@@ -111,7 +111,7 @@ const isCtrlKey = (e: PointerEvent): boolean => e.ctrlKey || (isMacPlatform() &&
  * ```
  */
 export function createInteractOutside<T extends Element>(
-  props: CreateInteractOutsideProps,
+  options: CreateInteractOutsideOptions,
   ref: Accessor<T | undefined>,
 ): void {
   if (isServer) return;
@@ -126,7 +126,7 @@ export function createInteractOutside<T extends Element>(
     if (!el) return false;
     if (!el.ownerDocument.contains(target)) return false;
     if (el.contains(target)) return false;
-    return !(props.shouldExcludeElement?.(target) ?? false);
+    return !(options.shouldExcludeElement?.(target) ?? false);
   };
 
   const onPointerDown = (e: PointerEvent) => {
@@ -136,7 +136,7 @@ export function createInteractOutside<T extends Element>(
 
       target.addEventListener(
         POINTER_DOWN_OUTSIDE_EVENT,
-        composeHandlers([props.onPointerDownOutside, props.onInteractOutside]),
+        composeHandlers([options.onPointerDownOutside, options.onInteractOutside]),
         { once: true },
       );
       target.dispatchEvent(
@@ -169,7 +169,7 @@ export function createInteractOutside<T extends Element>(
 
     target.addEventListener(
       FOCUS_OUTSIDE_EVENT,
-      composeHandlers([props.onFocusOutside, props.onInteractOutside]),
+      composeHandlers([options.onFocusOutside, options.onInteractOutside]),
       { once: true },
     );
     target.dispatchEvent(
@@ -189,7 +189,7 @@ export function createInteractOutside<T extends Element>(
   // The apply function returns a teardown function; Solid 2.0 calls it before
   // re-running apply or when the owner is disposed (no onCleanup needed).
   createEffect(
-    () => ({ disabled: access(props.isDisabled), el: ref() }),
+    () => ({ disabled: access(options.isDisabled), el: ref() }),
     ({ disabled, el }: { disabled: boolean | undefined; el: T | undefined }) => {
       if (disabled || !el) return;
 
@@ -210,4 +210,3 @@ export function createInteractOutside<T extends Element>(
     },
   );
 }
-

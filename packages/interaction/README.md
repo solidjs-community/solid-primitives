@@ -62,17 +62,17 @@ import { createSignal, Show } from "solid-js";
 import { createInteractOutside } from "@solid-primitives/interaction";
 
 function Popover() {
-  let ref: HTMLDivElement | undefined;
+  const [ref, setRef] = createSignal<HTMLDivElement>();
   const [open, setOpen] = createSignal(false);
 
   createInteractOutside(
     { onInteractOutside: () => setOpen(false) },
-    () => ref,
+    ref,
   );
 
   return (
     <Show when={open()}>
-      <div ref={ref} class="popover">
+      <div ref={setRef} class="popover">
         Popover content
       </div>
     </Show>
