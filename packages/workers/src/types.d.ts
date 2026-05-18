@@ -22,3 +22,8 @@ export type WorkerExports = [
 export interface PostMessageOptions {
   transfer?: any[] | undefined;
 }
+
+export type BridgeMessage =
+  | { type: "init"; inputs: Record<string, unknown>; outputs: Record<string, unknown> }
+  | { type: "input"; key: string; value: unknown }
+  | { type: "outputs"; snapshot: Record<string, unknown> };

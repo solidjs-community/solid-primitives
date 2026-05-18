@@ -15,7 +15,9 @@
     "list": [
       "createWorker",
       "createWorkerPool",
-      "createWorkerQuery"
+      "createWorkerQuery",
+      "createReactiveWorker",
+      "workerScope"
     ],
     "category": "Browser APIs"
   },
@@ -29,10 +31,19 @@
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
-    "import": {
-      "@solid-primitives/source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "import": {
+        "@solid-primitives/source": "./src/index.ts",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./worker": {
+      "import": {
+        "@solid-primitives/source": "./src/worker-scope.ts",
+        "types": "./dist/worker-scope.d.ts",
+        "default": "./dist/worker-scope.js"
+      }
     }
   },
   "scripts": {

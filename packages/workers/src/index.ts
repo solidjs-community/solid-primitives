@@ -4,6 +4,7 @@ import type { PostMessageOptions, WorkerCallbacks, WorkerExports, WorkerMessage 
 import { KILL, RPC, cjs, setup } from "./utils.js";
 
 export type * from "./types.js";
+export { createReactiveWorker } from "./reactive-worker.js";
 
 /**
  * Creates a very basic WebWorker based on provided code.
