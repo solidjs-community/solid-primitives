@@ -15,7 +15,7 @@
     "list": [
       "createWorker",
       "createWorkerPool",
-      "createSignaledWorker"
+      "createWorkerQuery"
     ],
     "category": "Browser APIs"
   },

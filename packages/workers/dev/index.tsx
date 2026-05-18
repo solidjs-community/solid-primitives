@@ -1,6 +1,6 @@
-import { type Component, createSignal, onSettled } from "solid-js";
+import { type Component, Loading, createSignal, onSettled } from "solid-js";
 
-import { createWorker, createWorkerPool, createSignaledWorker } from "../src/index.js";
+import { createWorker, createWorkerPool, createWorkerQuery } from "../src/index.js";
 
 const App: Component = () => {
   // Worker
@@ -32,16 +32,13 @@ const App: Component = () => {
   calculate();
   calculatePooled();
 
-  // Signal
-  const [input, setInput] = createSignal([1, 1]);
-  const [output, setOutput] = createSignal([1, 1]);
-  createSignaledWorker({
-    input,
-    output: setOutput,
-    func: function add([a, b]) {
-      return a + b;
-    },
+  // Query
+  const [input, setInput] = createSignal<[number, number]>([1, 1]);
+  const [queryWorker] = createWorker(function add([a, b]: [number, number]) {
+    return a + b;
   });
+  // @ts-ignore — worker methods are dynamically attached
+  const queryResult = createWorkerQuery<number>(() => queryWorker.add(input()));
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center gap-12 p-24 text-white">
@@ -92,7 +89,7 @@ const App: Component = () => {
         = <div class="text-2xl">{poolResult()}</div>
       </div>
       <div class="flex w-full items-center justify-between">
-        <h3 class="w-2/6">Signal Worker Test</h3>
+        <h3 class="w-2/6">Worker Query Test</h3>
         <input
           type="number"
           class="w-30 p-3 text-2xl"
@@ -110,7 +107,7 @@ const App: Component = () => {
           }}
           value={input()[1]}
         />
-        = <div class="text-2xl">{output()}</div>
+        = <Loading fallback={<div class="text-2xl">…</div>}><div class="text-2xl">{queryResult()}</div></Loading>
       </div>
     </div>
   );

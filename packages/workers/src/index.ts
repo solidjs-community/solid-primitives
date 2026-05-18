@@ -1,4 +1,4 @@
-import { type Accessor, type Setter, createEffect, onCleanup } from "solid-js";
+import { type Accessor, createMemo, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
 import type { PostMessageOptions, WorkerCallbacks, WorkerExports, WorkerMessage } from "./types.js";
 import { KILL, RPC, cjs, setup } from "./utils.js";
@@ -106,47 +106,17 @@ export const createWorkerPool = (
   ];
 };
 
-export type WorkerInstruction = {
-  func: Function;
-  input?: Accessor<any>;
-  output?: Setter<any>;
-  concurrency?: number;
-};
-
 /**
- * Creates a complex worker that reads inputs and provides outputs.
+ * Creates a reactive async query backed by a worker call.
+ * Re-runs whenever reactive inputs inside `fn` change, and integrates
+ * with `<Loading>` for suspense-aware rendering.
  *
- * @param args An instruction list of controls for the worker.
- * @returns Basic start and stop functions
+ * @param fn A function that calls a worker method with reactive inputs.
+ * @returns An async accessor that resolves to the worker's result.
  */
-export const createSignaledWorker = (
-  ...args: WorkerInstruction[]
-): [start: () => void, stop: () => void] => {
+export function createWorkerQuery<T>(fn: () => Promise<T>): Accessor<T> {
   if (isServer) {
-    return [
-      () => {
-        /*noop*/
-      },
-      () => {
-        /*noop*/
-      },
-    ];
+    return () => undefined as unknown as T;
   }
-  const fns = [];
-  for (const i in args) {
-    const { input, output, func } = args[i]!;
-    if (input) {
-      createEffect(
-        () => input(),
-        async value => {
-          // @ts-ignore
-          const result = await worker[func.name](value);
-          if (output) output(result);
-        },
-      );
-    }
-    fns.push(func);
-  }
-  const [worker, start, stop] = createWorker(...fns);
-  return [start, stop];
-};
+  return createMemo(fn) as Accessor<T>;
+}
