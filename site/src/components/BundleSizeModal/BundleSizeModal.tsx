@@ -146,8 +146,7 @@ const BundleSizeModal: Component<{
             ref={el => setTarget((tableEl = el))}
           >
             <thead
-              class="sticky"
-              classList={{ "top-[-2px]": isSafari || isIOS, "top-0": !(isSafari || isIOS) }}
+              class={["sticky", { "top-[-2px]": isSafari || isIOS, "top-0": !(isSafari || isIOS) }]}
               ref={theadEl}
             >
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">

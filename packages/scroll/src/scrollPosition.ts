@@ -1,6 +1,5 @@
-import { type Accessor, createSignal, onSettled, sharedConfig } from "solid-js";
+import { type Accessor, createEffect, createRenderEffect, createSignal, onSettled, sharedConfig } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { createEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore } from "@solid-primitives/static-store";
 
@@ -65,19 +64,23 @@ export function getScrollPosition(target: Element | Window | undefined): Positio
 export function createScrollPosition(
   target?: Accessor<Element | Window | undefined> | Element | Window,
 ): Readonly<Position> {
-  if (isServer) {
-    return FALLBACK_SCROLL_POSITION;
+  // Reactive primitives (createMemo via createDerivedStaticStore, plus the scroll
+  // effect below) must be created on both server and client to keep Solid 2.0
+  // hydration child IDs consistent — all component scopes are transparent and share
+  // the root counter. DOM operations are guarded inside the apply phases.
+  if (!isServer) {
+    target = target || window;
   }
-
-  target = target || window;
 
   const isFn = typeof target === "function";
   const isHydrating = sharedConfig.hydrating;
 
   const getPos = (): Position =>
-    getScrollPosition(
-      isFn ? (target as Accessor<Element | Window | undefined>)() : (target as Element | Window),
-    );
+    isServer
+      ? { ...FALLBACK_SCROLL_POSITION }
+      : getScrollPosition(
+          isFn ? (target as Accessor<Element | Window | undefined>)() : (target as Element | Window),
+        );
 
   // Plain integer counter — avoids Solid 2.0 createSignal(fn) derived-signal semantics.
   // ownedWrite allows writes from DOM event handlers inside reactive scopes.
@@ -91,9 +94,32 @@ export function createScrollPosition(
   });
 
   // Refs aren't populated until mount; also refreshes position post-hydration.
-  if (isHydrating || isFn) onSettled(trigger);
+  if (!isServer && (isHydrating || isFn)) onSettled(trigger);
 
-  createEventListener(target, "scroll", trigger, { passive: true });
+  // Use createEffect/createRenderEffect directly instead of createEventListener so
+  // an effect node is always created (consuming a child ID) on both server and client.
+  // createEventListener returns early on server, which would cause a child ID mismatch.
+  if (isFn) {
+    const fnTarget = target as Accessor<Element | Window | undefined>;
+    createEffect(
+      () => fnTarget(),
+      el => {
+        if (isServer || !el) return;
+        el.addEventListener("scroll", trigger, { passive: true });
+        return () => el.removeEventListener("scroll", trigger);
+      },
+    );
+  } else {
+    const elTarget = target as Element | Window | undefined;
+    createRenderEffect(
+      () => elTarget,
+      el => {
+        if (isServer || !el) return;
+        el.addEventListener("scroll", trigger, { passive: true });
+        return () => el.removeEventListener("scroll", trigger);
+      },
+    );
+  }
 
   return pos;
 }

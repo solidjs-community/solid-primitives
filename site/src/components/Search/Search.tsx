@@ -2,7 +2,7 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
 import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
 import Fuse from "fuse.js";
-import { type Component, createMemo, createResource, createSignal, For, Show } from "solid-js";
+import { type Component, createMemo, createSignal, For, onSettled, Show } from "solid-js";
 import { fetchPackageList } from "~/api.js";
 import { type PackageListItem } from "~/types.js";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils.js";
@@ -101,8 +101,9 @@ const Search: Component<{
   const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
 
-  const [packages] = createResource(fetchPackageList, {
-    initialValue: [],
+  const [packages, setPackages] = createSignal<PackageListItem[]>([]);
+  onSettled(() => {
+    void fetchPackageList().then(data => setPackages(data));
   });
 
   const searchablePackages = createMemo(() =>
@@ -148,11 +149,7 @@ const Search: Component<{
     <div class="xs:w-full flex w-[calc(100vw-32px)] max-w-[800px] items-center justify-center">
       <div class="bg-page-main-bg w-full rounded-lg">
         <div
-          class="z-1 sticky"
-          classList={{
-            "top-0": isSmall(),
-            "top-[60px]": !isSmall(),
-          }}
+          class={["z-1 sticky", { "top-0": isSmall(), "top-[60px]": !isSmall() }]}
         >
           <div class="bg-page-main-bg flex gap-2 rounded-lg p-2">
             <div
@@ -182,19 +179,14 @@ const Search: Component<{
           </div>
 
           <div
-            class="bg-page-main-bg relative border-b border-slate-300 px-2 dark:border-slate-600"
-            classList={{ hidden: !result().length }}
+            class={["bg-page-main-bg relative border-b border-slate-300 px-2 dark:border-slate-600", { hidden: !result().length }]}
           >
             <div
-              class="-z-1 absolute left-4 right-4 top-[-16px] h-[16px] shadow-lg shadow-[#24405966] transition dark:shadow-[#05121dbf]"
-              classList={{
-                "opacity-0": !showShadow(),
-                "opacity-100": showShadow(),
-              }}
+              class={["-z-1 absolute left-4 right-4 top-[-16px] h-[16px] shadow-lg shadow-[#24405966] transition dark:shadow-[#05121dbf]", { "opacity-0": !showShadow(), "opacity-100": showShadow() }]}
             />
           </div>
         </div>
-        <div class="p-2 sm:p-4" classList={{ hidden: !result().length }}>
+        <div class={["p-2 sm:p-4", { hidden: !result().length }]}>
           <div class=""></div>
           <ul class="flex flex-col gap-y-6">
             <For each={result()}>
@@ -247,10 +239,7 @@ const Search: Component<{
                           onClick={toggleShowRest}
                         >
                           <div
-                            class="transition duration-200"
-                            classList={{
-                              "-rotate-90": showRest(),
-                            }}
+                            class={["transition duration-200", { "-rotate-90": showRest() }]}
                           >
                             <ChevronLeftIcon size={24} />
                           </div>

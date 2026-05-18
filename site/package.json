@@ -23,7 +23,7 @@
     "vite-plugin-solid": "3.0.0-next.5"
   },
   "dependencies": {
-    "@solidjs/web": "2.0.0-beta.10",
+    "@solidjs/web": "2.0.0-beta.13",
     "@solid-primitives/clipboard": "workspace:^",
     "@solid-primitives/event-bus": "workspace:^",
     "@solid-primitives/event-listener": "workspace:^",
@@ -51,8 +51,6 @@
     "remark-rehype": "^11.0.0",
     "sass": "^1.72.0",
     "@floating-ui/dom": "^1.7.6",
-    "solid-dismiss": "^1.7.121",
-    "solid-icons": "^1.1.0",
     "undici": "^5.28.2",
     "unified": "^11.0.4"
   },

@@ -1,7 +1,6 @@
 // import { createShortcut } from "@solid-primitives/keyboard";
 import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS } from "@solid-primitives/platform";
-import { defer } from "@solid-primitives/utils";
 import { type Component, createEffect, onSettled, Show } from "solid-js";
 import { createShortcut } from "~/primitives/createShortcut.js";
 import { doesPathnameMatchBase, scrollIntoView } from "~/utils.js";
@@ -79,24 +78,22 @@ const ClientSearchModal: Component<{
   createShortcut(["Control", "K"], () => props.setOpen(true));
 
   createEffect(
-    defer(
-      () => props.open,
-      open => {
-        if (!open) return;
-        prevPathname = location().pathname;
-        prevHash = location().hash;
-      },
-    ),
+    () => props.open,
+    open => {
+      if (!open) return;
+      prevPathname = location().pathname;
+      prevHash = location().hash;
+    },
+    { defer: true },
   );
 
   createEffect(
-    defer(
-      () => location().pathname,
-      (currentPathname, prevPathname) => {
-        if (prevPathname === currentPathname) return;
-        props.setOpen(false);
-      },
-    ),
+    () => location().pathname,
+    (currentPathname, prevPathname) => {
+      if (prevPathname === currentPathname) return;
+      props.setOpen(false);
+    },
+    { defer: true },
   );
 
   createEffect(
@@ -121,20 +118,17 @@ const ClientSearchModal: Component<{
       <div ref={containerEl}>
         <div>
           <div
-            class="fixed left-0 right-0 top-0 z-[1002] h-[60px]"
-            classList={{ hidden: isSmall() }}
+            class={["fixed left-0 right-0 top-0 z-[1002] h-[60px]", { hidden: isSmall() }]}
             onClick={onClickClose}
           />
           <div class="fixed inset-0 z-[1000] will-change-transform" onClick={onClickClose}>
             <div
-              class="h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-sm dark:bg-[#001627bd]"
-              classList={{ "mt-[60px]": !isSmall() }}
+              class={["h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-sm dark:bg-[#001627bd]", { "mt-[60px]": !isSmall() }]}
             />
           </div>
         </div>
         <div
-          class="pointer-events-none mb-[60px] flex justify-center p-4"
-          classList={{ "mt-[80px]": !isSmall() }}
+          class={["pointer-events-none mb-[60px] flex justify-center p-4", { "mt-[80px]": !isSmall() }]}
           role="presentation"
         >
           <div class="flex-grow">

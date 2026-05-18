@@ -1,5 +1,4 @@
 import { usePrefersDark } from "@solid-primitives/media";
-import { defer } from "@solid-primitives/utils";
 import { createEffect, createSignal, Match, onSettled, Switch } from "solid-js";
 import HalfSun from "../Icons/HalfSun.js";
 
@@ -99,15 +98,16 @@ const ThemeBtn = () => {
   };
 
   createEffect(
-    defer(prefersDark, prefersDark => {
+    () => prefersDark(),
+    prefersDark => {
       if (theme() !== "os") return;
-
       if (prefersDark) {
         document.documentElement.classList.add("dark");
       } else {
         document.documentElement.classList.remove("dark");
       }
-    }),
+    },
+    { defer: true },
   );
 
   onSettled(() => {
