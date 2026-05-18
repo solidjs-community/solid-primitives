@@ -20,7 +20,7 @@
  *
  */
 
-import { type Accessor, createEffect } from "solid-js";
+import { type Accessor, createEffect, onCleanup } from "solid-js";
 import { type MaybeAccessor, access, isServer, noop } from "@solid-primitives/utils";
 
 export type EventDetails<T> = {
@@ -62,6 +62,8 @@ export interface CreateInteractOutsideOptions {
   onInteractOutside?: (event: InteractOutsideEvent) => void;
 }
 
+export type MakeInteractOutsideOptions = Omit<CreateInteractOutsideOptions, "isDisabled">;
+
 const POINTER_DOWN_OUTSIDE_EVENT = "interactOutside.pointerDownOutside";
 const FOCUS_OUTSIDE_EVENT = "interactOutside.focusOutside";
 
@@ -76,55 +78,43 @@ function composeHandlers(handlers: (((e: any) => void) | undefined)[]): EventLis
 
 const isMacPlatform = (): boolean => {
   if (typeof navigator === "undefined") return false;
-  const platform =
-    (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform ??
-    navigator.platform;
-  return /mac/i.test(platform);
+  const uaData = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData;
+  if (uaData?.platform) return /mac/i.test(uaData.platform);
+  return /mac/i.test(navigator.userAgent);
 };
 
 const isCtrlKey = (e: PointerEvent): boolean => e.ctrlKey || (isMacPlatform() && e.metaKey);
 
 /**
- * Listens for pointer and focus events that originate outside a referenced element.
+ * Attaches outside-interaction listeners to `el` immediately and returns a cleanup function.
+ * No Solid reactivity — use when you already have a stable element reference.
  *
- * Fires `onPointerDownOutside`, `onFocusOutside`, and `onInteractOutside` when
- * the user interacts with any part of the page outside the element referenced by `ref`.
- * Each event is a `CustomEvent` that wraps the original DOM event and can be cancelled
- * with `event.preventDefault()` to stop subsequent handlers from firing.
- *
- * @param options - Configuration and event handlers.
- * @param ref - Accessor returning the element to watch.
+ * @param el - The element to watch.
+ * @param options - Event handlers and `shouldExcludeElement`.
+ * @returns A cleanup function that removes all attached listeners.
  *
  * @example
- * ```tsx
- * function Popover() {
- *   let ref: HTMLDivElement | undefined;
- *   const [open, setOpen] = createSignal(true);
- *
- *   createInteractOutside(
- *     { onInteractOutside: () => setOpen(false) },
- *     () => ref,
- *   );
- *
- *   return <Show when={open()}><div ref={ref}>Popover content</div></Show>;
- * }
+ * ```ts
+ * const cleanup = makeInteractOutside(el, {
+ *   onInteractOutside: () => close(),
+ * });
+ * // later:
+ * cleanup();
  * ```
  */
-export function createInteractOutside<T extends Element>(
-  options: CreateInteractOutsideOptions,
-  ref: Accessor<T | undefined>,
-): void {
-  if (isServer) return;
+export function makeInteractOutside<T extends Element>(
+  el: T,
+  options: MakeInteractOutsideOptions,
+): () => void {
+  if (isServer) return noop;
 
-  let pointerDownTimeoutId: number | undefined;
   let clickHandler: () => void = noop;
+  const ownerDoc = el.ownerDocument;
 
   const isEventOutside = (e: Event): boolean => {
     const target = e.target as Element | null;
     if (!(target instanceof Element)) return false;
-    const el = ref();
-    if (!el) return false;
-    if (!el.ownerDocument.contains(target)) return false;
+    if (!ownerDoc.contains(target)) return false;
     if (el.contains(target)) return false;
     return !(options.shouldExcludeElement?.(target) ?? false);
   };
@@ -132,7 +122,7 @@ export function createInteractOutside<T extends Element>(
   const onPointerDown = (e: PointerEvent) => {
     const handler = () => {
       const target = e.target as Element | null;
-      if (!ref() || !target || !isEventOutside(e)) return;
+      if (!target || !isEventOutside(e)) return;
 
       target.addEventListener(
         POINTER_DOWN_OUTSIDE_EVENT,
@@ -151,10 +141,7 @@ export function createInteractOutside<T extends Element>(
       );
     };
 
-    // On touch devices, wait for the click event (~350ms delay) before firing.
-    // We continuously remove the previous listener since we can't be certain it fired.
     if (e.pointerType === "touch") {
-      const ownerDoc = ref()?.ownerDocument ?? document;
       ownerDoc.removeEventListener("click", clickHandler);
       clickHandler = handler;
       ownerDoc.addEventListener("click", clickHandler, { once: true });
@@ -165,7 +152,7 @@ export function createInteractOutside<T extends Element>(
 
   const onFocusIn = (e: FocusEvent) => {
     const target = e.target as Element | null;
-    if (!ref() || !target || !isEventOutside(e)) return;
+    if (!target || !isEventOutside(e)) return;
 
     target.addEventListener(
       FOCUS_OUTSIDE_EVENT,
@@ -184,29 +171,85 @@ export function createInteractOutside<T extends Element>(
     );
   };
 
-  // Delay the pointerdown listener registration to avoid triggering on the
-  // same event that caused this component to mount.
-  // The apply function returns a teardown function; Solid 2.0 calls it before
-  // re-running apply or when the owner is disposed (no onCleanup needed).
+  // Delay pointerdown registration to avoid triggering on the event that caused this mount.
+  const pointerDownTimeoutId = window.setTimeout(() => {
+    ownerDoc.addEventListener("pointerdown", onPointerDown, true);
+  }, 0);
+
+  ownerDoc.addEventListener("focusin", onFocusIn, true);
+
+  return () => {
+    window.clearTimeout(pointerDownTimeoutId);
+    ownerDoc.removeEventListener("click", clickHandler);
+    ownerDoc.removeEventListener("pointerdown", onPointerDown, true);
+    ownerDoc.removeEventListener("focusin", onFocusIn, true);
+  };
+}
+
+/**
+ * Ref factory for `makeInteractOutside`. Call it in a component body and pass the
+ * result directly to a JSX `ref` prop. Cleanup is registered via `onCleanup` in the
+ * component's reactive scope so listeners are removed automatically when the component disposes.
+ *
+ * @param options - Event handlers and `shouldExcludeElement`.
+ * @returns A ref callback `(el: Element) => void` suitable for use as a JSX `ref`.
+ *
+ * @example
+ * ```tsx
+ * function Popover() {
+ *   const [open, setOpen] = createSignal(false);
+ *   return (
+ *     <Show when={open()}>
+ *       <div ref={interactOutside({ onInteractOutside: () => setOpen(false) })}>
+ *         Popover content
+ *       </div>
+ *     </Show>
+ *   );
+ * }
+ * ```
+ */
+export function interactOutside(options: MakeInteractOutsideOptions): (el: Element) => void {
+  let cleanup: (() => void) | undefined;
+  onCleanup(() => cleanup?.());
+  return el => {
+    cleanup = makeInteractOutside(el, options);
+  };
+}
+
+/**
+ * Listens for pointer and focus events that originate outside a referenced element.
+ * Reactively re-attaches whenever `ref` or `options.isDisabled` changes.
+ * Cleans up automatically with the reactive owner.
+ *
+ * @param options - Configuration, event handlers, and optional `isDisabled` accessor.
+ * @param ref - Accessor returning the element to watch.
+ *
+ * @example
+ * ```tsx
+ * function Popover() {
+ *   const [ref, setRef] = createSignal<HTMLDivElement>();
+ *   const [open, setOpen] = createSignal(true);
+ *
+ *   createInteractOutside(
+ *     { onInteractOutside: () => setOpen(false) },
+ *     ref,
+ *   );
+ *
+ *   return <Show when={open()}><div ref={setRef}>Popover content</div></Show>;
+ * }
+ * ```
+ */
+export function createInteractOutside<T extends Element>(
+  options: CreateInteractOutsideOptions,
+  ref: Accessor<T | undefined>,
+): void {
+  if (isServer) return;
+
   createEffect(
     () => ({ disabled: access(options.isDisabled), el: ref() }),
     ({ disabled, el }: { disabled: boolean | undefined; el: T | undefined }) => {
       if (disabled || !el) return;
-
-      const ownerDoc = el.ownerDocument;
-
-      pointerDownTimeoutId = window.setTimeout(() => {
-        ownerDoc.addEventListener("pointerdown", onPointerDown, true);
-      }, 0);
-
-      ownerDoc.addEventListener("focusin", onFocusIn, true);
-
-      return () => {
-        window.clearTimeout(pointerDownTimeoutId);
-        ownerDoc.removeEventListener("click", clickHandler);
-        ownerDoc.removeEventListener("pointerdown", onPointerDown, true);
-        ownerDoc.removeEventListener("focusin", onFocusIn, true);
-      };
+      return makeInteractOutside(el, options);
     },
   );
 }

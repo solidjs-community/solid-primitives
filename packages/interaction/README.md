@@ -13,27 +13,72 @@ Primitives for detecting and hiding interactions that originate **outside** a gi
 npm install @solid-primitives/interaction
 # or
 pnpm add @solid-primitives/interaction
-# or
-yarn add @solid-primitives/interaction
+```
+
+## `makeInteractOutside`
+
+```ts
+function makeInteractOutside<T extends Element>(
+  el: T,
+  options: MakeInteractOutsideOptions,
+): () => void
+```
+
+A non-reactive, pure-ref primitive. Attaches outside-interaction listeners to `el` immediately and returns a cleanup function. Use this when you already have a stable element reference and don't need reactive re-attachment.
+
+```ts
+import { makeInteractOutside } from "@solid-primitives/interaction";
+
+const cleanup = makeInteractOutside(el, {
+  onInteractOutside: () => close(),
+});
+
+// later, to remove listeners:
+cleanup();
+```
+
+## `interactOutside`
+
+```ts
+function interactOutside(options: MakeInteractOutsideOptions): (el: Element) => void
+```
+
+A ref factory for `makeInteractOutside`. The most concise way to build dismissable UI — pass the result directly to a JSX `ref` prop and the element will close itself when the user interacts outside it. Cleanup is registered via `onCleanup` in the component's reactive scope, so listeners are removed automatically when the component disposes — no signal ref needed.
+
+```tsx
+import { createSignal, Show } from "solid-js";
+import { interactOutside } from "@solid-primitives/interaction";
+
+function Popover() {
+  const [open, setOpen] = createSignal(false);
+
+  return (
+    <Show when={open()}>
+      <div ref={interactOutside({ onInteractOutside: () => setOpen(false) })}>
+        Popover content
+      </div>
+    </Show>
+  );
+}
 ```
 
 ## `createInteractOutside`
 
 ```ts
 function createInteractOutside<T extends Element>(
-  props: CreateInteractOutsideProps,
+  options: CreateInteractOutsideOptions,
   ref: Accessor<T | undefined>,
 ): void
 ```
 
-Sets up document-level event listeners that fire whenever the user interacts with any part of the page outside the element returned by `ref`. The listeners are registered lazily (via a deferred effect) and automatically removed on cleanup.
+Reactive wrapper around `makeInteractOutside`. Sets up document-level event listeners that fire whenever the user interacts outside the element returned by `ref`. Re-attaches automatically when `ref` or `options.isDisabled` changes. Cleans up with the reactive owner.
 
-### Props
+### Options
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Option | Type | Description |
+|--------|------|-------------|
 | `isDisabled` | `MaybeAccessor<boolean \| undefined>` | Disables all listeners when `true`. Reactive — can be an accessor. |
-| `shouldExcludeElement` | `(element: Element) => boolean` | Return `true` to suppress handlers for interactions with a specific element. |
+| `shouldExcludeElement` | `(element: Element) => boolean` | Return `true` to suppress handlers for a specific element. |
 | `onPointerDownOutside` | `(event: PointerDownOutsideEvent) => void` | Fired when a `pointerdown` event occurs outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing. |
 | `onFocusOutside` | `(event: FocusOutsideEvent) => void` | Fired when focus moves outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing. |
 | `onInteractOutside` | `(event: InteractOutsideEvent) => void` | Fired for any outside interaction — both pointer and focus. Always fires after the specific handler unless that handler called `preventDefault`. |
@@ -44,8 +89,8 @@ All handlers receive a `CustomEvent` that wraps the original DOM event.
 
 ```ts
 type EventDetails<T> = {
-  originalEvent: T;    // the original PointerEvent or FocusEvent
-  isContextMenu: boolean; // true for right-click / Ctrl+click on Mac
+  originalEvent: T;        // the original PointerEvent or FocusEvent
+  isContextMenu: boolean;  // true for right-click / Ctrl+click on Mac
 };
 
 type PointerDownOutsideEvent = CustomEvent<EventDetails<PointerEvent>>;
@@ -83,10 +128,11 @@ function Popover() {
 ### Using individual focus and pointer handlers
 
 ```tsx
+import { createSignal } from "solid-js";
 import { createInteractOutside } from "@solid-primitives/interaction";
 
 function Tooltip() {
-  let ref: HTMLElement | undefined;
+  const [ref, setRef] = createSignal<HTMLElement>();
 
   createInteractOutside(
     {
@@ -102,54 +148,96 @@ function Tooltip() {
         console.log("Any outside interaction");
       },
     },
-    () => ref,
+    ref,
   );
 
-  return <div ref={ref}>...</div>;
+  return <div ref={setRef}>...</div>;
 }
 ```
 
 ### Conditionally disabling
 
 ```tsx
+import { createSignal } from "solid-js";
+import { createInteractOutside } from "@solid-primitives/interaction";
+
 function Dialog(props: { open: boolean }) {
-  let ref: HTMLDivElement | undefined;
+  const [ref, setRef] = createSignal<HTMLDivElement>();
 
   createInteractOutside(
     {
       isDisabled: () => !props.open,
       onInteractOutside: () => { /* close */ },
     },
-    () => ref,
+    ref,
   );
 
-  return <div ref={ref}>Dialog</div>;
+  return <div ref={setRef}>Dialog</div>;
 }
 ```
 
 ### Excluding specific elements
 
 ```tsx
+import { createSignal } from "solid-js";
+import { createInteractOutside } from "@solid-primitives/interaction";
+
 function Dropdown() {
-  let ref: HTMLElement | undefined;
-  let triggerRef: HTMLButtonElement | undefined;
+  const [ref, setRef] = createSignal<HTMLElement>();
+  const [triggerRef, setTriggerRef] = createSignal<HTMLButtonElement>();
 
   createInteractOutside(
     {
       // Prevent the trigger button from closing the dropdown when clicked
-      shouldExcludeElement: el => el === triggerRef || !!triggerRef?.contains(el),
+      shouldExcludeElement: el => el === triggerRef() || !!triggerRef()?.contains(el),
       onInteractOutside: () => { /* close */ },
     },
-    () => ref,
+    ref,
   );
 
   return (
     <>
-      <button ref={triggerRef}>Open</button>
-      <div ref={ref}>Dropdown content</div>
+      <button ref={setTriggerRef}>Open</button>
+      <div ref={setRef}>Dropdown content</div>
     </>
   );
 }
+```
+
+### Using the ref factory
+
+`interactOutside` is the most concise option when you don't need a signal ref:
+
+```tsx
+import { createSignal, Show } from "solid-js";
+import { interactOutside } from "@solid-primitives/interaction";
+
+function Menu() {
+  const [open, setOpen] = createSignal(false);
+
+  return (
+    <Show when={open()}>
+      <ul ref={interactOutside({ onInteractOutside: () => setOpen(false) })}>
+        <li>Item 1</li>
+      </ul>
+    </Show>
+  );
+}
+```
+
+### Using the base primitive imperatively
+
+`makeInteractOutside` is the right choice outside of JSX — custom directives, imperative setups, or tests:
+
+```ts
+import { makeInteractOutside } from "@solid-primitives/interaction";
+
+const cleanup = makeInteractOutside(el, {
+  onInteractOutside: () => close(),
+});
+
+// later:
+cleanup();
 ```
 
 > **Tip:** To hide content outside a dialog from screen readers, you don't need a library.
