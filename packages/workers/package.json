@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/workers",
-  "version": "0.4.3",
+  "version": "2.0.0",
   "description": "Primitives that support creating Web Workers.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",
@@ -50,10 +50,12 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.13",
+    "solid-js": "^2.0.0-beta.13"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.13",
+    "solid-js": "2.0.0-beta.13"
   }
 }

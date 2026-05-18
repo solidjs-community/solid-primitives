@@ -1,5 +1,5 @@
-import { type Accessor, type Setter, createEffect, on, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, type Setter, createEffect, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
 import type { PostMessageOptions, WorkerCallbacks, WorkerExports, WorkerMessage } from "./types.js";
 import { KILL, RPC, cjs, setup } from "./utils.js";
 
@@ -137,11 +137,12 @@ export const createSignaledWorker = (
     const { input, output, func } = args[i]!;
     if (input) {
       createEffect(
-        on(input, async () => {
+        () => input(),
+        async value => {
           // @ts-ignore
-          const result = await worker[func.name](input());
+          const result = await worker[func.name](value);
           if (output) output(result);
-        }),
+        },
       );
     }
     fns.push(func);

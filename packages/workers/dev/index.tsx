@@ -1,4 +1,4 @@
-import { type Component, createSignal, onMount } from "solid-js";
+import { type Component, createSignal, onSettled } from "solid-js";
 
 import { createWorker, createWorkerPool, createSignaledWorker } from "../src/index.js";
 
@@ -118,6 +118,6 @@ const App: Component = () => {
 
 export default function () {
   const [mounted, setMounted] = createSignal(false);
-  onMount(() => setMounted(true));
+  onSettled(() => setMounted(true));
   return <>{mounted() && <App />}</>;
 }
