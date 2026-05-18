@@ -407,6 +407,23 @@ export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string)
   return (raw: string): B => b(a(raw));
 }
 
+// ─── DOM helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Check if a wrapper element contains a target element.
+ * Portal-aware: follows SolidJS `_$host` links so elements rendered inside
+ * a `<Portal>` are correctly treated as children of the portal's anchor.
+ */
+export const contains = (wrapper: HTMLElement, target: HTMLElement): boolean => {
+  if (wrapper.contains(target)) return true;
+  let current: HTMLElement | null = target;
+  while (current) {
+    if (current === wrapper) return true;
+    // @ts-expect-error: _$host is a SolidJS-internal property set on portal roots
+    current = current._$host ?? current.parentElement;
+  }
+  return false;
+};
 /**
  * Wraps a setter function of any signal or store
  *

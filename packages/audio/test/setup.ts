@@ -59,6 +59,7 @@ global.HTMLMediaElement.prototype.play = async function playMock() {
   }
   this.dispatchEvent(new Event("play"));
   this._mock.paused = false;
+  this.dispatchEvent(new Event("playing"));
 };
 
 // Pause the playback
