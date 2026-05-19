@@ -26,13 +26,15 @@ export const limitPath =
 export const toPromise = <T>(command: () => T | undefined): Promise<T> =>
   new Promise<T>(resolve =>
     createRoot(dispose =>
-      createEffect(() => {
-        const result = command();
-        if (result !== undefined) {
-          resolve(result);
-          dispose();
-        }
-      }),
+      createEffect(
+        () => command(),
+        result => {
+          if (result !== undefined) {
+            resolve(result as T);
+            dispose();
+          }
+        },
+      ),
     ),
   );
 

@@ -335,6 +335,9 @@ importers:
 
   packages/filesystem:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13(solid-js@2.0.0-beta.13)
       '@tauri-apps/api':
         specifier: ^1.5.3
         version: 1.6.0
@@ -345,8 +348,8 @@ importers:
         specifier: ^3.5.3
         version: 3.6.0
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13
 
   packages/flux-store:
     devDependencies:

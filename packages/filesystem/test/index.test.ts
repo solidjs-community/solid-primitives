@@ -12,7 +12,7 @@ import {
   makeTauriFileSystem,
   rsync,
 } from "../src/index.js";
-import { catchError, createEffect, createRoot } from "solid-js";
+import { createEffect, createRoot } from "solid-js";
 
 describe("makeNoFileSystem", () => {
   const fs = makeNoFileSystem();
@@ -128,17 +128,21 @@ describe("createFileSystem (sync) relays file system errors", () => {
   test("a deleted file stored in a signal throws an error", () =>
     new Promise<void>((done, fail) => {
       setTimeout(() => fail(new Error("did not throw")), 100);
-      const fs = createFileSystem(makeVirtualFileSystem({ "test.json": "{}" }));
-      catchError(
-        () => {
-          createEffect(() => fs.readFile("test.json"));
-          setTimeout(() => fs.rm("test.json"), 30);
-        },
-        error => {
-          expect(error).toEqual(new Error('"test.json" is not a file'));
-          done();
-        },
-      );
+      const vfs = makeVirtualFileSystem({ "test.json": "{}" });
+      const fs = createFileSystem(vfs);
+      createRoot(() => {
+        createEffect(
+          () => fs.readFile("test.json"),
+          {
+            effect: () => {},
+            error: err => {
+              expect(err).toEqual(new Error('"test.json" is not a file'));
+              done();
+            },
+          },
+        );
+        setTimeout(() => fs.rm("test.json"), 30);
+      });
     }));
 });
 
@@ -185,10 +189,13 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
     let captured: unknown;
 
     let dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured = fs.getType("/src/index.ts");
-        resolve?.();
-      });
+      createEffect(
+        () => fs.getType("/src/index.ts"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
@@ -201,15 +208,18 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
     dispose();
 
     dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured = fs.getType("/src");
-        resolve?.();
-      });
+      createEffect(
+        () => fs.getType("/src"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
 
-    expect(captured).toEqual(undefined);
+    expect(captured).toEqual("file"); // from previous
 
     await new Promise<void>(r => (resolve = r));
     expect(captured).toEqual("dir");
@@ -222,10 +232,13 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
     let captured: unknown;
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured = fs.readdir("src");
-        resolve?.();
-      });
+      createEffect(
+        () => fs.readdir("src"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
@@ -240,77 +253,74 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
 
   test("fs.mkdir updates existing readdir", async () => {
     let resolve: (() => void) | undefined;
-    const captured: unknown[] = [];
+    let captured: unknown;
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured.push(fs.readdir("/"));
-        resolve?.();
-      });
+      createEffect(
+        () => fs.readdir("/"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
 
-    expect(captured).toEqual([undefined]);
-    captured.length = 0;
-
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual([["src", "data"]]);
-    captured.length = 0;
+    expect(captured).toEqual(["src", "data"]);
 
     fs.mkdir("/test");
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual([["src", "data", "test"]]);
+    expect(captured).toEqual(["src", "data", "test"]);
 
     dispose();
   });
 
   test("fs.readFile returns the content", async () => {
     let resolve: (() => void) | undefined;
-    const captured: unknown[] = [];
+    let captured: unknown;
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured.push(fs.readFile("/src/index.ts"));
-        resolve?.();
-      });
+      createEffect(
+        () => fs.readFile("/src/index.ts"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
 
-    expect(captured).toEqual([undefined]);
-    captured.length = 0;
-
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual(["// test"]);
-    captured.length = 0;
+    expect(captured).toEqual("// test");
 
     dispose();
   });
 
   test("fs.writeFile updates a readFile resource", async () => {
     let resolve: (() => void) | undefined;
-    const captured: unknown[] = [];
+    let captured: unknown;
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured.push(fs.readFile("/data/data.json"));
-        resolve?.();
-      });
+      createEffect(
+        () => fs.readFile("/data/data.json"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
 
-    expect(captured).toEqual([undefined]);
-    captured.length = 0;
-
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual(["[1, 2, 3]"]);
-    captured.length = 0;
+    expect(captured).toEqual("[1, 2, 3]");
 
     fs.writeFile("/data/data.json", "[1, 2, 3, 4]");
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual(["[1, 2, 3, 4]"]);
+    expect(captured).toEqual("[1, 2, 3, 4]");
 
     dispose();
   });
@@ -319,27 +329,26 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
     await fs.mkdir("/src/subdir");
 
     let resolve: (() => void) | undefined;
-    const captured: unknown[] = [];
+    let captured: unknown;
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured.push(fs.readdir("/src"));
-        resolve?.();
-      });
+      createEffect(
+        () => fs.readdir("/src"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
 
-    expect(captured).toEqual([undefined]);
-    captured.length = 0;
-
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual([["index.ts", "subdir"]]);
-    captured.length = 0;
+    expect(captured).toEqual(["index.ts", "subdir"]);
 
     fs.rm("/src/subdir");
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual([["index.ts"]]);
+    expect(captured).toEqual(["index.ts"]);
 
     dispose();
   });
@@ -349,27 +358,26 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
     await fs.writeFile("/data/subdir/test.ts", "// test");
 
     let resolve: (() => void) | undefined;
-    const captured: unknown[] = [];
+    let captured: unknown;
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        captured.push(fs.readdir("/data/subdir"));
-        resolve?.();
-      });
+      createEffect(
+        () => fs.readdir("/data/subdir"),
+        val => {
+          captured = val;
+          if (val !== undefined) resolve?.();
+        },
+      );
 
       return dispose;
     });
 
-    expect(captured).toEqual([undefined]);
-    captured.length = 0;
-
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual([["test.ts"]]);
-    captured.length = 0;
+    expect(captured).toEqual(["test.ts"]);
 
     fs.rename("/data/subdir/test.ts", "/data/subdir/index.ts");
     await new Promise<void>(r => (resolve = r));
-    expect(captured).toEqual([["index.ts"]]);
+    expect(captured).toEqual(["index.ts"]);
 
     fs.rm("/data/subdir");
     dispose();
