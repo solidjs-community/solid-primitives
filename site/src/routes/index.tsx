@@ -1,5 +1,5 @@
 import { type Component, Show } from "solid-js";
-import { NoHydration } from "solid-js/web";
+import { NoHydration } from "@solidjs/web";
 import { createFileRoute } from "@tanstack/solid-router";
 import { fetchHomeContent, fetchPackageList } from "~/api.js";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
@@ -86,8 +86,9 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
   return (
     <Show when={props.packages} keyed>
       {packages => {
+        const packageList = packages();
         // group packages by category
-        const categories = packages.reduce((acc: Record<string, PackageListItem[]>, pkg) => {
+        const categories = packageList.reduce((acc: Record<string, PackageListItem[]>, pkg) => {
           const category = acc[pkg.primitive.category];
           if (category) category.push(pkg);
           else acc[pkg.primitive.category] = [pkg];

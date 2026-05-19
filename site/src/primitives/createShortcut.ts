@@ -3,14 +3,12 @@ import { createSharedRoot } from "@solid-primitives/rootless";
 import { arrayEquals } from "@solid-primitives/utils";
 import {
   type Accessor,
-  batch,
   createEffect,
   createMemo,
   createSignal,
-  on,
   untrack,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";
 export type KbdKey = ModifierKey | (string & {});
@@ -62,10 +60,8 @@ const useKeyDownList = createSharedRoot<
     if (e.repeat || typeof e.key !== "string") return;
     const key = e.key.toUpperCase();
     if (pressedKeys().includes(key)) return;
-    batch(() => {
-      setEvent(e);
-      setPressedKeys(prev => [...prev, key]);
-    });
+    setEvent(e);
+    setPressedKeys(prev => [...prev, key]);
   });
 
   makeEventListener(window, "keyup", e => {
@@ -152,10 +148,10 @@ export const useKeyDownSequence = /*#__PURE__*/ createSharedRoot<Accessor<string
     return () => [];
   }
   const [keys] = useKeyDownList();
-  return createMemo(prev => {
+  return createMemo((prev: string[][] = []) => {
     if (keys().length === 0) return [];
     return [...prev, keys()];
-  }, []);
+  });
 });
 
 /**
@@ -284,5 +280,5 @@ export function createShortcut(
     }
   };
 
-  createEffect(on(sequence, requireReset ? handleSequenceWithReset : handleSequenceWithoutReset));
+  createEffect(() => sequence(), requireReset ? handleSequenceWithReset : handleSequenceWithoutReset);
 }
