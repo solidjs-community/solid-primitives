@@ -1,5 +1,7 @@
-import { batch, createResource, createSignal } from "solid-js";
-import type { Accessor, Resource, ResourceActions, Setter } from "solid-js";
+import { createSignal } from "solid-js";
+import type { Accessor, Setter, SignalOptions } from "solid-js";
+
+const OWNED_WRITE: SignalOptions<unknown> = { ownedWrite: true };
 
 import type {
   ItemType,
@@ -14,7 +16,27 @@ import type {
 import { getItemName, getParentDir } from "./tools.js";
 
 type SignalMap<T> = Map<string, [Accessor<T>, Setter<T>]>;
-type ResourceMap<T> = Map<string, [Resource<T>, ResourceActions<T>]>;
+
+type AsyncEntry<T> = {
+  read: Accessor<T | undefined>;
+  mutate: (val: T | undefined) => void;
+  refetch: () => void;
+};
+
+const makeAsyncEntry = <T>(fetch: () => Promise<T | undefined>): AsyncEntry<T> => {
+  const [read, write] = createSignal<T | undefined>(undefined, OWNED_WRITE);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const set = write as (v: T | undefined) => void;
+  const doFetch = () => {
+    fetch().then(v => set(v));
+  };
+  doFetch();
+  return {
+    read,
+    mutate: (val: T | undefined) => set(val),
+    refetch: doFetch,
+  };
+};
 
 /** makes a synchronous filesystem reactive */
 export const createSyncFileSystem = (
@@ -27,21 +49,21 @@ export const createSyncFileSystem = (
   const fs: SyncFileSystem = {
     getType: (path, refresh) => {
       if (!getTypeMap.has(path)) {
-        getTypeMap.set(path, createSignal());
+        getTypeMap.set(path, createSignal<ItemType | undefined>(undefined, OWNED_WRITE));
       }
       const [fileType, setFileType] = getTypeMap.get(path)!;
       if (refresh || fileType() === undefined) {
-        setFileType(adapter.getType(path));
+        setFileType(adapter.getType(path) as Exclude<ItemType, Function>);
       }
       return fileType();
     },
     readdir: (path, refresh) => {
       if (!readdirMap.has(path)) {
-        readdirMap.set(path, createSignal());
+        readdirMap.set(path, createSignal<DirEntries | undefined>(undefined, OWNED_WRITE));
       }
       const [files, setFiles] = readdirMap.get(path)!;
       if (refresh || files() === undefined) {
-        setFiles(adapter.readdir(path));
+        setFiles(adapter.readdir(path) as Exclude<DirEntries, Function>);
       }
       return files();
     },
@@ -51,7 +73,7 @@ export const createSyncFileSystem = (
     },
     readFile: (path, refresh) => {
       if (!readFileMap.has(path)) {
-        readFileMap.set(path, createSignal());
+        readFileMap.set(path, createSignal<string | undefined>(undefined, OWNED_WRITE));
       }
       const [data, setData] = readFileMap.get(path)!;
       if (refresh || data() === undefined) {
@@ -144,35 +166,26 @@ export const createAsyncFileSystem = (
   adapter: AsyncFileSystemAdapter,
   watcher?: Watcher,
 ): AsyncFileSystem => {
-  const getTypeMap: ResourceMap<ItemType | undefined> = new Map();
-  const readdirMap: ResourceMap<DirEntries | undefined> = new Map();
-  const readFileMap: ResourceMap<string | undefined> = new Map();
+  const getTypeMap = new Map<string, AsyncEntry<ItemType>>();
+  const readdirMap = new Map<string, AsyncEntry<DirEntries>>();
+  const readFileMap = new Map<string, AsyncEntry<string>>();
+
   const fs: AsyncFileSystem = {
     getType: (path, refresh) => {
       if (!getTypeMap.has(path)) {
-        getTypeMap.set(
-          path,
-          createResource(() => adapter.getType(path)),
-        );
+        getTypeMap.set(path, makeAsyncEntry(() => adapter.getType(path)));
       }
-      const [fileType, { refetch }] = getTypeMap.get(path)!;
-      if (refresh) {
-        refetch();
-      }
-      return fileType();
+      const entry = getTypeMap.get(path)!;
+      if (refresh) entry.refetch();
+      return entry.read();
     },
     readdir: (path, refresh) => {
       if (!readdirMap.has(path)) {
-        readdirMap.set(
-          path,
-          createResource<DirEntries | undefined>(() => adapter.readdir(path)),
-        );
+        readdirMap.set(path, makeAsyncEntry(() => adapter.readdir(path)));
       }
-      const [files, { refetch }] = readdirMap.get(path)!;
-      if (refresh) {
-        refetch();
-      }
-      return files();
+      const entry = readdirMap.get(path)!;
+      if (refresh) entry.refetch();
+      return entry.read();
     },
     mkdir: path =>
       adapter.mkdir(path).then(() => {
@@ -181,33 +194,30 @@ export const createAsyncFileSystem = (
           if (!getTypeMap.has(subPath)) {
             fs.getType(subPath);
           } else {
-            getTypeMap.get(subPath)![1].refetch();
+            getTypeMap.get(subPath)!.refetch();
           }
         });
-        readdirMap.get(getParentDir(path))?.[1].refetch();
+        readdirMap.get(getParentDir(path))?.refetch();
       }),
     readFile: (path, refresh) => {
       if (!readFileMap.has(path)) {
-        readFileMap.set(
-          path,
-          createResource(() => adapter.readFile(path)),
-        );
+        readFileMap.set(path, makeAsyncEntry(() => adapter.readFile(path)));
       }
-      const [data, { refetch }] = readFileMap.get(path)!;
-      if (refresh) {
-        refetch();
-      }
-      return data();
+      const entry = readFileMap.get(path)!;
+      if (refresh) entry.refetch();
+      return entry.read();
     },
     writeFile: (path, data) =>
       adapter.writeFile(path, data).then(() => {
-        readFileMap.get(path)?.[1].mutate(data);
+        readFileMap.get(path)?.mutate(data);
         const name = getItemName(path);
-        readdirMap
-          .get(getParentDir(path))?.[1]
-          .mutate((items = []) =>
-            items.includes(name as never) ? items : ([...items, name] as DirEntries),
-          );
+        const readdirEntry = readdirMap.get(getParentDir(path));
+        if (readdirEntry) {
+          const items = readdirEntry.read() ?? [];
+          if (!items.includes(name as never)) {
+            readdirEntry.mutate([...items, name] as DirEntries);
+          }
+        }
       }),
     rename: async (previous, next) => {
       const previousType = await adapter.getType(previous);
@@ -233,40 +243,42 @@ export const createAsyncFileSystem = (
         }
         await adapter.rm(previous);
       }
-      batch(() => {
-        getTypeMap.get(previous)?.[1].mutate(undefined);
-        getTypeMap.delete(previous);
-        const previousParent = getParentDir(previous);
-        readdirMap.get(previousParent)?.[1].refetch();
-        const nextParent = getParentDir(next);
-        if (previousParent !== nextParent) readdirMap.get(nextParent)?.[1].refetch();
-      });
+      getTypeMap.get(previous)?.mutate(undefined);
+      getTypeMap.delete(previous);
+      const previousParent = getParentDir(previous);
+      readdirMap.get(previousParent)?.refetch();
+      const nextParent = getParentDir(next);
+      if (previousParent !== nextParent) readdirMap.get(nextParent)?.refetch();
     },
     rm: path =>
       adapter.rm(path).then(() => {
-        getTypeMap.get(path)?.[1].mutate(undefined);
+        getTypeMap.get(path)?.mutate(undefined);
         getTypeMap.delete(path);
         [...readdirMap.keys()].forEach(item => {
           if (item.startsWith(`${path}/`)) {
-            getTypeMap.get(item)?.[1].mutate(undefined);
+            getTypeMap.get(item)?.mutate(undefined);
             getTypeMap.delete(item);
           }
         });
-        readdirMap.get(getParentDir(path))?.[1].refetch();
+        readdirMap.get(getParentDir(path))?.refetch();
       }),
   };
   if (watcher) {
     watcher((operation, path) => {
       if (operation === "mkdir" || operation === "rm") {
-        readdirMap
-          .get(getParentDir(path))?.[1]
-          .mutate((items = []) => (items.includes(path as never) ? items : [...items, path]));
+        const readdirEntry = readdirMap.get(getParentDir(path));
+        if (readdirEntry) {
+          const items = readdirEntry.read() ?? [];
+          if (!items.includes(path as never)) {
+            readdirEntry.mutate([...items, path] as DirEntries);
+          }
+        }
       }
       if (operation === "rm") {
-        getTypeMap.get(path)?.[1].mutate(null);
+        getTypeMap.get(path)?.mutate(null);
       }
       if (operation === "writeFile") {
-        readFileMap.get(path)?.[1].refetch();
+        readFileMap.get(path)?.refetch();
       }
     });
   }
