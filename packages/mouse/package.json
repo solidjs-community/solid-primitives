@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mouse",
-  "version": "2.1.6",
+  "version": "3.0.0",
   "description": "A collection of Solid Primitives, that capture current mouse cursor position, and help to deal with common related usecases.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -51,7 +51,8 @@
   ],
   "devDependencies": {
     "@solid-primitives/raf": "workspace:^",
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.13",
+    "solid-js": "2.0.0-beta.13"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
@@ -60,7 +61,8 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.13",
+    "solid-js": "^2.0.0-beta.13"
   },
   "typesVersions": {}
 }
