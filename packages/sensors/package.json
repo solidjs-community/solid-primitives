@@ -20,7 +20,13 @@
       "makeAccelerometer",
       "createAccelerometer",
       "makeGyroscope",
-      "createGyroscope"
+      "createGyroscope",
+      "makeSensor",
+      "createSensor",
+      "makeCompass",
+      "createCompass",
+      "makeBattery",
+      "createBattery"
     ],
     "category": "Display & Media"
   },
