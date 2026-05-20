@@ -7,20 +7,16 @@ const Hamburger: Component<{ ref: HTMLButtonElement; active: boolean }> = props 
       ref={props.ref}
     >
       <div
-        class="flex h-[12px] w-[18px] origin-center flex-col justify-between transition-transform"
-        classList={{ "rotate-[225deg]": props.active }}
+        class={["flex h-[12px] w-[18px] origin-center flex-col justify-between transition-transform", { "rotate-[225deg]": props.active }]}
       >
         <div
-          class="h-[2px] w-full rounded-lg bg-current transition-transform"
-          classList={{ "translate-y-[5px]": props.active }}
+          class={["h-[2px] w-full rounded-lg bg-current transition-transform", { "translate-y-[5px]": props.active }]}
         />
         <div
-          class="h-[2px] w-full origin-center rounded-lg bg-current transition-transform"
-          classList={{ "rotate-90": props.active }}
+          class={["h-[2px] w-full origin-center rounded-lg bg-current transition-transform", { "rotate-90": props.active }]}
         />
         <div
-          class="h-[2px] w-full rounded-lg bg-current transition-transform"
-          classList={{ "translate-y-[-5px]": props.active }}
+          class={["h-[2px] w-full rounded-lg bg-current transition-transform", { "translate-y-[-5px]": props.active }]}
         />
       </div>
       {/* <FiMenu size={24} /> */}
