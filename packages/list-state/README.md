@@ -69,12 +69,12 @@ export function MyList() {
 ### Props
 
 ```ts
-interface ListStateProps<T> {
+interface ListStateOptions<T> {
   /** The items in the list. Should be in the same order as they appear in the DOM. */
   items: MaybeAccessor<T[]>;
   
-  /** The initially active item. @default null */
-  initialActive?: T | null;
+  /** The initially active item. @default undefined */
+  initialActive?: T | undefined;
   
   /** The orientation of the list. @default "vertical" */
   orientation?: MaybeAccessor<"vertical" | "horizontal">;
@@ -95,7 +95,7 @@ interface ListStateProps<T> {
   vimKeys?: MaybeAccessor<{ up: string; down: string; right: string; left: string }>;
   
   /** Callback fired when the active item changes. */
-  onActiveChange?: (active: T | null) => void;
+  onActiveChange?: (active: T | undefined) => void;
 }
 ```
 
@@ -103,8 +103,8 @@ interface ListStateProps<T> {
 
 ```ts
 interface ListStateReturn<T> {
-  active: Accessor<T | null>;
-  setActive: (value: T | null) => void;
+  active: Accessor<T | undefined>;
+  setActive: (value: T | undefined) => void;
   onKeyDown: (event: KeyboardEvent) => void;
 }
 ```
@@ -158,11 +158,11 @@ export function MyMultiSelectList() {
 ### Props
 
 ```ts
-interface MultiSelectListStateProps<T> {
-  // Same as ListStateProps<T>, plus:
+interface MultiSelectListStateOptions<T> {
+  // Same as ListStateOptions<T>, plus:
   
-  /** The initially focused item (cursor). @default null */
-  initialCursor?: T | null;
+  /** The initially focused item (cursor). @default undefined */
+  initialCursor?: T | undefined;
   
   /** The initially active items (range). @default [] */
   initialActive?: T[];
@@ -171,7 +171,7 @@ interface MultiSelectListStateProps<T> {
   initialSelected?: T[];
   
   /** Callback fired when the cursor changes. */
-  onCursorChange?: (cursor: T | null) => void;
+  onCursorChange?: (cursor: T | undefined) => void;
   
   /** Callback fired when the active items change. */
   onActiveChange?: (active: T[]) => void;
@@ -185,11 +185,11 @@ interface MultiSelectListStateProps<T> {
 
 ```ts
 interface MultiSelectListStateReturn<T> {
-  cursor: Accessor<T | null>;
-  setCursor: (value: T | null) => void;
+  cursor: Accessor<T | undefined>;
+  setCursor: (value: T | undefined) => void;
   active: Accessor<T[]>;
   setActive: (value: T[]) => void;
-  setCursorActive: (item: T | null) => void;
+  setCursorActive: (item: T | undefined) => void;
   selected: Accessor<T[]>;
   setSelected: (value: T[]) => void;
   toggleSelected: (item: T) => void;

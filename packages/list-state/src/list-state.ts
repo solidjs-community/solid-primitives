@@ -1,13 +1,13 @@
 import { createSignal } from "solid-js";
 import { access } from "@solid-primitives/utils";
-import type { ListStateProps, ListStateReturn } from "./types.js";
+import type { ListStateOptions, ListStateReturn } from "./types.js";
 
 /**
  * Creates a keyboard navigable single-select list.
  *
  * @param props - Configuration for the list state
  * @param props.items - The items in the list. Should be in the same order as they appear in the DOM.
- * @param props.initialActive - The initially active item. *Default = `null`*
+ * @param props.initialActive - The initially active item. *Default = `undefined`*
  * @param props.orientation - The orientation of the list. *Default = `'vertical'`*
  * @param props.loop - Whether the list should loop. *Default = `true`*
  * @param props.textDirection - The text direction of the list. *Default = `'ltr'`*
@@ -32,9 +32,9 @@ import type { ListStateProps, ListStateReturn } from "./types.js";
  * </ul>
  * ```
  */
-export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T> {
+export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<T> {
   const defaultedProps = {
-    initialActive: props.initialActive ?? (null as T | null),
+    initialActive: props.initialActive,
     orientation: props.orientation ?? ("vertical" as const),
     loop: props.loop ?? true,
     textDirection: props.textDirection ?? ("ltr" as const),
@@ -50,7 +50,7 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
     onActiveChange: props.onActiveChange,
   };
 
-  const [active, setActive] = createSignal<T | null>(defaultedProps.initialActive as any);
+  const [active, setActive] = createSignal<T | undefined>(defaultedProps.initialActive as any);
 
   const nextKeys = () => {
     const vimKeys = access(defaultedProps.vimKeys);
@@ -86,7 +86,7 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
     return access(defaultedProps.vimMode) ? [arrowKey, vimKey] : [arrowKey];
   };
 
-  const updateActive = (newActive: T | null) => {
+  const updateActive = (newActive: T | undefined) => {
     setActive(newActive as any);
     defaultedProps.onActiveChange?.(newActive);
   };
@@ -97,7 +97,7 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
     if (_items.length === 0) return;
     const _itemCount = _items.length;
     const _active = active();
-    const _activeIndex = _active !== null ? _items.indexOf(_active) : null;
+    const _activeIndex = _active !== undefined ? _items.indexOf(_active) : undefined;
 
     if (nextKeys().includes(eventKey)) {
       event.preventDefault();
@@ -106,7 +106,7 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
           updateActive(_items[0]!);
         }
       } else {
-        updateActive(_items[_activeIndex !== null ? _activeIndex + 1 : 0]!);
+        updateActive(_items[_activeIndex !== undefined ? _activeIndex + 1 : 0]!);
       }
     } else if (previousKeys().includes(eventKey)) {
       event.preventDefault();
@@ -115,7 +115,7 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
           updateActive(_items[_itemCount - 1]!);
         }
       } else {
-        updateActive(_items[_activeIndex !== null ? _activeIndex - 1 : _itemCount - 1]!);
+        updateActive(_items[_activeIndex !== undefined ? _activeIndex - 1 : _itemCount - 1]!);
       }
     } else if (eventKey === "home") {
       event.preventDefault();
@@ -123,7 +123,7 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
     } else if (eventKey === "end") {
       event.preventDefault();
       updateActive(_items[_itemCount - 1]!);
-    } else if (access(defaultedProps.handleTab) && _activeIndex !== null) {
+    } else if (access(defaultedProps.handleTab) && _activeIndex !== undefined) {
       if (eventKey === "tab" && !event.shiftKey && _activeIndex < _itemCount - 1) {
         event.preventDefault();
         updateActive(_items[_activeIndex + 1]!);
@@ -135,5 +135,5 @@ export function createListState<T>(props: ListStateProps<T>): ListStateReturn<T>
     }
   };
 
-  return { active, setActive: (value: T | null) => updateActive(value), onKeyDown };
+  return { active, setActive: (value: T | undefined) => updateActive(value), onKeyDown };
 }

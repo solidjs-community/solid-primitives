@@ -1,13 +1,13 @@
 import { createSignal } from "solid-js";
 import { access } from "@solid-primitives/utils";
-import type { MultiSelectListStateProps, MultiSelectListStateReturn } from "./types.js";
+import type { MultiSelectListStateOptions, MultiSelectListStateReturn } from "./types.js";
 
 /**
  * Creates a keyboard navigable multi-select list with cursor-based navigation.
  *
  * @param props - Configuration for the multi-select list state
  * @param props.items - The items in the list. Should be in the same order as they appear in the DOM.
- * @param props.initialCursor - The initially focused item (cursor). *Default = `null`*
+ * @param props.initialCursor - The initially focused item (cursor). *Default = `undefined`*
  * @param props.initialActive - The initially active items. *Default = `[]`*
  * @param props.initialSelected - The initially selected items. *Default = `[]`*
  * @param props.orientation - The orientation of the list. *Default = `'vertical'`*
@@ -41,10 +41,10 @@ import type { MultiSelectListStateProps, MultiSelectListStateReturn } from "./ty
  * ```
  */
 export function createMultiSelectListState<T>(
-  props: MultiSelectListStateProps<T>,
+  props: MultiSelectListStateOptions<T>,
 ): MultiSelectListStateReturn<T> {
   const defaultedProps = {
-    initialCursor: props.initialCursor ?? (null as T | null),
+    initialCursor: props.initialCursor,
     initialActive: props.initialActive ?? ([] as T[]),
     initialSelected: props.initialSelected ?? ([] as T[]),
     orientation: props.orientation ?? ("vertical" as const),
@@ -64,13 +64,13 @@ export function createMultiSelectListState<T>(
     onSelectedChange: props.onSelectedChange,
   };
 
-  const [cursor, setCursor] = createSignal<T | null>(defaultedProps.initialCursor as any);
+  const [cursor, setCursor] = createSignal<T | undefined>(defaultedProps.initialCursor as any);
   const [active, setActive] = createSignal<T[]>(defaultedProps.initialActive as any);
   const [selected, setSelected] = createSignal<T[]>(defaultedProps.initialSelected as any);
 
   let direction: "next" | "previous" | null = null;
 
-  const updateCursor = (newCursor: T | null) => {
+  const updateCursor = (newCursor: T | undefined) => {
     setCursor(newCursor as any);
     defaultedProps.onCursorChange?.(newCursor);
   };
@@ -85,9 +85,9 @@ export function createMultiSelectListState<T>(
     defaultedProps.onSelectedChange?.(newSelected);
   };
 
-  const setCursorActive = (item: T | null) => {
+  const setCursorActive = (item: T | undefined) => {
     updateCursor(item);
-    updateActive(item !== null ? [item] : []);
+    updateActive(item !== undefined ? [item] : []);
     direction = null;
   };
 
@@ -138,13 +138,13 @@ export function createMultiSelectListState<T>(
     if (_items.length === 0) return;
     const _itemCount = _items.length;
     const _cursor = cursor();
-    const _cursorIndex = _cursor !== null ? _items.indexOf(_cursor) : null;
+    const _cursorIndex = _cursor !== undefined ? _items.indexOf(_cursor) : undefined;
     const _active = active();
 
     if (nextKeys().includes(eventKey)) {
       event.preventDefault();
       if (event.shiftKey) {
-        if (_cursorIndex === null) {
+        if (_cursorIndex === undefined) {
           setCursorActive(_items[0]!);
           updateSelected([_items[0]!]);
         } else if (
@@ -172,13 +172,13 @@ export function createMultiSelectListState<T>(
             setCursorActive(_items[0]!);
           }
         } else {
-          setCursorActive(_items[_cursorIndex !== null ? _cursorIndex + 1 : 0]!);
+          setCursorActive(_items[_cursorIndex !== undefined ? _cursorIndex + 1 : 0]!);
         }
       }
     } else if (previousKeys().includes(eventKey)) {
       event.preventDefault();
       if (event.shiftKey) {
-        if (_cursorIndex === null) {
+        if (_cursorIndex === undefined) {
           setCursorActive(_items[_itemCount - 1]!);
           updateSelected([_items[_itemCount - 1]!]);
         } else if (
@@ -207,7 +207,7 @@ export function createMultiSelectListState<T>(
           }
         } else {
           setCursorActive(
-            _items[_cursorIndex !== null ? _cursorIndex - 1 : _itemCount - 1]!,
+            _items[_cursorIndex !== undefined ? _cursorIndex - 1 : _itemCount - 1]!,
           );
         }
       }
@@ -217,7 +217,7 @@ export function createMultiSelectListState<T>(
     } else if (eventKey === "end") {
       event.preventDefault();
       setCursorActive(_items[_itemCount - 1]!);
-    } else if (access(defaultedProps.handleTab) && _cursorIndex !== null) {
+    } else if (access(defaultedProps.handleTab) && _cursorIndex !== undefined) {
       if (eventKey === "tab" && !event.shiftKey && _cursorIndex < _itemCount - 1) {
         event.preventDefault();
         setCursorActive(_items[_cursorIndex + 1]!);
@@ -231,7 +231,7 @@ export function createMultiSelectListState<T>(
 
   return {
     cursor,
-    setCursor: (value: T | null) => updateCursor(value),
+    setCursor: (value: T | undefined) => updateCursor(value),
     active,
     setActive: (value: T[]) => updateActive(value),
     setCursorActive,

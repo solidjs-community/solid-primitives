@@ -1,3 +1,4 @@
+import { For } from "solid-js";
 import { createListState, createMultiSelectListState } from "../src/index.js";
 
 const items = ["Apple", "Banana", "Cherry", "Date", "Elderberry"];
@@ -21,21 +22,23 @@ export function SingleSelectDemo() {
           "list-style": "none",
         }}
       >
-        {items.map((item) => (
-          <li
-            class={{
-              active: active() === item,
-            }}
-            style={{
-              padding: "0.5rem",
-              background: active() === item ? "#0066cc" : "transparent",
-              color: active() === item ? "white" : "black",
-              cursor: "pointer",
-            }}
-          >
-            {item}
-          </li>
-        ))}
+        <For each={items}>
+          {(item) => (
+            <li
+              class={{
+                active: active() === item,
+              }}
+              style={{
+                padding: "0.5rem",
+                background: active() === item ? "#0066cc" : "transparent",
+                color: active() === item ? "white" : "black",
+                cursor: "pointer",
+              }}
+            >
+              {item}
+            </li>
+          )}
+        </For>
       </ul>
     </div>
   );
@@ -62,24 +65,26 @@ export function MultiSelectDemo() {
           "list-style": "none",
         }}
       >
-        {items.map((item) => (
-          <li
-            class={{
-              cursor: cursor() === item,
-              selected: selected().includes(item),
-            }}
-            onClick={() => setCursorActive(item)}
-            onDoubleClick={() => toggleSelected(item)}
-            style={{
-              padding: "0.5rem",
-              background: cursor() === item ? "#0066cc" : selected().includes(item) ? "#cce5ff" : "transparent",
-              color: cursor() === item ? "white" : "black",
-              cursor: "pointer",
-            }}
-          >
-            {item}
-          </li>
-        ))}
+        <For each={items}>
+          {(item) => (
+            <li
+              class={{
+                cursor: cursor() === item,
+                selected: selected().includes(item),
+              }}
+              onClick={() => setCursorActive(item)}
+              onDoubleClick={() => toggleSelected(item)}
+              style={{
+                padding: "0.5rem",
+                background: cursor() === item ? "#0066cc" : selected().includes(item) ? "#cce5ff" : "transparent",
+                color: cursor() === item ? "white" : "black",
+                cursor: "pointer",
+              }}
+            >
+              {item}
+            </li>
+          )}
+        </For>
       </ul>
       <p style={{ "font-size": "0.85em", color: "#666" }}>
         Double-click to toggle selection

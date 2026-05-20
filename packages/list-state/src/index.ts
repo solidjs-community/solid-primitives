@@ -1,9 +1,9 @@
 export { createListState } from "./list-state.js";
 export { createMultiSelectListState } from "./multi-list-state.js";
 export type {
-  ListStateProps,
+  ListStateOptions,
   ListStateReturn,
-  MultiSelectListStateProps,
+  MultiSelectListStateOptions,
   MultiSelectListStateReturn,
   Orientation,
   TextDirection,
