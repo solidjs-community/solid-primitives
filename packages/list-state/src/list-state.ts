@@ -50,11 +50,7 @@ export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<
     onActiveChange: props.onActiveChange,
   };
 
-  const [active, setActive] = createSignal<T>();
-  if (defaultedProps.initialActive !== undefined) {
-    const init = defaultedProps.initialActive;
-    setActive(() => init);
-  }
+  const [active, setActive] = createSignal<T | undefined>(defaultedProps.initialActive as never);
 
   const nextKeys = () => {
     const vimKeys = access(defaultedProps.vimKeys);

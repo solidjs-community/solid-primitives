@@ -51,16 +51,18 @@ export function MyList() {
 
   return (
     <ul role="listbox" onKeyDown={onKeyDown}>
-      {items.map((item) => (
-        <li
-          role="option"
-          aria-selected={active() === item}
-          onClick={() => setActive(item)}
-          class={{ selected: active() === item }}
-        >
-          {item}
-        </li>
-      ))}
+      <For each={items}>
+        {(item) => (
+          <li
+            role="option"
+            aria-selected={active() === item}
+            onClick={() => setActive(item)}
+            class={{ selected: active() === item }}
+          >
+            {item}
+          </li>
+        )}
+      </For>
     </ul>
   );
 }
@@ -136,20 +138,22 @@ export function MyMultiSelectList() {
 
   return (
     <ul role="listbox" onKeyDown={onKeyDown}>
-      {items.map((item) => (
-        <li
-          role="option"
-          aria-selected={selected().includes(item)}
-          onClick={() => setCursorActive(item)}
-          onDoubleClick={() => toggleSelected(item)}
-          class={{
-            cursor: cursor() === item,
-            selected: selected().includes(item),
-          }}
-        >
-          {item}
-        </li>
-      ))}
+      <For each={items}>
+        {(item) => (
+          <li
+            role="option"
+            aria-selected={selected().includes(item)}
+            onClick={() => setCursorActive(item)}
+            onDoubleClick={() => toggleSelected(item)}
+            class={{
+              cursor: cursor() === item,
+              selected: selected().includes(item),
+            }}
+          >
+            {item}
+          </li>
+        )}
+      </For>
     </ul>
   );
 }

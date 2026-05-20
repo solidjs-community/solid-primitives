@@ -64,11 +64,7 @@ export function createMultiSelectListState<T>(
     onSelectedChange: props.onSelectedChange,
   };
 
-  const [cursor, setCursor] = createSignal<T>();
-  if (defaultedProps.initialCursor !== undefined) {
-    const init = defaultedProps.initialCursor;
-    setCursor(() => init);
-  }
+  const [cursor, setCursor] = createSignal<T | undefined>(defaultedProps.initialCursor as never);
   const [active, setActive] = createSignal<T[]>(defaultedProps.initialActive);
   const [selected, setSelected] = createSignal<T[]>(defaultedProps.initialSelected);
 

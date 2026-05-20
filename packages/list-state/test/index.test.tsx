@@ -21,9 +21,9 @@ describe("createListState", () => {
     expect(typeof onKeyDown).toBe("function");
   });
 
-  test("initializes with null active when no initial value provided", () => {
+  test("initializes with undefined active when no initial value provided", () => {
     const { active } = createListState({ items: ["a", "b", "c"] });
-    expect(active()).toBe(null);
+    expect(active()).toBe(undefined);
   });
 
   test("accepts all config options", () => {
@@ -214,11 +214,11 @@ describe("createMultiSelectListState", () => {
     expect(typeof onKeyDown).toBe("function");
   });
 
-  test("initializes with null cursor and empty active/selected", () => {
+  test("initializes with undefined cursor and empty active/selected", () => {
     const { cursor, active, selected } = createMultiSelectListState({
       items: ["a", "b", "c"],
     });
-    expect(cursor()).toBe(null);
+    expect(cursor()).toBe(undefined);
     expect(active()).toEqual([]);
     expect(selected()).toEqual([]);
   });
@@ -291,7 +291,7 @@ describe("createMultiSelectListState", () => {
     expect(onChange).toHaveBeenCalledWith(["a"]);
   });
 
-  test("calls onCursorChange with null when setCursorActive(null)", () => {
+  test("calls onCursorChange with undefined when setCursorActive(undefined)", () => {
     const onChange = vi.fn();
     const { setCursorActive } = createMultiSelectListState({
       items: ["a", "b", "c"],
@@ -299,8 +299,8 @@ describe("createMultiSelectListState", () => {
       onCursorChange: onChange,
     });
     onChange.mockClear();
-    setCursorActive(null);
-    expect(onChange).toHaveBeenCalledWith(null);
+    setCursorActive(undefined);
+    expect(onChange).toHaveBeenCalledWith(undefined);
   });
 
   test("handles vim mode", () => {
