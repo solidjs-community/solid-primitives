@@ -126,3 +126,65 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
   };
   return fn(0);
 }
+
+/**
+ * A component that allows you to consume a context without extracting the children into a separate function.
+ * This is particularly useful when the context needs to be used within the same JSX where it is provided.
+ *
+ * The `ConsumeContext` component is equivalent to the following code and solely exists as syntactic sugar:
+ *
+ * ```tsx
+ * <CounterProvider>
+ *   {untrack(() => {
+ *     const context = useContext(counterContext); // or useCounter()
+ *     return children(context);
+ *   })}
+ * </CounterProvider>
+ * ```
+ *
+ * @param use Either one of the following:
+ *  - A function that returns the context value. Preferably the `use...()` function returned from `createContextProvider()`.
+ *  - The context itself returned from `createContext()`.
+ *  - A inline function that returns the context value.
+ *
+ * @example
+ * ```tsx
+ * // create the context
+ * const [CounterProvider, useCounter] // = createContextProvider(...)
+ *
+ * // provide and use the context
+ * <CounterProvider count={1}>
+ *   <ConsumeContext use={useCounter}>
+ *     {({ count }) => (
+ *       <div>Count: {count()}</div>
+ *     )}
+ *   </ConsumeContext>
+ * </CounterProvider>
+ * ```
+ *
+ * ```tsx
+ * // create the context
+ * const counterContext = createContext({ count: 0 });
+ *
+ * // provide and use the context
+ * <counterContext.Provider value={{ count: 1 }}>
+ *   <ConsumeContext use={counterContext}>
+ *     {({ count }) => (
+ *       <div>Count: {count}</div>
+ *     )}
+ *   </ConsumeContext>
+ * </counterContext.Provider>
+ * ```
+ */
+export function ConsumeContext<T>(props: {
+  children: (value: T | undefined) => JSX.Element,
+  use: (() => T | undefined) | Context<T>,
+}): JSX.Element {
+  let context: T | undefined;
+  if (typeof props.use === "function") {
+    context = props.use();
+  } else {
+    context = useContext(props.use);
+  }
+  return props.children(context);
+}
