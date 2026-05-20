@@ -35,9 +35,9 @@ import type { ListStateOptions, ListStateReturn } from "./types.js";
 export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<T> {
   const defaultedProps = {
     initialActive: props.initialActive,
-    orientation: props.orientation ?? ("vertical" as const),
+    orientation: props.orientation ?? "vertical",
     loop: props.loop ?? true,
-    textDirection: props.textDirection ?? ("ltr" as const),
+    textDirection: props.textDirection ?? "ltr",
     handleTab: props.handleTab ?? true,
     vimMode: props.vimMode ?? false,
     vimKeys: props.vimKeys ?? {
@@ -50,7 +50,11 @@ export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<
     onActiveChange: props.onActiveChange,
   };
 
-  const [active, setActive] = createSignal<T | undefined>(defaultedProps.initialActive as any);
+  const [active, setActive] = createSignal<T>();
+  if (defaultedProps.initialActive !== undefined) {
+    const init = defaultedProps.initialActive;
+    setActive(() => init);
+  }
 
   const nextKeys = () => {
     const vimKeys = access(defaultedProps.vimKeys);
@@ -87,7 +91,7 @@ export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<
   };
 
   const updateActive = (newActive: T | undefined) => {
-    setActive(newActive as any);
+    newActive === undefined ? setActive() : setActive(() => newActive);
     defaultedProps.onActiveChange?.(newActive);
   };
 
@@ -103,34 +107,34 @@ export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<
       event.preventDefault();
       if (_activeIndex === _itemCount - 1) {
         if (access(defaultedProps.loop)) {
-          updateActive(_items[0]!);
+          updateActive(_items[0]);
         }
       } else {
-        updateActive(_items[_activeIndex !== undefined ? _activeIndex + 1 : 0]!);
+        updateActive(_items[_activeIndex !== undefined ? _activeIndex + 1 : 0]);
       }
     } else if (previousKeys().includes(eventKey)) {
       event.preventDefault();
       if (_activeIndex === 0) {
         if (access(defaultedProps.loop)) {
-          updateActive(_items[_itemCount - 1]!);
+          updateActive(_items[_itemCount - 1]);
         }
       } else {
-        updateActive(_items[_activeIndex !== undefined ? _activeIndex - 1 : _itemCount - 1]!);
+        updateActive(_items[_activeIndex !== undefined ? _activeIndex - 1 : _itemCount - 1]);
       }
     } else if (eventKey === "home") {
       event.preventDefault();
-      updateActive(_items[0]!);
+      updateActive(_items[0]);
     } else if (eventKey === "end") {
       event.preventDefault();
-      updateActive(_items[_itemCount - 1]!);
+      updateActive(_items[_itemCount - 1]);
     } else if (access(defaultedProps.handleTab) && _activeIndex !== undefined) {
       if (eventKey === "tab" && !event.shiftKey && _activeIndex < _itemCount - 1) {
         event.preventDefault();
-        updateActive(_items[_activeIndex + 1]!);
+        updateActive(_items[_activeIndex + 1]);
       }
       if (eventKey === "tab" && event.shiftKey && _activeIndex > 0) {
         event.preventDefault();
-        updateActive(_items[_activeIndex - 1]!);
+        updateActive(_items[_activeIndex - 1]);
       }
     }
   };

@@ -45,11 +45,11 @@ export function createMultiSelectListState<T>(
 ): MultiSelectListStateReturn<T> {
   const defaultedProps = {
     initialCursor: props.initialCursor,
-    initialActive: props.initialActive ?? ([] as T[]),
-    initialSelected: props.initialSelected ?? ([] as T[]),
-    orientation: props.orientation ?? ("vertical" as const),
+    initialActive: props.initialActive ?? [],
+    initialSelected: props.initialSelected ?? [],
+    orientation: props.orientation ?? "vertical",
     loop: props.loop ?? true,
-    textDirection: props.textDirection ?? ("ltr" as const),
+    textDirection: props.textDirection ?? "ltr",
     handleTab: props.handleTab ?? true,
     vimMode: props.vimMode ?? false,
     vimKeys: props.vimKeys ?? {
@@ -64,24 +64,28 @@ export function createMultiSelectListState<T>(
     onSelectedChange: props.onSelectedChange,
   };
 
-  const [cursor, setCursor] = createSignal<T | undefined>(defaultedProps.initialCursor as any);
-  const [active, setActive] = createSignal<T[]>(defaultedProps.initialActive as any);
-  const [selected, setSelected] = createSignal<T[]>(defaultedProps.initialSelected as any);
+  const [cursor, setCursor] = createSignal<T>();
+  if (defaultedProps.initialCursor !== undefined) {
+    const init = defaultedProps.initialCursor;
+    setCursor(() => init);
+  }
+  const [active, setActive] = createSignal<T[]>(defaultedProps.initialActive);
+  const [selected, setSelected] = createSignal<T[]>(defaultedProps.initialSelected);
 
   let direction: "next" | "previous" | null = null;
 
   const updateCursor = (newCursor: T | undefined) => {
-    setCursor(newCursor as any);
+    newCursor === undefined ? setCursor() : setCursor(() => newCursor);
     defaultedProps.onCursorChange?.(newCursor);
   };
 
   const updateActive = (newActive: T[]) => {
-    setActive(newActive as any);
+    setActive(newActive);
     defaultedProps.onActiveChange?.(newActive);
   };
 
   const updateSelected = (newSelected: T[]) => {
-    setSelected(newSelected as any);
+    setSelected(newSelected);
     defaultedProps.onSelectedChange?.(newSelected);
   };
 
@@ -145,7 +149,7 @@ export function createMultiSelectListState<T>(
       event.preventDefault();
       if (event.shiftKey) {
         if (_cursorIndex === undefined) {
-          setCursorActive(_items[0]!);
+          setCursorActive(_items[0]);
           updateSelected([_items[0]!]);
         } else if (
           _cursorIndex !== _itemCount - 1 ||
@@ -169,17 +173,17 @@ export function createMultiSelectListState<T>(
       } else {
         if (_cursorIndex === _itemCount - 1) {
           if (access(defaultedProps.loop)) {
-            setCursorActive(_items[0]!);
+            setCursorActive(_items[0]);
           }
         } else {
-          setCursorActive(_items[_cursorIndex !== undefined ? _cursorIndex + 1 : 0]!);
+          setCursorActive(_items[_cursorIndex !== undefined ? _cursorIndex + 1 : 0]);
         }
       }
     } else if (previousKeys().includes(eventKey)) {
       event.preventDefault();
       if (event.shiftKey) {
         if (_cursorIndex === undefined) {
-          setCursorActive(_items[_itemCount - 1]!);
+          setCursorActive(_items[_itemCount - 1]);
           updateSelected([_items[_itemCount - 1]!]);
         } else if (
           _cursorIndex !== 0 ||
@@ -203,28 +207,28 @@ export function createMultiSelectListState<T>(
       } else {
         if (_cursorIndex === 0) {
           if (access(defaultedProps.loop)) {
-            setCursorActive(_items[_itemCount - 1]!);
+            setCursorActive(_items[_itemCount - 1]);
           }
         } else {
           setCursorActive(
-            _items[_cursorIndex !== undefined ? _cursorIndex - 1 : _itemCount - 1]!,
+            _items[_cursorIndex !== undefined ? _cursorIndex - 1 : _itemCount - 1],
           );
         }
       }
     } else if (eventKey === "home") {
       event.preventDefault();
-      setCursorActive(_items[0]!);
+      setCursorActive(_items[0]);
     } else if (eventKey === "end") {
       event.preventDefault();
-      setCursorActive(_items[_itemCount - 1]!);
+      setCursorActive(_items[_itemCount - 1]);
     } else if (access(defaultedProps.handleTab) && _cursorIndex !== undefined) {
       if (eventKey === "tab" && !event.shiftKey && _cursorIndex < _itemCount - 1) {
         event.preventDefault();
-        setCursorActive(_items[_cursorIndex + 1]!);
+        setCursorActive(_items[_cursorIndex + 1]);
       }
       if (eventKey === "tab" && event.shiftKey && _cursorIndex > 0) {
         event.preventDefault();
-        setCursorActive(_items[_cursorIndex - 1]!);
+        setCursorActive(_items[_cursorIndex - 1]);
       }
     }
   };
