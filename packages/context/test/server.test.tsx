@@ -1,7 +1,12 @@
 import { describe, test, expect } from "vitest";
 import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
 import { renderToString } from "@solidjs/web";
-import { createContextProvider, MultiProvider } from "../src/index.js";
+import {
+  createContextProvider,
+  createStrictContextProvider,
+  createLayeredContext,
+  MultiProvider,
+} from "../src/index.js";
 
 type TestContextValue = {
   message: string;
@@ -57,5 +62,50 @@ describe("MultiProvider", () => {
     expect(capture1).toBe("Hello");
     expect(capture2).toBe("World");
     expect(capture3).toBe(TEST_MESSAGE);
+  });
+});
+
+describe("createStrictContextProvider (SSR)", () => {
+  test("provides context value to descendants", () => {
+    const [StrictProvider, useStrict] = createStrictContextProvider(
+      () => ({ greeting: "hello from server" }),
+    );
+    let captured = "";
+    renderToString(() => (
+      <StrictProvider>
+        {untrack(() => {
+          captured = useStrict().greeting;
+          return captured;
+        })}
+      </StrictProvider>
+    ));
+    expect(captured).toBe("hello from server");
+  });
+});
+
+describe("createLayeredContext (SSR)", () => {
+  test("nested providers extend parent value", () => {
+    const [LayeredProvider, useLayered] = createLayeredContext(
+      (props: { level?: number }, parent) => ({
+        ...parent,
+        level: props.level ?? parent.level,
+      }),
+      { level: 0, base: "ssr" },
+    );
+
+    let capturedInner: { level: number; base: string } | undefined;
+    renderToString(() => (
+      <LayeredProvider level={1}>
+        <LayeredProvider level={2}>
+          {untrack(() => {
+            capturedInner = useLayered();
+            return "";
+          })}
+        </LayeredProvider>
+      </LayeredProvider>
+    ));
+
+    expect(capturedInner?.level).toBe(2);
+    expect(capturedInner?.base).toBe("ssr");
   });
 });

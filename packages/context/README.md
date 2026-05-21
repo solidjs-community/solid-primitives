@@ -11,6 +11,8 @@
 Primitives simplifying the creation and use of SolidJS Context API.
 
 - [`createContextProvider`](#createcontextprovider) - Create the Context Provider component and useContext function with types inferred from the factory function.
+- [`createStrictContextProvider`](#createstrictcontextprovider) - Like `createContextProvider`, but throws when the context is used outside a provider instead of returning `undefined`.
+- [`createLayeredContext`](#createlayeredcontext) - Like `createContextProvider`, but each provider extends the parent context value rather than replacing it.
 - [`MultiProvider`](#multiprovider) - A component that allows you to provide multiple contexts at once.
 
 ## Installation
@@ -74,15 +76,71 @@ const [CounterProvider, useCounter] = createContextProvider(
 const { count } = useCounter();
 ```
 
-Definite context types without defaults:
+### Debug name
+
+An optional `name` can be passed as part of the third argument. It labels the context's Symbol for Solid DevTools and improves `ContextNotFoundError` stack traces (dev mode only).
 
 ```ts
-const useDefiniteCounter = () => useCounter()!;
+const [ThemeProvider, useTheme] = createContextProvider(
+  () => createTheme(),
+  defaultTheme,
+  { name: "Theme" },
+);
 ```
 
 ### Demo
 
 https://codesandbox.io/s/solid-primitives-context-demo-oqyie2?file=/index.tsx
+
+## `createStrictContextProvider`
+
+Like `createContextProvider` without defaults, but with an explicit contract: if the hook is called outside a provider, Solid throws a `ContextNotFoundError` at runtime. The return type of the hook is `T` (never `undefined`), so no null-check is needed at the call site.
+
+```tsx
+import { createStrictContextProvider } from "@solid-primitives/context";
+
+const [AuthProvider, useAuth] = createStrictContextProvider(
+  () => {
+    const [user, setUser] = createSignal<User | null>(null);
+    return { user, setUser };
+  },
+  { name: "Auth" },
+);
+
+// No `!` needed — type is T, not T | undefined
+const { user } = useAuth();
+```
+
+Use `createStrictContextProvider` when a context is required by contract (e.g. a form context that must be inside `<Form>`). Use `createContextProvider` with defaults when a sensible fallback exists.
+
+## `createLayeredContext`
+
+Like `createContextProvider`, but each provider in the tree *extends* the parent context value rather than replacing it entirely. The factory function receives the nearest parent's context value as its second argument.
+
+This is useful for incremental overrides such as themes, permissions layers, or i18n patches where a child provider should inherit what it does not explicitly change.
+
+```tsx
+import { createLayeredContext } from "@solid-primitives/context";
+
+const [ThemeProvider, useTheme] = createLayeredContext(
+  (props: { primary?: string; secondary?: string }, parent) => ({
+    ...parent,
+    primary: props.primary ?? parent.primary,
+    secondary: props.secondary ?? parent.secondary,
+  }),
+  { primary: "blue", secondary: "gray" }, // base defaults
+);
+
+// Root: { primary: "red", secondary: "gray" }
+<ThemeProvider primary="red">
+  {/* Nested: { primary: "green", secondary: "gray" } — secondary inherited */}
+  <ThemeProvider primary="green">
+    <App />
+  </ThemeProvider>
+</ThemeProvider>;
+```
+
+`createLayeredContext` always requires a `defaults` value (the base used when no parent provider wraps the component). The hook return type is always `T` (never `undefined`).
 
 ## `MultiProvider`
 
@@ -130,7 +188,7 @@ import { MultiProvider } from "@solid-primitives/context";
 ```
 
 > **Warning**
-> Components and values passed to `MultiProvider` will be evaluated only once, so make sure that the structure is static. If is isn't, please use nested provider components instead.
+> Components and values passed to `MultiProvider` will be evaluated only once, so make sure that the structure is static. If it isn't, please use nested provider components instead.
 
 ## Changelog
 

@@ -14,6 +14,12 @@
 - `JSX.Element` replaced with `Element` from `solid-js` throughout the public API types.
 - `MultiProvider` no longer falls back to accessing `.Provider` on non-function items — contexts passed in `values` must be functions (which all `Context` objects are in Solid 2.0).
 
+#### New Exports
+
+- **`createStrictContextProvider`** — Like `createContextProvider` without defaults, but with the intent made explicit in types: the hook returns `T` (never `undefined`) and Solid throws `ContextNotFoundError` at runtime when used outside a provider. Accepts an optional `{ name }` option.
+- **`createLayeredContext`** — Like `createContextProvider`, but each provider in the tree extends the parent context value rather than replacing it. The factory receives both `props` and the nearest parent context value. Requires a `defaults` base value.
+- **`ContextProviderOptions`** — Exported type `{ name?: string }` for the third argument of `createContextProvider` and `createStrictContextProvider`/`createLayeredContext`'s second argument.
+
 ## 0.3.2
 
 ### Patch Changes
