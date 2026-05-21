@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
+import { createEffect, createRoot, createSignal, flush, merge } from "solid-js";
 import { filterProps, createPropsPredicate } from "../src/index.js";
 
 describe("filterProps", () => {
@@ -35,23 +35,25 @@ describe("filterProps", () => {
     expect(checked).toEqual(["a", "b", "c", "d"]);
   });
 
-  test("supports dynamic props", () =>
+  test("supports dynamic props", () => {
+    const [props, setProps] = createSignal<Record<string, number>>({ a: 1, b: 2, c: 3 });
+    let captured: any;
+
     createRoot(dispose => {
-      const [props, setProps] = createSignal<Record<string, number>>({ a: 1, b: 2, c: 3 });
-      const proxy = mergeProps(props);
+      const proxy = merge(props);
       const filtered = filterProps(proxy, key => key !== "b" && key !== "d");
-      let captured: any;
-      createComputed(() => {
-        captured = { ...filtered };
-      });
+      createEffect(
+        () => ({ ...filtered }),
+        v => { captured = v; },
+      );
+      flush();
       expect(captured).toEqual({ a: 1, c: 3 });
+    });
 
-      setProps({ a: 1, b: 2, c: 3, d: 4, e: 5 });
-
-      expect(captured).toEqual({ a: 1, c: 3, e: 5 });
-
-      dispose();
-    }));
+    setProps({ a: 1, b: 2, c: 3, d: 4, e: 5 });
+    flush();
+    expect(captured).toEqual({ a: 1, c: 3, e: 5 });
+  });
 });
 
 describe("filterProps + createPropsPredicate", () => {
@@ -95,11 +97,13 @@ describe("filterProps + createPropsPredicate", () => {
       dispose();
     }));
 
-  test("supports dynamic props", () =>
+  test("supports dynamic props", () => {
+    const checked: string[] = [];
+    const [props, setProps] = createSignal<Record<string, number>>({ a: 1, b: 2, c: 3 });
+    let captured: any;
+
     createRoot(dispose => {
-      const checked: string[] = [];
-      const [props, setProps] = createSignal<Record<string, number>>({ a: 1, b: 2, c: 3 });
-      const proxy = mergeProps(props);
+      const proxy = merge(props);
       const filtered = filterProps(
         proxy,
         createPropsPredicate(proxy, key => {
@@ -107,19 +111,19 @@ describe("filterProps + createPropsPredicate", () => {
           return key !== "b" && key !== "d";
         }),
       );
-      let captured: any;
-      createComputed(() => {
-        captured = { ...filtered };
-      });
+      createEffect(
+        () => ({ ...filtered }),
+        v => { captured = v; },
+      );
+      flush();
       expect(captured).toEqual({ a: 1, c: 3 });
       expect(checked).toEqual(["a", "b", "c"]);
       checked.length = 0;
+    });
 
-      setProps({ a: 1, b: 2, c: 3, d: 4, e: 5 });
-
-      expect(captured).toEqual({ a: 1, c: 3, e: 5 });
-      expect(checked).toEqual(["a", "b", "c", "d", "e"]);
-
-      dispose();
-    }));
+    setProps({ a: 1, b: 2, c: 3, d: 4, e: 5 });
+    flush();
+    expect(captured).toEqual({ a: 1, c: 3, e: 5 });
+    expect(checked).toEqual(["a", "b", "c", "d", "e"]);
+  });
 });

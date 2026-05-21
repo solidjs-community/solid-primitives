@@ -1,4 +1,5 @@
-import { type Component, type ComponentProps, createSignal, Show } from "solid-js";
+import { type Component, createSignal, Show } from "solid-js";
+import type { ComponentProps } from "@solidjs/web";
 
 import { combineProps } from "../src/index.js";
 

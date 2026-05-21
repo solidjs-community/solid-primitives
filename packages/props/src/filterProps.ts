@@ -63,7 +63,6 @@ export function createPropsPredicate<T extends object>(
       Object.keys(props);
       return {};
     },
-    undefined,
     { equals: false },
   );
   return key => {

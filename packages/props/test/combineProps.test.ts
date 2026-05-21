@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
+import { createRoot, createSignal, flush, merge } from "solid-js";
 import { combineProps } from "../src/index.js";
 
 describe("combineProps", () => {
@@ -195,27 +195,14 @@ describe("combineProps", () => {
     });
   });
 
-  it("combines css classList", async () => {
+  it("combines css class objects", async () => {
     createRoot(async dispose => {
-      const classList1 = {
-        primary: true,
-        outline: true,
-        compact: true,
-      };
+      const classObj1 = { primary: true, outline: true, compact: true };
+      const classObj2 = { large: true, compact: false };
 
-      const classList2 = {
-        large: true,
-        compact: false,
-      };
+      const combinedProps = combineProps({ class: classObj1 }, { class: classObj2 });
 
-      const combinedProps = combineProps({ classList: classList1 }, { classList: classList2 });
-
-      expect(combinedProps.classList).toEqual({
-        primary: true,
-        outline: true,
-        large: true,
-        compact: false,
-      });
+      expect(combinedProps.class).toEqual([classObj1, classObj2]);
 
       dispose();
     });
@@ -273,11 +260,11 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("works with mergeProps", () => {
+  it("works with merge", () => {
     const cb1 = vi.fn();
     const cb2 = vi.fn();
     const combined = combineProps({ onClick: cb1 }, { onClick: cb2 });
-    const merged = mergeProps(combined);
+    const merged = merge(combined);
 
     merged.onClick("foo");
 
@@ -288,38 +275,30 @@ describe("combineProps", () => {
   });
 
   it("accepts function sources", () => {
-    createRoot(() => {
-      const [signal, setSignal] = createSignal<any>({
-        class: "primary",
-        style: {
-          margin: "10px",
-        },
-      });
+    const [signal, setSignal] = createSignal<any>({
+      class: "primary",
+      style: {
+        margin: "10px",
+      },
+    });
 
-      const combinedProps = combineProps(
+    let combinedProps: any;
+    createRoot(() => {
+      combinedProps = combineProps(
         signal,
         { class: "secondary" },
         { style: { padding: "10px" } },
       );
 
-      let i = 0;
-
-      createComputed(() => {
-        if (i === 0) {
-          expect(combinedProps.class).toBe("primary secondary");
-          expect(combinedProps.style).toEqual({
-            margin: "10px",
-            padding: "10px",
-          });
-          i++;
-        } else {
-          expect(combinedProps.class).toBe("tertiary secondary");
-          expect(combinedProps.style).toEqual({ padding: "10px" });
-          expect(combinedProps.foo).toEqual("bar");
-        }
-      });
-
-      setSignal({ class: "tertiary", foo: "bar" });
+      expect(combinedProps.class).toBe("primary secondary");
+      expect(combinedProps.style).toEqual({ margin: "10px", padding: "10px" });
     });
+
+    setSignal({ class: "tertiary", foo: "bar" });
+    flush();
+
+    expect(combinedProps.class).toBe("tertiary secondary");
+    expect(combinedProps.style).toEqual({ padding: "10px" });
+    expect(combinedProps.foo).toBe("bar");
   });
 });

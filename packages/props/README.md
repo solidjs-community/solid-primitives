@@ -29,9 +29,9 @@ A helper that reactively merges multiple props objects together while smartly co
 
 Event handlers _(onClick, onclick, onMouseMove, onSomething)_, and refs _(props.ref)_ are chained.
 
-`class`, `className`, `classList` and `style` are combined.
+`class`, `className`, and `style` are combined.
 
-For all other props, the last prop object overrides all previous ones. Similarly to Solid's [mergeProps](https://www.solidjs.com/docs/latest/api#mergeprops).
+For all other props, the last prop object overrides all previous ones. Similarly to Solid's `merge`.
 
 ### How to use it
 
@@ -54,7 +54,7 @@ const MyButton: Component<ButtonProps> = props => {
 
 #### Chaining of event listeners
 
-Every [function/tuple](https://www.solidjs.com/docs/latest/api#on___) property with `on___` name get's chained. That could potentially include properties that are not actually event-listeners – such as `only` or `once`. Hence you should remove them from the props (with [splitProps](https://www.solidjs.com/docs/latest/api#splitprops)).
+Every function property with `on___` name gets chained. That could potentially include properties that are not actually event-listeners — such as `only` or `once`. Hence you should remove them from the props (with Solid's `omit`).
 
 Chained functions will always return `void`. If you want to get the returned value from a callback, you have to split those props and handle them yourself.
 
@@ -117,7 +117,7 @@ https://codesandbox.io/s/combineprops-demo-ytw247?file=/index.tsx
 
 A helper that creates a new props object with only the property names that match the predicate.
 
-An alternative primitive to Solid's [splitProps](https://www.solidjs.com/docs/latest/api#splitprops) that will split the props eagerly, without letting you change the omitted keys afterwards.
+An alternative primitive to Solid's `omit` that will split the props eagerly, without letting you change the omitted keys afterwards.
 
 The `predicate` is run for every property read lazily — any signal accessed within the `predicate` will be tracked, and `predicate` re-executed if changed.
 
