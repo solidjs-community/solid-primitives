@@ -23,9 +23,9 @@ describe("createInteractOutside on server", () => {
     expect(onInteractOutside).not.toHaveBeenCalled();
   });
 
-  it("does not call onChange when isDisabled is provided", () => {
+  it("does not call onChange when disabled is provided", () => {
     const onInteractOutside = vi.fn();
-    createInteractOutside({ isDisabled: true, onInteractOutside }, () => undefined);
+    createInteractOutside({ disabled: true, onInteractOutside }, () => undefined);
     expect(onInteractOutside).not.toHaveBeenCalled();
   });
 

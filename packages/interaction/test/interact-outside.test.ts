@@ -187,8 +187,8 @@ describe("createInteractOutside", () => {
   });
 
   describe("Configuration", () => {
-    it("does not trigger when isDisabled is true", () => {
-      const { mocks, outside, cleanup } = setupTest("div", "div", { isDisabled: true });
+    it("does not trigger when disabled is true", () => {
+      const { mocks, outside, cleanup } = setupTest("div", "div", { disabled: true });
       outside.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
       expect(mocks.onFocusOutside).not.toHaveBeenCalled();
       expect(mocks.onPointerDownOutside).not.toHaveBeenCalled();
@@ -196,8 +196,8 @@ describe("createInteractOutside", () => {
       cleanup();
     });
 
-    it("does not trigger when isDisabled accessor returns true", () => {
-      const { mocks, outside, cleanup } = setupTest("div", "div", { isDisabled: () => true });
+    it("does not trigger when disabled accessor returns true", () => {
+      const { mocks, outside, cleanup } = setupTest("div", "div", { disabled: () => true });
       outside.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
       expect(mocks.onFocusOutside).not.toHaveBeenCalled();
       cleanup();
@@ -223,10 +223,10 @@ describe("createInteractOutside", () => {
       cleanup();
     });
 
-    it("re-enables listeners when isDisabled changes from true to false", () => {
+    it("re-enables listeners when disabled changes from true to false", () => {
       // Must use a Solid signal so the effect reacts to the change.
-      const [isDisabled, setIsDisabled] = createSignal(true);
-      const { mocks, outside, cleanup } = setupTest("div", "div", { isDisabled });
+      const [disabled, setIsDisabled] = createSignal(true);
+      const { mocks, outside, cleanup } = setupTest("div", "div", { disabled });
 
       // Disabled — should not trigger
       outside.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));

@@ -71,13 +71,13 @@ function createInteractOutside<T extends Element>(
 ): void
 ```
 
-Reactive wrapper around `makeInteractOutside`. Sets up document-level event listeners that fire whenever the user interacts outside the element returned by `ref`. Re-attaches automatically when `ref` or `options.isDisabled` changes. Cleans up with the reactive owner.
+Reactive wrapper around `makeInteractOutside`. Sets up document-level event listeners that fire whenever the user interacts outside the element returned by `ref`. Re-attaches automatically when `ref` or `options.disabled` changes. Cleans up with the reactive owner.
 
 ### Options
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `isDisabled` | `MaybeAccessor<boolean \| undefined>` | Disables all listeners when `true`. Reactive — can be an accessor. |
+| `disabled` | `MaybeAccessor<boolean \| undefined>` | Disables all listeners when `true`. Reactive — can be an accessor. |
 | `shouldExcludeElement` | `(element: Element) => boolean` | Return `true` to suppress handlers for a specific element. |
 | `onPointerDownOutside` | `(event: PointerDownOutsideEvent) => void` | Fired when a `pointerdown` event occurs outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing. |
 | `onFocusOutside` | `(event: FocusOutsideEvent) => void` | Fired when focus moves outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing. |
@@ -166,7 +166,7 @@ function Dialog(props: { open: boolean }) {
 
   createInteractOutside(
     {
-      isDisabled: () => !props.open,
+      disabled: () => !props.open,
       onInteractOutside: () => { /* close */ },
     },
     ref,

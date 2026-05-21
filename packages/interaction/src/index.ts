@@ -34,7 +34,7 @@ export type InteractOutsideEvent = PointerDownOutsideEvent | FocusOutsideEvent;
 
 export interface CreateInteractOutsideOptions {
   /** Whether the interact outside events should be listened or not. */
-  isDisabled?: MaybeAccessor<boolean | undefined>;
+  disabled?: MaybeAccessor<boolean | undefined>;
 
   /**
    * When user interacts with the argument element outside the ref,
@@ -62,7 +62,7 @@ export interface CreateInteractOutsideOptions {
   onInteractOutside?: (event: InteractOutsideEvent) => void;
 }
 
-export type MakeInteractOutsideOptions = Omit<CreateInteractOutsideOptions, "isDisabled">;
+export type MakeInteractOutsideOptions = Omit<CreateInteractOutsideOptions, "disabled">;
 
 const POINTER_DOWN_OUTSIDE_EVENT = "interactOutside.pointerDownOutside";
 const FOCUS_OUTSIDE_EVENT = "interactOutside.focusOutside";
@@ -218,10 +218,10 @@ export function interactOutside(options: MakeInteractOutsideOptions): (el: Eleme
 
 /**
  * Listens for pointer and focus events that originate outside a referenced element.
- * Reactively re-attaches whenever `ref` or `options.isDisabled` changes.
+ * Reactively re-attaches whenever `ref` or `options.disabled` changes.
  * Cleans up automatically with the reactive owner.
  *
- * @param options - Configuration, event handlers, and optional `isDisabled` accessor.
+ * @param options - Configuration, event handlers, and optional `disabled` accessor.
  * @param ref - Accessor returning the element to watch.
  *
  * @example
@@ -246,7 +246,7 @@ export function createInteractOutside<T extends Element>(
   if (isServer) return;
 
   createEffect(
-    () => ({ disabled: access(options.isDisabled), el: ref() }),
+    () => ({ disabled: access(options.disabled), el: ref() }),
     ({ disabled, el }: { disabled: boolean | undefined; el: T | undefined }) => {
       if (disabled || !el) return;
       return makeInteractOutside(el, options);
