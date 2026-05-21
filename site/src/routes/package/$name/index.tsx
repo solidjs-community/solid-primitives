@@ -1,4 +1,4 @@
-import { createMemo, onMount } from "solid-js";
+import { createMemo, onSettled } from "solid-js";
 import { createFileRoute, notFound } from "@tanstack/solid-router";
 import { fetchPackageData } from "~/api.js";
 import NotFound from "~/components/NotFound.jsx";
@@ -87,7 +87,7 @@ function PackagePage() {
                 if (!el.isConnected) {
                   el.style.opacity = "0";
                   el.style.transition = "opacity 0.3s ease-in-out";
-                  onMount(() => {
+                  onSettled(() => {
                     requestAnimationFrame(() => (el.style.opacity = ""));
                   });
                 }

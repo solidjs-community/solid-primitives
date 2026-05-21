@@ -1,11 +1,13 @@
 {
-  "name": "@solid-primitives/virtual",
-  "version": "0.3.0",
-  "description": "A virtualized list component for performantly rendering lists with many elements",
-  "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
-  "contributors": [],
+  "name": "@solid-primitives/controlled-signal",
+  "version": "0.0.100",
+  "description": "Reactive signals that support both controlled (externally managed) and uncontrolled (internally managed) state — a pattern commonly used in headless UI components.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [
+    "Kobalte Contributors <https://github.com/kobaltedev/kobalte>"
+  ],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/virtual",
+  "homepage": "https://primitives.solidjs.community/package/controlled-signal",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,18 +16,25 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "virtual",
+    "name": "controlled-signal",
     "stage": 0,
     "list": [
-      "createVirutalList",
-      "VirtualList"
+      "createControllableSignal",
+      "createControllableBooleanSignal",
+      "createControllableArraySignal",
+      "createControllableSetSignal"
     ],
-    "category": "UI Patterns"
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",
     "primitives",
-    "virtualized"
+    "signal",
+    "controlled",
+    "controllable",
+    "uncontrolled",
+    "headless",
+    "ui"
   ],
   "private": false,
   "sideEffects": false,
@@ -38,8 +47,7 @@
   "browser": {},
   "exports": {
     "import": {
-      "@solid-primitives/source": "./src/index.tsx",
-      "solid": "./dist/index.jsx",
+      "@solid-primitives/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
@@ -49,21 +57,16 @@
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
-    "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
-    "test": "pnpm run vitest2",
-    "test:ssr": "pnpm run vitest2 --mode ssr"
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.13",
-    "solid-js": "^2.0.0-beta.13"
+    "solid-js": "^2.0.0-beta.12"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.0",
-    "@solidjs/web": "2.0.0-beta.13",
-    "babel-preset-solid": "2.0.0-beta.10",
-    "solid-js": "2.0.0-beta.13"
+    "solid-js": "2.0.0-beta.12"
   }
 }
