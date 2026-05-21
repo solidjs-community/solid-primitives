@@ -1,18 +1,18 @@
 import { describe, test, expect } from "vitest";
-import { createContext, type FlowComponent, type JSX, untrack, useContext } from "solid-js";
-import { renderToString } from "solid-js/web";
+import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
+import { renderToString } from "@solidjs/web";
 import { createContextProvider, MultiProvider } from "../src/index.js";
 
 type TestContextValue = {
   message: string;
-  children: JSX.Element;
+  children: Element;
 };
 
 const TEST_MESSAGE = "Hello, Context!";
 const FALLBACK: TestContextValue = { message: "FALLBACK", children: undefined };
 
 const [TestProvider, useTestContext] = createContextProvider(
-  (props: { children: JSX.Element }): TestContextValue => {
+  (props: { children: Element }): TestContextValue => {
     return {
       message: TEST_MESSAGE,
       get children() {
@@ -41,7 +41,7 @@ describe("MultiProvider", () => {
 
     renderToString(() => (
       <MultiProvider
-        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2.Provider, "World"], BoundProvider]}
+        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2, "World"], BoundProvider]}
       >
         {untrack(() => {
           runs++;

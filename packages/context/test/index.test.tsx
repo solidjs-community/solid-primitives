@@ -1,25 +1,24 @@
 import { describe, test, expect } from "vitest";
 import {
   createContext,
-  createRoot,
   type FlowComponent,
-  type JSX,
+  type Element,
   untrack,
   useContext,
 } from "solid-js";
-import { render } from "solid-js/web";
+import { render } from "@solidjs/web";
 import { createContextProvider, MultiProvider } from "../src/index.js";
 
 type TestContextValue = {
   message: string;
-  children: JSX.Element;
+  children: Element;
 };
 
 const TEST_MESSAGE = "Hello, Context!";
 const FALLBACK: TestContextValue = { message: "FALLBACK", children: undefined };
 
 const [TestProvider, useTestContext] = createContextProvider(
-  (props: { text?: string; children: JSX.Element }): TestContextValue => {
+  (props: { text?: string; children: Element }): TestContextValue => {
     return {
       message: props.text ?? TEST_MESSAGE,
       get children() {
@@ -94,23 +93,29 @@ describe("MultiProvider", () => {
       return <TestProvider>{props.children}</TestProvider>;
     };
 
-    createRoot(() => {
-      <MultiProvider
-        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2.Provider, "World"], BoundProvider]}
-      >
-        {untrack(() => {
-          runs++;
-          capture1 = useContext(Ctx1);
-          capture2 = useContext(Ctx2);
-          capture3 = useTestContext().message;
-          return "";
-        })}
-      </MultiProvider>;
-    });
+    const container = document.createElement("div");
+    const unmount = render(
+      () => (
+        <MultiProvider
+          values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2, "World"], BoundProvider]}
+        >
+          {untrack(() => {
+            runs++;
+            capture1 = useContext(Ctx1);
+            capture2 = useContext(Ctx2);
+            capture3 = useTestContext().message;
+            return "";
+          })}
+        </MultiProvider>
+      ),
+      container,
+    );
 
     expect(runs).toBe(1);
     expect(capture1).toBe("Hello");
     expect(capture2).toBe("World");
     expect(capture3).toBe(TEST_MESSAGE);
+
+    unmount();
   });
 });

@@ -2,18 +2,18 @@ import {
   createContext,
   createComponent,
   useContext,
-  type JSX,
+  type Element,
   type Context,
+  type ContextProviderComponent,
   type FlowComponent,
 } from "solid-js";
-import type { ContextProviderComponent } from "../node_modules/solid-js/types/reactive/signal.js";
 
 export type ContextProviderProps = {
-  children?: JSX.Element;
+  children?: Element;
 } & Record<string, unknown>;
 export type ContextProvider<T extends ContextProviderProps> = (
-  props: { children: JSX.Element } & T,
-) => JSX.Element;
+  props: { children: Element } & T,
+) => Element;
 
 /**
  * Create the Context Provider component and useContext function with types inferred from the factory function.
@@ -47,10 +47,10 @@ export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
   defaults?: T,
 ): [provider: ContextProvider<P>, useContext: () => T | undefined] {
-  const ctx = createContext(defaults);
+  const ctx = createContext<T | undefined>(defaults);
   return [
     props => {
-      return createComponent(ctx.Provider, {
+      return createComponent(ctx, {
         value: factoryFn(props),
         get children() {
           return props.children;
@@ -79,16 +79,16 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
  * @example
  * ```tsx
  * // before
- * <CounterCtx.Provider value={1}>
- *   <NameCtx.Provider value="John">
+ * <CounterCtx value={1}>
+ *   <NameCtx value="John">
  *     <App/>
- *   </NameCtx.Provider>
- * </CounterCtx.Provider>
+ *   </NameCtx>
+ * </CounterCtx>
  *
  * // after
  * <MultiProvider values={[
- *  [CounterCtx.Provider, 1],
- *  [NameCtx.Provider, "John"]
+ *  [CounterCtx, 1],
+ *  [NameCtx, "John"]
  * ]}>
  *  <App/>
  * </MultiProvider>
@@ -103,15 +103,15 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
         ]
       | FlowComponent;
   };
-  children: JSX.Element;
-}): JSX.Element {
+  children: Element;
+}): Element {
   const { values } = props;
   const fn = (i: number) => {
     let item: any = values[i];
 
     if (!item) return props.children;
 
-    const ctxProps: { value?: any; children: JSX.Element } = {
+    const ctxProps: { value?: any; children: Element } = {
       get children() {
         return fn(i + 1);
       },
@@ -119,7 +119,6 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
     if (Array.isArray(item)) {
       ctxProps.value = item[1];
       item = item[0];
-      if (typeof item !== "function") item = item.Provider;
     }
 
     return createComponent(item, ctxProps);

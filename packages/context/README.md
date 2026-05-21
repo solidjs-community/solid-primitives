@@ -23,6 +23,8 @@ pnpm add @solid-primitives/context
 yarn add @solid-primitives/context
 ```
 
+Requires `solid-js@^2.0.0-beta.13` and `@solidjs/web@^2.0.0-beta.13`.
+
 ## `createContextProvider`
 
 Create the Context Provider component and useContext function with types inferred from the factory function.
@@ -99,17 +101,17 @@ It will work exactly like nesting multiple providers as separate components, but
 import { MultiProvider } from "@solid-primitives/context";
 
 // before
-<FooContext.Provider value={"foo"}>
-  <BarContext.Provider value={"bar"}>
-    <BazContext.Provider value={"baz"}>
+<FooContext value={"foo"}>
+  <BarContext value={"bar"}>
+    <BazContext value={"baz"}>
       <MyCustomProviderComponent value={"hello-world"}>
         <BoundContextProvider>
           <App />
         </BoundContextProvider>
       </MyCustomProviderComponent>
-    </BazContext.Provider>
-  </BarContext.Provider>
-</FooContext.Provider>;
+    </BazContext>
+  </BarContext>
+</FooContext>;
 
 // after
 <MultiProvider
