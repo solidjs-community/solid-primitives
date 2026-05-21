@@ -211,6 +211,16 @@ importers:
         specifier: ^1.9.7
         version: 1.9.7
 
+  packages/controlled-signal:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      solid-js:
+        specifier: 2.0.0-beta.12
+        version: 2.0.0-beta.12
+
   packages/cookies:
     devDependencies:
       solid-js:

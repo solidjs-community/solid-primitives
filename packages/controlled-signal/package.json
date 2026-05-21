@@ -1,0 +1,72 @@
+{
+  "name": "@solid-primitives/controlled-signal",
+  "version": "0.0.100",
+  "description": "Reactive signals that support both controlled (externally managed) and uncontrolled (internally managed) state — a pattern commonly used in headless UI components.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [
+    "Kobalte Contributors <https://github.com/kobaltedev/kobalte>"
+  ],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/controlled-signal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "controlled-signal",
+    "stage": 0,
+    "list": [
+      "createControllableSignal",
+      "createControllableBooleanSignal",
+      "createControllableArraySignal",
+      "createControllableSetSignal"
+    ],
+    "category": "Reactivity"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "signal",
+    "controlled",
+    "controllable",
+    "uncontrolled",
+    "headless",
+    "ui"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "solid-js": "^2.0.0-beta.12"
+  },
+  "devDependencies": {
+    "solid-js": "2.0.0-beta.12"
+  }
+}
