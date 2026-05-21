@@ -74,3 +74,34 @@ export function createPropsPredicate<T extends object>(
     return v;
   };
 }
+
+/**
+ * Splits a props object into two reactive views: one containing only the keys
+ * that match the predicate, and one containing the rest.
+ *
+ * Both returned objects are lazy proxies — the predicate runs per property read,
+ * not eagerly. For expensive predicates, pass a {@link createPropsPredicate}
+ * result to share a single cache across both views.
+ *
+ * @param props - The props object to partition.
+ * @param predicate - Returns `true` for keys that belong in the first view.
+ * @returns A tuple `[matched, rest]` of reactive props objects.
+ *
+ * @example
+ * ```tsx
+ * const [ownProps, htmlProps] = partitionProps(props,
+ *   key => ["label", "variant", "size"].includes(key as string)
+ * );
+ * return <button {...htmlProps}>{ownProps.label}</button>;
+ *
+ * // With caching for an expensive predicate:
+ * const pred = createPropsPredicate(props, key => expensiveCheck(key));
+ * const [ownProps, htmlProps] = partitionProps(props, pred);
+ * ```
+ */
+export function partitionProps<T extends object>(
+  props: T,
+  predicate: (key: keyof T) => boolean,
+): [T, T] {
+  return [filterProps(props, predicate), filterProps(props, key => !predicate(key))];
+}

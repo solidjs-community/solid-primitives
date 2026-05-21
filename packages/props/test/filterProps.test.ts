@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createEffect, createRoot, createSignal, flush, merge } from "solid-js";
-import { filterProps, createPropsPredicate } from "../src/index.js";
+import { filterProps, createPropsPredicate, partitionProps } from "../src/index.js";
 
 describe("filterProps", () => {
   test("filters props", () => {
@@ -126,4 +126,78 @@ describe("filterProps + createPropsPredicate", () => {
     expect(captured).toEqual({ a: 1, c: 3, e: 5 });
     expect(checked).toEqual(["a", "b", "c", "d", "e"]);
   });
+});
+
+describe("partitionProps", () => {
+  test("splits props into matched and rest", () => {
+    const props = { a: 1, b: 2, c: 3, d: 4 };
+    const [matched, rest] = partitionProps(props, key => key === "a" || key === "c");
+
+    expect(matched).toEqual({ a: 1, c: 3 });
+    expect(rest).toEqual({ b: 2, d: 4 });
+    expect(Object.keys(matched)).toEqual(["a", "c"]);
+    expect(Object.keys(rest)).toEqual(["b", "d"]);
+  });
+
+  test("both views are lazy — predicate runs per read", () => {
+    const checked: string[] = [];
+    const props = { a: 1, b: 2, c: 3 };
+    const [matched, rest] = partitionProps(props, key => {
+      checked.push(key as string);
+      return key !== "b";
+    });
+
+    expect(checked.length).toBe(0);
+
+    matched.a;
+    // predicate run once for matched.a
+    expect(checked).toEqual(["a"]);
+
+    rest.b;
+    // predicate run once for rest.b (negated — "b" returns false, so rest includes it)
+    expect(checked).toEqual(["a", "b"]);
+  });
+
+  test("both views update with dynamic props", () => {
+    const [props, setProps] = createSignal<Record<string, number>>({ a: 1, b: 2, c: 3 });
+    let capturedMatched: any;
+    let capturedRest: any;
+
+    createRoot(dispose => {
+      const proxy = merge(props);
+      const [matched, rest] = partitionProps(proxy, key => key !== "b");
+      createEffect(
+        () => [{ ...matched }, { ...rest }],
+        ([m, r]) => { capturedMatched = m; capturedRest = r; },
+      );
+      flush();
+      expect(capturedMatched).toEqual({ a: 1, c: 3 });
+      expect(capturedRest).toEqual({ b: 2 });
+    });
+
+    setProps({ a: 10, b: 20, c: 30, d: 40 });
+    flush();
+    expect(capturedMatched).toEqual({ a: 10, c: 30, d: 40 });
+    expect(capturedRest).toEqual({ b: 20 });
+  });
+
+  test("works with createPropsPredicate to share cache across both views", () =>
+    createRoot(dispose => {
+      const props = { a: 1, b: 2, c: 3, d: 4 };
+      const checked: string[] = [];
+      const pred = createPropsPredicate(props, key => {
+        checked.push(key as string);
+        return key !== "b";
+      });
+      const [matched, rest] = partitionProps(props, pred);
+
+      matched.a;
+      matched.a; // cache hit — predicate should not run again
+      rest.b;
+      rest.b;   // cache hit
+
+      expect(checked).toEqual(["a", "b"]);
+
+      dispose();
+    }));
 });

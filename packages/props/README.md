@@ -11,7 +11,9 @@
 Library of primitives focused around component props.
 
 - [`combineProps`](#combineprops) - Reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+- [`combineHandlers`](#combinehandlers) - Chains multiple event handlers into a single handler.
 - [`filterProps`](#filterprops) - Create a new props object with only the property names that match the predicate.
+- [`partitionProps`](#partitionprops) - Split a props object into two reactive views based on a predicate.
 
 ## Installation
 
@@ -113,6 +115,27 @@ styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
 
 https://codesandbox.io/s/combineprops-demo-ytw247?file=/index.tsx
 
+## `combineHandlers`
+
+Chains multiple event handlers into a single handler that calls each in order. Handlers that are `null`, `undefined`, or `false` are silently skipped.
+
+When used inline in JSX, reads from Solid's reactive props proxy are tracked through the render context automatically — no explicit signal unwrapping is needed. For a standalone signal holding a handler, read it before passing (`handler()`) or wrap the whole call in a `createMemo`.
+
+```tsx
+import { combineHandlers } from "@solid-primitives/props";
+
+const MyButton: Component<ButtonProps> = props => {
+  // Merge an internal handler with whatever the consumer provides
+  return <button onClick={combineHandlers(props.onClick, () => console.log("clicked"))} />;
+};
+```
+
+Conditional handlers can be passed inline — `null`/`false` entries are skipped safely:
+
+```tsx
+<div onKeyDown={combineHandlers(props.onKeyDown, isOpen() ? closeOnEsc : null)} />
+```
+
 ## `filterProps`
 
 A helper that creates a new props object with only the property names that match the predicate.
@@ -146,7 +169,7 @@ Creates a predicate function that can be used to filter props by the prop name d
 
 The provided `predicate` function get's wrapped with a cache layer to prevent unnecessary re-evaluation. If one property is requested multiple times, the `predicate` will only be evaluated once.
 
-The cache is only cleared when the keys of the props object change. _(when spreading props from a singal)_ This also means that any signal accessed within the `predicate` won't be tracked.
+The cache is only cleared when the keys of the props object change. _(when spreading props from a signal)_ This also means that any signal accessed within the `predicate` won't be tracked.
 
 ```tsx
 import { filterProps, createPropsPredicate } from "@solid-primitives/props";
@@ -157,6 +180,29 @@ const MyComponent = props => {
 
   return <div {...dataProps} />;
 };
+```
+
+## `partitionProps`
+
+Splits a props object into two reactive views: one containing only the keys that match the predicate, and one containing the rest. Both views are lazy proxies — the predicate runs per property read, not eagerly.
+
+```tsx
+import { partitionProps } from "@solid-primitives/props";
+
+const MyButton = (props: ButtonProps & JSX.HTMLAttributes<HTMLButtonElement>) => {
+  const [ownProps, htmlProps] = partitionProps(props,
+    key => ["label", "variant", "size"].includes(key as string)
+  );
+
+  return <button {...htmlProps}>{ownProps.label}</button>;
+};
+```
+
+For an expensive predicate, pass a [`createPropsPredicate`](#createpropspredicate) result to share a single cache across both views:
+
+```tsx
+const pred = createPropsPredicate(props, key => expensiveCheck(key));
+const [ownProps, htmlProps] = partitionProps(props, pred);
 ```
 
 ## Changelog

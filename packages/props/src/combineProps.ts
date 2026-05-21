@@ -201,3 +201,31 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(
   ) as any;
 }
 
+/**
+ * Chains multiple event handlers into a single handler that calls each in order.
+ * Handlers that are `null`, `undefined`, or `false` are silently skipped, making
+ * it safe to pass conditional handlers directly.
+ *
+ * When used inline in JSX, reads from Solid's reactive props proxy are tracked
+ * through the surrounding render context — no explicit signal unwrapping needed.
+ * For a standalone signal holding a handler, read it before passing:
+ * `combineHandlers(handler(), base)` or wrap the whole call in a `createMemo`.
+ *
+ * @example
+ * ```tsx
+ * // Inline — props.onClick is tracked via Solid's reactive props proxy
+ * <button onClick={combineHandlers(props.onClick, internalHandler)} />
+ *
+ * // Conditional handler — null/false are safely skipped
+ * <div onKeyDown={combineHandlers(props.onKeyDown, isOpen() ? closeOnEsc : null)} />
+ * ```
+ */
+export function combineHandlers<T extends (...args: any[]) => void>(
+  ...handlers: (T | null | undefined | false)[]
+): T | undefined {
+  const fns = handlers.filter((h): h is T => typeof h === "function");
+  if (fns.length === 0) return undefined;
+  if (fns.length === 1) return fns[0];
+  return ((...args: any[]) => { for (const fn of fns) fn(...args); }) as T;
+}
+

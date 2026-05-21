@@ -15,7 +15,9 @@
     "stage": 3,
     "list": [
       "combineProps",
-      "filterProps"
+      "combineHandlers",
+      "filterProps",
+      "partitionProps"
     ],
     "category": "Utilities"
   },

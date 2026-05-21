@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createRoot, createSignal, flush, merge } from "solid-js";
-import { combineProps } from "../src/index.js";
+import { combineProps, combineHandlers } from "../src/index.js";
 
 describe("combineProps", () => {
   it("handles one argument", () =>
@@ -300,5 +300,58 @@ describe("combineProps", () => {
     expect(combinedProps.class).toBe("tertiary secondary");
     expect(combinedProps.style).toEqual({ padding: "10px" });
     expect(combinedProps.foo).toBe("bar");
+  });
+});
+
+describe("combineHandlers", () => {
+  it("chains handlers left-to-right", () => {
+    const order: number[] = [];
+    const combined = combineHandlers(
+      () => order.push(1),
+      () => order.push(2),
+      () => order.push(3),
+    )!;
+    combined();
+    expect(order).toEqual([1, 2, 3]);
+  });
+
+  it("passes all arguments to every handler", () => {
+    const mock1 = vi.fn();
+    const mock2 = vi.fn();
+    const combined = combineHandlers(mock1, mock2)!;
+    combined("a", "b");
+    expect(mock1).toHaveBeenCalledWith("a", "b");
+    expect(mock2).toHaveBeenCalledWith("a", "b");
+  });
+
+  it("skips null, undefined, and false", () => {
+    const mock = vi.fn();
+    const combined = combineHandlers(null, undefined, false, mock, undefined)!;
+    combined("arg");
+    expect(mock).toHaveBeenCalledOnce();
+    expect(mock).toHaveBeenCalledWith("arg");
+  });
+
+  it("supports conditional handlers", () => {
+    const mock1 = vi.fn();
+    const mock2 = vi.fn();
+
+    const inactive = combineHandlers(mock1, false ? mock2 : null)!;
+    inactive("x");
+    expect(mock1).toHaveBeenCalledWith("x");
+    expect(mock2).not.toHaveBeenCalled();
+
+    const active = combineHandlers(mock1, mock2)!;
+    active("y");
+    expect(mock2).toHaveBeenCalledWith("y");
+  });
+
+  it("returns undefined when all handlers are absent", () => {
+    expect(combineHandlers(null, undefined, false)).toBeUndefined();
+  });
+
+  it("returns the single handler unchanged (no wrapping)", () => {
+    const fn = vi.fn();
+    expect(combineHandlers(fn)).toBe(fn);
   });
 });
