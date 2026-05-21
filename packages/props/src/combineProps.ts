@@ -86,8 +86,8 @@ export type CombinePropsOptions = {
 /**
  * A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
  *
- * Event handlers and refs are chained, class, classNames and styles are combined.
- * For all other props, the last prop object overrides all previous ones. Similarly to {@link mergeProps}
+ * Event handlers and refs are chained, `class` and `style` are combined.
+ * For all other props, the last prop object overrides all previous ones. Similarly to `merge`.
  * @param sources - Multiple sets of props to combine together.
  * @example
  * ```tsx
@@ -201,29 +201,3 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(
   ) as any;
 }
 
-// type check
-
-// const com = combineProps(
-//   {
-//     onSomething: 123,
-//     onWheel: (e: WheelEvent) => 213,
-//     something: "foo",
-//     style: { margin: "24px" },
-//     once: true,
-//     onMount: (fn: VoidFunction) => undefined
-//   },
-//   {
-//     onSomething: [(n: number, s: string) => "fo", 123],
-//     once: "ovv"
-//   },
-//   {
-//     onWheel: false,
-//     onMount: (n: number) => void 0
-//   }
-// );
-// com.onSomething; // (s: string) => void;
-// com.once; // string;
-// com.onWheel; // false;
-// com.onMount; // ((fn: VoidFunction) => undefined) & ((n: number) => undefined);
-// com.something; // string;
-// com.style; // string | JSX.CSSProperties;

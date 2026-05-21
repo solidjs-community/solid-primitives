@@ -18,8 +18,8 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("combines handlers", async () => {
-    createRoot(async dispose => {
+  it("combines handlers", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
@@ -69,8 +69,8 @@ describe("combineProps", () => {
     });
   });
 
-  it("event handlers can be overwritten", async () => {
-    createRoot(async dispose => {
+  it("event handlers can be overwritten", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
@@ -92,8 +92,8 @@ describe("combineProps", () => {
     });
   });
 
-  it("last value overwrites the event-listeners", async () => {
-    createRoot(async dispose => {
+  it("last value overwrites the event-listeners", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
@@ -134,8 +134,8 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("merges props with different keys", async () => {
-    createRoot(async dispose => {
+  it("merges props with different keys", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const click1 = "click1";
       const click2 = "click2";
@@ -169,8 +169,8 @@ describe("combineProps", () => {
     });
   });
 
-  it("combines css classes", async () => {
-    createRoot(async dispose => {
+  it("combines css classes", () => {
+    createRoot(dispose => {
       const className1 = "primary";
       const className2 = "hover";
       const className3 = "focus";
@@ -195,8 +195,8 @@ describe("combineProps", () => {
     });
   });
 
-  it("combines css class objects", async () => {
-    createRoot(async dispose => {
+  it("combines css class objects", () => {
+    createRoot(dispose => {
       const classObj1 = { primary: true, outline: true, compact: true };
       const classObj2 = { large: true, compact: false };
 
