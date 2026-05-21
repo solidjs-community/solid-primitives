@@ -5,20 +5,20 @@ import type { MultiSelectListStateOptions, MultiSelectListStateReturn } from "./
 /**
  * Creates a keyboard navigable multi-select list with cursor-based navigation.
  *
- * @param props - Configuration for the multi-select list state
- * @param props.items - The items in the list. Should be in the same order as they appear in the DOM.
- * @param props.initialCursor - The initially focused item (cursor). *Default = `undefined`*
- * @param props.initialActive - The initially active items. *Default = `[]`*
- * @param props.initialSelected - The initially selected items. *Default = `[]`*
- * @param props.orientation - The orientation of the list. *Default = `'vertical'`*
- * @param props.loop - Whether the list should loop. *Default = `true`*
- * @param props.textDirection - The text direction of the list. *Default = `'ltr'`*
- * @param props.handleTab - Whether tab key presses should be handled. *Default = `true`*
- * @param props.vimMode - Whether vim movement key bindings should be used. *Default = `false`*
- * @param props.vimKeys - The vim movement key bindings. *Default = `{ up: 'k', down: 'j', right: 'l', left: 'h' }`*
- * @param props.onCursorChange - Callback fired when the cursor changes.
- * @param props.onActiveChange - Callback fired when the active items change.
- * @param props.onSelectedChange - Callback fired when the selected items change.
+ * @param options - Configuration for the multi-select list state
+ * @param options.items - The items in the list. Should be in the same order as they appear in the DOM.
+ * @param options.initialCursor - The initially focused item (cursor). *Default = `undefined`*
+ * @param options.initialActive - The initially active items. *Default = `[]`*
+ * @param options.initialSelected - The initially selected items. *Default = `[]`*
+ * @param options.orientation - The orientation of the list. *Default = `'vertical'`*
+ * @param options.loop - Whether the list should loop. *Default = `true`*
+ * @param options.textDirection - The text direction of the list. *Default = `'ltr'`*
+ * @param options.handleTab - Whether tab key presses should be handled. *Default = `true`*
+ * @param options.vimMode - Whether vim movement key bindings should be used. *Default = `false`*
+ * @param options.vimKeys - The vim movement key bindings. *Default = `{ up: 'k', down: 'j', right: 'l', left: 'h' }`*
+ * @param options.onCursorChange - Callback fired when the cursor changes.
+ * @param options.onActiveChange - Callback fired when the active items change.
+ * @param options.onSelectedChange - Callback fired when the selected items change.
  * @returns Object with cursor, active, and selected accessors/setters, plus utility methods
  *
  * @example
@@ -29,39 +29,41 @@ import type { MultiSelectListStateOptions, MultiSelectListStateReturn } from "./
  * });
  *
  * <ul onKeyDown={onKeyDown}>
- *   {items().map((item) => (
- *     <li
- *       class={{ cursor: cursor() === item, selected: selected().includes(item) }}
- *       onClick={() => setCursorActive(item)}
- *     >
- *       {item}
- *     </li>
- *   ))}
+ *   <For each={items()}>
+ *     {(item) => (
+ *       <li
+ *         class={{ cursor: cursor() === item, selected: selected().includes(item) }}
+ *         onClick={() => setCursorActive(item)}
+ *       >
+ *         {item}
+ *       </li>
+ *     )}
+ *   </For>
  * </ul>
  * ```
  */
 export function createMultiSelectListState<T>(
-  props: MultiSelectListStateOptions<T>,
+  options: MultiSelectListStateOptions<T>,
 ): MultiSelectListStateReturn<T> {
   const defaultedProps = {
-    initialCursor: props.initialCursor,
-    initialActive: props.initialActive ?? [],
-    initialSelected: props.initialSelected ?? [],
-    orientation: props.orientation ?? "vertical",
-    loop: props.loop ?? true,
-    textDirection: props.textDirection ?? "ltr",
-    handleTab: props.handleTab ?? true,
-    vimMode: props.vimMode ?? false,
-    vimKeys: props.vimKeys ?? {
+    initialCursor: options.initialCursor,
+    initialActive: options.initialActive ?? [],
+    initialSelected: options.initialSelected ?? [],
+    orientation: options.orientation ?? "vertical",
+    loop: options.loop ?? true,
+    textDirection: options.textDirection ?? "ltr",
+    handleTab: options.handleTab ?? true,
+    vimMode: options.vimMode ?? false,
+    vimKeys: options.vimKeys ?? {
       up: "k",
       down: "j",
       right: "l",
       left: "h",
     },
-    items: props.items,
-    onCursorChange: props.onCursorChange,
-    onActiveChange: props.onActiveChange,
-    onSelectedChange: props.onSelectedChange,
+    items: options.items,
+    onCursorChange: options.onCursorChange,
+    onActiveChange: options.onActiveChange,
+    onSelectedChange: options.onSelectedChange,
   };
 
   const [cursor, setCursor] = createSignal<T | undefined>(defaultedProps.initialCursor as never);
