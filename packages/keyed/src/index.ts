@@ -3,16 +3,15 @@ import {
   createMemo,
   createRoot,
   createSignal,
-  type JSX,
-  on,
   onCleanup,
   type Setter,
   untrack,
   $TRACK,
   mapArray,
-  type AccessorArray,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import type { JSX } from "@solidjs/web";
+import { isServer } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 const FALLBACK = Symbol("fallback");
 
@@ -114,10 +113,10 @@ export function keyArray<T, U, K>(
 
   function addNewItem(list: U[], item: T, i: number, key: K): void {
     createRoot(dispose => {
-      const [getItem, setItem] = createSignal(item);
+      const [getItem, setItem] = createSignal(item as Exclude<T, Function>, INTERNAL_OPTIONS);
       const save = { setItem, dispose } as Save;
       if (mapFn.length > 1) {
-        const [index, setIndex] = createSignal(i);
+        const [index, setIndex] = createSignal(i, INTERNAL_OPTIONS);
         save.setIndex = setIndex;
         save.mapped = mapFn(getItem, index);
       } else save.mapped = (mapFn as any)(getItem);
@@ -277,18 +276,31 @@ export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Elem
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Rerun
  */
 export function Rerun<S>(props: {
-  on: AccessorArray<S> | Accessor<S>;
+  on: Accessor<S>[] | Accessor<S>;
   children: RerunChildren<S>;
 }): JSX.Element;
 export function Rerun<
   S extends (object | string | bigint | number | boolean) & { length?: never },
 >(props: { on: S; children: RerunChildren<S> }): JSX.Element;
 export function Rerun(props: { on: any; children: RerunChildren<any> }): JSX.Element {
-  const key = typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
+  const key =
+    typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
+  const getKey = Array.isArray(key)
+    ? () => (key as Accessor<unknown>[]).map(fn => fn())
+    : (key as Accessor<unknown>);
+
+  let prevKey: unknown;
   return createMemo(
-    on(key, (a, b) => {
+    () => {
+      const currentKey = getKey();
       const child = props.children;
-      return typeof child === "function" && child.length > 0 ? (child as any)(a, b) : child;
-    }),
+      const el =
+        typeof child === "function" && (child as Function).length > 0
+          ? (child as any)(currentKey, prevKey)
+          : child;
+      prevKey = currentKey;
+      return el;
+    },
+    { equals: false },
   ) as unknown as JSX.Element;
 }
