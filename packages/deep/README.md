@@ -41,20 +41,23 @@ import { trackDeep } from "@solid-primitives/deep";
 
 const [state, setState] = createStore({ name: "John", age: 42 });
 
-createEffect(() => {
-  trackDeep(state);
-  /* execute some logic whenever the state changes */
-});
+createEffect(
+  () => trackDeep(state),
+  () => {
+    /* execute some logic whenever the state changes */
+  }
+);
 ```
 
 Or since this has a composable design, you can create _derivative_ functions and use them similar to derivative signals.
 
 ```ts
 const deeplyTrackedStore = () => trackDeep(sign);
-createEffect(() => {
-  console.log("Store is: ", deeplyTrackedStore());
-  //                        ^ this causes a re-execution of the effect on deep changes of properties
-});
+createEffect(
+  () => deeplyTrackedStore(),
+  //    ^ this causes a re-execution of the effect on deep changes of properties
+  value => console.log("Store is:", value)
+);
 ```
 
 `trackDeep` will traverse any "wrappable" object _(objects that solid stores will wrap with proxies)_, even if it's not a solid store.
@@ -66,15 +69,17 @@ createEffect(() => {
 });
 ```
 
-> **Warning** If you `unwrap` a store, it will no longer be tracked by `trackDeep` nor `trackStore`!
+> **Warning** If you `snapshot` a store, it will no longer be tracked by `trackDeep` nor `trackStore`!
 
 ```ts
-const unwrapped = unwrap(state);
+import { snapshot } from "solid-js";
 
-createEffect(() => {
-  // This will NOT work:
-  trackDeep(unwrapped);
-});
+const plain = snapshot(state);
+
+createEffect(
+  () => trackDeep(plain), // This will NOT work — plain objects are not reactive
+  () => {}
+);
 ```
 
 ## `trackStore`
@@ -92,10 +97,12 @@ import { trackStore } from "@solid-primitives/deep";
 
 const [state, setState] = createStore({ name: "John", age: 42 });
 
-createEffect(() => {
-  trackStore(state);
-  /* execute some logic whenever the state changes */
-});
+createEffect(
+  () => trackStore(state),
+  () => {
+    /* execute some logic whenever the state changes */
+  }
+);
 ```
 
 ## `captureStoreUpdates`
@@ -115,7 +122,7 @@ const getDelta = captureStoreUpdates(state);
 
 getDelta(); // [{ path: [], value: { todos: [] } }]
 
-setState("todos", ["foo"]);
+setState(s => { s.todos = ["foo"]; });
 
 getDelta(); // [{ path: ["todos"], value: ["foo"] }]
 ```
@@ -127,11 +134,13 @@ const [state, setState] = createStore({ todos: [] });
 
 const getDelta = captureStoreUpdates(state);
 
-createEffect(() => {
-  const delta = getDelta();
-  /* execute some logic whenever the state changes */
-  console.log(delta);
-});
+createEffect(
+  () => getDelta(),
+  delta => {
+    /* execute some logic whenever the state changes */
+    console.log(delta);
+  }
+);
 ```
 
 The returned function is not a signal - it won't get updated by itself, it has to be called manually, or under a tracking scope to capture new updates.
@@ -144,12 +153,14 @@ const [state, setState] = createStore({ todos: [] });
 const delta = createMemo(captureStoreUpdates(state));
 
 // both of these effects will receive the same delta
-createEffect(() => {
-  console.log(delta());
-});
-createEffect(() => {
-  console.log(delta());
-});
+createEffect(
+  () => delta(),
+  value => console.log(value)
+);
+createEffect(
+  () => delta(),
+  value => console.log(value)
+);
 ```
 
 ### Demo

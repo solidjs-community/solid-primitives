@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
-import { batch, createEffect, createRoot, createSignal } from "solid-js";
+import { createEffect, createRoot, createSignal, flush } from "solid-js";
+import { createStore, reconcile } from "solid-js";
 import { captureStoreUpdates } from "../src/index.js";
-import { createStore } from "solid-js/store";
 
 describe("createStoreDelta", () => {
   test("initial value", () => {
@@ -22,12 +22,15 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    set("a", "a.b", "minds");
+    set(s => { s.a["a.b"] = "minds"; });
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       {
@@ -36,7 +39,8 @@ describe("createStoreDelta", () => {
       },
     ] satisfies ReturnType<typeof diff>);
 
-    set("b", "bar");
+    set(s => { s.b = "bar"; });
+    flush();
     expect(captured).toHaveLength(3);
     expect(captured[2]).toEqual([
       {
@@ -52,15 +56,16 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    batch(() => {
-      set("a", "ab", "minds");
-      set("b", "ba", 2);
-    });
+    set(s => { s.a.ab = "minds"; });
+    set(s => { s.b.ba = 2; });
+    flush();
 
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
@@ -81,15 +86,16 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    batch(() => {
-      set("a", "a.b", "minds");
-      set("b", "bar");
-    });
+    set(s => { s.a["a.b"] = "minds"; });
+    set(s => { s.b = "bar"; });
+    flush();
 
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
@@ -104,16 +110,18 @@ describe("createStoreDelta", () => {
     const captured: any[] = [];
     const [sign] = createStore({ a: { "a.b": "thoughts" } });
     const diff = captureStoreUpdates(sign);
-    const [track, trigger] = createSignal(undefined, { equals: false });
+    const [track, trigger] = createSignal<undefined>(undefined, { equals: false });
 
     createRoot(() => {
-      createEffect(() => {
-        track();
-        captured.push(diff());
-      });
+      createEffect(
+        () => { track(); return diff(); },
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    trigger();
+    trigger(undefined);
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([]);
   });
@@ -124,12 +132,15 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    set("b", "foo");
+    set((s: any) => { s.b = "foo"; });
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       {
@@ -145,12 +156,15 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    set("b", undefined);
+    set(s => { (s as any).b = undefined; });
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       {
@@ -166,12 +180,15 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    set({ a: { "a.b": "minds" } });
+    set(() => ({ a: { "a.b": "minds" } }));
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       {
@@ -187,12 +204,15 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    set("b", 0, "bar");
+    set(s => { s.b[0] = "bar"; });
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       {
@@ -201,7 +221,8 @@ describe("createStoreDelta", () => {
       },
     ] satisfies ReturnType<typeof diff>);
 
-    set("b", 1, "baz");
+    set(s => { (s.b as any)[1] = "baz"; });
+    flush();
     expect(captured).toHaveLength(3);
     expect(captured[2]).toEqual([
       {
@@ -217,12 +238,15 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    set(0, "n", 1);
+    set(s => { s[0].n = 1; });
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       {
@@ -238,12 +262,15 @@ describe("createStoreDelta", () => {
     const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
-      createEffect(() => {
-        captured.push(diff());
-      });
+      createEffect(
+        () => diff(),
+        updates => { captured.push(updates); },
+      );
     });
+    flush();
 
-    set("a", "ab", sign);
+    set((s: any) => { s.a.ab = sign; });
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       {

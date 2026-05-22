@@ -1,7 +1,6 @@
 import { createLazyMemo } from "@solid-primitives/memo";
-import { $PROXY, $TRACK, type Accessor, createRoot, untrack } from "solid-js";
-import { unwrap } from "solid-js/store";
-import { isDev, isServer } from "solid-js/web";
+import { $PROXY, $TRACK, type Accessor, DEV, runWithOwner, untrack, snapshot } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 type Static<T = unknown> = { [K in number | string]: T } | T[];
 
@@ -28,14 +27,15 @@ function getStoreNodechildren(node: StoreNode): StoreNodeChildren {
   let signal = StoreNodeChildrenCache.get(node);
 
   if (!signal) {
-    const unwrapped = unwrap(node),
-      isArray = Array.isArray(unwrapped);
+    const isArray = Array.isArray(node);
 
-    signal = createRoot(() =>
+    signal = runWithOwner(null, () =>
       createLazyMemo(() => {
         node[$TRACK];
+        // take a plain snapshot inside untrack so we don't add per-key tracking subscriptions
+        const unwrapped = untrack(() => snapshot(node));
         const children: StoreNodeChildren = isArray ? [] : {};
-        for (const [key, child] of entries(unwrapped)) {
+        for (const [key, child] of entries(unwrapped as Static)) {
           let childNode: any;
           if (
             child != null &&
@@ -50,10 +50,10 @@ function getStoreNodechildren(node: StoreNode): StoreNodeChildren {
       }),
     );
 
-    StoreNodeChildrenCache.set(node, signal);
+    StoreNodeChildrenCache.set(node, signal!);
   }
 
-  return signal();
+  return signal!();
 }
 
 export type AllNestedObjects<T> = T extends Static<infer U> ? AllNestedObjects<U> | T : never;
@@ -125,7 +125,7 @@ function compareStoreWithCache(
  *
  * getDelta(); // [{ path: [], value: { todos: [] } }]
  *
- * setState("todos", ["foo"]);
+ * setState(s => { s.todos = ["foo"]; });
  *
  * getDelta(); // [{ path: ["todos"], value: ["foo"] }]
  * ```
@@ -134,7 +134,7 @@ export function captureStoreUpdates<T extends Static>(store: T): () => NestedUpd
   // on the server you cannot check if the passed object is a store
   // so we just return the whole store always
   if (isServer || !($TRACK in store)) {
-    if (isDev) {
+    if (DEV) {
       // eslint-disable-next-line no-console
       console.warn("createStoreDelta expects a store, got", store);
     }
