@@ -76,9 +76,7 @@ v.value; // "foo"
 
 if (v.type === "idle") {
   v.to.loading(1000);
-
-  v.type; // "loading"
-  v.value; // "bar"
+  // state is now "loading" after the next reactive flush
 }
 ```
 
@@ -93,9 +91,21 @@ if (state.type === "idle") {
 }
 ```
 
+> **Note:** Transitions via `state.to.*()` are batched and applied asynchronously (microtask). In reactive contexts such as JSX or effects, the updated state is reflected automatically. In tests or imperative code, call `flush()` from `solid-js` after a transition to read the updated state synchronously.
+>
+> ```ts
+> import { flush } from "solid-js";
+>
+> state.to.loading(1000);
+> flush();
+> state.type; // "loading"
+> ```
+
 ### Lifecycle
 
 `createMachine` is implemented using `createMemo`, which reruns when the state is changed. This means that any reactive computations can be used inside the state callbacks and they will be disposed when the state changes. (owner context will be available in the callbacks)
+
+State callbacks that immediately call `next.*()` (inline transitions to another state) are resolved synchronously within the same reactive computation — no flush is needed to see the final settled state.
 
 ```tsx
 const state = createMachine({
