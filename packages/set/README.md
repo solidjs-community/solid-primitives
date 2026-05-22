@@ -40,11 +40,15 @@ import { ReactiveSet } from "@solid-primitives/set";
 ```ts
 const set = new ReactiveSet([1, 1, 2, 3]);
 
-// listen for changes reactively
-createEffect(() => {
-  [...set]; // => [1,2,3] (reactive on any change)
-  set.has(2); // => true (reactive on change to the result)
-});
+// listen for changes reactively (split effect: compute → apply)
+createEffect(
+  () => [...set],
+  values => console.log("set contents:", values), // => [1,2,3] (reactive on any change)
+);
+createEffect(
+  () => set.has(2),
+  exists => console.log("has 2:", exists), // => true (reactive on change to the result)
+);
 
 // apply like with normal Set
 set.add(4);
@@ -69,10 +73,11 @@ import { ReactiveWeakSet } from "@solid-primitives/set";
 ```ts
 const set = new ReactiveWeakSet([1, 1, 2, 3]);
 
-// listen for changes reactively
-createEffect(() => {
-  set.has(2); // => true (reactive on change to the result)
-});
+// listen for changes reactively (split effect: compute → apply)
+createEffect(
+  () => set.has(2),
+  exists => console.log("has 2:", exists), // reactive on change to the result
+);
 
 // apply changes like with normal Set
 set.add(4);

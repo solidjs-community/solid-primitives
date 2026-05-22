@@ -1,4 +1,4 @@
-import { type Accessor, batch } from "solid-js";
+import { type Accessor } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
 const $KEYS = Symbol("track-keys");
@@ -65,10 +65,8 @@ export class ReactiveSet<T> extends Set<T> {
   add(value: T): this {
     if (!super.has(value)) {
       super.add(value);
-      batch(() => {
-        this.#triggers.dirty(value);
-        this.#triggers.dirty($KEYS);
-      });
+      this.#triggers.dirty(value);
+      this.#triggers.dirty($KEYS);
     }
 
     return this;
@@ -78,10 +76,8 @@ export class ReactiveSet<T> extends Set<T> {
     const result = super.delete(value);
 
     if (result) {
-      batch(() => {
-        this.#triggers.dirty(value);
-        this.#triggers.dirty($KEYS);
-      });
+      this.#triggers.dirty(value);
+      this.#triggers.dirty($KEYS);
     }
 
     return result;
@@ -89,13 +85,11 @@ export class ReactiveSet<T> extends Set<T> {
 
   clear(): void {
     if (!super.size) return;
-    batch(() => {
-      this.#triggers.dirty($KEYS);
-      for (const member of super.values()) {
-        this.#triggers.dirty(member);
-      }
-      super.clear();
-    });
+    this.#triggers.dirty($KEYS);
+    for (const member of super.values()) {
+      this.#triggers.dirty(member);
+    }
+    super.clear();
   }
 }
 
