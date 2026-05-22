@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/set",
   "version": "0.7.3",
-  "description": "The Set & WeakSet data structures as a reactive signals.",
+  "description": "Reactive Set and WeakSet primitives with set-algebra operations: union, intersection, difference, and symmetricDifference.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/set",
@@ -17,13 +17,23 @@
     "stage": 2,
     "list": [
       "ReactiveSet",
-      "ReactiveWeakSet"
+      "ReactiveWeakSet",
+      "union",
+      "intersection",
+      "difference",
+      "symmetricDifference",
+      "readonlySet"
     ],
     "category": "Reactivity"
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "set",
+    "reactive",
+    "union",
+    "intersection",
+    "difference"
   ],
   "private": false,
   "sideEffects": false,

@@ -1,4 +1,4 @@
-import { type Accessor } from "solid-js";
+import { type Accessor, createMemo } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
 const $KEYS = Symbol("track-keys");
@@ -147,4 +147,69 @@ export function createSet<T>(initial?: T[]): SignalSet<T> {
 /** @deprecated */
 export function createWeakSet<T extends object>(initial?: T[]): ReactiveWeakSet<T> {
   return new ReactiveWeakSet(initial);
+}
+
+/**
+ * Reactive union — elements that appear in `a`, `b`, or both.
+ * Re-derives when either input changes.
+ */
+export function union<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    const result = new Set<T>(a);
+    for (const v of b) result.add(v);
+    return result;
+  });
+}
+
+/**
+ * Reactive intersection — elements that appear in both `a` and `b`.
+ * Re-derives when either input changes.
+ */
+export function intersection<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    const result = new Set<T>();
+    for (const v of a) {
+      if (b.has(v)) result.add(v);
+    }
+    return result;
+  });
+}
+
+/**
+ * Reactive difference — elements in `a` that do not appear in `b`.
+ * Re-derives when either input changes.
+ */
+export function difference<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    const result = new Set<T>();
+    for (const v of a) {
+      if (!b.has(v)) result.add(v);
+    }
+    return result;
+  });
+}
+
+/**
+ * Reactive symmetric difference — elements in `a` or `b`, but not both.
+ * Re-derives when either input changes.
+ */
+export function symmetricDifference<T>(
+  a: ReadonlySet<T>,
+  b: ReadonlySet<T>,
+): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    const result = new Set<T>(a);
+    for (const v of b) {
+      if (result.has(v)) result.delete(v);
+      else result.add(v);
+    }
+    return result;
+  });
+}
+
+/**
+ * Casts a `ReactiveSet` to `ReadonlySet` to prevent callers from mutating it.
+ */
+export function readonlySet<T>(set: ReactiveSet<T>): ReadonlySet<T> {
+  return set;
 }

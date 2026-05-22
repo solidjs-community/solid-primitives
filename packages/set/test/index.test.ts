@@ -1,5 +1,13 @@
 import { describe, test, it, expect, vi } from "vitest";
-import { ReactiveSet, ReactiveWeakSet } from "../src/index.js";
+import {
+  ReactiveSet,
+  ReactiveWeakSet,
+  union,
+  intersection,
+  difference,
+  symmetricDifference,
+  readonlySet,
+} from "../src/index.js";
 import { createEffect, createRoot, flush } from "solid-js";
 
 describe("ReactiveSet", () => {
@@ -326,5 +334,167 @@ describe("ReactiveWeakSet", () => {
 
       dispose();
     });
+  });
+});
+
+describe("union", () => {
+  it("contains all elements from both sets", () =>
+    createRoot(dispose => {
+      const a = new ReactiveSet([1, 2, 3]);
+      const b = new ReactiveSet([3, 4, 5]);
+      const u = union(a, b);
+
+      expect([...u()]).toEqual([1, 2, 3, 4, 5]);
+
+      b.add(6);
+      flush();
+      expect([...u()]).toEqual([1, 2, 3, 4, 5, 6]);
+
+      a.delete(3);
+      flush();
+      expect([...u()]).toEqual([1, 2, 3, 4, 5, 6]); // 3 still present via b
+
+      b.delete(3);
+      flush();
+      expect([...u()]).toEqual([1, 2, 4, 5, 6]);
+
+      a.clear();
+      flush();
+      expect([...u()]).toEqual([4, 5, 6]);
+
+      dispose();
+    }));
+
+  it("updates when b changes", () =>
+    createRoot(dispose => {
+      const a = new ReactiveSet([1, 2]);
+      const b = new ReactiveSet([3]);
+      const u = union(a, b);
+
+      expect([...u()]).toEqual([1, 2, 3]);
+
+      b.add(4);
+      flush();
+      expect([...u()]).toEqual([1, 2, 3, 4]);
+
+      dispose();
+    }));
+});
+
+describe("intersection", () => {
+  it("contains only shared elements", () =>
+    createRoot(dispose => {
+      const a = new ReactiveSet([1, 2, 3]);
+      const b = new ReactiveSet([2, 3, 4]);
+      const i = intersection(a, b);
+
+      expect([...i()]).toEqual([2, 3]);
+
+      a.add(4);
+      flush();
+      expect([...i()]).toEqual([2, 3, 4]);
+
+      b.delete(3);
+      flush();
+      expect([...i()]).toEqual([2, 4]);
+
+      a.delete(2);
+      flush();
+      expect([...i()]).toEqual([4]);
+
+      dispose();
+    }));
+
+  it("does not re-derive when an unshared element is added to b", () =>
+    createRoot(dispose => {
+      const a = new ReactiveSet([1, 2]);
+      const b = new ReactiveSet([2]);
+      const fn = vi.fn(() => [...intersection(a, b)()]);
+
+      // call once to get initial value and set up tracking
+      fn();
+
+      b.add(99); // 99 is not in a — intersection unchanged
+      flush();
+
+      // fn was not called reactively; memo didn't invalidate
+      expect(fn).toHaveBeenCalledTimes(1);
+
+      dispose();
+    }));
+});
+
+describe("difference", () => {
+  it("contains elements in a that are not in b", () =>
+    createRoot(dispose => {
+      const a = new ReactiveSet([1, 2, 3]);
+      const b = new ReactiveSet([2, 3]);
+      const d = difference(a, b);
+
+      expect([...d()]).toEqual([1]);
+
+      a.add(4);
+      flush();
+      expect([...d()]).toEqual([1, 4]);
+
+      b.add(1);
+      flush();
+      expect([...d()]).toEqual([4]);
+
+      b.delete(2);
+      flush();
+      expect([...d()]).toEqual([2, 4]); // 2 is back: no longer in b
+
+      a.clear();
+      flush();
+      expect([...d()]).toEqual([]);
+
+      dispose();
+    }));
+});
+
+describe("symmetricDifference", () => {
+  it("contains elements in either set but not both", () =>
+    createRoot(dispose => {
+      const a = new ReactiveSet([1, 2, 3]);
+      const b = new ReactiveSet([2, 3, 4]);
+      const s = symmetricDifference(a, b);
+
+      expect([...s()]).toEqual([1, 4]);
+
+      a.add(4);
+      flush();
+      expect([...s()]).toEqual([1]);
+
+      b.add(1);
+      flush();
+      expect([...s()]).toEqual([]);
+
+      a.delete(2);
+      flush();
+      expect([...s()]).toEqual([2]);
+
+      dispose();
+    }));
+});
+
+describe("readonlySet", () => {
+  it("returns the same instance typed as ReadonlySet", () => {
+    const set = new ReactiveSet([1, 2, 3]);
+    const ro = readonlySet(set);
+
+    expect(ro).toBe(set);
+    expect(ro.has(1)).toBe(true);
+    expect(ro.size).toBe(3);
+    expect([...ro]).toEqual([1, 2, 3]);
+  });
+
+  it("reflects mutations made through the original reference", () => {
+    const set = new ReactiveSet([1, 2]);
+    const ro = readonlySet(set);
+
+    set.add(3);
+    expect(ro.has(3)).toBe(true);
+    expect(ro.size).toBe(3);
   });
 });
