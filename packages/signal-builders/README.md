@@ -8,23 +8,23 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/signal-builders?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/signal-builders)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A collection of chainable and composable reactive signal calculations, _AKA_ **Signal Builders**.
+A collection of chainable, composable reactive computations — **Signal Builders** — for common array, object, number, string, and type-conversion operations.
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/signal-builders
 # or
-yarn add @solid-primitives/signal-builders
+pnpm add @solid-primitives/signal-builders
 ```
 
-**Requires** `solid-js@^2.0.0-beta.13` as a peer dependency.
+Requires `solid-js@^2.0.0-beta.13` as a peer dependency.
 
-## How to use it
+## Usage
 
-Signal builders create computations when used, so they need to be used under a reactive root.
+Each builder wraps its computation in `createMemo`, so results only update when the computed value actually changes. Builders must be called inside a reactive owner (a component body or `createRoot`), and computations should be kept pure — avoid side effects inside them.
 
-Note, since all of the signal builders use [`createMemo`](https://www.solidjs.com/docs/latest/api#creatememo) to wrap the calculation, updates will be caused only when the calculated value changes. Also the calculations should stay 'pure' – try to not cause side effects inside them.
+Because each builder returns an `Accessor<T>`, the output of one can be passed directly as input to another:
 
 ### Array
 
@@ -58,10 +58,10 @@ modifiedUser(); // { name: { first: "John", last: "Solid" }, age: 21 }
 import { add, multiply, clamp, int } from "@solid-primitives/signal-builders";
 
 const [input, setInput] = createSignal("123");
-const [ing, setIng] = createSignal(-45);
+const [offset, setOffset] = createSignal(-45);
 const [max, setMax] = createSignal(1000);
 
-const value = clamp(multiply(int(input), add(ing, 54, 9)), 0, max);
+const value = clamp(multiply(int(input), add(offset, 54, 9)), 0, max);
 ```
 
 ### String
@@ -73,74 +73,67 @@ const [greeting, setGreeting] = createSignal("Hello");
 const [target, setTarget] = createSignal("World");
 
 const message = template`${greeting}, ${target}!`;
-message(); // => Hello, World!
+message(); // => "Hello, World!"
 
 const solidMessage = lowercase(add(substring(message, 0, 7), "Solid"));
-solidMessage(); // => hello, solid
+solidMessage(); // => "hello, solid"
 ```
 
-## List of builders
+## Builder Reference
 
 ### Array
 
-- **`push`** - basically `Array.prototype.push()`
-- **`drop`** - drop n items from the array start
-- **`dropRight`** - drop n items from the end of the array
-- **`filter`** - basically `Array.prototype.filter()`
-- **`filterOut`** - filter out passed item from an array
-- **`remove`** - removes passed item from an array (first one from the start)
-- **`removeItems`** - removes multiple items from an array
-- **`splice`** - signal-builder `Array.prototype.splice()`
-- **`slice`** - signal-builder `Array.prototype.slice()`
-- **`map`** - signal-builder `Array.prototype.map()`
-- **`sort`** - signal-builder `Array.prototype.sort()`
-- **`concat`** - Append multiple arrays together
-- **`flatten`** - Flattens a nested array into a one-level array
-- **`filterInstance`** - filter list: only leave items that are instances of specified Classes
-- **`filterOutInstance`** - filter list: remove items that are instances of specified Classes
-
-### Object/Array
-
-- **`get`** - Get a single property value of an object by specifying a path to it.
-- **`update`** - Change single value in an object by key, or series of recursing keys.
+- **`push`** — append items to an array
+- **`drop`** — remove n items from the start
+- **`dropRight`** — remove n items from the end
+- **`filter`** — `Array.prototype.filter()`
+- **`filterOut`** — remove all occurrences of a specific item
+- **`remove`** — remove the first occurrence of a specific item
+- **`removeItems`** — remove multiple specific items
+- **`splice`** — `Array.prototype.splice()`
+- **`slice`** — `Array.prototype.slice()`
+- **`map`** — `Array.prototype.map()`
+- **`sort`** — `Array.prototype.sort()`
+- **`concat`** — concatenate multiple arrays
+- **`flatten`** — flatten one level of nesting
+- **`filterInstance`** — keep only items that are instances of the specified classes
+- **`filterOutInstance`** — remove items that are instances of the specified classes
 
 ### Object
 
-- **`omit`** - get an object copy without the provided keys
-- **`pick`** - get an object copy with only the provided keys
-- **`merge`** - Merges multiple objects into a single one.
+- **`omit`** — copy an object without the specified keys
+- **`pick`** — copy an object with only the specified keys
+- **`get`** — read a value at a key path (up to 6 levels deep)
+- **`merge`** — shallow merge of multiple objects
+- **`update`** — immutably set a value at a key path; the last argument can be a new value or a setter function `(prev) => next`
 
 ### Convert
 
-- **`string`** - turns passed value to a string
-- **`float`** - turns passed string to an float number
-- **`int`** - turns passed string to an intiger
-- **`join`** - join array with a separator to a string
+- **`string`** — convert a value to a string
+- **`float`** — parse a string as a float (`Number.parseFloat`)
+- **`int`** — parse a string as an integer (`Number.parseInt`)
+- **`join`** — join an array into a string with a separator
 
 ### Number
 
-- **`add`** - `a + b + c + ...`
-- **`substract`** - `a - b - c - ...`
-- **`multiply`** - `a * b * c * ...`
-- **`divide`** - `a / b / c / ...`
-- **`power`** - `a ** b ** c ** ...`
-- **`clamp`** - clamp a number value between two other values
-- **`round`** - `Math.round()`
-- **`ceil`** - `Math.ceil()`
-- **`floor`** - `Math.floor()`
+- **`add`** — `a + b + c + ...`
+- **`substract`** — `a - b - c - ...`
+- **`multiply`** — `a * b * c * ...`
+- **`divide`** — `a / b / c / ...`
+- **`power`** — `a ** b ** c ** ...`
+- **`clamp`** — constrain a value between min and max
+- **`round`** — `Math.round()`
+- **`ceil`** — `Math.ceil()`
+- **`floor`** — `Math.floor()`
 
 ### String
 
-- **`add`** - `a + b + c + ...`
-- **`lowercase`** - signal builder `String.prototype.toLowerCase()`
-- **`uppercase`** - signal builder `String.prototype.toUpperCase()`
-- **`capitalize`** - capitalize a string input e.g. `"solidJS"` -> `"Solidjs"`
-- **`substring`** - signal builder `String.prototype.substring()`
-- **`template`** - Create reactive string templates
-
-## A call for feedback
-
-`signal-builders` package is now a proof of concept of a fresh and experimental idea. Therefore all feedback/ideas/issues are highly welcome! :)
+- **`lowercase`** — `String.prototype.toLowerCase()`
+- **`uppercase`** — `String.prototype.toUpperCase()`
+- **`capitalize`** — capitalize the first character and lowercase the rest
+- **`substring`** — `String.prototype.substring()`
+- **`add`** — `a + b + c + ...` (string concatenation)
+- **`template`** — reactive tagged template literal
 
 ## Changelog
 

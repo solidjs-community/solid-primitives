@@ -8,9 +8,6 @@ import {
 import { type Accessor, createMemo } from "solid-js";
 import * as _ from "@solid-primitives/utils/immutable";
 
-/**
- * Signal Builder: Create a new subset object without the provided keys
- */
 export const omit = <
   A extends MaybeAccessor<object>,
   O extends MaybeAccessorValue<A>,
@@ -20,9 +17,6 @@ export const omit = <
   ...keys: MaybeAccessor<K>[]
 ): Accessor<Omit<O, K>> => createMemo(() => _.omit<any, any>(access(object), ...accessArray(keys)));
 
-/**
- * Signal Builder: Create a new subset object with only the provided keys
- */
 export const pick = <
   A extends MaybeAccessor<object>,
   O extends MaybeAccessorValue<A>,
@@ -32,9 +26,6 @@ export const pick = <
   ...keys: MaybeAccessor<K>[]
 ): Accessor<Pick<O, K>> => createMemo(() => _.pick<any, any>(access(object), ...accessArray(keys)));
 
-/**
- * Signal Builder: Get a single property value of an object by specifying a path to it.
- */
 export function get<O extends object, K extends keyof O>(
   obj: MaybeAccessor<O>,
   key: MaybeAccessor<K>,
@@ -104,9 +95,7 @@ export function get(obj: any, ...keys: any[]) {
   return createMemo(() => _.get(access(obj), ...(accessArray(keys) as [any, any])));
 }
 
-/**
- * Signal Builder: Merges multiple objects into a single one. Only the first level of properties is merged.
- */
+/** Shallow merge — only top-level properties are combined. */
 export function merge<A extends object, B extends object>(
   a: MaybeAccessor<A>,
   b: MaybeAccessor<B>,
