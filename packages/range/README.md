@@ -10,8 +10,9 @@
 
 Control Flow Primitives for displaying a number range or given number of elements.
 
+- [`createNumericRange`](#createnumericrange) - Reactively generates a number array for a given range. Convenient companion to the built-in `<For>`.
 - [`repeat`](#repeat) - Primitive for mapping a number of elements. Underlying helper for the [`<Repeat>`](#repeat-1) control flow.
-- [`<Repeat>`](#repeat-1) - Control Flow Component for displaying a number of elements.
+- [`<Repeat>`](#repeat-1) - Control Flow Component for displaying a number of elements. ⚠️ Deprecated — use Solid 2.0's built-in `<Repeat>`.
 - [`mapRange`](#maprange) - Primitive for mapping a number range of given start, end, and step values. Underlying helper for the [`<Range>`](#range) control flow.
 - [`<Range>`](#range) - Control Flow Component for displaying a number range of elements.
 - [`indexRange`](#indexrange) - Primitive for mapping a number range while keeping previous elements of the same index. Underlying helper for the [`<IndexRange>`](#indexrange-1) control flow.
@@ -27,9 +28,42 @@ yarn add @solid-primitives/range
 
 Requires `solid-js` and `@solidjs/web` v2.0.0-beta.13 or later as peer dependencies.
 
+## `createNumericRange`
+
+Reactively generates an array of numbers for the given range. Mirrors the `range()` API from Python — one argument gives `[0, to)`, two or three give `[start, to)` with an optional step.
+
+All arguments accept either a plain number or a reactive accessor. Pairs naturally with Solid 2.0's built-in `<For>`.
+
+```ts
+// static
+createNumericRange(5)         // [0, 1, 2, 3, 4]
+createNumericRange(2, 7)      // [2, 3, 4, 5, 6]
+createNumericRange(0, 10, 2)  // [0, 2, 4, 6, 8]
+createNumericRange(5, 0)      // [5, 4, 3, 2, 1]  (descending)
+
+// reactive
+const [to, setTo] = createSignal(5);
+const nums = createNumericRange(to);  // updates when `to` changes
+
+// compose with <For> — pass the signal, not the called value
+const nums = createNumericRange(count);
+<For each={nums()}>{n => <div>{n}</div>}</For>
+```
+
+#### Definition
+
+```ts
+function createNumericRange(to: MaybeAccessor<number>): Accessor<number[]>;
+function createNumericRange(
+  start: MaybeAccessor<number>,
+  to: MaybeAccessor<number>,
+  step?: MaybeAccessor<number>,
+): Accessor<number[]>;
+```
+
 ## `repeat`
 
-Reactively maps a number range of specified length with a callback function - underlying helper for the [`<Repeat>`](#repeat-1) control flow.
+Reactively maps a number range of specified length with a callback function - underlying helper for the `<Repeat>` control flow.
 
 ```ts
 const [length, setLength] = createSignal(10)
@@ -52,7 +86,26 @@ function repeat<T>(
 ): Accessor<T[]>;
 ```
 
-## `<Repeat>`
+## `<Repeat>` ⚠️ Deprecated
+
+> **Deprecated** — Solid 2.0 ships a built-in `<Repeat>` in `@solidjs/web`. Migrate to that:
+>
+> ```tsx
+> import { Repeat } from "@solidjs/web";
+>
+> // basic — children receive a plain index number
+> <Repeat count={10}>{(i) => <div>{i}</div>}</Repeat>
+>
+> // with offset (replaces a start > 0 use-case)
+> <Repeat count={8} from={2}>{(i) => <div>{i}</div>}</Repeat>
+>
+> // with fallback — wrap in <Show> since built-in <Repeat> has no fallback prop
+> <Show when={count() > 0} fallback={<p>no items</p>}>
+>   <Repeat count={count()}>{(i) => <div>{i}</div>}</Repeat>
+> </Show>
+> ```
+>
+> **Note:** The built-in `<Repeat>` does not diff — it re-renders all children when `count` changes. If incremental creation/disposal of children is important for your use case, keep using this primitive.
 
 Control Flow component for displaying a specified number of elements.
 
@@ -86,9 +139,9 @@ function Repeat<T>(props: {
 
 ## `mapRange`
 
-Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the [`<Range>`](#range) control flow.
+Reactively maps a number range of specified `start`, `to` and `step`, with a callback function - underlying helper for the [`<Range>`](#range) control flow.
 
-All `stop`, `to` and `step` arguments are accessors, and changing them will cause the mapped array to be recalculated, mapping new items for numbers added to the range.
+All `start`, `to` and `step` arguments are accessors, and changing them will cause the mapped array to be recalculated, mapping new items for numbers added to the range.
 
 `step` will become negative _(the range will be descending)_ if `to` is smaller than `start`. Range stops at `to`, it is not included in the range.
 
@@ -121,7 +174,7 @@ function mapRange<T>(
 
 Creates a list of elements by mapping a number range of specified `start`, `to`, and `step`.
 
-All `stop`, `to` and `step` props are reactive, and changing them will cause the elements array to be recalculated, creating new elements for numbers added to the range.
+All `start`, `to` and `step` props are reactive, and changing them will cause the elements array to be recalculated, creating new elements for numbers added to the range.
 
 - `start` defaults to 0.
 
@@ -159,7 +212,7 @@ const [step, setStep] = createSignal(2);
 
 #### Definition
 
-`RangeProps` is an interface of `stop`, `to` and `step` props, OR `0`, `1` and `2` indexes of a spread array.
+`RangeProps` is an interface of `start`, `to` and `step` props, OR `0`, `1` and `2` indexes of a spread array.
 
 ```ts
 function Range<T>(
@@ -172,9 +225,9 @@ function Range<T>(
 
 ## `indexRange`
 
-Primitive for mapping a number range of specified `stop`, `to` and `step`, while keeping previous elements of the same index. Underlying helper for the [`<IndexRange>`](#indexrange-1) control flow.
+Primitive for mapping a number range of specified `start`, `to` and `step`, while keeping previous elements of the same index. Underlying helper for the [`<IndexRange>`](#indexrange-1) control flow.
 
-All `stop`, `to` and `step` arguments are accessors, and changing them will cause the mapped array to be recalculated, mapping new items appended at the end of the range.
+All `start`, `to` and `step` arguments are accessors, and changing them will cause the mapped array to be recalculated, mapping new items appended at the end of the range.
 
 `step` will become negative _(the range will be descending)_ if `to` is smaller than `start`. Range stops at `to`, it is not included in the range.
 
@@ -212,7 +265,7 @@ function indexRange<T>(
 
 Control Flow Component for displaying a number range of elements, where elements receive a number value as signal, by mapping a number range of specified `start`, `to`, and `step`.
 
-All `stop`, `to` and `step` props are reactive, and changing them will cause the elements array to be recalculated, creating new elements for numbers added to the range.
+All `start`, `to` and `step` props are reactive, and changing them will cause the elements array to be recalculated, creating new elements for numbers added to the range.
 
 - `start` defaults to 0.
 
@@ -250,7 +303,7 @@ const [step, setStep] = createSignal(2);
 
 #### Definition
 
-`RangeProps` is an interface of `stop`, `to` and `step` props, OR `0`, `1` and `2` indexes of a spread array.
+`RangeProps` is an interface of `start`, `to` and `step` props, OR `0`, `1` and `2` indexes of a spread array.
 
 ```ts
 function IndexRange<T>(
