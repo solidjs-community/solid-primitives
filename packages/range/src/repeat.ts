@@ -1,4 +1,5 @@
-import { type Accessor, type JSX, createMemo, createRoot, onCleanup } from "solid-js";
+import { type Accessor, createMemo, createRoot, onCleanup } from "solid-js";
+import { type JSX } from "@solidjs/web";
 import { toFunction } from "./common.js";
 
 /**

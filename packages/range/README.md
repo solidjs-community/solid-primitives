@@ -25,6 +25,8 @@ npm install @solid-primitives/range
 yarn add @solid-primitives/range
 ```
 
+Requires `solid-js` and `@solidjs/web` v2.0.0-beta.13 or later as peer dependencies.
+
 ## `repeat`
 
 Reactively maps a number range of specified length with a callback function - underlying helper for the [`<Repeat>`](#repeat-1) control flow.
@@ -33,7 +35,7 @@ Reactively maps a number range of specified length with a callback function - un
 const [length, setLength] = createSignal(10)
 const mapped = repeat(length, index => {
    const [value, setValue] = createSignal(index);
-   createEffect(() => {...})
+   createEffect(() => value(), v => { /* react to value */ })
    return value
 })
 ```
@@ -94,7 +96,7 @@ All `stop`, `to` and `step` arguments are accessors, and changing them will caus
 const [to, setTo] = createSignal(5)
 const mapped = mapRange(() => 0, to, () => 0.5, number => {
    const [value, setValue] = createSignal(number);
-   createEffect(() => {...})
+   createEffect(() => value(), v => { /* react to value */ })
    return value
 })
 mapped() // => [0, 0.5, 1, 1.5, 2...]
@@ -184,7 +186,7 @@ const mapped = indexRange(
   () => 0.5,
   number => {
     const [value, setValue] = createSignal(number());
-    createEffect(() => handleNewNumber(number()));
+    createEffect(() => number(), n => handleNewNumber(n));
     return value;
   },
 );
