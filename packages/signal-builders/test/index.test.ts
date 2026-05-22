@@ -1,17 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { filterInstance, filterOutInstance, push, sort, template } from "../src/index.js";
-import { type Accessor, createRoot, createSignal, flush } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { compare } from "@solid-primitives/utils";
 
 describe("signal builders", () => {
   it("push + sort", () => {
     const [list, setList] = createSignal([4, 3, 2, 1]);
     const [item, setItem] = createSignal(0);
-    let res!: Accessor<number[]>;
-    const dispose = createRoot(d => {
-      res = sort(push(list, item), compare);
-      return d;
-    });
+    const { res, dispose } = createRoot(d => ({
+      res: sort(push(list, item), compare),
+      dispose: d,
+    }));
 
     expect(res()).toEqual([0, 1, 2, 3, 4]);
     setList([1, 2, 3, 5, 4]);
@@ -39,13 +38,12 @@ describe("signal builders", () => {
     }));
 
   it("template", () => {
-    const [a, _setA] = createSignal("Hello");
+    const [a] = createSignal("Hello");
     const [b, setB] = createSignal("World");
-    let result!: Accessor<string>;
-    const dispose = createRoot(d => {
-      result = template`${a} ${b}!!!`;
-      return d;
-    });
+    const { result, dispose } = createRoot(d => ({
+      result: template`${a} ${b}!!!`,
+      dispose: d,
+    }));
 
     expect(result()).toBe("Hello World!!!");
     setB("Solid");
