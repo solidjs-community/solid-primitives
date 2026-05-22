@@ -1,5 +1,4 @@
-import { $PROXY } from "solid-js";
-import { type Store } from "solid-js";
+import { $PROXY, type Store } from "solid-js";
 
 /**
  * Tracks all properties of a {@link store} by iterating over them recursively.
@@ -24,7 +23,7 @@ function trackDeep<T extends Store<object>>(store: T): T {
   return store;
 }
 
-function traverse<T>(value: Store<T>, seen: Set<unknown>): void {
+function traverse(value: unknown, seen: Set<unknown>): void {
   let isArray: boolean;
   let proto;
   // check the same conditions as in `isWrappable` from solid's store implementation
@@ -38,7 +37,7 @@ function traverse<T>(value: Store<T>, seen: Set<unknown>): void {
       proto === Object.prototype)
   ) {
     seen.add(value);
-    for (const child of isArray ? (value as unknown as any[]) : Object.values(value)) traverse(child, seen);
+    for (const child of isArray ? (value as any[]) : Object.values(value)) traverse(child, seen);
   }
 }
 

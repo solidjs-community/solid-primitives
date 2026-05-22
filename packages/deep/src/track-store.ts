@@ -19,7 +19,7 @@ import { $TRACK, type Store } from "solid-js";
  * ```
  */
 function trackStore<T extends object>(store: Store<T>): T {
-  traverseStore(store as any, new Set());
+  traverseStore(store, new Set());
   return store;
 }
 
@@ -27,9 +27,9 @@ function traverseStore(node: any, seen: Set<unknown>): void {
   if (!($TRACK in node) || seen.has(node)) return;
   seen.add(node);
   // subscribe to structural changes (additions/removals)
-  (node as any)[$TRACK];
+  node[$TRACK];
   // access all values through the proxy to subscribe to getters and collect children
-  for (const child of Object.values(node as any)) {
+  for (const child of Object.values(node)) {
     if (child != null && typeof child === "object") {
       traverseStore(child, seen);
     }
