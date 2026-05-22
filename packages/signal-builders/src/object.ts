@@ -101,7 +101,7 @@ export function get<
   k6: MaybeAccessor<K6>,
 ): Accessor<O[K1][K2][K3][K4][K5][K6]>;
 export function get(obj: any, ...keys: any[]) {
-  return _.get(access(obj), ...(accessArray(keys) as [any, any]));
+  return createMemo(() => _.get(access(obj), ...(accessArray(keys) as [any, any])));
 }
 
 /**
@@ -151,5 +151,5 @@ export function merge<
   f: MaybeAccessor<F>,
 ): Accessor<Modify<Modify<Modify<Modify<Modify<A, B>, C>, D>, E>, F>>;
 export function merge(...objects: object[]) {
-  return _.merge(...(accessArray(objects) as [object, object]));
+  return createMemo(() => _.merge(...(accessArray(objects) as [object, object])));
 }

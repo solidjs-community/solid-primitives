@@ -18,6 +18,8 @@ npm install @solid-primitives/signal-builders
 yarn add @solid-primitives/signal-builders
 ```
 
+**Requires** `solid-js@^2.0.0-beta.13` as a peer dependency.
+
 ## How to use it
 
 Signal builders create computations when used, so they need to be used under a reactive root.

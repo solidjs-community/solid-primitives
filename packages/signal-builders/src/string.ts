@@ -1,5 +1,5 @@
 import { access, type MaybeAccessor } from "@solid-primitives/utils";
-import { type Accessor, createMemo, on } from "solid-js";
+import { type Accessor, createMemo } from "solid-js";
 
 /**
  * Signal builder: `String.prototype.toLowerCase()`
@@ -13,7 +13,10 @@ export const uppercase = (string: Accessor<string>) => createMemo(() => string()
  * Signal builder: capitalize a string input
  */
 export const capitalize = (string: Accessor<string>) =>
-  createMemo(on(string, s => s[0]!.toUpperCase() + s.substring(1).toLowerCase()));
+  createMemo(() => {
+    const s = string();
+    return s[0]!.toUpperCase() + s.substring(1).toLowerCase();
+  });
 /**
  * Signal builder: `String.prototype.substring()`
  * @param start The zero-based index number indicating the beginning of the substring.
