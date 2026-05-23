@@ -34,7 +34,7 @@ function MyComp(): JSX.Element {
   const rowHeight = 10;
   const overscanCount = 5;
 
-  const [{ containerHeight, viewerTop, visibleItems }, onScroll] = createVirtualList({
+  const [virtual, onScroll] = createVirtualList({
     // the list of items - can be a signal
     items,
     // the height of the root element of the virtualizedList - can be a signal
@@ -59,20 +59,20 @@ function MyComp(): JSX.Element {
         style={{
           position: "relative",
           width: "100%",
-          // list container element's height must be set to containerHeight()
-          height: `${containerHeight()}px`,
+          // list container element's height must be set to virtual().containerHeight
+          height: `${virtual().containerHeight}px`,
         }}
       >
         <div
           style={{
             position: "absolute",
-            // viewer element's top must be set to viewerTop()
-            top: `${viewerTop()}px`,
+            // viewer element's top must be set to virtual().viewerTop
+            top: `${virtual().viewerTop}px`,
           }}
         >
-          {/* only visibleItems() are ultimately rendered */}
-          <For fallback={"no items"} each={visibleItems()}>
-            {item => <div>{item}</div>}
+          {/* only virtual().visibleItems are ultimately rendered */}
+          <For fallback={"no items"} each={virtual().visibleItems}>
+            {item => <div>{item()}</div>}
           </For>
         </div>
       </div>
@@ -100,7 +100,8 @@ function MyComp(): JSX.Element {
 >
   {
     // the flowComponent that will be used to transform the items into rows in the list
-    item => <div>{item}</div>
+    // item is an Accessor — call it to get the value
+    item => <div>{item()}</div>
   }
 </VirtualList>
 ```

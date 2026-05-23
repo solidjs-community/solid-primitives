@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { render } from "solid-js/web";
-import { DOMElement } from "solid-js/jsx-runtime";
+import { createRoot, flush } from "solid-js";
+import { render } from "@solidjs/web";
 
 import { createVirtualList, VirtualList } from "../src/index.jsx";
 
@@ -10,7 +10,7 @@ const ROOT = document.createElement("div");
 
 const SCROLL_EVENT = new Event("scroll");
 
-const TARGETED_SCROLL_EVENT = (el: DOMElement) => ({ ...SCROLL_EVENT, target: el });
+const TARGETED_SCROLL_EVENT = (el: Element) => ({ ...SCROLL_EVENT, target: el });
 
 function getScrollContainer() {
   const scrollContainer = ROOT.querySelector("div");
@@ -21,144 +21,171 @@ function getScrollContainer() {
 }
 
 describe("createVirtualList", () => {
-  test("returns containerHeight representing the size of the list container element within the root", () => {
-    const [virtual] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-    });
+  test("returns containerHeight representing the size of the list container element within the root", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
 
-    expect(virtual().containerHeight).toEqual(10_000);
-  });
+      expect(virtual().containerHeight).toEqual(10_000);
+      dispose();
+    }));
 
-  test("returns viewerTop representing the location of the list viewer element within the list container", () => {
-    const [virtual] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-    });
+  test("returns viewerTop representing the location of the list viewer element within the list container", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
 
-    expect(virtual().viewerTop).toEqual(0);
-  });
+      expect(virtual().viewerTop).toEqual(0);
+      dispose();
+    }));
 
-  test("returns visibleList representing the subset of items to render", () => {
-    const [virtual] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-    });
+  test("returns visibleList representing the subset of items to render", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
 
-    expect(virtual().visibleItems).toEqual([0, 1, 2]);
-  });
+      expect(virtual().visibleItems).toEqual([0, 1, 2]);
+      dispose();
+    }));
 
-  test("returns onScroll which sets viewerTop and visibleItems based on rootElement's scrolltop", () => {
-    const el = document.createElement("div");
+  test("returns onScroll which sets viewerTop and visibleItems based on rootElement's scrolltop", () =>
+    createRoot(dispose => {
+      const el = document.createElement("div");
 
-    const [virtual, onScroll] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-    });
+      const [virtual, onScroll] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
 
-    expect(virtual().visibleItems).toEqual([0, 1, 2]);
-    expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().visibleItems).toEqual([0, 1, 2]);
+      expect(virtual().viewerTop).toEqual(0);
 
-    el.scrollTop += 10;
+      el.scrollTop += 10;
 
-    // no change until onScroll is called
-    expect(virtual().visibleItems).toEqual([0, 1, 2]);
-    expect(virtual().viewerTop).toEqual(0);
+      // no change until onScroll is called
+      expect(virtual().visibleItems).toEqual([0, 1, 2]);
+      expect(virtual().viewerTop).toEqual(0);
 
-    onScroll(TARGETED_SCROLL_EVENT(el));
+      onScroll(TARGETED_SCROLL_EVENT(el));
+      flush();
 
-    expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
-    expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
+      expect(virtual().viewerTop).toEqual(0);
 
-    el.scrollTop += 10;
-    onScroll(TARGETED_SCROLL_EVENT(el));
+      el.scrollTop += 10;
+      onScroll(TARGETED_SCROLL_EVENT(el));
+      flush();
 
-    expect(virtual().visibleItems).toEqual([1, 2, 3, 4]);
-    expect(virtual().viewerTop).toEqual(10);
+      expect(virtual().visibleItems).toEqual([1, 2, 3, 4]);
+      expect(virtual().viewerTop).toEqual(10);
 
-    el.scrollTop -= 10;
-    onScroll(TARGETED_SCROLL_EVENT(el));
+      el.scrollTop -= 10;
+      onScroll(TARGETED_SCROLL_EVENT(el));
+      flush();
 
-    expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
-    expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
+      expect(virtual().viewerTop).toEqual(0);
 
-    el.scrollTop -= 10;
-    onScroll(TARGETED_SCROLL_EVENT(el));
+      el.scrollTop -= 10;
+      onScroll(TARGETED_SCROLL_EVENT(el));
+      flush();
 
-    expect(virtual().visibleItems).toEqual([0, 1, 2]);
-    expect(virtual().viewerTop).toEqual(0);
-  });
+      expect(virtual().visibleItems).toEqual([0, 1, 2]);
+      expect(virtual().viewerTop).toEqual(0);
 
-  test("onScroll handles reaching the bottom of the list", () => {
-    const el = document.createElement("div");
+      dispose();
+    }));
 
-    const [virtual, onScroll] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-    });
+  test("onScroll handles reaching the bottom of the list", () =>
+    createRoot(dispose => {
+      const el = document.createElement("div");
 
-    expect(virtual().visibleItems).toEqual([0, 1, 2]);
-    expect(virtual().viewerTop).toEqual(0);
+      const [virtual, onScroll] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
 
-    el.scrollTop += 9_980;
-    onScroll(TARGETED_SCROLL_EVENT(el));
+      expect(virtual().visibleItems).toEqual([0, 1, 2]);
+      expect(virtual().viewerTop).toEqual(0);
 
-    expect(virtual().visibleItems).toEqual([997, 998, 999]);
-    expect(virtual().viewerTop).toEqual(9_970);
-  });
+      el.scrollTop += 9_980;
+      onScroll(TARGETED_SCROLL_EVENT(el));
+      flush();
 
-  test("visibleList takes `overscanCount` into account", () => {
-    const el = document.createElement("div");
+      expect(virtual().visibleItems).toEqual([997, 998, 999]);
+      expect(virtual().viewerTop).toEqual(9_970);
 
-    const [virtual, onScroll] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-      overscanCount: 2,
-    });
+      dispose();
+    }));
 
-    el.scrollTop += 100;
-    onScroll(TARGETED_SCROLL_EVENT(el));
+  test("visibleList takes `overscanCount` into account", () =>
+    createRoot(dispose => {
+      const el = document.createElement("div");
 
-    expect(virtual().visibleItems).toEqual([8, 9, 10, 11, 12, 13]);
-  });
+      const [virtual, onScroll] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+        overscanCount: 2,
+      });
 
-  test("overscanCount defaults to 1 if undefined or zero", () => {
-    const [virtualUndefined] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-    });
+      el.scrollTop += 100;
+      onScroll(TARGETED_SCROLL_EVENT(el));
+      flush();
 
-    expect(virtualUndefined().visibleItems).toEqual([0, 1, 2]);
+      expect(virtual().visibleItems).toEqual([8, 9, 10, 11, 12, 13]);
 
-    const [virtualZero] = createVirtualList({
-      items: TEST_LIST,
-      rootHeight: 20,
-      rowHeight: 10,
-      overscanCount: 0,
-    });
+      dispose();
+    }));
 
-    expect(virtualZero().visibleItems).toEqual([0, 1, 2]);
-  });
+  test("overscanCount defaults to 1 if undefined or zero", () =>
+    createRoot(dispose => {
+      const [virtualUndefined] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
 
-  test("handles empty list", () => {
-    const [virtual] = createVirtualList({
-      items: [],
-      rootHeight: 20,
-      rowHeight: 10,
-      overscanCount: 0,
-    });
+      expect(virtualUndefined().visibleItems).toEqual([0, 1, 2]);
 
-    expect(virtual().containerHeight).toEqual(0);
-    expect(virtual().viewerTop).toEqual(0);
-    expect(virtual().visibleItems).toEqual([]);
-  });
+      const [virtualZero] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+        overscanCount: 0,
+      });
+
+      expect(virtualZero().visibleItems).toEqual([0, 1, 2]);
+
+      dispose();
+    }));
+
+  test("handles empty list", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: [],
+        rootHeight: 20,
+        rowHeight: 10,
+        overscanCount: 0,
+      });
+
+      expect(virtual().containerHeight).toEqual(0);
+      expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().visibleItems).toEqual([]);
+
+      dispose();
+    }));
 });
 
 describe("VirtualList", () => {
@@ -166,7 +193,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10}>
-          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+          {item => <div id={"item-" + item()} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       ROOT,
@@ -184,7 +211,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10}>
-          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+          {item => <div id={"item-" + item()} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       ROOT,
@@ -193,6 +220,7 @@ describe("VirtualList", () => {
     const scrollContainer = getScrollContainer();
 
     scrollContainer.dispatchEvent(SCROLL_EVENT);
+    flush();
 
     expect(ROOT.querySelector("#item-0")).not.toBeNull();
     expect(ROOT.querySelector("#item-1")).not.toBeNull();
@@ -201,6 +229,7 @@ describe("VirtualList", () => {
 
     scrollContainer.scrollTop += 10;
     scrollContainer.dispatchEvent(SCROLL_EVENT);
+    flush();
 
     expect(ROOT.querySelector("#item-0")).not.toBeNull();
     expect(ROOT.querySelector("#item-1")).not.toBeNull();
@@ -210,6 +239,7 @@ describe("VirtualList", () => {
 
     scrollContainer.scrollTop += 10;
     scrollContainer.dispatchEvent(SCROLL_EVENT);
+    flush();
 
     expect(ROOT.querySelector("#item-0")).toBeNull();
     expect(ROOT.querySelector("#item-1")).not.toBeNull();
@@ -220,6 +250,7 @@ describe("VirtualList", () => {
 
     scrollContainer.scrollTop -= 10;
     scrollContainer.dispatchEvent(SCROLL_EVENT);
+    flush();
 
     expect(ROOT.querySelector("#item-0")).not.toBeNull();
     expect(ROOT.querySelector("#item-1")).not.toBeNull();
@@ -229,6 +260,7 @@ describe("VirtualList", () => {
 
     scrollContainer.scrollTop -= 10;
     scrollContainer.dispatchEvent(SCROLL_EVENT);
+    flush();
 
     expect(ROOT.querySelector("#item-0")).not.toBeNull();
     expect(ROOT.querySelector("#item-1")).not.toBeNull();
@@ -242,7 +274,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10}>
-          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+          {item => <div id={"item-" + item()} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       ROOT,
@@ -252,6 +284,7 @@ describe("VirtualList", () => {
 
     scrollContainer.scrollTop += 9_980;
     scrollContainer.dispatchEvent(SCROLL_EVENT);
+    flush();
 
     expect(ROOT.querySelector("#item-996")).toBeNull();
     expect(ROOT.querySelector("#item-997")).not.toBeNull();
@@ -266,7 +299,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} overscanCount={2}>
-          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+          {item => <div id={"item-" + item()} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       ROOT,
@@ -276,6 +309,7 @@ describe("VirtualList", () => {
 
     scrollContainer.scrollTop += 100;
     scrollContainer.dispatchEvent(SCROLL_EVENT);
+    flush();
 
     expect(ROOT.querySelector("#item-7")).toBeNull();
     expect(ROOT.querySelector("#item-8")).not.toBeNull();
@@ -293,7 +327,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={[]} rootHeight={20} rowHeight={10}>
-          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+          {item => <div id={"item-" + item()} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       ROOT,
@@ -308,7 +342,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={[]} fallback={<div id="fallback" />} rootHeight={20} rowHeight={10}>
-          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+          {item => <div id={"item-" + item()} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       ROOT,

@@ -152,21 +152,11 @@ memo(); // T: number
 
 ### No `equals`
 
-The lazy memo, as it is implemented now, doesn't allow for setting a `equals` function like you could with normal memo. It is always set to `equals: false` as a lazy memo cannot eagerly evaluate to check if the next value is the same as the previous, it needs to always notify it's observers so they can read from it and evaluate the memo.
+`createLazyMemo` always uses `equals: false` internally. A lazy memo cannot eagerly evaluate to check equality — it needs to always notify its observers so they can pull and evaluate the new value.
 
-### Not ownerless
+### Auto-disposal and recomputation
 
-Lazy memos in Solid will be ownerless — the reactive context of the callback will depend of the place of read, not creation.
-
-This implementation will always execute it's callback with the context of owner it was created under. So ti won't work with [Suspense](https://www.solidjs.com/docs/latest/api#<suspense>) the way you might expect — meaning that it won't activate any Suspense that is below place of creation.
-
-Although if you only need the ownerless characteristics so that the memo can be garbage-collected when not referenced, instead of waiting for owner cleanup, you can wrap it with [`runWithOwner`](https://www.solidjs.com/docs/latest/api#runwithowner) to create it without an owner:
-
-```ts
-const memo = runWithOwner(null, () => {
-  return createLazyMemo(() => /* ... */)
-})
-```
+In Solid 2.0, `createLazyMemo` is backed by a native `createMemo({ lazy: true })`. When all observers disconnect the memo auto-disposes, and the next observer that reads it triggers a fresh computation from scratch. This means the previous value is **not** retained across idle periods — `prev` will be `undefined` again after a full unsubscribe/resubscribe cycle.
 
 ### You may not need a lazy memo
 
@@ -185,33 +175,15 @@ https://codesandbox.io/s/solid-primitives-memo-demo-3w0oz?file=/index.tsx
 
 ## `createDebouncedMemo`
 
-`createDebouncedMemo` is deprecated. Please use `createSchedule` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) instead.
-
-```ts
-import { createSchedule, debounce } from "@solid-primitives/schedule";
-
-const scheduled = createScheduled(fn => debounce(fn, 200));
-
-const double = createMemo(p => {
-  const value = count();
-  return scheduled() ? value * 2 : p;
-}, 0);
-```
+**Removed in v2.** `createDebouncedMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) once that package is updated for Solid 2.0.
 
 ## `createThrottledMemo`
 
-`createThrottledMemo` is deprecated. Please use `createSchedule` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) instead.
+**Removed in v2.** `createThrottledMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) once that package is updated for Solid 2.0.
 
-```ts
-import { createSchedule, throttle } from "@solid-primitives/schedule";
+## `createAsyncMemo`
 
-const scheduled = createScheduled(fn => throttle(fn, 200));
-
-const double = createMemo(p => {
-  const value = count();
-  return scheduled() ? value * 2 : p;
-}, 0);
-```
+**Removed in v2.** `createAsyncMemo` was deprecated in v1 (pointing to `createResource`) and has been removed. `createResource` does not exist in Solid 2.0. Async data fetching in Solid 2.0 can be handled with `createProjection` for store-based async state, or with a signal + `createEffect` for manual async management.
 
 ## `createPureReaction`
 

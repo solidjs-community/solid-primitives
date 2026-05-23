@@ -9,12 +9,12 @@ import {
   createDeepSignal,
 } from "../src/index.js";
 
-export function testEffect<T extends any = void>(
+export function testEffect<T = void>(
   fn: (done: (result: T) => void) => void,
 ): Promise<T> {
   let done: (result: T) => void;
   let fail: (error: any) => void;
-  let promise = new Promise<T>((resolve, reject) => {
+  const promise = new Promise<T>((resolve, reject) => {
     done = resolve;
     fail = reject;
   });
