@@ -1013,6 +1013,127 @@ describe("toFormData", () => {
   });
 });
 
+// ─── setValues ───────────────────────────────────────────────────────────────
+
+describe("setValues", () => {
+  it("updates multiple fields at once", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: { initial: "" },
+          name: { initial: "" },
+        },
+      });
+
+      form.setValues({ email: "user@example.com", name: "Alice" });
+      flush();
+
+      expect(form.fields.email.value()).toBe("user@example.com");
+      expect(form.fields.name.value()).toBe("Alice");
+      dispose();
+    });
+  });
+
+  it("accepts a partial update — only named fields change", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: { initial: "original@example.com" },
+          name: { initial: "Original" },
+        },
+      });
+
+      form.setValues({ name: "Updated" });
+      flush();
+
+      expect(form.fields.name.value()).toBe("Updated");
+      expect(form.fields.email.value()).toBe("original@example.com");
+      dispose();
+    });
+  });
+
+  it("marks the form dirty after update", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { name: { initial: "" } } });
+
+      expect(form.dirty()).toBe(false);
+      form.setValues({ name: "Alice" });
+      flush();
+      expect(form.dirty()).toBe(true);
+      dispose();
+    });
+  });
+
+  it("ignores unknown field keys", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { name: { initial: "" } } });
+
+      expect(() => form.setValues({ unknown: "x" } as any)).not.toThrow();
+      dispose();
+    });
+  });
+});
+
+// ─── validate() reactive invalidation ────────────────────────────────────────
+
+describe("validate reactive invalidation", () => {
+  it("valid() reflects a new cross-field rule added after it was first read", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          password: { initial: "secret" },
+          confirm: { initial: "different" },
+        },
+      });
+
+      // Read valid() before calling validate() — caches as true (no field validators)
+      expect(form.valid()).toBe(true);
+
+      // Now register a cross-field rule that currently fails
+      form.validate(v => (v.password !== v.confirm ? "Passwords must match" : null));
+      flush();
+
+      // valid() must re-compute and reflect the new failing rule
+      expect(form.valid()).toBe(false);
+      dispose();
+    });
+  });
+});
+
+// ─── bind with textarea ───────────────────────────────────────────────────────
+
+describe("bind with textarea", () => {
+  it("sets initial value on a textarea", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { bio: { initial: "Hello" } } });
+
+      const el = document.createElement("textarea");
+      const cleanup = form.bind("bio")(el);
+
+      expect(el.value).toBe("Hello");
+      cleanup();
+      dispose();
+    });
+  });
+
+  it("updates signal when input event fires on textarea", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { bio: { initial: "" } } });
+
+      const el = document.createElement("textarea");
+      const cleanup = form.bind("bio")(el);
+
+      el.value = "Updated bio";
+      el.dispatchEvent(new Event("input"));
+      flush();
+
+      expect(form.fields.bio.value()).toBe("Updated bio");
+      cleanup();
+      dispose();
+    });
+  });
+});
+
 // ─── Form ref ─────────────────────────────────────────────────────────────────
 
 describe("form ref", () => {

@@ -33,9 +33,10 @@ export type FormReturn<C extends FieldsConfig> = {
   pending: Accessor<boolean>;
   submitting: Accessor<boolean>;
   submitted: Accessor<boolean>;
-  bind: (name: keyof C & string) => (el: HTMLInputElement | HTMLSelectElement) => () => void;
+  bind: (name: keyof C & string) => (el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => () => void;
   ref: (el: HTMLFormElement) => () => void;
   validate: (fn: (values: { [K in keyof C]: InferValue<C[K]> }) => string | null) => Accessor<string | null>;
+  setValues: (values: Partial<{ [K in keyof C]: InferValue<C[K]> }>) => void;
   formData: () => FormData;
   reset: () => void;
   submit: () => Promise<void>;
@@ -100,6 +101,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       bind: () => () => () => {},
       ref: () => () => {},
       validate: () => () => null,
+      setValues: () => void 0,
       formData: () => new FormData(),
       reset: () => void 0,
       submit: async () => void 0,
@@ -157,9 +159,22 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
         val => {
           const s = ++seq;
           const run = async () => {
-            const results = validators.map(fn => fn(val));
-            if (results.some(r => r instanceof Promise)) setAp(true);
-            for (const r of results) {
+            // Only invoke and await validators that return Promises; sync
+            // validators are already covered by the syncError memo above.
+            const asyncResults: Promise<string | null>[] = [];
+            for (const fn of validators) {
+              const r = fn(val);
+              if (r instanceof Promise) asyncResults.push(r);
+            }
+
+            if (asyncResults.length === 0) {
+              setAe(null);
+              setAp(false);
+              return;
+            }
+
+            setAp(true);
+            for (const r of asyncResults) {
               const err = await r;
               if (s !== seq) return; // value changed mid-flight, discard
               if (err !== null) { setAe(err); setAp(false); return; }
@@ -236,20 +251,30 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
   const pending = createMemo(() => fieldEntries.some(([, f]) => f._asyncPending()));
 
-  const formValidators: Accessor<string | null>[] = [];
+  // Signal-backed list so valid() re-computes immediately when validate() is
+  // called after valid has already been read.
+  const [formValidators, setFormValidators] = createSignal<Accessor<string | null>[]>([], {
+    ownedWrite: true,
+  });
 
   const valid = createMemo(
     () =>
       fieldEntries.every(([, f]) => f._rawError() === null) &&
       !pending() &&
-      formValidators.every(v => v() === null),
+      formValidators().every(v => v() === null),
     { lazy: true },
   );
 
   const validate = (fn: (v: Values) => string | null): Accessor<string | null> => {
     const error = createMemo(() => fn(values()));
-    formValidators.push(error);
+    setFormValidators(vs => [...vs, error]);
     return error;
+  };
+
+  const setValues = (newValues: Partial<Values>) => {
+    for (const [k, v] of Object.entries(newValues)) {
+      if (k in internalFields) internalFields[k]!._setValue(v);
+    }
   };
 
   const [submitting, setSubmitting] = createSignal(false, { ownedWrite: true });
@@ -311,7 +336,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     );
 
     // Phase 2: wire up the element and return a teardown.
-    return (nextEl: HTMLInputElement | HTMLSelectElement) => {
+    return (nextEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => {
       el = nextEl as HTMLInputElement;
       const checkable = el.type === "checkbox" || el.type === "radio";
 
@@ -340,7 +365,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       void submit();
     });
 
-  onCleanup(reset);
+  onCleanup(() => { _isSubmitting = false; });
 
   return {
     fields,
@@ -354,6 +379,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     bind: bind as FormReturn<C>["bind"],
     ref,
     validate: validate as FormReturn<C>["validate"],
+    setValues: setValues as FormReturn<C>["setValues"],
     formData,
     reset,
     submit,
