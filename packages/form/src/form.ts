@@ -1,4 +1,4 @@
-import { createSignal, createMemo, onCleanup, untrack, createEffect, type Accessor } from "solid-js";
+import { createSignal, createMemo, createRoot, onCleanup, untrack, createEffect, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
@@ -48,11 +48,10 @@ export type FormConfig<C extends FieldsConfig> = {
   validateOn?: "change" | "blur" | "submit";
 };
 
-function runValidators<V>(value: V, validators: ValidatorFn<V>[]): string | null {
-  for (const fn of validators) {
-    const result = fn(value);
-    if (result instanceof Promise) continue; // async validators handled separately
-    if (result !== null) return result;
+function runValidators<V>(v: V, fns: ValidatorFn<V>[]): string | null {
+  for (const fn of fns) {
+    const r = fn(v);
+    if (!(r instanceof Promise) && r !== null) return r;
   }
   return null;
 }
@@ -68,7 +67,6 @@ export function toFormData(values: Record<string, unknown>): FormData {
 export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormReturn<C> {
   type Values = { [K in keyof C]: InferValue<C[K]> };
 
-  // On the server, return static stubs with initial values and no-op setters.
   if (isServer) {
     const initialValues = Object.fromEntries(
       Object.entries(config.fields).map(([k, f]) => [k, f.initial]),
@@ -108,14 +106,10 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     };
   }
 
-  // submitted must exist before the field loop so validateOn:"submit" fields
-  // can close over it when building their gated error memo.
+  // submitted is read inside per-field error memos, so it must exist before the loop.
   const [submitted, setSubmitted] = createSignal(false, { ownedWrite: true });
-
   const formValidateOn = config.validateOn ?? "change";
 
-  // Internal shape: _rawError is always computed (used by valid/errors),
-  // error is gated by validateOn (used by field.error() in the UI).
   type InternalField = {
     initial: any;
     value: Accessor<any>;
@@ -131,17 +125,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
   for (const [name, fc] of Object.entries(config.fields)) {
     const validators = fc.validate
-      ? Array.isArray(fc.validate)
-        ? fc.validate
-        : [fc.validate]
+      ? Array.isArray(fc.validate) ? fc.validate : [fc.validate]
       : [];
     const validateOn = fc.validateOn ?? formValidateOn;
 
     const [value, setValue] = createSignal<any>(fc.initial, { ownedWrite: true });
     const [touched, setTouched] = createSignal(false, { ownedWrite: true });
-
-    // Sync validators run in a memo for immediate reactivity; Promises are skipped.
-    const syncError = createMemo(() => runValidators(value(), validators));
 
     let asyncError: Accessor<string | null> = () => null;
     let _asyncPending: Accessor<boolean> = () => false;
@@ -153,52 +142,40 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       _asyncPending = ap;
 
       let seq = 0;
-
       createEffect(
         () => value(),
         val => {
           const s = ++seq;
-          const run = async () => {
-            // Only invoke and await validators that return Promises; sync
-            // validators are already covered by the syncError memo above.
-            const asyncResults: Promise<string | null>[] = [];
+          void (async () => {
+            // Invoke all validators; collect only the Promises (parallel start).
+            const ps: Promise<string | null>[] = [];
             for (const fn of validators) {
               const r = fn(val);
-              if (r instanceof Promise) asyncResults.push(r);
+              if (r instanceof Promise) ps.push(r);
             }
-
-            if (asyncResults.length === 0) {
-              setAe(null);
-              setAp(false);
-              return;
-            }
-
+            if (!ps.length) { setAe(null); setAp(false); return; }
             setAp(true);
-            for (const r of asyncResults) {
-              const err = await r;
-              if (s !== seq) return; // value changed mid-flight, discard
+            for (const p of ps) {
+              const err = await p;
+              if (s !== seq) return;
               if (err !== null) { setAe(err); setAp(false); return; }
             }
             setAe(null);
             setAp(false);
-          };
-          void run();
+          })();
         },
       );
     }
 
-    // The true validation result — always computed regardless of validateOn.
-    const _rawError = createMemo(() => syncError() ?? asyncError());
+    // Fields with no validators are always null — skip the memo entirely.
+    const _rawError: Accessor<string | null> = validators.length === 0
+      ? () => null
+      : createMemo(() => runValidators(value(), validators) ?? asyncError());
 
-    // What the UI sees — gated by validateOn mode.
-    const error =
-      validateOn === "change"
-        ? _rawError
-        : createMemo(() => {
-            if (validateOn === "blur" && !touched()) return null;
-            if (validateOn === "submit" && !submitted()) return null;
-            return _rawError();
-          });
+    // Display error is gated by validateOn; raw error is always computed above.
+    const error = validateOn === "change"
+      ? _rawError
+      : createMemo(() => (validateOn === "blur" ? touched() : submitted()) ? _rawError() : null);
 
     internalFields[name] = {
       initial: fc.initial,
@@ -224,10 +201,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
         pending: f._asyncPending,
         setValue: f._setValue,
         setTouched: f._setTouched,
-        reset: () => {
-          f._setValue(f.initial);
-          f._setTouched(false);
-        },
+        reset: () => { f._setValue(f.initial); f._setTouched(false); },
       } satisfies FormField<any>,
     ]),
   ) as unknown as FormReturn<C>["fields"];
@@ -236,8 +210,6 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     () => Object.fromEntries(fieldEntries.map(([k, f]) => [k, f.value()])) as Values,
   );
 
-  // errors() and valid() use _rawError so they always reflect true validity,
-  // regardless of the validateOn display mode.
   const errors = createMemo(() => {
     const result: Partial<Record<string, string>> = {};
     for (const [k, f] of fieldEntries) {
@@ -248,26 +220,29 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
   }) as Accessor<Partial<Record<keyof C & string, string>>>;
 
   const dirty = createMemo(() => fieldEntries.some(([, f]) => f.value() !== f.initial));
-
   const pending = createMemo(() => fieldEntries.some(([, f]) => f._asyncPending()));
 
-  // Signal-backed list so valid() re-computes immediately when validate() is
-  // called after valid has already been read.
-  const [formValidators, setFormValidators] = createSignal<Accessor<string | null>[]>([], {
-    ownedWrite: true,
-  });
+  // Counter signal: bumped by validate() so valid() re-computes immediately
+  // when a cross-field rule is registered after valid has already been read.
+  const [validVer, bumpValidVer] = createSignal(0, { ownedWrite: true });
+  const formValidators: Accessor<string | null>[] = [];
 
   const valid = createMemo(
-    () =>
-      fieldEntries.every(([, f]) => f._rawError() === null) &&
-      !pending() &&
-      formValidators().every(v => v() === null),
+    () => {
+      validVer();
+      return (
+        fieldEntries.every(([, f]) => f._rawError() === null) &&
+        !pending() &&
+        formValidators.every(v => v() === null)
+      );
+    },
     { lazy: true },
   );
 
   const validate = (fn: (v: Values) => string | null): Accessor<string | null> => {
     const error = createMemo(() => fn(values()));
-    setFormValidators(vs => [...vs, error]);
+    formValidators.push(error);
+    bumpValidVer(n => n + 1);
     return error;
   };
 
@@ -278,17 +253,10 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
   };
 
   const [submitting, setSubmitting] = createSignal(false, { ownedWrite: true });
-
-  // Plain boolean guard for synchronous concurrent-submit prevention.
-  // setSubmitting(true) is microtask-batched, so a second synchronous submit()
-  // call would read the stale false value before the batch flushes.
   let _isSubmitting = false;
 
   const reset = () => {
-    for (const [, f] of fieldEntries) {
-      f._setValue(f.initial);
-      f._setTouched(false);
-    }
+    for (const [, f] of fieldEntries) { f._setValue(f.initial); f._setTouched(false); }
     _isSubmitting = false;
     setSubmitting(false);
     setSubmitted(false);
@@ -296,16 +264,9 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
   const submit = async () => {
     if (_isSubmitting) return;
-
-    // Touch all fields so validation errors become visible in the UI.
     for (const [, f] of fieldEntries) f._setTouched(true);
-
-    // Set submitted before the valid check so validateOn:"submit" fields
-    // reveal their errors when the user tries to submit an invalid form.
     setSubmitted(true);
-
     if (!untrack(valid)) return;
-
     _isSubmitting = true;
     setSubmitting(true);
     try {
@@ -316,48 +277,35 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     }
   };
 
-  // bind() follows the Solid 2.0 two-phase ref directive pattern.
-  // Phase 1 runs in the component's reactive scope when bind() is called during
-  // JSX evaluation. Phase 2 is the ref callback that receives the element.
+  // bind() uses a single Phase 2 ref callback. The sync-to-DOM effect is scoped
+  // to the element's lifetime via createRoot, disposed when the element unmounts.
   const bind = (name: string) => {
     const f = internalFields[name];
     if (!f) throw new Error(`createForm: unknown field "${name}"`);
 
-    let el: HTMLInputElement | undefined;
-
-    // Phase 1: keep the DOM element in sync with the signal.
-    createEffect(
-      () => f.value(),
-      value => {
-        if (!el) return;
-        if (el.type === "checkbox" || el.type === "radio") el.checked = Boolean(value);
-        else if (el.value !== String(value ?? "")) el.value = String(value ?? "");
-      },
-    );
-
-    // Phase 2: wire up the element and return a teardown.
     return (nextEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => {
-      el = nextEl as HTMLInputElement;
+      const el = nextEl as HTMLInputElement;
       const checkable = el.type === "checkbox" || el.type === "radio";
 
-      if (checkable) el.checked = Boolean(untrack(() => f.value()));
+      if (checkable) el.checked = Boolean(untrack(f.value));
       else el.value = untrack(() => String(f.value() ?? ""));
 
-      const eventName = checkable ? "change" : "input";
-      const cleanupChange = makeEventListener(el, eventName as "input", () =>
-        f._setValue(checkable ? (el as HTMLInputElement).checked : el!.value),
-      );
-      const cleanupBlur = makeEventListener(el, "blur", () => f._setTouched(true));
+      const disposeEffect = createRoot(d => {
+        createEffect(f.value, v => {
+          if (checkable) el.checked = Boolean(v);
+          else if (el.value !== String(v ?? "")) el.value = String(v ?? "");
+        });
+        return d;
+      });
 
-      return () => {
-        cleanupChange();
-        cleanupBlur();
-        el = undefined;
-      };
+      const off1 = makeEventListener(el, checkable ? "change" : "input", () =>
+        f._setValue(checkable ? el.checked : el.value),
+      );
+      const off2 = makeEventListener(el, "blur", () => f._setTouched(true));
+
+      return () => { off1(); off2(); disposeEffect(); };
     };
   };
-
-  const formData = () => toFormData(values());
 
   const ref = (el: HTMLFormElement) =>
     makeEventListener(el, "submit", (e: SubmitEvent) => {
@@ -380,7 +328,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     ref,
     validate: validate as FormReturn<C>["validate"],
     setValues: setValues as FormReturn<C>["setValues"],
-    formData,
+    formData: () => toFormData(values()),
     reset,
     submit,
   };
