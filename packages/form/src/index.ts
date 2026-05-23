@@ -7,4 +7,4 @@ export type {
   FormField,
   FormReturn,
   FormConfig,
-} from "./form.js";
+} from "./types.js";
