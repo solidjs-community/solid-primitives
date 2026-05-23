@@ -934,14 +934,14 @@ importers:
         specifier: ^7.27.0
         version: 7.29.0
       '@solidjs/web':
-        specifier: 2.0.0-beta.10
-        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       babel-preset-solid:
-        specifier: 2.0.0-beta.10
-        version: 2.0.0-beta.10(@babel/core@7.29.0)(solid-js@2.0.0-beta.10)
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(@babel/core@7.29.0)(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: 2.0.0-beta.10
-        version: 2.0.0-beta.10
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/set:
     dependencies:
@@ -8388,6 +8388,16 @@ snapshots:
       parse5: 7.3.0
       validate-html-nesting: 1.2.4
 
+  babel-plugin-jsx-dom-expressions@0.50.0-next.13(@babel/core@7.29.0):
+    dependencies:
+      '@babel/core': 7.29.0
+      '@babel/helper-module-imports': 7.18.6
+      '@babel/plugin-syntax-jsx': 7.28.6(@babel/core@7.29.0)
+      '@babel/types': 7.29.0
+      html-entities: 2.3.3
+      parse5: 7.3.0
+      validate-html-nesting: 1.2.4
+
   babel-plugin-syntax-trailing-function-commas@7.0.0-beta.0: {}
 
   babel-preset-fbjs@3.4.0(@babel/core@7.29.0):
@@ -8441,6 +8451,13 @@ snapshots:
     dependencies:
       '@babel/core': 7.27.4
       babel-plugin-jsx-dom-expressions: 0.50.0-next.13(@babel/core@7.27.4)
+    optionalDependencies:
+      solid-js: 2.0.0-beta.14
+
+  babel-preset-solid@2.0.0-beta.14(@babel/core@7.29.0)(solid-js@2.0.0-beta.14):
+    dependencies:
+      '@babel/core': 7.29.0
+      babel-plugin-jsx-dom-expressions: 0.50.0-next.13(@babel/core@7.29.0)
     optionalDependencies:
       solid-js: 2.0.0-beta.14
 
