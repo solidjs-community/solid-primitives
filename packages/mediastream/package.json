@@ -4,7 +4,7 @@
   "description": "Primitives to work with media streams from microphones, cameras, and the screen",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
-    "David Di Biase <dave.dibiase@gmail.com>"
+    "David Di Biase <dave@solidjs.com>"
   ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/mediastream",

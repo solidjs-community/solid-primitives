@@ -58,7 +58,11 @@ Creates a reactive accessor for a display capture stream (screen, window, or bro
 const [stream, { mute, stop }] = createScreen(screenSource);
 ```
 
-Same interface as `createStream` but uses `getDisplayMedia` instead of `getUserMedia`.
+**Parameters**
+
+- `screenSource` — `DisplayMediaStreamConstraints | undefined | Accessor<DisplayMediaStreamConstraints | undefined>`
+
+Same controls as `createStream` but uses `getDisplayMedia` instead of `getUserMedia`. The stream stops automatically when the reactive owner is disposed.
 
 ```tsx
 const [stream] = createScreen({ video: true });
@@ -114,6 +118,8 @@ const [amplitude, stop] = createAmplitudeFromStream(stream);
 
 - `amplitude()` — `Accessor<number>` — value between 0 and 100
 - `stop()` — stops the amplitude measurement
+
+The measurement stops automatically when the reactive owner is disposed.
 
 ### `createMediaPermissionRequest`
 
