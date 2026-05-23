@@ -4,8 +4,11 @@
 
 Initial release of `@solid-primitives/queue`
 
-Three new primitives for managing FIFO queues:
+Six primitives for managing queues:
 
-- **`makeQueue<T>(initialValues?)`** — non-reactive base primitive backed by a plain array. No Solid lifecycle hooks, suitable for imperative contexts.
-- **`createQueue<T>(initialValues?)`** — reactive queue backed by Solid signals. Exposes reactive accessors (`queue`, `first`, `last`, `size`, `isEmpty`) and imperative methods (`add`, `remove`, `clear`).
-- **`createTaskQueue<T>()`** — reactive async task queue. Tasks are zero-argument functions (`() => Promise<T> | T`) executed one at a time in FIFO order. `enqueue(task)` returns a `Promise<T>` that settles with the task's result. Exposes reactive `size` (pending count) and `active` (currently executing). Built for Solid.js v2.0 (`beta.14`).
+- **`makeQueue<T>(initialValues?)`** — non-reactive FIFO queue backed by a plain array.
+- **`createQueue<T>(initialValues?)`** — reactive FIFO queue backed by Solid signals. Exposes reactive accessors (`queue`, `first`, `last`, `size`, `isEmpty`) and imperative methods (`add`, `remove`, `clear`).
+- **`makePriorityQueue<T>(comparator, initialValues?)`** — non-reactive priority queue; items are dequeued in comparator order rather than insertion order.
+- **`createPriorityQueue<T>(comparator, initialValues?)`** — reactive priority queue; same interface as `createQueue`.
+- **`createTaskQueue<T>()`** — reactive async task queue. Tasks execute one at a time in FIFO order. `enqueue(task)` returns a `Promise<T>`. Exposes reactive `size` (pending count) and `active` (`boolean`).
+- **`createConcurrentTaskQueue<T>(concurrency)`** — reactive async task queue running up to `concurrency` tasks simultaneously. `active` is a count (`Accessor<number>`).

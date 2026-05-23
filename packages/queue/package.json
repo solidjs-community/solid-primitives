@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/queue",
   "version": "0.1.0",
-  "description": "Reactive FIFO queue primitive for Solid.js",
-  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "description": "Queue primitives — FIFO, priority, and concurrent task queues",
+  "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/queue",
@@ -19,7 +19,10 @@
     "list": [
       "makeQueue",
       "createQueue",
-      "createTaskQueue"
+      "makePriorityQueue",
+      "createPriorityQueue",
+      "createTaskQueue",
+      "createConcurrentTaskQueue"
     ],
     "category": "Utilities"
   },

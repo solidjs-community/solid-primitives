@@ -1,6 +1,13 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, createEffect, flush } from "solid-js";
-import { makeQueue, createQueue, createTaskQueue } from "../src/index.js";
+import {
+  makeQueue,
+  createQueue,
+  createTaskQueue,
+  makePriorityQueue,
+  createPriorityQueue,
+  createConcurrentTaskQueue,
+} from "../src/index.js";
 
 describe("makeQueue", () => {
   test("creates an empty queue", () => {
@@ -78,6 +85,24 @@ describe("makeQueue", () => {
     expect(q.last).toBe(20);
     q.remove();
     expect(q.last).toBe(20);
+  });
+
+  test("push inserts items in comparator order", () => {
+    const asc = (a: number, b: number) => a - b;
+    const q = makeQueue<number>();
+    q.push(asc, 3, 1, 2);
+    expect(q.first).toBe(1);
+    expect(q.last).toBe(3);
+    expect(q.size).toBe(3);
+  });
+
+  test("push and add can be used on the same queue", () => {
+    const asc = (a: number, b: number) => a - b;
+    const q = makeQueue([10]);
+    q.push(asc, 5, 15); // inserts sorted: [5, 10, 15]
+    expect(q.first).toBe(5);
+    q.add(1);            // appends to back: [5, 10, 15, 1]
+    expect(q.last).toBe(1);
   });
 });
 
@@ -282,6 +307,18 @@ describe("createQueue", () => {
       dispose();
     });
   });
+
+  test("push inserts items in comparator order", () => {
+    createRoot(dispose => {
+      const asc = (a: number, b: number) => a - b;
+      const q = createQueue<number>();
+      q.push(asc, 3, 1, 2);
+      flush();
+      expect(q.queue()).toEqual([1, 2, 3]);
+      expect(q.first()).toBe(1);
+      dispose();
+    });
+  });
 });
 
 describe("createTaskQueue", () => {
@@ -417,5 +454,317 @@ describe("createTaskQueue", () => {
 
     await Promise.all([p1, p2]);
     expect(results).toEqual([1, 2]);
+  });
+});
+
+describe("makePriorityQueue", () => {
+  const asc = (a: number, b: number) => a - b;
+
+  test("turns an empty queue into a priority queue", () => {
+    const q = makePriorityQueue(makeQueue<number>(), asc);
+    expect(q.size).toBe(0);
+    expect(q.isEmpty).toBe(true);
+    expect(q.first).toBeUndefined();
+    expect(q.last).toBeUndefined();
+  });
+
+  test("preserves pre-sorted initial values", () => {
+    const q = makePriorityQueue(makeQueue([1, 2, 3]), asc);
+    expect(q.first).toBe(1);
+    expect(q.last).toBe(3);
+    expect(q.size).toBe(3);
+    expect(q.isEmpty).toBe(false);
+  });
+
+  test("does not mutate the initial values array", () => {
+    const initial = [3, 1, 2];
+    makePriorityQueue(makeQueue([...initial].sort(asc)), asc);
+    expect(initial).toEqual([3, 1, 2]);
+  });
+
+  test("add inserts items in priority order", () => {
+    const q = makePriorityQueue(makeQueue<number>(), asc);
+    q.add(3, 1, 2);
+    expect(q.first).toBe(1);
+    expect(q.last).toBe(3);
+    expect(q.size).toBe(3);
+  });
+
+  test("remove returns and removes the highest-priority item", () => {
+    const q = makePriorityQueue(makeQueue([1, 2, 3]), asc);
+    expect(q.remove()).toBe(1);
+    expect(q.first).toBe(2);
+    expect(q.size).toBe(2);
+  });
+
+  test("remove on an empty queue returns undefined", () => {
+    const q = makePriorityQueue(makeQueue<number>(), asc);
+    expect(q.remove()).toBeUndefined();
+  });
+
+  test("clear empties the queue", () => {
+    const q = makePriorityQueue(makeQueue([1, 2, 3]), asc);
+    q.clear();
+    expect(q.size).toBe(0);
+    expect(q.isEmpty).toBe(true);
+    expect(q.first).toBeUndefined();
+  });
+
+  test("works with a descending comparator", () => {
+    const desc = (a: number, b: number) => b - a;
+    const q = makePriorityQueue(makeQueue([3, 2, 1]), desc);
+    expect(q.first).toBe(3);
+    expect(q.remove()).toBe(3);
+    expect(q.first).toBe(2);
+  });
+
+  test("maintains priority order across multiple add/remove cycles", () => {
+    const q = makePriorityQueue(makeQueue<number>(), asc);
+    q.add(5, 3);
+    expect(q.remove()).toBe(3);
+    q.add(1, 4);
+    expect(q.first).toBe(1);
+    expect(q.last).toBe(5);
+  });
+
+  test("works on a reactive queue too", () => {
+    createRoot(dispose => {
+      const q = makePriorityQueue(createQueue<number>(), asc);
+      q.add(3, 1, 2);
+      flush();
+      expect(q.first()).toBe(1);
+      expect(q.last()).toBe(3);
+      dispose();
+    });
+  });
+});
+
+describe("createPriorityQueue", () => {
+  const asc = (a: number, b: number) => a - b;
+
+  test("creates an empty reactive priority queue", () => {
+    createRoot(dispose => {
+      const q = createPriorityQueue<number>(asc);
+      expect(q.size()).toBe(0);
+      expect(q.isEmpty()).toBe(true);
+      expect(q.first()).toBeUndefined();
+      expect(q.queue()).toEqual([]);
+      dispose();
+    });
+  });
+
+  test("creates with initial values sorted by comparator", () => {
+    createRoot(dispose => {
+      const q = createPriorityQueue(asc, [3, 1, 2]);
+      expect(q.queue()).toEqual([1, 2, 3]);
+      expect(q.first()).toBe(1);
+      expect(q.last()).toBe(3);
+      dispose();
+    });
+  });
+
+  test("does not mutate the initial values array", () => {
+    createRoot(dispose => {
+      const initial = [3, 1, 2];
+      createPriorityQueue(asc, initial);
+      expect(initial).toEqual([3, 1, 2]);
+      dispose();
+    });
+  });
+
+  test("add inserts in priority order and updates reactive accessors", () => {
+    createRoot(dispose => {
+      const q = createPriorityQueue<number>(asc);
+      q.add(3, 1, 2);
+      flush();
+      expect(q.queue()).toEqual([1, 2, 3]);
+      expect(q.first()).toBe(1);
+      expect(q.last()).toBe(3);
+      dispose();
+    });
+  });
+
+  test("remove returns the highest-priority item synchronously", () => {
+    createRoot(dispose => {
+      const q = createPriorityQueue(asc, [3, 1, 2]);
+      expect(q.remove()).toBe(1);
+      dispose();
+    });
+  });
+
+  test("remove updates reactive accessors after flush", () => {
+    createRoot(dispose => {
+      const q = createPriorityQueue(asc, [3, 1, 2]);
+      q.remove();
+      flush();
+      expect(q.queue()).toEqual([2, 3]);
+      expect(q.first()).toBe(2);
+      expect(q.size()).toBe(2);
+      dispose();
+    });
+  });
+
+  test("reactive effects track first changes after priority reordering", () => {
+    createRoot(dispose => {
+      const q = createPriorityQueue(asc, [5, 3]);
+      const firsts: (number | undefined)[] = [];
+
+      createEffect(
+        () => q.first(),
+        first => { firsts.push(first); },
+      );
+
+      flush();
+      expect(firsts).toEqual([3]);
+
+      q.add(1); // becomes new first
+      flush();
+      expect(firsts).toEqual([3, 1]);
+
+      q.remove();
+      flush();
+      expect(firsts).toEqual([3, 1, 3]);
+
+      dispose();
+    });
+  });
+
+  test("works with a descending comparator", () => {
+    createRoot(dispose => {
+      const desc = (a: number, b: number) => b - a;
+      const q = createPriorityQueue(desc, [1, 2, 3]);
+      expect(q.first()).toBe(3);
+      q.remove();
+      flush();
+      expect(q.first()).toBe(2);
+      dispose();
+    });
+  });
+});
+
+describe("createConcurrentTaskQueue", () => {
+  test("resolves with the task's return value", async () => {
+    const q = createConcurrentTaskQueue<number>(2);
+    expect(await q.enqueue(async () => 42)).toBe(42);
+  });
+
+  test("supports synchronous tasks", async () => {
+    const q = createConcurrentTaskQueue<string>(2);
+    expect(await q.enqueue(() => "hello")).toBe("hello");
+  });
+
+  test("runs up to concurrency tasks simultaneously", async () => {
+    const q = createConcurrentTaskQueue<number>(2);
+
+    let releaseA!: () => void;
+    let releaseB!: () => void;
+    let releaseC!: () => void;
+
+    const pA = q.enqueue(() => new Promise<number>(r => { releaseA = () => r(1); }));
+    const pB = q.enqueue(() => new Promise<number>(r => { releaseB = () => r(2); }));
+    const pC = q.enqueue(() => new Promise<number>(r => { releaseC = () => r(3); }));
+
+    flush();
+    expect(q.active()).toBe(2); // A and B running
+    expect(q.size()).toBe(1);   // C pending
+
+    releaseA();
+    await pA;
+    flush();
+    expect(q.active()).toBe(2); // B still running, C picked up slot
+    expect(q.size()).toBe(0);
+
+    releaseB();
+    releaseC();
+    await Promise.all([pB, pC]);
+    flush();
+    expect(q.active()).toBe(0);
+  });
+
+  test("active reflects number of running tasks", async () => {
+    const q = createConcurrentTaskQueue<void>(3);
+
+    let r1!: () => void, r2!: () => void, r3!: () => void;
+    const p1 = q.enqueue(() => new Promise<void>(r => { r1 = r; }));
+    const p2 = q.enqueue(() => new Promise<void>(r => { r2 = r; }));
+    const p3 = q.enqueue(() => new Promise<void>(r => { r3 = r; }));
+
+    flush();
+    expect(q.active()).toBe(3);
+    expect(q.size()).toBe(0);
+
+    r1();
+    await p1;
+    flush();
+    expect(q.active()).toBe(2);
+
+    r2(); r3();
+    await Promise.all([p2, p3]);
+    flush();
+    expect(q.active()).toBe(0);
+  });
+
+  test("size reflects pending count (excludes running tasks)", async () => {
+    const q = createConcurrentTaskQueue<void>(1);
+
+    let release!: () => void;
+    const p1 = q.enqueue(() => new Promise<void>(r => { release = r; }));
+    q.enqueue(async () => {});
+    q.enqueue(async () => {});
+
+    flush();
+    expect(q.active()).toBe(1);
+    expect(q.size()).toBe(2);
+
+    release();
+    await p1;
+    // task2 and task3 complete on their own — wait for queue to drain
+    await q.enqueue(async () => {});
+    flush();
+    expect(q.active()).toBe(0);
+    expect(q.size()).toBe(0);
+  });
+
+  test("task error rejects that Promise without stopping the queue", async () => {
+    const q = createConcurrentTaskQueue<number>(2);
+
+    await expect(
+      q.enqueue(async () => { throw new Error("boom"); }),
+    ).rejects.toThrow("boom");
+
+    expect(await q.enqueue(async () => 99)).toBe(99);
+  });
+
+  test("clear rejects pending tasks while running tasks complete", async () => {
+    const q = createConcurrentTaskQueue<number>(1);
+
+    let release!: () => void;
+    const p1 = q.enqueue(() => new Promise<number>(r => { release = () => r(1); }));
+    const p2 = q.enqueue(async () => 2);
+    const p3 = q.enqueue(async () => 3);
+
+    q.clear();
+    flush();
+    expect(q.size()).toBe(0);
+
+    await expect(p2).rejects.toThrow("Queue cleared");
+    await expect(p3).rejects.toThrow("Queue cleared");
+
+    release();
+    expect(await p1).toBe(1);
+  });
+
+  test("new tasks enqueued after clear are processed normally", async () => {
+    const q = createConcurrentTaskQueue<number>(1);
+
+    let release!: () => void;
+    q.enqueue(() => new Promise<number>(r => { release = () => r(0); }));
+    const toBeCleared = q.enqueue(async () => 1);
+
+    q.clear();
+    await expect(toBeCleared).rejects.toThrow("Queue cleared");
+    release();
+
+    expect(await q.enqueue(async () => 42)).toBe(42);
   });
 });
