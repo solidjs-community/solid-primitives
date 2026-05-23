@@ -1,8 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { autofocus, createAutofocus } from "../src/index.js";
-
-autofocus;
 
 let focused: HTMLElement | null = null;
 
@@ -25,60 +23,44 @@ afterAll(() => {
   HTMLElement.prototype.focus = original_focus;
 });
 
-describe("use:autofocus", () => {
-  test("use:autofocus focuses the element", () => {
-    const result = createRoot(dispose => ({
-      dispose,
-      el: (
-        <button use:autofocus autofocus>
-          Autofocused
-        </button>
-      ) as HTMLButtonElement,
-    }));
+describe("autofocus", () => {
+  test("focuses the element with autofocus attribute", () => {
+    const el = document.createElement("button");
+    el.setAttribute("autofocus", "");
 
+    const dispose = createRoot(dispose => {
+      // Phase 1: factory registers onSettled
+      const ref = autofocus();
+      // Phase 2: ref callback receives the element
+      ref(el);
+      return dispose;
+    });
+
+    flush();
     expect(focused).toBe(null);
-
     vi.runAllTimers();
-    expect(focused).toBe(result.el);
+    expect(focused).toBe(el);
 
-    result.dispose();
+    dispose();
   });
 
-  test("use:autofocus doesn't focus when autofocus={false}", () => {
-    const result = createRoot(dispose => ({
-      dispose,
-      el: (
-        <button use:autofocus autofocus={false}>
-          Autofocused
-        </button>
-      ) as HTMLButtonElement,
-    }));
+  test("doesn't focus when autofocus HTML attribute is absent", () => {
+    const el = document.createElement("button");
 
+    const dispose = createRoot(dispose => {
+      const ref = autofocus();
+      ref(el);
+      return dispose;
+    });
+
+    flush();
     expect(focused).toBe(null);
-
-    vi.runAllTimers();
-    expect(focused).toBe(null);
-
-    result.dispose();
-  });
-
-  test("doesn't focus with use:autofocus={false}", async () => {
-    const result = createRoot(dispose => ({
-      dispose,
-      el: (
-        <button use:autofocus={false} autofocus>
-          Autofocused
-        </button>
-      ) as HTMLButtonElement,
-    }));
-
-    expect(focused).toBe(null);
-
     vi.runAllTimers();
     expect(focused).toBe(null);
 
-    result.dispose();
+    dispose();
   });
+
 });
 
 describe("createAutofocus", () => {
@@ -91,8 +73,8 @@ describe("createAutofocus", () => {
       return dispose;
     });
 
+    flush();
     expect(focused).toBe(null);
-
     vi.runAllTimers();
     expect(focused).toBe(el);
 
@@ -107,20 +89,20 @@ describe("createAutofocus", () => {
       return dispose;
     });
 
+    flush();
     expect(focused).toBe(null);
-
     vi.runAllTimers();
     expect(focused).toBe(null);
 
     setRef(el);
+    flush();
     expect(focused).toBe(null);
-
     vi.runAllTimers();
     expect(focused).toBe(el);
 
     setRef(el2);
+    flush();
     expect(focused).toBe(el);
-
     vi.runAllTimers();
     expect(focused).toBe(el2);
 
@@ -128,7 +110,6 @@ describe("createAutofocus", () => {
 
     setRef(el);
     expect(focused).toBe(el2);
-
     vi.runAllTimers();
     expect(focused).toBe(el2);
   });

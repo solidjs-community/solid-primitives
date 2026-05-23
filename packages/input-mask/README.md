@@ -26,7 +26,7 @@ For convenience reasons, the handler returns the current value, which allows you
 import {
   stringMaskToArray,
   regexMaskToFn,
-  arrayMaskToFn,
+  maskArrayToFn,
   anyMaskToFn,
   createInputMask,
   stringMaskRegExp,
@@ -35,7 +35,7 @@ import {
 // 9 = any number,
 // 0 = any number (optional),
 // a = any letter,
-// z = any letter (optional),
+// o = any letter (optional),
 // * = any alphanumeric character,
 // ? = any alphanumeric character (optional)
 // any other letter becomes a fixed placeholder
@@ -45,7 +45,7 @@ import {
 stringMaskRegExp.u = /[A-Z]/;
 const isodate = "9999-99-99";
 // array mask: RegExp to match variable parts, strings for fixed placeholders
-const meetingId = [/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/]);
+const meetingId = [/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/];
 // regex replacer mask: a RegExp to match parts and a function to replace them
 // with the output of a function:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_the_replacement
@@ -63,7 +63,7 @@ const meetingIdOrName = (value, selection) =>
 // converting string mask to array:
 const maskArrayFromString = stringMaskToArray(maskString);
 // converting other formats to function:
-const maskFuncFromArray = arrayMaskToFn(maskArray);
+const maskFuncFromArray = maskArrayToFn(maskArray);
 const maskFuncFromRegexReplacer = regexMaskToFn(regexMask, replacerFn);
 const maskFuncFromAny = anyMaskToFn(mask);
 
