@@ -1,7 +1,6 @@
 import { access, tryOnCleanup, noop, type MaybeAccessor } from "@solid-primitives/utils";
 import {
   type Accessor,
-  type JSX,
   type Setter,
   createEffect,
   createMemo,
@@ -9,7 +8,7 @@ import {
   onCleanup,
   untrack,
 } from "solid-js";
-import { isServer } from "@solidjs/web";
+import { isServer, type JSX } from "@solidjs/web";
 
 /**
  * createSegment - create a reactive segment out of an array of items
@@ -359,6 +358,8 @@ export type _E = JSX.Element;
  * @method `setPages` allows to manually replace the accumulated items
  * @method `end` is a boolean indicator for end of the content
  * @method `setEnd` allows to manually change the end state
+ * @method `fetching` is true while a page fetch is in progress
+ * @method `error` contains the last fetch error, or undefined if the last fetch succeeded
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
   pages: Accessor<T[]>,
@@ -369,6 +370,8 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     setPages: Setter<T[]>;
     end: Accessor<boolean>;
     setEnd: Setter<boolean>;
+    fetching: Accessor<boolean>;
+    error: Accessor<unknown>;
   },
 ] {
   // ownedWrite allows setters to be called from reactive scopes and event handlers
@@ -376,6 +379,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
   const [page, setPage] = createSignal(0, { ownedWrite: true });
   const [end, setEnd] = createSignal(false, { ownedWrite: true });
   const [fetching, setFetching] = createSignal(false, { ownedWrite: true });
+  const [error, setError] = createSignal<unknown>(undefined, { ownedWrite: true });
 
   let add: (el: Element) => void = noop;
   if (!isServer) {
@@ -395,12 +399,20 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
       currentPage => {
         let cancelled = false;
         setFetching(true);
-        fetcher(currentPage).then(content => {
-          if (cancelled) return;
-          if (content.length === 0) setEnd(true);
-          setPages(p => [...p, ...content]);
-          setFetching(false);
-        });
+        fetcher(currentPage)
+          .then(content => {
+            if (cancelled) return;
+            setError(undefined);
+            if (content.length === 0) setEnd(true);
+            setPages(p => [...p, ...content]);
+            setFetching(false);
+          })
+          .catch(err => {
+            if (cancelled) return;
+            setError(err);
+            setEnd(true);
+            setFetching(false);
+          });
         return () => {
           cancelled = true;
         };
@@ -417,6 +429,8 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
       setPages,
       end,
       setEnd,
+      fetching,
+      error,
     },
   ];
 }
