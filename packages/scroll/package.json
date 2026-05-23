@@ -1,10 +1,17 @@
 {
   "name": "@solid-primitives/scroll",
   "version": "2.1.5",
-  "description": "Reactive primitives to react to element/window scrolling.",
+  "description": "Reactive primitives to react to element/window scrolling, and to prevent scroll outside of a given element.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
-    "Damian Tarnawski <gthetarnav@gmail.com>"
+    {
+      "name": "Damian Tarnawski",
+      "email": "gthetarnav@gmail.com"
+    },
+    {
+      "name": "Jasmin Noetzli",
+      "url": "https://github.com/GiyoMoon"
+    }
   ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/scroll",
@@ -17,7 +24,8 @@
     "stage": 2,
     "list": [
       "createScrollPosition",
-      "useWindowScrollPosition"
+      "useWindowScrollPosition",
+      "createPreventScroll"
     ],
     "category": "Inputs"
   },
@@ -49,19 +57,26 @@
     "monitor",
     "scrollTo",
     "scroll",
+    "prevent-scroll",
+    "scroll-lock",
+    "accessibility",
+    "a11y",
     "solid",
     "primitives"
   ],
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/rootless": "workspace:^",
-    "@solid-primitives/static-store": "workspace:^"
+    "@solid-primitives/static-store": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }

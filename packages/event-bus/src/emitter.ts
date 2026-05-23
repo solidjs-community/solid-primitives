@@ -1,5 +1,4 @@
 import { tryOnCleanup } from "@solid-primitives/utils";
-import { onCleanup } from "solid-js";
 import { createEventBus, EventBusCore, type Listener } from "./eventBus.js";
 
 export class EmitterCore<M extends Record<PropertyKey, any>> extends Map<
@@ -69,7 +68,7 @@ export function createEmitter<M extends Record<PropertyKey, any>>(): Emitter<M> 
       return tryOnCleanup(emitter.off.bind(emitter, event, listener as any));
     },
     emit: emitter.emit.bind(emitter),
-    clear: onCleanup(emitter.clear.bind(emitter)),
+    clear: tryOnCleanup(emitter.clear.bind(emitter)),
   };
 }
 

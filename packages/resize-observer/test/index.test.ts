@@ -1,6 +1,5 @@
 import { describe, test, expect, afterAll } from "vitest";
-import { createRoot, createSignal, onMount } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createRoot, createSignal, createStore, flush, onSettled } from "solid-js";
 import {
   Size,
   createElementSize,
@@ -26,6 +25,7 @@ afterAll(() => {
 
 let _targets: Set<Element>;
 let disconnect_count = 0;
+let _observe_calls: Element[] = [];
 class TestResizeObserver {
   _targets: Set<Element>;
   constructor() {
@@ -33,6 +33,7 @@ class TestResizeObserver {
   }
   observe(target: Element): void {
     this._targets.add(target);
+    _observe_calls.push(target);
   }
   unobserve(target: Element): void {
     this._targets.delete(target);
@@ -64,6 +65,7 @@ describe("createResizeObserver", () => {
       createResizeObserver(div1, () => {});
       return dispose;
     });
+    flush();
 
     expect(targets.size).toBe(1);
     expect(targets.has(div1)).toBeTruthy();
@@ -77,6 +79,7 @@ describe("createResizeObserver", () => {
       createResizeObserver([div1, div2], () => {});
       return dispose;
     });
+    flush();
     expect(targets.size).toBe(2);
     expect(targets.has(div1)).toBeTruthy();
     expect(targets.has(div2)).toBeTruthy();
@@ -92,12 +95,15 @@ describe("createResizeObserver", () => {
       expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
       return { dispose, setRefs };
     });
+    flush();
 
     expect(targets.size).toBe(1);
     expect(targets.has(div1)).toBeTruthy();
 
     setRefs([div2, div3]);
+    flush();
     expect(targets.size).toBe(2);
+    expect(targets.has(div1)).toBeFalsy();
     expect(targets.has(div2)).toBeTruthy();
     expect(targets.has(div3)).toBeTruthy();
 
@@ -112,14 +118,90 @@ describe("createResizeObserver", () => {
       expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
       return { dispose, setRefs };
     });
+    flush();
 
     expect(targets.size).toBe(1);
     expect(targets.has(div1)).toBeTruthy();
 
-    setRefs([div2, div3]);
+    setRefs(() => [div2, div3]);
+    flush();
     expect(targets.size).toBe(2);
+    expect(targets.has(div1)).toBeFalsy();
     expect(targets.has(div2)).toBeTruthy();
     expect(targets.has(div3)).toBeTruthy();
+
+    dispose();
+  });
+
+  test("observes added targets", () => {
+    const targets = (_targets = new Set<Element>());
+    const { dispose, setRefs } = createRoot(dispose => {
+      const [refs, setRefs] = createSignal([div1]);
+      createResizeObserver(refs, () => {});
+      return { dispose, setRefs };
+    });
+    flush();
+    expect(targets.size).toBe(1);
+    expect(targets.has(div1)).toBeTruthy();
+
+    setRefs([div1, div2]);
+    flush();
+    expect(targets.size).toBe(2);
+    expect(targets.has(div1)).toBeTruthy();
+    expect(targets.has(div2)).toBeTruthy();
+
+    setRefs([div1, div2, div3]);
+    flush();
+    expect(targets.size).toBe(3);
+    expect(targets.has(div1)).toBeTruthy();
+    expect(targets.has(div2)).toBeTruthy();
+    expect(targets.has(div3)).toBeTruthy();
+
+    dispose();
+  });
+
+  test("unobserves removed targets", () => {
+    const targets = (_targets = new Set<Element>());
+    const { dispose, setRefs } = createRoot(dispose => {
+      const [refs, setRefs] = createSignal([div1, div2, div3]);
+      createResizeObserver(refs, () => {});
+      return { dispose, setRefs };
+    });
+    flush();
+    expect(targets.size).toBe(3);
+
+    setRefs([div1]);
+    flush();
+    expect(targets.size).toBe(1);
+    expect(targets.has(div1)).toBeTruthy();
+    expect(targets.has(div2)).toBeFalsy();
+    expect(targets.has(div3)).toBeFalsy();
+
+    setRefs([]);
+    flush();
+    expect(targets.size).toBe(0);
+
+    dispose();
+  });
+
+  test("observe is called only once per node", () => {
+    _targets = new Set<Element>();
+    _observe_calls = [];
+    const { dispose, setRefs } = createRoot(dispose => {
+      const [refs, setRefs] = createSignal([div1, div2]);
+      createResizeObserver(refs, () => {});
+      return { dispose, setRefs };
+    });
+    flush();
+    expect(_observe_calls.length).toBe(2);
+    expect(_observe_calls.filter(t => t === div1).length).toBe(1);
+    expect(_observe_calls.filter(t => t === div2).length).toBe(1);
+
+    _observe_calls = [];
+    setRefs([div1, div3]);
+    flush();
+    expect(_observe_calls.length).toBe(1);
+    expect(_observe_calls.filter(t => t === div3).length).toBe(1);
 
     dispose();
   });
@@ -158,7 +240,7 @@ describe("createElementSize", () => {
       expect(size.width).toBe(null);
       expect(size.height).toBe(null);
 
-      onMount(() => {
+      onSettled(() => {
         expect(size.width).toBe(100);
         expect(size.height).toBe(200);
         dispose();
