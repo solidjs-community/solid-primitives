@@ -1,47 +1,9 @@
 import { type Accessor, createEffect, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
+import { type CursorProperty } from "./types.js";
 
-export type CursorProperty =
-  | "-moz-grab"
-  | "-webkit-grab"
-  | "alias"
-  | "all-scroll"
-  | "auto"
-  | "cell"
-  | "col-resize"
-  | "context-menu"
-  | "copy"
-  | "crosshair"
-  | "default"
-  | "e-resize"
-  | "ew-resize"
-  | "grab"
-  | "grabbing"
-  | "help"
-  | "move"
-  | "n-resize"
-  | "ne-resize"
-  | "nesw-resize"
-  | "no-drop"
-  | "none"
-  | "not-allowed"
-  | "ns-resize"
-  | "nw-resize"
-  | "nwse-resize"
-  | "pointer"
-  | "progress"
-  | "row-resize"
-  | "s-resize"
-  | "se-resize"
-  | "sw-resize"
-  | "text"
-  | "vertical-text"
-  | "w-resize"
-  | "wait"
-  | "zoom-in"
-  | "zoom-out"
-  | (string & {});
+export type { CursorProperty };
 
 /**
  * Set selected {@link cursor} to body element styles immediately.
@@ -79,9 +41,14 @@ export function makeBodyCursor(cursor: CursorProperty): VoidFunction {
  */
 export function makeElementCursor(target: HTMLElement, cursor: CursorProperty): VoidFunction {
   if (isServer) return noop;
-  const overwritten = target.style.cursor;
+  const prevValue = target.style.getPropertyValue("cursor");
+  const prevPriority = target.style.getPropertyPriority("cursor");
   target.style.setProperty("cursor", cursor, "important");
-  return () => (target.style.cursor = overwritten);
+  return () => {
+    prevValue
+      ? target.style.setProperty("cursor", prevValue, prevPriority)
+      : target.style.removeProperty("cursor");
+  };
 }
 
 /**
@@ -116,9 +83,14 @@ export function createElementCursor(
 
   const apply = ({ el, cursorValue }: State) => {
     if (!el) return;
-    const overwritten = el.style.cursor;
+    const prevValue = el.style.getPropertyValue("cursor");
+    const prevPriority = el.style.getPropertyPriority("cursor");
     el.style.setProperty("cursor", cursorValue, "important");
-    return () => (el.style.cursor = overwritten);
+    return () => {
+      prevValue
+        ? el.style.setProperty("cursor", prevValue, prevPriority)
+        : el.style.removeProperty("cursor");
+    };
   };
 
   createEffect(compute, apply);
@@ -144,9 +116,14 @@ export function createBodyCursor(cursor: Accessor<CursorProperty | FalsyValue>):
 
   createEffect(cursor, cursorValue => {
     if (!cursorValue) return;
-    const overwritten = document.body.style.cursor;
+    const prevValue = document.body.style.getPropertyValue("cursor");
+    const prevPriority = document.body.style.getPropertyPriority("cursor");
     document.body.style.setProperty("cursor", cursorValue, "important");
-    return () => (document.body.style.cursor = overwritten);
+    return () => {
+      prevValue
+        ? document.body.style.setProperty("cursor", prevValue, prevPriority)
+        : document.body.style.removeProperty("cursor");
+    };
   });
 }
 
@@ -190,7 +167,10 @@ export function createDragCursor(
   createEffect(
     () => access(target),
     el => {
-      if (!el) return;
+      if (!el) {
+        setDragging(false);
+        return;
+      }
       const onDown = () => setDragging(true);
       const onUp = () => setDragging(false);
       el.addEventListener("pointerdown", onDown);

@@ -8,7 +8,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/cursor?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/cursor)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitives for setting the CSS cursor property reactively.
+Utilities for setting the CSS cursor property via reactive primitives (`createBodyCursor`, `createElementCursor`) and imperative APIs (`makeBodyCursor`, `makeElementCursor`).
 
 - [`makeBodyCursor`](#makebodycursor) - Set cursor on body immediately; returns a cleanup function.
 - [`makeElementCursor`](#makeelementcursor) - Set cursor on an element immediately; returns a cleanup function.
