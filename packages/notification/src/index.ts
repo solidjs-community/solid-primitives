@@ -194,7 +194,7 @@ export function createNotification(
  * is still resolving. Note that the Notifications API uses `"default"` for
  * the same concept that the Permissions API calls `"prompt"`.
  *
- * @returns `{ permission, requestPermission }`
+ * @returns `{ permission, requestPermission, pending }`
  *
  * @example
  * ```ts

@@ -78,6 +78,7 @@ Reactive primitive tied to the current reactive owner.
 - Pass an optional `handlers` object to respond to notification events.
 
 ```ts
+import { createEffect } from "solid-js";
 import { createNotification } from "@solid-primitives/notification";
 
 const { show, close, notification, supported } = createNotification(
@@ -113,9 +114,10 @@ The `permission` accessor reflects the **live** permission state and updates aut
 
 Permission values follow Permissions API vocabulary: `"granted"`, `"denied"`, `"prompt"` (not yet asked), or `"unknown"` while the initial async query is still resolving. Note that the Notifications API uses `"default"` for the same concept that the Permissions API calls `"prompt"`.
 
-On the server or when the API is unavailable, `permission` always returns `"unknown"` and `requestPermission` resolves immediately to `"denied"`.
+On the server or when the API is unavailable, `permission` always returns `"unknown"` and `requestPermission` resolves immediately without effect.
 
 ```ts
+import { Show } from "solid-js";
 import { createNotificationPermission } from "@solid-primitives/notification";
 
 const { permission, requestPermission } = createNotificationPermission();
@@ -125,9 +127,8 @@ const { permission, requestPermission } = createNotificationPermission();
   <button onClick={requestPermission}>Enable notifications</button>
 </Show>
 
-// Await the result (returns the raw NotificationPermission value)
-const result = await requestPermission();
-// result: "granted" | "denied" | "default"
+// Call without expecting a return value — permission() updates reactively after it resolves
+requestPermission();
 ```
 
 ---
@@ -135,6 +136,7 @@ const result = await requestPermission();
 ### Full example
 
 ```tsx
+import { Component, Show } from "solid-js";
 import {
   createNotification,
   createNotificationPermission,
