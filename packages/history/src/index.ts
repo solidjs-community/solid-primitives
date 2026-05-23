@@ -91,7 +91,7 @@ export function createUndoHistory(
     sources = Array.isArray(source) ? source.map(s => createMemo(s)) : [source],
     clearIgnore = createMicrotask(() => (ignoreNext = false)),
     // Initial state lives outside the memo so Solid 2.0's undefined-prev first-call is handled
-    initialCount = createSignal<number>(0, { pureWrite: true }),
+    initialCount = createSignal<number>(0, { ownedWrite: true }),
     initialState: HistoryState = { list: [], count: initialCount },
     history = createMemo<HistoryState>(p => {
       const prev = p ?? initialState;
@@ -113,7 +113,7 @@ export function createUndoHistory(
         newHistory = prev.list.slice(Math.max(0, newLength - limit), newLength);
       newHistory.push(setters);
 
-      return { count: count ? createSignal(0, { pureWrite: true }) : prev.count, list: newHistory };
+      return { count: count ? createSignal(0, { ownedWrite: true }) : prev.count, list: newHistory };
     }),
     canUndo = createMemo(() => {
       const h = history();
