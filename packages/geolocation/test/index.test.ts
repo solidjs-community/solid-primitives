@@ -1,45 +1,382 @@
 import "./setup";
 import { mockCoordinates } from "./setup.js";
-import { createRoot, createSignal } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { createRoot, createSignal, flush } from "solid-js";
+import { describe, expect, it, vi } from "vitest";
 
-import { createGeolocation, createGeolocationWatcher } from "../src/index.js";
+import {
+  makeGeolocation,
+  makeGeolocationWatcher,
+  createGeolocation,
+  createGeolocationWatcher,
+  createDistance,
+  createWithinRadius,
+} from "../src/index.js";
+
+// ── makeGeolocation ───────────────────────────────────────────────────────────
+
+describe("makeGeolocation", () => {
+  it("resolves coordinates without a Solid owner", async () => {
+    const [query, cleanup] = makeGeolocation();
+    const coords = await query();
+    expect(coords).toBe(mockCoordinates);
+    cleanup();
+  });
+
+  it("cleanup prevents resolution of subsequent queries", async () => {
+    const [query, cleanup] = makeGeolocation();
+    cleanup();
+    // query after cleanup should not resolve (it returns without calling getCurrentPosition)
+    let resolved = false;
+    query().then(() => (resolved = true));
+    await Promise.resolve();
+    expect(resolved).toBe(false);
+  });
+
+  it("rejects when geolocation fails", async () => {
+    const spy = vi
+      .spyOn(navigator.geolocation, "getCurrentPosition")
+      .mockImplementation((_: any, reject: any) =>
+        reject({ code: 1, message: "Permission denied" }),
+      );
+    const [query, cleanup] = makeGeolocation();
+    await expect(query()).rejects.toThrow("Permission denied");
+    cleanup();
+    spy.mockRestore();
+  });
+});
+
+// ── makeGeolocationWatcher ────────────────────────────────────────────────────
+
+describe("makeGeolocationWatcher", () => {
+  it("starts watching and provides initial location without a Solid owner", () => {
+    const [store, cleanup] = makeGeolocationWatcher();
+    expect(store.location).toBe(mockCoordinates);
+    expect(store.error).toBe(null);
+    cleanup();
+  });
+
+  it("cleanup calls clearWatch", () => {
+    const clearWatch = vi.spyOn(navigator.geolocation, "clearWatch");
+    const [, cleanup] = makeGeolocationWatcher();
+    cleanup();
+    expect(clearWatch).toHaveBeenCalled();
+    clearWatch.mockRestore();
+  });
+});
+
+// ── createGeolocation ─────────────────────────────────────────────────────────
 
 describe("createGeolocation", () => {
-  it("test basic geolocation", () =>
+  it("resolves coordinates via async accessor", () =>
     createRoot(async dispose => {
       const [location] = createGeolocation();
-      expect(location.loading).toBe(true);
-      await location.loading;
-      expect(location.loading).toBe(false);
-      expect(location()).toBe(mockCoordinates);
+      const coords = await location();
+      expect(coords).toBe(mockCoordinates);
       dispose();
     }));
 
-  it("test basic geolocation error", () =>
+  it("rejects with an Error on failure", () =>
     createRoot(async dispose => {
       navigator.geolocation.getCurrentPosition = (_, reject: (error: any) => void) => {
         reject({ code: 1, message: "GeoLocation error" });
       };
       const [location] = createGeolocation();
+      await expect(location()).rejects.toThrow("GeoLocation error");
+      dispose();
+    }));
+
+  it("refetch triggers a new position query", () =>
+    createRoot(async dispose => {
+      let callCount = 0;
+      navigator.geolocation.getCurrentPosition = (resolve: PositionCallback) => {
+        callCount++;
+        resolve({ coords: mockCoordinates } as GeolocationPosition);
+      };
+      const [location, refetch] = createGeolocation();
       await location();
-      expect(location.loading).toBe(false);
-      expect(location.error).toBeInstanceOf(Error);
-      expect(location.error.code).toBe(1);
-      expect(location.error.message).toBe("GeoLocation error");
+      expect(callCount).toBe(1);
+      refetch();
+      await location();
+      expect(callCount).toBe(2);
+      dispose();
+    }));
+
+  it("re-queries when reactive options change", () =>
+    createRoot(async dispose => {
+      let lastOptions: PositionOptions | undefined;
+      navigator.geolocation.getCurrentPosition = (
+        resolve: PositionCallback,
+        _: any,
+        opts?: PositionOptions,
+      ) => {
+        lastOptions = opts;
+        resolve({ coords: mockCoordinates } as GeolocationPosition);
+      };
+      const [opts, setOpts] = createSignal<PositionOptions>({ enableHighAccuracy: false });
+      const [location] = createGeolocation(opts);
+      await location();
+      expect(lastOptions?.enableHighAccuracy).toBe(false);
+      setOpts({ enableHighAccuracy: true });
+      flush();
+      await location();
+      expect(lastOptions?.enableHighAccuracy).toBe(true);
       dispose();
     }));
 });
 
-describe("createGeolocation", () => {
-  it("test basic geolocation", () =>
+// ── createGeolocation — initialLocation ──────────────────────────────────────
+
+describe("createGeolocation — initialLocation (client)", () => {
+  it("initialLocation is ignored on the client — GPS is still queried", () =>
     createRoot(async dispose => {
-      const [enabled, setEnabled] = createSignal(false);
-      const watcher = createGeolocationWatcher(enabled);
-      expect(watcher.location).toBe(null);
-      expect(watcher.error).toBe(null);
-      await setEnabled(true);
-      expect(watcher.location).toBe(mockCoordinates);
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const [location] = createGeolocation(undefined, seed);
+      const coords = await location();
+      // Mock always returns mockCoordinates, not the seed
+      expect(coords).toBe(mockCoordinates);
+      dispose();
+    }));
+});
+
+// ── createGeolocationWatcher ──────────────────────────────────────────────────
+
+describe("createGeolocationWatcher", () => {
+  it("location and error are signal accessors", () =>
+    createRoot(dispose => {
+      const { location, error } = createGeolocationWatcher(true);
+      expect(typeof location).toBe("function");
+      expect(typeof error).toBe("function");
+      dispose();
+    }));
+
+  it("location updates after first watchPosition callback", () =>
+    createRoot(async dispose => {
+      const { location } = createGeolocationWatcher(true);
+      // Allow effect + watchPosition callback to run
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(location()).toBe(mockCoordinates);
+      dispose();
+    }));
+
+  it("location throws NotReadyError (pending) before first fix", () =>
+    createRoot(dispose => {
+      const { location } = createGeolocationWatcher(false);
+      expect(() => location()).toThrow();
+      dispose();
+    }));
+
+  it("error() is null on success", () =>
+    createRoot(async dispose => {
+      const { error } = createGeolocationWatcher(true);
+      await Promise.resolve();
+      expect(error()).toBe(null);
+      dispose();
+    }));
+
+  it("error() is set when watchPosition fails", () =>
+    createRoot(async dispose => {
+      const spy = vi
+        .spyOn(navigator.geolocation, "watchPosition")
+        .mockImplementation((_: any, errorCallback: any) => {
+          errorCallback({ code: 1, message: "Denied" } as GeolocationPositionError);
+          return 0;
+        });
+      const { error } = createGeolocationWatcher(true);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(error()?.message).toBe("Denied");
+      spy.mockRestore();
+      dispose();
+    }));
+
+  it("clears the watcher when disabled", () =>
+    createRoot(async dispose => {
+      const clearWatch = vi.spyOn(navigator.geolocation, "clearWatch");
+      const [enabled, setEnabled] = createSignal(true);
+      createGeolocationWatcher(enabled);
+      await Promise.resolve();
+      setEnabled(false);
+      await Promise.resolve();
+      expect(clearWatch).toHaveBeenCalled();
+      clearWatch.mockRestore();
+      dispose();
+    }));
+
+  it("initialLocation: location() returns seed immediately without waiting for GPS", () =>
+    createRoot(dispose => {
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const { location } = createGeolocationWatcher(true, undefined, seed);
+      const coords = location();
+      expect(coords.latitude).toBe(seed.latitude);
+      expect(coords.longitude).toBe(seed.longitude);
+      dispose();
+    }));
+
+  it("initialLocation: GPS fix replaces seed value", () =>
+    createRoot(async dispose => {
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const { location } = createGeolocationWatcher(true, undefined, seed);
+      expect(location().latitude).toBe(seed.latitude);
+      await Promise.resolve();
+      await Promise.resolve();
+      // After GPS fires, real coords replace the seed
+      expect(location()).toBe(mockCoordinates);
+      dispose();
+    }));
+
+  it("initialLocation: fills non-lat/lng fields with defaults", () =>
+    createRoot(dispose => {
+      const seed = { latitude: 51.5074, longitude: -0.1278 };
+      const { location } = createGeolocationWatcher(false, undefined, seed);
+      const coords = location();
+      expect(coords.altitude).toBeNull();
+      expect(coords.accuracy).toBe(0);
+      expect(coords.altitudeAccuracy).toBeNull();
+      expect(coords.heading).toBeNull();
+      expect(coords.speed).toBeNull();
+      dispose();
+    }));
+});
+
+// ── createDistance ────────────────────────────────────────────────────────────
+
+describe("createDistance", () => {
+  it("returns null before first GPS fix", () =>
+    createRoot(dispose => {
+      const distance = createDistance(mockCoordinates, { enabled: false });
+      expect(distance()).toBe(null);
+      dispose();
+    }));
+
+  it("returns 0 when target matches user location", () =>
+    createRoot(async dispose => {
+      const distance = createDistance(mockCoordinates);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distance()).toBe(0);
+      dispose();
+    }));
+
+  it("returns a positive km distance for a different target", () =>
+    createRoot(async dispose => {
+      // ~1 degree north of mockCoordinates ≈ 111 km away
+      const distance = createDistance({ latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude });
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distance()).toBeGreaterThan(100);
+      expect(distance()).toBeLessThan(120);
+      dispose();
+    }));
+
+  it("converts to metres with unit: 'm'", () =>
+    createRoot(async dispose => {
+      const distanceKm = createDistance(mockCoordinates);
+      const distanceM = createDistance(mockCoordinates, { unit: "m" });
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distanceM()).toBe((distanceKm() ?? 0) * 1000);
+      dispose();
+    }));
+
+  it("reacts when target changes", () =>
+    createRoot(async dispose => {
+      const [target, setTarget] = createSignal<{ latitude: number; longitude: number }>(mockCoordinates);
+      const distance = createDistance(target);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distance()).toBe(0);
+      setTarget({ latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude });
+      flush();
+      expect(distance()).toBeGreaterThan(0);
+      dispose();
+    }));
+
+  it("initialLocation: returns distance from seed immediately", () =>
+    createRoot(dispose => {
+      const seed = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      // Target is at seed position; user seed is 1° north of mockCoordinates
+      const distance = createDistance(mockCoordinates, { enabled: false, initialLocation: seed });
+      expect(distance()).toBeGreaterThan(100);
+      expect(distance()).toBeLessThan(120);
+      dispose();
+    }));
+});
+
+// ── createWithinRadius ────────────────────────────────────────────────────────
+
+describe("createWithinRadius", () => {
+  it("returns false before first GPS fix", () =>
+    createRoot(dispose => {
+      const within = createWithinRadius(mockCoordinates, 1000, { enabled: false });
+      expect(within()).toBe(false);
+      dispose();
+    }));
+
+  it("returns true when user is at the centre (radius 0)", () =>
+    createRoot(async dispose => {
+      const within = createWithinRadius(mockCoordinates, 0);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("returns true when user is within radius", () =>
+    createRoot(async dispose => {
+      // User is at mockCoordinates; centre is same point; 1 km radius
+      const within = createWithinRadius(mockCoordinates, 1000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("returns false when user is outside radius", () =>
+    createRoot(async dispose => {
+      // Centre is ~111 km away; radius is only 1 km
+      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const within = createWithinRadius(farCenter, 1000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(false);
+      dispose();
+    }));
+
+  it("reacts when radius changes", () =>
+    createRoot(async dispose => {
+      // Centre is ~111 km away; start with small radius then expand
+      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const [radius, setRadius] = createSignal(1000);
+      const within = createWithinRadius(farCenter, radius);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(false);
+      setRadius(200_000); // 200 km
+      flush();
+      expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("initialLocation: returns true when seed is within radius", () =>
+    createRoot(dispose => {
+      // Seed is at mockCoordinates; centre is also mockCoordinates; 1 km radius
+      const within = createWithinRadius(mockCoordinates, 1000, {
+        enabled: false,
+        initialLocation: mockCoordinates,
+      });
+      expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("initialLocation: returns false when seed is outside radius", () =>
+    createRoot(dispose => {
+      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const within = createWithinRadius(farCenter, 1000, {
+        enabled: false,
+        initialLocation: mockCoordinates,
+      });
+      expect(within()).toBe(false);
       dispose();
     }));
 });

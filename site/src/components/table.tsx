@@ -1,11 +1,10 @@
 import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
-import { defer } from "@solid-primitives/utils";
-import { createEffect, createSignal, onMount, type ParentComponent } from "solid-js";
+import { createEffect, createSignal, onSettled, type ParentComponent } from "solid-js";
 import { pageWidthClass } from "~/constants.js";
 import { doesPathnameMatchBase, reflow } from "~/utils.js";
 import * as Header from "./Header/Header.js";
-import { useLocation } from "@solidjs/router";
+import { useLocation } from "@tanstack/solid-router";
 
 export const TR: ParentComponent = props => {
   return (
@@ -277,7 +276,7 @@ export const Table: ParentComponent = props => {
     }
   };
 
-  onMount(() => {
+  onSettled(() => {
     queryTableElements(tableEl);
     if (isSafari || isIOS) {
       // Safari doesn't take borders into account, so subtrack 2px
@@ -401,52 +400,50 @@ export const Table: ParentComponent = props => {
   );
 
   createEffect(
-    defer(
-      () => location.hash,
-      (currentHash, prevHash) => {
-        if (prevHash === currentHash) return;
-        if (!doesPathnameMatchBase(location.pathname)) return;
+    () => location().hash,
+    (currentHash, prevHash) => {
+      if (prevHash === currentHash) return;
+      if (!doesPathnameMatchBase(location().pathname)) return;
 
-        const run = () => {
-          const tableElBCR = tableEl.getBoundingClientRect();
+      const run = () => {
+        const tableElBCR = tableEl.getBoundingClientRect();
 
-          const top = tableElBCR.top - rootMarginTop;
-          const bottom = tableElBCR.bottom - rootMarginTop;
+        const top = tableElBCR.top - rootMarginTop;
+        const bottom = tableElBCR.bottom - rootMarginTop;
 
-          if (top + rootMarginTop > 0) {
-            tableHeaderName.textContent = "Name";
-            hideActiveHeader();
-            return;
-          }
-
-          if (top < 0 && bottom >= 0) {
-            showActiveHeader();
-            return;
-          }
-          // if (boundingClientRect.bottom > 0) return;
-          if (bottom > 0) return;
-          // if (tableSameWidthAsParent) return;
-
+        if (top + rootMarginTop > 0) {
+          tableHeaderName.textContent = "Name";
           hideActiveHeader();
-        };
+          return;
+        }
 
+        if (top < 0 && bottom >= 0) {
+          showActiveHeader();
+          return;
+        }
+        if (bottom > 0) return;
+
+        hideActiveHeader();
+      };
+
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
+          run();
+          setTimeout(() => {
             run();
-            setTimeout(() => {
-              run();
-            });
           });
         });
-      },
-    ),
+      });
+    },
+    { defer: true },
   );
 
   createEffect(
-    defer(translateStickyTheader, translateStickyTheader => {
+    () => translateStickyTheader(),
+    val => {
       if (!tableEl || !tableSameWidthAsParent || !headerActive()) return;
 
-      if (translateStickyTheader) {
+      if (val) {
         const tableBCR = tableEl.getBoundingClientRect();
         const theadPositionTop = 58;
         const theadBorderWidth = 2;
@@ -454,11 +451,11 @@ export const Table: ParentComponent = props => {
           tableBCR.top -
           (theadPositionTop - theadBorderWidth)
         )}px)`;
-        return;
       } else {
         tableHeader.style.transform = "";
       }
-    }),
+    },
+    { defer: true },
   );
 
   return (
@@ -472,8 +469,7 @@ export const Table: ParentComponent = props => {
         {/* despite having overflow-clip doesn't cut off overflowing table in Safari/iOS */}
         {/* so added a inverse rounded corner to hide overflowing theader text */}
         <div
-          class="inverse-corner-[size(30px)_color(var(--page-main-bg))_position(0,100%)] pointer-events-none absolute right-0 top-0 z-10"
-          classList={{ hidden: !(isSafari || isIOS) }}
+          class={["inverse-corner-[size(30px)_color(var(--page-main-bg))_position(0,100%)] pointer-events-none absolute right-0 top-0 z-10", { hidden: !(isSafari || isIOS) }]}
         />
         <div class="pointer-events-none absolute left-0 top-0 z-10 h-full w-full rounded-[30px] border-[7px] border-[#E4F6F9] dark:border-[#2b455a]" />
         <div

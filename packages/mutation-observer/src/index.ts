@@ -1,5 +1,5 @@
-import { onCleanup, onMount } from "solid-js";
-import type { JSX } from "solid-js";
+import { onCleanup, onSettled } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { access, asArray, type MaybeAccessor } from "@solid-primitives/utils";
 
 export type MutationObserverAdd = (
@@ -17,44 +17,37 @@ export type MutationObserverReturn = [
   },
 ];
 
-export type MutationObserverStandaloneDirectiveProps = [
-  options: MutationObserverInit,
-  callback: MutationCallback,
-];
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      mutationObserver: MutationObserverInit | MutationObserverStandaloneDirectiveProps;
-    }
-  }
-}
-// this ensures the `JSX` import won't fall victim to tree shaking before typescript can use it
-export type E = JSX.Element;
-
 /**
  * Primitive providing the ability to watch for changes being made to the DOM tree.
- * 
+ *
+ * Automatically starts observing after the component settles and disconnects on cleanup.
+ * The returned `add` function can be used directly as a ref to observe a single element.
+ *
  * @param initial html elements to be observed by the MutationObserver
  * @param options MutationObserver options
  * @param callback function called by MutationObserver when DOM tree mutation is triggered
- * 
+ *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutation-observer
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
- * 
+ *
  * @example
  * ```ts
- * let ref: !HTMLElement;
- * const [observe, { start, stop, instance }] = createMutationObserver(
- *   () => ref,
+ * // Observe a single element via ref
+ * const [add] = createMutationObserver([], { childList: true }, records => console.log(records));
+ * <div ref={add} />
+ *
+ * // Observe multiple elements
+ * const [add, { start, stop }] = createMutationObserver(
+ *   () => [el1, el2],
  *   { attributes: true, subtree: true },
  *   records => console.log(records)
  * );
- * 
- * // Usage as a directive
- * const [mutationObserver] = createMutationObserver([], e => {...})
-
-<div use:mutationObserver={{ childList: true }}>...</div>
+ *
+ * // Per-element options
+ * createMutationObserver(
+ *   [[el, { childList: true }], [el2, { attributes: true }]],
+ *   records => console.log(records)
+ * );
  * ```
  */
 export function createMutationObserver(
@@ -74,7 +67,7 @@ export function createMutationObserver(
   c?: MutationCallback,
 ): MutationObserverReturn {
   let defaultOptions: MutationObserverInit, callback: MutationCallback;
-  const isSupported = typeof window !== "undefined" && "MutationObserver" in window;
+  const isSupported = !isServer;
   if (typeof b === "function") {
     defaultOptions = {};
     callback = b;
@@ -86,13 +79,18 @@ export function createMutationObserver(
   const add: MutationObserverAdd = (el, options) =>
     instance?.observe(el, access(options) ?? defaultOptions);
   const start = () => {
+    if (!isSupported) return;
     asArray(access(initial)).forEach(item => {
       item instanceof Node ? add(item, defaultOptions) : add(item[0], item[1]);
     });
   };
   const stop = () => instance?.disconnect();
-  onMount(start);
-  onCleanup(stop);
+
+  if (isSupported) {
+    onSettled(start);
+    onCleanup(stop);
+  }
+
   return [
     add,
     {
@@ -105,24 +103,25 @@ export function createMutationObserver(
 }
 
 /**
- * Primitive providing the ability to watch for changes being made to the DOM tree.
- * A Standalone Directive.
+ * A standalone ref factory for observing mutations on a single element without needing
+ * to call `createMutationObserver` separately. For most cases, prefer using the `add`
+ * ref returned by `createMutationObserver` directly.
  *
- * @param props [MutationObserver options, callback]
+ * @param options MutationObserver options
+ * @param callback function called when mutations are observed
+ * @returns a ref callback to pass to an element's `ref` prop
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutation-observer
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  *
  * @example
  * ```tsx
- * <div use:mutationObserver={[{ childList: true }, e => {...}]}></div>
+ * <div ref={mutationObserver({ childList: true }, records => console.log(records))} />
  * ```
  */
-export const mutationObserver = (
-  target: Element,
-  props: () => MutationObserverStandaloneDirectiveProps,
-): void => {
-  const [config, cb] = props();
-  const [add] = createMutationObserver([], cb);
-  add(target, config);
-};
+export const mutationObserver =
+  (options: MutationObserverInit, callback: MutationCallback) =>
+  (target: Element): void => {
+    const [add] = createMutationObserver([], callback);
+    add(target, options);
+  };

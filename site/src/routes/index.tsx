@@ -1,5 +1,6 @@
-import { type Component, createResource, Show, Suspense } from "solid-js";
-import { NoHydration } from "solid-js/web";
+import { type Component, Show } from "solid-js";
+import { NoHydration } from "@solidjs/web";
+import { createFileRoute } from "@tanstack/solid-router";
 import { fetchHomeContent, fetchPackageList } from "~/api.js";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
 import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn.jsx";
@@ -11,17 +12,27 @@ import { H2 } from "~/components/prose.jsx";
 import { StageContent } from "~/components/Stage/Stage.jsx";
 import * as Table from "~/components/table.jsx";
 import type { PackageListItem } from "~/types.js";
-import { Title } from "@solidjs/meta";
+
+export const Route = createFileRoute("/")({
+  component: Home,
+  loader: async () => {
+    const [content, packages] = await Promise.all([fetchHomeContent(), fetchPackageList()]);
+    return { content, packages };
+  },
+  head: () => ({
+    meta: [{ title: "Solid Primitives 2.0" }],
+  }),
+});
 
 const Header: Component = () => {
   return (
-    <div class="mx-auto min-h-[35vh] max-w-[720px] overflow-clip p-4 leading-7 sm:min-h-[50vh] sm:pt-[5vh] md:pt-[10vh]">
+    <div class="mx-auto min-h-[35vh] max-w-[850px] overflow-clip p-4 leading-7 sm:min-h-[50vh] sm:pt-[5vh] md:pt-[10vh]">
       <p class="py-3 sm:text-lg md:text-2xl">
         A project that strives to develop high-quality, community contributed Solid{" "}
-        <strong>Primitives</strong>.
+        <strong>Primitives</strong> (Verison 2).
         {/* All utilities are well tested and continuously maintained. */}
       </p>
-      <div class="relative mb-10 mt-4 text-[14px] sm:text-base md:text-lg">
+      <div class="relative mt-4 mb-10 text-[14px] sm:text-base md:text-lg">
         <ul class="flex gap-4">
           <li>
             <div class="font-semibold text-[#30889c] dark:text-[#44bfdb]">Small</div>
@@ -39,7 +50,7 @@ const Header: Component = () => {
           </li>
         </ul>
         <svg
-          class="-z-1 mask-image-[linear-gradient(to_bottom,transparent,#000_30%)] sm:mask-image-[linear-gradient(to_bottom,transparent,#000_20%)] pointer-events-none absolute -left-6 -right-8 top-[20%] opacity-60 sm:-left-4 sm:-right-4"
+          class="mask-image-[linear-gradient(to_bottom,transparent,#000_30%)] sm:mask-image-[linear-gradient(to_bottom,transparent,#000_20%)] pointer-events-none absolute top-[20%] -right-8 -left-6 -z-1 opacity-60 sm:-right-4 sm:-left-4"
           viewBox="0 0 188.975 179.46"
           // @ts-ignore
           xml:space="preserve"
@@ -75,8 +86,9 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
   return (
     <Show when={props.packages} keyed>
       {packages => {
+        const packageList = packages();
         // group packages by category
-        const categories = packages.reduce((acc: Record<string, PackageListItem[]>, pkg) => {
+        const categories = packageList.reduce((acc: Record<string, PackageListItem[]>, pkg) => {
           const category = acc[pkg.primitive.category];
           if (category) category.push(pkg);
           else acc[pkg.primitive.category] = [pkg];
@@ -148,13 +160,11 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
   );
 };
 
-export default function Home() {
-  const [content] = createResource(() => fetchHomeContent());
-  const [packages] = createResource(() => fetchPackageList());
+function Home() {
+  const data = Route.useLoaderData();
 
   return (
     <main style={{ "padding-top": `${HEADER_HEIGHT}px` }}>
-      <Title>Solid Primitives</Title>
       <Header />
 
       <div class="relative top-[-100px]">
@@ -162,7 +172,7 @@ export default function Home() {
           Primitives
         </h2>
       </div>
-      <PrimitivesTable packages={packages()} />
+      <PrimitivesTable packages={data().packages} />
 
       <div class="mx-auto mt-[125px] max-w-[864px] p-4 leading-7">
         <NoHydration>
@@ -170,9 +180,7 @@ export default function Home() {
             <H2 text="Contribution Process" />
             <br />
             <StageContent />
-            <Suspense>
-              <div innerHTML={content()} />
-            </Suspense>
+            <div innerHTML={data().content} />
           </div>
         </NoHydration>
       </div>
