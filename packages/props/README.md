@@ -140,7 +140,7 @@ Conditional handlers can be passed inline — `null`/`false` entries are skipped
 
 A helper that creates a new props object with only the property names that match the predicate.
 
-An alternative primitive to Solid's `omit` that will split the props eagerly, without letting you change the omitted keys afterwards.
+An alternative primitive to Solid's `omit` that splits props lazily (per-read) — the predicate is not evaluated upfront, so the set of included keys can change dynamically.
 
 The `predicate` is run for every property read lazily — any signal accessed within the `predicate` will be tracked, and `predicate` re-executed if changed.
 

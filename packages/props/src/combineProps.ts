@@ -54,7 +54,7 @@ export function combineStyle(
 }
 
 type PropsInput = {
-  class?: string | JSX.ClassList;
+  class?: JSX.ClassValue;
   className?: string;
   style?: JSX.CSSProperties | string;
   ref?: Element | ((el: any) => void);
@@ -105,9 +105,7 @@ export function combineProps<T extends [] | MaybeAccessor<PropsInput>[]>(
   sources: T,
   options?: CombinePropsOptions,
 ): Merge<T>;
-export function combineProps<T extends [] | MaybeAccessor<PropsInput>[]>(
-  ...sources: T
-): Merge<T>;
+export function combineProps<T extends [] | MaybeAccessor<PropsInput>[]>(...sources: T): Merge<T>;
 export function combineProps<T extends MaybeAccessor<PropsInput>[]>(
   ...args: T | [sources: T, options?: CombinePropsOptions]
 ): Merge<T> {
@@ -177,7 +175,7 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(
 
         // Combine class or className values
         if (key === "class" || key === "className") {
-          const parts: (string | JSX.ClassList)[] = [];
+          const parts: JSX.ClassValue[] = [];
           for (const s of sources) {
             const v = access(s)[key];
             if (v !== undefined) parts.push(v);
@@ -226,6 +224,7 @@ export function combineHandlers<T extends (...args: any[]) => void>(
   const fns = handlers.filter((h): h is T => typeof h === "function");
   if (fns.length === 0) return undefined;
   if (fns.length === 1) return fns[0];
-  return ((...args: any[]) => { for (const fn of fns) fn(...args); }) as T;
+  return ((...args: any[]) => {
+    for (const fn of fns) fn(...args);
+  }) as T;
 }
-
