@@ -128,6 +128,29 @@ describe("createServerCookie", () => {
     dispose();
   });
 
+  it("clears the cookie when value is set to undefined", () => {
+    document.cookie = "ck_clear=present";
+    const { setCookie, dispose } = createRoot(dispose => {
+      const [, setCookie] = createServerCookie("ck_clear");
+      return { setCookie, dispose };
+    });
+    flush();
+    (setCookie as (v: string | undefined) => void)(undefined);
+    flush();
+    expect(parseCookie(document.cookie, "ck_clear")).toBeUndefined();
+    dispose();
+  });
+
+  it("does not store the string 'undefined' when value is undefined", () => {
+    const { dispose } = createRoot(dispose => {
+      createServerCookie("ck_undef");
+      return { dispose };
+    });
+    flush();
+    expect(parseCookie(document.cookie, "ck_undef")).not.toBe("undefined");
+    dispose();
+  });
+
   it("respects a custom cookieMaxAge option", () => {
     const { setCookie, dispose } = createRoot(dispose => {
       const [, setCookie] = createServerCookie("ck_age", { cookieMaxAge: 60 });

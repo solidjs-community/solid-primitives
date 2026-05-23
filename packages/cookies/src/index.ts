@@ -71,9 +71,16 @@ export function createServerCookie<T>(
   );
 
   createEffect(
-    () => serialize(cookie()),
+    () => {
+      const val = cookie();
+      return val === undefined ? undefined : serialize(val);
+    },
     (string, prev) => {
-      if (prev !== string) document.cookie = `${name}=${string};max-age=${cookieMaxAge}`;
+      if (prev === string) return;
+      document.cookie =
+        string === undefined
+          ? `${name}=;max-age=0`
+          : `${name}=${string};max-age=${cookieMaxAge}`;
     },
   );
 
