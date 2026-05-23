@@ -8,7 +8,7 @@
 
 Primitives to help establish, maintain, and operate WebSocket connections in Solid.
 
-### Connection primitives
+## Connection primitives
 
 - [`makeWS`](#makews) — raw WebSocket with a buffered send queue (manual cleanup)
 - [`createWS`](#createws) — same, but closes on owner disposal
