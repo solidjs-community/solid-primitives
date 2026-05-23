@@ -1,7 +1,7 @@
 import {
   getOwner,
+  onSettled,
   onCleanup,
-  createEffect,
   createSignal,
   type Accessor,
   untrack,
@@ -15,6 +15,7 @@ import {
   sharedConfig,
   DEV,
 } from "solid-js";
+
 
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
@@ -41,7 +42,7 @@ export const isDev = isClient && !!DEV;
 export const isProd = !isDev;
 
 /** no operation */
-export const noop = (() => {}) as Noop;
+export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
@@ -264,12 +265,9 @@ export function createHydratableSignal<T>(
   }
   if (sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
-    createEffect(
-      () => {},
-      () => {
-        setState(() => update());
-      },
-    );
+    onSettled(() => {
+      setState(() => update());
+    });
     return [state, setState];
   }
   return createSignal(update() as Exclude<T, Function>, options);
@@ -322,16 +320,6 @@ export function handleDiffArray<T>(
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
 }
-
-/**
- * Schedules `fn` to run after the browser has painted by nesting two
- * requestAnimationFrame calls. No-op in non-browser environments.
- */
-export const afterPaint = (fn: () => void): void => {
-  if (typeof requestAnimationFrame === "function") {
-    requestAnimationFrame(() => requestAnimationFrame(fn));
-  }
-};
 
 // ─── String transforms ────────────────────────────────────────────────────────
 
@@ -419,6 +407,23 @@ export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string)
   return (raw: string): B => b(a(raw));
 }
 
+// ─── DOM helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Check if a wrapper element contains a target element.
+ * Portal-aware: follows SolidJS `_$host` links so elements rendered inside
+ * a `<Portal>` are correctly treated as children of the portal's anchor.
+ */
+export const contains = (wrapper: HTMLElement, target: HTMLElement): boolean => {
+  if (wrapper.contains(target)) return true;
+  let current: HTMLElement | null = target;
+  while (current) {
+    if (current === wrapper) return true;
+    // @ts-expect-error: _$host is a SolidJS-internal property set on portal roots
+    current = current._$host ?? current.parentElement;
+  }
+  return false;
+};
 /**
  * Wraps a setter function of any signal or store
  *

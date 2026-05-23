@@ -8,9 +8,9 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/audio?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/audio)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitive to manage audio playback in the browser. The primitives are easily composable and extended. To create your own audio element, consider using makeAudioPlayer which allows you to supply a player instance that matches the built-in standard Audio API.
+Primitives to manage audio playback in the browser. The primitives are layered: `make*` variants are non-reactive base primitives that require no Solid owner, while `createAudio` integrates with Solid's reactive system.
 
-Each primitive also exposes the audio instance for further custom extensions. Within an SSR context this audio primitive performs noops but never interrupts the process. Time values and durations are zero'd and in LOADING state.
+Within an SSR context these primitives perform noops and never interrupt the process.
 
 ## Installation
 
@@ -24,34 +24,48 @@ yarn add @solid-primitives/audio
 
 ### makeAudio
 
-A foundational primitive with no player controls but exposes the raw player object.
+A foundational non-reactive primitive that creates a raw `HTMLAudioElement` with optional event handlers. No Solid owner required.
 
 ```ts
-const player = makeAudio("example.mp3");
+const [player, cleanup] = makeAudio("example.mp3");
+// later:
+cleanup();
 ```
 
 #### Definition
 
 ```ts
-function makeAudio(src: AudioSource, handlers: AudioEventHandlers = {}): HTMLAudioElement;
+function makeAudio(
+  src: AudioSource | HTMLAudioElement,
+  handlers?: AudioEventHandlers,
+): [player: HTMLAudioElement, cleanup: VoidFunction];
 ```
 
 ### makeAudioPlayer
 
-Provides a very basic interface for wrapping listeners to a supplied or default audio player.
+Wraps `makeAudio` with simple playback controls. No Solid owner required.
 
 ```ts
-const { play, pause, seek } = makeAudioPlayer("example.mp3");
+const [{ play, pause, seek, setVolume, player }, cleanup] = makeAudioPlayer("example.mp3");
+play();
+seek(30);
+cleanup();
 ```
 
 #### Definition
 
 ```ts
 function makeAudioPlayer(
-  src: AudioSource,
-  handlers: AudioEventHandlers = {},
-): {
-  play: VoidFunction;
+  src: AudioSource | HTMLAudioElement,
+  handlers?: AudioEventHandlers,
+): [controls: AudioControls, cleanup: VoidFunction];
+```
+
+`AudioControls`:
+
+```ts
+type AudioControls = {
+  play: () => Promise<void>;
   pause: VoidFunction;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
@@ -59,66 +73,74 @@ function makeAudioPlayer(
 };
 ```
 
-The seek function falls back to fastSeek when on [supporting browsers](https://caniuse.com/?search=fastseek).
+The `seek` function uses `fastSeek` on [supporting browsers](https://caniuse.com/?search=fastseek).
 
 ### createAudio
 
-Creates a very basic audio/sound player with reactive properties to control the audio. Be careful not to destructure the value properties provided by the primitive as it will likely break reactivity.
+A reactive audio primitive. Returns a flat object with writable signal accessors for `playing` and `volume`, a reactive `currentTime`, and an async `duration` that suspends until audio metadata is loaded — integrating with `<Suspense>` / `<Loading>`.
 
 ```ts
-const [playing, setPlaying] = createSignal(false);
-const [volume, setVolume] = createSignal(false);
-const [audio, controls] = createAudio("sample.mp3", playing, volume);
-setPlaying(true); // or controls.play()
-controls.seek(4000);
+const audio = createAudio("example.mp3");
+
+audio.playing(); // boolean
+audio.setPlaying(true); // plays
+audio.volume(); // 0–1
+audio.setVolume(0.5);
+audio.currentTime(); // seconds
+audio.seek(30);
 ```
 
-The audio primitive exports an reactive properties that provides you access to state, duration and current time.
+The `duration` accessor throws `NotReadyError` until the audio metadata has loaded, making it work naturally with Solid 2.0's `<Loading>` boundary. After the first `loadeddata` event it returns the duration in seconds reactively. The pending state resets whenever the source changes.
 
-_Note:_ Initializing the primitive with `playing` as true works, however note that the user has to interact with the page first (on a fresh page load).
-
-```ts
-function createAudio(
-  src: AudioSource | Accessor<AudioSource>,
-  playing?: Accessor<boolean>,
-  volume?: Accessor<number>,
-): [
-  {
-    state: AudioState;
-    currentTime: number;
-    duration: number;
-    volume: number;
-    player: HTMLAudioElement;
-  },
-  {
-    seek: (time: number) => void;
-    setVolume: (volume: number) => void;
-    play: VoidFunction;
-    pause: VoidFunction;
-  },
-];
+```tsx
+<Loading fallback="Loading...">
+  <span>{audio.duration()}s</span>
+</Loading>
 ```
 
-#### Dynamic audio changes
-
-The source property can be a signal as well as a media source. Upon switching the source via a signal it will continue playing from the head.
+The `src` argument can be a reactive accessor — switching sources replaces the track and seeks to the start:
 
 ```ts
-const [src, setSrc] = createSignal("sample.mp3");
+const [src, setSrc] = createSignal("track1.mp3");
 const audio = createAudio(src);
-setSrc("sample2.mp3");
+setSrc("track2.mp3");
 ```
 
-### Audio Source
+#### Definition
 
-`createAudio` as well as `makeAudio` and `makeAudioPlayer` all accept MediaSource as a property.
+```ts
+function createAudio(src: AudioSource | Accessor<AudioSource>): AudioReturn;
+```
+
+`AudioReturn`:
+
+```ts
+type AudioReturn = {
+  player: HTMLAudioElement;
+  playing: Accessor<boolean>;
+  setPlaying: (v: boolean) => void;
+  volume: Accessor<number>;
+  setVolume: (v: number) => void;
+  currentTime: Accessor<number>;
+  duration: Accessor<number>; // async — suspends until loaded
+  seek: (time: number) => void;
+};
+```
+
+## Audio Source
+
+All primitives accept `AudioSource` as their `src` argument:
+
+```ts
+type AudioSource = string | undefined | MediaProvider;
+```
+
+This includes `MediaSource` and `MediaStream`, enabling streamed or Blob-backed audio:
 
 ```ts
 const media = new MediaSource();
 const audio = createAudio(URL.createObjectURL(media));
 ```
-
-This allows you to managed streamed or Blob supplied media. In essence the primitives in this package are very flexible and allow direct access to the base browser API.
 
 ## Demo
 
