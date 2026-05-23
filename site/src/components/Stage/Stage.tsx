@@ -60,7 +60,8 @@ const Content = () => {
           </thead>
           <tbody>
             <For each={items}>
-              {({ stage, description }) => {
+              {item => {
+                const { stage, description } = item();
                 return (
                   <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
                     <td class="p-1 px-2">

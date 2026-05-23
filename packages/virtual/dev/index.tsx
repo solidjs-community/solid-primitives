@@ -1,5 +1,5 @@
-import { createSignal, onMount, onCleanup, type Component } from "solid-js";
-import { isServer } from "solid-js/web";
+import { createSignal, onSettled, onCleanup, type Component } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { VirtualList } from "../src/index.jsx";
 
 const intl = new Intl.NumberFormat();
@@ -71,7 +71,7 @@ const App: Component = () => {
           rootHeight={rootHeight()}
           rowHeight={rowHeight()}
         >
-          {item => <VirtualListItem item={item} height={rowHeight()} />}
+          {item => <VirtualListItem item={item()} height={rowHeight()} />}
         </VirtualList>
       </div>
     </div>
@@ -113,7 +113,7 @@ type VirtualListItemProps = {
 };
 
 const VirtualListItem: Component<VirtualListItemProps> = props => {
-  onMount(() => {
+  onSettled(() => {
     if (!isServer) console.log("item added:", props.item);
   });
 
