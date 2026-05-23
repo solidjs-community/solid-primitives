@@ -4,7 +4,7 @@ import { type Accessor, createMemo } from "solid-js";
 export const lowercase = (string: Accessor<string>) => createMemo(() => string().toLowerCase());
 export const uppercase = (string: Accessor<string>) => createMemo(() => string().toUpperCase());
 export const capitalize = (string: Accessor<string>) =>
-  createMemo(() => { const s = string(); return s[0]!.toUpperCase() + s.substring(1).toLowerCase(); });
+  createMemo(() => { const s = string(); return s.length === 0 ? s : s[0]!.toUpperCase() + s.substring(1).toLowerCase(); });
 
 /**
  * `String.prototype.substring()`
