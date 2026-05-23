@@ -133,7 +133,7 @@ createMediaPermissionRequest(source?);
 
 - `source?` — `'audio' | 'video' | MediaStreamConstraints` — defaults to both audio and video
 
-Returns a `Promise<void>` that resolves once the permission prompt is handled.
+Returns a `Promise<void>` that resolves when permission is granted, and rejects if the user denies permission or `navigator.mediaDevices.getUserMedia` fails for any other reason — forwarding the rejection directly from `getUserMedia`.
 
 ```ts
 // Request both microphone and camera permissions

@@ -12,7 +12,7 @@ class AudioContextMock {
       {
         frequencyBinCount: 128,
         getByteFrequencyData: (array: Uint8Array) => {
-          array.set([...array].map(() => (Math.random() * 255) | 0));
+          array.fill(128);
         },
       } as AnalyserNode,
       {

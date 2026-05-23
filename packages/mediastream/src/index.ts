@@ -80,9 +80,13 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
       stopStream(untrack(stream));
 
       if (c) {
+        setStream(undefined);
         navigator.mediaDevices.getUserMedia(c).then(s => {
           if (active) setStream(s);
           else stopStream(s);
+        }).catch((err: unknown) => {
+          if (active) setStream(undefined);
+          console.error(err);
         });
       } else {
         setStream(undefined);
@@ -100,7 +104,7 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
     stream,
     {
       mute: (muted?: boolean) => muteStream(untrack(stream), muted),
-      stop: () => stopStream(untrack(stream)),
+      stop: () => { stopStream(untrack(stream)); setStream(undefined); },
     },
   ];
 };
@@ -163,13 +167,13 @@ export const createAmplitudeFromStream = (
   loop();
 
   const stop = () => {
+    cancelAnimationFrame(rafId);
     source?.disconnect();
     if (ctx.state !== "closed") {
       ctx.close();
     }
   };
 
-  onCleanup(() => cancelAnimationFrame(rafId));
   onCleanup(stop);
 
   return [amplitude, stop];
@@ -243,9 +247,13 @@ export const createScreen = (
       stopStream(untrack(stream));
 
       if (constraints) {
+        setStream(undefined);
         navigator.mediaDevices.getDisplayMedia(constraints).then(s => {
           if (active) setStream(s);
           else stopStream(s);
+        }).catch((err: unknown) => {
+          if (active) setStream(undefined);
+          console.error(err);
         });
       } else {
         setStream(undefined);
@@ -263,7 +271,7 @@ export const createScreen = (
     stream,
     {
       mute: (muted?: boolean) => muteStream(untrack(stream), muted),
-      stop: () => stopStream(untrack(stream)),
+      stop: () => { stopStream(untrack(stream)); setStream(undefined); },
     },
   ];
 };
