@@ -692,6 +692,22 @@ importers:
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14
 
+  packages/notification:
+    dependencies:
+      '@solid-primitives/permission':
+        specifier: workspace:^
+        version: link:../permission
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
+      solid-js:
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
+
   packages/orientation:
     dependencies:
       '@solid-primitives/utils':
@@ -733,9 +749,12 @@ importers:
 
   packages/permission:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/platform:
     devDependencies:
