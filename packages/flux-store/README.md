@@ -8,10 +8,12 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/flux-store?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/flux-store)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A library for creating Solid stores with implementing state management through explicit getters for reads and actions for writes.
+A library for creating Solid stores that enforce a one-way data flow through explicit getters for reads and actions for writes.
 
 - [`createFluxStore`](#createfluxstore) — Creates a store instance with explicit getters and actions.
-- [`createFluxStoreFactory`](#createfluxstorefactory) — Create a `FluxStore` encapsulated in a factory function for reusable store implementation.
+- [`createFluxStoreFactory`](#createfluxstorefactory) — Creates a `FluxStore` encapsulated in a factory function for reusable store instances.
+- [`createActions`](#createactions) — Wraps a record of functions so each runs untracked.
+- [`createAction`](#createaction) — Wraps a single function so it runs untracked.
 
 ## Installation
 
@@ -25,93 +27,108 @@ pnpm add @solid-primitives/flux-store
 
 ## `createFluxStore`
 
-Creates a `FluxStore` instance - a solid store that implements state management through explicit getters for reads and actions for writes.
+Creates a `FluxStore` — a Solid store that separates reads (`getters`) from writes (`actions`).
 
 ### How to use it
 
 `createFluxStore` takes two arguments:
 
-- `initialState` - the initial state of the store.
-
-- `createMethods` - object containing functions to create getters and/or actions.
-
-  - `getters` - functions that return a value from the store's state.
-  - `actions` - untracked and batched functions that update the store's state.
+- `initialState` — the initial state object.
+- `createMethods` — object with optional `getters` and required `actions` factory functions.
+  - `getters(state)` — return a record of functions that read from the reactive store proxy.
+  - `actions(setState, state)` — return a record of mutation functions. `setState` uses draft-first mutations: pass a function that mutates the draft object directly.
 
 ```ts
 import { createFluxStore } from "@solid-primitives/flux-store";
 
-const counterState = createFluxStore(
-  // initial state
+const counterStore = createFluxStore(
+  { value: 5 },
   {
-    value: 5,
-  },
-  {
-    // reads
     getters: state => ({
-      count() {
-        return state.value;
-      },
+      count: () => state.value,
+      isNegative: () => state.value < 0,
     }),
-    // writes
     actions: setState => ({
       increment(by = 1) {
-        setState("value", p => p + by);
+        setState(s => { s.value += by; });
       },
       reset() {
-        setState("value", 0);
+        setState(s => { s.value = 0; });
       },
     }),
   },
 );
 
-// read
-counterState.getters.count(); // => 5
-
-// write
-counterState.actions.increment();
-counterState.getters.count(); // => 6
+counterStore.getters.count();     // => 5
+counterStore.actions.increment();
+counterStore.getters.count();     // => 6
+counterStore.actions.reset();
+counterStore.getters.count();     // => 0
 ```
 
 ## `createFluxStoreFactory`
 
-Creates a [`FluxStore`](#createfluxstore) encapsulated in a factory function for reusable store implementation.
+Creates a reusable factory function that produces independent `FluxStore` instances from the same schema, with an optional initial-state override per instance.
 
 ### How to use it
 
 ```ts
-const createToggleState = createFluxStoreFactory(
-  // initial state
+import { createFluxStoreFactory } from "@solid-primitives/flux-store";
+
+const createToggleStore = createFluxStoreFactory(
+  { value: false },
   {
-    value: false,
+    getters: state => ({
+      isOn: () => state.value,
+    }),
+    actions: setState => ({
+      toggle() {
+        setState(s => { s.value = !s.value; });
+      },
+    }),
   },
-  // reads
-  getters: state => ({
-    isOn() {
-      return state.value;
-    },
-  }),
-  // writes
-  actions: setState => ({
-    toggle() {
-      setState("value", p => !p);
-    },
-  }),
 );
 
+// Each call creates an isolated store instance
+const toggleA = createToggleStore({ value: true });
+const toggleB = createToggleStore();
 
-// state factory can be reused in different components
-const toggleState = createToggleState(
-  // initial state can be overridden
-  { value: true },
-);
+toggleA.getters.isOn(); // => true
+toggleB.getters.isOn(); // => false
 
-// read
-toggleState.getters.isOn(); // => true
+toggleA.actions.toggle();
+toggleA.getters.isOn(); // => false
+toggleB.getters.isOn(); // => false (unaffected)
+```
 
-// write
-toggleState.actions.toggle();
-toggleState.getters.isOn(); // => false
+The factory accepts an optional override as a plain object or a function:
+
+```ts
+const store1 = createToggleStore({ value: true });
+const store2 = createToggleStore(defaults => ({ ...defaults, value: true }));
+```
+
+## `createActions`
+
+Wraps each function in a record with `createAction` and returns a new object of the same shape. Useful for applying the untracked wrapper to a batch of functions at once.
+
+```ts
+import { createActions } from "@solid-primitives/flux-store";
+
+const actions = createActions({
+  increment: () => setCount(c => c + 1),
+  reset: () => setCount(0),
+});
+```
+
+## `createAction`
+
+Wraps a single function so its body runs inside `untrack` — reactive reads inside will not register dependencies and writes will not throw inside owned scopes.
+
+```ts
+import { createAction } from "@solid-primitives/flux-store";
+
+const increment = createAction(() => setCount(c => c + 1));
 ```
 
 ## Demo

@@ -361,8 +361,8 @@ importers:
   packages/flux-store:
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/fullscreen:
     dependencies:
@@ -2721,6 +2721,9 @@ packages:
 
   '@solidjs/signals@2.0.0-beta.13':
     resolution: {integrity: sha512-jc+wLRK+eyUFerH8Mjed4HikdJwz3z95TT7tqyG+K00IV9jfgZWvR1nZDUEZc6kXffmtW/z+w6PNn62ea5KjIw==}
+
+  '@solidjs/signals@2.0.0-beta.14':
+    resolution: {integrity: sha512-y72nYtD7ogwX/UR5g2Y+meyeO6Q/xbQGtmvVTQX6USkMwEGOMnytqDnHj5amUzD7Fzqg32svwtCSx/q8hsOXAA==}
 
   '@solidjs/web@2.0.0-beta.10':
     resolution: {integrity: sha512-Ox7MBv19kuxHoHhWoLCCcc6aykSgaqzWvWT7RB66VqlFnQ8Lid2ncd30g5L4XC0GB+MN/WZVb68tiYrAFUDIAg==}
@@ -5355,6 +5358,9 @@ packages:
   solid-js@2.0.0-beta.13:
     resolution: {integrity: sha512-uAknr7Xkn25zAufBrYko4eOCbcg/gkrwnmE9KVb2Kb3vVZw2ibqseNxpjslnwJkT4gFScmFniqJtzRp7vO2klA==}
 
+  solid-js@2.0.0-beta.14:
+    resolution: {integrity: sha512-gbbvlxhs1GgL1IsnwHNtkTCRBBQcIDMwznBw3T05iYvP+fuUKMyIPku+ZLjeALyX4RaSLR99JSL6NttyHsYb8Q==}
+
   solid-refresh@0.8.0-next.7:
     resolution: {integrity: sha512-fqkPRAeiE0tqfo2ZljeQBIXwfYssU2w1FmaWFrXmnV33B/CfGfez7BjtOF0Y1/orUNRXI/DZcJlJThHllcCMsA==}
     peerDependencies:
@@ -7746,6 +7752,8 @@ snapshots:
       solid-js: 2.0.0-beta.10
 
   '@solidjs/signals@2.0.0-beta.13': {}
+
+  '@solidjs/signals@2.0.0-beta.14': {}
 
   '@solidjs/web@2.0.0-beta.10(solid-js@2.0.0-beta.10)':
     dependencies:
@@ -10829,8 +10837,15 @@ snapshots:
     dependencies:
       '@solidjs/signals': 2.0.0-beta.13
       csstype: 3.1.3
-      seroval: 1.5.2
-      seroval-plugins: 1.5.2(seroval@1.5.2)
+      seroval: 1.5.4
+      seroval-plugins: 1.5.4(seroval@1.5.4)
+
+  solid-js@2.0.0-beta.14:
+    dependencies:
+      '@solidjs/signals': 2.0.0-beta.14
+      csstype: 3.1.3
+      seroval: 1.5.4
+      seroval-plugins: 1.5.4(seroval@1.5.4)
 
   solid-refresh@0.8.0-next.7(solid-js@2.0.0-beta.10):
     dependencies:
