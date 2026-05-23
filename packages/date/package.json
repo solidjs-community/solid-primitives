@@ -54,17 +54,17 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.10",
+    "@solidjs/web": "2.0.0-beta.14",
     "date-fns": "^2.30.0",
-    "solid-js": "2.0.0-beta.10"
+    "solid-js": "2.0.0-beta.14"
   },
   "dependencies": {
     "@solid-primitives/timer": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.10",
-    "solid-js": "^2.0.0-beta.10"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {}
 }

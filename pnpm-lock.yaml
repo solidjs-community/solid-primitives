@@ -247,14 +247,14 @@ importers:
         version: link:../utils
     devDependencies:
       '@solidjs/web':
-        specifier: 2.0.0-beta.10
-        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
       solid-js:
-        specifier: 2.0.0-beta.10
-        version: 2.0.0-beta.10
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/db-store:
     dependencies:

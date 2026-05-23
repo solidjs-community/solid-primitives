@@ -76,7 +76,7 @@ export function createDateNow(
   createEffect(
     () => (typeof interval === "function" ? interval() : interval),
     ms => {
-      if (ms === false) return;
+      if (ms === false || ms === 0) return;
       const id = setInterval(update, ms);
       return () => clearInterval(id);
     },
