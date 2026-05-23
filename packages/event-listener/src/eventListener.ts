@@ -113,8 +113,8 @@ export function createEventListener(
   type State = { els: EventTarget[]; types: string[] };
 
   const compute = (): State => ({
-    els: asArray(access(targets)).filter(Boolean) as EventTarget[],
-    types: asArray(access(type)) as string[],
+    els: asArray(access(targets)).filter(x => !!x),
+    types: asArray(access(type)),
   });
 
   const apply = ({ els, types }: State) => {

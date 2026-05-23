@@ -67,7 +67,7 @@ export function createVirtualList<T extends readonly any[]>({
 }
 
 type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
-  children: (item: Accessor<T[number]>, index: Accessor<number>) => U;
+  children: (item: Accessor<T[number]>, index: number) => U;
   each: T | undefined | null | false;
   fallback?: JSX.Element;
   overscanCount?: number;
@@ -117,7 +117,7 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(
             top: `${virtual().viewerTop}px`,
           }}
         >
-          <For fallback={props.fallback} each={virtual().visibleItems}>
+          <For fallback={props.fallback} each={virtual().visibleItems} keyed={false}>
             {props.children}
           </For>
         </div>

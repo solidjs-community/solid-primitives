@@ -1,7 +1,7 @@
 class ResponseMock {
   constructor(
     public body: BodyInit | null,
-    private init: ResponseInit & { redirected: boolean; type: "cors" | "basic"; url: string },
+    private init: Partial<ResponseInit> & { redirected?: boolean; type?: "cors" | "basic"; url?: string },
   ) {}
   get status() {
     return this.init.status || -1;
@@ -12,7 +12,7 @@ class ResponseMock {
   get headers() {
     return this.init.headers instanceof Headers
       ? this.init.headers
-      : new Headers(this.init.headers) || new Headers();
+      : new Headers(this.init.headers || {});
   }
   get ok() {
     return this.status >= 200 && this.status < 300;
@@ -67,7 +67,7 @@ class ResponseMock {
 class HeadersMock {
   private headers: Record<string, string> = {};
   constructor(headers: Record<string, string>) {
-    Object.entries(headers || {}).forEach(([key, value]) => {
+    Object.entries(headers).forEach(([key, value]) => {
       this.headers[key.toLowerCase()] = value;
     });
   }

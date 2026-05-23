@@ -8,15 +8,15 @@ Object.defineProperty(global.navigator, "geolocation", {
     clearWatch: () => {},
     getCurrentPosition(
       successCallback: PositionCallback,
-      errorCallback?: PositionErrorCallback | null,
-      options?: PositionOptions,
+      _errorCallback?: PositionErrorCallback | null,
+      _options?: PositionOptions,
     ) {
       successCallback({ coords: mockCoordinates } as GeolocationPosition);
     },
     watchPosition(
       successCallback: PositionCallback,
-      errorCallback?: PositionErrorCallback | null,
-      options?: PositionOptions,
+      _errorCallback?: PositionErrorCallback | null,
+      _options?: PositionOptions,
     ) {
       successCallback({ coords: mockCoordinates } as GeolocationPosition);
     },
