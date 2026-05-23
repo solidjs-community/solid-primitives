@@ -48,6 +48,11 @@ export type ContextProviderOptions = {
  */
 export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
+  defaults: undefined,
+  options?: ContextProviderOptions,
+): [provider: ContextProvider<P>, useContext: () => T | undefined];
+export function createContextProvider<T, P extends ContextProviderProps>(
+  factoryFn: (props: P) => T,
   defaults: T,
   options?: ContextProviderOptions,
 ): [provider: ContextProvider<P>, useContext: () => T];
