@@ -86,7 +86,7 @@ function repeat<T>(
 ): Accessor<T[]>;
 ```
 
-## `<Repeat>` ⚠️ Deprecated
+## `<Repeat>`
 
 > **Deprecated** — Solid 2.0 ships a built-in `<Repeat>` in `@solidjs/web`. Migrate to that:
 >
