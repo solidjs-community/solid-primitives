@@ -1,0 +1,71 @@
+{
+  "name": "@solid-primitives/vibrate",
+  "version": "0.0.100",
+  "description": "Primitives to trigger and manage device vibration via the Vibration API",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/vibrate",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "vibrate",
+    "stage": 0,
+    "list": [
+      "isVibrationSupported",
+      "makeVibrate",
+      "createVibrate",
+      "frequencyToPattern",
+      "makePulse",
+      "createPulse"
+    ],
+    "category": "Sensors"
+  },
+  "keywords": [
+    "solid",
+    "vibrate",
+    "vibration",
+    "haptic",
+    "primitives"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "devDependencies": {
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
+  }
+}

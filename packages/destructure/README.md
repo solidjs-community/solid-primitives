@@ -15,8 +15,12 @@ Primitive for destructuring reactive objects _– like props or stores –_ or s
 ```bash
 npm install @solid-primitives/destructure
 # or
+pnpm add @solid-primitives/destructure
+# or
 yarn add @solid-primitives/destructure
 ```
+
+> Requires **Solid 2.0** (`solid-js ^2.0.0-beta.10`). For Solid 1.x use v0.2.x.
 
 ## `destructure`
 
@@ -30,11 +34,13 @@ import { destructure } from "@solid-primitives/destructure";
 
 #### How to use it
 
-`destructure` is an reactive primitive, hence needs to be used under an reactive root. Pass an reactive object or a signal as it's first argument, and configure it's behavior via options:
+`destructure` is a reactive primitive, hence needs to be used under a reactive root. Pass a reactive object or a signal as its first argument, and configure its behavior via options:
 
 - `memo` - wraps accessors in `createMemo`, making each property update independently. _(enabled by default for signal source)_
-- `lazy` - property accessors are created on key read. enable if you want to only a subset of source properties, or use properties initially missing
-- `deep` - destructure nested objects
+- `lazy` - property accessors are created on key read. enable if you want only a subset of source properties, or to use properties initially missing
+- `deep` - destructure nested objects recursively
+- `name` - debug name passed to internal `createMemo` calls _(dev mode only)_
+- `equals` - custom equality function passed to internal `createMemo` calls
 
 ```ts
 // spread tuples

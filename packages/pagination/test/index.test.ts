@@ -4,7 +4,7 @@ import {
   createInfiniteScroll,
   createPagination,
   createSegment,
-  PaginationOptions,
+  type PaginationOptions,
 } from "../src/index.js";
 
 describe("createPagination", () => {
@@ -100,7 +100,7 @@ describe("createPagination", () => {
 
   test("createPagination next back", () =>
     createRoot(dispose => {
-      const [paginationProps, page, setPage] = createPagination({
+      const [paginationProps, _page, _setPage] = createPagination({
         pages: 100,
         maxPages: 1,
         showFirst: false,
