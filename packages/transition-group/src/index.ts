@@ -1,14 +1,12 @@
 import {
   type Accessor,
-  batch,
   createSignal,
+  createMemo,
+  createRenderEffect,
   untrack,
   $TRACK,
-  createComputed,
-  createMemo,
-  useTransition,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 const noop = () => {
   /* noop */
@@ -78,7 +76,7 @@ export function createSwitchTransition<T>(
   options: SwitchTransitionOptions<NonNullable<T>>,
 ): Accessor<NonNullable<T>[]> {
   const initSource = untrack(source);
-  const initReturned = initSource ? [initSource] : [];
+  const initReturned = initSource ? [initSource as NonNullable<T>] : [];
 
   if (isServer) {
     return () => initReturned;
@@ -86,23 +84,31 @@ export function createSwitchTransition<T>(
 
   const { onEnter = noopTransition, onExit = noopTransition } = options;
 
-  const [returned, setReturned] = createSignal<NonNullable<T>[]>(
-    options.appear ? [] : initReturned,
-  );
-  const [isTransitionPending] = useTransition();
+  // The list is maintained in a plain closure variable (synchronous mutations) and
+  // a version counter signal. The version signal marks the memo stale immediately
+  // when written, so the memo recomputes synchronously on the next read — even
+  // inside a user effect running in the same flush cycle.
+  let currentList: NonNullable<T>[] = options.appear ? [] : initReturned.slice();
+  const [listVersion, bumpVersion] = createSignal(0, { equals: false, ownedWrite: true });
+
+  function updateList(fn: (prev: NonNullable<T>[]) => NonNullable<T>[]) {
+    currentList = fn(currentList);
+    bumpVersion(v => v + 1);
+  }
 
   let next: T | undefined;
   let isExiting = false;
+  // Pre-seeded with initSource so the first render-effect run skips the transition
+  // when appear is false (the initial element is already shown).
+  let prevEl: T | undefined = options.appear ? undefined : (initSource as T | undefined);
 
   function exitTransition(el: T | undefined, after?: () => void) {
     if (!el) return after && after();
     isExiting = true;
-    onExit(el, () => {
-      batch(() => {
-        isExiting = false;
-        setReturned(p => p.filter(e => e !== el));
-        after && after();
-      });
+    onExit(el as NonNullable<T>, () => {
+      isExiting = false;
+      updateList(p => p.filter(e => e !== el));
+      after && after();
     });
   }
 
@@ -110,8 +116,8 @@ export function createSwitchTransition<T>(
     const el = next;
     if (!el) return after && after();
     next = undefined;
-    setReturned(p => [el, ...p]);
-    onEnter(el, after ?? noop);
+    updateList(p => [el as NonNullable<T>, ...p]);
+    onEnter(el as NonNullable<T>, after ?? noop);
   }
 
   const triggerTransitions: (prev: T | undefined) => void =
@@ -127,27 +133,27 @@ export function createSwitchTransition<T>(
             enterTransition();
           };
 
-  createComputed(
-    (prev: T | undefined) => {
-      const el = source();
-
-      if (untrack(isTransitionPending)) {
-        // wait for pending transition to end before animating
-        isTransitionPending();
-        return prev;
-      }
-
-      if (el !== prev) {
+  // createRenderEffect runs its apply synchronously in the reactive pass, before
+  // deferred effects, so triggerTransitions (and the updateList calls within it)
+  // happen before any user createEffect runs in the same flush.
+  createRenderEffect(
+    () => source() as T | undefined,
+    el => {
+      if (el !== prevEl) {
         next = el;
-        batch(() => untrack(() => triggerTransitions(prev)));
+        const prev = prevEl;
+        prevEl = el;
+        triggerTransitions(prev);
       }
-
-      return el;
     },
-    options.appear ? undefined : initSource,
   );
 
-  return returned;
+  // Call listVersion() only to set up reactive subscriptions; always return
+  // currentList directly so reads during the same flush see the latest state.
+  return () => {
+    listVersion();
+    return currentList;
+  };
 }
 
 export type OnListChange<T> = (payload: {
@@ -226,20 +232,24 @@ export function createListTransition<T extends object>(
 
   const { onChange } = options;
 
-  // if appear is enabled, the initial transition won't have any previous elements.
-  // otherwise the elements will match and transition skipped, or transitioned if the source is different from the initial value
+  // Pre-seeded with initSource so the first memo run skips the transition
+  // when appear is false (all elements are already "known").
   let prevSet: ReadonlySet<T> = new Set(options.appear ? undefined : initSource);
   const exiting = new WeakSet<T>();
 
-  const [toRemove, setToRemove] = createSignal<T[]>([], { equals: false });
-  const [isTransitionPending] = useTransition();
+  // Pending removals are accumulated in a plain array and consumed atomically by
+  // the memo. Using a version counter signal instead of storing in a signal avoids
+  // mutating signal-owned values.
+  let pendingRemovals: T[] = [];
+  const [removeVersion, setRemoveVersion] = createSignal(0, { equals: false });
 
   const finishRemoved: (els: T[]) => void =
     options.exitMethod === "remove"
       ? noop
       : els => {
-          setToRemove(p => (p.push.apply(p, els), p));
+          pendingRemovals.push(...els);
           for (const el of els) exiting.delete(el);
+          setRemoveVersion(v => v + 1);
         };
 
   const handleRemoved: (els: T[], el: T, i: number) => void =
@@ -249,22 +259,21 @@ export function createListTransition<T extends object>(
         ? (els, el, i) => els.splice(i, 0, el)
         : (els, el) => els.push(el);
 
+  // createMemo is pull-based: it recomputes synchronously when read and its deps
+  // are stale, so user effects that read this memo see the latest list immediately
+  // after a flush without requiring an additional flush cycle.
   return createMemo(
-    prev => {
-      const elsToRemove = toRemove();
+    (prev: T[] = options.appear ? [] : initSource.slice()) => {
+      removeVersion(); // track version for finishRemoved-driven recomputation
       const sourceList = source();
       (sourceList as any)[$TRACK]; // top level store tracking
 
-      if (untrack(isTransitionPending)) {
-        // wait for pending transition to end before animating
-        isTransitionPending();
-        return prev;
-      }
-
-      if (elsToRemove.length) {
-        const next = prev.filter(e => !elsToRemove.includes(e));
-        elsToRemove.length = 0;
-        onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved });
+      if (pendingRemovals.length) {
+        const toRemove = pendingRemovals.splice(0); // take all and clear atomically
+        const next = prev.filter(e => !toRemove.includes(e));
+        untrack(() =>
+          onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved }),
+        );
         return next;
       }
 
@@ -302,6 +311,5 @@ export function createListTransition<T extends object>(
         return next;
       });
     },
-    options.appear ? [] : initSource.slice(),
   );
 }
