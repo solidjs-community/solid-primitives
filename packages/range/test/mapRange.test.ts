@@ -86,7 +86,7 @@ describe("mapRange", () => {
       const [to, setTo] = createSignal(8);
       const [step, setStep] = createSignal(1);
 
-      let captured: (string | number)[] = [];
+      const captured: (string | number)[] = [];
       const mapped = mapRange(start, to, step, n => {
         captured.push(n);
       });
@@ -118,7 +118,7 @@ describe("mapRange", () => {
       const [to, setTo] = createSignal(8);
       const [step, setStep] = createSignal(1);
 
-      let captured: (string | number)[] = [];
+      const captured: (string | number)[] = [];
       const mapped = mapRange(start, to, step, n => {
         onCleanup(() => captured.push(n));
       });
@@ -148,7 +148,7 @@ describe("mapRange", () => {
     createRoot(dispose => {
       const [start, setStart] = createSignal(4);
       const [to, setTo] = createSignal(8);
-      const [step, setStep] = createSignal(1);
+      const [step, _setStep] = createSignal(1);
 
       const mapped = mapRange<string | number>(start, to, step, n => n, { fallback: () => "fb" });
 

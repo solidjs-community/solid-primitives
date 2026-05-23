@@ -2,6 +2,21 @@ MIT License
 
 Copyright (c) 2021 Solid Primitives Working Group
 
+---
+
+The `createPreventScroll` primitive is adapted from
+[solid-prevent-scroll](https://github.com/corvudev/corvu/tree/main/packages/solid-prevent-scroll)
+by Jasmin Noetzli (GiyoMoon), part of the [corvu](https://corvu.dev) project,
+which is itself inspired by [react-remove-scroll](https://github.com/theKashey/react-remove-scroll)
+by Anton Korzunov.
+
+MIT License
+
+Copyright (c) Jasmin Noetzli
+Copyright (c) Anton Korzunov
+
+---
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

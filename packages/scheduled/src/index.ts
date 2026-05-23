@@ -1,5 +1,5 @@
-import { type Accessor, createSignal, getListener, getOwner, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createSignal, getObserver, getOwner, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 export type ScheduleCallback = <Args extends unknown[]>(
   callback: (...args: Args) => void,
@@ -269,14 +269,15 @@ export function leadingAndTrailing<Args extends unknown[]>(
  * ```ts
  * const debounced = createScheduled(fn => debounce(fn, 250));
  *
- * createEffect(() => {
- *   // track source signal
- *   const value = count();
- *   // track the debounced signal and check if it's dirty
- *   if (debounced()) {
- *     console.log('count', value);
+ * createEffect(
+ *   () => count(), // compute: track source signal
+ *   value => {
+ *     // apply: runs after scheduled invalidation
+ *     if (debounced()) {
+ *       console.log('count', value);
+ *     }
  *   }
- * });
+ * );
  * ```
  */
 
@@ -287,7 +288,9 @@ export function createScheduled(
 ): Accessor<boolean> {
   let listeners = 0;
   let isDirty = false;
-  const [track, dirty] = createSignal(void 0, { equals: false });
+  // ownedWrite: true allows dirty() to be called synchronously from within a
+  // reactive computation's compute phase (e.g. when using leading edge schedules).
+  const [track, dirty] = createSignal(void 0, { equals: false, ownedWrite: true });
   const call = schedule(() => {
     isDirty = true;
     dirty();
@@ -300,7 +303,7 @@ export function createScheduled(
       return true;
     }
 
-    if (getListener()) {
+    if (getObserver()) {
       listeners++;
       onCleanup(() => listeners--);
     }
