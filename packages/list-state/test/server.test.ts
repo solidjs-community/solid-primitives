@@ -58,7 +58,7 @@ describe("createListState - SSR safety", () => {
       const { active } = createListState({
         items: [],
       });
-      expect(active()).toBe(null);
+      expect(active()).toBe(undefined);
       dispose();
     });
   });
@@ -155,7 +155,7 @@ describe("createMultiSelectListState - SSR safety", () => {
       const { cursor } = createMultiSelectListState({
         items: [],
       });
-      expect(cursor()).toBe(null);
+      expect(cursor()).toBe(undefined);
       dispose();
     });
   });
