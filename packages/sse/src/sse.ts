@@ -1,6 +1,6 @@
 import { onCleanup, createSignal, createTrackedEffect, untrack, NotReadyError } from "solid-js";
 import type { Accessor } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import { access, type MaybeAccessor } from "@solid-primitives/utils";
 
 /**
