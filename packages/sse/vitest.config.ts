@@ -17,14 +17,14 @@ export default defineConfig(({ mode }) => {
       alias: {
         "solid-js/web": new URL(
           testSSR
-            ? "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.14_solid-js@2.0.0-beta.14/node_modules/@solidjs/web/dist/server.js"
-            : "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.14_solid-js@2.0.0-beta.14/node_modules/@solidjs/web/dist/web.js",
+            ? "../../node_modules/@solidjs/web/dist/server.js"
+            : "../../node_modules/@solidjs/web/dist/web.js",
           import.meta.url,
         ).pathname,
         "@solidjs/web": new URL(
           testSSR
-            ? "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.14_solid-js@2.0.0-beta.14/node_modules/@solidjs/web/dist/server.js"
-            : "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.14_solid-js@2.0.0-beta.14/node_modules/@solidjs/web/dist/web.js",
+            ? "../../node_modules/@solidjs/web/dist/server.js"
+            : "../../node_modules/@solidjs/web/dist/web.js",
           import.meta.url,
         ).pathname,
       },

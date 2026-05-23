@@ -13,7 +13,7 @@ Primitives for [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web
 - [`makeSSE`](#makesse) — Base non-reactive primitive. Creates an `EventSource` and returns a cleanup function. No Solid lifecycle.
 - [`createSSE`](#createsse) — Reactive primitive. Accepts a reactive URL, integrates with Solid's owner lifecycle, and returns signals for `data` and `readyState`.
 - [`makeSSEAsyncIterable`](#makesseasynciterable) — Wraps an SSE endpoint as an `AsyncIterable<T>`. Non-reactive foundation.
-- [`createSSEStream`](#createssesstream) — Minimal reactive stream: just a `data` accessor backed by an async iterable.
+- [`createSSEStream`](#createssestream) — Minimal reactive stream: just a `data` accessor backed by an async iterable.
 - [`makeSSEWorker`](#running-sse-in-a-worker) — Runs the SSE connection inside a Web Worker or SharedWorker.
 - [Built-in transformers](#built-in-transformers) — `json`, `ndjson`, `lines`, `number`, `safe`, `pipe`.
 
