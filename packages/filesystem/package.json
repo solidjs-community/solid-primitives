@@ -59,13 +59,14 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.13",
+    "@solidjs/web": "2.0.0-beta.14",
     "@tauri-apps/api": "^1.5.3",
     "@types/wicg-file-system-access": "2023.10.2",
     "chokidar": "^3.5.3",
-    "solid-js": "2.0.0-beta.13"
+    "solid-js": "2.0.0-beta.14"
   },
   "peerDependencies": {
+    "@solidjs/web": "^2.0.0-beta.13",
     "chokidar": "^3.5.3",
     "solid-js": "^2.0.0-beta.13"
   },

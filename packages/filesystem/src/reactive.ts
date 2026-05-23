@@ -69,7 +69,7 @@ export const createSyncFileSystem = (
     },
     mkdir: path => {
       adapter.mkdir(path);
-      readdirMap.get(getParentDir(path))?.[1]((items = []) => [...items, path] as DirEntries);
+      readdirMap.get(getParentDir(path))?.[1]((items = []) => [...items, getItemName(path)] as DirEntries);
     },
     readFile: (path, refresh) => {
       if (!readFileMap.has(path)) {
@@ -146,9 +146,10 @@ export const createSyncFileSystem = (
   if (watcher) {
     watcher((operation, path) => {
       if (operation === "mkdir" || operation === "rm") {
-        readdirMap.get(getParentDir(path))?.[1]((items = []) =>
-          items.includes(path as never) ? items : [...items, path],
-        );
+        readdirMap.get(getParentDir(path))?.[1]((items = []) => {
+          const name = getItemName(path);
+          return items.includes(name as never) ? items : ([...items, name] as DirEntries);
+        });
       }
       if (operation === "rm") {
         getTypeMap.get(path)?.[1](null);
@@ -268,9 +269,10 @@ export const createAsyncFileSystem = (
       if (operation === "mkdir" || operation === "rm") {
         const readdirEntry = readdirMap.get(getParentDir(path));
         if (readdirEntry) {
+          const name = getItemName(path);
           const items = readdirEntry.read() ?? [];
-          if (!items.includes(path as never)) {
-            readdirEntry.mutate([...items, path] as DirEntries);
+          if (!items.includes(name as never)) {
+            readdirEntry.mutate([...items, name] as DirEntries);
           }
         }
       }
