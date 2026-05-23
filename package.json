@@ -35,7 +35,7 @@
     "@babel/core": "^7.27.0",
     "@changesets/cli": "^2.29.4",
     "@nothing-but/node-resolve-ts": "^1.0.1",
-    "@solidjs/web": "2.0.0-beta.10",
+    "@solidjs/web": "2.0.0-beta.14",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.15.31",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
@@ -53,16 +53,16 @@
     "rehype-highlight": "^7.0.2",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "solid-js": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.14",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-solid": "3.0.0-next.5",
-    "babel-preset-solid": "2.0.0-beta.13",
+    "babel-preset-solid": "2.0.0-beta.14",
     "vitest": "^2.1.9"
   },
   "pnpm": {
     "overrides": {
-      "babel-preset-solid": "2.0.0-beta.13"
+      "babel-preset-solid": "2.0.0-beta.14"
     }
   },
   "packageManager": "pnpm@11.1.1",
