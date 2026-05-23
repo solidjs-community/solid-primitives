@@ -123,9 +123,9 @@ describe("mutation-observer", () => {
       dispose();
     }));
 
-  it("standalone mutationObserver directive", () =>
+  it("standalone mutationObserver ref", () =>
     createRoot(dispose => {
-      mutationObserver(parent, () => [config, () => {}]);
+      mutationObserver(config, () => {})(parent);
 
       expect(getLastInstance()!.elements).toEqual([[parent, config]]);
 

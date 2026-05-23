@@ -64,16 +64,16 @@ describe("indexRange", () => {
 
       const a = mapped();
       expect(a.length).toBe(3);
-      expect(a[0]()).toBe(-3.5);
-      expect(a[1]()).toBe(-2);
-      expect(a[2]()).toBe(-0.5);
+      expect(a[0]?.()).toBe(-3.5);
+      expect(a[1]?.()).toBe(-2);
+      expect(a[2]?.()).toBe(-0.5);
 
       setStart(0);
       setTo(2);
       setStep(0.2);
       const b = mapped();
       for (let n = 0, i = 0; i < 10; n += 0.2, i++) {
-        expect(b[i]()).toBe(n);
+        expect(b[i]?.()).toBe(n);
       }
 
       setStart(5);
@@ -81,11 +81,11 @@ describe("indexRange", () => {
       setStep(2);
       const c = mapped();
       expect(c.length).toBe(5);
-      expect(c[0]()).toBe(5);
-      expect(c[1]()).toBe(3);
-      expect(c[2]()).toBe(1);
-      expect(c[3]()).toBe(-1);
-      expect(c[4]()).toBe(-3);
+      expect(c[0]?.()).toBe(5);
+      expect(c[1]?.()).toBe(3);
+      expect(c[2]?.()).toBe(1);
+      expect(c[3]?.()).toBe(-1);
+      expect(c[4]?.()).toBe(-3);
 
       dispose();
     }));
@@ -94,9 +94,9 @@ describe("indexRange", () => {
     createRoot(dispose => {
       const [start, setStart] = createSignal(4);
       const [to, setTo] = createSignal(8);
-      const [step, setStep] = createSignal(1);
+      const [step, _setStep] = createSignal(1);
 
-      let captured: (string | number)[] = [];
+      const captured: (string | number)[] = [];
       const mapped = indexRange(start, to, step, n => {
         captured.push(n());
       });
@@ -123,7 +123,7 @@ describe("indexRange", () => {
       const [to, setTo] = createSignal(8);
       const [step, setStep] = createSignal(1);
 
-      let captured: (string | number)[] = [];
+      const captured: (string | number)[] = [];
       const mapped = indexRange(start, to, step, n => {
         onCleanup(() => captured.push(n()));
       });
@@ -152,7 +152,7 @@ describe("indexRange", () => {
     createRoot(dispose => {
       const [start, setStart] = createSignal(4);
       const [to, setTo] = createSignal(8);
-      const [step, setStep] = createSignal(1);
+      const [step, _setStep] = createSignal(1);
 
       const mapped = indexRange<string | number>(start, to, step, n => n(), {
         fallback: () => "fb",

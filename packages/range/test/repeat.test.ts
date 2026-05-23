@@ -6,7 +6,7 @@ describe("repeat", () => {
   it("maps only added items", () =>
     createRoot(dispose => {
       const [length, setLength] = createSignal(5);
-      let captured: number[] = [];
+      const captured: number[] = [];
       const mapped = repeat(length, i => {
         captured.push(i);
         return i;
@@ -28,7 +28,7 @@ describe("repeat", () => {
   it("uses fallback if length is 0", () =>
     createRoot(dispose => {
       const [length, setLength] = createSignal(4);
-      let captured: (string | number)[] = [];
+      const captured: (string | number)[] = [];
       const mapped = repeat<string | number>(
         length,
         i => {
@@ -56,7 +56,7 @@ describe("repeat", () => {
   it("disposing on remove and cleanup", () =>
     createRoot(dispose => {
       const [length, setLength] = createSignal(2);
-      let cleanups: (string | number)[] = [];
+      const cleanups: (string | number)[] = [];
       const mapped = repeat<string | number>(
         length,
         i => {

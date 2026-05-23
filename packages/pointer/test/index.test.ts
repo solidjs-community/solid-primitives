@@ -1,5 +1,5 @@
 import { describe, it, test, expect } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { createPointerListeners } from "../src/index.js";
 
 describe("createPointerListeners", () => {
@@ -72,16 +72,17 @@ describe("createPointerListeners", () => {
       return dispose;
     });
 
+    flush(); // run initial effect → adds event listener
     ref.dispatchEvent(move_event);
     expect(captured_events).toBe(1);
 
-    setTarget();
-
+    setTarget(undefined);
+    flush(); // run effect → removes event listener
     ref.dispatchEvent(move_event);
     expect(captured_events).toBe(1);
 
     setTarget(ref);
-
+    flush(); // run effect → adds event listener back
     ref.dispatchEvent(move_event);
     expect(captured_events).toBe(2);
 

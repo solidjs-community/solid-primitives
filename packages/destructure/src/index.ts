@@ -1,4 +1,4 @@
-import { createMemo, type Accessor, runWithOwner, getOwner, type MemoOptions } from "solid-js";
+import { createMemo, type Accessor, type MemoOptions, runWithOwner, getOwner } from "solid-js";
 import {
   access,
   type MaybeAccessor,
@@ -102,7 +102,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
       const calc = getter(key);
       if (config.deep && isReactiveObject(obj[key]))
         return runWithOwner(owner, () => destructure(calc, { ...config, memo }));
-      return memo ? runWithOwner(owner, () => createMemo(calc, undefined, options)) : calc;
+      return memo ? runWithOwner(owner, () => createMemo(calc, options)) : calc;
     });
   }
 
@@ -112,7 +112,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
     const calc = getter(key);
     if (config.deep && isReactiveObject(value))
       result[key] = destructure(calc, { ...config, memo });
-    else result[key] = memo ? createMemo(calc, undefined, options) : calc;
+    else result[key] = memo ? createMemo(calc, options) : calc;
   }
   return result;
 }
