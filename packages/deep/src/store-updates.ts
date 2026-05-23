@@ -170,7 +170,7 @@ export function captureStoreUpdates<T extends Static>(store: T): () => NestedUpd
     return () => (init ? ((init = false), [{ path: [], value: store as any }]) : []);
   }
 
-  if (!($TRACK in store)) {
+  if (!(typeof store === "object" && store !== null && $TRACK in store)) {
     if (DEV) {
       // eslint-disable-next-line no-console
       console.warn("captureStoreUpdates expects a store, got", store);

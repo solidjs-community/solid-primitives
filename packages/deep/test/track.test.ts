@@ -305,7 +305,7 @@ for (const api of apis) {
       let runs = 0;
       createRoot(() => {
         createEffect(
-          () => fn,
+          () => fn(),
           () => {},
         );
         const a = sign.a;
