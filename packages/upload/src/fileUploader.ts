@@ -29,6 +29,8 @@ export const fileUploader = (options: FileUploaderDirective) => {
       } else {
         throw err;
       }
+    } finally {
+      target.value = "";
     }
   };
 
