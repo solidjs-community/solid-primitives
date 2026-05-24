@@ -133,9 +133,13 @@ export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource)
   }
   const [currentTimeout, setCurrentTimeout] = createSignal(untrack(timeout));
   createEffect(
-    () => currentTimeout(),
+    () => {
+      const t = timeout();
+      const curr = currentTimeout();
+      return curr === false ? t : curr;
+    },
     (currTimeout: number | false) => {
-      if (currTimeout === false) return;
+      if (currTimeout === false) return () => {};
       const id = setInterval(() => {
         handler();
         setCurrentTimeout(timeout());
