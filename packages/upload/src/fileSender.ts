@@ -57,6 +57,7 @@ export function fileSender(url: string, options?: FileSenderOptions): SendFuncti
 
       xhr.open("POST", url);
       for (const [k, v] of Object.entries(headers)) {
+        if (formData instanceof FormData && k.toLowerCase() === "content-type") continue;
         xhr.setRequestHeader(k, v);
       }
       xhr.send(formData);

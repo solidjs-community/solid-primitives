@@ -68,12 +68,16 @@ function createFileUploader(send: SendFunction): FileUploader {
 
     const settled = await Promise.allSettled(
       uploadFiles.map((uploadFile, i) =>
-        send(
-          uploadFile,
-          (p: UploadProgress) => {
-            if (generation === thisGen) setFiles(s => { s[i]!.progress = p; });
-          },
-          controllers[i]!.signal,
+        new Promise<unknown>(resolve =>
+          resolve(
+            send(
+              uploadFile,
+              (p: UploadProgress) => {
+                if (generation === thisGen) setFiles(s => { s[i]!.progress = p; });
+              },
+              controllers[i]!.signal,
+            ),
+          ),
         ).then(
           result => {
             if (generation === thisGen) {
