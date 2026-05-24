@@ -18,6 +18,7 @@
     "stage": 3,
     "list": [
       "createPageVisibility",
+      "usePageVisibility",
       "makePageLeave",
       "createPageLeaveBlocker"
     ],

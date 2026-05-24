@@ -13,7 +13,7 @@ Primitives for tracking page visibility and intercepting navigation away from th
 - [`createPageVisibility`](#createpagevisibility) - Reactive signal tracking whether the page is currently visible
 - [`usePageVisibility`](#usepagevisibility) - Shared [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) version of `createPageVisibility`
 - [`makePageLeave`](#makepageleave) - Intercepts `beforeunload` to prevent navigation; returns a manual cleanup function
-- [`createPageLeaveBlocker`](#createpageleaveBlocker) - Reactive version of `makePageLeave`; accepts a signal to toggle prevention
+- [`createPageLeaveBlocker`](#createpageleaveblocker) - Reactive version of `makePageLeave`; accepts a signal to toggle prevention
 
 ## Installation
 
@@ -39,7 +39,7 @@ createEffect(() => {
 });
 ```
 
-#### Definition
+### Definition
 
 ```ts
 function createPageVisibility(): Accessor<boolean>;
@@ -59,7 +59,7 @@ createEffect(() => {
 });
 ```
 
-#### Definition
+### Definition
 
 ```ts
 const usePageVisibility: () => Accessor<boolean>;
@@ -78,7 +78,7 @@ const cleanup = makePageLeave();
 cleanup();
 ```
 
-#### Definition
+### Definition
 
 ```ts
 function makePageLeave(): VoidFunction;
@@ -103,7 +103,7 @@ const [isDirty, setIsDirty] = createSignal(false);
 createPageLeaveBlocker(isDirty);
 ```
 
-#### Definition
+### Definition
 
 ```ts
 function createPageLeaveBlocker(enabled?: MaybeAccessor<boolean>): void;
