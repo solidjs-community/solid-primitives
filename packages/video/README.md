@@ -8,124 +8,77 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/video?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/video)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitives to manage HTML video playback in the browser. The primitives are layered: `make*` variants are non-reactive base primitives that require no Solid owner, while `createVideo` integrates with Solid's reactive system.
-
-Within an SSR context these primitives perform noops and never interrupt the process.
+Layered primitives for managing HTML video playback. The `make*` variants are non-reactive and require no Solid owner. The `create*` variants integrate with Solid's reactive system — `createVideo` covers essential playback state, and `createVideoPlayer` extends it with the full control surface.
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/video
 # or
-yarn add @solid-primitives/video
-# or
 pnpm add @solid-primitives/video
 ```
 
 ## How to use it
 
-### makeVideo
+### `makeVideo`
 
-A foundational non-reactive primitive that creates a raw `HTMLVideoElement` with optional event handlers. No Solid owner required.
+Creates a raw `HTMLVideoElement` with optional event handlers and initial configuration. No Solid owner required.
 
 ```ts
-const [player, cleanup] = makeVideo("clip.mp4");
-// later:
+const [player, cleanup] = makeVideo('clip.mp4', {}, { muted: true, loop: true });
 cleanup();
 ```
-
-#### Definition
 
 ```ts
 function makeVideo(
   src: VideoSource | HTMLVideoElement,
   handlers?: VideoEventHandlers,
+  options?: VideoOptions,
 ): [player: HTMLVideoElement, cleanup: VoidFunction];
 ```
 
-### makeVideoPlayer
+### `makeVideoPlayer`
 
-Wraps `makeVideo` with playback and fullscreen controls. No Solid owner required.
+Wraps `makeVideo` with imperative playback controls. No Solid owner required.
 
 ```ts
-const [{ play, pause, seek, setVolume, setMuted, setPlaybackRate, player }, cleanup] =
-  makeVideoPlayer("clip.mp4");
+const [{ play, pause, seek, setVolume, setMuted, setPlaybackRate, setLoop }, cleanup] =
+  makeVideoPlayer('clip.mp4');
 
 await play();
 seek(30);
 setPlaybackRate(1.5);
-await requestFullscreen();
+setLoop(true);
 cleanup();
 ```
-
-#### Definition
 
 ```ts
 function makeVideoPlayer(
   src: VideoSource | HTMLVideoElement,
   handlers?: VideoEventHandlers,
+  options?: VideoOptions,
 ): [controls: VideoControls, cleanup: VoidFunction];
 ```
 
-`VideoControls`:
+### `createVideo`
+
+Essential reactive playback state: `playing`, `currentTime`, `ended`, `seeking`, `error`, and an async `duration` that suspends until metadata is loaded.
 
 ```ts
-type VideoControls = {
-  play: () => Promise<void>;
-  pause: VoidFunction;
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  setMuted: (muted: boolean) => void;
-  setPlaybackRate: (rate: number) => void;
-  requestFullscreen: () => Promise<void>;
-  exitFullscreen: () => Promise<void>;
-  toggleFullscreen: () => Promise<void>;
-  player: HTMLVideoElement;
-};
-```
-
-The `seek` function uses `fastSeek` on [supporting browsers](https://caniuse.com/?search=fastseek).
-
-### createVideo
-
-A reactive video primitive. Returns a flat object with writable signal accessors for `playing`, `volume`, `muted`, and `playbackRate`; reactive signals for `currentTime`, `ended`, `buffered`, `readyState`, `videoWidth`, `videoHeight`, and `fullscreen`; and an async `duration` that suspends until metadata is loaded — integrating with `<Loading>`.
-
-```ts
-const video = createVideo("clip.mp4");
+const video = createVideo('clip.mp4');
 // or with a reactive source:
 const video = createVideo(() => selectedUrl());
 
-video.playing()             // boolean
-video.setPlaying(true)      // plays
-video.volume()              // 0–1
-video.setVolume(0.5)
-video.muted()               // boolean
-video.setMuted(true)
-video.playbackRate()        // number
-video.setPlaybackRate(1.5)
-video.currentTime()         // seconds
+video.playing()         // boolean — true while actively playing
+video.setPlaying(true)  // plays
+video.currentTime()     // seconds
 video.seek(30)
-video.ended()               // boolean
-video.readyState()          // 0–4
-video.videoWidth()          // intrinsic pixel width
-video.videoHeight()         // intrinsic pixel height
-video.fullscreen()          // boolean
-video.requestFullscreen()
-video.exitFullscreen()
-video.toggleFullscreen()
+video.ended()           // boolean
+video.seeking()         // boolean — true while scrubbing
+video.error()           // MediaError | null
 ```
 
-Attach the `player` to a `<video>` element via `ref`:
-
-```tsx
-const video = createVideo("clip.mp4");
-
-<video ref={el => { /* video.player === el */ }} src="clip.mp4" />
-// or pass an existing element:
-const video = createVideo(videoEl);
-```
-
-The `duration` accessor throws `NotReadyError` until video metadata has loaded, making it work naturally with Solid 2.0's `<Loading>` boundary. The pending state resets whenever the source changes.
+The `duration` accessor throws `NotReadyError` until video metadata has loaded, integrating with Solid 2.0's `<Loading>` boundary:
 
 ```tsx
 <Loading fallback="Loading…">
@@ -133,44 +86,91 @@ The `duration` accessor throws `NotReadyError` until video metadata has loaded, 
 </Loading>
 ```
 
-#### Definition
-
 ```ts
-function createVideo(src: VideoSource | Accessor<VideoSource>): VideoReturn;
+function createVideo(
+  src: VideoSource | Accessor<VideoSource>,
+  options?: VideoOptions,
+): VideoReturn;
 ```
 
-`VideoReturn`:
+### `createVideoPlayer`
+
+Extends `createVideo` with the full control surface: volume, muted, playback rate, loop, buffering state, and dimensions. Accepts all `VideoOptions` plus `volume` and `playbackRate` initial values.
 
 ```ts
+const video = createVideoPlayer('clip.mp4', {
+  muted: true,
+  volume: 0.8,
+  playbackRate: 1,
+});
+
+// All fields from createVideo, plus:
+video.volume()              // 0–1
+video.setVolume(0.5)
+video.muted()               // boolean
+video.setMuted(true)
+video.playbackRate()        // number
+video.setPlaybackRate(1.5)
+video.loop()                // boolean
+video.setLoop(true)
+video.buffered()            // TimeRanges | undefined
+video.readyState()          // 0–4
+video.videoWidth()          // intrinsic pixel width
+video.videoHeight()         // intrinsic pixel height
+```
+
+> **Fullscreen** is intentionally omitted — use the dedicated `@solid-primitives/fullscreen` primitive to manage fullscreen state and attach it to `video.player`.
+
+```ts
+function createVideoPlayer(
+  src: VideoSource | Accessor<VideoSource>,
+  options?: VideoControlsOptions,
+): VideoControlsReturn;
+```
+
+## Types
+
+```ts
+type VideoSource = string | undefined | MediaProvider;
+
+type VideoOptions = {
+  autoPlay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  preload?: "" | "none" | "metadata" | "auto";
+};
+
+type VideoControlsOptions = VideoOptions & {
+  volume?: number;
+  playbackRate?: number;
+};
+
 type VideoReturn = {
   player: HTMLVideoElement;
   playing: Accessor<boolean>;
   setPlaying: (v: boolean) => void;
   currentTime: Accessor<number>;
   seek: (time: number) => void;
+  ended: Accessor<boolean>;
+  seeking: Accessor<boolean>;
+  error: Accessor<MediaError | null>;
+  duration: Accessor<number>; // throws NotReadyError until loaded
+};
+
+type VideoControlsReturn = VideoReturn & {
   volume: Accessor<number>;
   setVolume: (v: number) => void;
   muted: Accessor<boolean>;
   setMuted: (v: boolean) => void;
   playbackRate: Accessor<number>;
   setPlaybackRate: (rate: number) => void;
-  ended: Accessor<boolean>;
+  loop: Accessor<boolean>;
+  setLoop: (v: boolean) => void;
   buffered: Accessor<TimeRanges | undefined>;
   readyState: Accessor<number>;
   videoWidth: Accessor<number>;
   videoHeight: Accessor<number>;
-  fullscreen: Accessor<boolean>;
-  requestFullscreen: () => Promise<void>;
-  exitFullscreen: () => Promise<void>;
-  toggleFullscreen: () => Promise<void>;
-  duration: Accessor<number>;
 };
-```
-
-`VideoSource`:
-
-```ts
-type VideoSource = string | undefined | MediaProvider;
 ```
 
 ## Changelog

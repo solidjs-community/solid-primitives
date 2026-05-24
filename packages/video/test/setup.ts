@@ -10,9 +10,11 @@ interface VideoMock {
   volume: number;
   muted: boolean;
   playbackRate: number;
+  loop: boolean;
   readyState: number;
   videoWidth: number;
   videoHeight: number;
+  error: MediaError | null;
   _loaded: boolean;
   _load: (video: HTMLVideoElement) => void;
   _resetMock: (video: HTMLVideoElement) => void;
@@ -27,9 +29,11 @@ const createMockState = (): VideoMock => ({
   volume: 1,
   muted: false,
   playbackRate: 1,
+  loop: false,
   readyState: 0,
   videoWidth: 0,
   videoHeight: 0,
+  error: null,
   _loaded: false,
   _load(video: HTMLVideoElement) {
     // Update mock values before dispatching events so listeners read correct state.
@@ -70,23 +74,17 @@ Object.defineProperty(global.HTMLVideoElement.prototype, "_mock", {
 });
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "paused", {
-  get(this: HTMLVideoElement) {
-    return this._mock.paused;
-  },
+  get(this: HTMLVideoElement) { return this._mock.paused; },
   configurable: true,
 });
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "duration", {
-  get(this: HTMLVideoElement) {
-    return this._mock.duration;
-  },
+  get(this: HTMLVideoElement) { return this._mock.duration; },
   configurable: true,
 });
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "volume", {
-  get(this: HTMLVideoElement) {
-    return this._mock.volume;
-  },
+  get(this: HTMLVideoElement) { return this._mock.volume; },
   set(this: HTMLVideoElement, value: number) {
     this._mock.volume = value;
     this.dispatchEvent(new Event("volumechange"));
@@ -95,9 +93,7 @@ Object.defineProperty(global.HTMLVideoElement.prototype, "volume", {
 });
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "muted", {
-  get(this: HTMLVideoElement) {
-    return this._mock.muted;
-  },
+  get(this: HTMLVideoElement) { return this._mock.muted; },
   set(this: HTMLVideoElement, value: boolean) {
     this._mock.muted = value;
     this.dispatchEvent(new Event("volumechange"));
@@ -106,9 +102,7 @@ Object.defineProperty(global.HTMLVideoElement.prototype, "muted", {
 });
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "playbackRate", {
-  get(this: HTMLVideoElement) {
-    return this._mock.playbackRate;
-  },
+  get(this: HTMLVideoElement) { return this._mock.playbackRate; },
   set(this: HTMLVideoElement, value: number) {
     this._mock.playbackRate = value;
     this.dispatchEvent(new Event("ratechange"));
@@ -116,24 +110,29 @@ Object.defineProperty(global.HTMLVideoElement.prototype, "playbackRate", {
   configurable: true,
 });
 
+Object.defineProperty(global.HTMLVideoElement.prototype, "loop", {
+  get(this: HTMLVideoElement) { return this._mock.loop; },
+  set(this: HTMLVideoElement, value: boolean) { this._mock.loop = value; },
+  configurable: true,
+});
+
 Object.defineProperty(global.HTMLVideoElement.prototype, "readyState", {
-  get(this: HTMLVideoElement) {
-    return this._mock.readyState;
-  },
+  get(this: HTMLVideoElement) { return this._mock.readyState; },
   configurable: true,
 });
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "videoWidth", {
-  get(this: HTMLVideoElement) {
-    return this._mock.videoWidth;
-  },
+  get(this: HTMLVideoElement) { return this._mock.videoWidth; },
   configurable: true,
 });
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "videoHeight", {
-  get(this: HTMLVideoElement) {
-    return this._mock.videoHeight;
-  },
+  get(this: HTMLVideoElement) { return this._mock.videoHeight; },
+  configurable: true,
+});
+
+Object.defineProperty(global.HTMLVideoElement.prototype, "error", {
+  get(this: HTMLVideoElement) { return this._mock.error; },
   configurable: true,
 });
 
@@ -149,28 +148,6 @@ global.HTMLVideoElement.prototype.play = async function playMock(this: HTMLVideo
 global.HTMLVideoElement.prototype.pause = function pauseMock(this: HTMLVideoElement) {
   this.dispatchEvent(new Event("pause"));
   this._mock.paused = true;
-};
-
-// Fullscreen API mock — jsdom does not implement the Fullscreen API
-let _fullscreenElement: Element | null = null;
-
-Object.defineProperty(global.document, "fullscreenElement", {
-  get() {
-    return _fullscreenElement;
-  },
-  configurable: true,
-});
-
-global.HTMLVideoElement.prototype.requestFullscreen = async function requestFullscreenMock(
-  this: HTMLVideoElement,
-) {
-  _fullscreenElement = this;
-  document.dispatchEvent(new Event("fullscreenchange"));
-};
-
-global.document.exitFullscreen = async function exitFullscreenMock() {
-  _fullscreenElement = null;
-  document.dispatchEvent(new Event("fullscreenchange"));
 };
 
 export {};

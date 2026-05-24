@@ -4,16 +4,24 @@
 
 New package: `@solid-primitives/video`
 
-Layered primitives for managing HTML video playback.
+Layered primitives for managing HTML video playback, built for Solid 2.0 (beta.14).
 
 ### `makeVideo`
 
-Non-reactive base primitive. Creates an `HTMLVideoElement` with optional event handlers and returns a `[player, cleanup]` tuple. No Solid owner required.
+Non-reactive base. Creates an `HTMLVideoElement` with optional event handlers and initial configuration (`autoPlay`, `loop`, `muted`, `preload`). Returns a `[player, cleanup]` tuple. No Solid owner required.
 
 ### `makeVideoPlayer`
 
-Wraps `makeVideo` with playback and fullscreen controls: `play`, `pause`, `seek`, `setVolume`, `setMuted`, `setPlaybackRate`, `requestFullscreen`, `exitFullscreen`, `toggleFullscreen`.
+Wraps `makeVideo` with imperative controls: `play`, `pause`, `seek`, `setVolume`, `setMuted`, `setPlaybackRate`, `setLoop`, and fullscreen (`requestFullscreen`, `exitFullscreen`, `toggleFullscreen`).
 
 ### `createVideo`
 
-Reactive primitive that tracks all media state as signals: `playing`, `currentTime`, `volume`, `muted`, `playbackRate`, `ended`, `buffered`, `readyState`, `videoWidth`, `videoHeight`, `fullscreen`, and `duration`. The `duration` accessor throws `NotReadyError` until metadata loads, integrating naturally with `<Loading>`. Accepts a static or reactive `VideoSource`.
+Reactive primitive covering essential playback state: `playing`/`setPlaying`, `currentTime`/`seek`, `ended`, `seeking`, `error` (`MediaError | null`), and `duration` (throws `NotReadyError` until metadata loads — integrates with `<Loading>`). Accepts a static or reactive `VideoSource` and optional `VideoOptions`.
+
+### `createVideoPlayer`
+
+Extends `createVideo` with the full control surface: `volume`/`setVolume`, `muted`/`setMuted`, `playbackRate`/`setPlaybackRate`, `loop`/`setLoop`, `buffered`, `readyState`, `videoWidth`, `videoHeight`, and `fullscreen`/fullscreen controls. Accepts `VideoControlsOptions` which adds `volume` and `playbackRate` initial values to `VideoOptions`.
+
+### Design notes
+
+`createVideo` and `createVideoPlayer` are composable — `createVideoPlayer` calls `createVideo` internally and layers additional `createEventListenerMap` bindings on the same player element. Choose the primitive that matches your needs; the non-reactive `make*` layer remains available when no Solid owner is present.

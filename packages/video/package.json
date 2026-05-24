@@ -19,7 +19,8 @@
     "list": [
       "makeVideo",
       "makeVideoPlayer",
-      "createVideo"
+      "createVideo",
+      "createVideoPlayer"
     ],
     "category": "Display & Media"
   },
