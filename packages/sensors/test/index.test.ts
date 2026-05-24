@@ -650,7 +650,7 @@ describe("createBattery", () => {
   it("updates reactively on battery events", () =>
     createRoot(
       dispose =>
-        new Promise<void>(async (resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           const battery = createBattery();
           let count = 0;
 
@@ -671,8 +671,7 @@ describe("createBattery", () => {
             },
           );
 
-          await Promise.resolve();
-          setTimeout(() => reject(new Error("timed out")), 500);
+          Promise.resolve().then(() => setTimeout(() => reject(new Error("timed out")), 500));
         }),
     ));
 });
