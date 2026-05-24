@@ -378,6 +378,7 @@ describe("createSensor", () => {
 });
 
 let lastCompassInstance: MockMagnetometerSensor;
+let lastCompassConstructorArgs: any;
 
 class MockMagnetometerSensor extends EventTarget {
   x: number | null = null;
@@ -390,6 +391,7 @@ class MockMagnetometerSensor extends EventTarget {
   constructor(_opts?: any) {
     super();
     lastCompassInstance = this;
+    lastCompassConstructorArgs = _opts;
   }
 
   start() {
@@ -451,6 +453,7 @@ describe("makeCompass", () => {
     const spy = vi.spyOn(MockMagnetometerSensor.prototype, "start");
     const cleanup = makeCompass(() => {}, { frequency: 60, referenceFrame: "screen" })!;
     expect(spy).toHaveBeenCalled();
+    expect(lastCompassConstructorArgs).toEqual({ frequency: 60, referenceFrame: "screen" });
     cleanup();
     spy.mockRestore();
   });
