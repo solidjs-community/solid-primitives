@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createSignal } from "solid-js";
-import createTween from "../src/index.js";
+import { createTween } from "../src/index.js";
 
 describe("createTween", () => {
   test("doesn't break in SSR", () => {
