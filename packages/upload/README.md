@@ -60,6 +60,8 @@ selectFiles(async files => {
 | `removeFile`  | `(fileName: string) => void`        | Removes a single file from the list by name                      |
 | `clearFiles`  | `() => void`                        | Clears all selected files                                        |
 
+> **Note:** `removeFile` matches by file name. If the list contains duplicate file names, only the first match is removed.
+
 **Options:**
 
 | Option     | Type      | Default | Description                                                                                               |
@@ -118,6 +120,8 @@ const results = await upload(myFiles);
 | `abort`      | `() => void`                                 | Cancel all in-flight uploads                                      |
 | `removeFile` | `(fileName: string) => void`                 | Remove one entry by name; aborts all in-flight uploads            |
 | `clearFiles` | `() => void`                                 | Remove all entries; aborts all in-flight uploads                  |
+
+> **Note:** `removeFile` matches by `file.name`. If a batch contains duplicate file names, only the first match is removed. Avoid batching files with duplicate names when using `removeFile`.
 
 Each entry in `files` has the shape:
 
@@ -258,6 +262,8 @@ const { ref, files, isDragging, error } = createDropzone({
 | `isDragging` | `Accessor<boolean>`          | `true` while a drag is active over the element                   |
 | `removeFile` | `(fileName: string) => void` | Removes a single file from the list by name                      |
 | `clearFiles` | `() => void`                 | Clears all dropped files                                         |
+
+> **Note:** `removeFile` matches by file name. If the list contains duplicate file names, only the first match is removed.
 
 **Options (all optional):**
 
