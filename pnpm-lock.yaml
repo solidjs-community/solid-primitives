@@ -366,13 +366,19 @@ importers:
 
   packages/fullscreen:
     dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/geolocation:
     dependencies:
