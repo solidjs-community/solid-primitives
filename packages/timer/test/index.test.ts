@@ -235,6 +235,39 @@ describe("createTimeoutLoop", () => {
     dispose();
   });
 
+  test("false → number: loop restarts when delay transitions from false to a number", () => {
+    let count = 0;
+    const [delay, setDelay] = createSignal<number | false>(100);
+    const dispose = createRoot(dispose => {
+      createTimeoutLoop(() => count++, delay);
+      return dispose;
+    });
+    flush();
+
+    vi.advanceTimersByTime(100); // first tick
+    expect(count).toBe(1);
+
+    setDelay(false);
+    flush();
+
+    vi.advanceTimersByTime(100); // tick fires; reads delay()=false, stops loop
+    expect(count).toBe(2);
+    flush();
+
+    vi.advanceTimersByTime(500); // loop is stopped; no more ticks
+    expect(count).toBe(2);
+
+    setDelay(100);
+    flush(); // effect re-runs; curr===false so apply receives 100 and restarts
+
+    vi.advanceTimersByTime(100);
+    expect(count).toBe(3);
+    vi.advanceTimersByTime(100);
+    expect(count).toBe(4);
+
+    dispose();
+  });
+
   test("false delay stops the loop after the current execution", () => {
     let count = 0;
     const [delay, setDelay] = createSignal<number | false>(100);
