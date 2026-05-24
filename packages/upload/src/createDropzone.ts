@@ -60,17 +60,17 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   };
 
   const onDragStart = (event: DragEvent) => {
-    setIsDragging(true);
     void runCallback(options?.onDragStart, transformFiles(event.dataTransfer?.files || null));
   };
   const onDragEnd = (event: DragEvent) => {
-    setIsDragging(false);
     void runCallback(options?.onDragEnd, transformFiles(event.dataTransfer?.files || null));
   };
   const onDragEnter = (event: DragEvent) => {
+    setIsDragging(true);
     void runCallback(options?.onDragEnter, transformFiles(event.dataTransfer?.files || null));
   };
   const onDragLeave = (event: DragEvent) => {
+    setIsDragging(false);
     void runCallback(options?.onDragLeave, transformFiles(event.dataTransfer?.files || null));
   };
   const onDragOver = (event: DragEvent) => {
@@ -82,6 +82,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   };
   const onDrop = (event: DragEvent) => {
     event.preventDefault();
+    setIsDragging(false);
     const parsedFiles = transformFiles(event.dataTransfer?.files || null);
     setFiles(parsedFiles);
     setError(null);
