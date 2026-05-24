@@ -394,12 +394,12 @@ describe("createDropzone", () => {
 
 describe("fileUploader", () => {
   it("returns a function (ref callback)", () => {
-    const ref = createRoot(dispose => {
-      const r = fileUploader({ userCallback: vi.fn(), setFiles: vi.fn() });
-      dispose();
-      return r;
-    });
+    const { ref, dispose } = createRoot(dispose => ({
+      ref: fileUploader({ userCallback: vi.fn(), setFiles: vi.fn() }),
+      dispose,
+    }));
     expect(typeof ref).toBe("function");
+    dispose();
   });
 
   it("attaches a change listener to the element", () => {
@@ -407,14 +407,14 @@ describe("fileUploader", () => {
     input.type = "file";
     const addSpy = vi.spyOn(input, "addEventListener");
 
-    const ref = createRoot(dispose => {
-      const r = fileUploader({ userCallback: vi.fn(), setFiles: vi.fn() });
-      dispose();
-      return r;
+    const dispose = createRoot(dispose => {
+      const ref = fileUploader({ userCallback: vi.fn(), setFiles: vi.fn() });
+      ref(input);
+      return dispose;
     });
 
-    ref(input);
     expect(addSpy).toHaveBeenCalledWith("change", expect.any(Function));
+    dispose();
   });
 
   it("calls setFiles and userCallback on change event", async () => {
@@ -423,13 +423,12 @@ describe("fileUploader", () => {
     const setFiles = vi.fn();
     const userCallback = vi.fn();
 
-    const ref = createRoot(dispose => {
-      const r = fileUploader({ userCallback, setFiles });
-      dispose();
-      return r;
+    const dispose = createRoot(dispose => {
+      const ref = fileUploader({ userCallback, setFiles });
+      ref(input);
+      return dispose;
     });
 
-    ref(input);
     dispatchChange(input, makeFileList(makeFile("upload.png")));
     await Promise.resolve();
 
@@ -438,6 +437,7 @@ describe("fileUploader", () => {
     expect(uploaded).toHaveLength(1);
     expect(uploaded[0]!.name).toBe("upload.png");
     expect(userCallback).toHaveBeenCalledOnce();
+    dispose();
   });
 
   it("calls onError when userCallback throws", async () => {
@@ -446,24 +446,24 @@ describe("fileUploader", () => {
     input.type = "file";
     const onError = vi.fn();
 
-    const ref = createRoot(dispose => {
-      const r = fileUploader({
+    const dispose = createRoot(dispose => {
+      const ref = fileUploader({
         userCallback: async () => {
           throw boom;
         },
         setFiles: vi.fn(),
         onError,
       });
-      dispose();
-      return r;
+      ref(input);
+      return dispose;
     });
 
-    ref(input);
     dispatchChange(input, makeFileList(makeFile()));
     await Promise.resolve();
     await Promise.resolve();
 
     expect(onError).toHaveBeenCalledWith(boom);
+    dispose();
   });
 });
 
@@ -801,19 +801,21 @@ function makeMockXhr() {
 describe("createFileUploader — XHR", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("opens a POST to the provided URL and sends FormData", () => {
-    const { xhr } = makeMockXhr();
+  it("opens a POST to the provided URL and sends FormData", async () => {
+    const { xhr, triggerLoad } = makeMockXhr();
     vi.stubGlobal("XMLHttpRequest", vi.fn(() => xhr));
 
-    const { upload } = createRoot(dispose => ({
+    const { upload, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload")),
       dispose,
     }));
 
-    upload([makeUploadFile()]).catch(() => {});
-
+    const uploadPromise = upload([makeUploadFile()]);
     expect(xhr.open).toHaveBeenCalledWith("POST", "/api/upload");
     expect(xhr.send).toHaveBeenCalledWith(expect.any(FormData));
+    triggerLoad();
+    await uploadPromise;
+    dispose();
   });
 
   it("resolves with parsed JSON on 200 load", async () => {
@@ -894,16 +896,19 @@ describe("createFileUploader — XHR", () => {
     dispose();
   });
 
-  it("sets custom headers on the XHR request", () => {
-    const { xhr } = makeMockXhr();
+  it("sets custom headers on the XHR request", async () => {
+    const { xhr, triggerLoad } = makeMockXhr();
     vi.stubGlobal("XMLHttpRequest", vi.fn(() => xhr));
 
-    const { upload } = createRoot(dispose => ({
+    const { upload, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload", { headers: { "X-Auth": "token123" } })),
       dispose,
     }));
 
-    upload([makeUploadFile()]).catch(() => {});
+    const uploadPromise = upload([makeUploadFile()]);
     expect(xhr.setRequestHeader).toHaveBeenCalledWith("X-Auth", "token123");
+    triggerLoad();
+    await uploadPromise;
+    dispose();
   });
 });
