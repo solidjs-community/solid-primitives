@@ -293,11 +293,12 @@ export function Rerun(props: { on: any; children: RerunChildren<any> }): JSX.Ele
   return createMemo(
     () => {
       const currentKey = getKey();
-      const child = props.children;
-      const el =
-        typeof child === "function" && (child as Function).length > 0
+      const el = untrack(() => {
+        const child = props.children;
+        return typeof child === "function" && (child as Function).length > 0
           ? (child as any)(currentKey, prevKey)
           : child;
+      });
       prevKey = currentKey;
       return el;
     },
