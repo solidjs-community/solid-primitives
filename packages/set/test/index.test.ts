@@ -409,15 +409,17 @@ describe("intersection", () => {
     createRoot(dispose => {
       const a = new ReactiveSet([1, 2]);
       const b = new ReactiveSet([2]);
-      const fn = vi.fn(() => [...intersection(a, b)()]);
+      const fn = vi.fn();
 
-      // call once to get initial value and set up tracking
-      fn();
+      createEffect(
+        () => [...intersection(a, b)()],
+        result => fn(result),
+      );
+      flush(); // initial apply — fn called once
 
-      b.add(99); // 99 is not in a — intersection unchanged
+      b.add(99); // 99 is not in a — intersection unchanged, memo does not invalidate
       flush();
 
-      // fn was not called reactively; memo didn't invalidate
       expect(fn).toHaveBeenCalledTimes(1);
 
       dispose();
