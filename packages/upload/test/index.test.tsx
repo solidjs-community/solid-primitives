@@ -360,6 +360,41 @@ describe("createDropzone", () => {
     dispose();
   });
 
+  it("re-assigning setRef detaches listeners from the previous element", () => {
+    const { setRef, isDragging, dispose } = createRoot(dispose => ({
+      ...createDropzone(),
+      dispose,
+    }));
+
+    const el1 = document.createElement("div");
+    const el2 = document.createElement("div");
+    const removeSpy = vi.spyOn(el1, "removeEventListener");
+
+    setRef(el1);
+    el1.dispatchEvent(new Event("dragenter"));
+    flush();
+    expect(isDragging()).toBe(true);
+    el1.dispatchEvent(new Event("dragleave"));
+    flush();
+    expect(isDragging()).toBe(false);
+
+    // Re-assign — el1 listeners should be removed, el2 should become active
+    setRef(el2);
+    expect(removeSpy).toHaveBeenCalled();
+
+    // el1 events no longer affect state
+    el1.dispatchEvent(new Event("dragenter"));
+    flush();
+    expect(isDragging()).toBe(false);
+
+    // el2 events now drive state
+    el2.dispatchEvent(new Event("dragenter"));
+    flush();
+    expect(isDragging()).toBe(true);
+
+    dispose();
+  });
+
   it("error() captures a thrown onDrop callback", async () => {
     const boom = new Error("drop failed");
     const { error, setRef, dispose } = createRoot(dispose => ({

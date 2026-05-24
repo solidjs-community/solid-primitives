@@ -5,7 +5,11 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "references": [],
+  "references": [
+    {
+      "path": "../event-listener"
+    }
+  ],
   "include": [
     "src"
   ]

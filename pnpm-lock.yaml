@@ -1071,6 +1071,10 @@ importers:
         version: 2.0.0-beta.14
 
   packages/upload:
+    dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:*
+        version: link:../event-listener
     devDependencies:
       '@solidjs/web':
         specifier: 2.0.0-beta.14

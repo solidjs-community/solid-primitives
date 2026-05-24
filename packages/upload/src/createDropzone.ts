@@ -1,5 +1,6 @@
-import { createSignal, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { isServer } from "@solidjs/web";
+import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { transformFiles } from "./helpers.js";
 import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
 
@@ -44,9 +45,6 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   const [error, setError] = createSignal<unknown>(null);
   const [isLoading, setIsLoading] = createSignal(false);
   const [isDragging, setIsDragging] = createSignal(false);
-
-  // Capture owner in the Phase-1 (owned) scope so cleanup can be registered later
-  const owner = getOwner();
 
   const runCallback = async (
     callback: ((files: UploadFile[]) => void | Promise<void>) | undefined,
@@ -98,29 +96,19 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     })();
   };
 
-  // setRef is the Phase-2 ref callback: called synchronously when the element is created.
-  // Listeners are attached immediately; cleanup is registered back in the owner scope.
-  const setRef = (ref: T) => {
-    ref.addEventListener("dragstart", onDragStart);
-    ref.addEventListener("dragenter", onDragEnter);
-    ref.addEventListener("dragend", onDragEnd);
-    ref.addEventListener("dragleave", onDragLeave);
-    ref.addEventListener("dragover", onDragOver);
-    ref.addEventListener("drag", onDrag);
-    ref.addEventListener("drop", onDrop);
+  const [refTarget, setRefTarget] = createSignal<T | undefined>(undefined);
 
-    runWithOwner(owner, () => {
-      onCleanup(() => {
-        ref.removeEventListener("dragstart", onDragStart);
-        ref.removeEventListener("dragenter", onDragEnter);
-        ref.removeEventListener("dragend", onDragEnd);
-        ref.removeEventListener("dragleave", onDragLeave);
-        ref.removeEventListener("dragover", onDragOver);
-        ref.removeEventListener("drag", onDrag);
-        ref.removeEventListener("drop", onDrop);
-      });
-    });
-  };
+  createEventListenerMap(refTarget as () => T, {
+    dragstart: onDragStart,
+    dragenter: onDragEnter,
+    dragend: onDragEnd,
+    dragleave: onDragLeave,
+    dragover: onDragOver,
+    drag: onDrag,
+    drop: onDrop,
+  });
+
+  const setRef = (ref: T) => { setRefTarget(() => ref); flush(); };
 
   const removeFile = (fileName: string) => {
     setFiles(prev => prev.filter(f => f.name !== fileName));
