@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/sensors",
   "version": "0.1.0",
-  "description": "Primitives for device motion and orientation sensors (accelerometer and gyroscope).",
+  "description": "Primitives for device sensors: accelerometer, gyroscope, compass, battery, and generic Sensor API.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
   "license": "MIT",
