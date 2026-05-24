@@ -5,7 +5,6 @@ import {
   createSignal,
   type Accessor,
   untrack,
-  type EffectFunction,
   type ComputeFunction,
   type NoInfer,
   type Setter,
@@ -16,6 +15,7 @@ import {
   sharedConfig,
   DEV,
 } from "solid-js";
+
 
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
@@ -191,7 +191,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     const result = untrack(() => fn(input, prevInput, prevValue));
     prevInput = input;
     return result;
-  }) as unknown as EffectFunction<NoInfer<Next> | undefined>;
+  }) as unknown as ComputeFunction<NoInfer<Next> | undefined>;
 }
 
 /**
@@ -265,10 +265,9 @@ export function createHydratableSignal<T>(
   }
   if (sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
-    createEffect(
-      () => {},
-      () => { setState(() => update()); },
-    );
+    onSettled(() => {
+      setState(() => update());
+    });
     return [state, setState];
   }
   return createSignal(update() as Exclude<T, Function>, options);
@@ -408,30 +407,65 @@ export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string)
   return (raw: string): B => b(a(raw));
 }
 
+// ─── DOM helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Check if a wrapper element contains a target element.
+ * Portal-aware: follows SolidJS `_$host` links so elements rendered inside
+ * a `<Portal>` are correctly treated as children of the portal's anchor.
+ */
+export const contains = (wrapper: HTMLElement, target: HTMLElement): boolean => {
+  if (wrapper.contains(target)) return true;
+  let current: HTMLElement | null = target;
+  while (current) {
+    if (current === wrapper) return true;
+    // @ts-expect-error: _$host is a SolidJS-internal property set on portal roots
+    current = current._$host ?? current.parentElement;
+  }
+  return false;
+};
 /**
  * Wraps a setter function of any signal or store
  *
  * ```ts
  * const [data, setData] = wrapSetter(
- *   createSignal(initialData), 
+ *   createSignal(initialData),
  *   (setter) => (next) => { console.log(next); return setter(next); },
  * );
  * ```
  * If you destructure signal or store in a longer tuple, you need to use a const assertion for the types to work.
  */
-export function wrapSetter<T>(signal: Signal<T>, wrapper: (setter: Setter<T>) => Setter<T>): Signal<T>;
-export function wrapSetter<T>(store: [Store<T>, StoreSetter<T>], wrapper: (setter: StoreSetter<T>) => StoreSetter<T>): [Store<T>, StoreSetter<T>];
-export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
-  signalOrStore: S,
-  wrapper: (setter: S[1]) => S[1]
-): S;
-export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | readonly [...Signal<T>, ...any[]] | readonly [Store<T>, StoreSetter<T>, ...any[]]>(
-  signalOrStore: S,
-  wrapper: (setter: S[1]) => S[1]
-): S;
-export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
-  signalOrStore: S,
-  wrapper: (setter: S[1]) => S[1]
-): S {
+export function wrapSetter<T>(
+  signal: Signal<T>,
+  wrapper: (setter: Setter<T>) => Setter<T>,
+): Signal<T>;
+export function wrapSetter<T>(
+  store: [Store<T>, StoreSetter<T>],
+  wrapper: (setter: StoreSetter<T>) => StoreSetter<T>,
+): [Store<T>, StoreSetter<T>];
+export function wrapSetter<
+  T,
+  S extends
+    | Signal<T>
+    | [Store<T>, StoreSetter<T>]
+    | [...Signal<T>, ...any[]]
+    | [Store<T>, StoreSetter<T>, ...any[]],
+>(signalOrStore: S, wrapper: (setter: S[1]) => S[1]): S;
+export function wrapSetter<
+  T,
+  S extends
+    | Signal<T>
+    | [Store<T>, StoreSetter<T>]
+    | readonly [...Signal<T>, ...any[]]
+    | readonly [Store<T>, StoreSetter<T>, ...any[]],
+>(signalOrStore: S, wrapper: (setter: S[1]) => S[1]): S;
+export function wrapSetter<
+  T,
+  S extends
+    | Signal<T>
+    | [Store<T>, StoreSetter<T>]
+    | [...Signal<T>, ...any[]]
+    | [Store<T>, StoreSetter<T>, ...any[]],
+>(signalOrStore: S, wrapper: (setter: S[1]) => S[1]): S {
   return [signalOrStore[0], wrapper(signalOrStore[1]), ...signalOrStore.slice(2)] as S;
 }
