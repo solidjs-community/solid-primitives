@@ -53,17 +53,17 @@
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.8",
-    "@solidjs/web": "2.0.0-beta.10",
+    "@solidjs/web": "2.0.0-beta.14",
     "leaflet": "^1.9.4",
-    "solid-js": "2.0.0-beta.10"
+    "solid-js": "2.0.0-beta.14"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "2.0.0-beta.10",
-    "solid-js": "2.0.0-beta.10"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   },
   "typesVersions": {}
 }
