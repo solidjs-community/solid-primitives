@@ -108,6 +108,7 @@ export const createTimer = (
 
       fractionDone = 0;
       shouldHandleFraction = true;
+      if (done) return () => {};
       const id = timer(callHandler, currDelay);
       return () => clearInterval(id);
     },
