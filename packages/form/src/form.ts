@@ -102,9 +102,11 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       createEffect(
         () => value(),
         val => {
+          // If a sync validator already fails, clear async state and skip.
+          if (runValidators(val, validators) !== null) { setAe(null); setAp(false); return; }
           const s = ++seq;
           void (async () => {
-            // Invoke all validators; collect only the Promises (parallel start).
+            // Collect only async validators (sync already passed above).
             const ps: Promise<string | null>[] = [];
             for (const fn of validators) {
               const r = fn(val);

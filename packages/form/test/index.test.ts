@@ -303,6 +303,21 @@ describe("reset", () => {
       dispose();
     });
   });
+
+  it("field.reset() also clears touched state", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "" } } });
+
+      form.fields.email.setTouched(true);
+      flush();
+      expect(form.fields.email.touched()).toBe(true);
+
+      form.fields.email.reset();
+      flush();
+      expect(form.fields.email.touched()).toBe(false);
+      dispose();
+    });
+  });
 });
 
 // ─── Submit ───────────────────────────────────────────────────────────────────
@@ -407,6 +422,58 @@ describe("submit", () => {
 
     await submitPromise!;
     expect(submittingAfter).toBe(false);
+    dispose();
+  });
+
+  it("does not submit while async validators are pending", async () => {
+    const onSubmit = vi.fn();
+    let submitPromise: Promise<void>;
+
+    const dispose = createRoot(d => {
+      const form = createForm({
+        fields: {
+          email: {
+            initial: "user@example.com",
+            validate: async () => {
+              await new Promise(r => setTimeout(r, 50));
+              return null;
+            },
+          },
+        },
+        onSubmit,
+      });
+
+      flush(); // starts async validator → pending() = true
+      submitPromise = form.submit();
+      return d;
+    });
+
+    await submitPromise!;
+    expect(onSubmit).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it("allows re-submit after correcting a validation error", async () => {
+    const onSubmit = vi.fn();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let form: any;
+
+    const dispose = createRoot(d => {
+      form = createForm({
+        fields: { email: { initial: "", validate: isEmail } },
+        onSubmit,
+      });
+      return d;
+    });
+
+    await form.submit(); // invalid → blocked
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    form.fields.email.setValue("user@example.com");
+    flush();
+
+    await form.submit(); // valid → succeeds
+    expect(onSubmit).toHaveBeenCalledWith({ email: "user@example.com" });
     dispose();
   });
 
@@ -701,6 +768,29 @@ describe("async validators", () => {
     });
   });
 
+  it("pending() is false when a sync validator already fails", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: {
+            initial: "",
+            validate: [
+              isEmail,
+              async (v: string) => (v === "taken@example.com" ? "Email already taken" : null),
+            ],
+          },
+        },
+      });
+
+      flush();
+      // isEmail("") fails synchronously — async validator must not run
+      expect(form.fields.email.error()).toBe("Invalid email");
+      expect(form.fields.email.pending()).toBe(false);
+      expect(form.pending()).toBe(false);
+      dispose();
+    });
+  });
+
   it("stale results are discarded when value changes mid-flight", async () => {
     const form = createRoot(() =>
       createForm({
@@ -834,6 +924,70 @@ describe("bind", () => {
 
       expect(form.fields.agree.value()).toBe(true);
       cleanup();
+      dispose();
+    });
+  });
+
+  it("radio: sets initial checked from boolean signal", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { agree: { initial: true } } });
+
+      const el = document.createElement("input");
+      el.type = "radio";
+      const cleanup = form.bind("agree" as any)(el);
+
+      expect(el.checked).toBe(true);
+      cleanup();
+      dispose();
+    });
+  });
+
+  it("radio: updates signal with boolean on change event", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { agree: { initial: false } } });
+
+      const el = document.createElement("input");
+      el.type = "radio";
+      const cleanup = form.bind("agree" as any)(el);
+
+      el.checked = true;
+      el.dispatchEvent(new Event("change"));
+      flush();
+
+      expect(form.fields.agree.value()).toBe(true);
+      cleanup();
+      dispose();
+    });
+  });
+
+  it("syncs DOM when signal changes programmatically", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "" } } });
+
+      const el = document.createElement("input");
+      const cleanup = form.bind("email")(el);
+
+      form.fields.email.setValue("new@example.com");
+      flush();
+
+      expect(el.value).toBe("new@example.com");
+      cleanup();
+      dispose();
+    });
+  });
+
+  it("cleanup stops signal→DOM sync", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "" } } });
+
+      const el = document.createElement("input");
+      const cleanup = form.bind("email")(el);
+      cleanup();
+
+      form.fields.email.setValue("ignored@example.com");
+      flush();
+
+      expect(el.value).toBe("");
       dispose();
     });
   });
@@ -1013,6 +1167,38 @@ describe("toFormData", () => {
   });
 });
 
+// ─── formData ─────────────────────────────────────────────────────────────────
+
+describe("formData", () => {
+  it("returns FormData with all current field values", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: { initial: "user@example.com" },
+          name: { initial: "Alice" },
+        },
+      });
+
+      const fd = form.formData();
+      expect(fd.get("email")).toBe("user@example.com");
+      expect(fd.get("name")).toBe("Alice");
+      dispose();
+    });
+  });
+
+  it("reflects updated values", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { name: { initial: "" } } });
+
+      form.fields.name.setValue("Bob");
+      flush();
+
+      expect(form.formData().get("name")).toBe("Bob");
+      dispose();
+    });
+  });
+});
+
 // ─── setValues ───────────────────────────────────────────────────────────────
 
 describe("setValues", () => {
@@ -1072,6 +1258,18 @@ describe("setValues", () => {
       dispose();
     });
   });
+
+  it("does not affect touched state", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { name: { initial: "" } } });
+
+      expect(form.fields.name.touched()).toBe(false);
+      form.setValues({ name: "Alice" });
+      flush();
+      expect(form.fields.name.touched()).toBe(false);
+      dispose();
+    });
+  });
 });
 
 // ─── validate() reactive invalidation ────────────────────────────────────────
@@ -1128,6 +1326,66 @@ describe("bind with textarea", () => {
       flush();
 
       expect(form.fields.bio.value()).toBe("Updated bio");
+      cleanup();
+      dispose();
+    });
+  });
+});
+
+// ─── bind with select ────────────────────────────────────────────────────────
+
+describe("bind with select", () => {
+  function makeSelect(...values: string[]): HTMLSelectElement {
+    const el = document.createElement("select");
+    for (const v of values) {
+      const opt = document.createElement("option");
+      opt.value = v;
+      el.append(opt);
+    }
+    return el;
+  }
+
+  it("sets initial value on a select element", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { role: { initial: "admin" } } });
+
+      const el = makeSelect("admin", "user");
+      const cleanup = form.bind("role")(el);
+
+      expect(el.value).toBe("admin");
+      cleanup();
+      dispose();
+    });
+  });
+
+  it("updates signal when select changes via input event", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { role: { initial: "admin" } } });
+
+      const el = makeSelect("admin", "user");
+      const cleanup = form.bind("role")(el);
+
+      el.value = "user";
+      el.dispatchEvent(new Event("input"));
+      flush();
+
+      expect(form.fields.role.value()).toBe("user");
+      cleanup();
+      dispose();
+    });
+  });
+
+  it("syncs DOM when signal changes programmatically", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { role: { initial: "admin" } } });
+
+      const el = makeSelect("admin", "user");
+      const cleanup = form.bind("role")(el);
+
+      form.fields.role.setValue("user");
+      flush();
+
+      expect(el.value).toBe("user");
       cleanup();
       dispose();
     });
