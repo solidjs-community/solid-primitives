@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
 import { createRoot, flush } from "solid-js";
-import { createFilePicker, createFileUploader, fileSender, createDropzone, fileUploader } from "../src/index.js";
+import { createFilePicker, createFileUploader, fileSender, createDropzone, dropzone, fileUploader } from "../src/index.js";
 import { transformFiles } from "../src/helpers.js";
 import type { UploadFile } from "../src/types.js";
 
@@ -264,12 +264,12 @@ describe("createDropzone", () => {
     dispose();
   });
 
-  it("exposes setRef, removeFile, clearFiles", () => {
-    const { setRef, removeFile, clearFiles, dispose } = createRoot(dispose => ({
+  it("exposes ref, removeFile, clearFiles", () => {
+    const { ref, removeFile, clearFiles, dispose } = createRoot(dispose => ({
       ...createDropzone(),
       dispose,
     }));
-    expect(typeof setRef).toBe("function");
+    expect(typeof ref).toBe("function");
     expect(typeof removeFile).toBe("function");
     expect(typeof clearFiles).toBe("function");
     dispose();
@@ -311,14 +311,14 @@ describe("createDropzone", () => {
 
     // Capture isLoading via closure — onDrop is passed before the primitive returns
     let getIsLoading!: () => boolean;
-    const { setRef, dispose } = createRoot(dispose => {
+    const { ref, dispose } = createRoot(dispose => {
       const dz = createDropzone({ onDrop: () => blocker });
       getIsLoading = dz.isLoading;
       return { ...dz, dispose };
     });
 
     const div = document.createElement("div");
-    setRef(div);
+    ref(div);
 
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
@@ -339,13 +339,13 @@ describe("createDropzone", () => {
   });
 
   it("isLoading is false after onDrop throws", async () => {
-    const { isLoading, setRef, dispose } = createRoot(dispose => ({
+    const { isLoading, ref, dispose } = createRoot(dispose => ({
       ...createDropzone({ onDrop: async () => { throw new Error("oops"); } }),
       dispose,
     }));
 
     const div = document.createElement("div");
-    setRef(div);
+    ref(div);
 
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
@@ -360,8 +360,8 @@ describe("createDropzone", () => {
     dispose();
   });
 
-  it("re-assigning setRef detaches listeners from the previous element", () => {
-    const { setRef, isDragging, dispose } = createRoot(dispose => ({
+  it("re-assigning ref detaches listeners from the previous element", () => {
+    const { ref, isDragging, dispose } = createRoot(dispose => ({
       ...createDropzone(),
       dispose,
     }));
@@ -370,7 +370,7 @@ describe("createDropzone", () => {
     const el2 = document.createElement("div");
     const removeSpy = vi.spyOn(el1, "removeEventListener");
 
-    setRef(el1);
+    ref(el1);
     el1.dispatchEvent(new Event("dragenter"));
     flush();
     expect(isDragging()).toBe(true);
@@ -379,7 +379,7 @@ describe("createDropzone", () => {
     expect(isDragging()).toBe(false);
 
     // Re-assign — el1 listeners should be removed, el2 should become active
-    setRef(el2);
+    ref(el2);
     expect(removeSpy).toHaveBeenCalled();
 
     // el1 events no longer affect state
@@ -397,7 +397,7 @@ describe("createDropzone", () => {
 
   it("error() captures a thrown onDrop callback", async () => {
     const boom = new Error("drop failed");
-    const { error, setRef, dispose } = createRoot(dispose => ({
+    const { error, ref, dispose } = createRoot(dispose => ({
       ...createDropzone({
         onDrop: async () => {
           throw boom;
@@ -407,7 +407,7 @@ describe("createDropzone", () => {
     }));
 
     const div = document.createElement("div");
-    setRef(div);
+    ref(div);
 
     // jsdom does not implement DragEvent — dispatch a plain Event with stubbed dataTransfer
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
@@ -421,6 +421,56 @@ describe("createDropzone", () => {
     await Promise.resolve();
 
     expect(error()).toBe(boom);
+    dispose();
+  });
+});
+
+// ── dropzone ref callback factory ────────────────────────────────────────────
+
+describe("dropzone", () => {
+  it("returns a callable ref with state properties attached", () => {
+    const { dz, dispose } = createRoot(dispose => ({
+      dz: dropzone(),
+      dispose,
+    }));
+    expect(typeof dz).toBe("function");
+    expect(typeof dz.files).toBe("function");
+    expect(typeof dz.isDragging).toBe("function");
+    expect(typeof dz.isLoading).toBe("function");
+    expect(typeof dz.error).toBe("function");
+    expect(typeof dz.removeFile).toBe("function");
+    expect(typeof dz.clearFiles).toBe("function");
+    dispose();
+  });
+
+  it("initial state matches createDropzone defaults", () => {
+    const { dz, dispose } = createRoot(dispose => ({
+      dz: dropzone(),
+      dispose,
+    }));
+    expect(dz.files()).toEqual([]);
+    expect(dz.error()).toBeNull();
+    expect(dz.isLoading()).toBe(false);
+    expect(dz.isDragging()).toBe(false);
+    dispose();
+  });
+
+  it("works as a ref — drag events update isDragging", () => {
+    const { dz, dispose } = createRoot(dispose => ({
+      dz: dropzone(),
+      dispose,
+    }));
+    const el = document.createElement("div");
+    dz(el);
+
+    el.dispatchEvent(new Event("dragenter"));
+    flush();
+    expect(dz.isDragging()).toBe(true);
+
+    el.dispatchEvent(new Event("dragleave"));
+    flush();
+    expect(dz.isDragging()).toBe(false);
+
     dispose();
   });
 });

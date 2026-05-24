@@ -7,7 +7,7 @@ import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
 /**
  * Primitive to make working with dropzones easier.
  *
- * @returns `setRef`
+ * @returns `ref`
  * @returns `files`
  * @returns `error` - Reactive error from the last drag callback, cleared on next drop
  * @returns `isLoading` - True while the `onDrop` callback is pending
@@ -17,7 +17,7 @@ import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
  *
  * @example
  * ```ts
- * const { setRef: dropzoneRef, files: droppedFiles, error } = createDropzone({
+ * const { ref: dropzoneRef, files: droppedFiles, error } = createDropzone({
  *   onDrop: async files => {
  *     await doStuff(2);
  *     files.forEach(f => console.log(f));
@@ -32,7 +32,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
 ): Dropzone<T> {
   if (isServer) {
     return {
-      setRef: () => {},
+      ref: () => {},
       files: () => [],
       error: () => null,
       isLoading: () => false,
@@ -108,7 +108,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     drop: onDrop,
   });
 
-  const setRef = (ref: T) => { setRefTarget(() => ref); flush(); };
+  const ref = (el: T) => { setRefTarget(() => el); flush(); };
 
   const removeFile = (fileName: string) => {
     setFiles(prev => prev.filter(f => f.name !== fileName));
@@ -119,7 +119,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   };
 
   return {
-    setRef,
+    ref,
     files,
     error,
     isLoading,
@@ -129,4 +129,20 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   };
 }
 
-export { createDropzone };
+/**
+ * Ref callback factory for dropzone elements. Returns a single value that is
+ * both a ref callback and a reactive state object — use it directly as a `ref`
+ * while reading `.files`, `.isDragging`, etc. from the same reference.
+ *
+ * @example
+ * ```tsx
+ * const dz = dropzone({ onDrop: handleFiles });
+ * <div ref={dz} class={dz.isDragging() ? "dragging" : ""} />
+ * ```
+ */
+function dropzone<T extends HTMLElement = HTMLElement>(options?: DropzoneOptions) {
+  const { ref, ...state } = createDropzone<T>(options);
+  return Object.assign(ref, state);
+}
+
+export { createDropzone, dropzone };

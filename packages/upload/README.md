@@ -15,6 +15,7 @@ Primitives for file picking, drag-and-drop zones, and XHR uploads with progress 
 - [`fileSender`](#filesender) — XHR transport factory for `createFileUploader` (tree-shakeable)
 - [`fileUploader`](#fileuploader) — ref callback factory for `<input type="file">` elements
 - [`createDropzone`](#createdropzone) — reactive drag-and-drop zone with full drag-event callbacks
+- [`dropzone`](#dropzone) — ref callback factory variant of `createDropzone`
 
 ## Installation
 
@@ -218,18 +219,18 @@ If `onError` is omitted, a rejection from `userCallback` propagates as an unhand
 
 ## `createDropzone`
 
-A reactive drag-and-drop zone. Attach it to any element via the `setRef` ref callback and respond to the full set of drag lifecycle events.
+A reactive drag-and-drop zone. Attach it to any element via the `ref` callback and respond to the full set of drag lifecycle events.
 
 ```tsx
 import { createDropzone, createFileUploader, fileSender } from "@solid-primitives/upload";
 
 const { upload, progress, status } = createFileUploader(fileSender("/api/upload"));
-const { setRef, files, isDragging, error } = createDropzone({
+const { ref, files, isDragging, error } = createDropzone({
   onDrop: files => upload(files),
 });
 
 <div
-  ref={setRef}
+  ref={ref}
   style={{
     background: isDragging() ? "lightblue" : "lightgray",
     padding: "2rem",
@@ -248,15 +249,15 @@ const { setRef, files, isDragging, error } = createDropzone({
 
 **Returned object:**
 
-| Name         | Type                         | Description                                                          |
-| ------------ | ---------------------------- | -------------------------------------------------------------------- |
-| `setRef`     | `(el: T) => void`            | Ref callback — pass to the `ref` prop of the drop target element     |
-| `files`      | `Accessor<UploadFile[]>`     | Reactive list of the most recently dropped files                     |
-| `error`      | `Accessor<unknown>`          | Error thrown by the last `onDrop` callback; `null` if none           |
-| `isLoading`  | `Accessor<boolean>`          | `true` while the `onDrop` callback is pending                        |
-| `isDragging` | `Accessor<boolean>`          | `true` while a drag is active over the element                       |
-| `removeFile` | `(fileName: string) => void` | Removes a single file from the list by name                          |
-| `clearFiles` | `() => void`                 | Clears all dropped files                                             |
+| Name         | Type                         | Description                                                      |
+| ------------ | ---------------------------- | ---------------------------------------------------------------- |
+| `ref`        | `(el: T) => void`            | Ref callback — pass to the `ref` prop of the drop target element |
+| `files`      | `Accessor<UploadFile[]>`     | Reactive list of the most recently dropped files                 |
+| `error`      | `Accessor<unknown>`          | Error thrown by the last `onDrop` callback; `null` if none       |
+| `isLoading`  | `Accessor<boolean>`          | `true` while the `onDrop` callback is pending                    |
+| `isDragging` | `Accessor<boolean>`          | `true` while a drag is active over the element                   |
+| `removeFile` | `(fileName: string) => void` | Removes a single file from the list by name                      |
+| `clearFiles` | `() => void`                 | Clears all dropped files                                         |
 
 **Options (all optional):**
 
@@ -271,6 +272,34 @@ const { setRef, files, isDragging, error } = createDropzone({
 | `onDrag`      | Any drag event fires on the element                      |
 
 All callbacks have signature `(files: UploadFile[]) => void | Promise<void>`. `isLoading` tracks only the `onDrop` callback — drag-movement events are fire-and-forget.
+
+## `dropzone`
+
+A ref callback factory variant of `createDropzone`. Returns a single value that is both the ref callback and the reactive state object — use it directly as a `ref` while reading `.files`, `.isDragging`, etc. from the same reference. Mirrors the `fileUploader` pattern.
+
+```tsx
+import { dropzone, createFileUploader, fileSender } from "@solid-primitives/upload";
+
+const { upload, progress, status } = createFileUploader(fileSender("/api/upload"));
+
+<div
+  ref={dropzone({
+    onDrop: files => upload(files)
+  })}
+  style={{
+    background: dz.isDragging() ? "lightblue" : "lightgray",
+    padding: "2rem",
+    border: "2px dashed #999",
+  }}
+>
+  <Show when={status() === "uploading"} fallback="Drop files here">
+    Uploading… {progress().percentage}%
+  </Show>
+  <For each={dz.files()}>{file => <p>{file.name}</p>}</For>
+</div>
+```
+
+The returned value is a function (the ref callback) with all `createDropzone` state properties attached directly to it — `files`, `error`, `isLoading`, `isDragging`, `removeFile`, and `clearFiles`. Accepts the same `DropzoneOptions` as `createDropzone`.
 
 ## Types
 

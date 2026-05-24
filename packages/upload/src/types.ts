@@ -37,7 +37,7 @@ export type FileUploaderDirective = {
 };
 
 export interface Dropzone<T extends HTMLElement = HTMLElement> {
-  setRef: (ref: T) => void;
+  ref: (el: T) => void;
   files: Accessor<UploadFile[]>;
   error: Accessor<unknown>;
   isLoading: Accessor<boolean>;
