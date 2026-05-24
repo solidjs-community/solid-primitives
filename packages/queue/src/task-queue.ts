@@ -147,6 +147,11 @@ export function createTaskQueue<T>(): ReactiveTaskQueue<T> {
  * ```
  */
 export function createConcurrentTaskQueue<T>(concurrency: number): ReactiveConcurrentTaskQueue<T> {
+  if (!Number.isFinite(concurrency) || !Number.isInteger(concurrency) || concurrency < 1) {
+    throw new RangeError(
+      `createConcurrentTaskQueue: concurrency must be a finite integer >= 1, got ${concurrency}`,
+    );
+  }
   const pending: TaskEntry<T>[] = [];
   const [size, setSize] = createSignal(0, INTERNAL_OPTIONS);
   const [activeCount, setActiveCount] = createSignal(0, INTERNAL_OPTIONS);

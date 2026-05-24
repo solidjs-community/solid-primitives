@@ -58,6 +58,7 @@ type Queue<T> = {
   readonly size: number;
   readonly isEmpty: boolean;
   add: (...items: T[]) => void;
+  push: (comparator: (a: T, b: T) => number, ...items: T[]) => void;
   remove: () => T | undefined;
   clear: () => void;
 };
@@ -101,6 +102,7 @@ type ReactiveQueue<T> = {
   readonly size: Accessor<number>;
   readonly isEmpty: Accessor<boolean>;
   add: (...items: T[]) => void;
+  push: (comparator: (a: T, b: T) => number, ...items: T[]) => void;
   remove: () => T | undefined;
   clear: () => void;
 };
@@ -116,12 +118,13 @@ function createQueue<T>(initialValues?: T[]): ReactiveQueue<T>;
 
 ## `makePriorityQueue`
 
-Creates a plain, non-reactive priority queue. Items are kept in sorted order; `remove()` always returns the highest-priority item (smallest by the comparator).
+Modifies an existing queue in place so that every `add` call maintains comparator-sorted order. Returns the same queue object with its `add` method patched; `remove()` always returns the highest-priority item (smallest by the comparator).
 
 ```ts
-import { makePriorityQueue } from "@solid-primitives/queue";
+import { makeQueue, makePriorityQueue } from "@solid-primitives/queue";
 
-const q = makePriorityQueue((a, b) => a - b, [3, 1, 2]);
+const cmp = (a: number, b: number) => a - b;
+const q = makePriorityQueue(makeQueue([3, 1, 2].sort(cmp)), cmp);
 
 q.first;    // 1
 q.last;     // 3
@@ -135,10 +138,10 @@ q.first;    // 0
 ### Type
 
 ```ts
-function makePriorityQueue<T>(
+function makePriorityQueue<T, Q extends Queue<T>>(
+  q: Q,
   comparator: (a: T, b: T) => number,
-  initialValues?: T[],
-): Queue<T>;
+): Q;
 ```
 
 ## `createPriorityQueue`
