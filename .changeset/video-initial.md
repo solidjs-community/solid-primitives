@@ -12,7 +12,7 @@ Non-reactive base. Creates an `HTMLVideoElement` with optional event handlers an
 
 ### `makeVideoPlayer`
 
-Wraps `makeVideo` with imperative controls: `play`, `pause`, `seek`, `setVolume`, `setMuted`, `setPlaybackRate`, `setLoop`, and fullscreen (`requestFullscreen`, `exitFullscreen`, `toggleFullscreen`).
+Wraps `makeVideo` with imperative controls: `play`, `pause`, `seek`, `setVolume`, `setMuted`, `setPlaybackRate`, and `setLoop`.
 
 ### `createVideo`
 
@@ -20,7 +20,7 @@ Reactive primitive covering essential playback state: `playing`/`setPlaying`, `c
 
 ### `createVideoPlayer`
 
-Extends `createVideo` with the full control surface: `volume`/`setVolume`, `muted`/`setMuted`, `playbackRate`/`setPlaybackRate`, `loop`/`setLoop`, `buffered`, `readyState`, `videoWidth`, `videoHeight`, and `fullscreen`/fullscreen controls. Accepts `VideoControlsOptions` which adds `volume` and `playbackRate` initial values to `VideoOptions`.
+Extends `createVideo` with the full control surface: `volume`/`setVolume`, `muted`/`setMuted`, `playbackRate`/`setPlaybackRate`, `loop`/`setLoop`, `buffered`, `readyState`, `videoWidth`, and `videoHeight`. Accepts `VideoControlsOptions` which adds `volume` and `playbackRate` initial values to `VideoOptions`.
 
 ### Design notes
 

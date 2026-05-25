@@ -90,7 +90,7 @@ export const createVideo = (
       setRawDuration(NOT_SET);
       setError(null);
     },
-    loadeddata: () => setRawDuration(player.duration),
+    loadedmetadata: () => setRawDuration(player.duration),
   });
 
   const duration = (): number => {
