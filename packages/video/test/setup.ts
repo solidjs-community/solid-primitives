@@ -6,7 +6,11 @@ declare global {
 
 interface VideoMock {
   paused: boolean;
+  currentTime: number;
   duration: number;
+  src: string;
+  srcObject: MediaProvider | null;
+  buffered: TimeRanges;
   volume: number;
   muted: boolean;
   playbackRate: number;
@@ -25,7 +29,11 @@ interface VideoMock {
 
 const createMockState = (): VideoMock => ({
   paused: true,
+  currentTime: 0,
   duration: NaN,
+  src: "",
+  srcObject: null,
+  buffered: { length: 0, start: () => 0, end: () => 0 } as unknown as TimeRanges,
   volume: 1,
   muted: false,
   playbackRate: 1,
@@ -133,6 +141,29 @@ Object.defineProperty(global.HTMLVideoElement.prototype, "videoHeight", {
 
 Object.defineProperty(global.HTMLVideoElement.prototype, "error", {
   get(this: HTMLVideoElement) { return this._mock.error; },
+  configurable: true,
+});
+
+Object.defineProperty(global.HTMLVideoElement.prototype, "currentTime", {
+  get(this: HTMLVideoElement) { return this._mock.currentTime; },
+  set(this: HTMLVideoElement, value: number) { this._mock.currentTime = value; },
+  configurable: true,
+});
+
+Object.defineProperty(global.HTMLVideoElement.prototype, "src", {
+  get(this: HTMLVideoElement) { return this._mock.src; },
+  set(this: HTMLVideoElement, value: string) { this._mock.src = value; },
+  configurable: true,
+});
+
+Object.defineProperty(global.HTMLVideoElement.prototype, "srcObject", {
+  get(this: HTMLVideoElement) { return this._mock.srcObject; },
+  set(this: HTMLVideoElement, value: MediaProvider | null) { this._mock.srcObject = value; },
+  configurable: true,
+});
+
+Object.defineProperty(global.HTMLVideoElement.prototype, "buffered", {
+  get(this: HTMLVideoElement) { return this._mock.buffered; },
   configurable: true,
 });
 
