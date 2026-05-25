@@ -31,7 +31,7 @@ export const ReactivePlayer = meta.story({
     },
   },
   render: () => {
-    const [source, setSource] = createSignal<string>(SAMPLES[0].url);
+    const [source, setSource] = createSignal(SAMPLES.at(0)!.url);
     const audio = createAudio(source);
 
     return (
@@ -85,7 +85,7 @@ export const ReactiveSource = meta.story({
   },
   render: () => {
     const [idx, setIdx] = createSignal(0);
-    const source = () => SAMPLES[idx()]!.url;
+    const source = () => SAMPLES.at(idx())!.url;
     const audio = createAudio(source);
 
     return (
@@ -96,7 +96,7 @@ export const ReactiveSource = meta.story({
           <button onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx() === 0}>
             ← Prev
           </button>
-          <strong>{SAMPLES[idx()]?.label}</strong>
+          <strong>{SAMPLES.at(idx())?.label}</strong>
           <button
             onClick={() => setIdx(i => Math.min(SAMPLES.length - 1, i + 1))}
             disabled={idx() === SAMPLES.length - 1}

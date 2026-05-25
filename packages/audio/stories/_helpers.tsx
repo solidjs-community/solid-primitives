@@ -2,7 +2,7 @@ export const SAMPLES = [
   { label: "Sample 1", url: "/audio/sample1.mp3" },
   { label: "Sample 2", url: "/audio/sample2.mp3" },
   { label: "Sample 3", url: "/audio/sample3.mp3" },
-] as const;
+];
 
 export const formatTime = (s: number) => {
   const m = Math.floor(s / 60);
