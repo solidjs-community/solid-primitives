@@ -251,9 +251,6 @@ importers:
 
   packages/date:
     dependencies:
-      '@solid-primitives/memo':
-        specifier: workspace:^
-        version: link:../memo
       '@solid-primitives/timer':
         specifier: workspace:^
         version: link:../timer
@@ -261,15 +258,15 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
-      '@solid-primitives/event-listener':
-        specifier: workspace:^
-        version: link:../event-listener
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/db-store:
     dependencies:
@@ -1041,9 +1038,12 @@ importers:
 
   packages/timer:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/transition-group:
     devDependencies:
