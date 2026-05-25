@@ -2,9 +2,82 @@ import { createSignal, NotReadyError } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { createVideo } from "./createVideo.js";
-import type { VideoControlsOptions, VideoControlsReturn, VideoSource } from "./types.js";
+import { createVideo, makeVideo } from "./createVideo.js";
+import type {
+  VideoControls,
+  VideoControlsOptions,
+  VideoControlsReturn,
+  VideoEventHandlers,
+  VideoOptions,
+  VideoSource,
+} from "./types.js";
 import type { Accessor } from "solid-js";
+
+/**
+ * Wraps `makeVideo` with playback controls and exposes `player` for external
+ * fullscreen handling. Fullscreen must be implemented by the consumer (e.g. via
+ * `@solid-primitives/fullscreen`). Non-reactive — no Solid owner required.
+ * Returns a cleanup function.
+ *
+ * @param src Video URL, MediaProvider, or existing HTMLVideoElement
+ * @param handlers Event handlers to bind against the player
+ * @param options Initial element configuration
+ * @returns Tuple of `[controls, cleanup]`
+ *
+ * @example
+ * ```ts
+ * const [{ play, pause, seek }, cleanup] = makeVideoPlayer('clip.mp4');
+ * ```
+ */
+export const makeVideoPlayer = (
+  src: VideoSource | HTMLVideoElement,
+  handlers: VideoEventHandlers = {},
+  options?: VideoOptions,
+): [controls: VideoControls, cleanup: VoidFunction] => {
+  if (isServer) {
+    return [
+      {
+        play: async () => noop(),
+        pause: noop,
+        seek: noop,
+        setVolume: noop,
+        setMuted: noop,
+        setPlaybackRate: noop,
+        setLoop: noop,
+        player: {} as HTMLVideoElement,
+      },
+      noop,
+    ];
+  }
+
+  const [player, cleanup] = makeVideo(src, handlers, options);
+
+  const controls: VideoControls = {
+    player,
+    play: () => player.play(),
+    pause: () => player.pause(),
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    seek: player.fastSeek
+      ? (time: number) => player.fastSeek(time)
+      : (time: number) => {
+          player.currentTime = time;
+        },
+    setVolume: (volume: number) => {
+      player.volume = volume;
+    },
+    setMuted: (muted: boolean) => {
+      player.muted = muted;
+    },
+    setPlaybackRate: (rate: number) => {
+      player.playbackRate = rate;
+    },
+    setLoop: (loop: boolean) => {
+      player.loop = loop;
+    },
+  };
+
+  return [controls, cleanup];
+};
 
 /**
  * A reactive video primitive with full media controls.

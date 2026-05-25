@@ -2,10 +2,69 @@ import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } f
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { makeVideo, setVideoSrc } from "./make.js";
-import type { VideoOptions, VideoReturn, VideoSource } from "./types.js";
+import type { VideoEventHandlers, VideoOptions, VideoReturn, VideoSource } from "./types.js";
 
 const NOT_SET: unique symbol = Symbol();
+
+export function setVideoSrc(el: HTMLVideoElement, src: VideoSource): void {
+  if (typeof src === "string") {
+    el.src = src;
+  } else {
+    el.srcObject = (src as MediaProvider | null) ?? null;
+  }
+}
+
+function unwrapSource(src: VideoSource | HTMLVideoElement): HTMLVideoElement {
+  if (src instanceof HTMLVideoElement) return src;
+  const player = document.createElement("video");
+  setVideoSrc(player, src);
+  return player;
+}
+
+function applyOptions(player: HTMLVideoElement, options: VideoOptions): void {
+  if (options.autoPlay !== undefined) player.autoplay = options.autoPlay;
+  if (options.loop !== undefined) player.loop = options.loop;
+  if (options.muted !== undefined) player.muted = options.muted;
+  if (options.preload !== undefined) player.preload = options.preload;
+}
+
+/**
+ * Creates a raw `HTMLVideoElement` with optional event handlers and initial options.
+ * Non-reactive — no Solid owner required. Returns a cleanup function.
+ *
+ * @param src Video URL, MediaProvider, or existing HTMLVideoElement
+ * @param handlers Event handlers to bind against the player
+ * @param options Initial element configuration (autoPlay, loop, muted, preload)
+ * @returns Tuple of `[player, cleanup]`
+ *
+ * @example
+ * ```ts
+ * const [player, cleanup] = makeVideo('clip.mp4', {}, { muted: true });
+ * ```
+ */
+export const makeVideo = (
+  src: VideoSource | HTMLVideoElement,
+  handlers: VideoEventHandlers = {},
+  options?: VideoOptions,
+): [player: HTMLVideoElement, cleanup: VoidFunction] => {
+  if (isServer) return [{} as HTMLVideoElement, noop];
+
+  const player = unwrapSource(src);
+  if (options) applyOptions(player, options);
+
+  for (const [name, handler] of Object.entries(handlers)) {
+    player.addEventListener(name, handler as EventListener);
+  }
+
+  const cleanup = () => {
+    player.pause();
+    for (const [name, handler] of Object.entries(handlers)) {
+      player.removeEventListener(name, handler as EventListener);
+    }
+  };
+
+  return [player, cleanup];
+};
 
 /**
  * A reactive video primitive with essential playback state.
