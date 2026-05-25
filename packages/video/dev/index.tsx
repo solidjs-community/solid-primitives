@@ -1,12 +1,12 @@
 import { type Component, createSignal } from "solid-js";
-import { createVideo } from "../src/index.js";
+import { createVideoPlayer } from "../src/index.js";
 
 const DEMO_URL =
   "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 const App: Component = () => {
   const [src, setSrc] = createSignal(DEMO_URL);
-  const video = createVideo(src);
+  const video = createVideoPlayer(src);
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
@@ -28,9 +28,7 @@ const App: Component = () => {
           <button class="btn" onClick={() => video.setMuted(!video.muted())}>
             {video.muted() ? "Unmute" : "Mute"}
           </button>
-          <button class="btn" onClick={() => video.toggleFullscreen()}>
-            {video.fullscreen() ? "Exit Fullscreen" : "Fullscreen"}
-          </button>
+
         </div>
 
         <div class="space-y-1 text-sm">
