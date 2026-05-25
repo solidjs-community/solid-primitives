@@ -1,4 +1,4 @@
-import preview from "../../../.storybook/preview";
+import preview from "../../../.storybook/preview.js";
 
 // Replace with your actual primitive imports, e.g.:
 // import { createPrimitiveTemplate } from "@solid-primitives/template-primitive";

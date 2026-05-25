@@ -1,6 +1,6 @@
 import { createSignal, For, Show } from "solid-js";
 import { Loading } from "@solidjs/web";
-import preview from "../../../.storybook/preview";
+import preview from "../../../.storybook/preview.js";
 import { createAudio, makeAudio, makeAudioPlayer } from "@solid-primitives/audio";
 
 // Audio files are served from packages/audio/dev/ via storybook staticDirs → /audio/*
