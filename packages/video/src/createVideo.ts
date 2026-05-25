@@ -8,8 +8,10 @@ const NOT_SET: unique symbol = Symbol();
 
 export function setVideoSrc(el: HTMLVideoElement, src: VideoSource): void {
   if (typeof src === "string") {
+    el.srcObject = null;
     el.src = src;
   } else {
+    el.src = "";
     el.srcObject = (src as MediaProvider | null) ?? null;
   }
 }

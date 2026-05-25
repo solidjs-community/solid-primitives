@@ -1,12 +1,33 @@
 import "./setup";
 import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { makeVideo, makeVideoPlayer, createVideo, createVideoPlayer } from "../src/index.js";
+import { makeVideo, makeVideoPlayer, createVideo, createVideoPlayer, setVideoSrc } from "../src/index.js";
 
 const testUrl = "https://example.com/clip.mp4";
 
 /** Yield to the microtask queue — used alongside flush() to drain Solid 2.0 effects. */
 const tick = () => Promise.resolve();
+
+// ── setVideoSrc ───────────────────────────────────────────────────────────────
+
+describe("setVideoSrc", () => {
+  it("sets src and nulls srcObject when given a string", () => {
+    const el = document.createElement("video") as HTMLVideoElement;
+    el.srcObject = {} as MediaProvider;
+    setVideoSrc(el, "clip.mp4");
+    expect(el.srcObject).toBeNull();
+    expect(el.src).toMatch(/clip\.mp4$/);
+  });
+
+  it("sets srcObject and clears src when given a MediaProvider", () => {
+    const el = document.createElement("video") as HTMLVideoElement;
+    el.src = "clip.mp4";
+    const provider = {} as MediaProvider;
+    setVideoSrc(el, provider);
+    expect(el.srcObject).toBe(provider);
+    expect(el.src).not.toMatch(/clip\.mp4$/);
+  });
+});
 
 // ── makeVideo ─────────────────────────────────────────────────────────────────
 
