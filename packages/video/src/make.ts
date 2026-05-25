@@ -63,8 +63,10 @@ export const makeVideo = (
 };
 
 /**
- * Wraps `makeVideo` with playback and fullscreen controls.
- * Non-reactive — no Solid owner required. Returns a cleanup function.
+ * Wraps `makeVideo` with playback controls and exposes `player` for external
+ * fullscreen handling. Fullscreen must be implemented by the consumer (e.g. via
+ * `@solid-primitives/fullscreen`). Non-reactive — no Solid owner required.
+ * Returns a cleanup function.
  *
  * @param src Video URL, MediaProvider, or existing HTMLVideoElement
  * @param handlers Event handlers to bind against the player

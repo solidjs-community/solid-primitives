@@ -10,14 +10,14 @@ import type { Accessor } from "solid-js";
  * A reactive video primitive with full media controls.
  *
  * Extends `createVideo` with `volume`, `muted`, `playbackRate`, `loop`,
- * `buffered`, `readyState`, `videoWidth`, `videoHeight`, and fullscreen state.
+ * `buffered`, `readyState`, `videoWidth`, and `videoHeight`.
  *
  * @param src Video URL, MediaProvider, or a reactive accessor returning either
  * @param options Initial element configuration including volume and playback rate
  *
  * @example
  * ```ts
- * const video = createVideoControls('clip.mp4', { muted: true, volume: 0.8 });
+ * const video = createVideoPlayer('clip.mp4', { muted: true, volume: 0.8 });
  * video.playing()              // boolean
  * video.volume()               // 0–1
  * video.setVolume(0.5)
@@ -27,8 +27,10 @@ import type { Accessor } from "solid-js";
  * video.setPlaybackRate(1.5)
  * video.loop()                 // boolean
  * video.setLoop(true)
- * video.fullscreen()           // boolean
- * video.requestFullscreen()
+ * video.buffered()             // TimeRanges | undefined
+ * video.readyState()           // 0–4
+ * video.videoWidth()           // number
+ * video.videoHeight()          // number
  * ```
  */
 export const createVideoPlayer = (

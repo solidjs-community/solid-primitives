@@ -13,8 +13,8 @@ const NOT_SET: unique symbol = Symbol();
  * Returns `playing`, `currentTime`, `ended`, `seeking`, `error`, and a `duration`
  * that throws `NotReadyError` until metadata loads (integrates with `<Loading>`).
  *
- * For volume, muted, playback rate, fullscreen, and buffering state use
- * `createVideoControls`.
+ * For volume, muted, playback rate, buffering, and dimensions use
+ * `createVideoPlayer`.
  *
  * @param src Video URL, MediaProvider, or a reactive accessor returning either
  * @param options Initial element configuration

@@ -48,14 +48,14 @@ export type VideoReturn = {
   /** `MediaError` if the element has encountered a media error, otherwise `null`. */
   error: Accessor<MediaError | null>;
   /**
-   * Throws `NotReadyError` until video metadata has loaded (integrates with
-   * `<Loading>`). After the first `loadeddata` event returns the duration in
+   * Throws `NotReadyError` until metadata has loaded (integrates with
+   * `<Loading>`). After `loadedmetadata` fires, returns the duration in
    * seconds reactively. Resets to pending whenever the source changes.
    */
   duration: Accessor<number>;
 };
 
-/** Return type of `createVideoControls` — extends `VideoReturn` with full media controls. */
+/** Return type of `createVideoPlayer` — extends `VideoReturn` with full media controls. */
 export type VideoControlsReturn = VideoReturn & {
   volume: Accessor<number>;
   setVolume: (v: number) => void;
