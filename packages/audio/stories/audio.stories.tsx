@@ -2,6 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import { Loading } from "@solidjs/web";
 import preview from "../../../.storybook/preview.js";
 import { createAudio, makeAudio, makeAudioPlayer } from "@solid-primitives/audio";
+import readme from "../README.md?raw";
 
 // Audio files are served from packages/audio/dev/ via storybook staticDirs → /audio/*
 const SAMPLES = [
@@ -63,18 +64,7 @@ const meta = preview.meta({
     layout: "centered",
     docs: {
       description: {
-        component: `
-**@solid-primitives/audio** provides three primitives for working with audio:
-
-| Primitive | Reactive? | Returns |
-|-----------|-----------|---------|
-| \`makeAudio\` | No | \`[HTMLAudioElement, cleanup]\` |
-| \`makeAudioPlayer\` | No | \`[AudioControls, cleanup]\` |
-| \`createAudio\` | Yes | \`AudioReturn\` with signals |
-
-\`createAudio\` accepts a static string **or** a reactive \`Accessor<string>\` — it reconnects automatically when the source changes.
-The \`duration\` signal throws \`NotReadyError\` until metadata loads, integrating with \`<Loading>\`.
-        `.trim(),
+        component: readme,
       },
     },
   },
@@ -97,7 +87,7 @@ export const Reactive = meta.story({
     },
   },
   render: () => {
-    const [source, setSource] = createSignal(SAMPLES[0].url);
+    const [source, setSource] = createSignal<string>(SAMPLES[0].url);
     const audio = createAudio(source);
 
     return (

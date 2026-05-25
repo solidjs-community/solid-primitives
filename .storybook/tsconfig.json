@@ -4,7 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "verbatimModuleSyntax": false,
-    "noUncheckedIndexedAccess": false
+    "noUncheckedIndexedAccess": false,
+    "types": ["vite/client"]
   },
   "include": ["./**/*", "../packages/*/stories/**/*", "../template/stories/**/*"]
 }

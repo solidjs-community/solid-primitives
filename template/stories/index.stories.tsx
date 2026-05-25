@@ -1,4 +1,5 @@
-import preview from "../../../.storybook/preview.js";
+import preview from "../../.storybook/preview.js";
+import readme from "../README.md?raw";
 
 // Replace with your actual primitive imports, e.g.:
 // import { createPrimitiveTemplate } from "@solid-primitives/template-primitive";
@@ -9,7 +10,7 @@ const meta = preview.meta({
   parameters: {
     docs: {
       description: {
-        component: "Short description of what this primitive does.",
+        component: readme,
       },
     },
   },
