@@ -43,7 +43,7 @@ export const HeldKeys = meta.story({
         <h3 style={{ margin: 0 }}>useKeyDownList</h3>
 
         <div
-          tabIndex={0}
+          tabindex={0}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={{
