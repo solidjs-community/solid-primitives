@@ -159,10 +159,6 @@ type PresenceResult<TItem> = {
 };
 ```
 
-## Demo
-
-Demo can be seen [here](https://stackblitz.com/edit/presence-demo).
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
