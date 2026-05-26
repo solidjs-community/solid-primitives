@@ -25,11 +25,7 @@ export const enDict = {
       return `${list.join(", ")} and ${last}`;
     },
   },
-  jsx: (name: string) => (
-    <>
-      Hi <b>{name}!</b>
-    </>
-  ),
+  jsx: (name: string) => ({ greeting: "Hi", name }),
 };
 
 export type Dict = typeof enDict;
@@ -56,9 +52,5 @@ export const plDict = {
       return `${list.join(", ")} i ${last}`;
     },
   },
-  jsx: (name: string) => (
-    <>
-      Cześć <b>{name}!</b>
-    </>
-  ),
+  jsx: (name: string) => ({ greeting: "Cześć", name }),
 } satisfies Dict;

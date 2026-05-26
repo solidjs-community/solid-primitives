@@ -54,11 +54,12 @@ const fr_dict: Dict = {
 
 When using large dictionary files, JSON files are [faster to load](https://www.youtube.com/watch?v=ff4fgQxPaO0). Additionally, we recommend keeping a flat JSON structure so you don't need to flatten the object on the client for best performance.
 
-### With `createResource`
+### Dynamic loading
 
-Example of using `@solid-primitives/i18n` with `createResource` to dynamically load directories for selected languages.
+Use `createMemo` with an async function to load dictionaries on demand. The translator suspends inside a `<Loading>` boundary until the dictionary resolves.
 
 ```tsx
+import { type Component, createMemo, createSignal, Loading } from "solid-js";
 import * as i18n from "@solid-primitives/i18n";
 
 /*
@@ -67,7 +68,7 @@ Assuming the dictionaries are in the following structure:
   en.ts
   fr.ts
   es.ts
-And all exports a `dict` object
+And all export a `dict` object
 */
 
 // use `type` to not include the actual dictionary in the bundle
@@ -85,86 +86,49 @@ async function fetchDictionary(locale: Locale): Promise<Dictionary> {
 const App: Component = () => {
   const [locale, setLocale] = createSignal<Locale>("en");
 
-  const [dict] = createResource(locale, fetchDictionary);
-
-  dict(); // => Dictionary | undefined
-  // (undefined when the dictionary is not loaded yet)
-
-  const t = i18n.translator(dict);
-
-  t("hello"); // => string | undefined
+  const dict = createMemo(async () => fetchDictionary(locale()));
+  const t = i18n.translator(dict, i18n.resolveTemplate);
 
   return (
-    <Suspense>
-      <Show when={dict()}>
-        {dict => {
-          dict(); // => Dictionary (narrowed by Show)
+    <Loading fallback={<div>Loading...</div>}>
+      <div>
+        <p>Current locale: {locale()}</p>
+        <div>
+          <button onClick={() => setLocale("en")}>English</button>
+          <button onClick={() => setLocale("fr")}>French</button>
+          <button onClick={() => setLocale("es")}>Spanish</button>
+        </div>
 
-          const t = i18n.translator(dict);
-
-          t("hello"); // => string
-
-          return (
-            <div>
-              <p>Current locale: {locale()}</p>
-              <div>
-                <button onClick={() => setLocale("en")}>English</button>
-                <button onClick={() => setLocale("fr")}>French</button>
-                <button onClick={() => setLocale("es")}>Spanish</button>
-              </div>
-
-              <h4>{t("hello", { name: "John" })}</h4>
-              <h4>{t("goodbye", { name: "John" })}</h4>
-              <h4>{t("food.meat")}</h4>
-            </div>
-          );
-        }}
-      </Show>
-    </Suspense>
+        <h4>{t("hello", { name: "John" })}</h4>
+        <h4>{t("goodbye", { name: "John" })}</h4>
+        <h4>{t("food.meat")}</h4>
+      </div>
+    </Loading>
   );
 };
 ```
 
-### With initial dictionary
-
-Instead of narrowing the current dictionary with `Show`, you can also provide an initial dictionary to `createResource`.
-
-```ts
-// en dictionary will be included in the bundle
-import { dict as en_dict } from "./i18n/en.js";
-
-const [dict] = createResource(locale, fetchDictionary, {
-  initialValue: i18n.flatten(en_dict),
-});
-
-dict(); // => Dictionary
-```
-
 ### With transitions
 
-Since the dictionary is a resource, you can use solid's transitions when switching the locale.
+Use `isPending()` to show visual feedback while a locale switch is in progress.
 
 ```tsx
-const [dict] = createResource(locale, fetchDictionary);
+import { createMemo, isPending, Loading } from "solid-js";
 
-const [duringTransition, startTransition] = useTransition();
-
-function switchLocale(locale: Locale) {
-  startTransition(() => setLocale(locale));
-}
+const dict = createMemo(async () => fetchDictionary(locale()));
 
 return (
-  <div style={{ opacity: duringTransition() ? 0.5 : 1 }}>
-    <Suspense>
+  <div style={{ opacity: isPending() ? 0.5 : 1 }}>
+    <Loading>
       <App />
-    </Suspense>
+    </Loading>
   </div>
 );
 ```
 
 ### Static dictionaries
 
-If you don't need to load dictionaries dynamically, you can use `createMemo` instead of `createResource`.
+If you don't need to load dictionaries dynamically, use `createMemo` with a synchronous function.
 
 ```tsx
 import * as en from "./i18n/en.js";
@@ -236,12 +200,12 @@ Translations in `root.ts` would be available in all modules. Translations in `lo
 // root.ts
 
 const [locale, setLocale] = createSignal<Locale>("en");
-const [commonDict] = createResource(locale, fetchCommonDictionary);
+const commonDict = createMemo(async () => fetchCommonDictionary(locale()));
 const t = i18n.translator(commonDict);
 
 // login/login.ts
 
-const [loginDict] = createResource(locale, fetchLoginDictionary);
+const loginDict = createMemo(async () => fetchLoginDictionary(locale()));
 
 // translator only for login module
 const loginT = i18n.translator(loginDict);
@@ -250,7 +214,7 @@ t("welcome"); // => 'Welcome from common translations!'
 loginT("welcome"); // => 'Welcome from login translations!'
 ```
 
-Or combine multiple dictionaries into one. While prefixing the keys with the module name.
+Or combine multiple dictionaries into one, prefixing the keys with the module name.
 
 ```ts
 const combined_dict = createMemo(() => ({
