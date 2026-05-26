@@ -4,6 +4,7 @@
 
 # @solid-primitives/pagination
 
+[![docs](https://img.shields.io/badge/-docs%20%26%20demos-blue?style=for-the-badge)](https://primitives.solidjs.community/package/pagination)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/pagination?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/pagination)
 [![version](https://img.shields.io/npm/v/@solid-primitives/pagination?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/pagination)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
@@ -128,11 +129,6 @@ return <For each={segment()}>{item => <Item item={item} />}</For>;
 - `limit` is the limit for the number of items within a segment; this can be a number or an accessor containing a number
 - `page` is an accessor with the number or the segment page, starting with 1
 
-### Demo
-
-You may view a working example here:
-https://primitives.solidjs.community/playground/pagination/
-
 ## `createInfiniteScroll`
 
 Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. Browser-only: the loader and fetching are skipped on the server.
@@ -153,21 +149,6 @@ return (
 );
 ```
 
-Or as a directive:
-
-```tsx
-const [pages, infiniteScrollLoader, { end }] = createInfiniteScroll(fetcher);
-
-return (
-  <div>
-    <For each={pages()}>{item => <h4>{item}</h4>}</For>
-    <Show when={!end()}>
-      <h1 use:infiniteScrollLoader>Loading...</h1>
-    </Show>
-  </div>
-);
-```
-
 ### Definition
 
 ```ts
@@ -179,10 +160,13 @@ function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
     setPage: Setter<number>;
     setPages: Setter<T[]>;
     end: Accessor<boolean>;
-    setEnd: Setter<boolean>;
+    fetching: Accessor<boolean>;
+    error: Accessor<unknown>;
   },
 ];
 ```
+
+`end` is `true` when the fetcher returns an empty array or when an error occurs.
 
 ## Changelog
 

@@ -136,8 +136,8 @@ export const createPagination = (
   const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
   // ownedWrite allows setPage to be called from event handlers and reactive scopes
   const [rawPage, setPage] = wrapSetter(
-    createSignal(opts().initialPage || 1, { ownedWrite: true }),
-    setter => p => {
+    createSignal<number>(opts().initialPage || 1, { ownedWrite: true }),
+    setter => (p: number | ((prev: number) => number)): number => {
       const n = typeof p === "function" ? p(page()) : p;
       if (n < 1) return setter(1);
       const pages = opts().pages;
@@ -147,7 +147,7 @@ export const createPagination = (
   );
 
   // Clamp page to valid range reactively — handles page count decreasing below current page
-  const page = createMemo(() => Math.max(1, Math.min(rawPage(), opts().pages)));
+  const page: Accessor<number> = createMemo(() => Math.max(1, Math.min(rawPage(), opts().pages)));
 
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
     setPage(p);
