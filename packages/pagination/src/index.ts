@@ -1,4 +1,4 @@
-import { access, tryOnCleanup, noop, type MaybeAccessor } from "@solid-primitives/utils";
+import { access, tryOnCleanup, noop, wrapSetter, type MaybeAccessor } from "@solid-primitives/utils";
 import {
   type Accessor,
   type Setter,
@@ -135,21 +135,16 @@ export const createPagination = (
 ): [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>] => {
   const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
   // ownedWrite allows setPage to be called from event handlers and reactive scopes
-  const [rawPage, setRawPage] = createSignal(opts().initialPage || 1, { ownedWrite: true });
-
-  const setPage = (p: number | ((_p: number) => number)) => {
-    if (typeof p === "function") {
-      p = p(page());
-    }
-    if (p < 1) {
-      return setRawPage(1);
-    }
-    const pages = opts().pages;
-    if (p > pages) {
-      return setRawPage(pages);
-    }
-    return setRawPage(p);
-  };
+  const [rawPage, setPage] = wrapSetter(
+    createSignal(opts().initialPage || 1, { ownedWrite: true }),
+    setter => p => {
+      const n = typeof p === "function" ? p(page()) : p;
+      if (n < 1) return setter(1);
+      const pages = opts().pages;
+      if (n > pages) return setter(pages);
+      return setter(n);
+    },
+  );
 
   // Clamp page to valid range reactively — handles page count decreasing below current page
   const page = createMemo(() => Math.max(1, Math.min(rawPage(), opts().pages)));
@@ -331,7 +326,7 @@ export const createPagination = (
     return props;
   });
 
-  return [paginationProps, page, setPage as Setter<number>];
+  return [paginationProps, page, setPage];
 };
 
 declare module "solid-js" {
