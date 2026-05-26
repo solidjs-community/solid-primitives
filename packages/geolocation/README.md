@@ -286,10 +286,6 @@ const geolocationDefaults: PositionOptions = {
 };
 ```
 
-## Demo
-
-You may view a working example here: https://stackblitz.com/edit/vitejs-vite-dvk4m4
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
