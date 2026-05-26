@@ -107,10 +107,6 @@ Regex returned by `makeSearchRegex` will:
 - trim the searched text
 - match multiple words independently
 
-## Demo
-
-[Deployed example](https://primitives.solidjs.community/playground/marker) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/marker/dev)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
