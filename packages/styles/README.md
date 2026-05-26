@@ -69,10 +69,6 @@ const remSize = createRemSize();
 console.log(remSize()); // 10 instead of 16 (only on the server!)
 ```
 
-## Demo
-
-TODO
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
