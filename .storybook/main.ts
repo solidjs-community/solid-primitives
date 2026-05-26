@@ -3,7 +3,11 @@ import { mergeConfig } from "vite";
 
 const config: StorybookConfig = {
   stories: ["../packages/*/stories/*.stories.{ts,tsx}"],
-  staticDirs: [{ from: "../packages/audio/stories/assets", to: "/audio" }],
+  staticDirs: [
+    { from: "../packages/audio/stories/assets", to: "/audio" },
+    { from: "../assets/img", to: "/img" },
+    { from: "../node_modules/geist/dist/fonts", to: "/geist-fonts" },
+  ],
   addons: ["@storybook/addon-docs"],
   framework: {
     name: "storybook-solidjs-vite",
