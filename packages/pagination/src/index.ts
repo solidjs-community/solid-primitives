@@ -343,7 +343,7 @@ export type _E = JSX.Element;
  * Provides an easy way to implement infinite scrolling.
  *
  * ```ts
- * const [pages, loader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
+ * const [pages, loader, { page, setPage, setPages, end }] = createInfiniteScroll(fetcher);
  * ```
  * @param fetcher `(page: number) => Promise<T[]>`
  * @return `pages()` is an accessor that contains the accumulated array of all fetched items
@@ -351,8 +351,7 @@ export type _E = JSX.Element;
  * @method `page` is an accessor that contains the current page number
  * @method `setPage` allows to manually change the page number
  * @method `setPages` allows to manually replace the accumulated items
- * @method `end` is a boolean indicator for end of the content
- * @method `setEnd` allows to manually change the end state
+ * @method `end` is true when content is exhausted or an error occurred
  * @method `fetching` is true while a page fetch is in progress
  * @method `error` contains the last fetch error, or undefined if the last fetch succeeded
  */
@@ -364,7 +363,6 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     setPage: Setter<number>;
     setPages: Setter<T[]>;
     end: Accessor<boolean>;
-    setEnd: Setter<boolean>;
     fetching: Accessor<boolean>;
     error: Accessor<unknown>;
   },
@@ -372,9 +370,10 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
   // ownedWrite allows setters to be called from reactive scopes and event handlers
   const [pages, setPages] = createSignal<T[]>([], { ownedWrite: true });
   const [page, setPage] = createSignal(0, { ownedWrite: true });
-  const [end, setEnd] = createSignal(false, { ownedWrite: true });
+  const [_end, _setEnd] = createSignal(false, { ownedWrite: true });
   const [fetching, setFetching] = createSignal(false, { ownedWrite: true });
   const [error, setError] = createSignal<unknown>(undefined, { ownedWrite: true });
+  const end = createMemo(() => _end() || !!error());
 
   let add: (el: Element) => void = noop;
   if (!isServer) {
@@ -398,14 +397,13 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
           .then(content => {
             if (cancelled) return;
             setError(undefined);
-            if (content.length === 0) setEnd(true);
+            if (content.length === 0) _setEnd(true);
             setPages(p => [...p, ...content]);
             setFetching(false);
           })
           .catch(err => {
             if (cancelled) return;
             setError(err);
-            setEnd(true);
             setFetching(false);
           });
         return () => {
@@ -423,7 +421,6 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
       setPage,
       setPages,
       end,
-      setEnd,
       fetching,
       error,
     },
