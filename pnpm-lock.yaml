@@ -461,8 +461,8 @@ importers:
   packages/i18n:
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/idle:
     devDependencies:
@@ -6060,6 +6060,9 @@ packages:
 
   solid-js@1.9.7:
     resolution: {integrity: sha512-/saTKi8iWEM233n5OSi1YHCCuh66ZIQ7aK2hsToPe4tqGm7qAejU1SwNuTPivbWAYq7SjuHVVYxxuZQNRbICiw==}
+
+  solid-js@2.0.0-beta.10:
+    resolution: {integrity: sha512-EAfV6b1SC4c3wEBAoX4dMy063uTb4nfL5uXnN8yse4InH7RTw1LoB0I9HAy+pj3/GHqQE2tYZurlZtqU4pGyog==}
 
   solid-js@2.0.0-beta.13:
     resolution: {integrity: sha512-uAknr7Xkn25zAufBrYko4eOCbcg/gkrwnmE9KVb2Kb3vVZw2ibqseNxpjslnwJkT4gFScmFniqJtzRp7vO2klA==}
@@ -12087,6 +12090,13 @@ snapshots:
       csstype: 3.1.3
       seroval: 1.3.2
       seroval-plugins: 1.3.2(seroval@1.3.2)
+
+  solid-js@2.0.0-beta.10:
+    dependencies:
+      '@solidjs/signals': 2.0.0-beta.14
+      csstype: 3.2.3
+      seroval: 1.5.2
+      seroval-plugins: 1.5.2(seroval@1.5.2)
 
   solid-js@2.0.0-beta.13:
     dependencies:
