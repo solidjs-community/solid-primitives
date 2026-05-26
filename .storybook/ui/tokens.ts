@@ -22,8 +22,8 @@ export const radii = {
 } as const;
 
 export const font = {
-  system: "system-ui, sans-serif",
-  mono: "monospace",
+  system: '"Geist", system-ui, sans-serif',
+  mono: '"Geist Mono", monospace',
   sizeSm: "0.82rem",
   sizeBase: "0.9rem",
   sizeMd: "1rem",

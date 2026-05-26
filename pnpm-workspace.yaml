@@ -5,7 +5,7 @@ packages:
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
-  sharp: set this to true or false
+  sharp: false
 
 onlyBuiltDependencies:
   - "@parcel/watcher"

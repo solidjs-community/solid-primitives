@@ -14,6 +14,18 @@ const config: StorybookConfig = {
     options: {},
   },
   docs: {},
+  // Swap Storybook's Nunito Sans woff2 files for Geist equivalents so that
+  // every existing `font-family: 'Nunito Sans'` rule in the manager runtime
+  // renders Geist without needing CSS overrides.
+  managerHead: (head = "") =>
+    head
+      .replace("./sb-common-assets/nunito-sans-regular.woff2", "/geist-fonts/geist-sans/Geist-Regular.woff2")
+      .replace("./sb-common-assets/nunito-sans-bold.woff2", "/geist-fonts/geist-sans/Geist-Bold.woff2")
+      .replace("./sb-common-assets/nunito-sans-italic.woff2", "/geist-fonts/geist-sans/Geist-Italic.woff2")
+      .replace(
+        "./sb-common-assets/nunito-sans-bold-italic.woff2",
+        "/geist-fonts/geist-sans/Geist-BoldItalic.woff2",
+      ),
   async viteFinal(config) {
     return mergeConfig(config, {
       plugins: [
