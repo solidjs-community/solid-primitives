@@ -377,6 +377,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
 
   let add: (el: Element) => void = noop;
   if (!isServer) {
+    let sentinelEl: Element | null = null;
     const io = new IntersectionObserver(e => {
       if (e.length > 0 && e[0]!.isIntersecting && !end() && !fetching()) {
         setPage(p => p + 1);
@@ -384,8 +385,12 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     });
     onCleanup(() => io.disconnect());
     add = (el: Element) => {
+      sentinelEl = el;
       io.observe(el);
-      tryOnCleanup(() => io.unobserve(el));
+      tryOnCleanup(() => {
+        io.unobserve(el);
+        if (sentinelEl === el) sentinelEl = null;
+      });
     };
 
     createEffect(
@@ -397,9 +402,22 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
           .then(content => {
             if (cancelled) return;
             setError(undefined);
-            if (content.length === 0) _setEnd(true);
-            setPages(p => [...p, ...content]);
-            setFetching(false);
+            if (content.length === 0) {
+              _setEnd(true);
+              setFetching(false);
+            } else {
+              setPages(p => [...p, ...content]);
+              setFetching(false);
+              // IO only fires on intersection *changes*. After the DOM updates
+              // with new items, re-observe so IO fires again if the sentinel is
+              // still in the viewport — this auto-fills the viewport before
+              // handing off to the user's scroll.
+              const el = sentinelEl;
+              if (el && !end()) {
+                io.unobserve(el);
+                io.observe(el);
+              }
+            }
           })
           .catch(err => {
             if (cancelled) return;

@@ -48,8 +48,6 @@ const config: StorybookConfig = {
       ],
       resolve: {
         conditions: ["@solid-primitives/source"],
-        // solid-js 2.0 removed the ./web subpath — redirect any lingering imports
-        // (e.g. from storybook-solidjs-vite's Solid 1.x code path) to @solidjs/web.
         alias: [{ find: "solid-js/web", replacement: "@solidjs/web" }],
       },
     });
