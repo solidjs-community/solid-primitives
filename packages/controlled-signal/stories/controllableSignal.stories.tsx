@@ -8,7 +8,7 @@ import {
 } from "@solid-primitives/controlled-signal";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { btnStyle, inputStyle } from "../../../.storybook/ui/index.js";
+import { inputStyle, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Controlled Signal",
@@ -48,12 +48,13 @@ export const UncontrolledStory = meta.story({
         <h3 style={{ margin: 0 }}>Uncontrolled mode</h3>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
-          <button
+          <Button
             onClick={() => setCount(prev => (prev ?? 0) - 1)}
-            style={{ ...btnStyle, width: "40px", "text-align": "center", padding: "0.4rem" }}
+            variant="outline"
+            style={{ width: "40px", padding: "0.4rem" }}
           >
             −
-          </button>
+          </Button>
           <span
             style={{
               flex: 1,
@@ -65,12 +66,13 @@ export const UncontrolledStory = meta.story({
           >
             {count() ?? 0}
           </span>
-          <button
+          <Button
             onClick={() => setCount(prev => (prev ?? 0) + 1)}
-            style={{ ...btnStyle, width: "40px", "text-align": "center", padding: "0.4rem" }}
+            variant="outline"
+            style={{ width: "40px", padding: "0.4rem" }}
           >
             +
-          </button>
+          </Button>
         </div>
 
         <div
@@ -85,12 +87,13 @@ export const UncontrolledStory = meta.story({
           <code style={{ color: "#334155" }}>[{changeLog().join(", ")}]</code>
         </div>
 
-        <button
+        <Button
           onClick={() => setCount(0)}
-          style={{ ...btnStyle, display: "block", width: "100%", "text-align": "center" }}
+          variant="outline"
+          style={{ width: "100%" }}
         >
           Reset to 0
-        </button>
+        </Button>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           No <code>value</code> prop — the signal owns its state, initialized to{" "}
@@ -125,12 +128,13 @@ export const ControlledStory = meta.story({
         <h3 style={{ margin: 0 }}>Controlled mode</h3>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
-          <button
+          <Button
             onClick={() => setCount(prev => (prev ?? 0) - 1)}
-            style={{ ...btnStyle, width: "40px", "text-align": "center", padding: "0.4rem" }}
+            variant="outline"
+            style={{ width: "40px", padding: "0.4rem" }}
           >
             −
-          </button>
+          </Button>
           <span
             style={{
               flex: 1,
@@ -142,12 +146,13 @@ export const ControlledStory = meta.story({
           >
             {count()}
           </span>
-          <button
+          <Button
             onClick={() => setCount(prev => (prev ?? 0) + 1)}
-            style={{ ...btnStyle, width: "40px", "text-align": "center", padding: "0.4rem" }}
+            variant="outline"
+            style={{ width: "40px", padding: "0.4rem" }}
           >
             +
-          </button>
+          </Button>
         </div>
 
         <div
@@ -162,19 +167,13 @@ export const ControlledStory = meta.story({
           <div style={{ display: "flex", gap: "0.4rem" }}>
             <For each={[0, 5, 10, 25]}>
               {val => (
-                <button
+                <Button
                   onClick={() => setExternal(val)}
-                  style={{
-                    ...btnStyle,
-                    padding: "0.25rem 0.55rem",
-                    "font-size": "0.8rem",
-                    background: external() === val ? "#6366f1" : "#f8fafc",
-                    color: external() === val ? "white" : "#1e293b",
-                    border: external() === val ? "1px solid #6366f1" : "1px solid #e2e8f0",
-                  }}
+                  variant={external() === val ? "primary" : "outline"}
+                  style={{ padding: "0.25rem 0.55rem", "font-size": "0.8rem" }}
                 >
                   {val}
-                </button>
+                </Button>
               )}
             </For>
           </div>
@@ -237,18 +236,14 @@ export const TypedVariantsStory = meta.story({
           <span style={{ "font-size": "0.8rem", color: "#64748b", "font-family": "monospace" }}>
             createControllableBooleanSignal
           </span>
-          <button
+          <Button
             onClick={() => setOpen(p => !p)}
-            style={{
-              ...btnStyle,
-              "align-self": "flex-start",
-              background: open() ? "#16a34a" : "#f8fafc",
-              color: open() ? "white" : "#1e293b",
-              border: open() ? "1px solid #16a34a" : "1px solid #e2e8f0",
-            }}
+            color={open() ? "#16a34a" : undefined}
+            variant={open() ? undefined : "outline"}
+            style={{ "align-self": "flex-start" }}
           >
             {open() ? "Open" : "Closed"} — click to toggle
-          </button>
+          </Button>
         </div>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.4rem" }}>
@@ -271,6 +266,7 @@ export const TypedVariantsStory = meta.story({
                   }}
                 >
                   {tag}
+                  {/* Inline badge dismiss — not a generic action button */}
                   <button
                     onClick={() => setTags(prev => prev.filter(t => t !== tag))}
                     style={{
@@ -297,9 +293,7 @@ export const TypedVariantsStory = meta.story({
               style={{ ...inputStyle, "font-size": "0.85rem" }}
               onKeyDown={e => e.key === "Enter" && addTag()}
             />
-            <button onClick={addTag} style={btnStyle}>
-              Add
-            </button>
+            <Button onClick={addTag} variant="outline">Add</Button>
           </div>
         </div>
 
@@ -310,17 +304,12 @@ export const TypedVariantsStory = meta.story({
           <div style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap" }}>
             <For each={frameworks}>
               {fw => (
-                <button
+                <Button
                   onClick={() => toggleFramework(fw)}
-                  style={{
-                    ...btnStyle,
-                    background: selected().has(fw) ? "#6366f1" : "#f8fafc",
-                    color: selected().has(fw) ? "white" : "#1e293b",
-                    border: selected().has(fw) ? "1px solid #6366f1" : "1px solid #e2e8f0",
-                  }}
+                  variant={selected().has(fw) ? "primary" : "outline"}
                 >
                   {fw}
-                </button>
+                </Button>
               )}
             </For>
           </div>

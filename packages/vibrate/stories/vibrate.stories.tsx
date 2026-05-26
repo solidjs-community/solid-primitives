@@ -8,33 +8,9 @@ import {
   makeVibrate,
 } from "@solid-primitives/vibrate";
 import readme from "../README.md?raw";
+import { makeContainer, Button, Alert } from "../../../.storybook/ui/index.js";
 
-const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  "min-width": "360px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
-
-const SupportBanner = () => (
-  <Show when={!isVibrationSupported()}>
-    <div
-      style={{
-        padding: "0.5rem 0.75rem",
-        background: "#fef9c3",
-        border: "1px solid #fde047",
-        "border-radius": "6px",
-        "font-size": "0.8rem",
-        color: "#854d0e",
-      }}
-    >
-      Vibration API not available in this browser. Controls and state still work — haptics are
-      no-ops on desktop and iOS.
-    </div>
-  </Show>
-);
+const container = makeContainer({ minWidth: 360 });
 
 const StatusPill = (props: { active: boolean; label: string }) => (
   <div
@@ -110,7 +86,11 @@ export const ReactiveVibrate = meta.story({
     return (
       <div style={container}>
         <h3 style={{ margin: 0 }}>createVibrate</h3>
-        <SupportBanner />
+        <Show when={!isVibrationSupported()}>
+          <Alert variant="warning">
+            Vibration API not available in this browser. Controls and state still work — haptics are no-ops on desktop and iOS.
+          </Alert>
+        </Show>
 
         <div style={{ display: "flex", "align-items": "center", gap: "0.75rem" }}>
           <StatusPill active={vibrating()} label={vibrating() ? "Vibrating" : "Idle"} />
@@ -155,36 +135,12 @@ export const ReactiveVibrate = meta.story({
         </label>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            onClick={start}
-            disabled={vibrating()}
-            style={{
-              background: vibrating() ? "#e2e8f0" : "#6366f1",
-              color: vibrating() ? "#94a3b8" : "white",
-              border: "none",
-              padding: "0.5rem 1.25rem",
-              "border-radius": "6px",
-              cursor: vibrating() ? "default" : "pointer",
-              "font-size": "0.9rem",
-            }}
-          >
+          <Button onClick={start} disabled={vibrating()}>
             ▶ Start
-          </button>
-          <button
-            onClick={stop}
-            disabled={!vibrating()}
-            style={{
-              background: !vibrating() ? "#e2e8f0" : "#ef4444",
-              color: !vibrating() ? "#94a3b8" : "white",
-              border: "none",
-              padding: "0.5rem 1.25rem",
-              "border-radius": "6px",
-              cursor: !vibrating() ? "default" : "pointer",
-              "font-size": "0.9rem",
-            }}
-          >
+          </Button>
+          <Button onClick={stop} disabled={!vibrating()} color="#ef4444">
             ■ Stop
-          </button>
+          </Button>
         </div>
 
         <div
@@ -231,7 +187,11 @@ export const NonReactiveVibrate = meta.story({
     return (
       <div style={container}>
         <h3 style={{ margin: 0 }}>makeVibrate — non-reactive</h3>
-        <SupportBanner />
+        <Show when={!isVibrationSupported()}>
+          <Alert variant="warning">
+            Vibration API not available in this browser. Controls and state still work — haptics are no-ops on desktop and iOS.
+          </Alert>
+        </Show>
 
         <div style={{ display: "flex", "align-items": "center", gap: "0.75rem" }}>
           <StatusPill active={vibrating()} label={vibrating() ? "Active" : "Stopped"} />
@@ -257,36 +217,12 @@ export const NonReactiveVibrate = meta.story({
         </p>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            onClick={handleStart}
-            disabled={vibrating()}
-            style={{
-              background: vibrating() ? "#e2e8f0" : "#6366f1",
-              color: vibrating() ? "#94a3b8" : "white",
-              border: "none",
-              padding: "0.5rem 1.25rem",
-              "border-radius": "6px",
-              cursor: vibrating() ? "default" : "pointer",
-              "font-size": "0.9rem",
-            }}
-          >
+          <Button onClick={handleStart} disabled={vibrating()}>
             ▶ Start
-          </button>
-          <button
-            onClick={handleStop}
-            disabled={!vibrating()}
-            style={{
-              background: !vibrating() ? "#e2e8f0" : "#ef4444",
-              color: !vibrating() ? "#94a3b8" : "white",
-              border: "none",
-              padding: "0.5rem 1.25rem",
-              "border-radius": "6px",
-              cursor: !vibrating() ? "default" : "pointer",
-              "font-size": "0.9rem",
-            }}
-          >
+          </Button>
+          <Button onClick={handleStop} disabled={!vibrating()} color="#ef4444">
             ■ Stop
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -319,7 +255,11 @@ export const ReactivePulse = meta.story({
     return (
       <div style={container}>
         <h3 style={{ margin: 0 }}>createPulse</h3>
-        <SupportBanner />
+        <Show when={!isVibrationSupported()}>
+          <Alert variant="warning">
+            Vibration API not available in this browser. Controls and state still work — haptics are no-ops on desktop and iOS.
+          </Alert>
+        </Show>
 
         <div style={{ display: "flex", "align-items": "center", gap: "0.75rem" }}>
           <StatusPill active={pulsing()} label={pulsing() ? "Pulsing" : "Idle"} />
@@ -387,36 +327,12 @@ export const ReactivePulse = meta.story({
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            onClick={start}
-            disabled={pulsing()}
-            style={{
-              background: pulsing() ? "#e2e8f0" : "#6366f1",
-              color: pulsing() ? "#94a3b8" : "white",
-              border: "none",
-              padding: "0.5rem 1.25rem",
-              "border-radius": "6px",
-              cursor: pulsing() ? "default" : "pointer",
-              "font-size": "0.9rem",
-            }}
-          >
+          <Button onClick={start} disabled={pulsing()}>
             ▶ Pulse
-          </button>
-          <button
-            onClick={stop}
-            disabled={!pulsing()}
-            style={{
-              background: !pulsing() ? "#e2e8f0" : "#ef4444",
-              color: !pulsing() ? "#94a3b8" : "white",
-              border: "none",
-              padding: "0.5rem 1.25rem",
-              "border-radius": "6px",
-              cursor: !pulsing() ? "default" : "pointer",
-              "font-size": "0.9rem",
-            }}
-          >
+          </Button>
+          <Button onClick={stop} disabled={!pulsing()} color="#ef4444">
             ■ Stop
-          </button>
+          </Button>
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>

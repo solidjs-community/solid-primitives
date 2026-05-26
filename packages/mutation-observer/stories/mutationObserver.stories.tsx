@@ -2,26 +2,9 @@ import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createMutationObserver, mutationObserver } from "@solid-primitives/mutation-observer";
 import readme from "../README.md?raw";
+import { makeContainer, Button, logBox } from "../../../.storybook/ui/index.js";
 
-const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  "min-width": "360px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
-
-const logBox = {
-  background: "#f8fafc",
-  border: "1px solid #e2e8f0",
-  "border-radius": "6px",
-  padding: "0.5rem 0.75rem",
-  "min-height": "80px",
-  "font-size": "0.8rem",
-  "font-family": "monospace",
-  color: "#334155",
-} as const;
+const container = makeContainer({ minWidth: 360 });
 
 const meta = preview.meta({
   title: "DOM/Mutation Observer",
@@ -67,10 +50,10 @@ export const ChildListObserver = meta.story({
         <h3 style={{ margin: 0 }}>createMutationObserver — childList</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => setItems(i => [...i, nextId++])}>+ Add child</button>
-          <button onClick={() => setItems(i => i.slice(0, -1))} disabled={items().length === 0}>
+          <Button onClick={() => setItems(i => [...i, nextId++])} variant="outline">+ Add child</Button>
+          <Button onClick={() => setItems(i => i.slice(0, -1))} disabled={items().length === 0} variant="outline">
             − Remove last
-          </button>
+          </Button>
         </div>
 
         <div
@@ -153,8 +136,8 @@ export const AttributeObserver = meta.story({
         <h3 style={{ margin: 0 }}>createMutationObserver — attributes</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => setHighlighted(h => !h)}>Toggle class</button>
-          <button onClick={() => setLarge(l => !l)}>Toggle font size</button>
+          <Button onClick={() => setHighlighted(h => !h)} variant="outline">Toggle class</Button>
+          <Button onClick={() => setLarge(l => !l)} variant="outline">Toggle font size</Button>
         </div>
 
         <div
@@ -236,16 +219,16 @@ export const PerElementOptions = meta.story({
               childList observer
             </p>
             <div style={{ display: "flex", gap: "0.4rem", "margin-bottom": "0.5rem" }}>
-              <button style={{ "font-size": "0.8rem" }} onClick={() => setChildCount(n => n + 1)}>
+              <Button variant="outline" onClick={() => setChildCount(n => n + 1)}>
                 + Add
-              </button>
-              <button
-                style={{ "font-size": "0.8rem" }}
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => setChildCount(n => Math.max(0, n - 1))}
                 disabled={childCount() === 0}
               >
                 − Remove
-              </button>
+              </Button>
             </div>
             <div
               ref={el => (childEl = el)}
@@ -281,12 +264,11 @@ export const PerElementOptions = meta.story({
             <p style={{ margin: "0 0 0.4rem", "font-size": "0.8rem", color: "#64748b" }}>
               attributes observer
             </p>
-            <button
-              style={{ "font-size": "0.8rem", "margin-bottom": "0.5rem" }}
-              onClick={() => setBold(b => !b)}
-            >
-              Toggle bold
-            </button>
+            <div style={{ "margin-bottom": "0.5rem" }}>
+              <Button variant="outline" onClick={() => setBold(b => !b)}>
+                Toggle bold
+              </Button>
+            </div>
             <div
               ref={el => (attrEl = el)}
               style={{
@@ -343,10 +325,10 @@ export const StandaloneRef = meta.story({
         </p>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => setItems(i => [...i, nextId++])}>+ Add</button>
-          <button onClick={() => setItems(i => i.slice(0, -1))} disabled={items().length === 0}>
+          <Button onClick={() => setItems(i => [...i, nextId++])} variant="outline">+ Add</Button>
+          <Button onClick={() => setItems(i => i.slice(0, -1))} disabled={items().length === 0} variant="outline">
             − Remove
-          </button>
+          </Button>
         </div>
 
         <div

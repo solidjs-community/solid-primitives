@@ -3,7 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { makeTimer, createTimer, createTimeoutLoop } from "@solid-primitives/timer";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { Stat } from "../../../.storybook/ui/index.js";
+import { Stat, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Timer",
@@ -56,13 +56,15 @@ export const MakeTimer = meta.story({
         <Stat label="Ticks">{count()}</Stat>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={start} disabled={running()}>
+          <Button onClick={start} disabled={running()}>
             Start (500ms)
-          </button>
-          <button onClick={stop} disabled={!running()}>
+          </Button>
+          <Button onClick={stop} disabled={!running()} variant="outline">
             Stop
-          </button>
-          <button onClick={() => setCount(0)}>Reset</button>
+          </Button>
+          <Button onClick={() => setCount(0)} variant="outline">
+            Reset
+          </Button>
         </div>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
@@ -98,19 +100,19 @@ export const CreateTimerStory = meta.story({
 
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
           {([250, 500, 1000, 2000] as const).map(ms => (
-            <button
+            <Button
               onClick={() => setDelay(ms)}
-              style={{ "font-weight": delay() === ms ? "bold" : "normal" }}
+              variant={delay() === ms ? "primary" : "outline"}
             >
               {ms}ms
-            </button>
+            </Button>
           ))}
-          <button
+          <Button
             onClick={() => setDelay(false)}
-            style={{ "font-weight": delay() === false ? "bold" : "normal" }}
+            variant={delay() === false ? "primary" : "outline"}
           >
             Pause
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -142,19 +144,19 @@ export const CreateTimeoutLoop = meta.story({
 
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
           {([250, 500, 1000, 2000] as const).map(ms => (
-            <button
+            <Button
               onClick={() => setDelay(ms)}
-              style={{ "font-weight": delay() === ms ? "bold" : "normal" }}
+              variant={delay() === ms ? "primary" : "outline"}
             >
               {ms}ms
-            </button>
+            </Button>
           ))}
-          <button
+          <Button
             onClick={() => setDelay(false)}
-            style={{ "font-weight": delay() === false ? "bold" : "normal" }}
+            variant={delay() === false ? "primary" : "outline"}
           >
             Pause
-          </button>
+          </Button>
         </div>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>

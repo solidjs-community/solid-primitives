@@ -3,6 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { createElementBounds, type UpdateGuard } from "@solid-primitives/bounds";
 import readme from "../README.md?raw";
 import { container, BoundsGrid } from "./_helpers.js";
+import { Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "DOM/Bounds",
@@ -127,9 +128,9 @@ export const ReactiveTarget = meta.story({
           {active() ? "Tracked" : "Not tracked"}
         </div>
 
-        <button onClick={() => setActive(a => !a)}>
+        <Button onClick={() => setActive(a => !a)} variant="secondary">
           {active() ? "Disable tracking" : "Enable tracking"}
-        </button>
+        </Button>
 
         <BoundsGrid bounds={bounds} />
       </div>
@@ -289,4 +290,3 @@ export const ThrottledTracking = meta.story({
     );
   },
 });
-

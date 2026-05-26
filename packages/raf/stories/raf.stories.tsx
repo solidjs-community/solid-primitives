@@ -2,15 +2,9 @@ import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createRAF, targetFPS, createMs } from "@solid-primitives/raf";
 import readme from "../README.md?raw";
+import { makeContainer, Button } from "../../../.storybook/ui/index.js";
 
-const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  width: "360px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
+const container = makeContainer(360);
 
 const meta = preview.meta({
   title: "Animation/RAF",
@@ -71,12 +65,12 @@ export const BasicRAF = meta.story({
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={start} disabled={running()} style={{ flex: 1 }}>
+          <Button onClick={start} disabled={running()} style={{ flex: 1 }}>
             ▶ Start
-          </button>
-          <button onClick={stop} disabled={!running()} style={{ flex: 1 }}>
+          </Button>
+          <Button onClick={stop} disabled={!running()} variant="outline" style={{ flex: 1 }}>
             ■ Stop
-          </button>
+          </Button>
         </div>
 
         <div
@@ -156,28 +150,24 @@ export const TargetFPSStory = meta.story({
         <div style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap" }}>
           <For each={[...FPS_OPTIONS]}>
             {f => (
-              <button
+              <Button
                 onClick={() => changeTarget(f)}
-                style={{
-                  "font-weight": fps() === f ? "700" : "400",
-                  background: fps() === f ? "#6366f1" : "",
-                  color: fps() === f ? "white" : "",
-                  flex: 1,
-                }}
+                variant={fps() === f ? "primary" : "outline"}
+                style={{ flex: 1 }}
               >
                 {f} fps
-              </button>
+              </Button>
             )}
           </For>
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={start} disabled={running()} style={{ flex: 1 }}>
+          <Button onClick={start} disabled={running()} style={{ flex: 1 }}>
             ▶ Start
-          </button>
-          <button onClick={stop} disabled={!running()} style={{ flex: 1 }}>
+          </Button>
+          <Button onClick={stop} disabled={!running()} variant="outline" style={{ flex: 1 }}>
             ■ Stop
-          </button>
+          </Button>
         </div>
 
         <div
@@ -284,15 +274,15 @@ export const CreateMsStory = meta.story({
         </label>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => ms.start()} disabled={ms.running()} style={{ flex: 1 }}>
+          <Button onClick={() => ms.start()} disabled={ms.running()} style={{ flex: 1 }}>
             ▶ Start
-          </button>
-          <button onClick={() => ms.stop()} disabled={!ms.running()} style={{ flex: 1 }}>
+          </Button>
+          <Button onClick={() => ms.stop()} disabled={!ms.running()} variant="outline" style={{ flex: 1 }}>
             ■ Stop
-          </button>
-          <button onClick={() => ms.reset()} style={{ flex: 1 }}>
+          </Button>
+          <Button onClick={() => ms.reset()} variant="secondary" style={{ flex: 1 }}>
             ↺ Reset
-          </button>
+          </Button>
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>

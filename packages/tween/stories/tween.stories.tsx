@@ -3,7 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { createTween } from "@solid-primitives/tween";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { StatRow, Progress as Track } from "../../../.storybook/ui/index.js";
+import { StatRow, Progress as Track, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Animation/Tween",
@@ -59,15 +59,13 @@ export const BasicTween = meta.story({
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
           <For each={TARGETS}>
             {v => (
-              <button
+              <Button
                 onClick={() => setTarget(v)}
-                style={{
-                  "font-weight": target() === v ? "700" : "400",
-                  flex: 1,
-                }}
+                variant={target() === v ? "primary" : "outline"}
+                style={{ flex: 1 }}
               >
                 {v}%
-              </button>
+              </Button>
             )}
           </For>
         </div>
@@ -152,12 +150,12 @@ export const EasingComparison = meta.story({
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => fire(target() === 0 ? 100 : 0)} style={{ flex: 1 }}>
+          <Button onClick={() => fire(target() === 0 ? 100 : 0)} style={{ flex: 1 }}>
             Toggle 0 ↔ 100
-          </button>
-          <button onClick={() => fire(Math.round(Math.random() * 100))} style={{ flex: 1 }}>
+          </Button>
+          <Button onClick={() => fire(Math.round(Math.random() * 100))} style={{ flex: 1 }}>
             Random value
-          </button>
+          </Button>
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>

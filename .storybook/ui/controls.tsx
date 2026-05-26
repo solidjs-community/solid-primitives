@@ -7,8 +7,13 @@ export const Button = (props: {
   variant?: "primary" | "secondary" | "outline" | "ghost";
   color?: string;
   disabled?: boolean;
+  style?: JSX.CSSProperties;
+  type?: "button" | "submit" | "reset";
+  ref?: HTMLButtonElement | ((el: HTMLButtonElement) => void);
 }) => (
   <button
+    ref={props.ref}
+    type={props.type ?? "button"}
     onClick={props.onClick}
     disabled={props.disabled}
     style={{
@@ -40,6 +45,7 @@ export const Button = (props: {
         props.variant === "outline"
           ? `1px solid ${colors.border}`
           : "none",
+      ...(props.style ?? {}),
     }}
   >
     {props.children}

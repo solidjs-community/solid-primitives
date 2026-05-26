@@ -2,15 +2,9 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createOrientation, makeOrientation } from "@solid-primitives/orientation";
 import readme from "../README.md?raw";
+import { makeContainer, Button } from "../../../.storybook/ui/index.js";
 
-const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  width: "360px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
+const container = makeContainer(360);
 
 const meta = preview.meta({
   title: "Browser APIs/Orientation",
@@ -168,12 +162,12 @@ export const MakeOrientationStory = meta.story({
         <h3 style={{ margin: 0 }}>makeOrientation</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={start} disabled={listening()} style={{ flex: 1 }}>
+          <Button onClick={start} disabled={listening()} style={{ flex: 1 }}>
             Start listener
-          </button>
-          <button onClick={stop} disabled={!listening()} style={{ flex: 1 }}>
+          </Button>
+          <Button onClick={stop} disabled={!listening()} variant="outline" style={{ flex: 1 }}>
             Stop listener
-          </button>
+          </Button>
         </div>
 
         <div

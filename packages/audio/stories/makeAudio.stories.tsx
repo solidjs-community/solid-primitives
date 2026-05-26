@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { makeAudio } from "@solid-primitives/audio";
 import { VolumeSlider } from "./_helpers.js";
+import { Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Display & Media/Audio",
@@ -41,13 +42,13 @@ export const NonReactive = meta.story({
         </p>
 
         <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
-          <button
+          <Button
             onClick={() => (playing() ? player.pause() : player.play())}
-            style={{ "min-width": "70px" }}
+            variant="secondary"
           >
             {playing() ? "⏸ Pause" : "▶ Play"}
-          </button>
-          <button onClick={cleanup}>■ Cleanup</button>
+          </Button>
+          <Button onClick={cleanup} variant="outline">■ Cleanup</Button>
         </div>
 
         <VolumeSlider value={volume} onChange={v => { player.volume = v; }} />

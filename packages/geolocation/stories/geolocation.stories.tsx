@@ -7,7 +7,7 @@ import {
 } from "@solid-primitives/geolocation";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { Stat } from "../../../.storybook/ui/index.js";
+import { Stat, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Geolocation",
@@ -60,9 +60,9 @@ export const OneShot = meta.story({
       <div style={container}>
         <h3 style={{ margin: 0 }}>makeGeolocation</h3>
 
-        <button onClick={handleQuery} disabled={status() === "loading"}>
+        <Button onClick={handleQuery} disabled={status() === "loading"}>
           {status() === "loading" ? "Querying…" : "Get my location"}
-        </button>
+        </Button>
 
         <Show when={status() === "success"}>
           <div>
@@ -114,9 +114,12 @@ export const WatcherStory = meta.story({
       <div style={container}>
         <h3 style={{ margin: 0 }}>createGeolocationWatcher</h3>
 
-        <button onClick={() => setEnabled(e => !e)}>
+        <Button
+          onClick={() => setEnabled(e => !e)}
+          variant={enabled() ? "outline" : "primary"}
+        >
           {enabled() ? "Stop watching" : "Start watching"}
-        </button>
+        </Button>
 
         <Show when={enabled()}>
           <Switch>
@@ -211,9 +214,12 @@ export const DistanceTracking = meta.story({
           </select>
         </div>
 
-        <button onClick={() => setEnabled(e => !e)}>
+        <Button
+          onClick={() => setEnabled(e => !e)}
+          variant={enabled() ? "outline" : "primary"}
+        >
           {enabled() ? "Stop tracking" : "Start tracking"}
-        </button>
+        </Button>
 
         <Show when={enabled()}>
           <div>

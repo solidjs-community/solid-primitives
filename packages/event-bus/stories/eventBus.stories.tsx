@@ -8,7 +8,7 @@ import {
 } from "@solid-primitives/event-bus";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { inputStyle, btnStyle } from "../../../.storybook/ui/index.js";
+import { inputStyle, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Event Bus",
@@ -63,6 +63,7 @@ export const EventBusStory = meta.story({
             "border-radius": "10px",
           }}
         >
+          {/* Custom ON/OFF toggle — lives inside a dark panel, uses inverted theming */}
           <button
             onClick={toggle}
             style={{
@@ -146,15 +147,13 @@ export const EmitterStory = meta.story({
             placeholder="name"
             style={{ ...inputStyle, flex: 1 }}
           />
-          <button onClick={() => emitter.emit("greet", name())} style={btnStyle}>
-            Greet
-          </button>
+          <Button onClick={() => emitter.emit("greet", name())}>Greet</Button>
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
-          <button onClick={dec} style={{ ...btnStyle, width: "36px", padding: "0.4rem" }}>
+          <Button onClick={dec} variant="outline" style={{ width: "36px", padding: "0.4rem" }}>
             −
-          </button>
+          </Button>
           <span
             style={{
               flex: 1,
@@ -166,9 +165,9 @@ export const EmitterStory = meta.story({
           >
             {count()}
           </span>
-          <button onClick={inc} style={{ ...btnStyle, width: "36px", padding: "0.4rem" }}>
+          <Button onClick={inc} variant="outline" style={{ width: "36px", padding: "0.4rem" }}>
             +
-          </button>
+          </Button>
         </div>
 
         <div
@@ -233,24 +232,15 @@ export const EventHubStory = meta.story({
         <h3 style={{ margin: 0 }}>createEventHub</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            onClick={() => emit("spin", 45)}
-            style={{ ...btnStyle, flex: 1 }}
-          >
+          <Button onClick={() => emit("spin", 45)} style={{ flex: 1 }}>
             Spin +45°
-          </button>
-          <button
-            onClick={() => emit("spin", -45)}
-            style={{ ...btnStyle, flex: 1 }}
-          >
+          </Button>
+          <Button onClick={() => emit("spin", -45)} style={{ flex: 1 }}>
             Spin −45°
-          </button>
-          <button
-            onClick={() => emit("wiggle")}
-            style={{ ...btnStyle, flex: 1 }}
-          >
+          </Button>
+          <Button onClick={() => emit("wiggle")} style={{ flex: 1 }}>
             Wiggle!
-          </button>
+          </Button>
         </div>
 
         <div
@@ -332,16 +322,10 @@ export const EventStackStory = meta.story({
             placeholder="Type a message…"
             style={{ ...inputStyle, flex: 1 }}
           />
-          <button type="submit" style={btnStyle}>
-            Send
-          </button>
-          <button
-            type="button"
-            onClick={() => stack.setValue([])}
-            style={btnStyle}
-          >
+          <Button type="submit">Send</Button>
+          <Button type="button" onClick={() => stack.setValue([])} variant="outline">
             Clear
-          </button>
+          </Button>
         </form>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.4rem", "min-height": "80px" }}>
@@ -368,6 +352,7 @@ export const EventStackStory = meta.story({
                   }}
                 >
                   <span style={{ flex: 1, color: "#334155" }}>{item.text}</span>
+                  {/* Inline dismiss — not a generic action button */}
                   <button
                     onClick={() => stack.remove(item)}
                     style={{

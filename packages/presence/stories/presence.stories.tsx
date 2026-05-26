@@ -2,36 +2,9 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createPresence } from "@solid-primitives/presence";
 import readme from "../README.md?raw";
+import { makeContainer, Button, BoolRow } from "../../../.storybook/ui/index.js";
 
-const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  width: "340px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
-
-const StatusRow = (props: { label: string; value: boolean }) => (
-  <div
-    style={{
-      display: "flex",
-      "justify-content": "space-between",
-      "font-size": "0.82rem",
-    }}
-  >
-    <span style={{ color: "#64748b" }}>{props.label}</span>
-    <span
-      style={{
-        "font-family": "monospace",
-        "font-weight": "600",
-        color: props.value ? "#16a34a" : "#94a3b8",
-      }}
-    >
-      {String(props.value)}
-    </span>
-  </div>
-);
+const container = makeContainer(340);
 
 const meta = preview.meta({
   title: "Animation/Presence",
@@ -68,7 +41,7 @@ export const ShowHide = meta.story({
       <div style={container}>
         <h3 style={{ margin: 0 }}>createPresence — boolean</h3>
 
-        <button onClick={() => setShow(v => !v)}>{show() ? "Hide" : "Show"}</button>
+        <Button onClick={() => setShow(v => !v)}>{show() ? "Hide" : "Show"}</Button>
 
         <Show when={isMounted()}>
           <div
@@ -96,11 +69,11 @@ export const ShowHide = meta.story({
             gap: "0.3rem",
           }}
         >
-          <StatusRow label="isMounted" value={isMounted()} />
-          <StatusRow label="isVisible" value={isVisible()} />
-          <StatusRow label="isAnimating" value={isAnimating()} />
-          <StatusRow label="isEntering" value={isEntering()} />
-          <StatusRow label="isExiting" value={isExiting()} />
+          <BoolRow label="isMounted" value={isMounted()} />
+          <BoolRow label="isVisible" value={isVisible()} />
+          <BoolRow label="isAnimating" value={isAnimating()} />
+          <BoolRow label="isEntering" value={isEntering()} />
+          <BoolRow label="isExiting" value={isExiting()} />
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -136,17 +109,13 @@ export const ItemSwitcher = meta.story({
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
           <For each={[...ITEMS]}>
             {item => (
-              <button
+              <Button
                 onClick={() => setActive(v => (v === item ? undefined : item))}
-                style={{
-                  "font-weight": active() === item ? "700" : "400",
-                  background: active() === item ? "#6366f1" : "",
-                  color: active() === item ? "white" : "",
-                  flex: 1,
-                }}
+                variant={active() === item ? "primary" : "outline"}
+                style={{ flex: 1 }}
               >
                 {item}
-              </button>
+              </Button>
             )}
           </For>
         </div>
@@ -227,9 +196,9 @@ export const SeparateDurations = meta.story({
       <div style={container}>
         <h3 style={{ margin: 0 }}>Enter 200ms / Exit 800ms</h3>
 
-        <button onClick={() => setShow(v => !v)}>
+        <Button onClick={() => setShow(v => !v)}>
           {show() ? "Hide (slow exit)" : "Show (fast enter)"}
-        </button>
+        </Button>
 
         <Show when={isMounted()}>
           <div

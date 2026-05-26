@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createCountdown, createCountdownFromNow } from "@solid-primitives/date";
 import { container, toDatetimeLocal } from "./_helpers.js";
-import { Stat } from "../../../.storybook/ui/index.js";
+import { Stat, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",
@@ -110,7 +110,12 @@ export const CountdownFromNow = meta.story({
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}>
           {PRESETS.map(p => (
-            <button onClick={() => setTarget(new Date(Date.now() + p.ms))}>{p.label}</button>
+            <Button
+              onClick={() => setTarget(new Date(Date.now() + p.ms))}
+              variant="outline"
+            >
+              {p.label}
+            </Button>
           ))}
           <input
             type="datetime-local"
@@ -132,9 +137,9 @@ export const CountdownFromNow = meta.story({
           <Stat label="Target">{target().toLocaleString()}</Stat>
         </div>
 
-        <button onClick={update} style={{ "align-self": "flex-start" }}>
+        <Button onClick={update} variant="outline" style={{ "align-self": "flex-start" }}>
           Force update
-        </button>
+        </Button>
       </div>
     );
   },

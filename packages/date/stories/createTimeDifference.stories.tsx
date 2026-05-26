@@ -1,7 +1,7 @@
 import preview from "../../../.storybook/preview.js";
 import { createDate, createTimeDifference, createTimeDifferenceFromNow } from "@solid-primitives/date";
 import { container, formatMs, toDatetimeLocal } from "./_helpers.js";
-import { Stat } from "../../../.storybook/ui/index.js";
+import { Stat, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",
@@ -91,9 +91,9 @@ export const TimeDifferenceFromNow = meta.story({
           <Stat label="Difference">{formatMs(diff())}</Stat>
         </div>
 
-        <button onClick={update} style={{ "align-self": "flex-start" }}>
+        <Button onClick={update} variant="outline" style={{ "align-self": "flex-start" }}>
           Force update
-        </button>
+        </Button>
       </div>
     );
   },

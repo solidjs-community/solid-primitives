@@ -4,6 +4,7 @@ import preview from "../../../.storybook/preview.js";
 import { createAudio } from "@solid-primitives/audio";
 import readme from "../README.md?raw";
 import { SAMPLES, formatTime, VolumeSlider, SeekSlider } from "./_helpers.js";
+import { Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Display & Media/Audio",
@@ -41,23 +42,20 @@ export const ReactivePlayer = meta.story({
         <div style={{ display: "flex", gap: "0.5rem", "margin-bottom": "1rem" }}>
           <For each={SAMPLES}>
             {s => (
-              <button
+              <Button
                 onClick={() => setSource(s.url)}
-                style={{
-                  "font-weight": source() === s.url ? "bold" : "normal",
-                  "text-decoration": source() === s.url ? "underline" : "none",
-                }}
+                variant={source() === s.url ? "primary" : "outline"}
               >
                 {s.label}
-              </button>
+              </Button>
             )}
           </For>
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
-          <button onClick={() => audio.setPlaying(!audio.playing())} style={{ "min-width": "70px" }}>
+          <Button onClick={() => audio.setPlaying(!audio.playing())} variant="secondary">
             {audio.playing() ? "⏸ Pause" : "▶ Play"}
-          </button>
+          </Button>
 
           <Loading fallback={<span style={{ color: "#94a3b8", "font-size": "0.85rem" }}>Loading…</span>}>
             <SeekSlider current={audio.currentTime} max={audio.duration()} onSeek={audio.seek} />
@@ -93,22 +91,23 @@ export const ReactiveSource = meta.story({
         <h3 style={{ margin: "0 0 1rem" }}>Reactive source swap</h3>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "margin-bottom": "1rem" }}>
-          <button onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx() === 0}>
+          <Button onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx() === 0} variant="outline">
             ← Prev
-          </button>
+          </Button>
           <strong>{SAMPLES.at(idx())?.label}</strong>
-          <button
+          <Button
             onClick={() => setIdx(i => Math.min(SAMPLES.length - 1, i + 1))}
             disabled={idx() === SAMPLES.length - 1}
+            variant="outline"
           >
             Next →
-          </button>
+          </Button>
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
-          <button onClick={() => audio.setPlaying(!audio.playing())} style={{ "min-width": "70px" }}>
+          <Button onClick={() => audio.setPlaying(!audio.playing())} variant="secondary">
             {audio.playing() ? "⏸ Pause" : "▶ Play"}
-          </button>
+          </Button>
 
           <Loading fallback={<span style={{ color: "#f59e0b", "font-size": "0.85rem" }}>⏳ Buffering…</span>}>
             <span style={{ "font-size": "0.85rem" }}>

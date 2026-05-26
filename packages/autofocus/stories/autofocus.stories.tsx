@@ -3,6 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { autofocus, createAutofocus } from "@solid-primitives/autofocus";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
+import { Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "DOM/Autofocus",
@@ -45,9 +46,9 @@ export const AutofocusRefCallback = meta.story({
           />
         </Show>
 
-        <button onClick={() => setMounted(m => !m)}>
+        <Button onClick={() => setMounted(m => !m)} variant="secondary">
           {mounted() ? "Unmount" : "Remount (autofocus fires again)"}
-        </button>
+        </Button>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
           The native <code>autofocus</code> attribute alone only fires on page load. This
@@ -94,9 +95,9 @@ export const ConditionalAutofocus = meta.story({
           />
         </Show>
 
-        <button onClick={() => setMounted(m => !m)}>
+        <Button onClick={() => setMounted(m => !m)} variant="secondary">
           {mounted() ? "Unmount" : "Remount"}
-        </button>
+        </Button>
       </div>
     );
   },
@@ -135,9 +136,9 @@ export const CreateAutofocusLetRef = meta.story({
           <FocusedInput />
         </Show>
 
-        <button onClick={() => setMounted(m => !m)}>
+        <Button onClick={() => setMounted(m => !m)} variant="secondary">
           {mounted() ? "Unmount" : "Remount (autofocus fires again)"}
-        </button>
+        </Button>
       </div>
     );
   },
@@ -176,9 +177,9 @@ export const CreateAutofocusSignalRef = meta.story({
           <FocusedInput />
         </Show>
 
-        <button onClick={() => setMounted(m => !m)}>
+        <Button onClick={() => setMounted(m => !m)} variant="secondary">
           {mounted() ? "Unmount" : "Remount (autofocus fires again)"}
-        </button>
+        </Button>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
           The signal approach is useful when you need to store the ref elsewhere — e.g.{" "}

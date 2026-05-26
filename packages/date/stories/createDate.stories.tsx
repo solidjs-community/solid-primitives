@@ -3,7 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { createDate, createDateNow } from "@solid-primitives/date";
 import readme from "../README.md?raw";
 import { container, toDatetimeLocal } from "./_helpers.js";
-import { Stat } from "../../../.storybook/ui/index.js";
+import { Stat, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",
@@ -50,10 +50,10 @@ export const CreateDate = meta.story({
         />
 
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
-          <button onClick={() => setDate(new Date())}>Now</button>
-          <button onClick={() => setDate(Date.now() - 86_400_000)}>Yesterday</button>
-          <button onClick={() => setDate(Date.now() - 7 * 86_400_000)}>Last week</button>
-          <button onClick={() => setDate(Date.now() + 86_400_000)}>Tomorrow</button>
+          <Button onClick={() => setDate(new Date())} variant="outline">Now</Button>
+          <Button onClick={() => setDate(Date.now() - 86_400_000)} variant="outline">Yesterday</Button>
+          <Button onClick={() => setDate(Date.now() - 7 * 86_400_000)} variant="outline">Last week</Button>
+          <Button onClick={() => setDate(Date.now() + 86_400_000)} variant="outline">Tomorrow</Button>
         </div>
       </div>
     );
@@ -86,24 +86,24 @@ export const CreateDateNow = meta.story({
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
           <span style={{ "font-size": "0.85rem", color: "#64748b" }}>Interval:</span>
           {([250, 1000, 5000] as const).map(ms => (
-            <button
+            <Button
               onClick={() => setInterval(ms)}
-              style={{ "font-weight": interval() === ms ? "bold" : "normal" }}
+              variant={interval() === ms ? "primary" : "outline"}
             >
               {ms}ms
-            </button>
+            </Button>
           ))}
-          <button
+          <Button
             onClick={() => setInterval(false)}
-            style={{ "font-weight": interval() === false ? "bold" : "normal" }}
+            variant={interval() === false ? "primary" : "outline"}
           >
             off
-          </button>
+          </Button>
         </div>
 
-        <button onClick={update} style={{ "align-self": "flex-start" }}>
+        <Button onClick={update} variant="outline" style={{ "align-self": "flex-start" }}>
           Force update
-        </button>
+        </Button>
       </div>
     );
   },

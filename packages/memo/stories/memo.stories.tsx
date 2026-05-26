@@ -10,7 +10,7 @@ import {
 } from "@solid-primitives/memo";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { StatRow, Card, Separator as Divider, ButtonRow } from "../../../.storybook/ui/index.js";
+import { StatRow, Card, Separator as Divider, ButtonRow, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Memo",
@@ -54,13 +54,13 @@ export const WritableMemo = meta.story({
         </Card>
 
         <ButtonRow>
-          <button onClick={() => setBase(b => b + 1)}>base +1</button>
-          <button onClick={() => setMultiplier(m => m + 1)}>multiplier +1</button>
+          <Button onClick={() => setBase(b => b + 1)}>base +1</Button>
+          <Button onClick={() => setMultiplier(m => m + 1)}>multiplier +1</Button>
         </ButtonRow>
 
         <ButtonRow>
-          <button onClick={() => setResult(99)}>Override → 99</button>
-          <button onClick={() => setResult(0)}>Override → 0</button>
+          <Button onClick={() => setResult(99)} variant="outline">Override → 99</Button>
+          <Button onClick={() => setResult(0)} variant="outline">Override → 0</Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -99,8 +99,8 @@ export const LazyMemo = meta.story({
         </Card>
 
         <ButtonRow>
-          <button onClick={() => setN(v => v + 1)}>n++</button>
-          <button onClick={() => setN(0)}>Reset</button>
+          <Button onClick={() => setN(v => v + 1)}>n++</Button>
+          <Button onClick={() => setN(0)} variant="outline">Reset</Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -145,8 +145,8 @@ export const Latest = meta.story({
         </Card>
 
         <ButtonRow>
-          <button onClick={() => setCountA(c => c + 1)}>A++</button>
-          <button onClick={() => setCountB(c => c + 1)}>B++</button>
+          <Button onClick={() => setCountA(c => c + 1)}>A++</Button>
+          <Button onClick={() => setCountB(c => c + 1)}>B++</Button>
         </ButtonRow>
 
         <h3 style={{ margin: 0 }}>createLatestMany</h3>
@@ -159,7 +159,7 @@ export const Latest = meta.story({
           <StatRow label="createLatestMany([A, B])" value={JSON.stringify(latestMany())} />
         </Card>
 
-        <button onClick={() => setShared(s => s + 1)}>shared++ (updates both memos)</button>
+        <Button onClick={() => setShared(s => s + 1)}>shared++ (updates both memos)</Button>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           When <code>shared</code> changes, both derived memos update in the same flush —{" "}
@@ -213,10 +213,10 @@ export const Reducer = meta.story({
         </div>
 
         <div style={{ display: "grid", "grid-template-columns": "1fr 1fr", gap: "0.5rem" }}>
-          <button onClick={() => dispatch("increment")}>+ Increment</button>
-          <button onClick={() => dispatch("decrement")}>− Decrement</button>
-          <button onClick={() => dispatch("double")}>× Double</button>
-          <button onClick={() => dispatch("reset")}>↺ Reset</button>
+          <Button onClick={() => dispatch("increment")}>+ Increment</Button>
+          <Button onClick={() => dispatch("decrement")} variant="outline">− Decrement</Button>
+          <Button onClick={() => dispatch("double")}>× Double</Button>
+          <Button onClick={() => dispatch("reset")} variant="outline">↺ Reset</Button>
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -274,7 +274,7 @@ export const MemoCache = meta.story({
 
         <ButtonRow>
           {[5, 10, 15, 20, 10, 5].map(n => (
-            <button onClick={() => selectKey(n)}>fib({n})</button>
+            <Button onClick={() => selectKey(n)} variant="outline">fib({n})</Button>
           ))}
         </ButtonRow>
 

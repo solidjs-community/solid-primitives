@@ -3,7 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { Key, Entries, SetValues, Rerun } from "@solid-primitives/keyed";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { Card, ButtonRow } from "../../../.storybook/ui/index.js";
+import { Card, ButtonRow, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Control Flow/Keyed",
@@ -107,6 +107,7 @@ export const KeyComponent = meta.story({
                   <span style={{ "font-size": "0.78rem", color: "#94a3b8" }}>
                     id:{item().id}
                   </span>
+                  {/* Color changes based on item color — not a generic action button */}
                   <button
                     onClick={() => setClicks(c => c + 1)}
                     style={{
@@ -129,12 +130,12 @@ export const KeyComponent = meta.story({
         </div>
 
         <ButtonRow>
-          <button onClick={shuffle}>Shuffle</button>
-          <button onClick={reverse}>Reverse</button>
-          <button onClick={addItem}>Add item</button>
-          <button onClick={removeFirst} disabled={items().length === 0}>
+          <Button onClick={shuffle} variant="outline">Shuffle</Button>
+          <Button onClick={reverse} variant="outline">Reverse</Button>
+          <Button onClick={addItem}>Add item</Button>
+          <Button onClick={removeFirst} disabled={items().length === 0} variant="outline">
             Remove first
-          </button>
+          </Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -244,13 +245,13 @@ export const EntriesComponent = meta.story({
         </div>
 
         <ButtonRow>
-          <button onClick={randomize}>Randomize scores</button>
-          <button onClick={addPlayer} disabled={Object.keys(scores()).length >= 5}>
+          <Button onClick={randomize}>Randomize scores</Button>
+          <Button onClick={addPlayer} disabled={Object.keys(scores()).length >= 5} variant="outline">
             Add player
-          </button>
-          <button onClick={removeLast} disabled={Object.keys(scores()).length === 0}>
+          </Button>
+          <Button onClick={removeLast} disabled={Object.keys(scores()).length === 0} variant="outline">
             Remove last
-          </button>
+          </Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -283,7 +284,7 @@ export const SetValuesComponent = meta.story({
         return next;
       });
 
-    const clear = () => setSelected(new Set());
+    const clear = () => setSelected(new Set<string>());
 
     return (
       <div style={container}>
@@ -294,21 +295,13 @@ export const SetValuesComponent = meta.story({
         <div style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap" }}>
           <For each={TAGS}>
             {tag => (
-              <button
+              <Button
                 onClick={() => toggle(tag)}
-                style={{
-                  padding: "0.3rem 0.65rem",
-                  "border-radius": "999px",
-                  border: `1.5px solid ${selected().has(tag) ? "#6366f1" : "#e2e8f0"}`,
-                  background: selected().has(tag) ? "#6366f1" : "white",
-                  color: selected().has(tag) ? "white" : "#475569",
-                  "font-size": "0.82rem",
-                  cursor: "pointer",
-                  transition: "background 0.1s, border-color 0.1s",
-                }}
+                variant={selected().has(tag) ? "primary" : "outline"}
+                style={{ "border-radius": "999px", padding: "0.3rem 0.65rem", "font-size": "0.82rem" }}
               >
                 {tag}
-              </button>
+              </Button>
             )}
           </For>
         </div>
@@ -343,9 +336,14 @@ export const SetValuesComponent = meta.story({
           </div>
         </Card>
 
-        <button onClick={clear} disabled={selected().size === 0} style={{ "align-self": "flex-start" }}>
+        <Button
+          onClick={clear}
+          disabled={selected().size === 0}
+          variant="outline"
+          style={{ "align-self": "flex-start" }}
+        >
           Clear all
-        </button>
+        </Button>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Tags render in insertion order. Adding a tag that already exists is a no-op.
@@ -376,6 +374,7 @@ export const RerunComponent = meta.story({
           {"<Rerun on={tab}>"}
         </h3>
 
+        {/* Tab navigation — custom underline styling, kept as <button> */}
         <div style={{ display: "flex", gap: 0, "border-bottom": "2px solid #e2e8f0" }}>
           <For each={TABS}>
             {t => (
@@ -428,12 +427,13 @@ export const RerunComponent = meta.story({
                   <span style={{ "font-size": "0.85rem", color: "#475569" }}>
                     Local counter: <strong>{localCount()}</strong>
                   </span>
-                  <button
+                  <Button
                     onClick={() => setLocalCount(c => c + 1)}
+                    variant="outline"
                     style={{ "font-size": "0.82rem" }}
                   >
                     +1
-                  </button>
+                  </Button>
                 </div>
               </Card>
             );

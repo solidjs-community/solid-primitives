@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createMasonry } from "@solid-primitives/masonry";
 import readme from "../README.md?raw";
+import { Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Masonry",
@@ -199,7 +200,7 @@ export const InteractiveMasonry = meta.story({
             <strong>{cols()}</strong>
           </label>
 
-          <button onClick={shuffle}>Shuffle</button>
+          <Button onClick={shuffle} variant="secondary">Shuffle</Button>
 
           <span style={{ "font-size": "0.85rem", color: "#64748b" }}>
             Click items to toggle height · colour = column

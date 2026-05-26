@@ -3,7 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { createStaticStore, createDerivedStaticStore } from "@solid-primitives/static-store";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { btnStyle } from "../../../.storybook/ui/index.js";
+import { Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Static Store",
@@ -75,15 +75,20 @@ export const CreateStaticStoreStory = meta.story({
             setSize("width", fn) — key-value
           </span>
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button
+            <Button
               onClick={() => setSize("width", w => Math.max(60, w - 20))}
-              style={{ ...btnStyle, flex: 1 }}
+              variant="outline"
+              style={{ flex: 1 }}
             >
               Width −
-            </button>
-            <button onClick={() => setSize("width", w => w + 20)} style={{ ...btnStyle, flex: 1 }}>
+            </Button>
+            <Button
+              onClick={() => setSize("width", w => w + 20)}
+              variant="outline"
+              style={{ flex: 1 }}
+            >
               Width +
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -94,18 +99,20 @@ export const CreateStaticStoreStory = meta.story({
             {`setSize({ height }) — partial object`}
           </span>
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button
+            <Button
               onClick={() => setSize({ height: Math.max(40, size.height - 20) })}
-              style={{ ...btnStyle, flex: 1 }}
+              variant="outline"
+              style={{ flex: 1 }}
             >
               Height −
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setSize({ height: size.height + 20 })}
-              style={{ ...btnStyle, flex: 1 }}
+              variant="outline"
+              style={{ flex: 1 }}
             >
               Height +
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -116,20 +123,22 @@ export const CreateStaticStoreStory = meta.story({
             setSize(prev =&gt; ...) — function
           </span>
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button
+            <Button
               onClick={() =>
                 setSize(prev => ({ width: prev.width + 10, height: prev.height + 10 }))
               }
-              style={{ ...btnStyle, flex: 1 }}
+              variant="outline"
+              style={{ flex: 1 }}
             >
               Grow both
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setSize({ width: 200, height: 120 })}
-              style={{ ...btnStyle, flex: 1 }}
+              variant="outline"
+              style={{ flex: 1 }}
             >
               Reset
-            </button>
+            </Button>
           </div>
         </div>
       </div>

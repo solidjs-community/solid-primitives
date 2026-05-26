@@ -2,6 +2,7 @@ import { createSignal, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { makeAudioPlayer } from "@solid-primitives/audio";
 import { formatTime, VolumeSlider, SeekSlider } from "./_helpers.js";
+import { Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Display & Media/Audio",
@@ -42,12 +43,12 @@ export const Controls = meta.story({
         <h3 style={{ margin: "0 0 1rem" }}>makeAudioPlayer</h3>
 
         <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
-          <button
+          <Button
             onClick={() => (playing() ? controls.pause() : controls.play())}
-            style={{ "min-width": "70px" }}
+            variant="secondary"
           >
             {playing() ? "⏸ Pause" : "▶ Play"}
-          </button>
+          </Button>
 
           <Show
             when={duration() > 0}

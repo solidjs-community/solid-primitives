@@ -3,7 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { makeBroadcastChannel, createBroadcastChannel } from "@solid-primitives/broadcast-channel";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { btnStyle, inputStyle, logBox } from "../../../.storybook/ui/index.js";
+import { inputStyle, logBox, Button } from "../../../.storybook/ui/index.js";
 
 const CHANNEL = "sp-broadcast-demo";
 
@@ -71,17 +71,13 @@ export const MakeBroadcastChannelStory = meta.story({
         >
           <span style={{ "font-size": "0.85rem", color: "#64748b" }}>Channel:</span>
           <code style={channelBadge}>{channelName}</code>
-          <button
+          <Button
             onClick={() => window.open(window.location.href, "_blank")}
-            style={{
-              ...btnStyle,
-              "margin-left": "auto",
-              "font-size": "0.8rem",
-              padding: "0.3rem 0.65rem",
-            }}
+            variant="outline"
+            style={{ "margin-left": "auto", "font-size": "0.8rem", padding: "0.3rem 0.65rem" }}
           >
             Open new tab ↗
-          </button>
+          </Button>
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -92,9 +88,7 @@ export const MakeBroadcastChannelStory = meta.story({
             style={inputStyle}
             onKeyDown={e => e.key === "Enter" && send()}
           />
-          <button onClick={send} style={btnStyle}>
-            Post
-          </button>
+          <Button onClick={send}>Post</Button>
         </div>
 
         <div style={logBox}>
@@ -156,17 +150,13 @@ export const CreateBroadcastChannelStory = meta.story({
         >
           <span style={{ "font-size": "0.85rem", color: "#64748b" }}>Channel:</span>
           <code style={channelBadge}>{channelName}</code>
-          <button
+          <Button
             onClick={() => window.open(window.location.href, "_blank")}
-            style={{
-              ...btnStyle,
-              "margin-left": "auto",
-              "font-size": "0.8rem",
-              padding: "0.3rem 0.65rem",
-            }}
+            variant="outline"
+            style={{ "margin-left": "auto", "font-size": "0.8rem", padding: "0.3rem 0.65rem" }}
           >
             Open new tab ↗
-          </button>
+          </Button>
         </div>
 
         <div
@@ -204,9 +194,7 @@ export const CreateBroadcastChannelStory = meta.story({
             style={inputStyle}
             onKeyDown={e => e.key === "Enter" && send()}
           />
-          <button onClick={send} style={btnStyle}>
-            Post
-          </button>
+          <Button onClick={send}>Post</Button>
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>

@@ -2,15 +2,9 @@ import { createMemo, createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createTrigger, createTriggerCache } from "@solid-primitives/trigger";
 import readme from "../README.md?raw";
+import { makeContainer, Button } from "../../../.storybook/ui/index.js";
 
-const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  width: "360px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
+const container = makeContainer(360);
 
 const meta = preview.meta({
   title: "Reactivity/Trigger",
@@ -90,27 +84,12 @@ export const BasicTrigger = meta.story({
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            onClick={() => dirty()}
-            style={{
-              flex: 1,
-              background: "#6366f1",
-              color: "white",
-              border: "none",
-              padding: "0.55rem",
-              "border-radius": "6px",
-              cursor: "pointer",
-              "font-size": "0.9rem",
-            }}
-          >
+          <Button onClick={() => dirty()} style={{ flex: 1 }}>
             dirty() — invalidate
-          </button>
-          <button
-            onClick={() => setNoise(n => n + 1)}
-            style={{ flex: 1 }}
-          >
+          </Button>
+          <Button onClick={() => setNoise(n => n + 1)} variant="outline" style={{ flex: 1 }}>
             setNoise() — no update
-          </button>
+          </Button>
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -176,30 +155,16 @@ export const TriggerCacheStory = meta.story({
               >
                 {row.run()} evaluations
               </span>
-              <button
-                onClick={() => dirty(row.key)}
-                style={{ "font-size": "0.8rem", padding: "0.3rem 0.75rem" }}
-              >
+              <Button onClick={() => dirty(row.key)} variant="outline">
                 dirty({row.key})
-              </button>
+              </Button>
             </div>
           ))}
         </div>
 
-        <button
-          onClick={() => dirtyAll()}
-          style={{
-            background: "#0f172a",
-            color: "white",
-            border: "none",
-            padding: "0.55rem",
-            "border-radius": "6px",
-            cursor: "pointer",
-            "font-size": "0.9rem",
-          }}
-        >
+        <Button onClick={() => dirtyAll()} color="#0f172a">
           dirtyAll() — invalidate every key
-        </button>
+        </Button>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Each row has its own trigger. <code>dirty(1)</code> only re-evaluates the memo

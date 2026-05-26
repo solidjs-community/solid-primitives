@@ -10,7 +10,7 @@ import {
 } from "@solid-primitives/clipboard";
 import readme from "../README.md?raw";
 import { container } from "./_helpers.js";
-import { inputStyle } from "../../../.storybook/ui/index.js";
+import { inputStyle, Button } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Clipboard",
@@ -70,12 +70,12 @@ export const CopyDirective = meta.story({
           <label style={{ "font-size": "0.85rem", color: "#64748b" }}>
             Button with explicit value override
           </label>
-          <button
+          <Button
             ref={copyToClipboard({ value: "Hello from a button!", setter: notifyingSetter })}
-            style={{ padding: "0.4rem 1rem", width: "100%", cursor: "pointer" }}
+            style={{ width: "100%" }}
           >
             Copy "Hello from a button!"
-          </button>
+          </Button>
         </div>
 
         <div style={{ "min-height": "1.4rem" }}>
@@ -151,9 +151,7 @@ export const ImperativeAPI = meta.story({
             onInput={e => setText(e.currentTarget.value)}
             style={inputStyle}
           />
-          <button onClick={handleWrite} style={{ padding: "0.4rem 1rem" }}>
-            Write to clipboard
-          </button>
+          <Button onClick={handleWrite}>Write to clipboard</Button>
           <Show when={writeMsg()}>
             <span
               style={{
@@ -170,9 +168,7 @@ export const ImperativeAPI = meta.story({
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
           <label style={{ "font-size": "0.85rem", color: "#64748b" }}>Read</label>
-          <button onClick={handleRead} style={{ padding: "0.4rem 1rem" }}>
-            Read from clipboard
-          </button>
+          <Button onClick={handleRead}>Read from clipboard</Button>
           <Show when={readResult()}>
             <div
               style={{
@@ -229,12 +225,12 @@ export const ReactiveClipboard = meta.story({
             style={inputStyle}
           />
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button onClick={handleWrite} style={{ flex: 1, padding: "0.4rem" }}>
+            <Button onClick={handleWrite} style={{ flex: 1 }}>
               Write to clipboard
-            </button>
-            <button onClick={refetch} style={{ flex: 1, padding: "0.4rem" }}>
+            </Button>
+            <Button onClick={refetch} variant="outline" style={{ flex: 1 }}>
               Read clipboard
-            </button>
+            </Button>
           </div>
           <Show when={writeFlash()}>
             <span style={{ "font-size": "0.85rem", color: "#10b981" }}>✓ Written</span>

@@ -2,15 +2,9 @@ import { createSignal, For, type Accessor } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { VirtualList, createVirtualList } from "@solid-primitives/virtual";
 import readme from "../README.md?raw";
+import { makeContainer, Button } from "../../../.storybook/ui/index.js";
 
-const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  "min-width": "380px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
+const container = makeContainer({ minWidth: 380 });
 
 const meta = preview.meta({
   title: "Display & Media/Virtual List",
@@ -290,9 +284,9 @@ export const EmptyFallback = meta.story({
       <div style={container}>
         <h3 style={{ margin: 0 }}>Empty list fallback</h3>
 
-        <button onClick={() => setShowItems(s => !s)} style={{ "align-self": "flex-start" }}>
+        <Button onClick={() => setShowItems(s => !s)} variant="secondary" style={{ "align-self": "flex-start" }}>
           {showItems() ? "Clear list" : "Load items"}
-        </button>
+        </Button>
 
         <VirtualList
           each={items()}
