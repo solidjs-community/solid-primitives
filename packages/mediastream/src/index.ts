@@ -30,9 +30,9 @@ const constraintsFromDevice = (
 const stopStream = (stream: MediaStream | undefined) =>
   stream?.getTracks().forEach(track => track.stop());
 
-const muteStream = (stream: MediaStream | undefined, muted?: boolean) =>
+const muteStream = (stream: MediaStream | undefined, muted = true) =>
   stream?.getTracks().forEach(track => {
-    track.enabled = muted === false;
+    track.enabled = !muted;
   });
 
 export type StreamSourceDescription =
