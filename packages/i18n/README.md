@@ -292,12 +292,6 @@ proxy.greetings.hi(); // => "greetings.hi"
 proxy.goodbye("John"); // => "goodbye"
 ```
 
-## Demo
-
-[Live example](https://primitives.solidjs.community/playground/i18n) | [Source code](https://github.com/solidjs-community/solid-primitives/blob/main/packages/i18n/dev/index.tsx)
-
-the i18n package is also being used in solidjs.com, you can see the source code [here](https://github.com/solidjs/solid-site/blob/main/src/AppContext.tsx)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
