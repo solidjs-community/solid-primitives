@@ -1,29 +1,29 @@
 import { describe, expect, test } from "vitest";
 import * as i18n from "../src/index.js";
 import { createEffect, createMemo, createRoot, createSignal, flush } from "solid-js";
-import { Locale, en_dict, pl_dict } from "./setup.js";
+import { Locale, enDict, plDict } from "./setup.js";
 
 describe("dict", () => {
   test("flatten", () => {
-    const flat = i18n.flatten(en_dict);
+    const flat = i18n.flatten(enDict);
 
     expect(flat).toEqual({
-      ...en_dict,
+      ...enDict,
       "numbers.1": "one",
       "numbers.2": "two",
       "numbers.3": "three",
-      "data.class": en_dict.data.class,
-      "data.currency": en_dict.data.currency,
+      "data.class": enDict.data.class,
+      "data.currency": enDict.data.currency,
       "data.currency.name": "dollar",
       "data.currency.symbol": "$",
       "data.currency.iso": "USD",
       "data.currency.to.usd": 1,
-      "data.users": en_dict.data.users,
-      "data.users.0": en_dict.data.users[0],
+      "data.users": enDict.data.users,
+      "data.users.0": enDict.data.users[0],
       "data.users.0.name": "John",
-      "data.users.1": en_dict.data.users[1],
+      "data.users.1": enDict.data.users[1],
       "data.users.1.name": "Kate",
-      "data.formatList": en_dict.data.formatList,
+      "data.formatList": enDict.data.formatList,
     } satisfies typeof flat);
   });
 
@@ -74,56 +74,56 @@ describe("template", () => {
 });
 
 describe("translator", () => {
-  let flat_dict = i18n.flatten(en_dict);
+  let flatDict = i18n.flatten(enDict);
 
-  const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+  const t = i18n.translator(() => flatDict, i18n.resolveTemplate);
 
   test("initial", () => {
     expect(t("hello", { name: "Tester", thing: "day" })).toBe("Hello Tester! How is your day?");
     expect(t("numbers.1")).toBe("one");
-    expect(t("data.class")).toBe(en_dict.data.class);
+    expect(t("data.class")).toBe(enDict.data.class);
     expect(t("data.currency.name")).toBe("dollar");
     expect(t("data.currency.to.usd")).toBe(1);
-    expect(t("data.users")).toEqual(en_dict.data.users);
+    expect(t("data.users")).toEqual(enDict.data.users);
     expect(t("data.formatList", ["John", "Kate", "Tester"])).toBe("John, Kate and Tester");
-    expect(t("jsx", "Tester")).toEqual(en_dict.jsx("Tester"));
+    expect(t("jsx", "Tester")).toEqual(enDict.jsx("Tester"));
   });
 
   test("after change", () => {
-    flat_dict = i18n.flatten(pl_dict);
+    flatDict = i18n.flatten(plDict);
 
     expect(t("hello", { name: "Tester", thing: "dzień" })).toBe("Cześć Tester!");
     expect(t("numbers.1")).toBe("jeden");
-    expect(t("data.class")).toBe(pl_dict.data.class);
+    expect(t("data.class")).toBe(plDict.data.class);
     expect(t("data.currency.name")).toBe("złoty");
     expect(t("data.currency.to.usd")).toBe(0.27);
-    expect(t("data.users")).toEqual(pl_dict.data.users);
+    expect(t("data.users")).toEqual(plDict.data.users);
     expect(t("data.formatList", ["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
-    expect(t("jsx", "Tester")).toEqual(pl_dict.jsx("Tester"));
+    expect(t("jsx", "Tester")).toEqual(plDict.jsx("Tester"));
   });
 });
 
 describe("scopedTranslator", () => {
-  let flat_dict = i18n.flatten(en_dict);
+  let flatDict = i18n.flatten(enDict);
 
-  const _t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+  const _t = i18n.translator(() => flatDict, i18n.resolveTemplate);
   const t = i18n.scopedTranslator(_t, "data");
 
   test("initial", () => {
-    expect(t("class")).toBe(en_dict.data.class);
+    expect(t("class")).toBe(enDict.data.class);
     expect(t("currency.name")).toBe("dollar");
     expect(t("currency.to.usd")).toBe(1);
-    expect(t("users")).toEqual(en_dict.data.users);
+    expect(t("users")).toEqual(enDict.data.users);
     expect(t("formatList", ["John", "Kate", "Tester"])).toBe("John, Kate and Tester");
   });
 
   test("after change", () => {
-    flat_dict = i18n.flatten(pl_dict);
+    flatDict = i18n.flatten(plDict);
 
-    expect(t("class")).toBe(pl_dict.data.class);
+    expect(t("class")).toBe(plDict.data.class);
     expect(t("currency.name")).toBe("złoty");
     expect(t("currency.to.usd")).toBe(0.27);
-    expect(t("users")).toEqual(pl_dict.data.users);
+    expect(t("users")).toEqual(plDict.data.users);
     expect(t("formatList", ["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
   });
 });
@@ -133,36 +133,36 @@ Object.entries({
   proxy: (_, t) => i18n.proxyTranslator(t),
 } satisfies Record<string, typeof i18n.chainedTranslator>).forEach(([name, fn]) => {
   describe(name, () => {
-    let flat_dict = i18n.flatten(en_dict);
+    let flatDict = i18n.flatten(enDict);
 
-    const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+    const t = i18n.translator(() => flatDict, i18n.resolveTemplate);
 
-    const chained = fn(en_dict, t);
+    const chained = fn(enDict, t);
 
     test("initial", () => {
       expect(chained.hello({ name: "Tester", thing: "day" })).toBe(
         "Hello Tester! How is your day?",
       );
       expect(chained.numbers[1]()).toBe("one");
-      expect(chained.data.class()).toBe(en_dict.data.class);
+      expect(chained.data.class()).toBe(enDict.data.class);
       expect(chained.data.currency.name()).toBe("dollar");
       expect(chained.data.currency["to.usd"]()).toBe(1);
-      expect(chained.data.users()).toEqual(en_dict.data.users);
+      expect(chained.data.users()).toEqual(enDict.data.users);
       expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate and Tester");
-      expect(chained.jsx("Tester")).toEqual(en_dict.jsx("Tester"));
+      expect(chained.jsx("Tester")).toEqual(enDict.jsx("Tester"));
     });
 
     test("after change", () => {
-      flat_dict = i18n.flatten(pl_dict);
+      flatDict = i18n.flatten(plDict);
 
       expect(chained.hello({ name: "Tester", thing: "dzień" })).toBe("Cześć Tester!");
       expect(chained.numbers[1]()).toBe("jeden");
-      expect(chained.data.class()).toBe(pl_dict.data.class);
+      expect(chained.data.class()).toBe(plDict.data.class);
       expect(chained.data.currency.name()).toBe("złoty");
       expect(chained.data.currency["to.usd"]()).toBe(0.27);
-      expect(chained.data.users()).toEqual(pl_dict.data.users);
+      expect(chained.data.users()).toEqual(plDict.data.users);
       expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
-      expect(chained.jsx("Tester")).toEqual(pl_dict.jsx("Tester"));
+      expect(chained.jsx("Tester")).toEqual(plDict.jsx("Tester"));
     });
   });
 });
@@ -171,22 +171,22 @@ describe("reactive", () => {
   test("with translator", () => {
     const [locale, setLocale] = createSignal<Locale>("en");
     let hello = "";
-    let to_usd = 0;
+    let toUsd = 0;
 
     const dispose = createRoot(dispose => {
-      const dict = createMemo(() => i18n.flatten(locale() === "en" ? en_dict : pl_dict));
+      const dict = createMemo(() => i18n.flatten(locale() === "en" ? enDict : plDict));
 
       const t = i18n.translator(dict, i18n.resolveTemplate);
-      const chained = i18n.chainedTranslator(en_dict, t);
+      const chained = i18n.chainedTranslator(enDict, t);
 
       createEffect(
         () => ({
           hello: t("hello", { name: "Tester", thing: "day" }),
-          to_usd: chained.data.currency["to.usd"](),
+          toUsd: chained.data.currency["to.usd"](),
         }),
-        ({ hello: h, to_usd: u }) => {
+        ({ hello: h, toUsd: u }) => {
           hello = h;
-          to_usd = u;
+          toUsd = u;
         },
       );
 
@@ -195,12 +195,12 @@ describe("reactive", () => {
 
     flush();
     expect(hello).toBe("Hello Tester! How is your day?");
-    expect(to_usd).toBe(1);
+    expect(toUsd).toBe(1);
 
     setLocale("pl");
     flush();
     expect(hello).toBe("Cześć Tester!");
-    expect(to_usd).toBe(0.27);
+    expect(toUsd).toBe(0.27);
 
     dispose();
   });

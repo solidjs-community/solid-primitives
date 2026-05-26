@@ -50,7 +50,7 @@ const App: Component = () => {
 };
 
 export default function () {
-  const [is_mounted, set_mounted] = createSignal(false);
-  onSettled(() => set_mounted(true));
-  return <>{is_mounted() && <App />}</>;
+  const [isMounted, setMounted] = createSignal(false);
+  onSettled(() => setMounted(true));
+  return <>{isMounted() && <App />}</>;
 }
