@@ -7,7 +7,8 @@ import {
   pointerHover,
 } from "@solid-primitives/pointer";
 import readme from "../README.md?raw";
-import { container, StatRow, TrackingBox } from "./_helpers.js";
+import { container, TrackingBox } from "./_helpers.js";
+import { StatRow } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Inputs/Pointer",

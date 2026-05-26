@@ -1,7 +1,8 @@
 import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createPolled, createIntervalCounter } from "@solid-primitives/timer";
-import { Stat, container } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { Stat } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Timer",

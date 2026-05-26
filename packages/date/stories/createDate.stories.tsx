@@ -2,7 +2,8 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createDate, createDateNow } from "@solid-primitives/date";
 import readme from "../README.md?raw";
-import { Stat, container, toDatetimeLocal } from "./_helpers.js";
+import { container, toDatetimeLocal } from "./_helpers.js";
+import { Stat } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",

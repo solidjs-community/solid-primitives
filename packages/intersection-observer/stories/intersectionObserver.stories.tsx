@@ -8,7 +8,8 @@ import {
   type AddViewportObserverEntry,
 } from "@solid-primitives/intersection-observer";
 import readme from "../README.md?raw";
-import { container, btnStyle } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { btnStyle } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Display & Media/Intersection Observer",

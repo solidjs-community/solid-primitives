@@ -2,7 +2,8 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createListState, createMultiSelectListState } from "@solid-primitives/list-state";
 import readme from "../README.md?raw";
-import { container, Kbd } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { Kbd } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Input & Events/List State",

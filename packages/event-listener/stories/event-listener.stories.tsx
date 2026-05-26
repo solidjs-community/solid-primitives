@@ -7,7 +7,8 @@ import {
   WindowEventListener,
 } from "@solid-primitives/event-listener";
 import readme from "../README.md?raw";
-import { container, StatRow, Card, Btn } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { StatRow, Card, Button as Btn } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Event Listener",

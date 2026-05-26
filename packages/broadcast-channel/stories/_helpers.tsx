@@ -1,39 +1,13 @@
-export const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  width: "380px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
+import { makeContainer } from "../../../.storybook/ui/index.js";
 
-export const btnStyle = {
-  padding: "0.4rem 0.85rem",
-  "border-radius": "6px",
-  border: "1px solid #e2e8f0",
-  background: "#f8fafc",
-  cursor: "pointer",
-  "font-family": "system-ui",
-  "font-size": "0.9rem",
-  "white-space": "nowrap",
-} as const;
+export const container = makeContainer(380);
 
-export const inputStyle = {
-  padding: "0.4rem 0.75rem",
-  "font-size": "0.9rem",
-  flex: 1,
-  border: "1px solid #e2e8f0",
-  "border-radius": "6px",
-  "font-family": "system-ui",
-  "min-width": 0,
-} as const;
-
-export const logBox = {
-  background: "#f8fafc",
-  "border-radius": "6px",
-  border: "1px solid #e2e8f0",
-  padding: "0.6rem 0.75rem",
-  "min-height": "80px",
-  "font-size": "0.85rem",
-  "line-height": "1.6",
+export const channelBadge = {
+  display: "inline-block",
+  padding: "0.05rem 0.45rem",
+  background: "#dbeafe",
+  color: "#1d4ed8",
+  "border-radius": "4px",
+  "font-size": "0.78rem",
+  "font-family": "monospace",
 } as const;

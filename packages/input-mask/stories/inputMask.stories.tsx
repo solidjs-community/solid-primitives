@@ -2,7 +2,8 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createInputMask, createMaskPattern } from "@solid-primitives/input-mask";
 import readme from "../README.md?raw";
-import { container, inputStyle, Label, ValueDisplay } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { inputStyle, Label, ValueDisplay } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Forms/Input Mask",

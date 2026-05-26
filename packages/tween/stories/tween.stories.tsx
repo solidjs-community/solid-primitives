@@ -2,7 +2,8 @@ import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createTween } from "@solid-primitives/tween";
 import readme from "../README.md?raw";
-import { container, StatRow, Track } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { StatRow, Progress as Track } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Animation/Tween",

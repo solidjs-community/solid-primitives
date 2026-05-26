@@ -1,7 +1,8 @@
 import preview from "../../../.storybook/preview.js";
 import * as platform from "@solid-primitives/platform";
 import readme from "../README.md?raw";
-import { container, Section, BoolRow } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { Section, BoolRow } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Platform",

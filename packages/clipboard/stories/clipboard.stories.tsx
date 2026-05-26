@@ -9,7 +9,8 @@ import {
   type ClipboardSetter,
 } from "@solid-primitives/clipboard";
 import readme from "../README.md?raw";
-import { container, inputStyle } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { inputStyle } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Clipboard",

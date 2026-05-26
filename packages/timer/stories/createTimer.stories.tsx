@@ -2,7 +2,8 @@ import { createSignal, onCleanup } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { makeTimer, createTimer, createTimeoutLoop } from "@solid-primitives/timer";
 import readme from "../README.md?raw";
-import { Stat, container } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { Stat } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Timer",

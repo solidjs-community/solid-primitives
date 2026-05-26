@@ -7,7 +7,8 @@ import {
   createShortcut,
 } from "@solid-primitives/keyboard";
 import readme from "../README.md?raw";
-import { container, Kbd } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { Kbd } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Input & Events/Keyboard",

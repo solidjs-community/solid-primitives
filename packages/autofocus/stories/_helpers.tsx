@@ -1,8 +1,3 @@
-export const container = {
-  "font-family": "system-ui",
-  padding: "1.5rem",
-  width: "320px",
-  display: "flex",
-  "flex-direction": "column",
-  gap: "1rem",
-} as const;
+import { makeContainer } from "../../../.storybook/ui/index.js";
+
+export const container = makeContainer(320);

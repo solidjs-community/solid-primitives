@@ -7,7 +7,8 @@ import {
   createEventStack,
 } from "@solid-primitives/event-bus";
 import readme from "../README.md?raw";
-import { container, inputStyle, btnStyle } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { inputStyle, btnStyle } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Event Bus",

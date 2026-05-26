@@ -6,7 +6,8 @@ import {
   makeInteractOutside,
 } from "@solid-primitives/interaction";
 import readme from "../README.md?raw";
-import { container, btnStyle, popoverStyle } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { btnStyle, popoverStyle } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Interaction",

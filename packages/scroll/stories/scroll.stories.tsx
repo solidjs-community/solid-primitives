@@ -6,7 +6,8 @@ import {
   createPreventScroll,
 } from "@solid-primitives/scroll";
 import readme from "../README.md?raw";
-import { container, StatRow } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { StatRow } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Scroll",

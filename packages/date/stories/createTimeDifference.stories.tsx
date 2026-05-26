@@ -1,6 +1,7 @@
 import preview from "../../../.storybook/preview.js";
 import { createDate, createTimeDifference, createTimeDifferenceFromNow } from "@solid-primitives/date";
-import { Stat, container, formatMs, toDatetimeLocal } from "./_helpers.js";
+import { container, formatMs, toDatetimeLocal } from "./_helpers.js";
+import { Stat } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",

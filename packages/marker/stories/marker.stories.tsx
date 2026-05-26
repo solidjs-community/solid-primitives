@@ -2,7 +2,8 @@ import { createMemo, createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
 import readme from "../README.md?raw";
-import { container, inputStyle, markStyle } from "./_helpers.js";
+import { container, markStyle } from "./_helpers.js";
+import { inputStyle } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "UI Patterns/Marker",

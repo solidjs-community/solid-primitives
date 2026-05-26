@@ -7,7 +7,8 @@ import {
   createControllableSetSignal,
 } from "@solid-primitives/controlled-signal";
 import readme from "../README.md?raw";
-import { container, btnStyle, inputStyle } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { btnStyle, inputStyle } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Controlled Signal",

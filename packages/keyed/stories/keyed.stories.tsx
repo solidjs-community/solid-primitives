@@ -2,7 +2,8 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { Key, Entries, SetValues, Rerun } from "@solid-primitives/keyed";
 import readme from "../README.md?raw";
-import { container, Card, ButtonRow } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { Card, ButtonRow } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Control Flow/Keyed",

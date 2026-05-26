@@ -1,7 +1,8 @@
 import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createTimeAgo } from "@solid-primitives/date";
-import { Stat, container, toDatetimeLocal } from "./_helpers.js";
+import { container, toDatetimeLocal } from "./_helpers.js";
+import { Stat } from "../../../.storybook/ui/index.js";
 
 const PRESETS = [
   { label: "30 seconds ago", offset: -30_000 },

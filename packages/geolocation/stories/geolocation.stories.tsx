@@ -6,7 +6,8 @@ import {
   createDistance,
 } from "@solid-primitives/geolocation";
 import readme from "../README.md?raw";
-import { container, Stat } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { Stat } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Geolocation",

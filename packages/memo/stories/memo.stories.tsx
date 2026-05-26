@@ -9,7 +9,8 @@ import {
   createMemoCache,
 } from "@solid-primitives/memo";
 import readme from "../README.md?raw";
-import { container, StatRow, Card, Divider, ButtonRow } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { StatRow, Card, Separator as Divider, ButtonRow } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Memo",

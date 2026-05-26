@@ -2,7 +2,8 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { makeBroadcastChannel, createBroadcastChannel } from "@solid-primitives/broadcast-channel";
 import readme from "../README.md?raw";
-import { container, btnStyle, inputStyle, logBox } from "./_helpers.js";
+import { container } from "./_helpers.js";
+import { btnStyle, inputStyle, logBox } from "../../../.storybook/ui/index.js";
 
 const CHANNEL = "sp-broadcast-demo";
 
