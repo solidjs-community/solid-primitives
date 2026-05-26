@@ -6,8 +6,7 @@ import {
   createDistance,
 } from "@solid-primitives/geolocation";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Stat, Button } from "../../../.storybook/ui/index.js";
+import { Stat, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Geolocation",
@@ -57,7 +56,7 @@ export const OneShot = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>makeGeolocation</h3>
 
         <Button onClick={handleQuery} disabled={status() === "loading"}>
@@ -83,7 +82,7 @@ export const OneShot = meta.story({
           Non-reactive — no Solid owner required. Call <code>cleanup()</code> to cancel a
           pending request.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -111,7 +110,7 @@ export const WatcherStory = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createGeolocationWatcher</h3>
 
         <Button
@@ -152,7 +151,7 @@ export const WatcherStory = meta.story({
           The watcher starts and stops reactively based on <code>enabled</code>. Reactive{" "}
           <code>options</code> would restart the watcher automatically.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -193,7 +192,7 @@ export const DistanceTracking = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createDistance</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
@@ -238,7 +237,7 @@ export const DistanceTracking = meta.story({
           Swap the landmark while tracking — distance recalculates immediately using the
           Haversine formula without restarting the GPS watcher.
         </p>
-      </div>
+      </Container>
     );
   },
 });

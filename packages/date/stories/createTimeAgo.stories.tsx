@@ -1,8 +1,8 @@
 import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createTimeAgo } from "@solid-primitives/date";
-import { container, toDatetimeLocal } from "./_helpers.js";
-import { Stat } from "../../../.storybook/ui/index.js";
+import { toDatetimeLocal } from "./_helpers.js";
+import { Stat, Container } from "../../../.storybook/ui/index.js";
 
 const PRESETS = [
   { label: "30 seconds ago", offset: -30_000 },
@@ -37,7 +37,7 @@ export const TimeAgo = meta.story({
     const [timeAgo, { now, difference }] = createTimeAgo(target, { interval: 1000 });
 
     return (
-      <div style={container}>
+      <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createTimeAgo</h3>
 
         <div style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap" }}>
@@ -71,7 +71,7 @@ export const TimeAgo = meta.story({
           <Stat label="Target">{target().toLocaleString()}</Stat>
           <Stat label="Difference (ms)">{difference()}</Stat>
         </div>
-      </div>
+      </Container>
     );
   },
 });

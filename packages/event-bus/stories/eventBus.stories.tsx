@@ -7,8 +7,7 @@ import {
   createEventStack,
 } from "@solid-primitives/event-bus";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { inputStyle, Button } from "../../../.storybook/ui/index.js";
+import { inputStyle, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Event Bus",
@@ -49,7 +48,7 @@ export const EventBusStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createEventBus</h3>
 
         <div
@@ -95,7 +94,7 @@ export const EventBusStory = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           The switch emits on the bus; the light subscribes. They share no direct reference.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -137,7 +136,7 @@ export const EmitterStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createEmitter</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -197,7 +196,7 @@ export const EmitterStory = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Two channels — <code>greet</code> and <code>count</code> — share one emitter object.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -228,7 +227,7 @@ export const EventHubStory = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createEventHub</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -275,7 +274,7 @@ export const EventHubStory = meta.story({
           <code>spin.listen</code> and <code>wiggle.listen</code> subscribe per-channel; buttons use
           the hub's unified <code>emit(channel, payload)</code>.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -306,7 +305,7 @@ export const EventStackStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createEventStack</h3>
 
         <form
@@ -377,7 +376,7 @@ export const EventStackStory = meta.story({
           Stack holds up to 8 items. <code>stack.remove(item)</code> removes one;{" "}
           <code>setValue([])</code> clears all.
         </p>
-      </div>
+      </Container>
     );
   },
 });

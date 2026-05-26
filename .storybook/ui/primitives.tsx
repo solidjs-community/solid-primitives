@@ -2,21 +2,27 @@ import type { JSX } from "solid-js";
 import { For } from "solid-js";
 import { colors, font, radii } from "./tokens.js";
 
-type ContainerOptions = { width?: number; minWidth?: number; gap?: string };
-
-export const makeContainer = (options: ContainerOptions | number = {}): Record<string, string> => {
-  const opts: ContainerOptions = typeof options === "number" ? { width: options } : options;
-  return {
-    "font-family": font.system,
-    padding: "1.5rem",
-    ...(opts.minWidth != null
-      ? { "min-width": `${opts.minWidth}px` }
-      : { width: `${opts.width ?? 380}px` }),
-    display: "flex",
-    "flex-direction": "column",
-    gap: opts.gap ?? "1rem",
-  };
-};
+export const Container = (props: {
+  width?: number;
+  minWidth?: number;
+  gap?: string;
+  children: JSX.Element;
+}) => (
+  <div
+    style={{
+      "font-family": font.system,
+      padding: "1.5rem",
+      ...(props.minWidth != null
+        ? { "min-width": `${props.minWidth}px` }
+        : { width: `${props.width ?? 360}px` }),
+      display: "flex",
+      "flex-direction": "column",
+      gap: props.gap ?? "1rem",
+    }}
+  >
+    {props.children}
+  </div>
+);
 
 export const Stat = (props: { label: string; labelWidth?: string; children: JSX.Element }) => (
   <div style={{ display: "flex", gap: "1rem", "align-items": "baseline", "margin-bottom": "0.4rem" }}>

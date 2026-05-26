@@ -2,9 +2,7 @@ import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createRAF, targetFPS, createMs } from "@solid-primitives/raf";
 import readme from "../README.md?raw";
-import { makeContainer, Button } from "../../../.storybook/ui/index.js";
-
-const container = makeContainer(360);
+import { Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Animation/RAF",
@@ -41,7 +39,7 @@ export const BasicRAF = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createRAF</h3>
 
         <div
@@ -102,7 +100,7 @@ export const BasicRAF = meta.story({
           On a 60 Hz display the callback fires ~60 times per second. The loop disposes
           automatically when the story unmounts — no manual cleanup needed.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -144,7 +142,7 @@ export const TargetFPSStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>targetFPS</h3>
 
         <div style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap" }}>
@@ -204,7 +202,7 @@ export const TargetFPSStory = meta.story({
           Switch targets while running — the rate adjusts immediately. Limiting works by
           skipping frames, so individual frame durations may be uneven at low targets.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -225,7 +223,7 @@ export const CreateMsStory = meta.story({
     const ms = createMs(fps, LIMIT);
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createMs</h3>
 
         <div
@@ -289,7 +287,7 @@ export const CreateMsStory = meta.story({
           The counter auto-resets every {LIMIT}ms (the <code>limit</code> option). Drag the
           fps slider to change the tick resolution while running.
         </p>
-      </div>
+      </Container>
     );
   },
 });

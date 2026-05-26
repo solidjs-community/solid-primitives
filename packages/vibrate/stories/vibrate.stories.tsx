@@ -8,9 +8,7 @@ import {
   makeVibrate,
 } from "@solid-primitives/vibrate";
 import readme from "../README.md?raw";
-import { makeContainer, Button, Alert } from "../../../.storybook/ui/index.js";
-
-const container = makeContainer({ minWidth: 360 });
+import { Button, Alert, Container } from "../../../.storybook/ui/index.js";
 
 const StatusPill = (props: { active: boolean; label: string }) => (
   <div
@@ -84,7 +82,7 @@ export const ReactiveVibrate = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>createVibrate</h3>
         <Show when={!isVibrationSupported()}>
           <Alert variant="warning">
@@ -155,7 +153,7 @@ export const ReactiveVibrate = meta.story({
         >
           resolved pattern: [{Array.isArray(pattern()) ? (pattern() as number[]).join(", ") : pattern()}]
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -185,7 +183,7 @@ export const NonReactiveVibrate = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>makeVibrate — non-reactive</h3>
         <Show when={!isVibrationSupported()}>
           <Alert variant="warning">
@@ -224,7 +222,7 @@ export const NonReactiveVibrate = meta.story({
             ■ Stop
           </Button>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -253,7 +251,7 @@ export const ReactivePulse = meta.story({
     const periodMs = createMemo(() => Math.round(1000 / hz()));
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>createPulse</h3>
         <Show when={!isVibrationSupported()}>
           <Alert variant="warning">
@@ -338,7 +336,7 @@ export const ReactivePulse = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Drag sliders while pulsing — the rhythm updates immediately without stopping.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -362,7 +360,7 @@ export const FrequencyCalculator = meta.story({
     const onPct = createMemo(() => (pattern()[0] / periodMs()) * 100);
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>frequencyToPattern</h3>
 
         <label style={{ "font-size": "0.85rem", color: "#64748b" }}>
@@ -502,7 +500,7 @@ export const FrequencyCalculator = meta.story({
             </div>
           ))}
         </div>
-      </div>
+      </Container>
     );
   },
 });

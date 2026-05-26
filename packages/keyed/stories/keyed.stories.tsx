@@ -2,8 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { Key, Entries, SetValues, Rerun } from "@solid-primitives/keyed";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Card, ButtonRow, Button } from "../../../.storybook/ui/index.js";
+import { Card, ButtonRow, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Control Flow/Keyed",
@@ -67,7 +66,7 @@ export const KeyComponent = meta.story({
     const removeFirst = () => setItems(prev => prev.slice(1));
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>
           {"<Key by=\"id\">"}
         </h3>
@@ -142,7 +141,7 @@ export const KeyComponent = meta.story({
           Click-count any item, then shuffle or reverse — the count stays with that item's{" "}
           <code>id</code>, not its position.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -186,7 +185,7 @@ export const EntriesComponent = meta.story({
       );
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>
           {"<Entries of={scores}>"}
         </h3>
@@ -258,7 +257,7 @@ export const EntriesComponent = meta.story({
           The bar widths are driven by a value signal — only the bars update when scores change, no
           row remount.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -287,7 +286,7 @@ export const SetValuesComponent = meta.story({
     const clear = () => setSelected(new Set<string>());
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>
           {"<SetValues of={selected}>"}
         </h3>
@@ -348,7 +347,7 @@ export const SetValuesComponent = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Tags render in insertion order. Adding a tag that already exists is a no-op.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -369,7 +368,7 @@ export const RerunComponent = meta.story({
     const [tab, setTab] = createSignal<Tab>("Overview");
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>
           {"<Rerun on={tab}>"}
         </h3>
@@ -444,7 +443,7 @@ export const RerunComponent = meta.story({
           Increment the counter, then switch tabs — the count resets because the child is fully
           remounted. The mount timestamp confirms a fresh instance.
         </p>
-      </div>
+      </Container>
     );
   },
 });

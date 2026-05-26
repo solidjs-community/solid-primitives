@@ -6,8 +6,7 @@ import {
   createPreventScroll,
 } from "@solid-primitives/scroll";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { StatRow } from "../../../.storybook/ui/index.js";
+import { StatRow, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Scroll",
@@ -39,7 +38,7 @@ export const ScrollPositionStory = meta.story({
     const scroll = createScrollPosition(() => boxRef);
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createScrollPosition</h3>
 
         <div
@@ -89,7 +88,7 @@ export const ScrollPositionStory = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Scroll inside the box — both axes update in real time.
         </p>
-      </div>
+      </Container>
     );
   },
 });

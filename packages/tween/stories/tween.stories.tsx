@@ -2,8 +2,7 @@ import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createTween } from "@solid-primitives/tween";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { StatRow, Progress as Track, Button } from "../../../.storybook/ui/index.js";
+import { StatRow, Progress as Track, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Animation/Tween",
@@ -36,7 +35,7 @@ export const BasicTween = meta.story({
     const tweened = createTween(target, { duration: 600 });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createTween — 600 ms linear</h3>
 
         <div
@@ -73,7 +72,7 @@ export const BasicTween = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Click a target value — the bar slides smoothly using <code>requestAnimationFrame</code>.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -117,7 +116,7 @@ export const EasingComparison = meta.story({
     const fire = (v: number) => setTarget(v);
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>Easing comparison — 1200 ms</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.75rem" }}>
@@ -161,7 +160,7 @@ export const EasingComparison = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           All four bars start from the same value. Notice the acceleration profile of each curve.
         </p>
-      </div>
+      </Container>
     );
   },
 });

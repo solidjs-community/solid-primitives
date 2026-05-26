@@ -2,8 +2,7 @@ import { createSignal, onCleanup } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { makeTimer, createTimer, createTimeoutLoop } from "@solid-primitives/timer";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Stat, Button } from "../../../.storybook/ui/index.js";
+import { Stat, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Timer",
@@ -50,7 +49,7 @@ export const MakeTimer = meta.story({
     onCleanup(() => clear?.());
 
     return (
-      <div style={container}>
+      <Container minWidth={320}>
         <h3 style={{ margin: 0 }}>makeTimer</h3>
 
         <Stat label="Ticks">{count()}</Stat>
@@ -70,7 +69,7 @@ export const MakeTimer = meta.story({
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
           Cleanup is manual — <code>onCleanup(makeTimer(...))</code> ties it to the component lifecycle.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -92,7 +91,7 @@ export const CreateTimerStory = meta.story({
     createTimer(() => setCount(c => c + 1), delay, setInterval);
 
     return (
-      <div style={container}>
+      <Container minWidth={320}>
         <h3 style={{ margin: 0 }}>createTimer</h3>
 
         <Stat label="Ticks">{count()}</Stat>
@@ -114,7 +113,7 @@ export const CreateTimerStory = meta.story({
             Pause
           </Button>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -136,7 +135,7 @@ export const CreateTimeoutLoop = meta.story({
     createTimeoutLoop(() => setCount(c => c + 1), delay);
 
     return (
-      <div style={container}>
+      <Container minWidth={320}>
         <h3 style={{ margin: 0 }}>createTimeoutLoop</h3>
 
         <Stat label="Ticks">{count()}</Stat>
@@ -162,7 +161,7 @@ export const CreateTimeoutLoop = meta.story({
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
           Change the delay mid-tick — it takes effect on the <em>next</em> execution, not the current one.
         </p>
-      </div>
+      </Container>
     );
   },
 });

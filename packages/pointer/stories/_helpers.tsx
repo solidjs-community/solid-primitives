@@ -1,6 +1,4 @@
-import { makeContainer, colors } from "../../../.storybook/ui/index.js";
-
-export const container = makeContainer(420);
+import { colors } from "../../../.storybook/ui/index.js";
 
 export const TrackingBox = (props: { children: any; active?: boolean }) => (
   <div

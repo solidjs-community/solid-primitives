@@ -2,9 +2,7 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createOrientation, makeOrientation } from "@solid-primitives/orientation";
 import readme from "../README.md?raw";
-import { makeContainer, Button } from "../../../.storybook/ui/index.js";
-
-const container = makeContainer(360);
+import { Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Orientation",
@@ -50,7 +48,7 @@ export const CreateOrientationStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createOrientation</h3>
 
         <div
@@ -121,7 +119,7 @@ export const CreateOrientationStory = meta.story({
           <code>screen.orientation</code> when available, falling back to the{" "}
           <code>orientationchange</code> event on older browsers.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -158,7 +156,7 @@ export const MakeOrientationStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>makeOrientation</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -212,7 +210,7 @@ export const MakeOrientationStory = meta.story({
           Non-reactive — no Solid owner or <code>onCleanup</code> involved. Call the returned
           function to remove the listener at any time.
         </p>
-      </div>
+      </Container>
     );
   },
 });

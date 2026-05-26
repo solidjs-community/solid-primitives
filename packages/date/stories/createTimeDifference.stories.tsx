@@ -1,7 +1,7 @@
 import preview from "../../../.storybook/preview.js";
 import { createDate, createTimeDifference, createTimeDifferenceFromNow } from "@solid-primitives/date";
-import { container, formatMs, toDatetimeLocal } from "./_helpers.js";
-import { Stat, Button } from "../../../.storybook/ui/index.js";
+import { formatMs, toDatetimeLocal } from "./_helpers.js";
+import { Stat, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",
@@ -26,7 +26,7 @@ export const TimeDifference = meta.story({
     const [diff] = createTimeDifference(from, to);
 
     return (
-      <div style={container}>
+      <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createTimeDifference</h3>
 
         <div style={{ display: "flex", gap: "1rem", "flex-wrap": "wrap" }}>
@@ -53,7 +53,7 @@ export const TimeDifference = meta.story({
           <Stat label="Formatted">{formatMs(diff())}</Stat>
           <Stat label="Days">{(diff() / 86_400_000).toFixed(2)}</Stat>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -73,7 +73,7 @@ export const TimeDifferenceFromNow = meta.story({
     const [diff, { now, target: targetDate, update }] = createTimeDifferenceFromNow(target, 1000);
 
     return (
-      <div style={container}>
+      <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createTimeDifferenceFromNow</h3>
 
         <label style={{ display: "flex", "flex-direction": "column", gap: "0.25rem", "font-size": "0.85rem" }}>
@@ -94,7 +94,7 @@ export const TimeDifferenceFromNow = meta.story({
         <Button onClick={update} variant="outline" style={{ "align-self": "flex-start" }}>
           Force update
         </Button>
-      </div>
+      </Container>
     );
   },
 });

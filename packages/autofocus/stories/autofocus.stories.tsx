@@ -2,8 +2,7 @@ import { createSignal, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { autofocus, createAutofocus } from "@solid-primitives/autofocus";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Button } from "../../../.storybook/ui/index.js";
+import { Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "DOM/Autofocus",
@@ -34,7 +33,7 @@ export const AutofocusRefCallback = meta.story({
     const [mounted, setMounted] = createSignal(true);
 
     return (
-      <div style={container}>
+      <Container width={320}>
         <h3 style={{ margin: 0 }}>autofocus()</h3>
 
         <Show when={mounted()}>
@@ -54,7 +53,7 @@ export const AutofocusRefCallback = meta.story({
           The native <code>autofocus</code> attribute alone only fires on page load. This
           primitive re-applies it on every render.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -74,7 +73,7 @@ export const ConditionalAutofocus = meta.story({
     const [mounted, setMounted] = createSignal(true);
 
     return (
-      <div style={container}>
+      <Container width={320}>
         <h3 style={{ margin: 0 }}>Conditional autofocus</h3>
 
         <label style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
@@ -98,7 +97,7 @@ export const ConditionalAutofocus = meta.story({
         <Button onClick={() => setMounted(m => !m)} variant="secondary">
           {mounted() ? "Unmount" : "Remount"}
         </Button>
-      </div>
+      </Container>
     );
   },
 });
@@ -129,7 +128,7 @@ export const CreateAutofocusLetRef = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={320}>
         <h3 style={{ margin: 0 }}>createAutofocus — let ref</h3>
 
         <Show when={mounted()}>
@@ -139,7 +138,7 @@ export const CreateAutofocusLetRef = meta.story({
         <Button onClick={() => setMounted(m => !m)} variant="secondary">
           {mounted() ? "Unmount" : "Remount (autofocus fires again)"}
         </Button>
-      </div>
+      </Container>
     );
   },
 });
@@ -170,7 +169,7 @@ export const CreateAutofocusSignalRef = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={320}>
         <h3 style={{ margin: 0 }}>createAutofocus — signal ref</h3>
 
         <Show when={mounted()}>
@@ -185,7 +184,7 @@ export const CreateAutofocusSignalRef = meta.story({
           The signal approach is useful when you need to store the ref elsewhere — e.g.{" "}
           <code>const [ref, setRef] = createSignal()</code> at an outer scope.
         </p>
-      </div>
+      </Container>
     );
   },
 });

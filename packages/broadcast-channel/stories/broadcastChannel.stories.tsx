@@ -2,8 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { makeBroadcastChannel, createBroadcastChannel } from "@solid-primitives/broadcast-channel";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { inputStyle, logBox, Button } from "../../../.storybook/ui/index.js";
+import { inputStyle, logBox, Button, Container } from "../../../.storybook/ui/index.js";
 
 const CHANNEL = "sp-broadcast-demo";
 
@@ -58,7 +57,7 @@ export const MakeBroadcastChannelStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>makeBroadcastChannel</h3>
 
         <div
@@ -112,7 +111,7 @@ export const MakeBroadcastChannelStory = meta.story({
           BroadcastChannel only delivers to <em>other</em> browsing contexts — messages posted here
           will not appear in this same tab's log.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -137,7 +136,7 @@ export const CreateBroadcastChannelStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createBroadcastChannel</h3>
 
         <div
@@ -202,7 +201,7 @@ export const CreateBroadcastChannelStory = meta.story({
           Both stories share channel <code>sp-broadcast-demo</code>, so posting from either tab
           updates this signal.
         </p>
-      </div>
+      </Container>
     );
   },
 });

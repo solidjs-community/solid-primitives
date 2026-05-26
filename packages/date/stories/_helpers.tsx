@@ -1,7 +1,3 @@
-import { makeContainer } from "../../../.storybook/ui/index.js";
-
-export const container = makeContainer({ minWidth: 340 });
-
 export const formatMs = (ms: number): string => {
   const abs = Math.abs(ms);
   const days = Math.floor(abs / 86_400_000);

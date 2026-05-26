@@ -2,8 +2,7 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createInputMask, createMaskPattern } from "@solid-primitives/input-mask";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { inputStyle, Label, ValueDisplay } from "../../../.storybook/ui/index.js";
+import { inputStyle, Label, ValueDisplay, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Forms/Input Mask",
@@ -35,7 +34,7 @@ export const DateMask = meta.story({
     const mask = createInputMask("99/99/9999");
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>Date — "99/99/9999"</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
@@ -56,7 +55,7 @@ export const DateMask = meta.story({
           <code>*</code> = alphanumeric. Fixed characters like <code>/</code> are inserted
           automatically as you type.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -76,7 +75,7 @@ export const PhoneMask = meta.story({
     const mask = createInputMask("(999) 999-9999");
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>Phone — "(999) 999-9999"</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
@@ -91,7 +90,7 @@ export const PhoneMask = meta.story({
         </div>
 
         <ValueDisplay label="value" value={value()} />
-      </div>
+      </Container>
     );
   },
 });
@@ -110,7 +109,7 @@ export const PatternOverlay = meta.story({
     const handler = createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD");
 
     return (
-      <div style={container}>
+      <Container>
         <style>{`
           .sp-mask-label[data-mask-value] {
             position: absolute;
@@ -155,7 +154,7 @@ export const PatternOverlay = meta.story({
           <code>::before</code> renders transparent typed text to push <code>::after</code> (the
           remaining pattern) to the correct position.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -175,7 +174,7 @@ export const ArrayMask = meta.story({
     const mask = createInputMask([/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/]);
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>Meeting ID — NNN-NNN-NNN</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
@@ -195,7 +194,7 @@ export const ArrayMask = meta.story({
           The array <code>[/\d/, /\d/, /\d/, "-", ...]</code> inserts dashes automatically and
           rejects any non-digit input.
         </p>
-      </div>
+      </Container>
     );
   },
 });

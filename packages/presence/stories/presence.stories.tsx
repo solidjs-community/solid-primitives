@@ -2,9 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createPresence } from "@solid-primitives/presence";
 import readme from "../README.md?raw";
-import { makeContainer, Button, BoolRow } from "../../../.storybook/ui/index.js";
-
-const container = makeContainer(340);
+import { Button, BoolRow, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Animation/Presence",
@@ -38,7 +36,7 @@ export const ShowHide = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container width={340}>
         <h3 style={{ margin: 0 }}>createPresence — boolean</h3>
 
         <Button onClick={() => setShow(v => !v)}>{show() ? "Hide" : "Show"}</Button>
@@ -80,7 +78,7 @@ export const ShowHide = meta.story({
           The element stays in the DOM until the 500ms exit transition finishes — unmounting
           happens only after the animation completes.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -103,7 +101,7 @@ export const ItemSwitcher = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container width={340}>
         <h3 style={{ margin: 0 }}>createPresence — item switcher</h3>
 
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
@@ -170,7 +168,7 @@ export const ItemSwitcher = meta.story({
           Click a button to switch items. The exiting item slides out before the next one
           slides in. Click the active button again to deselect.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -193,7 +191,7 @@ export const SeparateDurations = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container width={340}>
         <h3 style={{ margin: 0 }}>Enter 200ms / Exit 800ms</h3>
 
         <Button onClick={() => setShow(v => !v)}>
@@ -238,7 +236,7 @@ export const SeparateDurations = meta.story({
           Toggle quickly to see the transitions overlap. The CSS duration switches between
           200ms and 800ms based on which phase is active.
         </p>
-      </div>
+      </Container>
     );
   },
 });

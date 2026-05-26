@@ -2,8 +2,8 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createDate, createDateNow } from "@solid-primitives/date";
 import readme from "../README.md?raw";
-import { container, toDatetimeLocal } from "./_helpers.js";
-import { Stat, Button } from "../../../.storybook/ui/index.js";
+import { toDatetimeLocal } from "./_helpers.js";
+import { Stat, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",
@@ -34,7 +34,7 @@ export const CreateDate = meta.story({
     const [date, setDate] = createDate(new Date());
 
     return (
-      <div style={container}>
+      <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createDate</h3>
 
         <div>
@@ -55,7 +55,7 @@ export const CreateDate = meta.story({
           <Button onClick={() => setDate(Date.now() - 7 * 86_400_000)} variant="outline">Last week</Button>
           <Button onClick={() => setDate(Date.now() + 86_400_000)} variant="outline">Tomorrow</Button>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -75,7 +75,7 @@ export const CreateDateNow = meta.story({
     const [now, update] = createDateNow(interval);
 
     return (
-      <div style={container}>
+      <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createDateNow</h3>
 
         <div>
@@ -104,7 +104,7 @@ export const CreateDateNow = meta.story({
         <Button onClick={update} variant="outline" style={{ "align-self": "flex-start" }}>
           Force update
         </Button>
-      </div>
+      </Container>
     );
   },
 });

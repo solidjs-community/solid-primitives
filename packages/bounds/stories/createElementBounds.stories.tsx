@@ -2,8 +2,8 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createElementBounds, type UpdateGuard } from "@solid-primitives/bounds";
 import readme from "../README.md?raw";
-import { container, BoundsGrid } from "./_helpers.js";
-import { Button } from "../../../.storybook/ui/index.js";
+import { BoundsGrid } from "./_helpers.js";
+import { Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "DOM/Bounds",
@@ -38,7 +38,7 @@ export const LiveBounds = meta.story({
     const bounds = createElementBounds(() => ref);
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>createElementBounds</h3>
 
         <div
@@ -85,7 +85,7 @@ export const LiveBounds = meta.story({
         </div>
 
         <BoundsGrid bounds={bounds} />
-      </div>
+      </Container>
     );
   },
 });
@@ -107,7 +107,7 @@ export const ReactiveTarget = meta.story({
     const bounds = createElementBounds(() => (active() ? ref() : null));
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>Reactive target</h3>
 
         <div
@@ -133,7 +133,7 @@ export const ReactiveTarget = meta.story({
         </Button>
 
         <BoundsGrid bounds={bounds} />
-      </div>
+      </Container>
     );
   },
 });
@@ -153,7 +153,7 @@ export const ScrollTracking = meta.story({
     const bounds = createElementBounds(() => ref);
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>Scroll tracking</h3>
 
         <div
@@ -191,7 +191,7 @@ export const ScrollTracking = meta.story({
           Scroll the container — <code>top</code>, <code>left</code>, <code>bottom</code>, and{" "}
           <code>right</code> reflect the element's position in the viewport.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -229,7 +229,7 @@ export const ThrottledTracking = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>UpdateGuard — throttled tracking</h3>
 
         <div
@@ -286,7 +286,7 @@ export const ThrottledTracking = meta.story({
           Pass an <code>UpdateGuard</code> to wrap the internal trigger — throttle, debounce, or
           batch updates any way you like.
         </p>
-      </div>
+      </Container>
     );
   },
 });

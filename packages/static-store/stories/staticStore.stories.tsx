@@ -2,8 +2,7 @@ import { createSignal, createTrackedEffect } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createStaticStore, createDerivedStaticStore } from "@solid-primitives/static-store";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Button } from "../../../.storybook/ui/index.js";
+import { Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Static Store",
@@ -34,7 +33,7 @@ export const CreateStaticStoreStory = meta.story({
     const [size, setSize] = createStaticStore({ width: 200, height: 120 });
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createStaticStore</h3>
 
         <div
@@ -141,7 +140,7 @@ export const CreateStaticStoreStory = meta.story({
             </Button>
           </div>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -167,7 +166,7 @@ export const DerivedStaticStoreStory = meta.story({
     createTrackedEffect(() => { store.height; setHeightTicks(n => n + 1); });
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createDerivedStaticStore</h3>
 
         <div
@@ -255,7 +254,7 @@ export const DerivedStaticStoreStory = meta.story({
           width tick increments. The source signal is a single object, but the store splits it into
           per-key reactive values.
         </p>
-      </div>
+      </Container>
     );
   },
 });

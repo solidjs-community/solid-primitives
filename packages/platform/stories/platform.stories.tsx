@@ -1,8 +1,7 @@
 import preview from "../../../.storybook/preview.js";
 import * as platform from "@solid-primitives/platform";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Section, BoolRow } from "../../../.storybook/ui/index.js";
+import { Section, BoolRow, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Platform",
@@ -30,7 +29,7 @@ export const AllDetections = meta.story({
     },
   },
   render: () => (
-    <div style={container}>
+    <Container width={380} gap="0.75rem">
       <h3 style={{ margin: 0 }}>Current Environment</h3>
 
       <Section title="Device">
@@ -64,7 +63,7 @@ export const AllDetections = meta.story({
         <BoolRow label="isTrident" value={platform.isTrident} />
         <BoolRow label="isEdgeHTML" value={platform.isEdgeHTML} />
       </Section>
-    </div>
+    </Container>
   ),
 });
 
@@ -131,7 +130,7 @@ export const ConditionalRendering = meta.story({
     );
 
     return (
-      <div style={container}>
+      <Container width={380} gap="0.75rem">
         <h3 style={{ margin: 0 }}>You are running…</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
@@ -164,7 +163,7 @@ export const ConditionalRendering = meta.story({
         >
           These are compile-time constants — no signals, no overhead.
         </p>
-      </div>
+      </Container>
     );
   },
 });

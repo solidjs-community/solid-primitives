@@ -2,9 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createTrigger, createTriggerCache } from "@solid-primitives/trigger";
 import readme from "../README.md?raw";
-import { makeContainer, Button } from "../../../.storybook/ui/index.js";
-
-const container = makeContainer(360);
+import { Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Trigger",
@@ -38,7 +36,7 @@ export const BasicTrigger = meta.story({
     const runCount = createMemo(() => { track(); return ++count; });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createTrigger</h3>
 
         <div
@@ -97,7 +95,7 @@ export const BasicTrigger = meta.story({
           <code>noise</code> signal leaves the counter unchanged — the trigger is decoupled
           from any data model.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -127,7 +125,7 @@ export const TriggerCacheStory = meta.story({
     ] as const;
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createTriggerCache</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
@@ -171,7 +169,7 @@ export const TriggerCacheStory = meta.story({
           tracking key 1, leaving keys 2 and 3 untouched. <code>dirtyAll()</code> invalidates
           all three at once.
         </p>
-      </div>
+      </Container>
     );
   },
 });

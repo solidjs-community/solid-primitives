@@ -1,8 +1,8 @@
 import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createCountdown, createCountdownFromNow } from "@solid-primitives/date";
-import { container, toDatetimeLocal } from "./_helpers.js";
-import { Stat, Button } from "../../../.storybook/ui/index.js";
+import { toDatetimeLocal } from "./_helpers.js";
+import { Stat, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Date",
@@ -47,7 +47,7 @@ export const Countdown = meta.story({
     const countdown = createCountdown(from, to);
 
     return (
-      <div style={container}>
+      <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createCountdown</h3>
 
         <div style={{ display: "flex", gap: "1rem", "flex-wrap": "wrap" }}>
@@ -79,7 +79,7 @@ export const Countdown = meta.story({
         <div>
           <Stat label="Milliseconds">{countdown.milliseconds ?? 0}</Stat>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -105,7 +105,7 @@ export const CountdownFromNow = meta.story({
     const [countdown, { now, update }] = createCountdownFromNow(target, 1000);
 
     return (
-      <div style={container}>
+      <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createCountdownFromNow</h3>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}>
@@ -140,7 +140,7 @@ export const CountdownFromNow = meta.story({
         <Button onClick={update} variant="outline" style={{ "align-self": "flex-start" }}>
           Force update
         </Button>
-      </div>
+      </Container>
     );
   },
 });

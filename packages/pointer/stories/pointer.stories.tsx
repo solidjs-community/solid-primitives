@@ -7,8 +7,8 @@ import {
   pointerHover,
 } from "@solid-primitives/pointer";
 import readme from "../README.md?raw";
-import { container, TrackingBox } from "./_helpers.js";
-import { StatRow } from "../../../.storybook/ui/index.js";
+import { TrackingBox } from "./_helpers.js";
+import { StatRow, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Inputs/Pointer",
@@ -41,7 +41,7 @@ export const PointerPositionStory = meta.story({
     const pos = createPointerPosition({ target: boxEl as Accessor<EventTarget> });
 
     return (
-      <div style={container}>
+      <Container width={420}>
         <h3 style={{ margin: 0 }}>createPointerPosition</h3>
 
         <TrackingBox active={pos().isActive}>
@@ -84,7 +84,7 @@ export const PointerPositionStory = meta.story({
           Tracks mouse, touch, and pen. <code>isActive</code> is <code>false</code> when the
           pointer leaves the element.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -107,9 +107,18 @@ export const PointerListStory = meta.story({
     return (
       <div
         style={{
-          ...container,
-          height: "20vh",
+          "font-family": "system-ui",
+          width: "420px",
+          display: "flex",
+          "flex-direction": "column",
+          gap: "1rem",
+          padding: "1.25rem",
+          background: "white",
+          border: "1px solid #e2e8f0",
+          "border-radius": "12px",
+          "box-shadow": "0 4px 12px rgba(0,0,0,0.06)",
           "box-sizing": "border-box",
+          height: "20vh",
           "justify-content": "space-between",
         }}
       >
@@ -216,7 +225,7 @@ export const PointerListenersStory = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container width={420}>
         <h3 style={{ margin: 0 }}>createPointerListeners</h3>
 
         <div
@@ -274,7 +283,7 @@ export const PointerListenersStory = meta.story({
             </span>
           )}
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -293,7 +302,7 @@ export const PointerHoverStory = meta.story({
     const [isHovered, setIsHovered] = createSignal(false);
 
     return (
-      <div style={container}>
+      <Container width={420}>
         <h3 style={{ margin: 0 }}>pointerHover</h3>
 
         <div
@@ -339,7 +348,7 @@ export const PointerHoverStory = meta.story({
           Handles multiple simultaneous pointers — hover is <code>false</code> only when{" "}
           <em>all</em> pointers have left the element.
         </p>
-      </div>
+      </Container>
     );
   },
 });

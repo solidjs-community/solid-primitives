@@ -6,8 +6,7 @@ import {
   makeInteractOutside,
 } from "@solid-primitives/interaction";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { btnStyle, popoverStyle } from "../../../.storybook/ui/index.js";
+import { btnStyle, popoverStyle, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Interaction",
@@ -49,7 +48,21 @@ export const CreateInteractOutsideStory = meta.story({
     );
 
     return (
-      <div style={{ ...container, position: "relative" }}>
+      <div
+        style={{
+          "font-family": "system-ui",
+          width: "380px",
+          display: "flex",
+          "flex-direction": "column",
+          gap: "1rem",
+          padding: "1.25rem",
+          background: "white",
+          border: "1px solid #e2e8f0",
+          "border-radius": "12px",
+          "box-shadow": "0 4px 12px rgba(0,0,0,0.06)",
+          position: "relative",
+        }}
+      >
         <h3 style={{ margin: 0 }}>createInteractOutside</h3>
 
         <button
@@ -109,7 +122,21 @@ export const InteractOutsideRefStory = meta.story({
     let triggerRef!: HTMLButtonElement;
 
     return (
-      <div style={{ ...container, position: "relative" }}>
+      <div
+        style={{
+          "font-family": "system-ui",
+          width: "380px",
+          display: "flex",
+          "flex-direction": "column",
+          gap: "1rem",
+          padding: "1.25rem",
+          background: "white",
+          border: "1px solid #e2e8f0",
+          "border-radius": "12px",
+          "box-shadow": "0 4px 12px rgba(0,0,0,0.06)",
+          position: "relative",
+        }}
+      >
         <h3 style={{ margin: 0 }}>interactOutside</h3>
 
         <button
@@ -208,7 +235,7 @@ export const MakeInteractOutsideStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>makeInteractOutside</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -276,7 +303,7 @@ export const MakeInteractOutsideStory = meta.story({
           The returned cleanup function removes all listeners. Useful outside Solid component
           trees or when lifecycle hooks are unavailable.
         </p>
-      </div>
+      </Container>
     );
   },
 });

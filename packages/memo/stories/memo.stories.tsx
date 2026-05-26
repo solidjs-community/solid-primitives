@@ -9,8 +9,7 @@ import {
   createMemoCache,
 } from "@solid-primitives/memo";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { StatRow, Card, Separator as Divider, ButtonRow, Button } from "../../../.storybook/ui/index.js";
+import { StatRow, Card, Separator as Divider, ButtonRow, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Memo",
@@ -43,7 +42,7 @@ export const WritableMemo = meta.story({
     const [result, setResult] = createWritableMemo(() => base() * multiplier());
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createWritableMemo</h3>
 
         <Card>
@@ -67,7 +66,7 @@ export const WritableMemo = meta.story({
           Override the result with the setter, then change <code>base</code> or{" "}
           <code>multiplier</code> — the reactive computation resumes automatically.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -88,7 +87,7 @@ export const LazyMemo = meta.story({
     const triangleNumber = createLazyMemo<number>(prev => (prev ?? 0) + n());
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createLazyMemo — triangular sum</h3>
 
         <Card>
@@ -107,7 +106,7 @@ export const LazyMemo = meta.story({
           Each increment passes the previous computed value through <code>prev</code>, accumulating
           a running total. T(n) always equals n*(n+1)/2 — verify by incrementing several times.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -134,7 +133,7 @@ export const Latest = meta.story({
     const latestMany = createLatestMany([derivedA, derivedB]);
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createLatest</h3>
 
         <Card>
@@ -166,7 +165,7 @@ export const Latest = meta.story({
           <code>createLatestMany</code> captures both values. Updating A or B individually returns a
           single-element array.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -194,7 +193,7 @@ export const Reducer = meta.story({
     const [count, dispatch] = createReducer(dispatcher, 0);
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createReducer</h3>
 
         <div
@@ -223,7 +222,7 @@ export const Reducer = meta.story({
           <code>dispatch</code> passes an action to the reducer without exposing the raw setter —
           all valid transitions live in one place.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -264,7 +263,7 @@ export const MemoCache = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createMemoCache — Fibonacci</h3>
 
         <Card>
@@ -302,7 +301,7 @@ export const MemoCache = meta.story({
           Click fib(10) → fib(15) → fib(10): the third click is a{" "}
           <span style={{ color: "#10b981" }}>cache hit</span> — the calculation does not re-run.
         </p>
-      </div>
+      </Container>
     );
   },
 });

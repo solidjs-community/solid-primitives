@@ -1,8 +1,7 @@
 import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createPolled, createIntervalCounter } from "@solid-primitives/timer";
-import { container } from "./_helpers.js";
-import { Stat } from "../../../.storybook/ui/index.js";
+import { Stat, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Timer",
@@ -35,7 +34,7 @@ export const CreatePolled = meta.story({
     );
 
     return (
-      <div style={container}>
+      <Container minWidth={320}>
         <h3 style={{ margin: 0 }}>createPolled</h3>
 
         <Stat label="Timestamp">{timestamp()}</Stat>
@@ -68,7 +67,7 @@ export const CreatePolled = meta.story({
             Pause
           </button>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -88,7 +87,7 @@ export const CreateIntervalCounter = meta.story({
     const count = createIntervalCounter(interval);
 
     return (
-      <div style={container}>
+      <Container minWidth={320}>
         <h3 style={{ margin: 0 }}>createIntervalCounter</h3>
 
         <div style={{ "font-size": "3rem", "font-weight": "bold", "font-variant-numeric": "tabular-nums", "text-align": "center" }}>
@@ -112,7 +111,7 @@ export const CreateIntervalCounter = meta.story({
             Pause
           </button>
         </div>
-      </div>
+      </Container>
     );
   },
 });

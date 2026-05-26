@@ -2,8 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createListState, createMultiSelectListState } from "@solid-primitives/list-state";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Kbd } from "../../../.storybook/ui/index.js";
+import { Kbd, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Input & Events/List State",
@@ -40,7 +39,7 @@ export const SingleSelect = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createListState</h3>
 
         <ul
@@ -101,7 +100,7 @@ export const SingleSelect = meta.story({
           Click the list to focus it, then press <Kbd>↑</Kbd> / <Kbd>↓</Kbd>,{" "}
           <Kbd>Home</Kbd>, or <Kbd>End</Kbd> to navigate.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -132,7 +131,7 @@ export const MultiSelect = meta.story({
       createMultiSelectListState({ items: FILES });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createMultiSelectListState</h3>
 
         <ul
@@ -214,7 +213,7 @@ export const MultiSelect = meta.story({
           Click to focus item. <Kbd>Shift</Kbd>+<Kbd>↑</Kbd>/<Kbd>↓</Kbd> extends the range.
           Double-click to commit to selected set.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -243,7 +242,7 @@ export const HorizontalList = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>Horizontal list</h3>
 
         <div
@@ -316,7 +315,7 @@ export const HorizontalList = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Click the tab bar, then press <Kbd>←</Kbd> / <Kbd>→</Kbd> to navigate.
         </p>
-      </div>
+      </Container>
     );
   },
 });

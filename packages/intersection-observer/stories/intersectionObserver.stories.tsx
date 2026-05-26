@@ -8,8 +8,7 @@ import {
   type AddViewportObserverEntry,
 } from "@solid-primitives/intersection-observer";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { btnStyle } from "../../../.storybook/ui/index.js";
+import { btnStyle, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Display & Media/Intersection Observer",
@@ -42,7 +41,7 @@ export const VisibilityObserverStory = meta.story({
     const ITEMS = Array.from({ length: 16 }, (_, i) => i + 1);
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createVisibilityObserver</h3>
         <p style={{ margin: 0, "font-size": "0.85rem", color: "#64748b" }}>
           Scroll the grid — items highlight when ≥ 60% visible inside the container.
@@ -91,7 +90,7 @@ export const VisibilityObserverStory = meta.story({
             }}
           </For>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -111,7 +110,7 @@ export const VisibilityOccurrenceStory = meta.story({
     const ITEMS = Array.from({ length: 14 }, (_, i) => i + 1);
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createVisibilityObserver + withOccurrence</h3>
         <p style={{ margin: 0, "font-size": "0.85rem", color: "#64748b" }}>
           Scroll to see <em>Entering</em> / <em>Leaving</em> / <em>Inside</em> / <em>Outside</em>.
@@ -179,7 +178,7 @@ export const VisibilityOccurrenceStory = meta.story({
             }}
           </For>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -204,7 +203,7 @@ export const ViewportObserverStory = meta.story({
     }));
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>createViewportObserver</h3>
         <p style={{ margin: 0, "font-size": "0.85rem", color: "#64748b" }}>
           One shared observer watches all 12 items. Scroll to see them react.
@@ -258,7 +257,7 @@ export const ViewportObserverStory = meta.story({
             }}
           </For>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -282,7 +281,7 @@ export const MakeIntersectionObserverStory = meta.story({
     let addEl!: (el: Element) => void;
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>makeIntersectionObserver</h3>
 
         <div
@@ -362,7 +361,7 @@ export const MakeIntersectionObserverStory = meta.story({
           Elements are added with <code>add(el)</code> after the observer is created. The raw{" "}
           <code>onChange</code> callback receives all changed entries in one batch.
         </p>
-      </div>
+      </Container>
     );
   },
 });

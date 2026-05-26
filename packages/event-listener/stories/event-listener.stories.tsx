@@ -7,8 +7,7 @@ import {
   WindowEventListener,
 } from "@solid-primitives/event-listener";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { StatRow, Card, Button as Btn } from "../../../.storybook/ui/index.js";
+import { StatRow, Card, Button as Btn, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Event Listener",
@@ -140,10 +139,19 @@ export const ReactiveTargetsStory = meta.story({
     return (
       <div
         style={{
-          ...container,
+          "font-family": "system-ui",
+          width: "400px",
+          display: "flex",
+          "flex-direction": "column",
+          gap: "1rem",
+          padding: "1.25rem",
+          background: "white",
+          border: "1px solid #e2e8f0",
+          "border-radius": "12px",
+          "box-shadow": "0 4px 12px rgba(0,0,0,0.06)",
+          "box-sizing": "border-box",
           height: "20vh",
           "overflow-y": "auto",
-          "box-sizing": "border-box",
           "justify-content": "space-between",
         }}
       >
@@ -218,7 +226,7 @@ export const EventSignalStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>createEventSignal</h3>
 
         <div
@@ -251,7 +259,7 @@ export const EventSignalStory = meta.story({
           Listening for: <code>mouseenter</code>, <code>mouseleave</code>, <code>click</code>,{" "}
           <code>contextmenu</code>, <code>wheel</code>
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -272,7 +280,7 @@ export const MakeEventListenerStory = meta.story({
     const [enterCount, setEnterCount] = createSignal(0);
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>makeEventListener via ref</h3>
 
         <div style={{ display: "flex", gap: "0.75rem" }}>
@@ -340,7 +348,7 @@ export const MakeEventListenerStory = meta.story({
           <code>ref={"{el => makeEventListener(el, 'click', handler)}"}</code> — the listener is
           registered during mount and removed automatically on cleanup via <code>onCleanup</code>.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -372,7 +380,7 @@ export const CustomEventsStory = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>Custom event map</h3>
 
         <div
@@ -412,7 +420,7 @@ export const CustomEventsStory = meta.story({
           Uses a signal target so <code>createEventListener</code> tracks the element reactively.
           Dispatch either event with the buttons above to see the payload.
         </p>
-      </div>
+      </Container>
     );
   },
 });

@@ -2,9 +2,7 @@ import { createSignal, For, type Accessor } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { VirtualList, createVirtualList } from "@solid-primitives/virtual";
 import readme from "../README.md?raw";
-import { makeContainer, Button } from "../../../.storybook/ui/index.js";
-
-const container = makeContainer({ minWidth: 380 });
+import { Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Display & Media/Virtual List",
@@ -45,7 +43,7 @@ export const VirtualListComponent = meta.story({
     const visibleCount = () => Math.ceil(rootHeight() / rowHeight()) + overscanCount() * 2;
 
     return (
-      <div style={container}>
+      <Container minWidth={380}>
         <h3 style={{ margin: 0 }}>{"<VirtualList>"} — 10,000 items</h3>
 
         <div
@@ -147,7 +145,7 @@ export const VirtualListComponent = meta.story({
             </div>
           )}
         </VirtualList>
-      </div>
+      </Container>
     );
   },
 });
@@ -178,7 +176,7 @@ export const HeadlessVirtualList = meta.story({
     const [scrollTop, setScrollTop] = createSignal(0);
 
     return (
-      <div style={container}>
+      <Container minWidth={380}>
         <h3 style={{ margin: 0 }}>createVirtualList — custom layout</h3>
 
         <div
@@ -261,7 +259,7 @@ export const HeadlessVirtualList = meta.story({
           <code>containerHeight</code> sets the scrollable area height. <code>viewerTop</code>{" "}
           offsets the rendered block. Only <code>visibleItems</code> are mounted — scroll to verify.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -281,7 +279,7 @@ export const EmptyFallback = meta.story({
     const items = () => (showItems() ? ALL_ITEMS.slice(0, 20) : []);
 
     return (
-      <div style={container}>
+      <Container minWidth={380}>
         <h3 style={{ margin: 0 }}>Empty list fallback</h3>
 
         <Button onClick={() => setShowItems(s => !s)} variant="secondary" style={{ "align-self": "flex-start" }}>
@@ -335,7 +333,7 @@ export const EmptyFallback = meta.story({
             </div>
           )}
         </VirtualList>
-      </div>
+      </Container>
     );
   },
 });

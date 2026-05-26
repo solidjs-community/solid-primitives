@@ -9,8 +9,7 @@ import {
   type ClipboardSetter,
 } from "@solid-primitives/clipboard";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { inputStyle, Button } from "../../../.storybook/ui/index.js";
+import { inputStyle, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Browser APIs/Clipboard",
@@ -51,7 +50,7 @@ export const CopyDirective = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>copyToClipboard</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
@@ -83,7 +82,7 @@ export const CopyDirective = meta.story({
             <span style={{ color: "#10b981", "font-size": "0.9rem" }}>✓ Copied {flash()}</span>
           </Show>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -141,7 +140,7 @@ export const ImperativeAPI = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>writeClipboard + readClipboard</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
@@ -187,7 +186,7 @@ export const ImperativeAPI = meta.story({
             <span style={{ "font-size": "0.85rem", color: "#64748b" }}>{readMsg()}</span>
           </Show>
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -215,7 +214,7 @@ export const ReactiveClipboard = meta.story({
     };
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createClipboard</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
@@ -271,7 +270,7 @@ export const ReactiveClipboard = meta.story({
           Signal changes after the first are written automatically. Use{" "}
           <code>isPending(() =&gt; clipboard())</code> to detect an in-flight read.
         </p>
-      </div>
+      </Container>
     );
   },
 });

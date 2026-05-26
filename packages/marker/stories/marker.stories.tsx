@@ -2,8 +2,8 @@ import { createMemo, createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
 import readme from "../README.md?raw";
-import { container, markStyle } from "./_helpers.js";
-import { inputStyle } from "../../../.storybook/ui/index.js";
+import { markStyle } from "./_helpers.js";
+import { inputStyle, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "UI Patterns/Marker",
@@ -45,7 +45,7 @@ export const SearchHighlightStory = meta.story({
     const regex = createMemo(() => makeSearchRegex(search()));
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>Search highlight</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
@@ -87,7 +87,7 @@ export const SearchHighlightStory = meta.story({
           <code>makeSearchRegex</code> trims input, escapes special chars, and splits on spaces so
           multiple words match independently.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -132,7 +132,7 @@ export const CustomRendererStory = meta.story({
       "Solid.js uses fine-grained reactivity: Solid signals propagate changes through Solid computations without re-running the whole component. This makes Solid fast even with deeply nested Solid state trees.";
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>Custom renderer</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -180,7 +180,7 @@ export const CustomRendererStory = meta.story({
           remount. The <code>text()</code> accessor inside <code>mapMatch</code> lets you build
           fully reactive match renderers.
         </p>
-      </div>
+      </Container>
     );
   },
 });

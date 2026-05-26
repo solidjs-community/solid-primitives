@@ -7,8 +7,7 @@ import {
   createShortcut,
 } from "@solid-primitives/keyboard";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { Kbd } from "../../../.storybook/ui/index.js";
+import { Kbd, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Input & Events/Keyboard",
@@ -40,7 +39,7 @@ export const HeldKeys = meta.story({
     const [focused, setFocused] = createSignal(false);
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>useKeyDownList</h3>
 
         <div
@@ -86,7 +85,7 @@ export const HeldKeys = meta.story({
           Clears on <code>blur</code> or right-click. Modifier keys already held before focus are
           detected automatically.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -105,7 +104,7 @@ export const KeyHold = meta.story({
     const holding = createKeyHold("Control", { preventDefault: false });
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createKeyHold("Control")</h3>
 
         <div
@@ -127,7 +126,7 @@ export const KeyHold = meta.story({
           Pressing another key while holding Control resets the signal to <code>false</code>. The
           default <code>preventDefault: true</code> stops the browser's built-in Ctrl shortcuts.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -157,7 +156,7 @@ export const Shortcut = meta.story({
     );
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>createShortcut(["Control", "K"])</h3>
 
         <div
@@ -194,7 +193,7 @@ export const Shortcut = meta.story({
           <code>requireReset: true</code> — you must release all keys before the shortcut fires
           again.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -213,7 +212,7 @@ export const KeySequence = meta.story({
     const sequence = useKeyDownSequence();
 
     return (
-      <div style={container}>
+      <Container>
         <h3 style={{ margin: 0 }}>useKeyDownSequence</h3>
 
         <div
@@ -262,7 +261,7 @@ export const KeySequence = meta.story({
           Try: hold <Kbd>Control</Kbd>, add <Kbd>Shift</Kbd>, then <Kbd>A</Kbd> — watch three steps
           build up before you release.
         </p>
-      </div>
+      </Container>
     );
   },
 });

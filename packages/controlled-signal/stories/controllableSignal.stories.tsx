@@ -7,8 +7,7 @@ import {
   createControllableSetSignal,
 } from "@solid-primitives/controlled-signal";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { inputStyle, Button } from "../../../.storybook/ui/index.js";
+import { inputStyle, Button, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Controlled Signal",
@@ -44,7 +43,7 @@ export const UncontrolledStory = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>Uncontrolled mode</h3>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
@@ -100,7 +99,7 @@ export const UncontrolledStory = meta.story({
           <code>defaultValue: 0</code>. Every <code>setValue</code> call also fires{" "}
           <code>onChange</code>.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -124,7 +123,7 @@ export const ControlledStory = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>Controlled mode</h3>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
@@ -184,7 +183,7 @@ export const ControlledStory = meta.story({
           <code>+/−</code> calls <code>onChange → setExternal</code>; the preset buttons set the
           parent signal directly, bypassing the component.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -229,7 +228,7 @@ export const TypedVariantsStory = meta.story({
       });
 
     return (
-      <div style={container}>
+      <Container width={380}>
         <h3 style={{ margin: 0 }}>Typed Variants</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.4rem" }}>
@@ -317,7 +316,7 @@ export const TypedVariantsStory = meta.story({
             Selected: {[...selected()].join(", ") || "(none)"}
           </span>
         </div>
-      </div>
+      </Container>
     );
   },
 });

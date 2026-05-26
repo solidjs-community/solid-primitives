@@ -8,8 +8,7 @@ import {
   createScheduled,
 } from "@solid-primitives/scheduled";
 import readme from "../README.md?raw";
-import { container } from "./_helpers.js";
-import { StatRow, EventLog, Button as Btn } from "../../../.storybook/ui/index.js";
+import { StatRow, EventLog, Button as Btn, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Scheduled",
@@ -48,7 +47,7 @@ export const DebounceStory = meta.story({
     }, 600);
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>debounce (600 ms trailing)</h3>
 
         <input
@@ -92,7 +91,7 @@ export const DebounceStory = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           The debounced value only updates 600 ms after you stop typing.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -118,7 +117,7 @@ export const ThrottleStory = meta.story({
     }, 800);
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>throttle (800 ms trailing)</h3>
 
         <Btn
@@ -149,7 +148,7 @@ export const ThrottleStory = meta.story({
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Click rapidly — the callback fires at most once every 800 ms.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -198,7 +197,7 @@ export const LeadingStory = meta.story({
     );
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>Leading edge (1 s window)</h3>
 
         <div style={{ display: "grid", "grid-template-columns": "1fr 1fr 1fr", gap: "0.5rem" }}>
@@ -241,7 +240,7 @@ export const LeadingStory = meta.story({
           <b> Trailing</b> fires after the window. <b>Leading</b> fires at the first call.{" "}
           <b>Both</b> fires at first call and again at the trailing edge if re-triggered.
         </p>
-      </div>
+      </Container>
     );
   },
 });
@@ -278,7 +277,7 @@ export const CreateScheduledStory = meta.story({
     );
 
     return (
-      <div style={container}>
+      <Container width={400}>
         <h3 style={{ margin: 0 }}>createScheduled (800 ms debounce)</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -308,7 +307,7 @@ export const CreateScheduledStory = meta.story({
           Click rapidly — <code>scheduledCount</code> only catches up 800 ms after the last
           increment. Each catch-up is one flush.
         </p>
-      </div>
+      </Container>
     );
   },
 });

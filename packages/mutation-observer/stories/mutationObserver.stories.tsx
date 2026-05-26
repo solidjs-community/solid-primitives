@@ -2,9 +2,7 @@ import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createMutationObserver, mutationObserver } from "@solid-primitives/mutation-observer";
 import readme from "../README.md?raw";
-import { makeContainer, Button, logBox } from "../../../.storybook/ui/index.js";
-
-const container = makeContainer({ minWidth: 360 });
+import { Button, logBox, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "DOM/Mutation Observer",
@@ -46,7 +44,7 @@ export const ChildListObserver = meta.story({
     });
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>createMutationObserver — childList</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -99,7 +97,7 @@ export const ChildListObserver = meta.story({
             <span style={{ color: "#94a3b8" }}>Add or remove children to see mutation records…</span>
           )}
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -132,7 +130,7 @@ export const AttributeObserver = meta.story({
     );
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>createMutationObserver — attributes</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -169,7 +167,7 @@ export const AttributeObserver = meta.story({
             <span style={{ color: "#94a3b8" }}>Toggle controls above to see attribute records…</span>
           )}
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -210,7 +208,7 @@ export const PerElementOptions = meta.story({
     );
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>Per-element options</h3>
 
         <div style={{ display: "grid", "grid-template-columns": "1fr 1fr", gap: "0.75rem" }}>
@@ -297,7 +295,7 @@ export const PerElementOptions = meta.story({
             <span style={{ color: "#94a3b8" }}>Interact with either element above…</span>
           )}
         </div>
-      </div>
+      </Container>
     );
   },
 });
@@ -318,7 +316,7 @@ export const StandaloneRef = meta.story({
     let nextId = 4;
 
     return (
-      <div style={container}>
+      <Container minWidth={360}>
         <h3 style={{ margin: 0 }}>mutationObserver — standalone ref</h3>
         <p style={{ margin: 0, "font-size": "0.85rem", color: "#64748b" }}>
           The observer is wired up via a single <code>ref</code> attribute — no separate setup.
@@ -379,7 +377,7 @@ export const StandaloneRef = meta.story({
             {mutationCount()}
           </strong>
         </div>
-      </div>
+      </Container>
     );
   },
 });

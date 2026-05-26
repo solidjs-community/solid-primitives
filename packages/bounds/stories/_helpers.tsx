@@ -1,7 +1,5 @@
 import type { NullableBounds } from "@solid-primitives/bounds";
-import { makeContainer, colors, font } from "../../../.storybook/ui/index.js";
-
-export const container = makeContainer({ minWidth: 360 });
+import { colors, font } from "../../../.storybook/ui/index.js";
 
 export const BoundsGrid = (props: { bounds: NullableBounds }) => (
   <div

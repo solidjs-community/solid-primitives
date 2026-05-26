@@ -31,13 +31,16 @@ export const SeekSlider = (props: {
   max: number;
   onSeek: (t: number) => void;
 }) => (
-  <input
-    type="range"
-    min="0"
-    max={props.max}
-    step="0.5"
-    value={props.current()}
-    onInput={e => props.onSeek(+e.currentTarget.value)}
-    style={{ width: "180px" }}
-  />
+  <label style={{ display: "flex", "align-items": "center", gap: "0.5rem", "font-size": "0.85rem" }}>
+    Seek
+    <input
+      type="range"
+      min="0"
+      max={props.max}
+      step="0.5"
+      value={props.current()}
+      onInput={e => props.onSeek(+e.currentTarget.value)}
+      style={{ width: "180px" }}
+    />
+  </label>
 );
