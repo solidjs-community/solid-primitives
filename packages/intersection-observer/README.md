@@ -242,10 +242,6 @@ function createVisibilityObserver(
 ): Accessor<boolean>;
 ```
 
-## Demo
-
-[a working example](https://primitives.solidjs.community/playground/intersection-observer/) ([source](https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer/dev))
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
