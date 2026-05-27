@@ -67,11 +67,6 @@ All four primitives:
 - Require no arguments.
 - Subscribe to [`devicechange`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/devicechange_event) events and clean up automatically via `onCleanup`.
 
-## Demo
-
-You may view a working example here:
-https://primitives.solidjs.community/playground/devices/
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
