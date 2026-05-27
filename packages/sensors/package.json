@@ -1,36 +1,51 @@
 {
-  "name": "@solid-primitives/devices",
-  "version": "2.0.0",
-  "description": "Reactive primitives for enumerating and filtering media input/output devices (microphones, speakers, cameras).",
-  "author": "Alex Lohr <alex.lohr@logmein.com>",
-  "contributors": [
-    "Mohan <mohanavel15@protonmail.com>"
-  ],
+  "name": "@solid-primitives/sensors",
+  "version": "0.1.0",
+  "description": "Primitives for device sensors: accelerometer, gyroscope, compass, battery, and generic Sensor API.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/devices",
+  "homepage": "https://primitives.solidjs.community/package/sensors",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
   "primitive": {
-    "name": "devices",
-    "stage": 3,
+    "name": "sensors",
+    "stage": 0,
     "list": [
-      "createDevices",
-      "createMicrophones",
-      "createSpeakers",
-      "createCameras"
+      "makeAccelerometer",
+      "createAccelerometer",
+      "makeGyroscope",
+      "createGyroscope",
+      "makeSensor",
+      "createSensor",
+      "makeCompass",
+      "createCompass",
+      "makeBattery",
+      "createBattery"
     ],
     "category": "Display & Media"
   },
-  "files": [
-    "dist"
+  "keywords": [
+    "accelerometer",
+    "gyroscope",
+    "sensors",
+    "solid",
+    "primitives"
   ],
   "private": false,
   "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "browser": {},
   "exports": {
     "import": {
       "@solid-primitives/source": "./src/index.ts",
@@ -38,6 +53,7 @@
       "default": "./dist/index.js"
     }
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
@@ -45,17 +61,9 @@
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
-  "keywords": [
-    "media",
-    "devices",
-    "solid",
-    "primitives"
-  ],
-  "browser": {},
   "peerDependencies": {
     "solid-js": "^2.0.0-beta.14"
   },
-  "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.14",
     "solid-js": "2.0.0-beta.14"
