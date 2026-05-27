@@ -17,7 +17,12 @@
     "name": "async",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "fromStream",
+      "fromJSONStream",
+      "makeAbortable",
+      "createAbortable",
+      "makeRetrying",
+      "createAggregated"
     ],
     "category": "Display & Media"
   },
