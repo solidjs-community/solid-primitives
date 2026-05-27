@@ -199,7 +199,7 @@ export const WSMessageStory = meta.story({
     docs: {
       description: {
         story:
-          "`createWSMessage<T>(ws)` returns a reactive `Accessor<T | undefined>` holding the **most recently received** message, starting as `undefined`. Because it is backed by a signal, only the last message in a reactive flush is observed — use the planned `wsMessageIterable` when every message must be processed.",
+          "`createWSMessage<T>(ws)` returns a reactive `Accessor<T | undefined>` holding the **most recently received** message, starting as `undefined`. Because it is backed by a signal, only the last message in a reactive flush is observed — use `wsMessageIterable` when every message must be processed.",
       },
     },
   },
