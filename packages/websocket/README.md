@@ -4,7 +4,11 @@
 
 # @solid-primitives/websocket
 
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/websocket?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/websocket)
+[![version](https://img.shields.io/npm/v/@solid-primitives/websocket?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/websocket)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+
+- [**Docs**](https://primitives.solidjs.community/docs/websocket)
 
 Primitives to help establish, maintain, and operate WebSocket connections in Solid.
 
@@ -20,9 +24,9 @@ Primitives to help establish, maintain, and operate WebSocket connections in Sol
 ### Message primitives
 
 - [`createWSMessage`](#createwsmessage) — reactive signal for the **latest** received message
-- [`wsMessageIterable`](#wsmessageiterable-planned) — buffered `AsyncIterable` over WS messages _(planned)_
-- [`createWSData`](#createwsdata-planned) — async memo compatible with `<Loading>`, `isPending`, and `latest` _(planned)_
-- [`createWSStore`](#createwsstore-planned) — reactive store driven by WS message patches _(planned)_
+- [`wsMessageIterable`](#wsmessageiterable) — buffered `AsyncIterable` over WS messages
+- [`createWSData`](#createwsdata) — async memo compatible with `<Loading>`, `isPending`, and `latest`
+- [`createWSStore`](#createwsstore) — reactive store driven by WS message patches
 
 ---
 
@@ -76,7 +80,7 @@ const message = createWSMessage<string>(ws);
 return <p>Last message: {message()}</p>;
 ```
 
-> **Note — "latest wins" semantics.** `createWSMessage` uses a signal internally. In Solid 2.0, signal writes are batched: if two messages arrive before the reactive flush, only the second is seen by effects. This is fine for "current state" displays, but if your protocol can burst messages and you need to process every one, use [`wsMessageIterable`](#wsmessageiterable-planned) or [`createWSData`](#createwsdata-planned) instead.
+> **Note — "latest wins" semantics.** `createWSMessage` uses a signal internally. In Solid 2.0, signal writes are batched: if two messages arrive before the reactive flush, only the second is seen by effects. This is fine for "current state" displays, but if your protocol can burst messages and you need to process every one, use [`wsMessageIterable`](#wsmessageiterable) or [`createWSData`](#createwsdata) instead.
 
 ### `makeReconnectingWS`
 
@@ -109,17 +113,19 @@ const ws = makeHeartbeatWS(createReconnectingWS("ws://localhost:5000"), {
 
 ---
 
-## Async message primitives _(planned for next minor)_
+## Async message primitives
 
 These three primitives leverage Solid's async reactivity — `createMemo` with `AsyncIterable`, `<Loading>` boundaries, `isPending`, and `latest` — to provide a more powerful and correct model for WebSocket data.
 
-### `wsMessageIterable` _(planned)_
-
-The foundational building block. Returns a buffered `AsyncIterable<T>` over a WebSocket's message stream. Cleanup (`ws.removeEventListener`) happens automatically when the iterator is returned (Solid calls `it.return()` on memo disposal).
+### `wsMessageIterable`
 
 ```ts
-import { wsMessageIterable } from "@solid-primitives/websocket";
+function wsMessageIterable<T = string>(ws: WebSocket): AsyncIterable<T>
+```
 
+The foundational building block. Returns a buffered `AsyncIterable<T>` over a WebSocket's message stream. Messages that arrive while a consumer is busy are queued; none are dropped. The event listener is removed automatically when the iterator's `return()` method is called (Solid does this on memo disposal).
+
+```ts
 // Compose freely with any Solid 2.0 async primitive:
 const latestQuote = createMemo(async function* () {
   for await (const raw of wsMessageIterable<string>(ws)) {
@@ -130,18 +136,25 @@ const latestQuote = createMemo(async function* () {
 
 Works correctly with `makeReconnectingWS` — event listeners are re-attached to each new underlying connection, so the iterable survives reconnects transparently.
 
-**Why this doesn't drop messages:** Unlike `createWSMessage`, each yielded value triggers its own `flush()` inside the Solid runtime. Messages that arrive while an earlier one is being processed are buffered and drained synchronously, so no message is skipped by reactive effects.
+**Why this doesn't drop messages:** Unlike `createWSMessage`, each yielded value triggers its own reactive flush. Messages that arrive while an earlier one is being processed are buffered and drained in order, so no message is skipped.
 
-### `createWSData` _(planned)_
+### `createWSData`
 
-An async memo wrapping `wsMessageIterable`. Suspends the nearest `<Loading>` boundary until the first message arrives; subsequent updates work with `isPending` and `latest`.
+```ts
+function createWSData<T = string, U = T>(
+  ws: WebSocket,
+  options?: { transform?: (msg: T) => U },
+): Accessor<U>
+```
+
+An async memo wrapping `wsMessageIterable`. Suspends the nearest `<Loading>` boundary until the first message arrives; subsequent updates work with `isPending` and `latest`. The optional `transform` is applied to each raw message before the memo value is updated.
 
 ```tsx
+const ws = createReconnectingWS("wss://prices.example.com");
 const price = createWSData<Quote>(ws, { transform: JSON.parse });
 
 return (
-  <Loading fallback={<p>Waiting for data…</p>}>
-    {/* isPending: true while the next tick is in-flight with a stale value showing */}
+  <Loading fallback={<p>Waiting for first quote…</p>}>
     <p class={isPending(() => price()) ? "stale" : ""}>
       Bid: {price().bid} / Ask: {price().ask}
     </p>
@@ -160,19 +173,44 @@ Comparison with `createWSMessage`:
 | Returns `undefined` before first message | Yes                       | No — throws (suspends)           |
 | Best for                                 | Simple last-value display | State-source WS, real-time feeds |
 
-### `createWSStore` _(planned)_
+### `createWSStore`
 
-A reactive store driven by WebSocket messages as incremental patches. Uses Solid `createStore(fn, seed)` form — each message is applied as a draft mutation.
+```ts
+function createWSStore<S extends object, T = string>(
+  ws: WebSocket,
+  options: {
+    initial: S;
+    patch: (draft: S, msg: T) => void;
+  },
+): [store: Store<S>, setStore: StoreSetter<S>]
+```
+
+A reactive store driven by WebSocket messages as incremental patches. `patch` is called for each incoming message with a mutable draft of the store — mutate it directly, no return value needed. The event listener is removed on owner disposal.
 
 ```tsx
-const [appState] = createWSStore(ws, {
+interface AppState {
+  users: string[];
+  status: "connecting" | "online" | "offline";
+}
+
+const ws = createReconnectingWS("wss://app.example.com");
+const [state] = createWSStore<AppState, string>(ws, {
   initial: { users: [], status: "connecting" },
   patch(draft, msg) {
     Object.assign(draft, JSON.parse(msg));
   },
 });
 
-return <p>Users online: {appState.users.length}</p>;
+return <p>Users online: {state.users.length}</p>;
+```
+
+You can also use the returned setter to apply local updates:
+
+```ts
+const [state, setState] = createWSStore(ws, { initial: { count: 0 }, patch });
+
+// imperative write from a button click, etc.
+setState(s => { s.count = 0; });
 ```
 
 ---
@@ -215,7 +253,7 @@ const queryServer = action(function* (payload: RequestPayload) {
 type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
 type WSReconnectOptions = {
-  delay?: number; // ms between reconnect attempts — default: 3000
+  delay?: number;   // ms between reconnect attempts — default: 3000
   retries?: number; // max reconnect attempts — default: Infinity
 };
 
@@ -226,8 +264,17 @@ type ReconnectingWebSocket = WebSocket & {
 
 type WSHeartbeatOptions = {
   message?: WSMessage; // default: "ping"
-  interval?: number; // ms between heartbeats — default: 1000
-  wait?: number; // ms to wait for pong before reconnecting — default: 1500
+  interval?: number;   // ms between heartbeats — default: 1000
+  wait?: number;       // ms to wait for pong before reconnecting — default: 1500
+};
+
+type WSDataOptions<T, U = T> = {
+  transform?: (msg: T) => U; // map each raw message before the memo value updates
+};
+
+type WSStoreOptions<S, T = string> = {
+  initial: S;                        // starting store state
+  patch: (draft: S, msg: T) => void; // mutate the draft for each incoming message
 };
 ```
 

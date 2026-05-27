@@ -1,4 +1,4 @@
-import { type Accessor, onCleanup, createSignal } from "solid-js";
+import { type Accessor, onCleanup, createSignal, createMemo, createStore, runWithOwner } from "solid-js";
 
 export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
@@ -230,4 +230,121 @@ export const makeHeartbeatWS = (
   ws.addEventListener("message", receiveMessage);
   ws.addEventListener("open", () => setTimeout(receiveMessage, options.interval || 1000));
   return ws;
+};
+
+/**
+ * Returns a buffered `AsyncIterable<T>` over the WebSocket's message stream.
+ * Each message triggers its own reactive flush, so no message is dropped under burst conditions.
+ * Calling `return()` on the iterator removes the event listener automatically.
+ *
+ * Compatible with `makeReconnectingWS` — listeners are re-attached to each new underlying connection.
+ *
+ * ```ts
+ * const latestQuote = createMemo(async function* () {
+ *   for await (const raw of wsMessageIterable<string>(ws)) {
+ *     yield JSON.parse(raw) as Quote;
+ *   }
+ * });
+ * ```
+ */
+export const wsMessageIterable = <T = string>(ws: WebSocket): AsyncIterable<T> => ({
+  [Symbol.asyncIterator]() {
+    const queue: T[] = [];
+    let wakeup: (() => void) | null = null;
+    let done = false;
+
+    const handler = (e: MessageEvent) => {
+      queue.push(e.data as T);
+      const w = wakeup;
+      wakeup = null;
+      w?.();
+    };
+
+    ws.addEventListener("message", handler);
+
+    return {
+      async next() {
+        if (done) return { value: undefined as unknown as T, done: true as const };
+        if (queue.length > 0) return { value: queue.shift()!, done: false as const };
+        await new Promise<void>(resolve => {
+          wakeup = resolve;
+        });
+        // `done` may have been set to true by return() while we were awaiting
+        if (done as boolean) return { value: undefined as unknown as T, done: true as const };
+        return { value: queue.shift()!, done: false as const };
+      },
+      return() {
+        done = true;
+        ws.removeEventListener("message", handler);
+        const w = wakeup;
+        wakeup = null;
+        w?.();
+        return Promise.resolve({ value: undefined as unknown as T, done: true as const });
+      },
+    };
+  },
+});
+
+export type WSDataOptions<T, U = T> = {
+  /** Transform each raw message before it is yielded to subscribers. */
+  transform?: (msg: T) => U;
+};
+
+/**
+ * An async memo that wraps `wsMessageIterable`. Suspends the nearest `<Loading>` boundary
+ * until the first message arrives; subsequent updates work with `isPending` and `latest`.
+ *
+ * ```tsx
+ * const price = createWSData<Quote>(ws, { transform: JSON.parse });
+ *
+ * return (
+ *   <Loading fallback={<p>Waiting for data…</p>}>
+ *     <p>Bid: {price().bid} / Ask: {price().ask}</p>
+ *   </Loading>
+ * );
+ * ```
+ */
+export const createWSData = <T = string, U = T>(
+  ws: WebSocket,
+  options?: WSDataOptions<T, U>,
+): Accessor<U> => {
+  const transform = options?.transform;
+  return createMemo(async function* () {
+    for await (const msg of wsMessageIterable<T>(ws)) {
+      yield (transform ? transform(msg) : (msg as unknown as U));
+    }
+  }) as Accessor<U>;
+};
+
+export type WSStoreOptions<S, T = string> = {
+  /** Initial store state before any messages arrive. */
+  initial: S;
+  /** Called for each incoming message with a draft of the store and the raw message. */
+  patch: (draft: S, msg: T) => void;
+};
+
+/**
+ * A reactive store driven by WebSocket messages as incremental patches.
+ * Each incoming message is passed to `options.patch` as a draft mutation.
+ *
+ * ```tsx
+ * const [appState] = createWSStore(ws, {
+ *   initial: { users: [], status: "connecting" },
+ *   patch(draft, msg) { Object.assign(draft, JSON.parse(msg)); },
+ * });
+ *
+ * return <p>Users online: {appState.users.length}</p>;
+ * ```
+ */
+export const createWSStore = <S extends object, T = string>(
+  ws: WebSocket,
+  options: WSStoreOptions<S, T>,
+) => {
+  const [store, setStore] = createStore(options.initial as any);
+  const handler = (e: MessageEvent) => {
+    runWithOwner(null, () => setStore((draft: S) => void options.patch(draft, e.data as T)));
+  };
+  ws.addEventListener("message", handler);
+  onCleanup(() => ws.removeEventListener("message", handler));
+  return [store, setStore] as ReturnType<typeof createStore<S>>;
 };
