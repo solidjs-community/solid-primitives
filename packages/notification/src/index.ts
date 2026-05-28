@@ -228,10 +228,9 @@ export function createNotificationPermission(): {
     setPending(true);
     try {
       yield Notification.requestPermission();
-    } catch {
-      // swallow — permission updates reactively via createPermission
+    } finally {
+      setPending(false);
     }
-    setPending(false);
   });
 
   return { permission, requestPermission, pending };
