@@ -47,8 +47,9 @@ export function makeNotification(
 
   const show = (): Notification | null => {
     if (Notification.permission !== "granted") {
-      // eslint-disable-next-line no-console
-      if (isDev) console.warn(
+      if (isDev)
+        // eslint-disable-next-line no-console
+        console.warn(
           `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
         );
       return null;
@@ -125,19 +126,20 @@ export function createNotification(
   let currentCleanup: VoidFunction | undefined;
 
   const close: VoidFunction = () => {
-    const n = current;
+    const notification = current;
     currentCleanup?.();
     currentCleanup = undefined;
-    n?.close();
+    notification?.close();
     current = null;
     setNotification(null);
-    if (n) handlers?.onClose?.(n);
+    if (notification) handlers?.onClose?.(notification);
   };
 
   const show = (): Notification | null => {
     if (Notification.permission !== "granted") {
-      // eslint-disable-next-line no-console
-      if (isDev) console.warn(
+      if (isDev)
+        // eslint-disable-next-line no-console
+        console.warn(
           `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
         );
       return null;
