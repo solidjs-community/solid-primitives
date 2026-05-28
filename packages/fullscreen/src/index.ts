@@ -89,7 +89,7 @@ export const createFullscreen = (
 
   if (typeof ref === "function") {
     createEffect(
-      () => (ref as Accessor<HTMLElement | undefined>)(),
+      () => ref(),
       node => {
         bound = node ? makeFullscreen(node, nativeOptions) : null;
         setActive(document.fullscreenElement === node);
