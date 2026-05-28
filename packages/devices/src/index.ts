@@ -1,6 +1,5 @@
-import { createMemo, createSignal, getOwner, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
-import { createStore } from "solid-js/store";
+import { createMemo, createSignal, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 /**
  * Creates a list of all media devices
@@ -13,11 +12,11 @@ import { createStore } from "solid-js/store";
  */
 export const createDevices = () => {
   if (isServer) {
-    return () => [];
+    return () => [] as MediaDeviceInfo[];
   }
   const [devices, setDevices] = createSignal<MediaDeviceInfo[]>([]);
   const enumerate = () => {
-    navigator.mediaDevices.enumerateDevices().then(setDevices);
+    navigator.mediaDevices.enumerateDevices().then(d => setDevices(d as MediaDeviceInfo[]));
   };
   enumerate();
   navigator.mediaDevices.addEventListener("devicechange", enumerate);
@@ -39,10 +38,10 @@ const equalDeviceLists = (prev: MediaDeviceInfo[], next: MediaDeviceInfo[]) =>
  */
 export const createMicrophones = () => {
   if (isServer) {
-    return () => [];
+    return () => [] as MediaDeviceInfo[];
   }
   const devices = createDevices();
-  return createMemo(() => devices().filter(device => device.kind === "audioinput"), [], {
+  return createMemo(() => devices().filter(device => device.kind === "audioinput"), {
     name: "microphones",
     equals: equalDeviceLists,
   });
@@ -59,10 +58,10 @@ export const createMicrophones = () => {
  */
 export const createSpeakers = () => {
   if (isServer) {
-    return () => [];
+    return () => [] as MediaDeviceInfo[];
   }
   const devices = createDevices();
-  return createMemo(() => devices().filter(device => device.kind === "audiooutput"), [], {
+  return createMemo(() => devices().filter(device => device.kind === "audiooutput"), {
     name: "speakers",
     equals: equalDeviceLists,
   });
@@ -79,74 +78,11 @@ export const createSpeakers = () => {
  */
 export const createCameras = () => {
   if (isServer) {
-    return () => [];
+    return () => [] as MediaDeviceInfo[];
   }
   const devices = createDevices();
-  return createMemo(() => devices().filter(device => device.kind === "videoinput"), [], {
+  return createMemo(() => devices().filter(device => device.kind === "videoinput"), {
     name: "cameras",
     equals: equalDeviceLists,
   });
-};
-
-/**
- * Creates a reactive wrapper to get device acceleration
- * @param includeGravity boolean. default value false
- * @param interval number as ms. default value 100
- * @returnValue Acceleration: Accessor<DeviceMotionEventAcceleration | undefined>
- */
-export const createAccelerometer = (includeGravity: boolean = false, interval: number = 100) => {
-  if (isServer) {
-    return () => ({
-      x: 0,
-      y: 0,
-      z: 0,
-    });
-  }
-  const [acceleration, setAcceleration] = createSignal<DeviceMotionEventAcceleration>();
-  let throttled = false;
-
-  const accelerationEvent = (e: DeviceMotionEvent) => {
-    if (throttled) return;
-    throttled = true;
-    setTimeout(() => {
-      throttled = false;
-    }, interval);
-
-    const acceleration = includeGravity ? e.accelerationIncludingGravity : e.acceleration;
-    setAcceleration(acceleration ? acceleration : undefined);
-  };
-
-  addEventListener("devicemotion", accelerationEvent);
-  getOwner() && onCleanup(() => removeEventListener("devicemotion", accelerationEvent));
-  return acceleration;
-};
-
-/**
- * Creates a reactive wrapper to get device orientation
- * @param interval number as ms. default value 100
- * @returnValue { alpha: 0, beta: 0, gamma: 0 }
- */
-export const createGyroscope = (interval: number = 100) => {
-  if (isServer) {
-    return { alpha: 0, beta: 0, gamma: 0 };
-  }
-  const [orientation, setOrientation] = createStore({ alpha: 0, beta: 0, gamma: 0 });
-  let throttled = false;
-
-  const orientationEvent = (e: DeviceOrientationEvent) => {
-    if (throttled) return;
-    throttled = true;
-    setTimeout(() => {
-      throttled = false;
-    }, interval);
-    setOrientation({
-      alpha: e.alpha ? e.alpha : 0,
-      beta: e.beta ? e.beta : 0,
-      gamma: e.gamma ? e.gamma : 0,
-    });
-  };
-
-  addEventListener("deviceorientation", orientationEvent);
-  getOwner() && onCleanup(() => removeEventListener("deviceorientation", orientationEvent));
-  return orientation;
 };
