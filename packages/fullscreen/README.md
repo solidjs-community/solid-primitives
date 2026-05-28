@@ -10,6 +10,11 @@
 
 Reactive wrapper around the [Fullscreen API](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API).
 
+- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/browser-apis-fullscreen--docs)
+- [`makeFullscreen`](#makefullscreen) — Non-reactive base, no Solid lifecycle.
+- [`createFullscreen`](#createfullscreen) — Reactive primitive with `isActive` state tracking.
+- [`fullscreen`](#fullscreen-ref-directive-factory) — Ref factory for click-to-toggle.
+
 ## Installation
 
 ```bash
@@ -101,10 +106,6 @@ const attach = fullscreen(options?: FullscreenOptions);
 ```
 
 The click listener is removed automatically when the component unmounts.
-
-## Demo
-
-TODO
 
 ## Changelog
 
