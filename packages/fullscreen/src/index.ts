@@ -92,6 +92,7 @@ export const createFullscreen = (
       () => (ref as Accessor<HTMLElement | undefined>)(),
       node => {
         bound = node ? makeFullscreen(node, nativeOptions) : null;
+        setActive(document.fullscreenElement === node);
       },
     );
   }
@@ -125,6 +126,7 @@ export const fullscreen = (options?: FullscreenOptions): ((el: HTMLElement) => v
   onCleanup(() => removeListener?.());
 
   return (el: HTMLElement) => {
+    removeListener?.();
     const [enter, exit] = makeFullscreen(el, options);
     const toggle = () => (document.fullscreenElement === el ? exit() : enter());
     el.addEventListener("click", toggle);
