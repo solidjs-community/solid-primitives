@@ -30,7 +30,7 @@ Requires `solid-js` and `@solidjs/web` v2.0.0-beta.13 or later as peer dependenc
 
 ## `createNumericRange`
 
-Reactively generates an array of numbers for the given range. Mirrors the `range()` API from Python — one argument gives `[0, to)`, two or three give `[start, to)` with an optional step.
+Reactively generates an array of numbers for the given range. Mirrors the `range()` API from Python — one argument gives `[0, to)`, two or three give `[from, to)` with an optional step.
 
 All arguments accept either a plain number or a reactive accessor. Pairs naturally with Solid 2.0's built-in `<For>`.
 

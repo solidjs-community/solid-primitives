@@ -97,9 +97,7 @@ export function repeat<T>(
  * <Repeat count={10} from={2}>{(i) => <div>{i}</div>}</Repeat>
  *
  * // with fallback
- * <Show when={count() > 0} fallback={<p>no items</p>}>
- *   <Repeat count={count()}>{(i) => <div>{i}</div>}</Repeat>
- * </Show>
+ * <Repeat count={count()} fallback={<p>no items</p>}>{(i) => <div>{i}</div>}</Repeat>
  * ```
  */
 export function Repeat<T>(props: {
