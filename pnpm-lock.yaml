@@ -1032,10 +1032,14 @@ importers:
         version: 1.9.7
 
   packages/state-machine:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13
 
   packages/static-store:
     dependencies:
@@ -12320,7 +12324,7 @@ snapshots:
   solid-js@2.0.0-beta.13:
     dependencies:
       '@solidjs/signals': 2.0.0-beta.14
-      csstype: 3.1.3
+      csstype: 3.2.3
       seroval: 1.5.4
       seroval-plugins: 1.5.4(seroval@1.5.4)
 
