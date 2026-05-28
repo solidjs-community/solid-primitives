@@ -1,27 +1,47 @@
 {
-  "name": "@solid-primitives/permission",
-  "version": "1.3.2",
-  "description": "Primitive that wraps permission queries",
-  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "name": "@solid-primitives/sensors",
+  "version": "0.1.0",
+  "description": "Primitives for device sensors: accelerometer, gyroscope, compass, battery, and generic Sensor API.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/permission",
+  "homepage": "https://primitives.solidjs.community/package/sensors",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
-  "primitive": {
-    "name": "permission",
-    "stage": 3,
-    "list": [
-      "createPermission"
-    ],
-    "category": "Browser APIs"
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
-  "files": [
-    "dist"
+  "primitive": {
+    "name": "sensors",
+    "stage": 0,
+    "list": [
+      "makeAccelerometer",
+      "createAccelerometer",
+      "makeGyroscope",
+      "createGyroscope",
+      "makeSensor",
+      "createSensor",
+      "makeCompass",
+      "createCompass",
+      "makeBattery",
+      "createBattery"
+    ],
+    "category": "Display & Media"
+  },
+  "keywords": [
+    "accelerometer",
+    "gyroscope",
+    "sensors",
+    "solid",
+    "primitives"
   ],
   "private": false,
   "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -33,6 +53,7 @@
       "default": "./dist/index.js"
     }
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
@@ -41,16 +62,8 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
     "solid-js": "^2.0.0-beta.14"
   },
-  "keywords": [
-    "permission",
-    "query",
-    "solid",
-    "primitives"
-  ],
-  "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.14",
     "solid-js": "2.0.0-beta.14"
