@@ -327,10 +327,6 @@ makeEventListener(window, "click", stopImmediatePropagation(handleClick), true);
 <div onClick={stopImmediatePropagation(handleClick)} />;
 ```
 
-## Demo
-
-You may view a working example here: https://codesandbox.io/s/solid-primitives-event-listener-elti5
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

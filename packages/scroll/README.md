@@ -93,10 +93,6 @@ x(); // => number
 y(); // => number
 ```
 
-### Demo
-
-https://codesandbox.io/s/solid-primitives-scroll-xy19c8?file=/index.tsx
-
 ## `useWindowScrollPosition`
 
 Returns a reactive object with current window scroll position.
