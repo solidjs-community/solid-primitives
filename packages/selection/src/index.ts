@@ -1,5 +1,6 @@
 import { type Accessor, createEffect, createSignal, onCleanup, type Setter } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 export type HTMLSelection = [node: HTMLElement | null, start: number, end: number];
 
@@ -44,8 +45,8 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
       sel => (typeof sel === "function" ? (sel as any)([null, NaN, NaN]) : sel),
     ];
   }
-  const [getSelection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);
-  const [selected, setSelected] = createSignal<HTMLSelection>([null, NaN, NaN]);
+  const [getSelection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN], INTERNAL_OPTIONS);
+  const [selected, setSelected] = createSignal<HTMLSelection>([null, NaN, NaN], INTERNAL_OPTIONS);
   const selectionHandler = () => {
     const active = document.activeElement;
     if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
@@ -68,36 +69,36 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
     setSelection([parent as HTMLElement, startPosition, endPosition]);
   };
   selectionHandler();
-  createEffect(() => {
-    document.addEventListener("selectionchange", selectionHandler);
-    document.addEventListener("click", selectionHandler);
-    document.addEventListener("keyup", selectionHandler);
-    onCleanup(() => {
-      document.removeEventListener("selectionchange", selectionHandler);
-      document.removeEventListener("click", selectionHandler);
-      document.removeEventListener("keyup", selectionHandler);
-    });
+  document.addEventListener("selectionchange", selectionHandler);
+  document.addEventListener("click", selectionHandler);
+  document.addEventListener("keyup", selectionHandler);
+  onCleanup(() => {
+    document.removeEventListener("selectionchange", selectionHandler);
+    document.removeEventListener("click", selectionHandler);
+    document.removeEventListener("keyup", selectionHandler);
   });
-  createEffect(() => {
-    const [node, start, end] = selected();
-    const selection = window.getSelection();
-    if (node === null) {
-      selection?.rangeCount && selection.removeAllRanges();
-    } else if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
-      document.activeElement !== node && node.focus();
-      node.setSelectionRange(start, end);
-    } else {
-      selection?.removeAllRanges();
-      const range = document.createRange();
-      const texts = getTextNodes(node);
-      const [startNode, startPos] = getRangeArgs(start, texts);
-      const [endNode, endPos] = start === end ? [startNode, startPos] : getRangeArgs(end, texts);
-      if (startNode && endNode && startPos !== -1 && endPos !== -1) {
-        range.setStart(startNode, startPos);
-        range.setEnd(endNode, endPos);
-        selection?.addRange(range);
+  createEffect(
+    () => selected(),
+    ([node, start, end]) => {
+      const selection = window.getSelection();
+      if (node === null) {
+        selection?.rangeCount && selection.removeAllRanges();
+      } else if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+        document.activeElement !== node && node.focus();
+        node.setSelectionRange(start, end);
+      } else {
+        selection?.removeAllRanges();
+        const range = document.createRange();
+        const texts = getTextNodes(node);
+        const [startNode, startPos] = getRangeArgs(start, texts);
+        const [endNode, endPos] = start === end ? [startNode, startPos] : getRangeArgs(end, texts);
+        if (startNode && endNode && startPos !== -1 && endPos !== -1) {
+          range.setStart(startNode, startPos);
+          range.setEnd(endNode, endPos);
+          selection?.addRange(range);
+        }
       }
-    }
-  });
+    },
+  );
   return [getSelection, setSelected];
 };
