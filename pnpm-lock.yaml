@@ -251,9 +251,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/date:
     dependencies:
@@ -309,9 +312,12 @@ importers:
 
   packages/devices:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/event-bus:
     dependencies:
@@ -381,13 +387,19 @@ importers:
 
   packages/fullscreen:
     dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/geolocation:
     dependencies:
@@ -707,6 +719,22 @@ importers:
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14
 
+  packages/notification:
+    dependencies:
+      '@solid-primitives/permission':
+        specifier: workspace:^
+        version: link:../permission
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
+      solid-js:
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
+
   packages/orientation:
     dependencies:
       '@solid-primitives/utils':
@@ -751,9 +779,12 @@ importers:
 
   packages/permission:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/platform:
     devDependencies:
@@ -832,12 +863,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13(solid-js@2.0.0-beta.13)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
-      solid-transition-group:
-        specifier: ^0.2.3
-        version: 0.2.3(solid-js@1.9.7)
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13
 
   packages/refs:
     dependencies:
@@ -961,6 +992,15 @@ importers:
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14
 
+  packages/sensors:
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
+      solid-js:
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
+
   packages/set:
     dependencies:
       '@solid-primitives/trigger':
@@ -1004,10 +1044,14 @@ importers:
         version: 1.9.7
 
   packages/state-machine:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13
 
   packages/static-store:
     dependencies:
@@ -1158,8 +1202,8 @@ importers:
   packages/websocket:
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/workers:
     devDependencies:
