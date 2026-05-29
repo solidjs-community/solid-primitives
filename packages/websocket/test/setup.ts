@@ -14,7 +14,7 @@ declare global {
 
 (global as any).WSMessages = new Map<WebSocket | MockWebSocket, WSMessage>();
 
-const readyStates = new Map<MockWebSocket, WSReadyState>();
+export const readyStates = new Map<MockWebSocket, WSReadyState>();
 
 class MockWebSocket extends EventTarget {
   public CONNECTING = 0;

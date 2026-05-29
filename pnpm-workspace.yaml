@@ -2,5 +2,11 @@ packages:
   - packages/*
   - site
 
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  sharp: false
+
 onlyBuiltDependencies:
+  - "@parcel/watcher"
   - esbuild

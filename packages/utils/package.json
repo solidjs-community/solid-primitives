@@ -60,12 +60,61 @@
     "solid",
     "primitives"
   ],
+  "primitive": {
+    "name": "utils",
+    "stage": 2,
+    "list": [
+      "shallowArrayCopy",
+      "shallowObjectCopy",
+      "shallowCopy",
+      "withArrayCopy",
+      "withObjectCopy",
+      "withCopy",
+      "push",
+      "drop",
+      "dropRight",
+      "filterOut",
+      "filter",
+      "sort",
+      "sortBy",
+      "map",
+      "slice",
+      "splice",
+      "fill",
+      "concat",
+      "remove",
+      "removeItems",
+      "flatten",
+      "filterInstance",
+      "filterOutInstance",
+      "omit",
+      "pick",
+      "split",
+      "merge",
+      "get",
+      "update",
+      "add",
+      "substract",
+      "multiply",
+      "divide",
+      "power",
+      "clamp",
+      "json",
+      "ndjson",
+      "lines",
+      "number",
+      "safe",
+      "pipe",
+      "wrapSetter"
+    ],
+    "category": "Utilities"
+  },
   "peerDependencies": {
-    "@solidjs/web": "2.0.0-beta.12",
-    "solid-js": "^2.0.0-beta.11"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.12",
-    "solid-js": "2.0.0-beta.12"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }

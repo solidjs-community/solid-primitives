@@ -25,6 +25,8 @@ pnpm add @solid-primitives/event-bus
 yarn add @solid-primitives/event-bus
 ```
 
+Requires `solid-js` `^2.0.0-beta.10`.
+
 ## `createEventBus`
 
 Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
@@ -276,25 +278,13 @@ emitInEffect(); // listener will log an owner object
 
 ### `batchEmits`
 
-Wraps `emit` calls inside a `batch` call. It causes that listeners execute in a single batch, so they are not executed in sepatate queue ticks.
+In Solid 2.0, all signal writes are automatically batched via microtasks, so this function is now a no-op that returns the bus unchanged. It is kept for backwards compatibility.
 
 ```ts
 import { createEventBus, batchEmits } from "@solid-primitives/event-bus";
 
 const bus = batchEmits(createEventBus());
-
-const [a, setA] = createSignal(0);
-const [b, setB] = createSignal(0);
-
-bus.listen(setA);
-bus.listen(setB);
-
-bus.emit(1); // will set both a and b to 1 in a single batch
 ```
-
-## Demo
-
-https://codesandbox.io/s/solid-primitives-event-bus-6fp4h?file=/index.tsx
 
 ## Changelog
 
