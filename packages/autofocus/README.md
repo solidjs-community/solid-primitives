@@ -70,12 +70,6 @@ createAutofocus(ref);
 <button ref={setRef}>Autofocused</button>;
 ```
 
-## Demo
-
-You may see the working example here: https://primitives.solidjs.community/playground/autofocus/
-
-Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/autofocus/dev/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
