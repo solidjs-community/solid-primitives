@@ -19,6 +19,14 @@ import {
 // Sentinel for the "not yet observed" pending state.
 const NOT_SET: unique symbol = Symbol();
 
+/** Thrown by `isVisible()` and `createVisibilityObserver()` when called before the first IntersectionObserver callback has fired. Integrates with `<Loading>`. */
+export class NotReadyError extends Error {
+  constructor(message = "Not yet observed") {
+    super(message);
+    this.name = "NotReadyError";
+  }
+}
+
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;
 

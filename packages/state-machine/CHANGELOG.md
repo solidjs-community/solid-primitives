@@ -1,5 +1,11 @@
 # @solid-primitives/state-machine
 
+## 0.2.0
+
+### Major Changes
+
+- Migrate to Solid.js v2.0 (beta.13)
+
 ## 0.1.1
 
 ### Patch Changes
