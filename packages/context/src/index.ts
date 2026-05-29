@@ -2,23 +2,33 @@ import {
   createContext,
   createComponent,
   useContext,
-  type JSX,
+  type Element,
   type Context,
+  type ContextProviderComponent,
   type FlowComponent,
 } from "solid-js";
-import type { ContextProviderComponent } from "../node_modules/solid-js/types/reactive/signal.js";
 
 export type ContextProviderProps = {
-  children?: JSX.Element;
+  children?: Element;
 } & Record<string, unknown>;
 export type ContextProvider<T extends ContextProviderProps> = (
-  props: { children: JSX.Element } & T,
-) => JSX.Element;
+  props: { children: Element } & T,
+) => Element;
+
+/**
+ * Options shared by context provider factories.
+ * @param name Debug label passed to the context's underlying Symbol — visible in Solid DevTools
+ * and `ContextNotFoundError` stack traces. Dev-mode only; stripped in production.
+ */
+export type ContextProviderOptions = {
+  name?: string;
+};
 
 /**
  * Create the Context Provider component and useContext function with types inferred from the factory function.
- * @param factoryFn Factory function will run when the provider component in executed. It takes the provider component `props` as it's argument, and what it returns will be available in the contexts for all the underlying components.
- * @param defaults fallback returned from useContext function if the context wasn't provided
+ * @param factoryFn Factory function will run when the provider component is executed. It takes the provider component `props` as its argument, and what it returns will be available in the contexts for all the underlying components.
+ * @param defaults Fallback returned from useContext function if the context wasn't provided.
+ * @param options Optional configuration, including a debug `name` for DevTools.
  * @returns tuple of `[provider component, useContext function]`
  * @example
  * ```tsx
@@ -38,7 +48,13 @@ export type ContextProvider<T extends ContextProviderProps> = (
  */
 export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
+  defaults: undefined,
+  options?: ContextProviderOptions,
+): [provider: ContextProvider<P>, useContext: () => T | undefined];
+export function createContextProvider<T, P extends ContextProviderProps>(
+  factoryFn: (props: P) => T,
   defaults: T,
+  options?: ContextProviderOptions,
 ): [provider: ContextProvider<P>, useContext: () => T];
 export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
@@ -46,12 +62,62 @@ export function createContextProvider<T, P extends ContextProviderProps>(
 export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
   defaults?: T,
+  options?: ContextProviderOptions,
 ): [provider: ContextProvider<P>, useContext: () => T | undefined] {
-  const ctx = createContext(defaults);
+  const ctx = createContext<T>(defaults as T, options);
   return [
     props => {
-      return createComponent(ctx.Provider, {
+      return createComponent(ctx, {
         value: factoryFn(props),
+        get children() {
+          return props.children;
+        },
+      });
+    },
+    () => useContext(ctx),
+  ];
+}
+
+/**
+ * Like `createContextProvider`, but each provider in the tree *extends* the parent context
+ * value rather than replacing it. The factory receives the nearest parent's context value,
+ * letting it selectively override or merge properties.
+ *
+ * Useful for incremental overrides — themes, permissions, i18n patches — where a child
+ * provider should inherit what it does not explicitly override.
+ *
+ * @param factoryFn Factory called when the provider mounts. Receives the component `props`
+ * and the `parent` context value (or `defaults` at the root). Returns the new context value.
+ * @param defaults Base context value used when no parent provider is present.
+ * @param options Optional configuration, including a debug `name` for DevTools.
+ * @returns tuple of `[provider component, useContext function]`
+ * @example
+ * ```tsx
+ * const [ThemeProvider, useTheme] = createLayeredContext(
+ *   (props: { primary?: string }, parent) => ({ ...parent, primary: props.primary ?? parent.primary }),
+ *   { primary: "blue", secondary: "gray" },
+ * );
+ *
+ * // Root: { primary: "red", secondary: "gray" }
+ * <ThemeProvider primary="red">
+ *   // Nested: { primary: "green", secondary: "gray" } — secondary inherited
+ *   <ThemeProvider primary="green">
+ *     <App />
+ *   </ThemeProvider>
+ * </ThemeProvider>
+ * ```
+ */
+export function createLayeredContext<T, P extends ContextProviderProps>(
+  factoryFn: (props: P, parent: T) => T,
+  defaults: T,
+  options?: ContextProviderOptions,
+): [provider: ContextProvider<P>, useContext: () => T] {
+  const ctx = createContext<T>(defaults, options);
+  return [
+    props => {
+      const parent = useContext(ctx);
+      return createComponent(ctx, {
+        value: factoryFn(props, parent),
         get children() {
           return props.children;
         },
@@ -79,16 +145,16 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
  * @example
  * ```tsx
  * // before
- * <CounterCtx.Provider value={1}>
- *   <NameCtx.Provider value="John">
+ * <CounterCtx value={1}>
+ *   <NameCtx value="John">
  *     <App/>
- *   </NameCtx.Provider>
- * </CounterCtx.Provider>
+ *   </NameCtx>
+ * </CounterCtx>
  *
  * // after
  * <MultiProvider values={[
- *  [CounterCtx.Provider, 1],
- *  [NameCtx.Provider, "John"]
+ *  [CounterCtx, 1],
+ *  [NameCtx, "John"]
  * ]}>
  *  <App/>
  * </MultiProvider>
@@ -103,15 +169,15 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
         ]
       | FlowComponent;
   };
-  children: JSX.Element;
-}): JSX.Element {
+  children: Element;
+}): Element {
   const { values } = props;
   const fn = (i: number) => {
     let item: any = values[i];
 
     if (!item) return props.children;
 
-    const ctxProps: { value?: any; children: JSX.Element } = {
+    const ctxProps: { value?: any; children: Element } = {
       get children() {
         return fn(i + 1);
       },
@@ -119,7 +185,6 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
     if (Array.isArray(item)) {
       ctxProps.value = item[1];
       item = item[0];
-      if (typeof item !== "function") item = item.Provider;
     }
 
     return createComponent(item, ctxProps);
