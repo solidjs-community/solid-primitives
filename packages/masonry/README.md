@@ -226,10 +226,6 @@ const masonry = createMasonry({
 });
 ```
 
-## Demo
-
-[Deployed example](https://primitives.solidjs.community/playground/masonry) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/masonry/dev)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
