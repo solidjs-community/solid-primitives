@@ -64,46 +64,7 @@ export function createContextProvider<T, P extends ContextProviderProps>(
   defaults?: T,
   options?: ContextProviderOptions,
 ): [provider: ContextProvider<P>, useContext: () => T | undefined] {
-  const ctx = createContext<T | undefined>(defaults, options);
-  return [
-    props => {
-      return createComponent(ctx, {
-        value: factoryFn(props),
-        get children() {
-          return props.children;
-        },
-      });
-    },
-    () => useContext(ctx),
-  ];
-}
-
-/**
- * Like `createContextProvider`, but the returned hook always returns `T` — if the context is
- * used outside a provider, Solid throws a `ContextNotFoundError` instead of returning
- * `undefined`. Use this when the provider is required by contract.
- *
- * @param factoryFn Factory function run when the provider component mounts. Its return value
- * becomes the context value available to all descendants.
- * @param options Optional configuration, including a debug `name` for DevTools.
- * @returns tuple of `[provider component, useContext function]`
- * @example
- * ```tsx
- * const [AuthProvider, useAuth] = createStrictContextProvider(() => {
- *   const [user, setUser] = createSignal<User | null>(null);
- *   return { user, setUser };
- * }, { name: "Auth" });
- *
- * // throws if used outside <AuthProvider>
- * const { user } = useAuth();
- * ```
- */
-export function createStrictContextProvider<T, P extends ContextProviderProps>(
-  factoryFn: (props: P) => T,
-  options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T] {
-  // No default value — getContext throws ContextNotFoundError when not inside a provider
-  const ctx = createContext<T>(undefined, options);
+  const ctx = createContext<T>(defaults as T, options);
   return [
     props => {
       return createComponent(ctx, {

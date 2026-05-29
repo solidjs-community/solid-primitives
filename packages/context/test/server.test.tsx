@@ -3,7 +3,6 @@ import { createContext, type FlowComponent, type Element, untrack, useContext } 
 import { renderToString } from "@solidjs/web";
 import {
   createContextProvider,
-  createStrictContextProvider,
   createLayeredContext,
   MultiProvider,
 } from "../src/index.js";
@@ -62,24 +61,6 @@ describe("MultiProvider", () => {
     expect(capture1).toBe("Hello");
     expect(capture2).toBe("World");
     expect(capture3).toBe(TEST_MESSAGE);
-  });
-});
-
-describe("createStrictContextProvider (SSR)", () => {
-  test("provides context value to descendants", () => {
-    const [StrictProvider, useStrict] = createStrictContextProvider(
-      () => ({ greeting: "hello from server" }),
-    );
-    let captured = "";
-    renderToString(() => (
-      <StrictProvider>
-        {untrack(() => {
-          captured = useStrict().greeting;
-          return captured;
-        })}
-      </StrictProvider>
-    ));
-    expect(captured).toBe("hello from server");
   });
 });
 

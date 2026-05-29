@@ -9,7 +9,6 @@ import {
 import { render } from "@solidjs/web";
 import {
   createContextProvider,
-  createStrictContextProvider,
   createLayeredContext,
   MultiProvider,
 } from "../src/index.js";
@@ -99,60 +98,6 @@ describe("createContextProvider", () => {
     );
     expect(captured).toBe(1);
     unmount2();
-  });
-});
-
-describe("createStrictContextProvider", () => {
-  test("provides context value to descendants", () => {
-    const [StrictProvider, useStrict] = createStrictContextProvider(
-      (props: { value: number }) => ({ value: props.value }),
-    );
-
-    let captured = -1;
-    const container = document.createElement("div");
-    const unmount = render(
-      () => (
-        <StrictProvider value={42}>
-          {untrack(() => {
-            captured = useStrict().value;
-            return "";
-          })}
-        </StrictProvider>
-      ),
-      container,
-    );
-    expect(captured).toBe(42);
-    unmount();
-  });
-
-  test("accepts a debug name", () => {
-    const [StrictProvider, useStrict] = createStrictContextProvider(() => ({ ok: true }), {
-      name: "Strict",
-    });
-    let captured = false;
-    const unmount = render(
-      () => (
-        <StrictProvider>
-          {untrack(() => {
-            captured = useStrict().ok;
-            return "";
-          })}
-        </StrictProvider>
-      ),
-      document.createElement("div"),
-    );
-    expect(captured).toBe(true);
-    unmount();
-  });
-
-  test("throws ContextNotFoundError when used outside a provider", () => {
-    const [, useStrict] = createStrictContextProvider(() => ({ value: 1 }));
-    expect(() => {
-      render(() => {
-        useStrict();
-        return "";
-      }, document.createElement("div"));
-    }).toThrow();
   });
 });
 

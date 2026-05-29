@@ -11,7 +11,6 @@
 Primitives simplifying the creation and use of SolidJS Context API.
 
 - [`createContextProvider`](#createcontextprovider) - Create the Context Provider component and useContext function with types inferred from the factory function.
-- [`createStrictContextProvider`](#createstrictcontextprovider) - Like `createContextProvider`, but throws when the context is used outside a provider instead of returning `undefined`.
 - [`createLayeredContext`](#createlayeredcontext) - Like `createContextProvider`, but each provider extends the parent context value rather than replacing it.
 - [`MultiProvider`](#multiprovider) - A component that allows you to provide multiple contexts at once.
 
@@ -91,27 +90,6 @@ const [ThemeProvider, useTheme] = createContextProvider(
 ### Demo
 
 https://codesandbox.io/s/solid-primitives-context-demo-oqyie2?file=/index.tsx
-
-## `createStrictContextProvider`
-
-Like `createContextProvider` without defaults, but with an explicit contract: if the hook is called outside a provider, Solid throws a `ContextNotFoundError` at runtime. The return type of the hook is `T` (never `undefined`), so no null-check is needed at the call site.
-
-```tsx
-import { createStrictContextProvider } from "@solid-primitives/context";
-
-const [AuthProvider, useAuth] = createStrictContextProvider(
-  () => {
-    const [user, setUser] = createSignal<User | null>(null);
-    return { user, setUser };
-  },
-  { name: "Auth" },
-);
-
-// No `!` needed — type is T, not T | undefined
-const { user } = useAuth();
-```
-
-Use `createStrictContextProvider` when a context is required by contract (e.g. a form context that must be inside `<Form>`). Use `createContextProvider` with defaults when a sensible fallback exists.
 
 ## `createLayeredContext`
 
