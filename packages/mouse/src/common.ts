@@ -7,7 +7,7 @@ import type {
   PositionRelativeToElement,
   UseTouchOptions,
 } from "./types.js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 const PASSIVE = { passive: true };
 
