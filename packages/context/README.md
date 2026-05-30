@@ -4,6 +4,7 @@
 
 # @solid-primitives/context
 
+[![docs](https://img.shields.io/badge/-docs%20%26%20demos-blue?style=for-the-badge)](https://primitives.solidjs.community/package/context)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/context?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/context)
 [![version](https://img.shields.io/npm/v/@solid-primitives/context?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/context)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
@@ -11,6 +12,7 @@
 Primitives simplifying the creation and use of SolidJS Context API.
 
 - [`createContextProvider`](#createcontextprovider) - Create the Context Provider component and useContext function with types inferred from the factory function.
+- [`createLayeredContext`](#createlayeredcontext) - Like `createContextProvider`, but each provider extends the parent context value rather than replacing it.
 - [`MultiProvider`](#multiprovider) - A component that allows you to provide multiple contexts at once.
 
 ## Installation
@@ -22,6 +24,8 @@ pnpm add @solid-primitives/context
 # or
 yarn add @solid-primitives/context
 ```
+
+Requires `solid-js@^2.0.0-beta.13` and `@solidjs/web@^2.0.0-beta.13`.
 
 ## `createContextProvider`
 
@@ -72,15 +76,46 @@ const [CounterProvider, useCounter] = createContextProvider(
 const { count } = useCounter();
 ```
 
-Definite context types without defaults:
+### Debug name
+
+An optional `name` can be passed as part of the third argument. It labels the context's Symbol for Solid DevTools and improves `ContextNotFoundError` stack traces (dev mode only).
 
 ```ts
-const useDefiniteCounter = () => useCounter()!;
+const [ThemeProvider, useTheme] = createContextProvider(
+  () => createTheme(),
+  defaultTheme,
+  { name: "Theme" },
+);
 ```
 
-### Demo
+## `createLayeredContext`
 
-https://codesandbox.io/s/solid-primitives-context-demo-oqyie2?file=/index.tsx
+Like `createContextProvider`, but each provider in the tree *extends* the parent context value rather than replacing it entirely. The factory function receives the nearest parent's context value as its second argument.
+
+This is useful for incremental overrides such as themes, permissions layers, or i18n patches where a child provider should inherit what it does not explicitly change.
+
+```tsx
+import { createLayeredContext } from "@solid-primitives/context";
+
+const [ThemeProvider, useTheme] = createLayeredContext(
+  (props: { primary?: string; secondary?: string }, parent) => ({
+    ...parent,
+    primary: props.primary ?? parent.primary,
+    secondary: props.secondary ?? parent.secondary,
+  }),
+  { primary: "blue", secondary: "gray" }, // base defaults
+);
+
+// Root: { primary: "red", secondary: "gray" }
+<ThemeProvider primary="red">
+  {/* Nested: { primary: "green", secondary: "gray" } — secondary inherited */}
+  <ThemeProvider primary="green">
+    <App />
+  </ThemeProvider>
+</ThemeProvider>;
+```
+
+`createLayeredContext` always requires a `defaults` value (the base used when no parent provider wraps the component). The hook return type is always `T` (never `undefined`).
 
 ## `MultiProvider`
 
@@ -99,17 +134,17 @@ It will work exactly like nesting multiple providers as separate components, but
 import { MultiProvider } from "@solid-primitives/context";
 
 // before
-<FooContext.Provider value={"foo"}>
-  <BarContext.Provider value={"bar"}>
-    <BazContext.Provider value={"baz"}>
+<FooContext value={"foo"}>
+  <BarContext value={"bar"}>
+    <BazContext value={"baz"}>
       <MyCustomProviderComponent value={"hello-world"}>
         <BoundContextProvider>
           <App />
         </BoundContextProvider>
       </MyCustomProviderComponent>
-    </BazContext.Provider>
-  </BarContext.Provider>
-</FooContext.Provider>;
+    </BazContext>
+  </BarContext>
+</FooContext>;
 
 // after
 <MultiProvider
@@ -128,7 +163,7 @@ import { MultiProvider } from "@solid-primitives/context";
 ```
 
 > **Warning**
-> Components and values passed to `MultiProvider` will be evaluated only once, so make sure that the structure is static. If is isn't, please use nested provider components instead.
+> Components and values passed to `MultiProvider` will be evaluated only once, so make sure that the structure is static. If it isn't, please use nested provider components instead.
 
 ## Changelog
 

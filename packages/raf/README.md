@@ -119,10 +119,6 @@ function createMs(
 };
 ```
 
-## Demo
-
-You may view a working example here: https://codesandbox.io/s/solid-primitives-raf-demo-4xvmjd?file=/src/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

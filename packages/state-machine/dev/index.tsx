@@ -1,6 +1,5 @@
-import { type Component, For, type JSX, onMount } from "solid-js";
+import { type Component, createStore, For, type JSX, onSettled } from "solid-js";
 import { type MachineStates, createMachine } from "../src/index.js";
-import { createStore } from "solid-js/store";
 
 type Todo = {
   title: string;
@@ -60,7 +59,7 @@ const todo_states: MachineStates<{
         <input
           ref={el => {
             input = el;
-            onMount(() => el.focus());
+            onSettled(() => el.focus());
           }}
           type="text"
           value={todo.title}
@@ -95,20 +94,16 @@ const App: Component = () => {
   ]);
 
   function addTodo(title: string) {
-    setTodos(todos.length, { title, done: false });
+    setTodos(t => { t.push({ title, done: false }); });
   }
   function removeTodo(index: number) {
-    setTodos(p => {
-      const copy = p.slice();
-      copy.splice(index, 1);
-      return copy;
-    });
+    setTodos(t => { t.splice(index, 1); });
   }
   function toggleTodo(index: number) {
-    setTodos(index, "done", p => !p);
+    setTodos(t => { t[index]!.done = !t[index]!.done; });
   }
   function editTodo(index: number, title: string) {
-    setTodos(index, "title", title);
+    setTodos(t => { t[index]!.title = title; });
   }
 
   let input!: HTMLInputElement;
