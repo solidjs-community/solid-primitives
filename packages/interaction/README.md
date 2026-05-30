@@ -244,10 +244,6 @@ cleanup();
 > Set `ariaModal="true"` on your dialog or popover element and assistive technologies will
 > automatically scope navigation to it. See [`Element.ariaModal`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaModal) on MDN.
 
-## Demo
-
-TODO
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
