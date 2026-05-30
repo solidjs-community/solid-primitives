@@ -99,10 +99,11 @@ export const remove = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAc
 ): Accessor<V[]> => createMemo(() => _.remove(access(list), access(item)));
 
 /**
- * Reactively removes all provided items from the array (every occurrence of each).
+ * Reactively removes the first occurrence of each provided item from the array.
+ * Once an item is matched, subsequent occurrences of that item in the list are kept.
  * @example
  * const [list, setList] = createSignal([1, 2, 3, 2, 1]);
- * removeItems(list, 1, 2)(); // => [3]
+ * removeItems(list, 1, 2)(); // => [3, 2, 1]  (first 1 and first 2 removed)
  */
 export const removeItems = <T extends any[]>(
   list: MaybeAccessor<T>,
@@ -121,7 +122,7 @@ export const concat = <A extends MaybeAccessor<any>[], V extends MaybeAccessorVa
 ): Accessor<Array<V extends any[] ? ItemsOf<V> : V>> =>
   createMemo(() => _.concat(...accessArray(a)));
 
-/** Reactively flattens a nested array by one level. */
+/** Reactively deep-flattens a nested array (fully recursive, not just one level). */
 export const flatten = <T extends any[]>(list: MaybeAccessor<T>): Accessor<FlattenArray<T>> =>
   createMemo(() => _.flatten(access(list)) as FlattenArray<T>);
 
