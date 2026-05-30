@@ -1,14 +1,27 @@
 import { access, type MaybeAccessor } from "@solid-primitives/utils";
 import { type Accessor, createMemo } from "solid-js";
 
+/** Reactive `String.prototype.toLowerCase()`. */
 export const lowercase = (string: Accessor<string>) => createMemo(() => string().toLowerCase());
+
+/** Reactive `String.prototype.toUpperCase()`. */
 export const uppercase = (string: Accessor<string>) => createMemo(() => string().toUpperCase());
+
+/**
+ * Reactively capitalizes a string — uppercases the first character, lowercases the rest.
+ * @example
+ * const [s, setS] = createSignal("hELLO wORLD");
+ * capitalize(s)(); // => "Hello world"
+ */
 export const capitalize = (string: Accessor<string>) =>
   createMemo(() => { const s = string(); return s.length === 0 ? s : s[0]!.toUpperCase() + s.substring(1).toLowerCase(); });
 
 /**
- * `String.prototype.substring()`
+ * Reactive `String.prototype.substring()`.
  * @param end Exclusive upper bound; omit to extend through the end of the string.
+ * @example
+ * const [s, setS] = createSignal("Hello, world!");
+ * substring(s, 7, 12)(); // => "world"
  */
 export const substring = (
   string: MaybeAccessor<string>,

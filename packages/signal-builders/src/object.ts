@@ -8,6 +8,12 @@ import {
 import { type Accessor, createMemo } from "solid-js";
 import * as _ from "@solid-primitives/utils/immutable";
 
+/**
+ * Reactively creates a new object with the specified keys omitted.
+ * @example
+ * const [obj, setObj] = createSignal({ a: 1, b: 2, c: 3 });
+ * omit(obj, "b")(); // => { a: 1, c: 3 }
+ */
 export const omit = <
   A extends MaybeAccessor<object>,
   O extends MaybeAccessorValue<A>,
@@ -17,6 +23,12 @@ export const omit = <
   ...keys: MaybeAccessor<K>[]
 ): Accessor<Omit<O, K>> => createMemo(() => _.omit<any, any>(access(object), ...accessArray(keys)));
 
+/**
+ * Reactively creates a new object containing only the specified keys.
+ * @example
+ * const [obj, setObj] = createSignal({ a: 1, b: 2, c: 3 });
+ * pick(obj, "a", "c")(); // => { a: 1, c: 3 }
+ */
 export const pick = <
   A extends MaybeAccessor<object>,
   O extends MaybeAccessorValue<A>,
@@ -26,6 +38,13 @@ export const pick = <
   ...keys: MaybeAccessor<K>[]
 ): Accessor<Pick<O, K>> => createMemo(() => _.pick<any, any>(access(object), ...accessArray(keys)));
 
+/**
+ * Reactively reads a property at a key path. Supports up to 6 levels deep with full type inference.
+ * Any argument can be a signal or a plain value.
+ * @example
+ * const [user, setUser] = createSignal({ profile: { name: "Alice" } });
+ * get(user, "profile", "name")(); // => "Alice"
+ */
 export function get<O extends object, K extends keyof O>(
   obj: MaybeAccessor<O>,
   key: MaybeAccessor<K>,
@@ -95,7 +114,14 @@ export function get(obj: any, ...keys: any[]) {
   return createMemo(() => _.get(access(obj), ...(accessArray(keys) as [any, any])));
 }
 
-/** Shallow merge — only top-level properties are combined. */
+/**
+ * Reactively shallow-merges objects — later arguments override earlier ones for matching keys.
+ * Only top-level properties are combined; nested objects are replaced, not merged.
+ * @example
+ * const [defaults, setDefaults] = createSignal({ color: "blue", size: 12 });
+ * const [overrides, setOverrides] = createSignal({ size: 16 });
+ * merge(defaults, overrides)(); // => { color: "blue", size: 16 }
+ */
 export function merge<A extends object, B extends object>(
   a: MaybeAccessor<A>,
   b: MaybeAccessor<B>,
