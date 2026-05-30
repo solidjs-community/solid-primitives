@@ -1034,8 +1034,8 @@ importers:
         version: link:../utils
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/spring:
     devDependencies:
@@ -3279,6 +3279,11 @@ packages:
 
   '@solidjs/signals@2.0.0-beta.14':
     resolution: {integrity: sha512-y72nYtD7ogwX/UR5g2Y+meyeO6Q/xbQGtmvVTQX6USkMwEGOMnytqDnHj5amUzD7Fzqg32svwtCSx/q8hsOXAA==}
+
+  '@solidjs/web@2.0.0-beta.10':
+    resolution: {integrity: sha512-Ox7MBv19kuxHoHhWoLCCcc6aykSgaqzWvWT7RB66VqlFnQ8Lid2ncd30g5L4XC0GB+MN/WZVb68tiYrAFUDIAg==}
+    peerDependencies:
+      solid-js: ^2.0.0-beta.10
 
   '@solidjs/web@2.0.0-beta.13':
     resolution: {integrity: sha512-ugSnWcNc18osJZ24+op7mQpm6LlyHSgTnvSaYqEwL9PVmLxXpmAS7/dt5nc7MLLZtwgf1J1rmRfZb7mT8fTL2w==}
@@ -8932,6 +8937,12 @@ snapshots:
       solid-js: 2.0.0-beta.14
 
   '@solidjs/signals@2.0.0-beta.14': {}
+
+  '@solidjs/web@2.0.0-beta.10(solid-js@2.0.0-beta.10)':
+    dependencies:
+      seroval: 1.5.4
+      seroval-plugins: 1.5.4(seroval@1.5.4)
+      solid-js: 2.0.0-beta.10
 
   '@solidjs/web@2.0.0-beta.13(solid-js@2.0.0-beta.13)':
     dependencies:
