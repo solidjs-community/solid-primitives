@@ -18,6 +18,8 @@ npm install @solid-primitives/selection
 yarn add @solid-primitives/selection
 ```
 
+**Requires**: `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`
+
 ## Usage
 
 The format of the getter output and setter input is `HTMLSelection`, consisting of a tuple of the node in which the selection happens and a start and end offset within the text content. The offsets count from zero, so `1` would be the second character.
@@ -77,10 +79,6 @@ getTextNodes(div); // [Text, Text, Text]
 ```
 
 At some point, this might move into the [utils](../utils/README.md) package if used by other primitives, but in this case, it will be re-exported not to break compatibility.
-
-### DEMO
-
-https://primitives.solidjs.community/playground/selection
 
 ## Changelog
 

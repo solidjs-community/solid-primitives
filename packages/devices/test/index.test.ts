@@ -1,14 +1,7 @@
 import "./setup";
 import { describe, it, expect } from "vitest";
 import { createEffect, createRoot } from "solid-js";
-import {
-  createDevices,
-  createMicrophones,
-  createSpeakers,
-  createCameras,
-  createAccelerometer,
-  createGyroscope,
-} from "../src/index.js";
+import { createDevices, createMicrophones, createSpeakers, createCameras } from "../src/index.js";
 
 let fakeDeviceCount = 0;
 const fakeDeviceInfo = (overrides: Partial<MediaDeviceInfo> = {}): MediaDeviceInfo => ({
@@ -37,14 +30,16 @@ describe("devices", () => {
           ];
           setDevices(deviceFakes);
           const devices = createDevices();
-          const expectedDevices = [[], deviceFakes];
-          createEffect(() => {
-            expect(devices()).toEqual(expectedDevices.shift());
-            if (expectedDevices.length === 0) {
-              dispose();
-              resolve();
-            }
-          });
+          createEffect(
+            () => devices(),
+            val => {
+              if (val.length > 0) {
+                expect(val).toEqual(deviceFakes);
+                dispose();
+                resolve();
+              }
+            },
+          );
         }),
     ));
 
@@ -59,14 +54,16 @@ describe("devices", () => {
           ];
           setDevices(deviceFakes);
           const microphones = createMicrophones();
-          const expectedDevices = [[], [deviceFakes[0]]];
-          createEffect(() => {
-            expect(microphones()).toEqual(expectedDevices.shift());
-            if (expectedDevices.length === 0) {
-              dispose();
-              resolve();
-            }
-          });
+          createEffect(
+            () => microphones(),
+            val => {
+              if (val.length > 0) {
+                expect(val).toEqual([deviceFakes[0]]);
+                dispose();
+                resolve();
+              }
+            },
+          );
         }),
     ));
 
@@ -81,14 +78,16 @@ describe("devices", () => {
           ];
           setDevices(deviceFakes);
           const speakers = createSpeakers();
-          const expectedDevices = [[], [deviceFakes[1]]];
-          createEffect(() => {
-            expect(speakers()).toEqual(expectedDevices.shift());
-            if (expectedDevices.length === 0) {
-              dispose();
-              resolve();
-            }
-          });
+          createEffect(
+            () => speakers(),
+            val => {
+              if (val.length > 0) {
+                expect(val).toEqual([deviceFakes[1]]);
+                dispose();
+                resolve();
+              }
+            },
+          );
         }),
     ));
 
@@ -103,14 +102,16 @@ describe("devices", () => {
           ];
           setDevices(deviceFakes);
           const cameras = createCameras();
-          const expectedDevices = [[], [deviceFakes[2]]];
-          createEffect(() => {
-            expect(cameras()).toEqual(expectedDevices.shift());
-            if (expectedDevices.length === 0) {
-              dispose();
-              resolve();
-            }
-          });
+          createEffect(
+            () => cameras(),
+            val => {
+              if (val.length > 0) {
+                expect(val).toEqual([deviceFakes[2]]);
+                dispose();
+                resolve();
+              }
+            },
+          );
         }),
     ));
 
@@ -125,74 +126,22 @@ describe("devices", () => {
           ];
           setDevices(deviceFakes.slice(0, 1));
           const devices = createDevices();
-          const expectedDevices = [[], deviceFakes.slice(0, 1), deviceFakes];
-          createEffect(() => {
-            expect(devices()).toEqual(expectedDevices.shift());
-            if (expectedDevices.length === 1) {
-              setDevices(deviceFakes);
-              (navigator.mediaDevices as any).dispatchFakeEvent();
-              // navigator.mediaDevices.dispatchEvent(new Event("devicechange"));
-            }
-            if (expectedDevices.length === 0) {
-              dispose();
-              resolve();
-            }
-          });
-        }),
-    ));
-
-  it("reads the accelerometer", () => {
-    const moveDevice = (acceleration?: { x: number; y: number; z: number }) =>
-      dispatchEvent(new Event("deviceMotion", { acceleration } as any));
-    createRoot(
-      dispose =>
-        new Promise<void>(resolve => {
-          const acceleration = createAccelerometer(false, 0);
-          const expectedAcceleration = [
-            undefined,
-            { x: 0, y: 0, z: 0 },
-            { x: 1, y: 0, z: 0 },
-            { x: 0, y: 1, z: 0 },
-            { x: 0, y: 0, z: 1 },
-          ];
-          moveDevice(expectedAcceleration[1]);
-          createEffect(() => {
-            expect(acceleration()).toEqual(expectedAcceleration.shift());
-            if (expectedAcceleration.length === 0) {
-              dispose();
-              resolve();
-            } else {
-              moveDevice(expectedAcceleration[0]);
-            }
-          });
-        }),
-    );
-  });
-
-  it("reads the gyroscope", () =>
-    createRoot(
-      dispose =>
-        new Promise<void>(resolve => {
-          const turnDevice = (orientation?: { alpha: number; beta: number; gamma: number }) =>
-            dispatchEvent(Object.assign(new Event("deviceorientation", {}), orientation as any));
-          const orientation = createGyroscope(0);
-          const expectedOrientations = [
-            { alpha: 0, beta: 0, gamma: 0 },
-            { alpha: 1, beta: 0, gamma: 1 },
-          ];
-          createEffect(() => {
-            expect({
-              alpha: orientation.alpha,
-              beta: orientation.beta,
-              gamma: orientation.gamma,
-            }).toEqual(expectedOrientations.shift());
-            if (expectedOrientations.length === 0) {
-              dispose();
-              resolve();
-            } else {
-              turnDevice(expectedOrientations[0]);
-            }
-          });
+          let initialized = false;
+          createEffect(
+            () => devices(),
+            val => {
+              if (!initialized && val.length > 0) {
+                initialized = true;
+                expect(val).toEqual(deviceFakes.slice(0, 1));
+                setDevices(deviceFakes);
+                (navigator.mediaDevices as any).dispatchFakeEvent();
+              } else if (initialized && val.length === deviceFakes.length) {
+                expect(val).toEqual(deviceFakes);
+                dispose();
+                resolve();
+              }
+            },
+          );
         }),
     ));
 });

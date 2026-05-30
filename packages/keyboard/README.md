@@ -173,12 +173,6 @@ When `preventDefault` is `true`, `e.preventDefault()` will be called not only on
 
 E.g. when listening for `Control + Shift + A`, all three keydown events will be prevented.
 
-## DEMO
-
-Working demo of some of the primitives in keyboard package:
-
-https://codesandbox.io/s/solid-primitives-keyboard-demo-s2l84k?file=/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/context",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Primitives simplifying or extending the SolidJS Context API",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -17,6 +17,7 @@
     "stage": 2,
     "list": [
       "createContextProvider",
+      "createLayeredContext",
       "MultiProvider"
     ],
     "category": "Control Flow"
@@ -51,10 +52,12 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }

@@ -1,25 +1,28 @@
 import { describe, test, expect } from "vitest";
 import {
   createContext,
-  createRoot,
   type FlowComponent,
-  type JSX,
+  type Element,
   untrack,
   useContext,
 } from "solid-js";
-import { render } from "solid-js/web";
-import { createContextProvider, MultiProvider } from "../src/index.js";
+import { render } from "@solidjs/web";
+import {
+  createContextProvider,
+  createLayeredContext,
+  MultiProvider,
+} from "../src/index.js";
 
 type TestContextValue = {
   message: string;
-  children: JSX.Element;
+  children: Element;
 };
 
 const TEST_MESSAGE = "Hello, Context!";
 const FALLBACK: TestContextValue = { message: "FALLBACK", children: undefined };
 
 const [TestProvider, useTestContext] = createContextProvider(
-  (props: { text?: string; children: JSX.Element }): TestContextValue => {
+  (props: { text?: string; children: Element }): TestContextValue => {
     return {
       message: props.text ?? TEST_MESSAGE,
       get children() {
@@ -76,6 +79,102 @@ describe("createContextProvider", () => {
     expect(ctx.children).toBe(TextComp);
     unmount();
   });
+
+  test("accepts a debug name without affecting behavior", () => {
+    const [NamedProvider, useNamed] = createContextProvider(() => ({ value: 1 }), { value: 0 }, {
+      name: "Named",
+    });
+    let captured = -1;
+    const unmount = render(() => {
+      captured = useNamed().value;
+      return "";
+    }, document.createElement("div"));
+    expect(captured).toBe(0);
+    unmount();
+
+    const unmount2 = render(
+      () => <NamedProvider>{untrack(() => { captured = useNamed().value; return ""; })}</NamedProvider>,
+      document.createElement("div"),
+    );
+    expect(captured).toBe(1);
+    unmount2();
+  });
+});
+
+describe("createLayeredContext", () => {
+  test("factory receives defaults as parent at the root level", () => {
+    const [LayeredProvider, useLayered] = createLayeredContext(
+      (props: { extra?: number }, parent) => ({ ...parent, extra: props.extra ?? parent.extra }),
+      { base: "root", extra: 0 },
+    );
+
+    let captured: { base: string; extra: number } | undefined;
+    const unmount = render(
+      () => (
+        <LayeredProvider extra={7}>
+          {untrack(() => {
+            captured = useLayered();
+            return "";
+          })}
+        </LayeredProvider>
+      ),
+      document.createElement("div"),
+    );
+    expect(captured?.base).toBe("root");
+    expect(captured?.extra).toBe(7);
+    unmount();
+  });
+
+  test("nested providers extend the parent context value", () => {
+    const [LayeredProvider, useLayered] = createLayeredContext(
+      (props: { level?: number; tag?: string }, parent) => ({
+        ...parent,
+        level: props.level ?? parent.level,
+        tag: props.tag ?? parent.tag,
+      }),
+      { level: 0, tag: "default" },
+    );
+
+    let capturedInner: { level: number; tag: string } | undefined;
+    let capturedOuter: { level: number; tag: string } | undefined;
+
+    const unmount = render(
+      () => (
+        <LayeredProvider level={1} tag="outer">
+          {untrack(() => {
+            capturedOuter = useLayered();
+          }) as any}
+          <LayeredProvider level={2}>
+            {untrack(() => {
+              capturedInner = useLayered();
+              return "";
+            })}
+          </LayeredProvider>
+        </LayeredProvider>
+      ),
+      document.createElement("div"),
+    );
+
+    expect(capturedOuter?.level).toBe(1);
+    expect(capturedOuter?.tag).toBe("outer");
+    expect(capturedInner?.level).toBe(2);
+    expect(capturedInner?.tag).toBe("outer"); // inherited from outer provider
+    unmount();
+  });
+
+  test("returns defaults when used outside any provider", () => {
+    const [, useLayered] = createLayeredContext(
+      (_props, parent) => parent,
+      { value: 99 },
+    );
+    let captured = -1;
+    const unmount = render(() => {
+      captured = useLayered().value;
+      return "";
+    }, document.createElement("div"));
+    expect(captured).toBe(99);
+    unmount();
+  });
 });
 
 describe("MultiProvider", () => {
@@ -94,23 +193,29 @@ describe("MultiProvider", () => {
       return <TestProvider>{props.children}</TestProvider>;
     };
 
-    createRoot(() => {
-      <MultiProvider
-        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2.Provider, "World"], BoundProvider]}
-      >
-        {untrack(() => {
-          runs++;
-          capture1 = useContext(Ctx1);
-          capture2 = useContext(Ctx2);
-          capture3 = useTestContext().message;
-          return "";
-        })}
-      </MultiProvider>;
-    });
+    const container = document.createElement("div");
+    const unmount = render(
+      () => (
+        <MultiProvider
+          values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2, "World"], BoundProvider]}
+        >
+          {untrack(() => {
+            runs++;
+            capture1 = useContext(Ctx1);
+            capture2 = useContext(Ctx2);
+            capture3 = useTestContext().message;
+            return "";
+          })}
+        </MultiProvider>
+      ),
+      container,
+    );
 
     expect(runs).toBe(1);
     expect(capture1).toBe("Hello");
     expect(capture2).toBe("World");
     expect(capture3).toBe(TEST_MESSAGE);
+
+    unmount();
   });
 });
