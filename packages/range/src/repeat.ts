@@ -1,4 +1,5 @@
-import { type Accessor, type JSX, createMemo, createRoot, onCleanup } from "solid-js";
+import { type Accessor, createMemo, createRoot, onCleanup } from "solid-js";
+import { type JSX } from "@solidjs/web";
 import { toFunction } from "./common.js";
 
 /**
@@ -8,15 +9,6 @@ import { toFunction } from "./common.js";
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#repeat
- * @example
- * ```tsx
- * const [length, setLength] = createSignal(10)
- * const mapped = repeat(length, index => {
- *    const [value, setValue] = createSignal(index);
- *    createEffect(() => {...})
- *    return value
- * })
- * ```
  */
 export function repeat<T>(
   times: Accessor<number>,
@@ -89,16 +81,23 @@ export function repeat<T>(
 }
 
 /**
- * Creates a range of elements `of` specified size.
+ * Creates a range of elements of specified size.
  * @param times number of elements
- * @param fallback element returned when `of` equals 0
+ * @param fallback element returned when `times` equals 0
  * @param children render function
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Repeat-1
- * @example
+ * @deprecated Use the built-in `<Repeat>` from `@solidjs/web` instead:
  * ```tsx
- * <Repeat times={10}>
- *    {n => <div>{n}</div>}
- * </Repeat>
+ * import { Repeat } from "@solidjs/web";
+ *
+ * // basic
+ * <Repeat count={10}>{(i) => <div>{i}</div>}</Repeat>
+ *
+ * // with offset
+ * <Repeat count={10} from={2}>{(i) => <div>{i}</div>}</Repeat>
+ *
+ * // with fallback
+ * <Repeat count={count()} fallback={<p>no items</p>}>{(i) => <div>{i}</div>}</Repeat>
  * ```
  */
 export function Repeat<T>(props: {

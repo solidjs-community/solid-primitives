@@ -1,12 +1,12 @@
-import { type Accessor, onCleanup, createSignal } from "solid-js";
+import { type Accessor, onCleanup, createSignal, createMemo, createStore, runWithOwner } from "solid-js";
 
 export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
 /**
- * opens a web socket connection with a queued send
+ * Opens a web socket connection with a queued send.
  * ```ts
  * const ws = makeWS("ws://localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * createEffect(serverMessage, (msg) => ws.send(msg));
  * onCleanup(() => ws.close());
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
@@ -28,10 +28,10 @@ export const makeWS = (
 };
 
 /**
- * opens a web socket connection with a queued send that closes on cleanup
+ * Opens a web socket connection with a queued send that closes on cleanup.
  * ```ts
- * const ws = makeWS("ws://localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * const ws = createWS("ws://localhost:5000");
+ * createEffect(serverMessage, (msg) => ws.send(msg));
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
  */
@@ -42,12 +42,12 @@ export const createWS = (url: string, protocols?: string | string[]): WebSocket 
 };
 
 /**
- * Returns a reactive state signal for the web socket's readyState:
+ * Returns a reactive signal for the WebSocket's `readyState`:
  *
- * WebSocket.CONNECTING = 0
- * WebSocket.OPEN = 1
- * WebSocket.CLOSING = 2
- * WebSocket.CLOSED = 3
+ * - `0` — CONNECTING
+ * - `1` — OPEN
+ * - `2` — CLOSING
+ * - `3` — CLOSED
  *
  * ```ts
  * const ws = createWS('ws://localhost:5000');
@@ -57,7 +57,10 @@ export const createWS = (url: string, protocols?: string | string[]): WebSocket 
  * ```
  */
 export const createWSState = (ws: WebSocket): Accessor<0 | 1 | 2 | 3> => {
-  const [state, setState] = createSignal(ws.readyState as 0 | 1 | 2 | 3);
+  // ownedWrite: true — setState may be called from ws.close(), which the user
+  // could invoke inside a component or effect. This suppresses the dev-mode
+  // owned-scope write warning for this intentionally internal signal.
+  const [state, setState] = createSignal(ws.readyState as 0 | 1 | 2 | 3, { ownedWrite: true });
   const _close = ws.close.bind(ws);
   ws.addEventListener("open", () => setState(1));
   ws.close = (...args) => {
@@ -66,6 +69,30 @@ export const createWSState = (ws: WebSocket): Accessor<0 | 1 | 2 | 3> => {
   };
   ws.addEventListener("close", () => setState(3));
   return state;
+};
+
+/**
+ * Returns a reactive signal containing the latest message received from the WebSocket.
+ * Starts as `undefined` until the first message arrives.
+ *
+ * ```ts
+ * const ws = createWS("ws://localhost:5000");
+ * const message = createWSMessage<string>(ws);
+ * return <p>Last message: {message()}</p>;
+ * ```
+ *
+ * The signal updates on every incoming message. Pair it with `createEffect` to
+ * react to each new value:
+ * ```ts
+ * createEffect(message, (msg) => msg !== undefined && console.log("received:", msg));
+ * ```
+ */
+export const createWSMessage = <T = string>(ws: WebSocket): Accessor<T | undefined> => {
+  const [message, setMessage] = createSignal<T | undefined>(undefined, { ownedWrite: true });
+  const handler = (e: MessageEvent) => setMessage(() => e.data as T);
+  ws.addEventListener("message", handler);
+  onCleanup(() => ws.removeEventListener("message", handler));
+  return message;
 };
 
 export type WSReconnectOptions = {
@@ -83,7 +110,7 @@ export type ReconnectingWebSocket = WebSocket & {
  * Returns a WebSocket-like object that under the hood opens new connections on disconnect:
  * ```ts
  * const ws = makeReconnectingWS("ws:localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * createEffect(serverMessage, (msg) => ws.send(msg));
  * onCleanup(() => ws.close());
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
@@ -148,8 +175,8 @@ export const makeReconnectingWS = (
 /**
  * Returns a WebSocket-like object that under the hood opens new connections on disconnect and closes on cleanup:
  * ```ts
- * const ws = makeReconnectingWS("ws:localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * const ws = createReconnectingWS("ws:localhost:5000");
+ * createEffect(serverMessage, (msg) => ws.send(msg));
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
  */
@@ -178,7 +205,7 @@ export type WSHeartbeatOptions = {
 };
 
 /**
- * Wraps a reconnecting WebSocket to send a heartbeat to check the connection
+ * Wraps a reconnecting WebSocket to send a heartbeat to check the connection.
  * ```ts
  * const ws = makeHeartbeatWS(createReconnectingWS('ws://localhost:5000'))
  * ```
@@ -203,4 +230,121 @@ export const makeHeartbeatWS = (
   ws.addEventListener("message", receiveMessage);
   ws.addEventListener("open", () => setTimeout(receiveMessage, options.interval || 1000));
   return ws;
+};
+
+/**
+ * Returns a buffered `AsyncIterable<T>` over the WebSocket's message stream.
+ * Each message triggers its own reactive flush, so no message is dropped under burst conditions.
+ * Calling `return()` on the iterator removes the event listener automatically.
+ *
+ * Compatible with `makeReconnectingWS` — listeners are re-attached to each new underlying connection.
+ *
+ * ```ts
+ * const latestQuote = createMemo(async function* () {
+ *   for await (const raw of wsMessageIterable<string>(ws)) {
+ *     yield JSON.parse(raw) as Quote;
+ *   }
+ * });
+ * ```
+ */
+export const wsMessageIterable = <T = string>(ws: WebSocket): AsyncIterable<T> => ({
+  [Symbol.asyncIterator]() {
+    const queue: T[] = [];
+    let wakeup: (() => void) | null = null;
+    let done = false;
+
+    const handler = (e: MessageEvent) => {
+      queue.push(e.data as T);
+      const w = wakeup;
+      wakeup = null;
+      w?.();
+    };
+
+    ws.addEventListener("message", handler);
+
+    return {
+      async next() {
+        if (done) return { value: undefined as unknown as T, done: true as const };
+        if (queue.length > 0) return { value: queue.shift()!, done: false as const };
+        await new Promise<void>(resolve => {
+          wakeup = resolve;
+        });
+        // `done` may have been set to true by return() while we were awaiting
+        if (done as boolean) return { value: undefined as unknown as T, done: true as const };
+        return { value: queue.shift()!, done: false as const };
+      },
+      return() {
+        done = true;
+        ws.removeEventListener("message", handler);
+        const w = wakeup;
+        wakeup = null;
+        w?.();
+        return Promise.resolve({ value: undefined as unknown as T, done: true as const });
+      },
+    };
+  },
+});
+
+export type WSDataOptions<T, U = T> = {
+  /** Transform each raw message before it is yielded to subscribers. */
+  transform?: (msg: T) => U;
+};
+
+/**
+ * An async memo that wraps `wsMessageIterable`. Suspends the nearest `<Loading>` boundary
+ * until the first message arrives; subsequent updates work with `isPending` and `latest`.
+ *
+ * ```tsx
+ * const price = createWSData<Quote>(ws, { transform: JSON.parse });
+ *
+ * return (
+ *   <Loading fallback={<p>Waiting for data…</p>}>
+ *     <p>Bid: {price().bid} / Ask: {price().ask}</p>
+ *   </Loading>
+ * );
+ * ```
+ */
+export const createWSData = <T = string, U = T>(
+  ws: WebSocket,
+  options?: WSDataOptions<T, U>,
+): Accessor<U> => {
+  const transform = options?.transform;
+  return createMemo(async function* () {
+    for await (const msg of wsMessageIterable<T>(ws)) {
+      yield (transform ? transform(msg) : (msg as unknown as U));
+    }
+  }) as Accessor<U>;
+};
+
+export type WSStoreOptions<S, T = string> = {
+  /** Initial store state before any messages arrive. */
+  initial: S;
+  /** Called for each incoming message with a draft of the store and the raw message. */
+  patch: (draft: S, msg: T) => void;
+};
+
+/**
+ * A reactive store driven by WebSocket messages as incremental patches.
+ * Each incoming message is passed to `options.patch` as a draft mutation.
+ *
+ * ```tsx
+ * const [appState] = createWSStore(ws, {
+ *   initial: { users: [], status: "connecting" },
+ *   patch(draft, msg) { Object.assign(draft, JSON.parse(msg)); },
+ * });
+ *
+ * return <p>Users online: {appState.users.length}</p>;
+ * ```
+ */
+export const createWSStore = <S extends object, T = string>(
+  ws: WebSocket,
+  options: WSStoreOptions<S, T>,
+) => {
+  const [store, setStore] = createStore(options.initial as any);
+  const handler = (e: MessageEvent) => {
+    runWithOwner(null, () => setStore((draft: S) => void options.patch(draft, e.data as T)));
+  };
+  ws.addEventListener("message", handler);
+  onCleanup(() => ws.removeEventListener("message", handler));
+  return [store, setStore] as ReturnType<typeof createStore<S>>;
 };

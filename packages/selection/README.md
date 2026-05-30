@@ -80,10 +80,6 @@ getTextNodes(div); // [Text, Text, Text]
 
 At some point, this might move into the [utils](../utils/README.md) package if used by other primitives, but in this case, it will be re-exported not to break compatibility.
 
-### DEMO
-
-https://primitives.solidjs.community/playground/selection
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
