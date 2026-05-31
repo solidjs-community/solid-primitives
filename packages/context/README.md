@@ -12,6 +12,7 @@
 Primitives simplifying the creation and use of SolidJS Context API.
 
 - [`createContextProvider`](#createcontextprovider) - Create the Context Provider component and useContext function with types inferred from the factory function.
+- [`createOptionalContextProvider`](#createoptionalcontextprovider) - Like `createContextProvider`, but returns `undefined` instead of throwing if the context is missing.
 - [`createLayeredContext`](#createlayeredcontext) - Like `createContextProvider`, but each provider extends the parent context value rather than replacing it.
 - [`MultiProvider`](#multiprovider) - A component that allows you to provide multiple contexts at once.
 
@@ -51,13 +52,13 @@ const [CounterProvider, useCounter] = createContextProvider((props: { initial: n
 
 // Use the context in a child component
 const ctx = useCounter();
-ctx; // T: { count: () => number; increment: () => void; } | undefined
+ctx; // T: { count: () => number; increment: () => void; }
 ```
 
 ### Providing context fallback
 
 The `createContextProvider` primitive takes a second, optional argument for providing context defaults for when the context wouldn't be provided higher in the component tree.
-Providing a fallback also removes `undefined` from `T | undefined` return type of the `useContext` function.
+If no fallback is provided, the `useContext` function will throw when the context is not provided.
 
 ```ts
 const [CounterProvider, useCounter] = createContextProvider(
@@ -76,6 +77,8 @@ const [CounterProvider, useCounter] = createContextProvider(
 const { count } = useCounter();
 ```
 
+The `useContext` function always returns `Exclude<T, undefined>`. If the factory or fallback value is `undefined`, Solid treats the value as missing and `useContext` will throw instead of returning it.
+
 ### Debug name
 
 An optional `name` can be passed as part of the third argument. It labels the context's Symbol for Solid DevTools and improves `ContextNotFoundError` stack traces (dev mode only).
@@ -87,6 +90,25 @@ const [ThemeProvider, useTheme] = createContextProvider(
   { name: "Theme" },
 );
 ```
+
+## `createOptionalContextProvider`
+
+Like `createContextProvider`, but the `useContext` function returns `undefined` when the context is missing or when the provider value is `undefined`.
+
+```tsx
+import { createOptionalContextProvider } from "@solid-primitives/context";
+
+const [GroupProvider, useGroup] = createOptionalContextProvider((props: { id: string }) => ({
+  groupId: props.id,
+}));
+
+const group = useGroup();
+group; // T: { groupId: string } | undefined
+```
+
+The fallback is returned when no provider is present. If a provider is present and its factory returns `undefined`, the `useContext` function returns `undefined`.
+
+An optional `name` can be passed as the third argument.
 
 ## `createLayeredContext`
 

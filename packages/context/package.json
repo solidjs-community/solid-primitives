@@ -17,6 +17,7 @@
     "stage": 2,
     "list": [
       "createContextProvider",
+      "createOptionalContextProvider",
       "createLayeredContext",
       "MultiProvider"
     ],
