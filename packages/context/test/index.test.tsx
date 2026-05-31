@@ -1,14 +1,9 @@
-import { describe, test, expect } from "vitest";
-import {
-  createContext,
-  type FlowComponent,
-  type Element,
-  untrack,
-  useContext,
-} from "solid-js";
+import { describe, test, expect, expectTypeOf } from "vitest";
+import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
 import { render } from "@solidjs/web";
 import {
   createContextProvider,
+  createOptionalContextProvider,
   createLayeredContext,
   MultiProvider,
 } from "../src/index.js";
@@ -81,9 +76,13 @@ describe("createContextProvider", () => {
   });
 
   test("accepts a debug name without affecting behavior", () => {
-    const [NamedProvider, useNamed] = createContextProvider(() => ({ value: 1 }), { value: 0 }, {
-      name: "Named",
-    });
+    const [NamedProvider, useNamed] = createContextProvider(
+      () => ({ value: 1 }),
+      { value: 0 },
+      {
+        name: "Named",
+      },
+    );
     let captured = -1;
     const unmount = render(() => {
       captured = useNamed().value;
@@ -93,11 +92,135 @@ describe("createContextProvider", () => {
     unmount();
 
     const unmount2 = render(
-      () => <NamedProvider>{untrack(() => { captured = useNamed().value; return ""; })}</NamedProvider>,
+      () => (
+        <NamedProvider>
+          {untrack(() => {
+            captured = useNamed().value;
+            return "";
+          })}
+        </NamedProvider>
+      ),
       document.createElement("div"),
     );
     expect(captured).toBe(1);
     unmount2();
+  });
+
+  test("throws if context is not provided and no fallback is provided", () => {
+    const [, useRequired] = createContextProvider(() => ({ value: 1 }));
+    expect(() =>
+      render(() => {
+        useRequired();
+        return "";
+      }, document.createElement("div")),
+    ).toThrow();
+  });
+
+  test("uses the non-undefined context type", () => {
+    const [, useRequired] = createContextProvider((): { value: number } | undefined => ({
+      value: 1,
+    }));
+    expectTypeOf<ReturnType<typeof useRequired>>().toEqualTypeOf<{ value: number }>();
+  });
+});
+
+describe("createOptionalContextProvider", () => {
+  test("returns undefined if context is not provided", () => {
+    const [, useOptional] = createOptionalContextProvider(() => ({ value: 1 }));
+    let ctx: { value: number } | undefined = { value: 0 };
+
+    const unmount = render(() => {
+      ctx = useOptional();
+      return "";
+    }, document.createElement("div"));
+
+    expect(ctx).toBeUndefined();
+    unmount();
+  });
+
+  test("returns fallback if context is not provided", () => {
+    const [, useOptional] = createOptionalContextProvider(() => ({ value: 1 }), { value: 0 });
+    let ctx: { value: number } | undefined;
+
+    const unmount = render(() => {
+      ctx = useOptional();
+      return "";
+    }, document.createElement("div"));
+
+    expect(ctx).toEqual({ value: 0 });
+    unmount();
+  });
+
+  test("returns undefined if provider value is undefined", () => {
+    const [OptionalProvider, useOptional] = createOptionalContextProvider(
+      (props: { value?: string; children: Element }) => props.value,
+    );
+    let ctx: string | undefined = "initial";
+
+    const unmount = render(
+      () => (
+        <OptionalProvider>
+          {untrack(() => {
+            ctx = useOptional();
+            return "";
+          })}
+        </OptionalProvider>
+      ),
+      document.createElement("div"),
+    );
+
+    expect(ctx).toBeUndefined();
+    unmount();
+  });
+
+  test("returns undefined if provider value is undefined and fallback exists", () => {
+    const [OptionalProvider, useOptional] = createOptionalContextProvider(
+      (props: { value?: string; children: Element }) => props.value,
+      "fallback",
+    );
+    let ctx: string | undefined = "initial";
+
+    const unmount = render(
+      () => (
+        <OptionalProvider>
+          {untrack(() => {
+            ctx = useOptional();
+            return "";
+          })}
+        </OptionalProvider>
+      ),
+      document.createElement("div"),
+    );
+
+    expect(ctx).toBeUndefined();
+    unmount();
+  });
+
+  test("returns provided values", () => {
+    const [OptionalProvider, useOptional] = createOptionalContextProvider(
+      (props: { value: string; children: Element }) => props.value,
+    );
+    let ctx: string | undefined;
+
+    const unmount = render(
+      () => (
+        <OptionalProvider value="provided">
+          {untrack(() => {
+            ctx = useOptional();
+            return "";
+          })}
+        </OptionalProvider>
+      ),
+      document.createElement("div"),
+    );
+
+    expect(ctx).toBe("provided");
+    unmount();
+  });
+
+  test("uses the optional context type", () => {
+    const [, useOptional] = createOptionalContextProvider(() => ({ value: 1 }));
+    expectTypeOf<ReturnType<typeof useOptional>>().toEqualTypeOf<{ value: number } | undefined>();
   });
 });
 
@@ -141,9 +264,11 @@ describe("createLayeredContext", () => {
     const unmount = render(
       () => (
         <LayeredProvider level={1} tag="outer">
-          {untrack(() => {
-            capturedOuter = useLayered();
-          }) as any}
+          {
+            untrack(() => {
+              capturedOuter = useLayered();
+            }) as any
+          }
           <LayeredProvider level={2}>
             {untrack(() => {
               capturedInner = useLayered();
@@ -163,10 +288,7 @@ describe("createLayeredContext", () => {
   });
 
   test("returns defaults when used outside any provider", () => {
-    const [, useLayered] = createLayeredContext(
-      (_props, parent) => parent,
-      { value: 99 },
-    );
+    const [, useLayered] = createLayeredContext((_props, parent) => parent, { value: 99 });
     let captured = -1;
     const unmount = render(() => {
       captured = useLayered().value;
