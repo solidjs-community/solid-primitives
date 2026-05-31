@@ -2,7 +2,13 @@
 Name: analytics
 Stage: 0
 Package: "@solid-primitives/analytics"
-Primitives: createAnalytics
+Primitives:
+  - makeAnalytics
+  - createAnalytics
+  - AnalyticsProvider
+  - useAnalytics
+  - makeAnalyticsGuard
+  - createAnalyticsGuard
 Category: Utilities
 ---
 
@@ -14,18 +20,270 @@ Category: Utilities
 
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Creates a primitive for analytics management.
+- [**Docs**](https://primitives.solidjs.community/docs/analytics)
 
-## How to use it
+Analytics tracking primitives for Solid.js with a queue-based dispatch pipeline, reactive signals, context sharing, and navigation guards.
 
-```ts
-const [running, start, stop] = createAnalytics(() => console.log('hi')));
-start();
+Plugins are **not bundled** — install any plugin from the [analytics plugin catalogue](https://www.npmjs.com/package/analytics#analytic-plugins) (Google Analytics, Segment, Amplitude, Mixpanel, …) and pass it straight in.
+
+## Installation
+
+```bash
+npm install @solid-primitives/analytics
+# or
+pnpm add @solid-primitives/analytics
 ```
 
-## Demo
+Install analytics plugins separately:
 
-You may view a working example here: https://codesandbox.io/s/solid-create-analytics?file=/src/index.tsx
+```bash
+npm install @analytics/google-analytics
+```
+
+---
+
+## Primitives
+
+The package follows the standard `make*` / `create*` pattern:
+
+| Primitive | Reactive? | Cleanup |
+|---|---|---|
+| `makeAnalytics` | No | manual `cleanup()` |
+| `createAnalytics` | Yes | auto on owner disposal |
+| `AnalyticsProvider` | Yes (via `createAnalytics`) | auto on unmount |
+| `makeAnalyticsGuard` | No | manual `cleanup()` |
+| `createAnalyticsGuard` | Yes | auto on owner disposal |
+
+`createAnalytics` is built on top of `makeAnalytics`. `AnalyticsProvider` creates a `createAnalytics` instance and shares it via context.
+
+---
+
+## `makeAnalytics`
+
+The base primitive. Returns `[controls, cleanup]`. Use this at module level or anywhere Solid's owner tree is unavailable.
+
+```ts
+import { makeAnalytics } from "@solid-primitives/analytics";
+import googleAnalytics from "@analytics/google-analytics";
+
+const [analytics, cleanup] = makeAnalytics([
+  googleAnalytics({ measurementId: "G-XXXXXXXXXX" }),
+]);
+
+analytics.page({ title: "Home" });
+analytics.track("signup", { plan: "pro" });
+analytics.identify("user-1", { email: "alice@example.com" });
+analytics.use(anotherPlugin); // register a plugin at any time
+
+// call when done
+cleanup();
+```
+
+---
+
+## `createAnalytics`
+
+Reactive wrapper built on `makeAnalytics`. Disposes automatically when the owning scope is destroyed. Exposes a reactive signal:
+
+- `pendingCount: Accessor<number>` — number of events waiting in the queue (non-zero while plugins are still initializing)
+
+```tsx
+import { createAnalytics } from "@solid-primitives/analytics";
+import googleAnalytics from "@analytics/google-analytics";
+import { Show } from "solid-js";
+
+function Root() {
+  const analytics = createAnalytics([
+    googleAnalytics({ measurementId: "G-XXXXXXXXXX" }),
+  ]);
+
+  return (
+    <>
+      <Show when={analytics.pendingCount() > 0}>
+        <p>{analytics.pendingCount()} events queued — analytics loading</p>
+      </Show>
+      <button onClick={() => analytics.track("cta_click", { location: "hero" })}>
+        Get Started
+      </button>
+    </>
+  );
+}
+```
+
+---
+
+## `AnalyticsProvider` / `useAnalytics`
+
+The easiest way to share analytics across a component tree. Wrap your app once; call `useAnalytics()` in any descendant.
+
+```tsx
+import { AnalyticsProvider, useAnalytics } from "@solid-primitives/analytics";
+import googleAnalytics from "@analytics/google-analytics";
+
+// At the root
+<AnalyticsProvider plugins={[googleAnalytics({ measurementId: "G-XXXXXXXXXX" })]}>
+  <App />
+</AnalyticsProvider>
+
+// Anywhere inside the tree
+function BuyButton() {
+  const analytics = useAnalytics();
+  return (
+    <button onClick={() => analytics.track("purchase", { plan: "pro" })}>
+      Buy now
+    </button>
+  );
+}
+```
+
+`AnalyticsProvider` creates and owns the `createAnalytics` instance. It disposes automatically when the provider unmounts. `useAnalytics()` throws `ContextNotFoundError` if called outside a provider.
+
+---
+
+## Navigation guard
+
+`makeAnalyticsGuard` / `createAnalyticsGuard` pause navigation until all in-flight plugin dispatches complete, preventing conversion events from being lost when users navigate away before async network calls finish.
+
+Both guards:
+- Return an `onBeforeLeave` handler compatible with SolidJS Router's `useBeforeLeave`
+- Register a `beforeunload` listener as a best-effort safety net for hard navigations
+
+### With SolidJS Router
+
+```tsx
+import { useBeforeLeave } from "@solidjs/router";
+import { useAnalytics, createAnalyticsGuard } from "@solid-primitives/analytics";
+
+function App() {
+  const analytics = useAnalytics();
+  const { onBeforeLeave } = createAnalyticsGuard(analytics);
+  useBeforeLeave(onBeforeLeave);
+}
+```
+
+### Without a router
+
+```ts
+import { makeAnalytics, makeAnalyticsGuard } from "@solid-primitives/analytics";
+
+const [analytics, cleanupAnalytics] = makeAnalytics([...]);
+const { onBeforeLeave, cleanup } = makeAnalyticsGuard(analytics);
+
+// wire onBeforeLeave into your routing solution
+// call cleanup() when tearing down
+```
+
+### How it works
+
+When `onBeforeLeave` fires:
+1. Navigation is paused via `event.preventDefault()`
+2. `analytics.drain()` waits for all in-flight plugin dispatches to settle
+3. Navigation resumes via `event.retry(true)`
+
+---
+
+## `drain()`
+
+All controls expose `drain(): Promise<void>`, which resolves once every currently in-flight plugin call has settled. Useful for imperative navigation:
+
+```ts
+await analytics.drain();
+router.navigate("/checkout");
+```
+
+> Events still in the queue (waiting for a plugin to initialize) are not awaited by `drain()`. In practice, plugins are ready long before a user navigates, so this edge case rarely applies.
+
+---
+
+## Controls reference
+
+`makeAnalytics`, `createAnalytics`, and `useAnalytics()` all return the same control surface:
+
+| Method | Description |
+|---|---|
+| `page(properties?)` | Track a page view. Auto-fills `path`, `url`, `title`, and `referrer` from `window.location` in the browser. |
+| `track(event, properties?)` | Track a named event with optional properties. |
+| `identify(userId, traits?)` | Associate subsequent events with a user identity. |
+| `use(plugin)` | Register an additional plugin at any time. |
+| `reset()` | Stop the poll timer and discard all queued events. |
+| `drain()` | `Promise<void>` — resolves when all in-flight dispatches have settled. |
+
+`createAnalytics` and `useAnalytics()` additionally expose:
+
+| Property | Type | Description |
+|---|---|---|
+| `pendingCount` | `Accessor<number>` | Events waiting in the queue; non-zero while plugins are still initializing |
+
+---
+
+## How the queue works
+
+Events fire immediately to all ready plugins. When one or more plugins are still initializing (async script load, consent check, etc.), events are held in a bounded FIFO queue and replayed in order once all plugins become ready. A poll timer (default: 500 ms) handles `loaded()` checks for external scripts.
+
+Dispatch is **sequential** through the plugin list. A plugin can call `abort()` to prevent subsequent plugins from receiving that event.
+
+---
+
+## Plugin interface
+
+`AnalyticsPlugin` matches the [analytics npm package plugin interface](https://getanalytics.io/plugins/writing-plugins/), so any plugin from the [catalogue](https://www.npmjs.com/package/analytics#analytic-plugins) is compatible without modification.
+
+```ts
+import type { AnalyticsPlugin } from "@solid-primitives/analytics";
+
+const myPlugin: AnalyticsPlugin = {
+  name: "my-service",
+  config: { apiKey: "abc123" },
+
+  // optional async setup (e.g. inject a script tag)
+  initialize: async ({ config }) => {
+    await loadScript(`https://cdn.example.com/sdk.js?key=${config.apiKey}`);
+  },
+
+  // polled until true before queued events are flushed
+  loaded: () => typeof window.myService !== "undefined",
+
+  page:     ({ payload, abort }) => { window.myService.page(payload.properties); },
+  track:    ({ payload, abort }) => { window.myService.track(payload.event, payload.properties); },
+  identify: ({ payload })        => { window.myService.identify(payload.userId, payload.traits); },
+};
+```
+
+All event payloads carry a `meta` object with a unique request ID (`rid`) and a timestamp (`ts`).
+
+---
+
+## Options
+
+```ts
+type AnalyticsOptions = {
+  /** Maximum events to hold in the queue before discarding. Default: 100 */
+  queueLimit?: number;
+  /** Milliseconds between plugin-readiness polls. Default: 500 */
+  retryInterval?: number;
+  /**
+   * When set, switches to batch mode: events accumulate and flush on this
+   * interval (ms) rather than immediately. Without this option events fire
+   * as soon as plugins are ready.
+   */
+  drainInterval?: number;
+  /**
+   * Maximum events dispatched per drain cycle. Only applies when
+   * `drainInterval` is set. Remaining events stay queued for the next cycle.
+   */
+  drainSize?: number;
+};
+```
+
+---
+
+## SSR
+
+Both `makeAnalytics` and `createAnalytics` are isomorphic. On the server, `page()` omits browser-only defaults (`url`, `referrer`, `title`) since `window` is not available, but all other behaviour — plugin dispatch, queuing, `drain()` — works identically. Plugins that perform HTTP requests run on both sides without modification.
+
+`makeAnalyticsGuard` / `createAnalyticsGuard` are no-ops on the server (no `window.addEventListener`).
+
+---
 
 ## Changelog
 

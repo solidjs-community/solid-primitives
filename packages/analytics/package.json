@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/analytics",
-  "version": "0.2.1",
-  "description": "Primitive that makes managing analytics a lot easier.",
+  "version": "1.0.0",
+  "description": "Solid primitives for analytics tracking with a plugin-compatible queue-based dispatch pipeline.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/analytics#readme",
@@ -23,24 +23,43 @@
     "dist"
   ],
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
+  "primitive": {
+    "name": "analytics",
+    "stage": 0,
+    "list": [
+      "makeAnalytics",
+      "createAnalytics",
+      "AnalyticsProvider",
+      "useAnalytics",
+      "makeAnalyticsGuard",
+      "createAnalyticsGuard"
+    ],
+    "category": "Utilities"
+  },
   "keywords": [
     "analytics",
     "google",
     "gtag",
+    "ga4",
+    "tracking",
     "solid",
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
-  "typesVersions": {},
+  "dependencies": {
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
+  },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }
