@@ -8,6 +8,8 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/idle?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/idle)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
+- [**Docs**](https://primitives.solidjs.community/docs/idle)
+
 `createIdleTimer` - A primitive to track the user's idle status and take appropriate action.
 
 ## Installation
@@ -67,10 +69,6 @@ The options are:
 - **startManually**: `boolean`; requires the event-listeners to be bound manually by using the `start` method, instead of on mount. It defaults to false.
 - **events**: `EventTypeName[]`; a list of the DOM events that will be listened to in order to monitor the user's activity. The events must be of `EventTypeName` type (it can be imported). The list defaults to `['mousemove', 'keydown', 'wheel', 'resize', 'mousedown', 'pointerdown', 'touchstart', 'touchmove', 'visibilitychange']`
 - **element**: `HTMLElement`; DOM element to which the event listeners will be attached. It defaults to `document`.
-
-## Demo
-
-Here is a working example: https://stackblitz.com/edit/vitejs-vite-dwxlhp?file=src/App.tsx
 
 ## Acknowledgments
 
