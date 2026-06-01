@@ -102,6 +102,12 @@ export function reverseChain<Args extends [] | any[]>(
 
 export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
+/** Creates an ID generator with its own isolated counter. Each call to the returned function produces a unique `timestamp-sequence` string. */
+export const createIdGenerator = (): (() => string) => {
+  let seq = 0;
+  return () => `${Date.now().toString(36)}-${(++seq).toString(36)}`;
+};
+
 /**
  * Accesses the value of a MaybeAccessor
  * @example

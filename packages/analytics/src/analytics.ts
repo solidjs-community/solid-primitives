@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
-import { tryOnCleanup, INTERNAL_OPTIONS } from "@solid-primitives/utils";
-import { makeQueue, type Queue } from "@solid-primitives/queue";
+import { tryOnCleanup, INTERNAL_OPTIONS, isServer, createIdGenerator } from "@solid-primitives/utils";
+import { makeQueue } from "@solid-primitives/queue";
 import type {
   AnyPayload,
   AnalyticsPlugin,
@@ -15,21 +15,14 @@ import type {
   IdentifyPayload,
 } from "./types.js";
 
-let _seq = 0;
-function generateId(): string {
-  return `${Date.now().toString(36)}-${(++_seq).toString(36)}`;
-}
+
+
+const generateId = createIdGenerator();
 
 function buildPagePayload(properties: PageProperties): PagePayload {
-  const defaults: PageProperties =
-    typeof window !== "undefined"
-      ? {
-          path: window.location.pathname,
-          url: window.location.href,
-          title: document.title,
-          referrer: document.referrer,
-        }
-      : {};
+  const defaults: PageProperties = !isServer
+    ? { path: window.location.pathname, url: window.location.href, title: document.title, referrer: document.referrer }
+    : {};
   return {
     type: "page",
     properties: { ...defaults, ...properties },
@@ -38,21 +31,11 @@ function buildPagePayload(properties: PageProperties): PagePayload {
 }
 
 function buildTrackPayload(event: string, properties: TrackProperties): TrackPayload {
-  return {
-    type: "track",
-    event,
-    properties,
-    meta: { rid: generateId(), ts: Date.now() },
-  };
+  return { type: "track", event, properties, meta: { rid: generateId(), ts: Date.now() } };
 }
 
 function buildIdentifyPayload(userId: string, traits: IdentifyTraits): IdentifyPayload {
-  return {
-    type: "identify",
-    userId,
-    traits,
-    meta: { rid: generateId(), ts: Date.now() },
-  };
+  return { type: "identify", userId, traits, meta: { rid: generateId(), ts: Date.now() } };
 }
 
 /**
@@ -62,9 +45,7 @@ function buildIdentifyPayload(userId: string, traits: IdentifyTraits): IdentifyP
 async function invokePlugin(plugin: AnalyticsPlugin, payload: AnyPayload): Promise<boolean> {
   const config = plugin.config ?? {};
   let aborted = false;
-  const abort = (): void => {
-    aborted = true;
-  };
+  const abort = (): void => { aborted = true; };
   try {
     if (payload.type === "page" && plugin.page) {
       await plugin.page({ payload, config, abort });
@@ -85,13 +66,21 @@ async function invokePlugin(plugin: AnalyticsPlugin, payload: AnyPayload): Promi
  */
 async function dispatchSequential(plugins: AnalyticsPlugin[], payload: AnyPayload): Promise<void> {
   for (const plugin of plugins) {
-    const continued = await invokePlugin(plugin, payload);
-    if (!continued) break;
+    if (!await invokePlugin(plugin, payload)) break;
   }
 }
 
+/** Minimal queue interface used by buildCore — a subset of Queue<T>. */
+type EventBuffer = {
+  readonly size: number;
+  readonly isEmpty: boolean;
+  add(item: AnyPayload): void;
+  remove(): AnyPayload | undefined;
+  clear(): void;
+};
+
 /** Internal engine — shared by makeAnalytics and createAnalytics. */
-function buildCore(queue: Queue<AnyPayload>, options: AnalyticsOptions) {
+function buildCore(queue: EventBuffer, options: AnalyticsOptions) {
   const { queueLimit = 100, retryInterval = 500, drainInterval, drainSize } = options;
   const batching = drainInterval != null;
   const plugins: AnalyticsPlugin[] = [];
@@ -164,17 +153,12 @@ function buildCore(queue: Queue<AnyPayload>, options: AnalyticsOptions) {
 
   async function initPlugin(plugin: AnalyticsPlugin): Promise<void> {
     const config = plugin.config ?? {};
-    if (plugin.initialize) {
-      await plugin.initialize({ config });
-    }
+    if (plugin.initialize) await plugin.initialize({ config });
     initialized.add(plugin.name);
     if (allReady()) {
       stopPoll();
-      if (batching) {
-        startDrainTimer();
-      } else {
-        await drainQueue();
-      }
+      if (batching) startDrainTimer();
+      else await drainQueue();
     } else {
       startPoll();
     }
@@ -187,12 +171,10 @@ function buildCore(queue: Queue<AnyPayload>, options: AnalyticsOptions) {
   }
 
   function dispatch(payload: AnyPayload): void {
-    if (batching && allReady()) {
-      if (queue.size < queueLimit) queue.add(payload);
-    } else if (allReady()) {
+    if (!batching && allReady()) {
       trackInflight(dispatchSequential(plugins, payload));
-    } else {
-      if (queue.size < queueLimit) queue.add(payload);
+    } else if (queue.size < queueLimit) {
+      queue.add(payload);
     }
   }
 
@@ -214,9 +196,9 @@ function buildControls(core: ReturnType<typeof buildCore>): AnalyticsControls {
     page: (properties = {}) => core.dispatch(buildPagePayload(properties)),
     track: (event, properties = {}) => core.dispatch(buildTrackPayload(event, properties)),
     identify: (userId, traits = {}) => core.dispatch(buildIdentifyPayload(userId, traits)),
-    use: plugin => core.addPlugin(plugin),
-    reset: () => core.stop(),
-    drain: () => core.drain(),
+    use: core.addPlugin,
+    reset: core.stop,
+    drain: core.drain,
   };
 }
 
@@ -238,14 +220,11 @@ export function makeAnalytics(
   // When an observer is provided, wrap the plain queue so every mutation also
   // fires the callback. Synchronous reads (isEmpty, size) go directly to the
   // underlying queue — no batching involved — which is what the drain loop needs.
-  const queue: Queue<AnyPayload> = onQueueChange
+  const queue: EventBuffer = onQueueChange
     ? {
-        get first() { return q.first; },
-        get last() { return q.last; },
         get size() { return q.size; },
         get isEmpty() { return q.isEmpty; },
-        add(...items) { q.add(...items); onQueueChange(q.size); },
-        push(cmp, ...items) { q.push(cmp, ...items); onQueueChange(q.size); },
+        add(item) { q.add(item); onQueueChange(q.size); },
         remove() { const r = q.remove(); onQueueChange(q.size); return r; },
         clear() { q.clear(); onQueueChange(0); },
       }
@@ -253,7 +232,7 @@ export function makeAnalytics(
 
   const core = buildCore(queue, options);
   for (const plugin of plugins) core.addPlugin(plugin);
-  return [buildControls(core), () => core.stop()];
+  return [buildControls(core), core.stop];
 }
 
 /**
