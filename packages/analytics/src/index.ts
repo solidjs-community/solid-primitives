@@ -16,6 +16,8 @@ export type {
 
 export { makeAnalytics, createAnalytics } from "./analytics.js";
 
+export { createServerPlugin } from "./relay.js";
+
 export { AnalyticsProvider, useAnalytics } from "./context.js";
 
 export { makeAnalyticsGuard, createAnalyticsGuard } from "./guard.js";

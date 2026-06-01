@@ -9,6 +9,9 @@ Primitives:
   - useAnalytics
   - makeAnalyticsGuard
   - createAnalyticsGuard
+  - createServerPlugin
+  - createSolidStartRelayPlugin
+  - createTanStackRelayPlugin
 Category: Utilities
 ---
 
@@ -20,9 +23,7 @@ Category: Utilities
 
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-- [**Docs**](https://primitives.solidjs.community/docs/analytics)
-
-Analytics tracking primitives for Solid.js with a queue-based dispatch pipeline, reactive signals, context sharing, and navigation guards.
+Analytics tracking primitives for Solid.js with a queue-based dispatch pipeline, reactive signals, context sharing, navigation guards, and server relay support.
 
 Plugins are **not bundled** — install any plugin from the [analytics plugin catalogue](https://www.npmjs.com/package/analytics#analytic-plugins) (Google Analytics, Segment, Amplitude, Mixpanel, …) and pass it straight in.
 
@@ -75,7 +76,6 @@ analytics.track("signup", { plan: "pro" });
 analytics.identify("user-1", { email: "alice@example.com" });
 analytics.use(anotherPlugin); // register a plugin at any time
 
-// call when done
 cleanup();
 ```
 
@@ -136,13 +136,13 @@ function BuyButton() {
 }
 ```
 
-`AnalyticsProvider` creates and owns the `createAnalytics` instance. It disposes automatically when the provider unmounts. `useAnalytics()` throws `ContextNotFoundError` if called outside a provider.
+`AnalyticsProvider` creates and owns the `createAnalytics` instance, disposing automatically when the provider unmounts. `useAnalytics()` throws `ContextNotFoundError` if called outside a provider.
 
 ---
 
 ## Navigation guard
 
-`makeAnalyticsGuard` / `createAnalyticsGuard` pause navigation until all in-flight plugin dispatches complete, preventing conversion events from being lost when users navigate away before async network calls finish.
+`makeAnalyticsGuard` / `createAnalyticsGuard` pause navigation until all in-flight plugin dispatches complete, preventing events from being lost when users navigate away before async network calls finish.
 
 Both guards:
 - Return an `onBeforeLeave` handler compatible with SolidJS Router's `useBeforeLeave`
@@ -170,7 +170,7 @@ const [analytics, cleanupAnalytics] = makeAnalytics([...]);
 const { onBeforeLeave, cleanup } = makeAnalyticsGuard(analytics);
 
 // wire onBeforeLeave into your routing solution
-// call cleanup() when tearing down
+cleanup(); // call when tearing down
 ```
 
 ### How it works
@@ -179,6 +179,115 @@ When `onBeforeLeave` fires:
 1. Navigation is paused via `event.preventDefault()`
 2. `analytics.drain()` waits for all in-flight plugin dispatches to settle
 3. Navigation resumes via `event.retry(true)`
+
+---
+
+## Server relay
+
+Route analytics events through your own server function instead of calling providers directly from the browser. This keeps API keys off the client and lets you enrich events with server-side context (session data, IP-based geo, etc.) before forwarding to the provider.
+
+```
+browser → createServerPlugin → your server function → GA / Mixpanel / Segment
+```
+
+### `createServerPlugin`
+
+```ts
+import { createServerPlugin } from "@solid-primitives/analytics/relay";
+```
+
+Creates a client-side plugin that forwards every event to a server function. The server function receives the full `AnyPayload` (including the original `rid` and `ts`) and is responsible for calling the actual provider.
+
+```ts
+// client
+import { createAnalytics } from "@solid-primitives/analytics";
+import { createServerPlugin } from "@solid-primitives/analytics/relay";
+import { relayEvent } from "./analytics.server";
+
+const analytics = createAnalytics([
+  createServerPlugin(relayEvent, { events: ["track", "identify"] }),
+]);
+
+analytics.track("purchase", { orderId: "123" }); // → server → GA
+```
+
+**Options:**
+
+| Option | Type | Description |
+|---|---|---|
+| `name` | `string` | Plugin name. Default: `"server"` |
+| `events` | `Array<"page" \| "track" \| "identify">` | Limit which event types are relayed. Omit to relay all. |
+
+---
+
+### SolidStart
+
+```ts
+import { createSolidStartRelayPlugin } from "@solid-primitives/analytics/relay/solidstart";
+```
+
+Because SolidStart requires `"use server"` as a literal in your source code, define the action yourself and pass it to `createSolidStartRelayPlugin`:
+
+```ts
+// analytics.server.ts
+import { action } from "@solidjs/router";
+import googleAnalytics from "@analytics/google-analytics";
+import type { AnyPayload } from "@solid-primitives/analytics";
+
+const ga = googleAnalytics({ measurementId: import.meta.env.VITE_GA_ID });
+
+export const relayEvent = action(async (payload: AnyPayload) => {
+  "use server";
+  await ga.track?.({ payload, config: {}, abort: () => {} });
+});
+```
+
+```ts
+// app.tsx
+import { createAnalytics } from "@solid-primitives/analytics";
+import { createSolidStartRelayPlugin } from "@solid-primitives/analytics/relay/solidstart";
+import { relayEvent } from "./analytics.server";
+
+const analytics = createAnalytics([
+  createSolidStartRelayPlugin(relayEvent, { events: ["track", "identify"] }),
+]);
+```
+
+---
+
+### TanStack Start
+
+```ts
+import { createTanStackRelayPlugin } from "@solid-primitives/analytics/relay/tanstack";
+```
+
+`createTanStackRelayPlugin` wraps your TanStack Start server function and handles the `{ data }` call-site signature automatically:
+
+```ts
+// analytics.server.ts
+import { createServerFn } from "@tanstack/start";
+import googleAnalytics from "@analytics/google-analytics";
+import type { AnyPayload } from "@solid-primitives/analytics";
+
+const ga = googleAnalytics({ measurementId: process.env.GA_ID });
+
+export const relayEvent = createServerFn({ method: "POST" })
+  .validator((d: unknown) => d as AnyPayload)
+  .handler(async ({ data: payload }) => {
+    await ga.track?.({ payload, config: {}, abort: () => {} });
+  });
+```
+
+```ts
+// app.tsx
+import { createAnalytics } from "@solid-primitives/analytics";
+import { createTanStackRelayPlugin } from "@solid-primitives/analytics/relay/tanstack";
+import { relayEvent } from "./analytics.server";
+
+const analytics = createAnalytics([
+  createTanStackRelayPlugin(relayEvent, { events: ["track", "identify"] }),
+]);
+```
 
 ---
 
@@ -191,7 +300,7 @@ await analytics.drain();
 router.navigate("/checkout");
 ```
 
-> Events still in the queue (waiting for a plugin to initialize) are not awaited by `drain()`. In practice, plugins are ready long before a user navigates, so this edge case rarely applies.
+> Events still in the queue (waiting for a plugin to initialize) are not awaited by `drain()`. In practice, plugins are ready long before a user navigates.
 
 ---
 
@@ -243,13 +352,13 @@ const myPlugin: AnalyticsPlugin = {
   // polled until true before queued events are flushed
   loaded: () => typeof window.myService !== "undefined",
 
-  page:     ({ payload, abort }) => { window.myService.page(payload.properties); },
-  track:    ({ payload, abort }) => { window.myService.track(payload.event, payload.properties); },
-  identify: ({ payload })        => { window.myService.identify(payload.userId, payload.traits); },
+  page:     ({ payload }) => { window.myService.page(payload.properties); },
+  track:    ({ payload }) => { window.myService.track(payload.event, payload.properties); },
+  identify: ({ payload }) => { window.myService.identify(payload.userId, payload.traits); },
 };
 ```
 
-All event payloads carry a `meta` object with a unique request ID (`rid`) and a timestamp (`ts`).
+All event payloads carry a `meta` object with a unique request ID (`rid`) and a Unix timestamp (`ts`).
 
 ---
 
@@ -263,8 +372,7 @@ type AnalyticsOptions = {
   retryInterval?: number;
   /**
    * When set, switches to batch mode: events accumulate and flush on this
-   * interval (ms) rather than immediately. Without this option events fire
-   * as soon as plugins are ready.
+   * interval (ms) rather than immediately.
    */
   drainInterval?: number;
   /**
@@ -279,9 +387,9 @@ type AnalyticsOptions = {
 
 ## SSR
 
-Both `makeAnalytics` and `createAnalytics` are isomorphic. On the server, `page()` omits browser-only defaults (`url`, `referrer`, `title`) since `window` is not available, but all other behaviour — plugin dispatch, queuing, `drain()` — works identically. Plugins that perform HTTP requests run on both sides without modification.
+Both `makeAnalytics` and `createAnalytics` are isomorphic. On the server, `page()` omits browser-only defaults (`url`, `referrer`, `title`) since `window` is unavailable, but all other behaviour — plugin dispatch, queuing, `drain()` — works identically.
 
-`makeAnalyticsGuard` / `createAnalyticsGuard` are no-ops on the server (no `window.addEventListener`).
+`makeAnalyticsGuard` / `createAnalyticsGuard` are no-ops on the server.
 
 ---
 

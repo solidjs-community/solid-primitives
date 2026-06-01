@@ -14,9 +14,29 @@
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
-    "import": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./relay": {
+      "import": {
+        "types": "./dist/relay.d.ts",
+        "default": "./dist/relay.js"
+      }
+    },
+    "./relay/solidstart": {
+      "import": {
+        "types": "./dist/relay/solidstart.d.ts",
+        "default": "./dist/relay/solidstart.js"
+      }
+    },
+    "./relay/tanstack": {
+      "import": {
+        "types": "./dist/relay/tanstack.d.ts",
+        "default": "./dist/relay/tanstack.js"
+      }
     }
   },
   "files": [
@@ -37,22 +57,29 @@
       "AnalyticsProvider",
       "useAnalytics",
       "makeAnalyticsGuard",
-      "createAnalyticsGuard"
+      "createAnalyticsGuard",
+      "createServerPlugin",
+      "createEventHandler"
     ],
     "category": "Utilities"
   },
   "keywords": [
     "analytics",
-    "google",
-    "gtag",
-    "ga4",
     "tracking",
     "solid",
+    "solidstart",
+    "tanstack",
     "primitives"
   ],
   "peerDependencies": {
     "@solidjs/web": "^2.0.0-beta.14",
+    "@tanstack/start": "*",
     "solid-js": "^2.0.0-beta.14"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/start": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
