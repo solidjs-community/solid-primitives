@@ -92,6 +92,7 @@ combined.onClick(); // "child" "parent"
 
 ### Additional helpers
 
+
 A couple of lower-lever helpers that power `combineProps`:
 
 #### `stringStyleToObject`
@@ -110,10 +111,6 @@ const styles = combineStyle("margin: 24px; border: 1px solid #121212", {
 });
 styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
 ```
-
-### DEMO
-
-https://codesandbox.io/s/combineprops-demo-ytw247?file=/index.tsx
 
 ## `combineHandlers`
 
