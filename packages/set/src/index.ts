@@ -155,9 +155,7 @@ export function createWeakSet<T extends object>(initial?: T[]): ReactiveWeakSet<
  */
 export function union<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): Accessor<ReadonlySet<T>> {
   return createMemo(() => {
-    const result = new Set<T>(a);
-    for (const v of b) result.add(v);
-    return result;
+    return new Set([...a, ...b]);
   });
 }
 
