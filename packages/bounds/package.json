@@ -19,7 +19,8 @@
     "list": [
       "createElementBounds"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 884
   },
   "keywords": [
     "solid",

@@ -24,7 +24,8 @@
       "createKeyHold",
       "createShortcut"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 1348
   },
   "keywords": [
     "solid",

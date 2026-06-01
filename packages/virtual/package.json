@@ -20,7 +20,8 @@
       "createVirutalList",
       "VirtualList"
     ],
-    "category": "UI Patterns"
+    "category": "UI Patterns",
+    "gzip": 618
   },
   "keywords": [
     "solid",

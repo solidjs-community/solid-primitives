@@ -24,7 +24,8 @@
       "Repeat",
       "IndexRange"
     ],
-    "category": "Control Flow"
+    "category": "Control Flow",
+    "gzip": 1519
   },
   "keywords": [
     "control-flow",

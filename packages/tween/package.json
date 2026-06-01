@@ -15,7 +15,8 @@
     "list": [
       "createTween"
     ],
-    "category": "Animation"
+    "category": "Animation",
+    "gzip": 260
   },
   "keywords": [
     "animate",

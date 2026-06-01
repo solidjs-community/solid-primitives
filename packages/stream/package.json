@@ -19,7 +19,8 @@
       "createAmplitudeFromStream",
       "createScreen"
     ],
-    "category": "Network"
+    "category": "Network",
+    "gzip": 1030
   },
   "files": [
     "dist"

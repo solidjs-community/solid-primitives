@@ -21,7 +21,8 @@
       "isHydrated",
       "onElementConnect"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 289
   },
   "keywords": [
     "solid",

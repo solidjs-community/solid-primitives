@@ -20,7 +20,8 @@
       "createInputMask",
       "createMaskPattern"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 694
   },
   "sideEffects": false,
   "type": "module",

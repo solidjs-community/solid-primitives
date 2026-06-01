@@ -26,7 +26,8 @@
       "createPolled",
       "createIntervalCounter"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 594
   },
   "private": false,
   "sideEffects": false,

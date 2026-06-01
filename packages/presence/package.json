@@ -15,7 +15,8 @@
     "list": [
       "createPresence"
     ],
-    "category": "Animation"
+    "category": "Animation",
+    "gzip": 649
   },
   "files": [
     "dist"

@@ -20,7 +20,8 @@
       "createWindowSize",
       "createElementSize"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 1461
   },
   "files": [
     "dist"

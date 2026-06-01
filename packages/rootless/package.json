@@ -19,7 +19,8 @@
       "createSharedRoot",
       "createRootPool"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 936
   },
   "private": false,
   "sideEffects": false,

@@ -25,7 +25,8 @@
       "createMemoCache",
       "createReducer"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 843
   },
   "private": false,
   "sideEffects": false,

@@ -27,7 +27,8 @@
       "useWindowScrollPosition",
       "createPreventScroll"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 2249
   },
   "files": [
     "dist"

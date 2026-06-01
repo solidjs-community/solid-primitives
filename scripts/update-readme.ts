@@ -51,7 +51,12 @@ const rootDependencies: string[] = [
       data.Size = "";
       data.NPM = "";
     } else {
-      data.Size = `[![SIZE](${sizeShield}${packageName}?style=for-the-badge&label=)](${bundlephobiaURL}${packageName})`;
+      if (module.primitive?.gzip != null) {
+        const [value, unit] = utils.formatBytes(module.primitive.gzip);
+        data.Size = `[![SIZE](https://img.shields.io/badge/size-${value}_${unit}-blue?style=for-the-badge)](${bundlephobiaURL}${packageName})`;
+      } else {
+        data.Size = `[![SIZE](${sizeShield}${packageName}?style=for-the-badge&label=)](${bundlephobiaURL}${packageName})`;
+      }
       data.NPM = `[![VERSION](${npmShield}${packageName}?style=for-the-badge&label=)](${npmURL}${packageName})`;
     }
     data.Stage = `[![STAGE](${stageShieldBaseURL}${module.primitive.stage}.json)](${stageShieldLink})`;

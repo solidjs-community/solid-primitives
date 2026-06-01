@@ -16,7 +16,8 @@
     "list": [
       "createControlledProp"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 849
   },
   "files": [
     "dist"

@@ -19,7 +19,8 @@
       "ReactiveSet",
       "ReactiveWeakSet"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 852
   },
   "keywords": [
     "solid",

@@ -27,7 +27,8 @@
       "createScheduled",
       "leadingAndTrailing"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 671
   },
   "private": false,
   "sideEffects": false,

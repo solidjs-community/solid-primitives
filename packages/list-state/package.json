@@ -29,7 +29,8 @@
       "createListState",
       "createMultiSelectListState"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 1304
   },
   "keywords": [
     "solid",

@@ -18,6 +18,7 @@ export type PrimitiveData = {
   list: string[];
   category: string;
   stage: number;
+  gzip?: number;
 };
 
 export type ModuleData = {

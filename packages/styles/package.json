@@ -21,7 +21,8 @@
     "list": [
       "createRemSize"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 700
   },
   "private": false,
   "sideEffects": false,

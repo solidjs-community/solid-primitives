@@ -21,7 +21,8 @@
       "createLayeredContext",
       "MultiProvider"
     ],
-    "category": "Control Flow"
+    "category": "Control Flow",
+    "gzip": 350
   },
   "files": [
     "dist"

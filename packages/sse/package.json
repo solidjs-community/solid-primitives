@@ -21,7 +21,8 @@
       "createSSE",
       "makeSSEWorker"
     ],
-    "category": "Network"
+    "category": "Network",
+    "gzip": 1081
   },
   "keywords": [
     "solid",

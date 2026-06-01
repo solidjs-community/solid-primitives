@@ -19,7 +19,8 @@
     "list": [
       "createIdleTimer"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 774
   },
   "private": false,
   "sideEffects": false,

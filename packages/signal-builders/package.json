@@ -24,7 +24,8 @@
       "clamp",
       "template"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 1514
   },
   "keywords": [
     "solid",

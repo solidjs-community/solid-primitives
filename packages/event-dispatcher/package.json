@@ -19,7 +19,8 @@
     "list": [
       "createEventDispatcher"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 232
   },
   "keywords": [
     "solid",

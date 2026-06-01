@@ -22,7 +22,8 @@
       "WindowEventListener",
       "DocumentEventListener"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 890
   },
   "private": false,
   "sideEffects": false,

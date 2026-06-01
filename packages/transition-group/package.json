@@ -20,7 +20,8 @@
       "createSwitchTransition",
       "createListTransition"
     ],
-    "category": "Animation"
+    "category": "Animation",
+    "gzip": 852
   },
   "keywords": [
     "solid",

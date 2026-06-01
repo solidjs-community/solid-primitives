@@ -24,7 +24,8 @@
       "createControllableArraySignal",
       "createControllableSetSignal"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 395
   },
   "keywords": [
     "solid",

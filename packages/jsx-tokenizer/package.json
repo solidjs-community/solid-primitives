@@ -24,7 +24,8 @@
       "resolveTokens",
       "isToken"
     ],
-    "category": "Control Flow"
+    "category": "Control Flow",
+    "gzip": 669
   },
   "keywords": [
     "solid",

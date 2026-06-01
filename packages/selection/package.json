@@ -19,7 +19,8 @@
     "list": [
       "createSelection"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 917
   },
   "sideEffects": false,
   "type": "module",

@@ -17,7 +17,8 @@
       "createFullscreen",
       "fullscreen"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 661
   },
   "files": [
     "dist"

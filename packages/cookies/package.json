@@ -24,7 +24,8 @@
       "createUserTheme",
       "getCookiesString"
     ],
-    "category": "Network"
+    "category": "Network",
+    "gzip": 427
   },
   "keywords": [
     "solid",

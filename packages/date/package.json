@@ -21,7 +21,8 @@
       "createCountdown",
       "createCountdownFromNow"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1509
   },
   "files": [
     "dist"

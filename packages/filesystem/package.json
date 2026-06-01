@@ -29,7 +29,8 @@
       "makeChokidarWatcher",
       "rsync"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 3529
   },
   "keywords": [
     "solid",

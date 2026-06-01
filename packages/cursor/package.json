@@ -24,7 +24,8 @@
       "createDragCursor",
       "cursorRef"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 651
   },
   "keywords": [
     "solid",

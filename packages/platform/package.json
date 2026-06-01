@@ -19,7 +19,8 @@
     "list": [
       "List of variables"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 603
   },
   "keywords": [
     "solid",

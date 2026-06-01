@@ -16,7 +16,8 @@
       "createMousePosition",
       "createPositionToElement"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 1741
   },
   "sideEffects": false,
   "private": false,

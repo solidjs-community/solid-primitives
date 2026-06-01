@@ -18,7 +18,8 @@
     "list": [
       "createScriptLoader"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 545
   },
   "files": [
     "dist"

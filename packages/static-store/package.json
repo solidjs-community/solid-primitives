@@ -20,7 +20,8 @@
       "createStaticStore",
       "createDerivedStaticStore"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 589
   },
   "keywords": [
     "solid",

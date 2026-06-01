@@ -22,7 +22,8 @@
       "createActions",
       "createAction"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 276
   },
   "keywords": [
     "solid",

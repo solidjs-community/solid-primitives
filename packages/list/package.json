@@ -20,7 +20,8 @@
       "listArray",
       "List"
     ],
-    "category": "Control Flow"
+    "category": "Control Flow",
+    "gzip": 774
   },
   "keywords": [
     "solid",
