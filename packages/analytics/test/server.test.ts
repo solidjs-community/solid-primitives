@@ -128,9 +128,9 @@ describe("makeAnalytics (server)", () => {
 
     expect(order).toEqual([]);
     resolveTrack();
-    await flushed;
+    await drained;
 
-    expect(order).toEqual(["plugin", "flushed"]);
+    expect(order).toEqual(["plugin", "drained"]);
     cleanup();
   });
 });

@@ -126,6 +126,9 @@ importers:
       '@solid-primitives/event-listener':
         specifier: workspace:^
         version: link:../event-listener
+      '@solid-primitives/queue':
+        specifier: workspace:^
+        version: link:../queue
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils

@@ -14,8 +14,6 @@ export type {
   ReactiveAnalyticsControls,
 } from "./types.js";
 
-export type { QueuedEvent } from "./queue.js";
-
 export { makeAnalytics, createAnalytics } from "./analytics.js";
 
 export { AnalyticsProvider, useAnalytics } from "./context.js";

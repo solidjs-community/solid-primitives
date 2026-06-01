@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { tryOnCleanup, INTERNAL_OPTIONS } from "@solid-primitives/utils";
+import { makeQueue, type Queue } from "@solid-primitives/queue";
 import type {
   AnyPayload,
   AnalyticsPlugin,
@@ -13,7 +14,6 @@ import type {
   TrackPayload,
   IdentifyPayload,
 } from "./types.js";
-import { EventQueue } from "./queue.js";
 
 let _seq = 0;
 function generateId(): string {
@@ -90,13 +90,10 @@ async function dispatchSequential(plugins: AnalyticsPlugin[], payload: AnyPayloa
   }
 }
 
-type StateSnapshot = { queueSize: number };
-
-/** Internal engine — shared by makeAnalytics and (via makeAnalytics) createAnalytics. */
-function buildCore(options: AnalyticsOptions, onStateChange?: (snap: StateSnapshot) => void) {
+/** Internal engine — shared by makeAnalytics and createAnalytics. */
+function buildCore(queue: Queue<AnyPayload>, options: AnalyticsOptions) {
   const { queueLimit = 100, retryInterval = 500, drainInterval, drainSize } = options;
   const batching = drainInterval != null;
-  const queue = new EventQueue(queueLimit);
   const plugins: AnalyticsPlugin[] = [];
   const initialized = new Set<string>();
   const inflight = new Set<Promise<void>>();
@@ -116,14 +113,18 @@ function buildCore(options: AnalyticsOptions, onStateChange?: (snap: StateSnapsh
     return plugins.length > 0 && plugins.every(isReady);
   }
 
-  function notify(): void {
-    onStateChange?.({ queueSize: queue.size });
+  function drainBatch(): AnyPayload[] {
+    const events: AnyPayload[] = [];
+    const max = drainSize ?? Infinity;
+    let item: AnyPayload | undefined;
+    while (events.length < max && (item = queue.remove()) !== undefined) {
+      events.push(item);
+    }
+    return events;
   }
 
   async function drainQueue(): Promise<void> {
-    const events = queue.drain(drainSize);
-    notify();
-    for (const { payload } of events) {
+    for (const payload of drainBatch()) {
       trackInflight(dispatchSequential(plugins, payload));
     }
     await Promise.all([...inflight]);
@@ -141,7 +142,7 @@ function buildCore(options: AnalyticsOptions, onStateChange?: (snap: StateSnapsh
     pollTimer = setInterval(() => {
       if (allReady()) {
         stopPoll();
-        if (!batching) void drainQueue().then(() => notify());
+        if (!batching) void drainQueue();
         else startDrainTimer();
       }
     }, retryInterval);
@@ -157,7 +158,7 @@ function buildCore(options: AnalyticsOptions, onStateChange?: (snap: StateSnapsh
   function startDrainTimer(): void {
     if (!batching || drainTimer != null) return;
     drainTimer = setInterval(() => {
-      if (queue.size > 0) void drainQueue().then(() => notify());
+      if (queue.size > 0) void drainQueue();
     }, drainInterval);
   }
 
@@ -177,63 +178,39 @@ function buildCore(options: AnalyticsOptions, onStateChange?: (snap: StateSnapsh
     } else {
       startPoll();
     }
-    notify();
   }
 
   function addPlugin(plugin: AnalyticsPlugin): void {
     plugins.push(plugin);
     void initPlugin(plugin);
     if (!allReady()) startPoll();
-    notify();
   }
 
   function dispatch(payload: AnyPayload): void {
     if (batching && allReady()) {
-      // Batching mode: accumulate in queue, drain on schedule.
-      queue.enqueue(payload);
-      notify();
+      if (queue.size < queueLimit) queue.add(payload);
     } else if (allReady()) {
       trackInflight(dispatchSequential(plugins, payload));
     } else {
-      queue.enqueue(payload);
-      notify();
+      if (queue.size < queueLimit) queue.add(payload);
     }
   }
 
-  function drain(): Promise<void> {
-    return Promise.all([...inflight]).then(() => {});
+  async function drain(): Promise<void> {
+    await Promise.all([...inflight]);
   }
 
   function stop(): void {
     stopPoll();
     stopDrainTimer();
     queue.clear();
-    notify();
   }
 
   return { addPlugin, dispatch, drain, stop };
 }
 
-/**
- * Non-reactive analytics primitive. Returns controls and a cleanup function.
- * Works on both server and client — plugins without DOM dependencies run identically
- * in SSR. Page property defaults (path, url, title, referrer) are omitted on the server.
- *
- * @param onStateChange - Internal hook used by createAnalytics to observe state changes.
- * @internal
- */
-export function makeAnalytics(
-  plugins: AnalyticsPlugin[],
-  options: AnalyticsOptions = {},
-  onStateChange?: (snap: StateSnapshot) => void,
-): [AnalyticsControls, () => void] {
-  const core = buildCore(options, onStateChange);
-
-  for (const plugin of plugins) {
-    core.addPlugin(plugin);
-  }
-
-  const controls: AnalyticsControls = {
+function buildControls(core: ReturnType<typeof buildCore>): AnalyticsControls {
+  return {
     page: (properties = {}) => core.dispatch(buildPagePayload(properties)),
     track: (event, properties = {}) => core.dispatch(buildTrackPayload(event, properties)),
     identify: (userId, traits = {}) => core.dispatch(buildIdentifyPayload(userId, traits)),
@@ -241,26 +218,56 @@ export function makeAnalytics(
     reset: () => core.stop(),
     drain: () => core.drain(),
   };
+}
 
-  return [controls, () => core.stop()];
+/**
+ * Non-reactive analytics primitive. Returns controls and a cleanup function.
+ * Works on both server and client — plugins without DOM dependencies run identically
+ * in SSR. Page property defaults (path, url, title, referrer) are omitted on the server.
+ *
+ * @param onQueueChange - Optional callback fired after every queue mutation with the
+ * new size. Used internally by `createAnalytics` to keep a reactive signal in sync.
+ */
+export function makeAnalytics(
+  plugins: AnalyticsPlugin[],
+  options: AnalyticsOptions = {},
+  onQueueChange?: (size: number) => void,
+): [AnalyticsControls, () => void] {
+  const q = makeQueue<AnyPayload>();
+
+  // When an observer is provided, wrap the plain queue so every mutation also
+  // fires the callback. Synchronous reads (isEmpty, size) go directly to the
+  // underlying queue — no batching involved — which is what the drain loop needs.
+  const queue: Queue<AnyPayload> = onQueueChange
+    ? {
+        get first() { return q.first; },
+        get last() { return q.last; },
+        get size() { return q.size; },
+        get isEmpty() { return q.isEmpty; },
+        add(...items) { q.add(...items); onQueueChange(q.size); },
+        push(cmp, ...items) { q.push(cmp, ...items); onQueueChange(q.size); },
+        remove() { const r = q.remove(); onQueueChange(q.size); return r; },
+        clear() { q.clear(); onQueueChange(0); },
+      }
+    : q;
+
+  const core = buildCore(queue, options);
+  for (const plugin of plugins) core.addPlugin(plugin);
+  return [buildControls(core), () => core.stop()];
 }
 
 /**
  * Reactive analytics primitive built on top of `makeAnalytics`.
  * Integrates with Solid's owner tree — auto-disposes on cleanup.
- * Exposes `initialized` and `pendingCount` signals for reactive UI.
+ * Exposes `pendingCount` as a reactive signal driven by `makeAnalytics`'s queue.
  */
 export function createAnalytics(
   plugins: AnalyticsPlugin[],
   options: AnalyticsOptions = {},
 ): ReactiveAnalyticsControls {
+  // ownedWrite: true because dispatch() may be called inside createRoot scope in tests.
   const [pendingCount, setPendingCount] = createSignal(0, INTERNAL_OPTIONS);
-
-  const [controls, cleanup] = makeAnalytics(plugins, options, ({ queueSize }) => {
-    setPendingCount(queueSize);
-  });
-
+  const [controls, cleanup] = makeAnalytics(plugins, options, setPendingCount);
   tryOnCleanup(cleanup);
-
   return { ...controls, pendingCount };
 }
