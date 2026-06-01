@@ -1,4 +1,4 @@
-import { type Accessor, batch } from "solid-js";
+import { type Accessor, createMemo } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
 const $KEYS = Symbol("track-keys");
@@ -65,10 +65,8 @@ export class ReactiveSet<T> extends Set<T> {
   add(value: T): this {
     if (!super.has(value)) {
       super.add(value);
-      batch(() => {
-        this.#triggers.dirty(value);
-        this.#triggers.dirty($KEYS);
-      });
+      this.#triggers.dirty(value);
+      this.#triggers.dirty($KEYS);
     }
 
     return this;
@@ -78,10 +76,8 @@ export class ReactiveSet<T> extends Set<T> {
     const result = super.delete(value);
 
     if (result) {
-      batch(() => {
-        this.#triggers.dirty(value);
-        this.#triggers.dirty($KEYS);
-      });
+      this.#triggers.dirty(value);
+      this.#triggers.dirty($KEYS);
     }
 
     return result;
@@ -89,13 +85,11 @@ export class ReactiveSet<T> extends Set<T> {
 
   clear(): void {
     if (!super.size) return;
-    batch(() => {
-      this.#triggers.dirty($KEYS);
-      for (const member of super.values()) {
-        this.#triggers.dirty(member);
-      }
-      super.clear();
-    });
+    this.#triggers.dirty($KEYS);
+    for (const member of super.values()) {
+      this.#triggers.dirty(member);
+    }
+    super.clear();
   }
 }
 
@@ -153,4 +147,67 @@ export function createSet<T>(initial?: T[]): SignalSet<T> {
 /** @deprecated */
 export function createWeakSet<T extends object>(initial?: T[]): ReactiveWeakSet<T> {
   return new ReactiveWeakSet(initial);
+}
+
+/**
+ * Reactive union — elements that appear in `a`, `b`, or both.
+ * Re-derives when either input changes.
+ */
+export function union<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    return new Set([...a, ...b]);
+  });
+}
+
+/**
+ * Reactive intersection — elements that appear in both `a` and `b`.
+ * Re-derives when either input changes.
+ */
+export function intersection<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    const result = new Set<T>();
+    for (const v of a) {
+      if (b.has(v)) result.add(v);
+    }
+    return result;
+  });
+}
+
+/**
+ * Reactive difference — elements in `a` that do not appear in `b`.
+ * Re-derives when either input changes.
+ */
+export function difference<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    const result = new Set<T>();
+    for (const v of a) {
+      if (!b.has(v)) result.add(v);
+    }
+    return result;
+  });
+}
+
+/**
+ * Reactive symmetric difference — elements in `a` or `b`, but not both.
+ * Re-derives when either input changes.
+ */
+export function symmetricDifference<T>(
+  a: ReadonlySet<T>,
+  b: ReadonlySet<T>,
+): Accessor<ReadonlySet<T>> {
+  return createMemo(() => {
+    const result = new Set<T>(a);
+    for (const v of b) {
+      if (result.has(v)) result.delete(v);
+      else result.add(v);
+    }
+    return result;
+  });
+}
+
+/**
+ * Casts a `ReactiveSet` to `ReadonlySet` to prevent callers from mutating it.
+ */
+export function readonlySet<T>(set: ReactiveSet<T>): ReadonlySet<T> {
+  return set;
 }
