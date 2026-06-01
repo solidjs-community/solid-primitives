@@ -31,7 +31,7 @@ const Counter: Component = () => {
 const TestCtx = createContext<{ title: string }>();
 
 const BoundProvider: FlowComponent = props => (
-  <TestCtx.Provider value={{ title: "foo" }}>{props.children}</TestCtx.Provider>
+  <TestCtx value={{ title: "foo" }}>{props.children}</TestCtx>
 );
 
 const App: Component = () => {
@@ -47,11 +47,8 @@ const App: Component = () => {
         <MultiProvider
           values={[
             [TestCtx, { title: "Hello Context" }],
-            [TestCtx.Provider, { title: "Hello Provider" }],
-            [TestCtx, { title: 123 }],
-            [TestCtx.Provider, { title: 321 }],
+            [TestCtx, { title: "Hello Provider" }],
             [TestCtx, undefined],
-            [TestCtx.Provider, undefined],
             BoundProvider,
             CounterProvider,
           ]}
