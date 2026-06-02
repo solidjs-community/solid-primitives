@@ -1,11 +1,11 @@
 {
-  "name": "@solid-primitives/history",
-  "version": "0.2.3",
-  "description": "Primitives for managing undo/redo history in Solid.",
-  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "name": "@solid-primitives/queue",
+  "version": "0.1.0",
+  "description": "Queue primitives — FIFO, priority, and concurrent task queues",
+  "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/history",
+  "homepage": "https://primitives.solidjs.community/package/queue",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,21 +14,25 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "history",
+    "name": "queue",
     "stage": 0,
     "list": [
-      "createUndoHistory"
+      "makeQueue",
+      "createQueue",
+      "makePriorityQueue",
+      "createPriorityQueue",
+      "createTaskQueue",
+      "createConcurrentTaskQueue"
     ],
-    "category": "Utilities",
-    "gzip": 615
+    "category": "Utilities"
   },
   "keywords": [
     "solid",
     "primitives",
-    "undo",
-    "redo",
-    "history",
-    "time travel"
+    "queue",
+    "fifo",
+    "data-structures",
+    "reactive"
   ],
   "private": false,
   "sideEffects": false,
@@ -50,20 +54,17 @@
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
-    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
-  },
-  "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
+  "peerDependencies": {
+    "solid-js": "^2.0.0-beta.14"
+  },
   "devDependencies": {
-    "@solid-primitives/deep": "workspace:^",
-    "@solidjs/web": "2.0.0-beta.14",
     "solid-js": "2.0.0-beta.14"
   }
 }
