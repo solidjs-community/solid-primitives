@@ -1,4 +1,4 @@
-# @solid-primitives/page-visibility
+# @solid-primitives/page-utilities
 
 ## 2.1.5
 
