@@ -4,6 +4,7 @@
 
 # @solid-primitives/share
 
+[![docs](https://img.shields.io/badge/docs-storybook-ff4785?style=for-the-badge)](https://primitives.solidjs.community/storybook/?path=/docs/utilities-share--docs)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/share?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/share)
 [![size](https://img.shields.io/npm/v/@solid-primitives/share?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/share)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
@@ -122,10 +123,6 @@ Example:
 ```ts
 const x: Network = "https://www.x.com/intent/tweet?text=@t&url=@u&hashtags=@h@tu";
 ```
-
-### Demo
-
-You may view a working example [here on Stackblitz](https://stackblitz.com/edit/vitejs-vite-vz1yr8?file=src/App.tsx).
 
 ### Acknowledgements
 
