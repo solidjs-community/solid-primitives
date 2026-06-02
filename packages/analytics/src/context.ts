@@ -42,4 +42,8 @@ export function AnalyticsProvider(props: {
  * }
  * ```
  */
-export const useAnalytics = (): ReactiveAnalyticsControls => useContext(AnalyticsCtx);
+export const useAnalytics = (): ReactiveAnalyticsControls => {
+  const controls = useContext(AnalyticsCtx);
+  if (controls === undefined) throw new Error("useAnalytics: must be called inside <AnalyticsProvider>");
+  return controls;
+};

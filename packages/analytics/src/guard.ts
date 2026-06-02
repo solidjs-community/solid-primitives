@@ -38,7 +38,7 @@ function buildOnBeforeLeave(analytics: Drainable): (event: BeforeLeaveEvent) => 
  * ```ts
  * import { useBeforeLeave } from "@solidjs/router";
  * const [analytics, cleanup] = makeAnalytics([...]);
- * const { onBeforeLeave, cleanup } = makeAnalyticsGuard(analytics);
+ * const { onBeforeLeave, cleanup: guardCleanup } = makeAnalyticsGuard(analytics);
  * useBeforeLeave(onBeforeLeave);
  * ```
  */

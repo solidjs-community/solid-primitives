@@ -58,8 +58,7 @@
       "useAnalytics",
       "makeAnalyticsGuard",
       "createAnalyticsGuard",
-      "createServerPlugin",
-      "createEventHandler"
+      "createServerPlugin"
     ],
     "category": "Utilities"
   },

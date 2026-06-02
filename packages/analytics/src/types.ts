@@ -13,7 +13,7 @@ export type TrackProperties = Record<string, unknown>;
 export type IdentifyTraits = Record<string, unknown>;
 
 export type EventMeta = {
-  /** Unique request identifier for this event. */
+  /** Unique request identifier for this event. Unique within an analytics instance and with high probability unique across independent instances (separate processes or SSR requests). */
   rid: string;
   /** Unix timestamp (ms) when the event was created. */
   ts: number;

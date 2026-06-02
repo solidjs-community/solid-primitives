@@ -104,7 +104,7 @@ function buildCore(queue: EventBuffer, options: AnalyticsOptions) {
 
   function drainBatch(): AnyPayload[] {
     const events: AnyPayload[] = [];
-    const max = drainSize ?? Infinity;
+    const max = batching ? (drainSize ?? Infinity) : Infinity;
     let item: AnyPayload | undefined;
     while (events.length < max && (item = queue.remove()) !== undefined) {
       events.push(item);

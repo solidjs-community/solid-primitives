@@ -10,11 +10,11 @@ import { createServerPlugin } from "../relay.js";
  *
  * ```ts
  * // analytics.server.ts
- * import { createServerFn } from "@tanstack/start";
+ * import { createServerFn } from "@tanstack/solid-start";
  * import googleAnalytics from "@analytics/google-analytics";
  *
  * export const relayEvent = createServerFn({ method: "POST" })
- *   .validator((d: unknown) => d as AnyPayload)
+ *   .inputValidator((d: unknown) => d as AnyPayload)
  *   .handler(async ({ data: payload }) => {
  *     const ga = googleAnalytics({ measurementId: process.env.GA_ID });
  *     await ga.track?.({ payload, config: {}, abort: () => {} });

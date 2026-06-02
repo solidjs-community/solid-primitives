@@ -186,7 +186,7 @@ When `onBeforeLeave` fires:
 
 Route analytics events through your own server function instead of calling providers directly from the browser. This keeps API keys off the client and lets you enrich events with server-side context (session data, IP-based geo, etc.) before forwarding to the provider.
 
-```
+```text
 browser → createServerPlugin → your server function → GA / Mixpanel / Segment
 ```
 

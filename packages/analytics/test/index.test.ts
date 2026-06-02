@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, afterEach } from "vitest";
+import { describe, expect, it, vi, afterEach, beforeEach } from "vitest";
 import { createRoot, flush } from "solid-js";
 import { makeAnalytics, createAnalytics } from "../src/analytics.js";
 import { makeAnalyticsGuard, createAnalyticsGuard } from "../src/guard.js";
@@ -9,9 +9,8 @@ function makeReadyPlugin(overrides: Partial<AnalyticsPlugin> = {}): AnalyticsPlu
   return { name: "ready", ...overrides };
 }
 
-function delay(ms = 0): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+beforeEach(() => vi.useFakeTimers());
+afterEach(() => vi.useRealTimers());
 
 // ─── makeAnalytics ────────────────────────────────────────────────────────────
 
@@ -20,7 +19,7 @@ describe("makeAnalytics", () => {
     const pageSpy = vi.fn();
     const [analytics, cleanup] = makeAnalytics([makeReadyPlugin({ page: ({ payload }) => pageSpy(payload) })]);
     analytics.page({ title: "Home" });
-    await delay();
+    await vi.advanceTimersByTimeAsync(0);
     expect(pageSpy).toHaveBeenCalledOnce();
     const payload = pageSpy.mock.calls[0]![0] as PagePayload;
     expect(payload.type).toBe("page");
@@ -33,7 +32,7 @@ describe("makeAnalytics", () => {
     const trackSpy = vi.fn();
     const [analytics, cleanup] = makeAnalytics([makeReadyPlugin({ track: ({ payload }) => trackSpy(payload) })]);
     analytics.track("button_click", { name: "signup" });
-    await delay();
+    await vi.advanceTimersByTimeAsync(0);
     expect(trackSpy).toHaveBeenCalledOnce();
     const payload = trackSpy.mock.calls[0]![0] as TrackPayload;
     expect(payload.type).toBe("track");
@@ -48,7 +47,7 @@ describe("makeAnalytics", () => {
       makeReadyPlugin({ identify: ({ payload }) => identifySpy(payload) }),
     ]);
     analytics.identify("user-1", { email: "alice@example.com" });
-    await delay();
+    await vi.advanceTimersByTimeAsync(0);
     expect(identifySpy).toHaveBeenCalledOnce();
     const payload = identifySpy.mock.calls[0]![0] as IdentifyPayload;
     expect(payload.type).toBe("identify");
@@ -71,11 +70,11 @@ describe("makeAnalytics", () => {
     ]);
 
     analytics.page({ title: "Queued" });
-    await delay(); // init not done yet
+    await vi.advanceTimersByTimeAsync(0); // init not done yet
     expect(pageSpy).not.toHaveBeenCalled();
 
     resolveInit();
-    await delay(20); // allow init + drain
+    await vi.advanceTimersByTimeAsync(20); // allow init + drain
     expect(pageSpy).toHaveBeenCalledOnce();
     cleanup();
   });
@@ -86,7 +85,7 @@ describe("makeAnalytics", () => {
     const pluginB: AnalyticsPlugin = { name: "b", track: async () => { order.push("b"); } };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
     analytics.track("ev");
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(order).toEqual(["a", "b"]);
     cleanup();
   });
@@ -98,7 +97,7 @@ describe("makeAnalytics", () => {
     const pluginB: AnalyticsPlugin = { name: "b", track: () => spyB() };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
     analytics.track("ev");
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(spyA).toHaveBeenCalledOnce();
     expect(spyB).not.toHaveBeenCalled();
     cleanup();
@@ -113,7 +112,7 @@ describe("makeAnalytics", () => {
     const pluginB: AnalyticsPlugin = { name: "ok", track: () => spyB() };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
     analytics.track("ev");
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(spyB).toHaveBeenCalledOnce();
     cleanup();
   });
@@ -126,7 +125,7 @@ describe("makeAnalytics", () => {
     const [analytics, cleanup] = makeAnalytics([pluginA]);
     analytics.use(pluginB);
     analytics.track("ev");
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(spyA).toHaveBeenCalledOnce();
     expect(spyB).toHaveBeenCalledOnce();
     cleanup();
@@ -143,7 +142,7 @@ describe("makeAnalytics", () => {
     analytics.page({ title: "Lost" });
     cleanup(); // discard before init resolves
     resolveInit();
-    await delay(100);
+    await vi.advanceTimersByTimeAsync(100);
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -157,10 +156,10 @@ describe("makeAnalytics", () => {
     };
     const [analytics, cleanup] = makeAnalytics([plugin], { retryInterval: 20 });
     analytics.page({ title: "Deferred" });
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(spy).not.toHaveBeenCalled();
     isLoaded = true;
-    await delay(50); // poll fires, drains queue
+    await vi.advanceTimersByTimeAsync(50); // poll fires, drains queue
     expect(spy).toHaveBeenCalledOnce();
     cleanup();
   });
@@ -171,7 +170,7 @@ describe("makeAnalytics", () => {
     const [analytics, cleanup] = makeAnalytics([plugin]);
     analytics.track("a");
     analytics.track("b");
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(rids).toHaveLength(2);
     expect(rids[0]).not.toBe(rids[1]);
     cleanup();
@@ -196,25 +195,23 @@ describe("createAnalytics", () => {
     });
   });
 
-  it("pendingCount() reflects queued event count", () =>
-    new Promise<void>(resolve => {
-      createRoot(d => {
-        dispose = d;
-        let resolveInit!: () => void;
-        const initDone = new Promise<void>(res => (resolveInit = res));
-        const analytics = createAnalytics([{ name: "async", initialize: () => initDone, page: () => {} }]);
-        analytics.page({ title: "A" });
-        analytics.page({ title: "B" });
-        flush();
-        expect(analytics.pendingCount()).toBe(2);
-        resolveInit();
-        delay(20).then(() => {
-          flush();
-          expect(analytics.pendingCount()).toBe(0);
-          resolve();
-        });
-      });
-    }));
+  it("pendingCount() reflects queued event count", async () => {
+    let resolveInit!: () => void;
+    const initDone = new Promise<void>(res => (resolveInit = res));
+    let analyticsRef!: ReturnType<typeof createAnalytics>;
+    createRoot(d => {
+      dispose = d;
+      analyticsRef = createAnalytics([{ name: "async", initialize: () => initDone, page: () => {} }]);
+      analyticsRef.page({ title: "A" });
+      analyticsRef.page({ title: "B" });
+      flush();
+      expect(analyticsRef.pendingCount()).toBe(2);
+      resolveInit();
+    });
+    await vi.advanceTimersByTimeAsync(20);
+    flush();
+    expect(analyticsRef.pendingCount()).toBe(0);
+  });
 
   it("reset() clears the queue and resets pendingCount", () => {
     createRoot(d => {
@@ -273,7 +270,7 @@ describe("drain()", () => {
     const [analytics, cleanup] = makeAnalytics([plugin]);
     analytics.track("ev");
     const drained = analytics.drain().then(() => order.push("drained"));
-    await delay(5);
+    await vi.advanceTimersByTimeAsync(5);
     expect(order).toEqual([]); // neither done yet
     resolveTrack();
     await drained;
@@ -308,10 +305,10 @@ describe("drainInterval / drainSize", () => {
     analytics.track("b");
     analytics.track("c");
 
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(spy).not.toHaveBeenCalled(); // not dispatched yet
 
-    await delay(30); // drain interval fires
+    await vi.advanceTimersByTimeAsync(30); // drain interval fires
     expect(spy).toHaveBeenCalledTimes(3);
     expect(spy.mock.calls.map(c => c[0])).toEqual(["a", "b", "c"]);
     cleanup();
@@ -326,35 +323,34 @@ describe("drainInterval / drainSize", () => {
     analytics.track("b");
     analytics.track("c");
 
-    await delay(40); // first drain fires
+    await vi.advanceTimersByTimeAsync(40); // first drain fires
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy.mock.calls.map(c => c[0])).toEqual(["a", "b"]);
 
-    await delay(30); // second drain fires
+    await vi.advanceTimersByTimeAsync(30); // second drain fires
     expect(spy).toHaveBeenCalledTimes(3);
     expect(spy.mock.calls[2]![0]).toBe("c");
     cleanup();
   });
 
   it("pendingCount reflects queued events in batch mode", async () => {
-    await new Promise<void>(resolve => {
-      createRoot(d => {
-        const spy = vi.fn();
-        const plugin: AnalyticsPlugin = { name: "p", track: () => spy() };
-        const analytics = createAnalytics([plugin], { drainInterval: 50 });
-        analytics.track("a");
-        analytics.track("b");
-        flush();
-        expect(analytics.pendingCount()).toBe(2);
-        delay(60).then(() => {
-          flush();
-          expect(analytics.pendingCount()).toBe(0);
-          expect(spy).toHaveBeenCalledTimes(2);
-          d();
-          resolve();
-        });
-      });
+    const spy = vi.fn();
+    let analyticsRef!: ReturnType<typeof createAnalytics>;
+    let disposeRef!: () => void;
+    createRoot(d => {
+      disposeRef = d;
+      const plugin: AnalyticsPlugin = { name: "p", track: () => spy() };
+      analyticsRef = createAnalytics([plugin], { drainInterval: 50 });
+      analyticsRef.track("a");
+      analyticsRef.track("b");
+      flush();
+      expect(analyticsRef.pendingCount()).toBe(2);
     });
+    await vi.advanceTimersByTimeAsync(60);
+    flush();
+    expect(analyticsRef.pendingCount()).toBe(0);
+    expect(spy).toHaveBeenCalledTimes(2);
+    disposeRef();
   });
 
   it("without drainInterval events dispatch immediately (default behavior unchanged)", async () => {
@@ -362,7 +358,7 @@ describe("drainInterval / drainSize", () => {
     const plugin: AnalyticsPlugin = { name: "p", track: ({ payload }) => spy(payload.event) };
     const [analytics, cleanup] = makeAnalytics([plugin]);
     analytics.track("immediate");
-    await delay(5);
+    await vi.advanceTimersByTimeAsync(5);
     expect(spy).toHaveBeenCalledWith("immediate");
     cleanup();
   });
@@ -393,7 +389,7 @@ describe("makeAnalyticsGuard", () => {
     expect(retried).not.toHaveBeenCalled();
 
     resolveTrack();
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     expect(retried).toHaveBeenCalledWith(true);
 
     cleanup();
@@ -419,7 +415,7 @@ describe("makeAnalyticsGuard", () => {
     expect(event.preventDefault).toHaveBeenCalledOnce();
 
     resolveTrack();
-    await delay(10);
+    await vi.advanceTimersByTimeAsync(10);
     cleanup();
     cleanupAnalytics();
   });

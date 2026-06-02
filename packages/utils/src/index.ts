@@ -102,10 +102,11 @@ export function reverseChain<Args extends [] | any[]>(
 
 export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
-/** Creates an ID generator with its own isolated counter. Each call to the returned function produces a unique `timestamp-sequence` string. */
+/** Creates an ID generator with its own isolated counter and per-generator random segment. Each call to the returned function produces a `timestamp-sequence-random` string that is unique within the generator and with high probability unique across independent generators (e.g. separate processes or SSR requests). */
 export const createIdGenerator = (): (() => string) => {
   let seq = 0;
-  return () => `${Date.now().toString(36)}-${(++seq).toString(36)}`;
+  const rand = Math.random().toString(36).slice(2, 8);
+  return () => `${Date.now().toString(36)}-${(++seq).toString(36)}-${rand}`;
 };
 
 /**

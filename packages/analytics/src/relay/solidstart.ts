@@ -10,13 +10,14 @@ import { createServerPlugin } from "../relay.js";
  *
  * ```ts
  * // analytics.server.ts
- * import { action } from "@solidjs/router";
+ * import { action, reload } from "@solidjs/router";
  * import googleAnalytics from "@analytics/google-analytics";
  *
  * export const relayEvent = action(async (payload: AnyPayload) => {
  *   "use server";
  *   const ga = googleAnalytics({ measurementId: import.meta.env.GA_ID });
  *   await ga.track?.({ payload, config: {}, abort: () => {} });
+ *   return reload({ revalidate: [] });
  * });
  *
  * // app.tsx
@@ -29,7 +30,7 @@ import { createServerPlugin } from "../relay.js";
  * ```
  */
 export function createSolidStartRelayPlugin(
-  action: (payload: AnyPayload) => Promise<void>,
+  action: (payload: AnyPayload) => Promise<unknown>,
   options?: { name?: string; events?: Array<AnyPayload["type"]> },
 ): AnalyticsPlugin {
   return createServerPlugin(action, { name: "solidstart", ...options });
