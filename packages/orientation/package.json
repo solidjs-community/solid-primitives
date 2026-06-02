@@ -20,7 +20,8 @@
       "makeOrientation",
       "createOrientation"
     ],
-    "category": "Sensors"
+    "category": "Sensors",
+    "gzip": 489
   },
   "keywords": [
     "solid",

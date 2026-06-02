@@ -23,7 +23,8 @@
       "trackStore",
       "captureStoreUpdates"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 1298
   },
   "keywords": [
     "solid",

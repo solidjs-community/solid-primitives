@@ -27,7 +27,8 @@
       "createWSData",
       "createWSStore"
     ],
-    "category": "Network"
+    "category": "Network",
+    "gzip": 1086
   },
   "private": false,
   "type": "module",

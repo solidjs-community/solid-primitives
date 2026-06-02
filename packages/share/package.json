@@ -21,7 +21,8 @@
       "createWebShare",
       "makeWebShare"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1998
   },
   "keywords": [
     "template",

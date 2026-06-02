@@ -19,7 +19,8 @@
     "list": [
       "createUndoHistory"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 615
   },
   "keywords": [
     "solid",
