@@ -64,7 +64,6 @@
     }
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -86,9 +85,6 @@
     "solid-js": "^2.0.0-beta.14"
   },
   "peerDependenciesMeta": {
-    "solid-start": {
-      "optional": true
-    },
     "@tauri-apps/plugin-store": {
       "optional": true
     }
