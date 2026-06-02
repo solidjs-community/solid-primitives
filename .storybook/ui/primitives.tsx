@@ -175,6 +175,59 @@ export const EventLog = (props: { entries: { label: string; time: string }[] }) 
   </div>
 );
 
+/**
+ * Kobalte-compatible progress bar primitive.
+ * Swap the implementation for `@kobalte/core` Progress when stable.
+ * Accepts raw value + min/max so callers never compute percentages.
+ */
+export const ProgressBar = (props: {
+  value: number;
+  min?: number;
+  max?: number;
+  color?: string;
+  label?: string;
+  trackHeight?: string;
+  style?: JSX.CSSProperties;
+}) => {
+  const lo = () => props.min ?? 0;
+  const hi = () => props.max ?? 100;
+  const pct = () => Math.max(0, Math.min(100, ((props.value - lo()) / (hi() - lo())) * 100));
+
+  return (
+    <div
+      role="progressbar"
+      aria-valuenow={props.value}
+      aria-valuemin={lo()}
+      aria-valuemax={hi()}
+      style={{ display: "flex", "flex-direction": "column", gap: "0.3rem", ...(props.style ?? {}) }}
+    >
+      {props.label != null && (
+        <span style={{ "font-size": font.sizeSm, color: colors.muted }}>{props.label}</span>
+      )}
+      <div
+        style={{
+          height: props.trackHeight ?? "8px",
+          background: colors.secondary,
+          "border-radius": radii.full,
+          overflow: "hidden",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: "0 auto 0 0",
+            width: `${pct()}%`,
+            background: props.color ?? colors.primary,
+            "border-radius": radii.full,
+            transition: "none",
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 export const Progress = (props: { value: number; color?: string }) => (
   <div
     style={{

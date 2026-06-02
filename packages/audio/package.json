@@ -17,7 +17,8 @@
       "makeAudioPlayer",
       "createAudio"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 851
   },
   "files": [
     "dist"

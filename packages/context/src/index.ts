@@ -24,6 +24,8 @@ export type ContextProviderOptions = {
   name?: string;
 };
 
+const $EMPTY = Symbol("empty-context");
+
 /**
  * Create the Context Provider component and useContext function with types inferred from the factory function.
  * @param factoryFn Factory function will run when the provider component is executed. It takes the provider component `props` as its argument, and what it returns will be available in the contexts for all the underlying components.
@@ -43,38 +45,67 @@ export type ContextProviderOptions = {
  * </CounterProvider>
  * // get the context
  * const ctx = useCounter()
- * ctx?.count() // => 1
+ * ctx.count() // => 1
  * ```
  */
 export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
-  defaults: undefined,
-  options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T | undefined];
-export function createContextProvider<T, P extends ContextProviderProps>(
-  factoryFn: (props: P) => T,
-  defaults: T,
-  options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T];
-export function createContextProvider<T, P extends ContextProviderProps>(
-  factoryFn: (props: P) => T,
-): [provider: ContextProvider<P>, useContext: () => T | undefined];
-export function createContextProvider<T, P extends ContextProviderProps>(
-  factoryFn: (props: P) => T,
   defaults?: T,
   options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T | undefined] {
-  const ctx = createContext<T>(defaults as T, options);
+): [provider: ContextProvider<P>, useContext: () => Exclude<T, undefined>] {
+  const ctx = createContext<Exclude<T, undefined>>(defaults as Exclude<T, undefined>, options);
   return [
     props => {
       return createComponent(ctx, {
-        value: factoryFn(props),
+        value: factoryFn(props) as Exclude<T, undefined>,
         get children() {
           return props.children;
         },
       });
     },
     () => useContext(ctx),
+  ];
+}
+
+/**
+ * Create the Context Provider component and useContext function with types inferred from the factory function.
+ *
+ * Unlike `createContextProvider`, this primitive represents a missing or undefined context
+ * value as `undefined` rather than throwing.
+ *
+ * @param factoryFn Factory function will run when the provider component is executed.
+ * @param defaults Fallback returned from useContext function if the context wasn't provided.
+ * @param options Optional configuration, including a debug `name` for DevTools.
+ * @returns tuple of `[provider component, useContext function]`
+ * @example
+ * ```tsx
+ * const [UserProvider, useUser] = createOptionalContextProvider(
+ *   (props: { id?: string }) => props.id ? { id: props.id } : undefined,
+ * );
+ *
+ * const user = useUser() // => undefined when no provider is present
+ * ```
+ */
+export function createOptionalContextProvider<T, P extends ContextProviderProps>(
+  factoryFn: (props: P) => T,
+  defaults?: T,
+  options?: ContextProviderOptions,
+): [provider: ContextProvider<P>, useContext: () => T | undefined] {
+  const ctx = createContext<T | typeof $EMPTY>(defaults === undefined ? $EMPTY : defaults, options);
+  return [
+    props => {
+      const value = factoryFn(props);
+      return createComponent(ctx, {
+        value: value === undefined ? $EMPTY : value,
+        get children() {
+          return props.children;
+        },
+      });
+    },
+    () => {
+      const value = useContext(ctx);
+      return value === $EMPTY ? undefined : value;
+    },
   ];
 }
 

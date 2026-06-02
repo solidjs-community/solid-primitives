@@ -21,7 +21,8 @@
       "createMs",
       "targetFPS"
     ],
-    "category": "Animation"
+    "category": "Animation",
+    "gzip": 539
   },
   "files": [
     "dist"

@@ -19,7 +19,8 @@
     "list": [
       "createMarker"
     ],
-    "category": "UI Patterns"
+    "category": "UI Patterns",
+    "gzip": 510
   },
   "keywords": [
     "solid",
