@@ -7,7 +7,7 @@
   },
   "references": [
     {
-      "path": "../event-listener"
+      "path": "../page-utilities"
     },
     {
       "path": "../queue"

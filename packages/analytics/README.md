@@ -145,29 +145,31 @@ function BuyButton() {
 `makeAnalyticsGuard` / `createAnalyticsGuard` pause navigation until all in-flight plugin dispatches complete, preventing events from being lost when users navigate away before async network calls finish.
 
 Both guards:
-- Return an `onBeforeLeave` handler compatible with SolidJS Router's `useBeforeLeave`
-- Register a `beforeunload` listener as a best-effort safety net for hard navigations
+- Show a browser confirmation dialog on hard navigation (tab close, URL bar, page refresh) via [`makePageLeave`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/page-utilities) from `@solid-primitives/page-utilities`
+- Return an `onBeforeLeave` handler compatible with SolidJS Router's `useBeforeLeave` for soft navigation
 
 ### With SolidJS Router
+
+`createAnalyticsGuard` returns the callback directly — pass it straight to `useBeforeLeave`:
 
 ```tsx
 import { useBeforeLeave } from "@solidjs/router";
 import { useAnalytics, createAnalyticsGuard } from "@solid-primitives/analytics";
 
 function App() {
-  const analytics = useAnalytics();
-  const { onBeforeLeave } = createAnalyticsGuard(analytics);
-  useBeforeLeave(onBeforeLeave);
+  useBeforeLeave(createAnalyticsGuard(useAnalytics()));
 }
 ```
 
 ### Without a router
 
+`makeAnalyticsGuard` returns a tuple `[onBeforeLeave, cleanup]`, consistent with `makeAnalytics`:
+
 ```ts
 import { makeAnalytics, makeAnalyticsGuard } from "@solid-primitives/analytics";
 
 const [analytics, cleanupAnalytics] = makeAnalytics([...]);
-const { onBeforeLeave, cleanup } = makeAnalyticsGuard(analytics);
+const [onBeforeLeave, cleanup] = makeAnalyticsGuard(analytics);
 
 // wire onBeforeLeave into your routing solution
 cleanup(); // call when tearing down
@@ -175,10 +177,12 @@ cleanup(); // call when tearing down
 
 ### How it works
 
-When `onBeforeLeave` fires:
+For **soft navigation** (SolidJS Router), when `onBeforeLeave` fires:
 1. Navigation is paused via `event.preventDefault()`
 2. `analytics.drain()` waits for all in-flight plugin dispatches to settle
 3. Navigation resumes via `event.retry(true)`
+
+For **hard navigation** (tab close, URL bar, page refresh), the browser confirmation dialog gives the drain a chance to complete before the page unloads.
 
 ---
 

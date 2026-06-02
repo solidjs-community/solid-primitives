@@ -1,5 +1,5 @@
 import { isServer } from "@solidjs/web";
-import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
+import { makePageLeave, createPageLeaveBlocker } from "@solid-primitives/page-utilities";
 import type { AnalyticsControls } from "./types.js";
 
 /** Minimal shape required by the guard — accepts both make and create controls. */
@@ -30,44 +30,38 @@ function buildOnBeforeLeave(analytics: Drainable): (event: BeforeLeaveEvent) => 
 }
 
 /**
- * Non-reactive navigation guard. Call cleanup() when done (e.g. on route teardown).
+ * Non-reactive navigation guard. Returns the router callback and a cleanup function.
  *
- * - Registers a `beforeunload` listener so hard navigations attempt a best-effort drain.
- * - Returns `onBeforeLeave` for use with SolidJS Router's `useBeforeLeave`:
+ * - Shows a browser confirmation dialog on hard navigation (tab close, URL bar, etc.).
+ * - Returns `onBeforeLeave` for use with SolidJS Router's `useBeforeLeave` to hold
+ *   back soft navigation until all in-flight analytics events have been sent.
  *
  * ```ts
  * import { useBeforeLeave } from "@solidjs/router";
- * const [analytics, cleanup] = makeAnalytics([...]);
- * const { onBeforeLeave, cleanup: guardCleanup } = makeAnalyticsGuard(analytics);
+ * const [analytics, cleanupAnalytics] = makeAnalytics([...]);
+ * const [onBeforeLeave, cleanupGuard] = makeAnalyticsGuard(analytics);
  * useBeforeLeave(onBeforeLeave);
  * ```
  */
-export function makeAnalyticsGuard(analytics: Drainable): {
-  onBeforeLeave: (event: BeforeLeaveEvent) => void;
-  cleanup: () => void;
-} {
-  if (isServer) return { onBeforeLeave: () => {}, cleanup: () => {} };
-  const onBeforeLeave = buildOnBeforeLeave(analytics);
-  const cleanup = makeEventListener(window, "beforeunload", () => void analytics.drain());
-  return { onBeforeLeave, cleanup };
+export function makeAnalyticsGuard(
+  analytics: Drainable,
+): [(event: BeforeLeaveEvent) => void, () => void] {
+  if (isServer) return [() => {}, () => {}];
+  return [buildOnBeforeLeave(analytics), makePageLeave()];
 }
 
 /**
- * Reactive navigation guard. Auto-removes the `beforeunload` listener when the owner disposes.
+ * Reactive navigation guard. Auto-removes the `beforeunload` listener when the owner
+ * disposes. Returns the `onBeforeLeave` callback directly for use with `useBeforeLeave`.
  *
  * ```tsx
  * function App() {
- *   const analytics = useAnalytics();
- *   const { onBeforeLeave } = createAnalyticsGuard(analytics);
- *   useBeforeLeave(onBeforeLeave);
+ *   useBeforeLeave(createAnalyticsGuard(useAnalytics()));
  * }
  * ```
  */
-export function createAnalyticsGuard(analytics: Drainable): {
-  onBeforeLeave: (event: BeforeLeaveEvent) => void;
-} {
-  if (isServer) return { onBeforeLeave: () => {} };
-  const onBeforeLeave = buildOnBeforeLeave(analytics);
-  createEventListener(window, "beforeunload", () => void analytics.drain());
-  return { onBeforeLeave };
+export function createAnalyticsGuard(analytics: Drainable): (event: BeforeLeaveEvent) => void {
+  if (isServer) return () => {};
+  createPageLeaveBlocker();
+  return buildOnBeforeLeave(analytics);
 }

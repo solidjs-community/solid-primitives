@@ -375,7 +375,7 @@ describe("makeAnalyticsGuard", () => {
     const [analytics, cleanupAnalytics] = makeAnalytics([plugin]);
     analytics.track("ev"); // in-flight
 
-    const { onBeforeLeave, cleanup } = makeAnalyticsGuard(analytics);
+    const [onBeforeLeave, cleanup] = makeAnalyticsGuard(analytics);
 
     const retried = vi.fn();
     const event: BeforeLeaveEvent = {
@@ -402,7 +402,7 @@ describe("makeAnalyticsGuard", () => {
     const plugin: AnalyticsPlugin = { name: "slow", track: () => trackDone };
     const [analytics, cleanupAnalytics] = makeAnalytics([plugin]);
     analytics.track("ev"); // keep a dispatch in-flight so drain() doesn't resolve immediately
-    const { onBeforeLeave, cleanup } = makeAnalyticsGuard(analytics);
+    const [onBeforeLeave, cleanup] = makeAnalyticsGuard(analytics);
 
     const event: BeforeLeaveEvent = {
       defaultPrevented: false,
@@ -422,7 +422,7 @@ describe("makeAnalyticsGuard", () => {
 
   it("does nothing when event.defaultPrevented is true", () => {
     const [analytics, cleanupAnalytics] = makeAnalytics([makeReadyPlugin()]);
-    const { onBeforeLeave, cleanup } = makeAnalyticsGuard(analytics);
+    const [onBeforeLeave, cleanup] = makeAnalyticsGuard(analytics);
 
     const event: BeforeLeaveEvent = {
       defaultPrevented: true,
@@ -451,7 +451,7 @@ describe("createAnalyticsGuard", () => {
       createAnalyticsGuard(analytics);
     });
     dispose();
-    expect(removeSpy).toHaveBeenCalledWith("beforeunload", expect.any(Function), undefined);
+    expect(removeSpy).toHaveBeenCalledWith("beforeunload", expect.any(Function));
     removeSpy.mockRestore();
   });
 });
