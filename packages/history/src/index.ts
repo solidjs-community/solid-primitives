@@ -1,5 +1,12 @@
 import { type Many, createMicrotask, falseFn, noop } from "@solid-primitives/utils";
-import { type Accessor, type Signal, createMemo, createSignal, untrack } from "solid-js";
+import {
+  type Accessor,
+  type Signal,
+  type SignalOptions,
+  createMemo,
+  createSignal,
+  untrack,
+} from "solid-js";
 import { isServer } from "@solidjs/web";
 
 /**
@@ -90,8 +97,8 @@ export function createUndoHistory(
   const limit = options?.limit ?? 100,
     sources = Array.isArray(source) ? source.map(s => createMemo(s)) : [source],
     clearIgnore = createMicrotask(() => (ignoreNext = false)),
-    // Initial state lives outside the memo so Solid 2.0's undefined-prev first-call is handled
-    initialCount = createSignal<number>(0, { ownedWrite: true }),
+    // Initial state lives outside the memo so Solid undefined-prev first-call is handled
+    initialCount = createSignal<number>(0, { ownedWrite: true } as SignalOptions<number>),
     initialState: HistoryState = { list: [], count: initialCount },
     history = createMemo<HistoryState>(p => {
       const prev = p ?? initialState;
@@ -113,7 +120,12 @@ export function createUndoHistory(
         newHistory = prev.list.slice(Math.max(0, newLength - limit), newLength);
       newHistory.push(setters);
 
-      return { count: count ? createSignal(0, { ownedWrite: true }) : prev.count, list: newHistory };
+      return {
+        count: count
+          ? createSignal<number>(0, { ownedWrite: true } as SignalOptions<number>)
+          : prev.count,
+        list: newHistory,
+      };
     }),
     canUndo = createMemo(() => {
       const h = history();
