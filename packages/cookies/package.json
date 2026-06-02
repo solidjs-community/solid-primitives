@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/cookies",
   "version": "0.0.3",
-  "description": "A set of primitives for handling cookies in solid",
+  "description": "Reactive, signal-based cookie primitives for isomorphic use on client and server",
   "author": "Thomas Beer (https://github.com/Tommypop2)",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>",
@@ -57,9 +57,11 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.8.18"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }
