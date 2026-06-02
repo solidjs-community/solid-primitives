@@ -90,13 +90,9 @@ const string = getCookiesString();
 const cookie = parseCookie(string, "cookie_name");
 ```
 
-## Examples
-
-PRs welcome :)
-
 ## Demo
 
-You can view a demo of this primitive here: <https://codesandbox.io/p/sandbox/amazing-easley-wqk38i?file=%2Fsrc%2Fcookies_primitive%2Findex.ts%3A36%2C20>
+You can view live examples in the [Storybook](https://primitives.solidjs.community/storybook/?path=/docs/network-cookies--docs).
 
 ## Changelog
 
