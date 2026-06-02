@@ -22,7 +22,8 @@
       "makePageLeave",
       "createPageLeaveBlocker"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 747
   },
   "files": [
     "dist"

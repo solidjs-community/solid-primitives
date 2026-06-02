@@ -19,7 +19,8 @@
       "MapEntries",
       "SetValues"
     ],
-    "category": "Control Flow"
+    "category": "Control Flow",
+    "gzip": 981
   },
   "keywords": [
     "key",

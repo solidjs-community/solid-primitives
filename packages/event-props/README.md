@@ -4,7 +4,7 @@
 
 # @solid-primitives/event-props
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-props?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-props)
+[![size](https://img.shields.io/badge/size-172_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-props)
 [![size](https://img.shields.io/npm/v/@solid-primitives/event-props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-props)
 
 A helpful primitive that creates the event props and a reactive store with the latest events

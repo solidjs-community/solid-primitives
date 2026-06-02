@@ -22,7 +22,8 @@
       "createSpring",
       "createDerivedSpring"
     ],
-    "category": "Animation"
+    "category": "Animation",
+    "gzip": 753
   },
   "keywords": [
     "animate",

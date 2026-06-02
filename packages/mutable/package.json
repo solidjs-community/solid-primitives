@@ -20,7 +20,8 @@
       "createMutable",
       "modifyMutable"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 1173
   },
   "keywords": [
     "solid",

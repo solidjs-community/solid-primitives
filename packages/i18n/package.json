@@ -24,7 +24,8 @@
       "scopedTranslator",
       "chainedTranslator"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 672
   },
   "files": [
     "dist"

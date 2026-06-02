@@ -15,7 +15,8 @@
     "list": [
       "createEventProps"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 172
   },
   "files": [
     "dist"

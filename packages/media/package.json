@@ -27,7 +27,8 @@
       "createBreakpoints",
       "usePrefersDark"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 1285
   },
   "keywords": [
     "media",
