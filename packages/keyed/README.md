@@ -121,10 +121,6 @@ Second argument of the map function is an index signal.
 </Key>
 ```
 
-### Demo
-
-https://codesandbox.io/s/solid-primitives-keyed-key-demo-gh7gd?file=/index.tsx
-
 ## `<Entries>`
 
 Creates a list of elements by mapping object entries. Similar to Solid's `<For>` and `<Index>`, but here, render function takes three arguments, and both value and index arguments are signals.
@@ -277,10 +273,6 @@ You can treat `on` prop like sources argument of the Solid's `on` helper, and th
   </Rerun>
 </Transition>
 ```
-
-### DEMO
-
-https://codesandbox.io/s/solid-primitives-keyed-rerun-demo-14vjr?file=/index.tsx
 
 ## Changelog
 
