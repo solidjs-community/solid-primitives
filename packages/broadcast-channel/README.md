@@ -164,10 +164,6 @@ const consumeDataCorrect = (data: { id: number; message: string }) => {
 };
 ```
 
-## Demo
-
-Here's a working example here: https://stackblitz.com/edit/vitejs-vite-5xren3?file=src%2Fmain.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

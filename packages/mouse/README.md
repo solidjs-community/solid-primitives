@@ -178,10 +178,6 @@ Turn position relative to the page, into position relative to the screen.
 const pos = getPositionToScreen(pageX, pageY);
 ```
 
-## Demo
-
-https://codesandbox.io/s/solid-primitives-mouse-p10s5?file=/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

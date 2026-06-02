@@ -8,46 +8,64 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/devices?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/devices)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Creates a primitive to get a list of media devices (microphones, speakers, cameras). There are filtered primitives for convenience reasons.
+Reactive primitives for enumerating and filtering media input/output devices (microphones, speakers, cameras).
+
+> **Looking for accelerometer or gyroscope?** Motion and orientation sensor primitives have moved to [`@solid-primitives/sensors`](../sensors/README.md).
 
 ## Installation
 
 ```
 npm install @solid-primitives/devices
 # or
-yarn add @solid-primitives/devices
+pnpm add @solid-primitives/devices
 ```
 
 ## How to use it
 
-### Media Devices
+### `createDevices`
+
+Returns a reactive accessor for the full list of [`MediaDeviceInfo`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDeviceInfo) objects available to the browser. The list updates automatically whenever devices are added or removed.
 
 ```ts
+import { createDevices } from "@solid-primitives/devices";
+
 const devices = createDevices();
+// => Accessor<MediaDeviceInfo[]>
+
+createEffect(() => console.log(devices()));
+```
+
+### `createMicrophones` / `createSpeakers` / `createCameras`
+
+Filtered convenience primitives that each return an accessor for a specific device kind. Each one only re-runs downstream computations when a device of its own kind changes — devices of other kinds changing do not trigger updates.
+
+```ts
+import { createMicrophones, createSpeakers, createCameras } from "@solid-primitives/devices";
 
 const microphones = createMicrophones();
+// => Accessor<MediaDeviceInfo[]>  (kind === "audioinput")
+
 const speakers = createSpeakers();
+// => Accessor<MediaDeviceInfo[]>  (kind === "audiooutput")
+
 const cameras = createCameras();
+// => Accessor<MediaDeviceInfo[]>  (kind === "videoinput")
 ```
 
-The filtered primitives are build so that they only triggered if the devices of their own kind changed.
-
-### Device Motion
+## API
 
 ```ts
-const accelerometer = createAccelerometer();
-const gyroscope = createGyroscope();
+function createDevices(): Accessor<MediaDeviceInfo[]>;
+
+function createMicrophones(): Accessor<MediaDeviceInfo[]>;
+function createSpeakers(): Accessor<MediaDeviceInfo[]>;
+function createCameras(): Accessor<MediaDeviceInfo[]>;
 ```
 
-## Demo
-
-You may view a working example here:
-https://primitives.solidjs.community/playground/devices/
-
-## Reference
-
-`createAccelerometer` : [devicemotion event](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicemotion_event)
-`createGyroscope` : [deviceorientation event](https://developer.mozilla.org/en-US/docs/Web/API/Window/deviceorientation_event)
+All four primitives:
+- Are SSR-safe — return an empty array on the server.
+- Require no arguments.
+- Subscribe to [`devicechange`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/devicechange_event) events and clean up automatically via `onCleanup`.
 
 ## Changelog
 

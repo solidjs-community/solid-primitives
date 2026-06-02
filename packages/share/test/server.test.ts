@@ -1,15 +1,32 @@
-import { createRoot, createSignal } from "solid-js";
+import { createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { createWebShare } from "../src/index.js";
+import { createWebShare, createSocialShare } from "../src/index.js";
 
 describe("createWebShare", () => {
   test("doesn't break in SSR", () => {
     createRoot(dispose => {
-      const [data] = createSignal<ShareData>({});
-      const status = createWebShare(data);
+      const { share, pending, status, message } = createWebShare();
 
-      expect(status.status, "Server test starting status should be undefined.").toBe(undefined);
-      expect(status.message, "Server test starting message should be undefined.").toBe(undefined);
+      expect(typeof share).toBe("function");
+      expect(pending()).toBe(false);
+      expect(status()).toBe(undefined);
+      expect(message()).toBe(undefined);
+
+      dispose();
+    });
+  });
+});
+
+describe("createSocialShare", () => {
+  test("doesn't break in SSR", () => {
+    createRoot(dispose => {
+      const { share, close, isSharing } = createSocialShare(
+        () => ({ url: "https://solidjs.com", title: "SolidJS", description: "A reactive library" }),
+      );
+
+      expect(typeof share).toBe("function");
+      expect(typeof close).toBe("function");
+      expect(isSharing()).toBe(false);
 
       dispose();
     });

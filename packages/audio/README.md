@@ -142,10 +142,6 @@ const media = new MediaSource();
 const audio = createAudio(URL.createObjectURL(media));
 ```
 
-## Demo
-
-You may view a working example here: https://stackblitz.com/edit/vitejs-vite-zwfs6h?file=src%2Fmain.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

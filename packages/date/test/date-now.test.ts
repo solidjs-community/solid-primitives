@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll, beforeEach, vi, beforeAll } from "vitest";
-import { createEffect, createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createDateNow } from "../src/index.js";
 
 beforeAll(() => {
@@ -15,7 +15,7 @@ afterAll(() => {
 });
 
 describe("createDateNow", () => {
-  it("returns an signal an update function", () => {
+  it("returns a signal and update function", () => {
     const test_now = Date.now();
 
     const { dispose, now } = createRoot(dispose => {
@@ -30,27 +30,18 @@ describe("createDateNow", () => {
   });
 
   it("autoupdates", () => {
-    const captured: number[] = [];
-
-    const dispose = createRoot(dispose => {
+    const { now, dispose } = createRoot(dispose => {
       const [now] = createDateNow(100);
-
-      createEffect(() => {
-        captured.push(now().getTime());
-      });
-
-      return dispose;
+      return { now, dispose };
     });
 
-    expect(captured.length).toBe(1);
+    flush(); // run initial effect and set up interval
+    const initial = now().getTime();
 
     vi.advanceTimersByTime(150);
+    flush(); // commit signal write from interval callback
 
-    expect(captured.length).toBe(2);
-    expect(
-      captured[1]! - captured[0]! >= 100,
-      "the newer timestamp should have bigger value",
-    ).toBeTruthy();
+    expect(now().getTime() > initial, "the newer timestamp should have bigger value").toBeTruthy();
 
     dispose();
   });
@@ -61,12 +52,14 @@ describe("createDateNow", () => {
       return { now, update, dispose };
     });
 
+    flush();
     const time = now().getTime();
 
     vi.advanceTimersByTime(150);
-    expect(time, "the time shouldn't update").toBe(now().getTime());
+    expect(time, "the time shouldn't update without calling update()").toBe(now().getTime());
 
     update();
+    flush();
     expect(
       now().getTime(),
       "the timestamp after update() should have bigger value",
@@ -81,10 +74,11 @@ describe("createDateNow", () => {
       return { now, dispose };
     });
 
+    flush(); // set up interval
     const time = now().getTime();
 
-    dispose();
+    dispose(); // cleanup clears the interval
     vi.advanceTimersByTime(150);
-    expect(time, "the time shouldn't update").toBe(now().getTime());
+    expect(time, "the time shouldn't update after dispose").toBe(now().getTime());
   });
 });

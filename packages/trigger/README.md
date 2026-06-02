@@ -108,10 +108,6 @@ createEffect(() => {
 map.dirty(obj);
 ```
 
-## Demo
-
-TODO
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

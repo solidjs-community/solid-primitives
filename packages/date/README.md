@@ -25,7 +25,11 @@ Collection of reactive primitives and utility functions, providing easier ways t
 npm install @solid-primitives/date
 # or
 yarn add @solid-primitives/date
+# or
+pnpm add @solid-primitives/date
 ```
+
+**Peer dependencies:** `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`
 
 ## Reactive Primitives:
 
@@ -227,10 +231,6 @@ Applies relative time formatting based on a time difference from **now**.
  */
 function formatDateRelative(difference: number, messages?: Partial<RelativeFormatMessages>): string;
 ```
-
-## Demo
-
-https://codesandbox.io/s/solid-date-hjxui?file=/index.tsx
 
 ## Changelog
 

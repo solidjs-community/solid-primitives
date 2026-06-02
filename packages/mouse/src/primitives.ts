@@ -1,8 +1,8 @@
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore, createStaticStore } from "@solid-primitives/static-store";
 import { asAccessor, type MaybeAccessor, type Position } from "@solid-primitives/utils";
-import { type Accessor, createEffect, createSignal, onMount, sharedConfig } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createSignal, onSettled, sharedConfig } from "solid-js";
+import { isServer } from "@solidjs/web";
 import {
   DEFAULT_MOUSE_POSITION,
   DEFAULT_RELATIVE_ELEMENT_POSITION,
@@ -64,13 +64,14 @@ export function createMousePosition(
 
   const [state, setState] = createStaticStore(fallback);
 
-  const attachListeners = (el: SVGSVGElement | HTMLElement | Window | Document | undefined) => {
-    makeMousePositionListener(el, setState, options);
-    makeMouseInsideListener(el, setState.bind(void 0, "isInside"), options);
+  const attachListeners = (el: SVGSVGElement | HTMLElement | Window | Document | undefined): VoidFunction => {
+    const clear1 = makeMousePositionListener(el, setState, options);
+    const clear2 = makeMouseInsideListener(el, setState.bind(void 0, "isInside"), options);
+    return () => { clear1(); clear2(); };
   };
 
   if (typeof target !== "function") attachListeners(target);
-  else createEffect(() => attachListeners(target()));
+  else createEffect(() => target(), el => attachListeners(el));
 
   return state;
 }
@@ -127,11 +128,11 @@ export function createPositionToElement(
   }
 
   const isFn = typeof element === "function",
-    isHydrating = sharedConfig.context,
+    isHydrating = sharedConfig.hydrating,
     getEl = asAccessor(element),
     [shouldFallback, setShouldFallback] = createSignal(!!isHydrating, { equals: false });
 
-  if (isHydrating || isFn) onMount(() => setShouldFallback(false));
+  if (isHydrating || isFn) onSettled(() => { setShouldFallback(false); });
 
   return createDerivedStaticStore(() => {
     let el!: Element | undefined;

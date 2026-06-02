@@ -4,6 +4,7 @@
 
 # @solid-primitives/state-machine
 
+[![docs](https://img.shields.io/badge/-docs%20%26%20demos-blue?style=for-the-badge)](https://primitives.solidjs.community/package/state-machine)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/state-machine?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/state-machine)
 [![version](https://img.shields.io/npm/v/@solid-primitives/state-machine?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/state-machine)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
@@ -76,9 +77,7 @@ v.value; // "foo"
 
 if (v.type === "idle") {
   v.to.loading(1000);
-
-  v.type; // "loading"
-  v.value; // "bar"
+  // state is now "loading" after the next reactive flush
 }
 ```
 
@@ -93,9 +92,21 @@ if (state.type === "idle") {
 }
 ```
 
+> **Note:** Transitions via `state.to.*()` are batched and applied asynchronously (microtask). In reactive contexts such as JSX or effects, the updated state is reflected automatically. In tests or imperative code, call `flush()` from `solid-js` after a transition to read the updated state synchronously.
+>
+> ```ts
+> import { flush } from "solid-js";
+>
+> state.to.loading(1000);
+> flush();
+> state.type; // "loading"
+> ```
+
 ### Lifecycle
 
 `createMachine` is implemented using `createMemo`, which reruns when the state is changed. This means that any reactive computations can be used inside the state callbacks and they will be disposed when the state changes. (owner context will be available in the callbacks)
+
+State callbacks that immediately call `next.*()` (inline transitions to another state) are resolved synchronously within the same reactive computation — no flush is needed to see the final settled state.
 
 ```tsx
 const state = createMachine({
@@ -366,12 +377,6 @@ const states = {
 
 state.to(States.Idle);
 ```
-
-## Demo
-
-You may see the working example here: https://primitives.solidjs.community/playground/state-machine/
-
-Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/state-machine/dev/index.tsx
 
 ## Changelog
 

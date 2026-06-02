@@ -2,7 +2,7 @@
   "name": "@solid-primitives/signal-builders",
   "version": "0.2.3",
   "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
-  "author": "Your Name <you@youremail.com>",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/signal-builders",
   "repository": {
@@ -13,14 +13,26 @@
     "name": "signal-builders",
     "stage": 2,
     "list": [
-      "List of builders"
+      "push",
+      "filter",
+      "sort",
+      "map",
+      "get",
+      "merge",
+      "update",
+      "add",
+      "clamp",
+      "template"
     ],
     "category": "Reactivity"
   },
   "keywords": [
     "solid",
     "primitives",
-    "fp"
+    "signal",
+    "reactive",
+    "fp",
+    "functional"
   ],
   "files": [
     "dist"
@@ -49,10 +61,10 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "2.0.0-beta.14"
   }
 }
