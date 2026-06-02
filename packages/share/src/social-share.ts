@@ -1,5 +1,6 @@
 import { type Accessor, createSignal } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 import { type Network } from "./networks.js";
 
 export type SharePopupOptions = {
@@ -24,8 +25,18 @@ export type SharePopupOptions = {
  * @param {tag} string A tag to associate with the share
  * @param {popup} SharePopupOptions An object representing the pop-up window controls
  * @param {controller} Window Controller to bind the share to
- * @return Returns a share, close and is sharing signal.
+ * @return An object with `share`, `close`, and `isSharing`.
  */
+
+export type SocialShareResult = {
+  /** Open the share popup for the given network (falls back to `options().network`). */
+  share: (network?: Network) => void;
+  /** Close the share popup. */
+  close: () => void;
+  /** True while the share popup window is open. */
+  isSharing: Accessor<boolean>;
+};
+
 export const createSocialShare = (
   options: Accessor<{
     network?: Network;
@@ -44,23 +55,19 @@ export const createSocialShare = (
     description: "",
   }),
   controller: Window = isServer ? (globalThis as any) : window,
-): [
-  share: (network: Network | undefined) => void,
-  close: () => void,
-  isSharing: Accessor<boolean>,
-] => {
+): SocialShareResult => {
   if (isServer) {
-    return [
-      () => {
+    return {
+      share: () => {
         /*noop*/
       },
-      () => {
+      close: () => {
         /*noop*/
       },
-      () => false,
-    ];
+      isSharing: () => false,
+    };
   }
-  const [isSharing, setIsSharing] = createSignal(false);
+  const [isSharing, setIsSharing] = createSignal(false, INTERNAL_OPTIONS);
   let popupInterval: null | ReturnType<typeof setTimeout> = null;
   let popupWindow: null | Window;
   let popup = {
@@ -158,5 +165,5 @@ export const createSocialShare = (
     }, 500);
     setIsSharing(true);
   };
-  return [share, close, isSharing];
+  return { share, close, isSharing };
 };

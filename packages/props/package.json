@@ -19,7 +19,8 @@
       "filterProps",
       "partitionProps"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1163
   },
   "keywords": [
     "props",

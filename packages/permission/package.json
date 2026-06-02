@@ -15,7 +15,8 @@
     "list": [
       "createPermission"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 483
   },
   "files": [
     "dist"

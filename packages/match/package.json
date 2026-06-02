@@ -20,7 +20,8 @@
       "MatchTag",
       "MatchValue"
     ],
-    "category": "Control Flow"
+    "category": "Control Flow",
+    "gzip": 159
   },
   "keywords": [
     "solid",

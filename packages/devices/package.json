@@ -21,7 +21,8 @@
       "createSpeakers",
       "createCameras"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 552
   },
   "files": [
     "dist"

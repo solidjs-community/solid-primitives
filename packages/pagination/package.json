@@ -24,7 +24,8 @@
       "createSegment",
       "createInfiniteScroll"
     ],
-    "category": "UI Patterns"
+    "category": "UI Patterns",
+    "gzip": 1680
   },
   "keywords": [
     "solid",

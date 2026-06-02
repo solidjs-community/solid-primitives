@@ -19,7 +19,8 @@
     "list": [
       "createMachine"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 456
   },
   "keywords": [
     "solid",
