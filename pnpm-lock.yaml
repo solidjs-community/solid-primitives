@@ -244,9 +244,12 @@ importers:
 
   packages/cookies:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/cursor:
     dependencies:
