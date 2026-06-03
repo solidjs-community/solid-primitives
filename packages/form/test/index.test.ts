@@ -318,6 +318,75 @@ describe("reset", () => {
       dispose();
     });
   });
+
+  it("reset(newValues) resets fields to new baseline values", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: { initial: "" },
+          name:  { initial: "" },
+        },
+      });
+
+      form.reset({ email: "server@example.com", name: "Alice" });
+      flush();
+
+      expect(form.fields.email.value()).toBe("server@example.com");
+      expect(form.fields.name.value()).toBe("Alice");
+      dispose();
+    });
+  });
+
+  it("reset(newValues) updates the dirty baseline — form is not dirty after reset", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "" } } });
+
+      form.fields.email.setValue("user@example.com");
+      flush();
+      expect(form.dirty()).toBe(true);
+
+      form.reset({ email: "user@example.com" });
+      flush();
+      // New baseline matches current value → not dirty
+      expect(form.dirty()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("reset(newValues) leaves unmentioned fields at their original baseline", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: {
+          email: { initial: "old@example.com" },
+          name:  { initial: "OldName" },
+        },
+      });
+
+      form.reset({ email: "new@example.com" });
+      flush();
+
+      expect(form.fields.email.value()).toBe("new@example.com");
+      expect(form.fields.name.value()).toBe("OldName"); // unchanged baseline
+      dispose();
+    });
+  });
+
+  it("after reset(newValues), editing to the original config value is still dirty", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { name: { initial: "" } } });
+
+      form.reset({ name: "Alice" });
+      flush();
+      // Baseline is now "Alice"
+      expect(form.dirty()).toBe(false);
+
+      form.fields.name.setValue("");
+      flush();
+      // "" differs from new baseline "Alice" → dirty
+      expect(form.dirty()).toBe(true);
+      dispose();
+    });
+  });
 });
 
 // ─── Submit ───────────────────────────────────────────────────────────────────

@@ -38,7 +38,7 @@ export type FormReturn<C extends FieldsConfig> = {
   setValues: (values: Partial<{ [K in keyof C]: InferValue<C[K]> }>) => void;
   setError: (name: keyof C & string, error: string | null) => void;
   formData: () => FormData;
-  reset: () => void;
+  reset: (newValues?: Partial<{ [K in keyof C]: InferValue<C[K]> }>) => void;
   submit: () => Promise<void>;
 };
 

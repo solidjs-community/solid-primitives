@@ -227,7 +227,13 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     return result;
   }) as Accessor<Partial<Record<keyof C & string, string>>>;
 
-  const dirty = createMemo(() => fieldEntries.some(([, f]) => f.value() !== f.initial));
+  // Bumped by reset(newValues) so dirty recomputes even when field values didn't change
+  // (the baseline changed, not the value).
+  const [dirtyVer, bumpDirtyVer] = createSignal(0, { ownedWrite: true });
+  const dirty = createMemo(() => {
+    dirtyVer();
+    return fieldEntries.some(([, f]) => f.value() !== f.initial);
+  });
   const pending = createMemo(() => fieldEntries.some(([, f]) => f._asyncPending()));
 
   // Counter signal: bumped by validate() so valid() re-computes immediately
@@ -267,8 +273,13 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     internalFields[name]?._setExternalError(error);
   };
 
-  const reset = () => {
-    for (const [, f] of fieldEntries) { f._setValue(f.initial); f._setTouched(false); f._setExternalError(null); }
+  const reset = (newValues?: Partial<Values>) => {
+    for (const [name, f] of fieldEntries) {
+      if (newValues && name in newValues) f.initial = (newValues as any)[name];
+      f._setValue(f.initial); // also clears external error via the setValue wrapper
+      f._setTouched(false);
+    }
+    if (newValues) bumpDirtyVer(n => n + 1); // dirty must recompute when baseline changes
     _isSubmitting = false;
     setSubmitting(false);
     setSubmitted(false);

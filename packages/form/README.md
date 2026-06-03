@@ -111,7 +111,7 @@ Each entry in `form.fields` exposes:
 | `validate(fn)` | Cross-field rule | Registers a form-level validation rule (see below) |
 | `setError(name, msg)` | `(name, error: string \| null) => void` | Inject an external error on a named field (e.g. server-side validation). Cleared automatically when that field's value changes. |
 | `formData()` | `() => FormData` | Snapshot of current field values as a `FormData` instance |
-| `reset()` | `() => void` | Reset all fields to their initial values and clear submitted |
+| `reset(newValues?)` | `(newValues?: Partial<Values>) => void` | Reset all fields. If `newValues` is provided, the named fields adopt those as their new baseline (useful for edit forms after a successful save). |
 | `submit()` | `() => Promise<void>` | Programmatically trigger submission |
 
 ### `validateOn`
@@ -424,7 +424,7 @@ type FormReturn<C extends FieldsConfig> = {
   validate:   (fn: (values: Values) => string | null) => Accessor<string | null>;
   setError:   (name: keyof C & string, error: string | null) => void;
   formData:   () => FormData;
-  reset:      () => void;
+  reset:      (newValues?: Partial<Values>) => void;
   submit:     () => Promise<void>;
 };
 ```
