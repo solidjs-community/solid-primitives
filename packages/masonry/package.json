@@ -19,7 +19,8 @@
     "list": [
       "createMasonry"
     ],
-    "category": "UI Patterns"
+    "category": "UI Patterns",
+    "gzip": 661
   },
   "keywords": [
     "solid",

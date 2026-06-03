@@ -19,7 +19,8 @@
       "Ref",
       "Refs"
     ],
-    "category": "Control Flow"
+    "category": "Control Flow",
+    "gzip": 669
   },
   "private": false,
   "sideEffects": false,

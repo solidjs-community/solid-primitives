@@ -22,7 +22,8 @@
       "createNotification",
       "createNotificationPermission"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 1221
   },
   "keywords": [
     "solid",

@@ -18,7 +18,8 @@
       "createPointerPosition",
       "createPointerList"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 1900
   },
   "keywords": [
     "solid",

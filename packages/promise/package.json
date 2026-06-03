@@ -17,7 +17,8 @@
       "raceTimeout",
       "until"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 491
   },
   "private": false,
   "sideEffects": false,

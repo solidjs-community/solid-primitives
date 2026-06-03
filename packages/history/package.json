@@ -19,7 +19,8 @@
     "list": [
       "createUndoHistory"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 615
   },
   "keywords": [
     "solid",
@@ -54,13 +55,15 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
     "@solid-primitives/deep": "workspace:^",
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }
