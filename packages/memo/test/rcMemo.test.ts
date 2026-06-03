@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { createRcMemo } from "../src/index.js";
-import { createComputed, createContext, createRoot, createSignal, getOwner, onCleanup, useContext } from "solid-js";
+import {
+  createComputed,
+  createContext,
+  createRoot,
+  createSignal,
+  getOwner,
+  onCleanup,
+  useContext,
+} from "solid-js";
 
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 const nextTick = () => new Promise<void>(resolve => queueMicrotask(resolve));
@@ -153,7 +161,7 @@ describe("createRcMemo", () => {
   it("passes context to the inner memo", async () => {
     const MyContext = createContext(123);
     let capturedContext: any;
-    
+
     const { memo, dispose } = createRoot(dispose => {
       const memo = createRcMemo(() => {
         capturedContext = useContext(MyContext);

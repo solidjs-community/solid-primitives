@@ -479,11 +479,13 @@ export function createRcMemo<T>(
       return value as T;
     };
   }
-  let existing: {
-    memo: Accessor<T>,
-    dispose: () => void,
-    refCount: number,
-  } | undefined = undefined;
+  let existing:
+    | {
+        memo: Accessor<T>;
+        dispose: () => void;
+        refCount: number;
+      }
+    | undefined = undefined;
   let lastSeenValue: T | undefined = value;
   // For capturing context
   const owner = getOwner();
@@ -498,10 +500,10 @@ export function createRcMemo<T>(
     } else {
       if (existing === undefined) {
         runWithOwner(owner, () => {
-          existing = createRoot((dispose) => {
+          existing = createRoot(dispose => {
             return {
               memo: createMemo(
-                (prev) => {
+                prev => {
                   let result = calc(prev);
                   lastSeenValue = result;
                   return result;
