@@ -158,7 +158,7 @@ Provide a fallback element when no match is found or the value is `null`/`undefi
 
 ## Demo
 
-[Deployed example](https://primitives.solidjs.community/playground/match) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/match/dev)
+[Storybook](https://primitives.solidjs.community/storybook/?path=/docs/control-flow-match--docs)
 
 ## Changelog
 
