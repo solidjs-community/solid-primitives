@@ -11,9 +11,7 @@ import * as _ from "@solid-primitives/utils/immutable";
 import { type Accessor, createMemo } from "solid-js";
 import type { MappingFn, Predicate, FlattenArray } from "@solid-primitives/utils/immutable";
 
-/**
- * signal-builder `Array.prototype.push()`
- */
+/** Reactively appends items to an array, returning a new array without mutating the original. */
 export const push = <
   A extends MaybeAccessor<any[]>,
   V extends ItemsOf<MaybeAccessorValue<A>>,
@@ -25,52 +23,51 @@ export const push = <
   createMemo(() => _.push(access(list), ...accessArray(items)));
 
 /**
- * signal-builder that drops n items from the array start.
+ * Reactively drops the first `n` elements from an array (default: 1).
+ * @example
+ * const [list, setList] = createSignal([1, 2, 3, 4]);
+ * drop(list, 2)(); // => [3, 4]
  */
 export const drop = <T extends any[]>(list: MaybeAccessor<T>, n?: number): Accessor<T> =>
   createMemo(() => _.drop(access(list), n) as T);
 
 /**
- * signal-builder that drops n items from the end of the array.
+ * Reactively drops the last `n` elements from an array (default: 1).
+ * @example
+ * const [list, setList] = createSignal([1, 2, 3, 4]);
+ * dropRight(list, 2)(); // => [1, 2]
  */
 export const dropRight = <T extends any[]>(list: MaybeAccessor<T>, n?: number): Accessor<T> =>
   createMemo(() => _.dropRight(access(list), n) as T);
 
-/**
- *  signal-builder `Array.prototype.filter()`
- */
+/** Reactively filters array items by a predicate function. */
 export const filter = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
   predicate: Predicate<V>,
 ): Accessor<V[]> => createMemo(() => _.filter(access(list), predicate));
 
-/**
- * signal-builder `Array.prototype.filter()` that filters out passed item
- */
+/** Reactively filters out all occurrences of `item` from the array. */
 export const filterOut = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
   item: MaybeAccessor<V>,
 ): Accessor<V[]> => createMemo(() => _.filterOut(access(list), access(item)));
 
 /**
- * signal-builder `Array.prototype.sort()`
+ * Reactively sorts an array, returning a new sorted copy without mutating the original.
+ * Without a `compareFn`, items are sorted lexicographically (coerced to strings).
  */
 export const sort = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
   compareFn?: (a: V, b: V) => number,
 ): Accessor<V[]> => createMemo(() => _.sort(access(list), compareFn));
 
-/**
- * signal-builder `Array.prototype.map()`
- */
+/** Reactively maps array items to a new value via `mapFn`. */
 export const map = <A extends MaybeAccessor<any[]>, T>(
   list: A,
   mapFn: MappingFn<ItemsOf<MaybeAccessorValue<A>>, T>,
 ): Accessor<T[]> => createMemo(() => _.map(access(list), mapFn));
 
-/**
- * signal-builder `Array.prototype.slice()`
- */
+/** Reactive `Array.prototype.slice()` — extracts a portion of the array without mutating it. */
 export const slice = <T extends any[]>(
   list: MaybeAccessor<T>,
   start?: number,
@@ -78,7 +75,8 @@ export const slice = <T extends any[]>(
 ): Accessor<T> => createMemo(() => _.slice(access(list), start, end) as T);
 
 /**
- * signal-builder `Array.prototype.splice()`
+ * Reactively removes/replaces elements and optionally inserts new ones, returning a new array.
+ * Immutable equivalent of `Array.prototype.splice()`.
  */
 export const splice = <
   A extends MaybeAccessor<any[]>,
@@ -94,16 +92,18 @@ export const splice = <
     _.splice(access(list), access(start), access(deleteCount), ...accessArray(items)),
   );
 
-/**
- * signal-builder removing passed item from an array (first one from the start)
- */
+/** Reactively removes the first occurrence of `item` from the array. */
 export const remove = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
   item: MaybeAccessor<V>,
 ): Accessor<V[]> => createMemo(() => _.remove(access(list), access(item)));
 
 /**
- * signal-builder removing multiple items from an array
+ * Reactively removes the first occurrence of each provided item from the array.
+ * Once an item is matched, subsequent occurrences of that item in the list are kept.
+ * @example
+ * const [list, setList] = createSignal([1, 2, 3, 2, 1]);
+ * removeItems(list, 1, 2)(); // => [3, 2, 1]  (first 1 and first 2 removed)
  */
 export const removeItems = <T extends any[]>(
   list: MaybeAccessor<T>,
@@ -111,21 +111,26 @@ export const removeItems = <T extends any[]>(
 ): Accessor<T> => createMemo(() => _.removeItems(access(list), ...accessArray(items)) as T);
 
 /**
- * signal-builder appending multiple arrays together
+ * Reactively concatenates multiple arrays or values into a single flat array.
+ * @example
+ * const [a, setA] = createSignal([1, 2]);
+ * const [b, setB] = createSignal([3, 4]);
+ * concat(a, b)(); // => [1, 2, 3, 4]
  */
 export const concat = <A extends MaybeAccessor<any>[], V extends MaybeAccessorValue<ItemsOf<A>>>(
   ...a: A
 ): Accessor<Array<V extends any[] ? ItemsOf<V> : V>> =>
   createMemo(() => _.concat(...accessArray(a)));
 
-/**
- * Signal builder: Flattens a nested array into a one-level array
- */
+/** Reactively deep-flattens a nested array (fully recursive, not just one level). */
 export const flatten = <T extends any[]>(list: MaybeAccessor<T>): Accessor<FlattenArray<T>> =>
   createMemo(() => _.flatten(access(list)) as FlattenArray<T>);
 
 /**
- * Signal builder: filter list: only leave items that are instances of specified Classes
+ * Reactively keeps only items that are instances of any of the provided classes.
+ * @example
+ * const [nodes, setNodes] = createSignal([new Text("hi"), new Comment("x"), new Text("bye")]);
+ * filterInstance(nodes, Text)(); // => [Text("hi"), Text("bye")]
  */
 export const filterInstance = <T, I extends AnyClass[]>(list: MaybeAccessor<T[]>, ...classes: I) =>
   (classes.length === 1
@@ -135,7 +140,10 @@ export const filterInstance = <T, I extends AnyClass[]>(list: MaybeAccessor<T[]>
       )) as Accessor<Extract<T, InstanceType<ItemsOf<I>>>[]>;
 
 /**
- * Signal builder: filter list: remove items that are instances of specified Classes
+ * Reactively removes items that are instances of any of the provided classes.
+ * @example
+ * const [nodes, setNodes] = createSignal([new Text("hi"), new Comment("x"), new Text("bye")]);
+ * filterOutInstance(nodes, Comment)(); // => [Text("hi"), Text("bye")]
  */
 export const filterOutInstance = <T, I extends AnyClass[]>(
   list: MaybeAccessor<T[]>,
