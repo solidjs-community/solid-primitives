@@ -815,6 +815,56 @@ describe("async validators", () => {
 
     expect(form.fields.username.error()).toBe(null);
   });
+
+  it("async validator is called exactly once per value change", async () => {
+    const asyncValidator = vi.fn(async (_v: string): Promise<string | null> => {
+      await new Promise(r => setTimeout(r, 10));
+      return null;
+    });
+
+    const form = createRoot(() =>
+      createForm({
+        fields: { name: { initial: "alice", validate: asyncValidator } },
+      }),
+    );
+
+    // Initial value triggers one invocation
+    flush();
+    await new Promise(r => setTimeout(r, 30));
+    flush();
+    expect(asyncValidator).toHaveBeenCalledTimes(1);
+
+    // Value change triggers exactly one more invocation
+    form.fields.name.setValue("bob");
+    flush();
+    await new Promise(r => setTimeout(r, 30));
+    flush();
+    expect(asyncValidator).toHaveBeenCalledTimes(2);
+  });
+
+  it("async validator is not re-invoked when its result settles (asyncError signal change)", async () => {
+    const asyncValidator = vi.fn(async (_v: string): Promise<string | null> => {
+      await new Promise(r => setTimeout(r, 10));
+      return "always fails";
+    });
+
+    createRoot(() =>
+      createForm({
+        fields: { name: { initial: "alice", validate: asyncValidator } },
+      }),
+    );
+
+    // One invocation on initial value
+    flush();
+    expect(asyncValidator).toHaveBeenCalledTimes(1);
+
+    // Wait for it to settle — asyncError signal changes here
+    await new Promise(r => setTimeout(r, 30));
+    flush();
+
+    // The asyncError signal change must not trigger another validator call
+    expect(asyncValidator).toHaveBeenCalledTimes(1);
+  });
 });
 
 // ─── Bind ─────────────────────────────────────────────────────────────────────

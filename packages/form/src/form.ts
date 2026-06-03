@@ -5,12 +5,14 @@ import type { ValidatorFn, FieldsConfig, InferValue, FormField, FormReturn, Form
 
 export type { ValidatorFn, FieldConfig, FieldsConfig, FormField, FormReturn, FormConfig } from "./types.js";
 
-function runValidators<V>(v: V, fns: ValidatorFn<V>[]): string | null {
+function runValidators<V>(v: V, fns: ValidatorFn<V>[]): { syncError: string | null; promises: Promise<string | null>[] } {
+  const promises: Promise<string | null>[] = [];
   for (const fn of fns) {
     const r = fn(v);
-    if (!(r instanceof Promise) && r !== null) return r;
+    if (r instanceof Promise) { promises.push(r); continue; }
+    if (r !== null) return { syncError: r, promises: [] };
   }
-  return null;
+  return { syncError: null, promises };
 }
 
 export function toFormData(values: Record<string, unknown>): FormData {
@@ -91,6 +93,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
     let asyncError: Accessor<string | null> = () => null;
     let _asyncPending: Accessor<boolean> = () => false;
+    let _syncError: Accessor<string | null> = () => null;
 
     if (validators.length > 0) {
       const [ae, setAe] = createSignal<string | null>(null, { ownedWrite: true });
@@ -98,38 +101,74 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       asyncError = ae;
       _asyncPending = ap;
 
-      let seq = 0;
-      createEffect(
-        () => value(),
-        val => {
-          // If a sync validator already fails, clear async state and skip.
-          if (runValidators(val, validators) !== null) { setAe(null); setAp(false); return; }
-          const s = ++seq;
-          void (async () => {
-            // Collect only async validators (sync already passed above).
-            const ps: Promise<string | null>[] = [];
-            for (const fn of validators) {
+      // Classify validators by probing with the initial value — one call per validator.
+      // Sync: returns string | null → goes into syncFns (used by the reactive memo).
+      // Async: returns Promise → goes into asyncFns; initial promises are saved for reuse.
+      const syncFns: ValidatorFn<any>[] = [];
+      const asyncFns: ValidatorFn<any>[] = [];
+      let initProms: Promise<string | null>[] = [];
+
+      for (const fn of validators) {
+        const probe = fn(fc.initial);
+        if (probe instanceof Promise) {
+          asyncFns.push(fn);
+          initProms.push(probe);
+        } else {
+          syncFns.push(fn);
+        }
+      }
+
+      // Sync-only memo: reactive to value(), never touches async validators.
+      // Lazy so the probe above serves as the only initial evaluation.
+      const syncMemo: Accessor<string | null> = syncFns.length > 0
+        ? createMemo(() => {
+            const val = value();
+            for (const fn of syncFns) {
               const r = fn(val);
-              if (r instanceof Promise) ps.push(r);
+              if (r !== null) return r as string;
             }
-            if (!ps.length) { setAe(null); setAp(false); return; }
+            return null;
+          }, { lazy: true })
+        : () => null;
+      _syncError = syncMemo;
+
+      if (asyncFns.length > 0) {
+        let seq = 0;
+        // First run: reuse initProms (already started during classification).
+        // Subsequent runs: call asyncFns fresh — one invocation per value change.
+        let isFirstRun = true;
+
+        createEffect(
+          // Compute reads value() and syncMemo() so the effect re-runs on value changes.
+          () => ({ val: value(), syncError: syncMemo() }),
+          ({ val, syncError }) => {
+            // Reuse initProms only if the value hasn't changed from the initial; otherwise
+          // the initial promises validated a stale value and must be discarded.
+          const asyncProms = (isFirstRun && val === fc.initial)
+            ? (isFirstRun = false, initProms)
+            : (isFirstRun = false, asyncFns.map(fn => fn(val) as Promise<string | null>));
+
+            if (syncError !== null || asyncProms.length === 0) { setAe(null); setAp(false); return; }
+            const s = ++seq;
             setAp(true);
-            for (const p of ps) {
-              const err = await p;
-              if (s !== seq) return;
-              if (err !== null) { setAe(err); setAp(false); return; }
-            }
-            setAe(null);
-            setAp(false);
-          })();
-        },
-      );
+            void (async () => {
+              for (const p of asyncProms) {
+                const err = await p;
+                if (s !== seq) return;
+                if (err !== null) { setAe(err); setAp(false); return; }
+              }
+              setAe(null);
+              setAp(false);
+            })();
+          },
+        );
+      }
     }
 
-    // Fields with no validators are always null — skip the memo entirely.
+    // _rawError reads the sync memo and async error signal — never calls validators itself.
     const _rawError: Accessor<string | null> = validators.length === 0
       ? () => null
-      : createMemo(() => runValidators(value(), validators) ?? asyncError());
+      : createMemo(() => _syncError() ?? asyncError());
 
     // Display error is gated by validateOn; raw error is always computed above.
     const error = validateOn === "change"
