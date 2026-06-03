@@ -247,8 +247,10 @@ export const createSSE = <T = string>(
   });
 
   // rawData holds either the latest message value or the NOT_SET sentinel.
+  // Cast through unknown: createSignal overload 1 requires Exclude<T, Function> but we can't
+  // prove that constraint for a generic T — the value is always a data value, never a compute fn.
   const [rawData, setRawData] = createSignal<T | NotSet>(
-    options.initialValue !== undefined ? options.initialValue : NOT_SET,
+    (options.initialValue !== undefined ? options.initialValue : NOT_SET) as unknown as Exclude<T, Function> | NotSet,
     { ownedWrite: true },
   );
 
