@@ -295,10 +295,6 @@ token; // token is typed as UnionOfAcceptedTokens
 isToken([tokenizer1, tokenizer2, MyTokenComponent], token);
 ```
 
-## Demo
-
-[Live Example](https://primitives.solidjs.community/playground/jsx-tokenizer) | [Source Code](./dev/index.tsx)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
