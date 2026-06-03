@@ -41,6 +41,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
           pending: () => false,
           setValue: () => void 0,
           setTouched: () => void 0,
+          setError: () => void 0,
           reset: () => void 0,
         },
       ]),
@@ -59,6 +60,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       ref: () => () => {},
       validate: () => () => null,
       setValues: () => void 0,
+      setError: () => void 0,
       formData: () => new FormData(),
       reset: () => void 0,
       submit: async () => void 0,
@@ -75,6 +77,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     _setValue: (v: any) => void;
     _rawError: Accessor<string | null>;
     _asyncPending: Accessor<boolean>;
+    _setExternalError: (error: string | null) => void;
     error: Accessor<string | null>;
     touched: Accessor<boolean>;
     _setTouched: (v: boolean) => void;
@@ -88,8 +91,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       : [];
     const validateOn = fc.validateOn ?? formValidateOn;
 
-    const [value, setValue] = createSignal<any>(fc.initial, { ownedWrite: true });
+    const [value, _setValueRaw] = createSignal<any>(fc.initial, { ownedWrite: true });
     const [touched, setTouched] = createSignal(false, { ownedWrite: true });
+    const [externalError, setExternalError] = createSignal<string | null>(null, { ownedWrite: true });
+    // Clearing the external error when the user edits the field is the expected UX:
+    // the server's previous verdict is stale the moment the user starts correcting.
+    const setValue = (v: any) => { _setValueRaw(v); setExternalError(null); };
 
     let asyncError: Accessor<string | null> = () => null;
     let _asyncPending: Accessor<boolean> = () => false;
@@ -165,10 +172,11 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       }
     }
 
-    // _rawError reads the sync memo and async error signal — never calls validators itself.
+    // _rawError reads the sync memo, async error, and external error signals.
+    // Never calls validators itself. External error is cleared whenever setValue is called.
     const _rawError: Accessor<string | null> = validators.length === 0
-      ? () => null
-      : createMemo(() => _syncError() ?? asyncError());
+      ? externalError
+      : createMemo(() => _syncError() ?? asyncError() ?? externalError());
 
     // Display error is gated by validateOn; raw error is always computed above.
     const error = validateOn === "change"
@@ -181,6 +189,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       _setValue: setValue,
       _rawError,
       _asyncPending,
+      _setExternalError: setExternalError,
       error,
       touched,
       _setTouched: setTouched,
@@ -199,6 +208,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
         pending: f._asyncPending,
         setValue: f._setValue,
         setTouched: f._setTouched,
+        setError: f._setExternalError,
         reset: () => { f._setValue(f.initial); f._setTouched(false); },
       } satisfies FormField<any>,
     ]),
@@ -253,8 +263,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
   const [submitting, setSubmitting] = createSignal(false, { ownedWrite: true });
   let _isSubmitting = false;
 
+  const setError = (name: keyof C & string, error: string | null) => {
+    internalFields[name]?._setExternalError(error);
+  };
+
   const reset = () => {
-    for (const [, f] of fieldEntries) { f._setValue(f.initial); f._setTouched(false); }
+    for (const [, f] of fieldEntries) { f._setValue(f.initial); f._setTouched(false); f._setExternalError(null); }
     _isSubmitting = false;
     setSubmitting(false);
     setSubmitted(false);
@@ -326,6 +340,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     ref,
     validate: validate as FormReturn<C>["validate"],
     setValues: setValues as FormReturn<C>["setValues"],
+    setError: setError as FormReturn<C>["setError"],
     formData: () => toFormData(values()),
     reset,
     submit,

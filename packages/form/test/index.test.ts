@@ -1329,6 +1329,111 @@ describe("setValues", () => {
   });
 });
 
+// ─── setError ────────────────────────────────────────────────────────────────
+
+describe("setError", () => {
+  it("field.setError sets an external error visible via error()", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "user@example.com" } } });
+
+      form.fields.email.setError("Email already registered");
+      flush();
+      expect(form.fields.email.error()).toBe("Email already registered");
+      dispose();
+    });
+  });
+
+  it("form.setError sets an external error on the named field", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "user@example.com" } } });
+
+      form.setError("email", "Email already registered");
+      flush();
+      expect(form.fields.email.error()).toBe("Email already registered");
+      dispose();
+    });
+  });
+
+  it("external error makes valid() false", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "user@example.com" } } });
+
+      expect(form.valid()).toBe(true);
+      form.fields.email.setError("Email already registered");
+      flush();
+      expect(form.valid()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("external error is included in errors()", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "user@example.com" } } });
+
+      form.fields.email.setError("Email already registered");
+      flush();
+      expect(form.errors().email).toBe("Email already registered");
+      dispose();
+    });
+  });
+
+  it("external error is cleared when setValue is called", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "user@example.com" } } });
+
+      form.fields.email.setError("Email already registered");
+      flush();
+      expect(form.fields.email.error()).toBe("Email already registered");
+
+      form.fields.email.setValue("other@example.com");
+      flush();
+      expect(form.fields.email.error()).toBe(null);
+      dispose();
+    });
+  });
+
+  it("external error is cleared by reset()", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "" } } });
+
+      form.fields.email.setError("Email already registered");
+      flush();
+      form.reset();
+      flush();
+      expect(form.fields.email.error()).toBe(null);
+      dispose();
+    });
+  });
+
+  it("setError(null) clears a previously set external error", () => {
+    createRoot(dispose => {
+      const form = createForm({ fields: { email: { initial: "user@example.com" } } });
+
+      form.fields.email.setError("Email already registered");
+      flush();
+      form.fields.email.setError(null);
+      flush();
+      expect(form.fields.email.error()).toBe(null);
+      expect(form.valid()).toBe(true);
+      dispose();
+    });
+  });
+
+  it("validator error takes priority over external error", () => {
+    createRoot(dispose => {
+      const form = createForm({
+        fields: { email: { initial: "bad", validate: isEmail } },
+      });
+
+      form.fields.email.setError("Server error");
+      flush();
+      // Client-side validator error wins — shown first
+      expect(form.fields.email.error()).toBe("Invalid email");
+      dispose();
+    });
+  });
+});
+
 // ─── validate() reactive invalidation ────────────────────────────────────────
 
 describe("validate reactive invalidation", () => {

@@ -92,6 +92,7 @@ Each entry in `form.fields` exposes:
 | `pending()` | `Accessor<boolean>` | `true` while an async validator is in flight for this field |
 | `setValue(v)` | `(v: V) => void` | Imperatively set the value |
 | `setTouched(v)` | `(v: boolean) => void` | Imperatively set the touched flag |
+| `setError(msg)` | `(error: string \| null) => void` | Inject an external error (e.g. from a server response). Cleared automatically when `setValue` is called. |
 | `reset()` | `() => void` | Reset this field to its initial value and clear touched |
 
 ### Form-level API
@@ -108,6 +109,7 @@ Each entry in `form.fields` exposes:
 | `bind(name)` | Ref directive factory | Wires an `<input>` or `<select>` to the named field (see below) |
 | `ref` | Ref callback | Attaches submit handling to a `<form>` element |
 | `validate(fn)` | Cross-field rule | Registers a form-level validation rule (see below) |
+| `setError(name, msg)` | `(name, error: string \| null) => void` | Inject an external error on a named field (e.g. server-side validation). Cleared automatically when that field's value changes. |
 | `formData()` | `() => FormData` | Snapshot of current field values as a `FormData` instance |
 | `reset()` | `() => void` | Reset all fields to their initial values and clear submitted |
 | `submit()` | `() => Promise<void>` | Programmatically trigger submission |
@@ -318,6 +320,32 @@ function ProfileForm() {
 function toFormData(values: Record<string, unknown>): FormData;
 ```
 
+### Server-side validation errors
+
+Use `form.setError(name, message)` (or `field.setError(message)`) to surface errors returned by the server after submission. The injected error is treated like any other field error: it blocks `form.valid()`, appears in `form.errors()`, and is visible via `field.error()`.
+
+The external error is cleared automatically the moment the user edits the field (`setValue` is called), so there is no manual cleanup needed.
+
+```tsx
+const form = createForm({
+  fields: {
+    email:    { initial: "" },
+    username: { initial: "" },
+  },
+  onSubmit: async values => {
+    const result = await api.signup(values);
+    if (!result.ok) {
+      // Surface each field-level error from the server response
+      for (const [field, message] of Object.entries(result.errors)) {
+        form.setError(field as "email" | "username", message);
+      }
+    }
+  },
+});
+```
+
+Client-side validator errors take priority over external errors — if a field fails its own validators, the client error is shown first. The external error becomes visible once the client error is resolved.
+
 ### Optimistic updates
 
 `createForm` works naturally with Solid 2.0's `action` primitive for optimistic mutations:
@@ -378,6 +406,7 @@ type FormField<V = string> = {
   pending:    Accessor<boolean>;
   setValue:   (v: V) => void;
   setTouched: (v: boolean) => void;
+  setError:   (error: string | null) => void;
   reset:      () => void;
 };
 
@@ -393,6 +422,7 @@ type FormReturn<C extends FieldsConfig> = {
   bind:       (name: keyof C & string) => (el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => () => void;
   ref:        (el: HTMLFormElement) => () => void;
   validate:   (fn: (values: Values) => string | null) => Accessor<string | null>;
+  setError:   (name: keyof C & string, error: string | null) => void;
   formData:   () => FormData;
   reset:      () => void;
   submit:     () => Promise<void>;

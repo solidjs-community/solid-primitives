@@ -19,6 +19,7 @@ export type FormField<V = string> = {
   pending: Accessor<boolean>;
   setValue: (v: V) => void;
   setTouched: (v: boolean) => void;
+  setError: (error: string | null) => void;
   reset: () => void;
 };
 
@@ -35,6 +36,7 @@ export type FormReturn<C extends FieldsConfig> = {
   ref: (el: HTMLFormElement) => () => void;
   validate: (fn: (values: { [K in keyof C]: InferValue<C[K]> }) => string | null) => Accessor<string | null>;
   setValues: (values: Partial<{ [K in keyof C]: InferValue<C[K]> }>) => void;
+  setError: (name: keyof C & string, error: string | null) => void;
   formData: () => FormData;
   reset: () => void;
   submit: () => Promise<void>;
