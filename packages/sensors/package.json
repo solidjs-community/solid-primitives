@@ -28,7 +28,8 @@
       "makeBattery",
       "createBattery"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 1195
   },
   "keywords": [
     "accelerometer",

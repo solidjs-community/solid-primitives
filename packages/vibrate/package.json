@@ -24,7 +24,8 @@
       "makePulse",
       "createPulse"
     ],
-    "category": "Sensors"
+    "category": "Sensors",
+    "gzip": 829
   },
   "keywords": [
     "solid",
