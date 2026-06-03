@@ -1215,6 +1215,13 @@ describe("toFormData", () => {
     expect(fd.get("label")).toBeNull();
     expect(fd.get("name")).toBe("Alice");
   });
+
+  it("omits false (unchecked checkbox semantics)", () => {
+    const fd = toFormData({ agreed: false, name: "Alice", count: 0 });
+    expect(fd.get("agreed")).toBeNull();
+    expect(fd.get("name")).toBe("Alice");
+    expect(fd.get("count")).toBe("0"); // 0 is not false — still included
+  });
 });
 
 // ─── formData ─────────────────────────────────────────────────────────────────

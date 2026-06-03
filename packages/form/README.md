@@ -104,7 +104,7 @@ Each entry in `form.fields` exposes:
 | `submitting()` | `Accessor<boolean>` | `true` while `onSubmit` is in flight |
 | `submitted()` | `Accessor<boolean>` | `true` after the first submit attempt; reset by `reset()` |
 | `values()` | `Accessor<Values>` | Plain object of all current field values |
-| `errors()` | `Accessor<Partial<Record<...>>>` | Object containing only fields that currently have errors (always reflects true validity, regardless of `validateOn`) |
+| `errors()` | `Accessor<Partial<Record<...>>>` | Object containing only **field-level** errors (always reflects true validity, regardless of `validateOn`). Cross-field errors registered via `validate()` are not included — access those through the accessor each `validate()` call returns. |
 | `bind(name)` | Ref directive factory | Wires an `<input>` or `<select>` to the named field (see below) |
 | `ref` | Ref callback | Attaches submit handling to a `<form>` element |
 | `validate(fn)` | Cross-field rule | Registers a form-level validation rule (see below) |
@@ -312,7 +312,7 @@ function ProfileForm() {
 }
 ```
 
-`null` and `undefined` values are omitted. All other values are coerced to strings via `String(value)`.
+`null`, `undefined`, and `false` are omitted — matching HTML's native checkbox behaviour where unchecked inputs are absent from the form payload. All other values are coerced to strings via `String(value)`.
 
 ```ts
 function toFormData(values: Record<string, unknown>): FormData;

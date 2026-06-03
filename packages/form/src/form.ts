@@ -18,7 +18,7 @@ function runValidators<V>(v: V, fns: ValidatorFn<V>[]): { syncError: string | nu
 export function toFormData(values: Record<string, unknown>): FormData {
   const fd = new FormData();
   for (const [k, v] of Object.entries(values)) {
-    if (v != null) fd.append(k, String(v));
+    if (v != null && v !== false) fd.append(k, String(v));
   }
   return fd;
 }
