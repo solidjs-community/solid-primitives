@@ -24,7 +24,8 @@
       "makeCache",
       "makeRetrying"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 1049
   },
   "keywords": [
     "solid",
