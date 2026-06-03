@@ -5,16 +5,21 @@ import type { ValidatorFn, FieldsConfig, InferValue, FormField, FormReturn, Form
 
 export type { ValidatorFn, FieldConfig, FieldsConfig, FormField, FormReturn, FormConfig } from "./types.js";
 
-function runValidators<V>(v: V, fns: ValidatorFn<V>[]): { syncError: string | null; promises: Promise<string | null>[] } {
-  const promises: Promise<string | null>[] = [];
-  for (const fn of fns) {
-    const r = fn(v);
-    if (r instanceof Promise) { promises.push(r); continue; }
-    if (r !== null) return { syncError: r, promises: [] };
-  }
-  return { syncError: null, promises };
-}
 
+/**
+ * Converts a plain values object into a `FormData` instance.
+ *
+ * `null`, `undefined`, and `false` are omitted — matching HTML's native behaviour where
+ * unchecked checkboxes are absent from the form payload. All other values are coerced to
+ * strings via `String(value)`.
+ *
+ * @example
+ * ```ts
+ * const form = createForm({ fields: { name: { initial: "" }, agreed: { initial: false } } });
+ * const fd = toFormData(form.values()); // agreed is omitted
+ * await fetch("/api", { method: "POST", body: fd });
+ * ```
+ */
 export function toFormData(values: Record<string, unknown>): FormData {
   const fd = new FormData();
   for (const [k, v] of Object.entries(values)) {
@@ -23,6 +28,37 @@ export function toFormData(values: Record<string, unknown>): FormData {
   return fd;
 }
 
+/**
+ * Creates a reactive form with per-field signals, derived validity state, and helpers for
+ * binding fields to DOM inputs.
+ *
+ * Validators are plain functions `(value) => string | null | Promise<string | null>`, so any
+ * schema library (Zod, Valibot, Arktype, …) wires in with a one-line adapter. Async validators
+ * (uniqueness checks, server-side rules) are first-class: while a check is in flight,
+ * `field.pending()` and `form.pending()` are `true` and `form.valid()` is `false`.
+ *
+ * @param config - Field definitions, optional `onSubmit` handler, and default `validateOn` mode.
+ * @returns Reactive form object with per-field accessors, form-level signals, and DOM helpers.
+ * @example
+ * ```tsx
+ * const form = createForm({
+ *   fields: {
+ *     email:    { initial: "", validate: isEmail },
+ *     password: { initial: "", validate: [minLength(8), hasUppercase] },
+ *   },
+ *   onSubmit: async values => { await api.login(values); },
+ * });
+ *
+ * return (
+ *   <form ref={form.ref}>
+ *     <input ref={form.bind("email")} type="email" />
+ *     <Show when={form.fields.email.error()}>{err => <span>{err()}</span>}</Show>
+ *     <button type="submit" disabled={!form.valid() || form.submitting()}>Sign in</button>
+ *   </form>
+ * );
+ * ```
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/form
+ */
 export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormReturn<C> {
   type Values = { [K in keyof C]: InferValue<C[K]> };
 
@@ -113,7 +149,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       // Async: returns Promise → goes into asyncFns; initial promises are saved for reuse.
       const syncFns: ValidatorFn<any>[] = [];
       const asyncFns: ValidatorFn<any>[] = [];
-      let initProms: Promise<string | null>[] = [];
+      const initProms: Promise<string | null>[] = [];
 
       for (const fn of validators) {
         const probe = fn(fc.initial);
