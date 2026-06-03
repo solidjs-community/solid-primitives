@@ -1,5 +1,6 @@
-import { batch, createSignal, onMount, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { createSignal, onSettled, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
+import { INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import type { EventTypeName, IdleTimerOptions, IdleTimer } from "./types.js";
 
 const THROTTLE_DELAY: number = 250;
@@ -13,7 +14,6 @@ const EVENTS: EventTypeName[] = [
   "keydown",
   "wheel",
   "resize",
-  "wheel",
   "mousedown",
   "pointerdown",
   "touchstart",
@@ -62,15 +62,15 @@ export const createIdleTimer = ({
     return {
       isIdle: () => false,
       isPrompted: () => false,
-      reset: () => {},
-      start: () => {},
-      stop: () => {},
-      triggerIdle: () => {},
+      reset: noop,
+      start: noop,
+      stop: noop,
+      triggerIdle: noop,
     };
   }
   let listenersAreOn = false;
-  const [isPrompted, setIsPrompted] = createSignal(false);
-  const [isIdle, setIsIdle] = createSignal(false);
+  const [isPrompted, setIsPrompted] = createSignal(false, INTERNAL_OPTIONS);
+  const [isIdle, setIsIdle] = createSignal(false, INTERNAL_OPTIONS);
 
   let idle: ReturnType<typeof setTimeout>;
   let prompt: ReturnType<typeof setTimeout>;
@@ -124,19 +124,15 @@ export const createIdleTimer = ({
 
   function setPromptTimer(evt: Event) {
     prompt = setTimeout(() => {
-      batch(() => {
-        setIsIdle(true);
-        setIsPrompted(false);
-      });
+      setIsIdle(true);
+      setIsPrompted(false);
       onIdle?.(evt);
     }, promptTimeout);
   }
 
   function cleanState() {
-    batch(() => {
-      setIsIdle(false);
-      setIsPrompted(false);
-    });
+    setIsIdle(false);
+    setIsPrompted(false);
   }
 
   function startListening(evt: Event = new CustomEvent("manualstart")) {
@@ -171,7 +167,7 @@ export const createIdleTimer = ({
     addListeners();
   }
 
-  onMount(() => {
+  onSettled(() => {
     if (startManually) return;
     startListening(new CustomEvent("mount"));
   });

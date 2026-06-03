@@ -20,7 +20,8 @@
       "makeBroadcastChannel",
       "createBroadcastChannel"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 569
   },
   "keywords": [
     "solid",

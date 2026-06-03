@@ -56,11 +56,11 @@ export type Flatten<T extends BaseDict, P = {}> = number extends T
         { [K in keyof T]: T[K] extends BaseDict ? Flatten<T[K], JoinPath<P, K>> : never }[keyof T]
       > & { readonly [K in keyof T as JoinPath<P, K>]: T[K] };
 
-function visitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: string): void {
+function visitDict(flatDict: Record<string, unknown>, dict: BaseDict, path: string): void {
   for (const [key, value] of Object.entries(dict)) {
-    const key_path = `${path}.${key}`;
-    flat_dict[key_path] = value;
-    isDict(value) && visitDict(flat_dict, value, key_path);
+    const keyPath = `${path}.${key}`;
+    flatDict[keyPath] = value;
+    isDict(value) && visitDict(flatDict, value, keyPath);
   }
 }
 
@@ -78,9 +78,9 @@ function visitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: str
  *   }
  * }
  *
- * const flat_dict = flatten(dict);
+ * const flatDict = flatten(dict);
  *
- * flat_dict === {
+ * flatDict === {
  *   a: {
  *     foo: "foo",
  *     b: { bar: 1 }
@@ -92,11 +92,11 @@ function visitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: str
  * ```
  */
 export function flatten<T extends BaseDict>(dict: T): Flatten<T> {
-  const flat_dict: Record<string, unknown> = { ...dict };
+  const flatDict: Record<string, unknown> = { ...dict };
   for (const [key, value] of Object.entries(dict)) {
-    isDict(value) && visitDict(flat_dict, value, key);
+    isDict(value) && visitDict(flatDict, value, key);
   }
-  return flat_dict as Flatten<T>;
+  return flatDict as Flatten<T>;
 }
 
 export type Prefixed<T extends BaseRecordDict, P extends string> = {
@@ -116,9 +116,9 @@ export type Prefixed<T extends BaseRecordDict, P extends string> = {
  *   food: { meat: "meat" },
  * }
  *
- * const prefixed_dict = prefix(dict, "greetings");
+ * const prefixedDict = prefix(dict, "greetings");
  *
- * prefixed_dict === {
+ * prefixedDict === {
  *   "greetings.hello": "hello",
  *   "greetings.goodbye": "goodbye",
  *   "greetings.food": { meat: "meat" },
@@ -232,9 +232,9 @@ export type NullableTranslator<T extends BaseRecordDict, O = string> = <K extend
  *     meat: "meat",
  *   }
  * }
- * const flat_dict = i18n.flatten(dict);
+ * const flatDict = i18n.flatten(dict);
  *
- * const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+ * const t = i18n.translator(() => flatDict, i18n.resolveTemplate);
  *
  * t("hello", { name: "John" }) // => "hello John!"
  * t("goodbye", "John") // => "goodbye John!"
@@ -289,9 +289,9 @@ export type Scoped<T extends BaseRecordDict, S extends Scopes<keyof T & string>>
  *   },
  *   goodbye: (name: string) => `goodbye ${name}!`,
  * }
- * const flat_dict = i18n.flatten(dict);
+ * const flatDict = i18n.flatten(dict);
  *
- * const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+ * const t = i18n.translator(() => flatDict, i18n.resolveTemplate);
  *
  * const greetings = i18n.scopedTranslator(t, "greetings");
  *
@@ -330,7 +330,7 @@ export type NullableChainedTranslator<T extends BaseRecordDict, O = string> = {
 /**
  * Create an object-chained translator that will resolve the path in the dictionary and return the value.
  *
- * @param init_dict The initial dictionary used for getting the structure of nested objects.
+ * @param initDict The initial dictionary used for getting the structure of nested objects.
  * @param translate {@link Translator} function that will resolve the path in the dictionary and return the value.
  *
  * @example
@@ -342,9 +342,9 @@ export type NullableChainedTranslator<T extends BaseRecordDict, O = string> = {
  *   },
  *   goodbye: (name: string) => `goodbye ${name}!`,
  * }
- * const flat_dict = i18n.flatten(dict);
+ * const flatDict = i18n.flatten(dict);
  *
- * const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+ * const t = i18n.translator(() => flatDict, i18n.resolveTemplate);
  *
  * const chained = i18n.chainedTranslator(dict, t);
  *
@@ -354,30 +354,30 @@ export type NullableChainedTranslator<T extends BaseRecordDict, O = string> = {
  * ```
  */
 export function chainedTranslator<T extends BaseRecordDict, O>(
-  init_dict: T,
+  initDict: T,
   translate: Translator<T, O>,
   path?: string,
 ): ChainedTranslator<T, O>;
 export function chainedTranslator<T extends BaseRecordDict, O>(
-  init_dict: T,
+  initDict: T,
   translate: NullableTranslator<T, O>,
   path?: string,
 ): NullableChainedTranslator<T, O>;
 export function chainedTranslator<T extends BaseRecordDict, O>(
-  init_dict: T,
+  initDict: T,
   translate: Translator<T, O>,
   path: string = "",
 ): any {
-  const result: any = { ...init_dict };
+  const result: any = { ...initDict };
 
-  for (const [key, value] of Object.entries(init_dict)) {
-    const key_path = `${path}.${key}`;
+  for (const [key, value] of Object.entries(initDict)) {
+    const keyPath = `${path}.${key}`;
 
     result[key] = isRecordDict(value)
-      ? chainedTranslator(value, translate, key_path)
+      ? chainedTranslator(value, translate, keyPath)
       : (...args: any[]) =>
           translate(
-            key_path,
+            keyPath,
             // @ts-expect-error
             ...args,
           );
@@ -400,9 +400,9 @@ export function chainedTranslator<T extends BaseRecordDict, O>(
  *   },
  *   goodbye: (name: string) => `goodbye ${name}!`,
  * }
- * const flat_dict = i18n.flatten(dict);
+ * const flatDict = i18n.flatten(dict);
  *
- * const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+ * const t = i18n.translator(() => flatDict, i18n.resolveTemplate);
  *
  * const proxy = i18n.proxyTranslator(t);
  *
