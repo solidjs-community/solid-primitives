@@ -262,7 +262,7 @@ const confirmError = form.validate(values => {
 });
 ```
 
-> **Note:** `validate` must be called during component rendering (inside a reactive owner), before `form.valid()` is first read.
+> **Note:** `validate` must be called inside a reactive owner (i.e. during component rendering), because it calls `createMemo` internally.
 
 ### `form.ref`
 
@@ -390,7 +390,7 @@ type FormReturn<C extends FieldsConfig> = {
   pending:    Accessor<boolean>;
   submitting: Accessor<boolean>;
   submitted:  Accessor<boolean>;
-  bind:       (name: keyof C & string) => (el: HTMLInputElement | HTMLSelectElement) => () => void;
+  bind:       (name: keyof C & string) => (el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => () => void;
   ref:        (el: HTMLFormElement) => () => void;
   validate:   (fn: (values: Values) => string | null) => Accessor<string | null>;
   formData:   () => FormData;
