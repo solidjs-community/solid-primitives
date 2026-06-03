@@ -558,7 +558,7 @@ export const createSSEStream = <T = string>(
   if (typeof url === "function") {
     let prevUrl = untrack(url);
     createTrackedEffect(() => {
-      const resolvedUrl = (url as Accessor<string>)();
+      const resolvedUrl = url();
       if (resolvedUrl !== prevUrl) {
         prevUrl = resolvedUrl;
         untrack(() => {
