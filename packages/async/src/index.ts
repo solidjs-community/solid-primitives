@@ -207,35 +207,37 @@ export type RetryOptions = {
 export function makeRetrying<T, C extends ComputeFunction<undefined | NoInfer<T>, T>>(
   fetcher: C,
   options: RetryOptions = {},
-) {
+): () => AsyncGenerator<T> {
   const delay = options.delay ?? 5000;
   let retries = options.retries || 3;
   
-  const handleError = (error: unknown) => {
-    if (retries-- > 0) {
-      return (delay ? 
-        (new Promise<void>(resolve => setTimeout(resolve, delay))) 
-        : Promise.resolve()).then(() => retrying);
+  return async function* retrying(v?: T): AsyncGenerator<T> {
+    let result: T | PromiseLike<T> | AsyncIterable<T> | undefined;
+    while (true) {
+      try {
+        result ??= fetcher(v);
+        if (isPromiseLike(result)) { 
+          yield await result;
+          result = undefined;
+        } else if (isIterable(result)) {
+          for (const item of result) 
+            if (isPromiseLike(item)) yield await item as PromiseLike<T>;
+            else yield Promise.resolve(item) as Promise<T>;
+          return;
+        } else {
+          yield Promise.resolve(result) as Promise<T>;
+          result = undefined;
+        }
+      } catch(error) {
+        if (retries-- <= 0) {
+          retries = options.retries || 3;
+          throw error;
+        }
+        if (delay) await new Promise<void>(resolve => setTimeout(resolve, delay));
+      }
     }
-    retries = options.retries || 3;
-    throw error;
-  };
+  };}
 
- async function* retrying(v?: T): AsyncGenerator<T> {
-    try {
-      const result = fetcher(v);
-      if (isPromiseLike(result)) yield result.then(out => out, handleError) as Promise<T>;
-      else if (isIterable(result)) 
-        for (const item of result) 
-          if (isPromiseLike(item)) yield item.then(out => out, handleError) as Promise<T>;
-          else yield Promise.resolve(item) as Promise<T>;
-      else yield Promise.resolve(result) as Promise<T>;
-    } catch(error) {
-      handleError(error)
-    }
-  };
-  return retrying;
-}
 
 function toArray(item: any) {
   return Array.isArray(item) ? item : item ? [item] : [];
