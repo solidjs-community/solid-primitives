@@ -83,6 +83,8 @@ Use the `partial` prop to only handle some of the union members:
 />
 ```
 
+> **Note:** `partial` is a TypeScript-only escape hatch — it switches the `case` mapped type from required to optional keys. It has no runtime effect; unmatched values fall through to `fallback` regardless of whether `partial` is set.
+
 ### Fallback
 
 Provide a fallback element when no match is found or the value is `null`/`undefined`:
@@ -133,6 +135,8 @@ Use the `partial` prop to only handle some of the union members:
 />
 ```
 
+> **Note:** `partial` is a TypeScript-only escape hatch — it has no runtime effect. See [`MatchTag` partial matching](#partial-matching) for details.
+
 ### Fallback
 
 Provide a fallback element when no match is found or the value is `null`/`undefined`:
@@ -148,9 +152,13 @@ Provide a fallback element when no match is found or the value is `null`/`undefi
 />
 ```
 
+## `MatchField` (deprecated)
+
+`MatchField` is an alias for `MatchTag` kept for backwards compatibility. Use `MatchTag` in new code.
+
 ## Demo
 
-[Deployed example](https://primitives.solidjs.community/playground/match) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/match/dev)
+[Storybook](https://primitives.solidjs.community/storybook/?path=/docs/control-flow-match--docs)
 
 ## Changelog
 
