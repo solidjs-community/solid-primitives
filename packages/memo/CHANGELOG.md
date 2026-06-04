@@ -1,5 +1,11 @@
 # @solid-primitives/memo
 
+## 1.5.0
+
+### Minor Changes
+
+- 0ebdd1a: Added createRcMemo primitive for memos that are only awake while there are listeners.
+
 ## 1.4.5
 
 ### Patch Changes
