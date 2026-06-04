@@ -21,6 +21,7 @@
       "createLatestMany",
       "createWritableMemo",
       "createLazyMemo",
+      "createRcMemo",
       "createPureReaction",
       "createMemoCache",
       "createReducer"
