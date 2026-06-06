@@ -19,7 +19,8 @@
       "ReactiveMap",
       "ReactiveWeakMap"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 949
   },
   "keywords": [
     "map",

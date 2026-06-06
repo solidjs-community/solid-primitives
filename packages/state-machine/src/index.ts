@@ -1,4 +1,5 @@
 import { createMemo, createSignal, type Accessor, untrack } from "solid-js";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 /**
  * Used for restricting the user type input in {@link createMachine} generic.
@@ -123,7 +124,7 @@ export type MachineNext<T extends StatesBase<keyof T>, TKey extends keyof T> = {
   ...args: T[K] extends { input: infer Input } ? [to: K, input: Input] : [to: K, input?: undefined]
 ) => void);
 
-const EQUALS_OPTIONS = { equals: (a: { type: any }, b: { type: any }) => a.type === b.type };
+const STATE_OPTIONS = { ...INTERNAL_OPTIONS, equals: (a: any, b: any) => a.type === b.type };
 
 /**
  * Creates a reactive state machine.
@@ -172,7 +173,7 @@ export function createMachine<T extends StatesBase<keyof T>>(
       typeof initial === "object"
         ? { type: initial.type, value: initial.input as any, to }
         : { type: initial as keyof T, value: undefined, to },
-      EQUALS_OPTIONS,
+      STATE_OPTIONS,
     );
 
   for (const key of Object.keys(states)) {
@@ -180,9 +181,31 @@ export function createMachine<T extends StatesBase<keyof T>>(
   }
 
   const memo = createMemo(() => {
-    const next = payload();
-    next.value = untrack(() => states[next.type](next.value, to));
-    return next;
+    let type = payload().type as keyof T;
+    let value: any = payload().value;
+    let pendingType: keyof T | undefined;
+    let pendingValue: any;
+
+    const next: any = (nextType: keyof T, nextValue?: any) => {
+      if (nextType !== type) {
+        pendingType = nextType;
+        pendingValue = nextValue;
+      }
+    };
+    for (const key of Object.keys(states)) {
+      next[key as any] = (input: any) => next(key, input);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    while (true) {
+      pendingType = undefined;
+      value = untrack(() => (states as any)[type](value, next));
+      if (pendingType === undefined) break; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+      type = pendingType;
+      value = pendingValue;
+    }
+
+    return { type, value, to };
   }) as any;
 
   Object.defineProperties(memo, {
