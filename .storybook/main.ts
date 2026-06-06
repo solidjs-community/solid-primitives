@@ -50,6 +50,7 @@ const config: StorybookConfig = {
       resolve: {
         conditions: ["@solid-primitives/source"],
         alias: [{ find: "solid-js/web", replacement: "@solidjs/web" }],
+        dedupe: ["react", "react-dom"],
       },
     });
   },

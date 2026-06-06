@@ -19,7 +19,8 @@
     "list": [
       "createImmutable"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 1799
   },
   "keywords": [
     "solid",

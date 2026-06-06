@@ -1,6 +1,6 @@
-import { batch, untrack } from "solid-js";
-import type { SetStoreFunction } from "solid-js/store";
-import { createStore } from "solid-js/store";
+import { untrack } from "solid-js";
+import type { Store, StoreSetter } from "solid-js";
+import { createStore } from "solid-js";
 
 /**
  * Type alias for any function with any number of arguments and any return type.
@@ -15,13 +15,13 @@ export type AnyFunctionsRecord = { readonly [K in string]: AnyFunction };
 export type Actions<T extends AnyFunctionsRecord> = { readonly [K in keyof T]: T[K] };
 
 /**
- * Identify function creating an action - function for mutating the state.
- * Actions are `batch`ed and `untrack`ed by default - no need to wrap them in `batch` and `untrack`.
+ * Wraps a function so its body runs untracked — reads inside will not register reactive
+ * dependencies and writes will not throw inside owned scopes.
  * @param fn the function to wrap
- * @returns function of the same signature as `fn` but wrapped in `batch` and `untrack`
+ * @returns function of the same signature as `fn` but running untracked
  */
 export function createAction<T extends AnyFunction>(fn: T): T {
-  return ((...args) => batch(() => untrack(() => fn(...args)))) as T;
+  return ((...args) => untrack(() => fn(...args))) as T;
 }
 
 /**
@@ -87,9 +87,9 @@ export type FluxFactory<
  *  getters: state => ({
  *   count: () => state.value,
  *  }),
- *  actions: (setState, state) => ({
- *   increment: () => setState(val => ({ ...val, value: val.value + 1 })),
- *   reset: () => setState("value", 0),
+ *  actions: setState => ({
+ *   increment: (by = 1) => setState(s => { s.value += by; }),
+ *   reset: () => setState(s => { s.value = 0; }),
  *  })
  * });
  *
@@ -110,13 +110,13 @@ export function createFluxStore<
   initialState: TState,
   createMethods: {
     getters: (state: TState) => TGetters;
-    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+    actions: (setState: StoreSetter<TState>, state: TState) => TActions;
   },
 ): FluxStore<TState, TActions, TGetters>;
 export function createFluxStore<TState extends object, TActions extends AnyFunctionsRecord>(
   initialState: TState,
   createMethods: {
-    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+    actions: (setState: StoreSetter<TState>, state: TState) => TActions;
   },
 ): FluxStore<TState, TActions>;
 export function createFluxStore<
@@ -127,10 +127,13 @@ export function createFluxStore<
   initialState: TState,
   createMethods: {
     getters?: (state: TState) => TGetters;
-    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+    actions: (setState: StoreSetter<TState>, state: TState) => TActions;
   },
 ): FluxStore<TState, TActions, TGetters | {}> {
-  const [state, setState] = createStore(initialState);
+  const [state, setState] = createStore(initialState as any) as unknown as [
+    Store<TState>,
+    StoreSetter<TState>,
+  ];
   return {
     state,
     getters: createMethods.getters ? createMethods.getters(state) : {},
@@ -154,9 +157,9 @@ export function createFluxStore<
  *  getters: state => ({
  *   count: () => state.value,
  *  }),
- *  actions: (setState, state) => ({
- *   increment: () => setState(val => ({ ...val, value: val.value + 1 })),
- *   reset: () => setState("value", 0),
+ *  actions: setState => ({
+ *   increment: (by = 1) => setState(s => { s.value += by; }),
+ *   reset: () => setState(s => { s.value = 0; }),
  *  })
  * });
  *
@@ -183,13 +186,13 @@ export function createFluxStoreFactory<
   fallbackState: TState,
   createMethods: {
     getters: (state: TState) => TGetters;
-    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+    actions: (setState: StoreSetter<TState>, state: TState) => TActions;
   },
 ): FluxFactory<TState, TActions, TGetters>;
 export function createFluxStoreFactory<TState extends object, TActions extends AnyFunctionsRecord>(
   fallbackState: TState,
   createMethods: {
-    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+    actions: (setState: StoreSetter<TState>, state: TState) => TActions;
   },
 ): FluxFactory<TState, TActions>;
 export function createFluxStoreFactory<
@@ -200,7 +203,7 @@ export function createFluxStoreFactory<
   fallbackState: TState,
   createMethods: {
     getters?: (state: TState) => TGetters;
-    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+    actions: (setState: StoreSetter<TState>, state: TState) => TActions;
   },
 ): FluxFactory<TState, TActions, TGetters | {}> {
   return initialValueOverride =>

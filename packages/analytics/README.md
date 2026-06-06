@@ -12,6 +12,7 @@ Category: Utilities
 
 # @solid-primitives/analytics
 
+[![size](https://img.shields.io/badge/size-125_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/analytics)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Creates a primitive for analytics management.

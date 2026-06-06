@@ -1,5 +1,5 @@
-import { type Accessor, createRoot, onCleanup, untrack, DEV, type JSX, createMemo } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createRoot, onCleanup, untrack, DEV, createMemo } from "solid-js";
+import { isServer, type JSX } from "@solidjs/web";
 import { abs, accessor, ceil, floor, min, type RangeProps, toFunction } from "./common.js";
 
 /**
