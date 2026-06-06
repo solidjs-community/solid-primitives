@@ -206,8 +206,6 @@ BOTTOM: called user callback
 6. █      █         █
 ```
 
-[**Interactive DEMO of the schematic above**](https://primitives.solidjs.community/playground/scheduled)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

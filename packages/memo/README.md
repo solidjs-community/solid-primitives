@@ -169,10 +169,6 @@ const getDouble = (n: number) => n * 2;
 const double = createMemo(() => getDouble(count()));
 ```
 
-### Demo
-
-https://codesandbox.io/s/solid-primitives-memo-demo-3w0oz?file=/index.tsx
-
 ## `createDebouncedMemo`
 
 **Removed in v2.** `createDebouncedMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) once that package is updated for Solid 2.0.
@@ -363,10 +359,6 @@ You need to convert that to the following format:
 ```ts
 const [fibonacci, nextFibonacci] = createReducer(nextFib, fib(1));
 ```
-
-### Demo
-
-https://codesandbox.io/s/solid-primitives-reducer-demo-7nrfs2?file=/index.tsx
 
 ## Changelog
 

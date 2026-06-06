@@ -232,10 +232,6 @@ const mask = createInputMask("9999-99-99");
 return <input ref={ref} onInput={e => useMask && mask(e)} onPaste={e => useMask && mask(e)} />;
 ```
 
-### DEMO
-
-Here is a [working demonstration](https://primitives.solidjs.community/playground/input-mask/) ([Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/input-mask/dev)).
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

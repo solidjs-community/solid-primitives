@@ -134,10 +134,6 @@ import { newClipboardItem } from "@solid-primitives/clipboard";
 writeClipboard([newClipboardItem("image/png", await image.blob())]);
 ```
 
-## Demo
-
-You may view a working example in [the /dev playground](./dev/index.tsx) deployed on [primitives.solidjs.community/playground/clipboard](https://primitives.solidjs.community/playground/clipboard/).
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
