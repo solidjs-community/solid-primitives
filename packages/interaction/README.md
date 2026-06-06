@@ -1,7 +1,7 @@
 # @solid-primitives/interaction
 
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/interaction?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/interaction)
+[![size](https://img.shields.io/badge/size-859_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/interaction)
 [![version](https://img.shields.io/npm/v/@solid-primitives/interaction?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/interaction)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -243,10 +243,6 @@ cleanup();
 > **Tip:** To hide content outside a dialog from screen readers, you don't need a library.
 > Set `ariaModal="true"` on your dialog or popover element and assistive technologies will
 > automatically scope navigation to it. See [`Element.ariaModal`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaModal) on MDN.
-
-## Demo
-
-TODO
 
 ## Changelog
 

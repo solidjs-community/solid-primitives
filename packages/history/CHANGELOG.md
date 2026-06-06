@@ -1,5 +1,19 @@
 # @solid-primitives/history
 
+## 0.3.0
+
+### Minor Changes
+
+- Migrate to Solid.js v2.0 (beta.10)
+
+### Breaking Changes
+
+- **Peer dependency**: `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10` are now required.
+- `isServer` import moved from `solid-js/web` to `@solidjs/web`.
+- `batch()` removed from `undo()` and `redo()` — Solid 2.0 batches signal updates automatically. Call `flush()` before reading `canUndo()`/`canRedo()` in tests or non-reactive contexts.
+- Internal count signal uses `{ pureWrite: true }` for Solid 2.0 signal semantics.
+- `createMemo` initial value handled via an explicit `initialState` reference to accommodate Solid 2.0's `undefined`-prev first-call behavior.
+
 ## 0.2.3
 
 ### Patch Changes

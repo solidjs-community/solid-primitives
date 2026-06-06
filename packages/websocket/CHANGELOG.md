@@ -1,5 +1,14 @@
 # @solid-primitives/websocket
 
+## 2.0.0-beta.0
+
+### Major Changes
+
+- Upgrade to Solid.js 2.0 (`^2.0.0-beta.7`).
+- `createWSState`: signal now uses `ownedWrite: true` to suppress dev-mode warnings when `ws.close()` is called from within a component or effect.
+- New primitive `createWSMessage<T>`: reactive signal containing the latest received WebSocket message. Cleans up its event listener automatically on owner disposal.
+- Updated all JSDoc examples to use the Solid 2.0 split `createEffect(compute, effect)` form.
+
 ## 1.3.2
 
 ### Patch Changes

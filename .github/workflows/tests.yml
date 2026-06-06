@@ -9,6 +9,8 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -36,3 +38,14 @@ jobs:
         # Will run the step even if lint step failed
         if: success() || failure()
         run: pnpm test
+
+      - name: Measure bundle sizes
+        if: github.ref == 'refs/heads/main'
+        run: pnpm measure --save && pnpm update-readme
+
+      - name: Commit size updates
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet || (git commit -am "chore: update bundle sizes [skip ci]" && git push)

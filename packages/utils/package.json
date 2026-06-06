@@ -107,7 +107,8 @@
       "pipe",
       "wrapSetter"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1399
   },
   "peerDependencies": {
     "@solidjs/web": "^2.0.0-beta.14",

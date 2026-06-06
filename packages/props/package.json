@@ -15,9 +15,12 @@
     "stage": 3,
     "list": [
       "combineProps",
-      "filterProps"
+      "combineHandlers",
+      "filterProps",
+      "partitionProps"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1163
   },
   "keywords": [
     "props",
@@ -51,10 +54,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {}
 }

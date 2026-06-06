@@ -18,7 +18,8 @@
     "list": [
       "destructure"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 498
   },
   "private": false,
   "sideEffects": false,

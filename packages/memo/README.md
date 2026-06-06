@@ -4,7 +4,7 @@
 
 # @solid-primitives/memo
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/memo?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/memo)
+[![size](https://img.shields.io/badge/size-843_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/memo)
 [![version](https://img.shields.io/npm/v/@solid-primitives/memo?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/memo)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -168,10 +168,6 @@ const getDouble = (n: number) => n * 2;
 // and only declare memo where you want to use it
 const double = createMemo(() => getDouble(count()));
 ```
-
-### Demo
-
-https://codesandbox.io/s/solid-primitives-memo-demo-3w0oz?file=/index.tsx
 
 ## `createDebouncedMemo`
 
@@ -363,10 +359,6 @@ You need to convert that to the following format:
 ```ts
 const [fibonacci, nextFibonacci] = createReducer(nextFib, fib(1));
 ```
-
-### Demo
-
-https://codesandbox.io/s/solid-primitives-reducer-demo-7nrfs2?file=/index.tsx
 
 ## Changelog
 
