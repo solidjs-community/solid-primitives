@@ -362,11 +362,6 @@ type FileUploaderDirective = {
 
 All primitives are SSR-safe. On the server they return no-op stubs so components render without errors.
 
-## Demo
-
-Working example: https://primitives.solidjs.community/playground/upload  
-Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/upload/dev/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

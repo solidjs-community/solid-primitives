@@ -25,7 +25,7 @@ export interface FilePicker {
   files: Accessor<UploadFile[]>;
   error: Accessor<unknown>;
   isLoading: Accessor<boolean>;
-  selectFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void;
+  selectFiles: (callback?: (files: UploadFile[]) => void | Promise<void>) => void;
   removeFile: (fileName: string) => void;
   clearFiles: () => void;
 }
