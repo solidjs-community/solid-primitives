@@ -1,4 +1,4 @@
-import { renderToString } from "solid-js/web";
+import { renderToString } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { createTokenizer, createToken, resolveTokens } from "../src/index.js";
 

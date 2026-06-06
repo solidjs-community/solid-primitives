@@ -18,7 +18,8 @@
       "createEventHub",
       "createEventStack"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1053
   },
   "private": false,
   "sideEffects": false,

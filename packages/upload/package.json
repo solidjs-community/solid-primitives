@@ -20,7 +20,8 @@
       "createDropzone",
       "dropzone"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 1035
   },
   "keywords": [
     "file",

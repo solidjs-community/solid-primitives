@@ -1,5 +1,5 @@
 import { createSignal, createEffect, type Signal } from "solid-js";
-import { getRequestEvent, isServer } from "solid-js/web";
+import { getRequestEvent, isServer } from "@solidjs/web";
 
 const YEAR = 365 * 24 * 60 * 60;
 
@@ -66,13 +66,23 @@ export function createServerCookie<T>(
     cookieMaxAge = YEAR,
   } = options ?? {};
 
-  const [cookie, setCookie] = createSignal(deserialize(parseCookie(getCookiesString(), name)));
+  const [cookie, setCookie] = createSignal<T | undefined>(
+    deserialize(parseCookie(getCookiesString(), name)) as Exclude<T | undefined, Function>,
+  );
 
-  createEffect(p => {
-    const string = serialize(cookie());
-    if (p !== string) document.cookie = `${name}=${string};max-age=${cookieMaxAge}`;
-    return string;
-  });
+  createEffect(
+    () => {
+      const val = cookie();
+      return val === undefined ? undefined : serialize(val);
+    },
+    (string, prev) => {
+      if (prev === string) return;
+      document.cookie =
+        string === undefined
+          ? `${name}=;max-age=0`
+          : `${name}=${string};max-age=${cookieMaxAge}`;
+    },
+  );
 
   return [cookie, setCookie];
 }
