@@ -192,10 +192,6 @@ createEffect(
 );
 ```
 
-### Demo
-
-See a demo of this primitive in action [here](https://primitives.solidjs.community/playground/deep).
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
