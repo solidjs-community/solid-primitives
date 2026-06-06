@@ -19,7 +19,8 @@
       "ariaHideOutside",
       "createHideOutside"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 859
   },
   "private": false,
   "sideEffects": false,

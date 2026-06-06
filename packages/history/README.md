@@ -4,7 +4,7 @@
 
 # @solid-primitives/history
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/history?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/history)
+[![size](https://img.shields.io/badge/size-615_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/history)
 [![version](https://img.shields.io/npm/v/@solid-primitives/history?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/history)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -99,8 +99,6 @@ const history = createUndoHistory(() => {
 
 To clone only the parts of the store that changed, you can use the [`captureStoreUpdates` utility from `@solid-primitives/deep`](https://primitives.solidjs.community/package/deep#captureStoreUpdates). This is useful for large stores where you want to avoid unnecessary cloning and reconciliation.
 
-The code for this example you'll find [in the source code of the DEMO](https://github.com/solidjs-community/solid-primitives/blob/main/packages/history/dev/index.tsx).
-
 ### Observing multiple sources
 
 You can track as many signals in the `source` callback as you want. Then any updates will create a point in history for all of them.
@@ -118,11 +116,10 @@ const history = createUndoHistory(() => {
   };
 });
 
-// set them both at the same time, to only create one point in history
-batch(() => {
-  setA(1);
-  setB(1);
-});
+// Note: updates are batched by default in Solid 2.0 — both
+// changes create a single history entry
+setA(1);
+setB(1);
 ```
 
 ### Observing multiple independent sources

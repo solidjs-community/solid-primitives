@@ -23,7 +23,8 @@
       "createViewportObserver",
       "createVisibilityObserver"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 1784
   },
   "private": false,
   "sideEffects": false,

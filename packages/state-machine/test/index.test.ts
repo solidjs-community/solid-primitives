@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { createMemo, createRoot, onCleanup, untrack } from "solid-js";
+import { createMemo, createRoot, flush, onCleanup, untrack } from "solid-js";
 import { createMachine } from "../src/index.js";
 
 describe("createMachine", () => {
@@ -28,6 +28,7 @@ describe("createMachine", () => {
 
       // @ts-expect-error need to check if state is idle
       state.to.loading();
+      flush();
 
       expect(state.type).toBe("loading");
       expect(state.value).toBe("bar");
@@ -40,6 +41,7 @@ describe("createMachine", () => {
 
         state.to.idle();
       }
+      flush();
 
       expect(state.type).toBe("idle");
       expect(state.value).toBe("foo");
@@ -69,6 +71,7 @@ describe("createMachine", () => {
       if (state.type === "idle") {
         state.to.loading(1);
       }
+      flush();
 
       expect(state.type).toBe("loading");
       expect(state.value).toBe(1);
@@ -77,6 +80,7 @@ describe("createMachine", () => {
         state.to.idle("a");
         state.to.idle("b");
       }
+      flush();
 
       expect(state.type).toBe("idle");
       expect(state.value).toBe("a");
@@ -99,12 +103,15 @@ describe("createMachine", () => {
         },
       });
 
+      flush();
+
       expect(state.type).toBe("loading");
       expect(state.value).toBe("bar");
 
       if (state.type === "loading") {
         state.to.idle();
       }
+      flush();
 
       expect(state.type).toBe("loading");
       expect(state.value).toBe("bar");
@@ -140,6 +147,7 @@ describe("createMachine", () => {
       if (state.type === "idle") {
         state.to.loading();
       }
+      flush();
 
       expect(state.type).toBe("loading");
       expect(cleanups.idle).toHaveBeenCalledOnce();
@@ -148,6 +156,7 @@ describe("createMachine", () => {
       if (state.type === "loading") {
         state.to.idle();
       }
+      flush();
 
       expect(state.type).toBe("idle");
       expect(cleanups.idle).toHaveBeenCalledOnce();

@@ -6,10 +6,10 @@ import {
   type Setter,
   untrack,
   DEV,
-  type JSX,
   createMemo,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer, type JSX } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./common.js";
 
 /**
@@ -49,7 +49,7 @@ export function indexRange<T>(
 
   const mapper = (i: number, n: number): void =>
     createRoot(dispose => {
-      const [number, setNumber] = createSignal(n);
+      const [number, setNumber] = createSignal(n, INTERNAL_OPTIONS);
       disposers[i] = dispose;
       items[i] = mapFn(number);
       setters[i] = setNumber;
