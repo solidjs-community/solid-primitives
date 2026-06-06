@@ -3,11 +3,10 @@ import {
   type Component,
   createComponent,
   createMemo,
-  type JSX,
   DEV,
-  type ResolvedJSXElement,
+  type ResolvedElement,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer, type JSX } from "@solidjs/web";
 import type { NoInfer, Many } from "@solid-primitives/utils";
 import { asArray } from "@solid-primitives/utils";
 
@@ -178,7 +177,7 @@ export function resolveTokens<TData>(
   options: {
     includeJSXElements: true;
   },
-): Accessor<(TokenElement<TData> | ResolvedJSXElement)[]>;
+): Accessor<(TokenElement<TData> | ResolvedElement)[]>;
 
 export function resolveTokens<TTokenizers extends readonly JSXTokenizer<any>[]>(
   tokenizers: TTokenizers,
@@ -194,7 +193,7 @@ export function resolveTokens<TTokenizers extends readonly JSXTokenizer<any>[]>(
   options: {
     includeJSXElements: true;
   },
-): Accessor<(TokenElement<JSXTokenizerData<TTokenizers[number]>> | ResolvedJSXElement)[]>;
+): Accessor<(TokenElement<JSXTokenizerData<TTokenizers[number]>> | ResolvedElement)[]>;
 
 export function resolveTokens<T>(
   tokenizers: Many<JSXTokenizer<T>>,
@@ -202,7 +201,7 @@ export function resolveTokens<T>(
   options?: {
     includeJSXElements?: boolean;
   },
-): Accessor<(TokenElement<T> | ResolvedJSXElement)[]> {
+): Accessor<(TokenElement<T> | ResolvedElement)[]> {
   const symbols = new Set(asArray(tokenizers).map(p => p[$TOKENIZER]));
   const children = createMemo(fn);
   return createMemo(() => getResolvedTokens([], children(), symbols, options?.includeJSXElements));

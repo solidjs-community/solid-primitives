@@ -28,7 +28,8 @@
       "addWithOptionsMethod",
       "makeObjectStorage"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 2013
   },
   "files": [
     "dist"
