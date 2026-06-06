@@ -1,5 +1,5 @@
 import { createStaticStore } from "@solid-primitives/static-store";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { createMousePosition, createPositionToElement } from "../src/index.js";
@@ -50,6 +50,7 @@ describe("createMouseToElement", () => {
       });
 
       setPos({ x: -20, y: 30 });
+      flush();
 
       expect(relative).toEqual({
         x: -20,
@@ -62,6 +63,7 @@ describe("createMouseToElement", () => {
       });
 
       setPos({ x: 15 });
+      flush();
 
       expect(relative).toEqual({
         x: 15,

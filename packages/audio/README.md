@@ -4,7 +4,7 @@
 
 # @solid-primitives/audio
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/audio?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/audio)
+[![size](https://img.shields.io/badge/size-851_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/audio)
 [![size](https://img.shields.io/npm/v/@solid-primitives/audio?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/audio)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -141,10 +141,6 @@ This includes `MediaSource` and `MediaStream`, enabling streamed or Blob-backed 
 const media = new MediaSource();
 const audio = createAudio(URL.createObjectURL(media));
 ```
-
-## Demo
-
-You may view a working example here: https://stackblitz.com/edit/vitejs-vite-zwfs6h?file=src%2Fmain.tsx
 
 ## Changelog
 

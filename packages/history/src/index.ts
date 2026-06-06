@@ -1,6 +1,13 @@
 import { type Many, createMicrotask, falseFn, noop } from "@solid-primitives/utils";
-import { type Accessor, type Signal, batch, createMemo, createSignal, untrack } from "solid-js";
-import { isServer } from "solid-js/web";
+import {
+  type Accessor,
+  type Signal,
+  type SignalOptions,
+  createMemo,
+  createSignal,
+  untrack,
+} from "solid-js";
+import { isServer } from "@solidjs/web";
 
 /**
  * Configuration object for {@link createUndoHistory}.
@@ -42,6 +49,8 @@ export type UndoHistoryReturn = {
    */
   redo: VoidFunction;
 };
+
+type HistoryState = { count: Signal<number>; list: VoidFunction[][] };
 
 /**
  * Creates an undo history from a reactive source for going back and forth between state snapshots.
@@ -88,29 +97,36 @@ export function createUndoHistory(
   const limit = options?.limit ?? 100,
     sources = Array.isArray(source) ? source.map(s => createMemo(s)) : [source],
     clearIgnore = createMicrotask(() => (ignoreNext = false)),
-    history = createMemo<{ count: Signal<number>; list: VoidFunction[][] }>(
-      p => {
-        // always track the sources
-        const setters: VoidFunction[] = [];
-        for (const s of sources) {
-          const setter = s();
-          if (setter) setters.push(setter);
-        }
+    // Initial state lives outside the memo so Solid undefined-prev first-call is handled
+    initialCount = createSignal<number>(0, { ownedWrite: true } as SignalOptions<number>),
+    initialState: HistoryState = { list: [], count: initialCount },
+    history = createMemo<HistoryState>(p => {
+      const prev = p ?? initialState;
 
-        if (ignoreNext || !setters.length) {
-          ignoreNext = false;
-          return p;
-        }
+      // always track the sources
+      const setters: VoidFunction[] = [];
+      for (const s of sources) {
+        const setter = s();
+        if (setter) setters.push(setter);
+      }
 
-        const count = untrack(p.count[0]),
-          newLength = p.list.length - count,
-          newHistory = p.list.slice(Math.max(0, newLength - limit), newLength);
-        newHistory.push(setters);
+      if (ignoreNext || !setters.length) {
+        ignoreNext = false;
+        return prev;
+      }
 
-        return { count: count ? createSignal(0) : p.count, list: newHistory };
-      },
-      { list: [], count: createSignal(0) },
-    ),
+      const count = untrack(prev.count[0]),
+        newLength = prev.list.length - count,
+        newHistory = prev.list.slice(Math.max(0, newLength - limit), newLength);
+      newHistory.push(setters);
+
+      return {
+        count: count
+          ? createSignal<number>(0, { ownedWrite: true } as SignalOptions<number>)
+          : prev.count,
+        list: newHistory,
+      };
+    }),
     canUndo = createMemo(() => {
       const h = history();
       return h.list.length - h.count[0]() > 1;
@@ -134,10 +150,10 @@ export function createUndoHistory(
     canUndo,
     canRedo,
     undo() {
-      untrack(() => canUndo() && batch(() => move(1)));
+      untrack(() => canUndo() && move(1));
     },
     redo() {
-      untrack(() => canRedo() && batch(() => move(-1)));
+      untrack(() => canRedo() && move(-1));
     },
   };
 }

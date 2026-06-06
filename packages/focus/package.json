@@ -32,7 +32,8 @@
       "makeFocusListener",
       "createFocusSignal"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 191
   },
   "keywords": [
     "solid",

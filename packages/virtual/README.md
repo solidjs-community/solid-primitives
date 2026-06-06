@@ -4,7 +4,7 @@
 
 # @solid-primitives/virtual
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/virtual?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/virtual)
+[![size](https://img.shields.io/badge/size-618_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/virtual)
 [![version](https://img.shields.io/npm/v/@solid-primitives/virtual?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/virtual)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -108,10 +108,6 @@ function MyComp(): JSX.Element {
 
 The tests describe the exact behavior and how overscanCount handles the start/end of the list in more detail.
 Note that the component only handles vertical lists where the number of items is known and the height of an individual item is fixed.
-
-## Demo
-
-You can see the VirtualList in action in the following sandbox: https://primitives.solidjs.community/playground/virtual
 
 ## Changelog
 

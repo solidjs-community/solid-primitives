@@ -4,7 +4,7 @@
 
 # @solid-primitives/keyed
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/keyed?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/keyed)
+[![size](https://img.shields.io/badge/size-981_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/keyed)
 [![version](https://img.shields.io/npm/v/@solid-primitives/keyed?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/keyed)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -120,10 +120,6 @@ Second argument of the map function is an index signal.
   {(item, index) => <div data-index={index()}>{item()}</div>}
 </Key>
 ```
-
-### Demo
-
-https://codesandbox.io/s/solid-primitives-keyed-key-demo-gh7gd?file=/index.tsx
 
 ## `<Entries>`
 
@@ -277,10 +273,6 @@ You can treat `on` prop like sources argument of the Solid's `on` helper, and th
   </Rerun>
 </Transition>
 ```
-
-### DEMO
-
-https://codesandbox.io/s/solid-primitives-keyed-rerun-demo-14vjr?file=/index.tsx
 
 ## Changelog
 

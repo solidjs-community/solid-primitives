@@ -18,7 +18,8 @@
     "list": [
       "createActiveElement"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 942
   },
   "private": false,
   "sideEffects": false,

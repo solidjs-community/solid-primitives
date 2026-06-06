@@ -1,5 +1,25 @@
 # @solid-primitives/context
 
+## 1.0.0
+
+### Major Changes
+
+- Migrate to Solid.js v2.0 (beta.13)
+
+#### Breaking Changes
+
+- **Peer dependencies**: `solid-js@^2.0.0-beta.13` and `@solidjs/web@^2.0.0-beta.13` are now required.
+- `Context` is now used directly as the provider component — `Context.Provider` no longer exists in Solid 2.0. `createContextProvider` and `MultiProvider` both reflect this change.
+- `ContextProviderComponent` is now a proper export from `solid-js`; the previous workaround importing from an internal `node_modules` path has been removed.
+- `JSX.Element` replaced with `Element` from `solid-js` throughout the public API types.
+- `MultiProvider` no longer falls back to accessing `.Provider` on non-function items — contexts passed in `values` must be functions (which all `Context` objects are in Solid 2.0).
+
+#### New Exports
+
+- **`createStrictContextProvider`** — Like `createContextProvider` without defaults, but with the intent made explicit in types: the hook returns `T` (never `undefined`) and Solid throws `ContextNotFoundError` at runtime when used outside a provider. Accepts an optional `{ name }` option.
+- **`createLayeredContext`** — Like `createContextProvider`, but each provider in the tree extends the parent context value rather than replacing it. The factory receives both `props` and the nearest parent context value. Requires a `defaults` base value.
+- **`ContextProviderOptions`** — Exported type `{ name?: string }` for the third argument of `createContextProvider` and `createStrictContextProvider`/`createLayeredContext`'s second argument.
+
 ## 0.3.2
 
 ### Patch Changes

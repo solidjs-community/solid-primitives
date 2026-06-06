@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from "fs";
+import * as fsp from "node:fs/promises";
 import path from "path";
 // @ts-expect-error ts-missing-module
 import tablemark from "json-to-markdown-table";
@@ -51,7 +52,29 @@ const rootDependencies: string[] = [
       data.Size = "";
       data.NPM = "";
     } else {
-      data.Size = `[![SIZE](${sizeShield}${packageName}?style=for-the-badge&label=)](${bundlephobiaURL}${packageName})`;
+      let gzip = module.primitive?.gzip;
+      if (gzip == null) {
+        const bundlesize = await utils.getPackageBundlesize(module.name, {
+          peerDependencies: module.peer_deps,
+        });
+        if (bundlesize != null) {
+          gzip = bundlesize.gzip;
+          const pkgPath = path.join(utils.PACKAGES_DIR, module.name, "package.json");
+          const raw = await fsp.readFile(pkgPath, "utf8");
+          const indent = raw.match(/^(\s+)"/m)?.[1] ?? "  ";
+          const pkg = JSON.parse(raw);
+          if (pkg.primitive) {
+            pkg.primitive.gzip = gzip;
+            await fsp.writeFile(pkgPath, JSON.stringify(pkg, null, indent) + "\n");
+          }
+        }
+      }
+      if (gzip != null) {
+        const [value, unit] = utils.formatBytes(gzip);
+        data.Size = `[![SIZE](https://img.shields.io/badge/size-${value}_${unit}-blue?style=for-the-badge)](${bundlephobiaURL}${packageName})`;
+      } else {
+        data.Size = `[![SIZE](${sizeShield}${packageName}?style=for-the-badge&label=)](${bundlephobiaURL}${packageName})`;
+      }
       data.NPM = `[![VERSION](${npmShield}${packageName}?style=for-the-badge&label=)](${npmURL}${packageName})`;
     }
     data.Stage = `[![STAGE](${stageShieldBaseURL}${module.primitive.stage}.json)](${stageShieldLink})`;
