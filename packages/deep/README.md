@@ -14,6 +14,35 @@ Primitives for tracking and observing nested reactive objects in Solid.
 - [`trackStore`](#trackstore) - A more performant alternative to `trackDeep` utilizing specific store implementations.
 - [`captureStoreUpdates`](#capturestoreupdates) - A utility function that captures all updates to a store and returns them as an array.
 
+## Comparison with Solid's built-in `deep`
+
+Solid 2.0 ships a `deep` helper in `solid-js` that tracks all nested properties of a store and returns a **plain snapshot** — a non-reactive copy suitable for serialization:
+
+```ts
+import { deep } from "solid-js";
+
+createEffect(
+  () => deep(store),
+  snapshot => localStorage.setItem("state", JSON.stringify(snapshot))
+);
+```
+
+This package complements that with three distinct utilities:
+
+| | Solid's `deep` | `trackDeep` | `trackStore` | `captureStoreUpdates` |
+|---|---|---|---|---|
+| Tracks all nested changes | ✓ | ✓ | ✓ | ✓ |
+| Returns live store proxy | — | ✓ | ✓ | — |
+| Returns plain snapshot | ✓ | — | — | — |
+| Works on plain objects wrapping stores | — | ✓ | — | — |
+| Reports what changed and where | — | — | — | ✓ |
+
+**Use Solid's `deep`** when you want to observe all changes and immediately consume a serializable value (e.g. persist to localStorage, send over the wire).
+
+**Use `trackDeep` or `trackStore`** when you need the live reactive proxy back — for example, to pass it reactively to another primitive, or when you want to decide what to do with the store rather than serialize it immediately. `trackStore` is preferred for large or frequently updated stores due to its use of memoized structural subscriptions; `trackDeep` additionally accepts plain objects that contain stores.
+
+**Use `captureStoreUpdates`** when you need to know _what_ changed and _where_ — it returns an array of `{ path, value }` deltas since the last call. Solid's `deep` has no equivalent for this.
+
 ## Installation
 
 ```bash
