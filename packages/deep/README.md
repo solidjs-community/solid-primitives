@@ -14,6 +14,35 @@ Primitives for tracking and observing nested reactive objects in Solid.
 - [`trackStore`](#trackstore) - A more performant alternative to `trackDeep` utilizing specific store implementations.
 - [`captureStoreUpdates`](#capturestoreupdates) - A utility function that captures all updates to a store and returns them as an array.
 
+## Comparison with Solid's built-in `deep`
+
+Solid 2.0 ships a `deep` helper in `solid-js` that tracks all nested properties of a store and returns a **plain snapshot** — a non-reactive copy suitable for serialization:
+
+```ts
+import { deep } from "solid-js";
+
+createEffect(
+  () => deep(store),
+  snapshot => localStorage.setItem("state", JSON.stringify(snapshot))
+);
+```
+
+This package complements that with three distinct utilities:
+
+| | Solid's `deep` | `trackDeep` | `trackStore` | `captureStoreUpdates` |
+|---|---|---|---|---|
+| Tracks all nested changes | ✓ | ✓ | ✓ | ✓ |
+| Returns live store proxy | — | ✓ | ✓ | — |
+| Returns plain snapshot | ✓ | — | — | — |
+| Works on plain objects wrapping stores | — | ✓ | — | — |
+| Reports what changed and where | — | — | — | ✓ |
+
+**Use Solid's `deep`** when you want to observe all changes and immediately consume a serializable value (e.g. persist to localStorage, send over the wire).
+
+**Use `trackDeep` or `trackStore`** when you need the live reactive proxy back — for example, to pass it reactively to another primitive, or when you want to decide what to do with the store rather than serialize it immediately. `trackStore` is preferred for large or frequently updated stores due to its use of memoized structural subscriptions; `trackDeep` additionally accepts plain objects that contain stores.
+
+**Use `captureStoreUpdates`** when you need to know _what_ changed and _where_ — it returns an array of `{ path, value }` deltas since the last call. Solid's `deep` has no equivalent for this.
+
 ## Installation
 
 ```bash
@@ -41,20 +70,23 @@ import { trackDeep } from "@solid-primitives/deep";
 
 const [state, setState] = createStore({ name: "John", age: 42 });
 
-createEffect(() => {
-  trackDeep(state);
-  /* execute some logic whenever the state changes */
-});
+createEffect(
+  () => trackDeep(state),
+  () => {
+    /* execute some logic whenever the state changes */
+  }
+);
 ```
 
 Or since this has a composable design, you can create _derivative_ functions and use them similar to derivative signals.
 
 ```ts
 const deeplyTrackedStore = () => trackDeep(sign);
-createEffect(() => {
-  console.log("Store is: ", deeplyTrackedStore());
-  //                        ^ this causes a re-execution of the effect on deep changes of properties
-});
+createEffect(
+  () => deeplyTrackedStore(),
+  //    ^ this causes a re-execution of the effect on deep changes of properties
+  value => console.log("Store is:", value)
+);
 ```
 
 `trackDeep` will traverse any "wrappable" object _(objects that solid stores will wrap with proxies)_, even if it's not a solid store.
@@ -66,15 +98,17 @@ createEffect(() => {
 });
 ```
 
-> **Warning** If you `unwrap` a store, it will no longer be tracked by `trackDeep` nor `trackStore`!
+> **Warning** If you `snapshot` a store, it will no longer be tracked by `trackDeep` nor `trackStore`!
 
 ```ts
-const unwrapped = unwrap(state);
+import { snapshot } from "solid-js";
 
-createEffect(() => {
-  // This will NOT work:
-  trackDeep(unwrapped);
-});
+const plain = snapshot(state);
+
+createEffect(
+  () => trackDeep(plain), // This will NOT work — plain objects are not reactive
+  () => {}
+);
 ```
 
 ## `trackStore`
@@ -92,10 +126,12 @@ import { trackStore } from "@solid-primitives/deep";
 
 const [state, setState] = createStore({ name: "John", age: 42 });
 
-createEffect(() => {
-  trackStore(state);
-  /* execute some logic whenever the state changes */
-});
+createEffect(
+  () => trackStore(state),
+  () => {
+    /* execute some logic whenever the state changes */
+  }
+);
 ```
 
 ## `captureStoreUpdates`
@@ -115,7 +151,7 @@ const getDelta = captureStoreUpdates(state);
 
 getDelta(); // [{ path: [], value: { todos: [] } }]
 
-setState("todos", ["foo"]);
+setState(s => { s.todos = ["foo"]; });
 
 getDelta(); // [{ path: ["todos"], value: ["foo"] }]
 ```
@@ -127,11 +163,13 @@ const [state, setState] = createStore({ todos: [] });
 
 const getDelta = captureStoreUpdates(state);
 
-createEffect(() => {
-  const delta = getDelta();
-  /* execute some logic whenever the state changes */
-  console.log(delta);
-});
+createEffect(
+  () => getDelta(),
+  delta => {
+    /* execute some logic whenever the state changes */
+    console.log(delta);
+  }
+);
 ```
 
 The returned function is not a signal - it won't get updated by itself, it has to be called manually, or under a tracking scope to capture new updates.
@@ -144,17 +182,15 @@ const [state, setState] = createStore({ todos: [] });
 const delta = createMemo(captureStoreUpdates(state));
 
 // both of these effects will receive the same delta
-createEffect(() => {
-  console.log(delta());
-});
-createEffect(() => {
-  console.log(delta());
-});
+createEffect(
+  () => delta(),
+  value => console.log(value)
+);
+createEffect(
+  () => delta(),
+  value => console.log(value)
+);
 ```
-
-### Demo
-
-See a demo of this primitive in action [here](https://primitives.solidjs.community/playground/deep).
 
 ## Changelog
 
