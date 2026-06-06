@@ -118,7 +118,7 @@ export const createSyncFileSystem = (
       getTypeMap.get(previous)?.[1](undefined);
       getTypeMap.delete(previous);
       readdirMap.get(getParentDir(previous))?.[1](
-        (items = []) => items.filter(item => item === getItemName(previous)) as [] | DirEntries,
+        (items = []) => items.filter(item => item !== getItemName(previous)) as [] | DirEntries,
       );
       readdirMap.get(getParentDir(next))?.[1](
         (items = []) => [...items, getItemName(next)] as DirEntries,
@@ -139,20 +139,24 @@ export const createSyncFileSystem = (
         readFileMap.delete(path);
       }
       readdirMap.get(getParentDir(path))?.[1](
-        (items = []) => items.filter(item => item === getItemName(path)) as [] | DirEntries,
+        (items = []) => items.filter(item => item !== getItemName(path)) as [] | DirEntries,
       );
     },
   };
   if (watcher) {
     watcher((operation, path) => {
-      if (operation === "mkdir" || operation === "rm") {
-        readdirMap.get(getParentDir(path))?.[1]((items = []) => {
-          const name = getItemName(path);
-          return items.includes(name as never) ? items : ([...items, name] as DirEntries);
-        });
+      const name = getItemName(path);
+      const parentSignal = readdirMap.get(getParentDir(path));
+      if (operation === "mkdir") {
+        parentSignal?.[1]((items = []) =>
+          items.includes(name as never) ? items : ([...items, name] as DirEntries),
+        );
       }
       if (operation === "rm") {
         getTypeMap.get(path)?.[1](null);
+        parentSignal?.[1]((items = []) =>
+          items.filter(item => item !== name) as [] | DirEntries,
+        );
       }
       if (operation === "writeFile" && readFileMap.has(path)) {
         fs.readFile(path, true);
@@ -266,10 +270,10 @@ export const createAsyncFileSystem = (
   };
   if (watcher) {
     watcher((operation, path) => {
-      if (operation === "mkdir" || operation === "rm") {
-        const readdirEntry = readdirMap.get(getParentDir(path));
+      const name = getItemName(path);
+      const readdirEntry = readdirMap.get(getParentDir(path));
+      if (operation === "mkdir") {
         if (readdirEntry) {
-          const name = getItemName(path);
           const items = readdirEntry.read() ?? [];
           if (!items.includes(name as never)) {
             readdirEntry.mutate([...items, name] as DirEntries);
@@ -278,6 +282,10 @@ export const createAsyncFileSystem = (
       }
       if (operation === "rm") {
         getTypeMap.get(path)?.mutate(null);
+        if (readdirEntry) {
+          const items = readdirEntry.read() ?? [];
+          readdirEntry.mutate(items.filter(item => item !== name) as [] | DirEntries);
+        }
       }
       if (operation === "writeFile") {
         readFileMap.get(path)?.refetch();

@@ -805,22 +805,6 @@ importers:
         specifier: 2.0.0-beta.13
         version: 2.0.0-beta.13
 
-  packages/page-visibility:
-    dependencies:
-      '@solid-primitives/event-listener':
-        specifier: workspace:^
-        version: link:../event-listener
-      '@solid-primitives/rootless':
-        specifier: workspace:^
-        version: link:../rootless
-      '@solid-primitives/utils':
-        specifier: workspace:^
-        version: link:../utils
-    devDependencies:
-      solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
-
   packages/pagination:
     dependencies:
       '@solid-primitives/utils':
