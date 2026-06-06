@@ -131,14 +131,6 @@ import { createAction } from "@solid-primitives/flux-store";
 const increment = createAction(() => setCount(c => c + 1));
 ```
 
-## Demo
-
-View Demo:
-https://vu5z5u-3000.preview.csb.app/
-
-Open Demo Editor:
-https://codesandbox.io/p/sandbox/solid-primitives-store-web-demo-vu5z5u
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
