@@ -150,12 +150,6 @@ createFocusTrap({
 });
 ```
 
-## Demo
-
-You may see the working example here: https://primitives.solidjs.community/playground/focus/
-
-Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/focus/dev/index.tsx
-
 ## Credits
 
 `createFocusTrap` is ported from [solid-focus-trap](https://github.com/corvudev/corvu/tree/main/packages/solid-focus-trap), part of the [corvu](https://corvu.dev) UI toolkit by [Jasmin Noetzli (GiyoMoon)](https://github.com/GiyoMoon). Licensed under the MIT License.
