@@ -1,10 +1,6 @@
-import { type FileUploaderOptions, type UploadFile } from "./types.js";
+import { type FilePickerOptions, type UploadFile } from "./types.js";
 
-export const doStuff = (s: number): Promise<void> => {
-  return new Promise(res => setTimeout(res, s * 1000));
-};
-
-export function createInputComponent({ multiple = false, accept = "" }: FileUploaderOptions) {
+export function createInputComponent({ multiple = false, accept = "" }: FilePickerOptions) {
   const element = document.createElement("input");
   element.type = "file";
   element.accept = accept;
