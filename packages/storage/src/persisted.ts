@@ -1,5 +1,6 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV } from "solid-js";
+import { action, createUniqueId, latest, untrack, snapshot, DEV } from "solid-js";
+import { isServer } from "@solid-primitives/utils";
 
 export type SyncStorage = {
   getItem: (key: string) => string | null;
@@ -74,7 +75,7 @@ export type PersistenceOptions<
 
 export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | string | null] : never;
 
-export type StoreTuple<T> = [Store<T>, StoreSetter<T>];
+export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
 
 /**
  * Persists a signal, store or similar API
@@ -135,39 +136,40 @@ export function makePersisted<
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
   const init = storage.getItem(name, storageOptions);
-  const set =
-    typeof signal[0] === "function"
-      ? (data: string) => {
-          try {
-            const value = deserialize(data);
-            (signal[1] as any)(() => value);
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            if (DEV) console.warn(e);
-          }
+  const isSignal = typeof signal[0] === "function";
+  const set = isSignal
+    ? (data: string) => {
+        try {
+          const value = deserialize(data);
+          (signal[1] as any)(() => value);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          if (DEV) console.warn(e);
         }
-      : (data: string) => {
-          try {
-            const value = deserialize(data);
-            (signal[1] as any)(reconcile(value, () => undefined));
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            if (DEV) console.warn(e);
-          }
-        };
+      }
+    : (data: string) => {
+        try {
+          const value = deserialize(data);
+          // TODO: restore the previous reconcile functionality
+          (signal[1] as any)(() => value);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          if (DEV) console.warn(e);
+        }
+      };
   let unchanged = true;
 
   if (init instanceof Promise) init.then(data => unchanged && data && set(data));
   else if (init) set(init);
 
+  const getter: () => T = isSignal ? (signal[0] as () => T) : () => snapshot(signal[0] as T);
+
   if (typeof options.sync?.[0] === "function") {
-    const get: () => T =
-      typeof signal[0] === "function" ? (signal[0] as () => T) : () => signal[0] as T;
     options.sync[0]((data: PersistenceSyncData) => {
       if (
         data.key !== name ||
-        (!globalThis.window && (data.url || globalThis.location.href) !== globalThis.location.href) ||
-        data.newValue === serialize(untrack(get))
+        (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
+        data.newValue === serialize(untrack(getter))
       ) {
         return;
       }
@@ -175,7 +177,6 @@ export function makePersisted<
     });
   }
 
-  const getter = typeof signal[0] === "function" ? signal[0] as () => T : () => snapshot(signal[0] as T);
   const persist = () => {
     const next = untrack(() => latest(getter));
     if (next == null) {
@@ -193,7 +194,7 @@ export function makePersisted<
       const output = signal[1](value);
       persist();
       unchanged = false;
-      return output instanceof Promise ? output.then((result) => (persist(), result)) : output;
+      return output instanceof Promise ? output.then((result) => (persist(), result), (err) => { persist(); throw err; }) : output;
     }),
     init,
   ] as unknown as PersistedState<S>;
@@ -222,7 +223,7 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
     }),
   (key, newValue) =>
     channel.postMessage(
-      { key, newValue, timeStamp: +new Date(), url: location.href },
+      { key, newValue, timeStamp: Date.now(), url: location.href },
       location.origin,
     ),
 ];
