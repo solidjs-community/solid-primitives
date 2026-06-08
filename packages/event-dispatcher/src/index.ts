@@ -1,4 +1,4 @@
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 export type Handlers<T> = {
   [Property in keyof T as Property extends `on${infer EventName}`

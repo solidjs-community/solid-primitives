@@ -9,7 +9,6 @@
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 `createEventDispatcher` creates a custom-event dispatcher for emitting component events.
-SolidJS equivalent of Svelte's [homonymous function](svelte.dev/docs#run-time-svelte-createeventdispatcher).
 
 ## Installation
 
@@ -17,11 +16,15 @@ SolidJS equivalent of Svelte's [homonymous function](svelte.dev/docs#run-time-sv
 npm install @solid-primitives/event-dispatcher
 # or
 yarn add @solid-primitives/event-dispatcher
+# or
+pnpm add @solid-primitives/event-dispatcher
 ```
+
+Requires `solid-js` and `@solidjs/web` as peer dependencies.
 
 ## How to use it
 
-### Exemple: create and dispatch the event
+### Example: create and dispatch the event
 
 ```tsx
 import { createEventDispatcher } from "@solid-primitives/event-dispatcher";
