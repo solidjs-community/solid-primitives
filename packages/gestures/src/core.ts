@@ -1,4 +1,3 @@
-import { onCleanup } from "solid-js";
 export type PointerCallback = (activeEvents: PointerEvent[], event: PointerEvent) => void;
 
 function downHandler(
@@ -42,8 +41,10 @@ export function registerPointerListener(
   downCallback?: PointerCallback,
   moveCallback?: PointerCallback,
   upCallback?: PointerCallback,
-) {
+): () => void {
   const activeEvents = new Map<number, PointerEvent>();
+  const activeMoveHandlers = new Set<(e: PointerEvent) => void>();
+  const activeUpHandlers = new Set<(e: PointerEvent) => void>();
 
   const handler = (downEvent: PointerEvent) => {
     downHandler(downEvent, activeEvents, downCallback);
@@ -53,16 +54,27 @@ export function registerPointerListener(
         node.removeEventListener("pointermove", moveHandlerWrapper);
         node.removeEventListener("pointerup", upHandlerWrapper);
         node.removeEventListener("lostpointercapture", upHandlerWrapper);
+        activeMoveHandlers.delete(moveHandlerWrapper);
+        activeUpHandlers.delete(upHandlerWrapper);
       });
+    activeMoveHandlers.add(moveHandlerWrapper);
+    activeUpHandlers.add(upHandlerWrapper);
     node.addEventListener("pointermove", moveHandlerWrapper);
     node.addEventListener("pointerup", upHandlerWrapper);
     node.addEventListener("lostpointercapture", upHandlerWrapper);
   };
 
   node.addEventListener("pointerdown", handler);
-  onCleanup(() => {
+  return () => {
     node.removeEventListener("pointerdown", handler);
-  });
+    for (const h of activeMoveHandlers) node.removeEventListener("pointermove", h);
+    for (const h of activeUpHandlers) {
+      node.removeEventListener("pointerup", h);
+      node.removeEventListener("lostpointercapture", h);
+    }
+    activeMoveHandlers.clear();
+    activeUpHandlers.clear();
+  };
 }
 
 export const DEFAULT_DELAY = 300;

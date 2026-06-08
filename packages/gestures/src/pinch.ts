@@ -1,16 +1,9 @@
+import { onCleanup } from "solid-js";
 import { registerPointerListener, getCenterOfTwoPoints } from "./core.js";
 
-type Props = {
-  callback: (scale: number, pinchCenter: { x: number; y: number }) => any;
+export type PinchProps = {
+  callback: (scale: number, pinchCenter: { x: number; y: number }) => void;
 };
-
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-      ["use:pinch"]?: Props;
-    }
-  }
-}
 
 function getPointersDistance(activeEvents: PointerEvent[]) {
   return Math.hypot(
@@ -19,35 +12,40 @@ function getPointersDistance(activeEvents: PointerEvent[]) {
   );
 }
 
-export function pinch(node: HTMLElement, props: () => Props) {
-  let prevDistance: number | undefined = undefined;
-  let initDistance = 0;
-  let pinchCenter: { x: number; y: number };
+export function pinch(props: PinchProps): (node: HTMLElement) => void {
+  let cleanup: (() => void) | undefined;
+  onCleanup(() => cleanup?.());
 
-  function onUp(activeEvents: PointerEvent[]) {
-    if (activeEvents.length === 1) {
-      prevDistance = undefined;
-    }
-  }
+  return (node: HTMLElement) => {
+    let prevDistance: number | undefined = undefined;
+    let initDistance = 0;
+    let pinchCenter: { x: number; y: number };
 
-  function onDown(activeEvents: PointerEvent[]) {
-    if (activeEvents.length === 2) {
-      initDistance = getPointersDistance(activeEvents);
-      pinchCenter = getCenterOfTwoPoints(node, activeEvents);
-    }
-  }
-
-  function onMove(activeEvents: PointerEvent[]) {
-    if (activeEvents.length === 2) {
-      const curDistance = getPointersDistance(activeEvents);
-
-      if (prevDistance !== undefined && curDistance !== prevDistance) {
-        const scale = curDistance / initDistance;
-        props().callback(scale, pinchCenter);
+    function onUp(activeEvents: PointerEvent[]) {
+      if (activeEvents.length === 1) {
+        prevDistance = undefined;
       }
-      prevDistance = curDistance;
     }
-  }
 
-  return registerPointerListener(node, onDown, onMove, onUp);
+    function onDown(activeEvents: PointerEvent[]) {
+      if (activeEvents.length === 2) {
+        initDistance = getPointersDistance(activeEvents);
+        pinchCenter = getCenterOfTwoPoints(node, activeEvents);
+      }
+    }
+
+    function onMove(activeEvents: PointerEvent[]) {
+      if (activeEvents.length === 2) {
+        const curDistance = getPointersDistance(activeEvents);
+
+        if (prevDistance !== undefined && curDistance !== prevDistance) {
+          const scale = curDistance / initDistance;
+          props.callback(scale, pinchCenter);
+        }
+        prevDistance = curDistance;
+      }
+    }
+
+    cleanup = registerPointerListener(node, onDown, onMove, onUp);
+  };
 }

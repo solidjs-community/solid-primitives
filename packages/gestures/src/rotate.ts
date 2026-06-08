@@ -1,19 +1,12 @@
+import { onCleanup } from "solid-js";
 import { registerPointerListener, getCenterOfTwoPoints } from "./core.js";
 
-type Props = {
-  callback: (rotation: number, center: { x: number; y: number }) => any;
+export type RotateProps = {
+  callback: (rotation: number, center: { x: number; y: number }) => void;
 };
 
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-      ["use:rotate"]?: Props;
-    }
-  }
-}
-
 function getPointersAngleDeg(activeEvents: PointerEvent[]) {
-  // instead of hell lot of conditions we use an object mapping
+  // object mapping avoids a nest of conditionals for quadrant detection
   const quadrantsMap = {
     left: { top: 360, bottom: 180 },
     right: { top: 0, bottom: 180 },
@@ -23,12 +16,12 @@ function getPointersAngleDeg(activeEvents: PointerEvent[]) {
   const height = activeEvents[0]!.clientY - activeEvents[1]!.clientY;
 
   /*
-  In quadrants 1 and 3 allworks as expected. 
+  In quadrants 1 and 3 all works as expected.
   In quadrants 2 and 4, either height or width is negative,
-  so we get negative angle. It is even the other of the two angles.
-  As sum in triangle is 180 deg, we can simply sum the negative angle with 90 deg
+  so we get a negative angle. It is the other of the two angles.
+  As the sum in a triangle is 180 deg, we sum the negative angle with 90 deg
   and get the right angle's positive value. Then add 90 for each quadrant above 1st.
-  This way we dont need to code our own arc cotangent fn (it does not exist in JS)
+  This avoids needing arc cotangent (not available in JS).
   */
 
   const angle = Math.atan(width / height) / (Math.PI / 180);
@@ -39,46 +32,49 @@ function getPointersAngleDeg(activeEvents: PointerEvent[]) {
   return angle + quadrantAngleBonus;
 }
 
-export function rotate(node: HTMLElement, props: () => Props) {
-  let prevAngle: number | undefined;
-  let initAngle = 0;
-  let rotationCenter: { x: number; y: number };
+export function rotate(props: RotateProps): (node: HTMLElement) => void {
+  let cleanup: (() => void) | undefined;
+  onCleanup(() => cleanup?.());
 
-  function onUp(activeEvents: PointerEvent[]) {
-    if (activeEvents.length === 1) {
-      prevAngle = undefined;
-    }
-  }
+  return (node: HTMLElement) => {
+    let prevAngle: number | undefined;
+    let initAngle = 0;
+    let rotationCenter: { x: number; y: number };
 
-  function onDown(activeEvents: PointerEvent[]) {
-    if (activeEvents.length === 2) {
-      activeEvents = activeEvents.sort((a, b) => {
-        return a.clientX - b.clientX;
-      });
-
-      rotationCenter = getCenterOfTwoPoints(node, activeEvents);
-      initAngle = getPointersAngleDeg(activeEvents);
-    }
-  }
-
-  function onMove(activeEvents: PointerEvent[]) {
-    if (activeEvents.length === 2) {
-      const curAngle = getPointersAngleDeg(activeEvents);
-
-      if (prevAngle !== undefined && curAngle !== prevAngle) {
-        // Make sure we start at zero, doesnt matter what is the initial angle of fingers
-        let rotation = curAngle - initAngle;
-
-        // instead of showing 180 - 360, we will show negative -180 - 0
-        if (rotation > 180) {
-          rotation -= 360;
-        }
-
-        props().callback(rotation, rotationCenter);
+    function onUp(activeEvents: PointerEvent[]) {
+      if (activeEvents.length === 1) {
+        prevAngle = undefined;
       }
-      prevAngle = curAngle;
     }
-  }
 
-  return registerPointerListener(node, onDown, onMove, onUp);
+    function onDown(activeEvents: PointerEvent[]) {
+      if (activeEvents.length === 2) {
+        activeEvents = activeEvents.sort((a, b) => {
+          return a.clientX - b.clientX;
+        });
+
+        rotationCenter = getCenterOfTwoPoints(node, activeEvents);
+        initAngle = getPointersAngleDeg(activeEvents);
+      }
+    }
+
+    function onMove(activeEvents: PointerEvent[]) {
+      if (activeEvents.length === 2) {
+        const curAngle = getPointersAngleDeg(activeEvents);
+
+        if (prevAngle !== undefined && curAngle !== prevAngle) {
+          // normalize to zero at start; show -180..0 instead of 180..360
+          let rotation = curAngle - initAngle;
+          if (rotation > 180) {
+            rotation -= 360;
+          }
+
+          props.callback(rotation, rotationCenter);
+        }
+        prevAngle = curAngle;
+      }
+    }
+
+    cleanup = registerPointerListener(node, onDown, onMove, onUp);
+  };
 }
