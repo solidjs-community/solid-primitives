@@ -210,12 +210,12 @@ export function createNetworkInformation(): NetworkInformationReturn {
 
   makeNetworkInformation(state => {
     setOnline(state.online);
-    setDownlink(() => state.downlink);
-    setDownlinkMax(() => state.downlinkMax);
-    setEffectiveType(() => state.effectiveType);
-    setRtt(() => state.rtt);
-    setSaveData(() => state.saveData);
-    setType(() => state.type);
+    setDownlink(state.downlink);
+    setDownlinkMax(state.downlinkMax);
+    setEffectiveType(state.effectiveType);
+    setRtt(state.rtt);
+    setSaveData(state.saveData);
+    setType(state.type);
   });
 
   return { online, downlink, downlinkMax, effectiveType, rtt, saveData, type };
