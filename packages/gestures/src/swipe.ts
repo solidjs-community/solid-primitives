@@ -14,19 +14,23 @@ export function swipe(props: SwipeProps): (node: HTMLElement) => void {
   onCleanup(() => cleanup?.());
 
   return (node: HTMLElement) => {
-    let startTime: number;
+    let startTime = 0;
     let clientX: number;
     let clientY: number;
 
-    function onDown(_: PointerEvent[], event: PointerEvent) {
-      clientX = event.clientX;
-      clientY = event.clientY;
-      startTime = Date.now();
+    function onDown(activeEvents: PointerEvent[], event: PointerEvent) {
+      if (activeEvents.length === 1) {
+        clientX = event.clientX;
+        clientY = event.clientY;
+        startTime = Date.now();
+      } else {
+        startTime = 0;
+      }
     }
 
     function onUp(activeEvents: PointerEvent[], event: PointerEvent) {
       const timeframe = props.parameters?.timeframe ?? DEFAULT_DELAY;
-      if (activeEvents.length === 0 && Date.now() - startTime < timeframe) {
+      if (activeEvents.length === 0 && startTime > 0 && Date.now() - startTime < timeframe) {
         const x = event.clientX - clientX;
         const y = event.clientY - clientY;
         const absX = Math.abs(x);
