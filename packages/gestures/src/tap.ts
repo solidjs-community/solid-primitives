@@ -16,22 +16,23 @@ export function tap(props: TapProps): (node: HTMLElement) => void {
     let x: number;
     let y: number;
     let time: number;
-    let down = false;
+    let startPointerId: number | null = null;
 
-    const downCallback: PointerCallback = (_, event) => {
+    const downCallback: PointerCallback = (activeEvents, event) => {
+      if (activeEvents.length !== 1) return;
+      startPointerId = event.pointerId;
       time = Date.now();
       x = event.clientX;
       y = event.clientY;
-      down = true;
     };
 
     const upCallback: PointerCallback = (_, event) => {
+      if (event.pointerId !== startPointerId) return;
+      startPointerId = null;
       const now = Date.now();
       if (
-        down &&
         Math.abs(event.clientX - x) < 4 &&
         Math.abs(event.clientY - y) < 4 &&
-        time &&
         now - time >= (props.minimumTapLength ?? 0) &&
         (props.maximumTapLength === undefined || now - time < props.maximumTapLength)
       ) {
@@ -40,7 +41,6 @@ export function tap(props: TapProps): (node: HTMLElement) => void {
         const tapY = Math.round(event.clientY - rect.top);
         props.callback({ x: tapX, y: tapY });
       }
-      down = false;
     };
 
     cleanup = registerPointerListener(node, downCallback, undefined, upCallback);
