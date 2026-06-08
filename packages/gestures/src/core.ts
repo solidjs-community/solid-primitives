@@ -46,15 +46,19 @@ export function registerPointerListener(
 
   const handler = (downEvent: PointerEvent) => {
     downHandler(node, downEvent, activeEvents, downCallback);
-    const moveHandlerWrapper = (e: PointerEvent) => moveHandler(e, activeEvents, moveCallback);
-    const upHandlerWrapper = (e: PointerEvent) =>
-      upHandler(e, downEvent, activeEvents, upCallback, () => {
-        node.removeEventListener("pointermove", moveHandlerWrapper);
-        node.removeEventListener("pointerup", upHandlerWrapper);
-        node.removeEventListener("lostpointercapture", upHandlerWrapper);
-        activeMoveHandlers.delete(moveHandlerWrapper);
-        activeUpHandlers.delete(upHandlerWrapper);
-      });
+    const moveHandlerWrapper = (e: PointerEvent) => {
+      if (e.pointerId === downEvent.pointerId) moveHandler(e, activeEvents, moveCallback);
+    };
+    const upHandlerWrapper = (e: PointerEvent) => {
+      if (e.pointerId === downEvent.pointerId)
+        upHandler(e, downEvent, activeEvents, upCallback, () => {
+          node.removeEventListener("pointermove", moveHandlerWrapper);
+          node.removeEventListener("pointerup", upHandlerWrapper);
+          node.removeEventListener("lostpointercapture", upHandlerWrapper);
+          activeMoveHandlers.delete(moveHandlerWrapper);
+          activeUpHandlers.delete(upHandlerWrapper);
+        });
+    };
     activeMoveHandlers.add(moveHandlerWrapper);
     activeUpHandlers.add(upHandlerWrapper);
     node.addEventListener("pointermove", moveHandlerWrapper);
