@@ -1,12 +1,13 @@
 export type PointerCallback = (activeEvents: PointerEvent[], event: PointerEvent) => void;
 
 function downHandler(
+  node: HTMLElement,
   downEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
   downCallback: PointerCallback | undefined,
 ) {
   activeEvents.set(downEvent.pointerId, downEvent);
-
+  node.setPointerCapture(downEvent.pointerId);
   downCallback?.(Array.from(activeEvents.values()), downEvent);
 }
 
@@ -44,7 +45,7 @@ export function registerPointerListener(
   const activeUpHandlers = new Set<(e: PointerEvent) => void>();
 
   const handler = (downEvent: PointerEvent) => {
-    downHandler(downEvent, activeEvents, downCallback);
+    downHandler(node, downEvent, activeEvents, downCallback);
     const moveHandlerWrapper = (e: PointerEvent) => moveHandler(e, activeEvents, moveCallback);
     const upHandlerWrapper = (e: PointerEvent) =>
       upHandler(e, downEvent, activeEvents, upCallback, () => {

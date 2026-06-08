@@ -1,6 +1,6 @@
 import { createRoot } from "solid-js";
 import { describe, it, expect } from "vitest";
-import { pan, pinch, rotate, swipe, tap, registerPointerListener } from "../src/index.js";
+import { pan, pinch, rotate, swipe, tap, longPress, registerPointerListener } from "../src/index.js";
 
 // jsdom 25 does not implement PointerEvent — extend MouseEvent for tests
 if (typeof PointerEvent === "undefined") {
@@ -12,6 +12,12 @@ if (typeof PointerEvent === "undefined") {
     }
   }
   (globalThis as any).PointerEvent = PointerEventPolyfill;
+}
+
+// jsdom 25 does not implement pointer capture — stub as no-ops
+if (!HTMLElement.prototype.setPointerCapture) {
+  HTMLElement.prototype.setPointerCapture = () => {};
+  HTMLElement.prototype.releasePointerCapture = () => {};
 }
 
 function makeNode() {
@@ -113,7 +119,7 @@ describe("pan", () => {
       document.body.removeChild(node);
     }));
 
-  it("does not fire when pointer is outside the element bounds", () =>
+  it("continues firing outside the element bounds during an active drag", () =>
     createRoot(dispose => {
       const node = makeNode();
       const positions: { x: number; y: number }[] = [];
@@ -121,8 +127,10 @@ describe("pan", () => {
       ref(node);
 
       pointerdown(node, 1, 0, 0);
-      pointermove(node, 1, 200, 0); // x=200 > rect.width=100
-      expect(positions).toHaveLength(0);
+      // pointer capture keeps events flowing even outside the element rect
+      pointermove(node, 1, 200, 0); // x=200 > rect.width=100 — should still fire
+      expect(positions).toHaveLength(1);
+      expect(positions[0]).toEqual({ x: 200, y: 0 });
 
       dispose();
       document.body.removeChild(node);
@@ -366,6 +374,88 @@ describe("rotate", () => {
       }
 
       dispose();
+      document.body.removeChild(node);
+    }));
+});
+
+describe("longPress", () => {
+  it("fires after the threshold has elapsed", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = longPress({ callback: pos => positions.push(pos), threshold: 20 });
+      ref(node);
+
+      pointerdown(node, 1, 10, 20);
+      expect(positions).toHaveLength(0);
+      await new Promise(r => setTimeout(r, 30));
+      expect(positions).toHaveLength(1);
+      expect(positions[0]).toEqual({ x: 10, y: 20 });
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("does not fire when pointer is released before threshold", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = longPress({ callback: pos => positions.push(pos), threshold: 50 });
+      ref(node);
+
+      pointerdown(node, 1, 10, 10);
+      pointerup(node, 1, 10, 10); // released before threshold
+      await new Promise(r => setTimeout(r, 80));
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("does not fire when pointer moves beyond moveThreshold", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = longPress({ callback: pos => positions.push(pos), threshold: 30 });
+      ref(node);
+
+      pointerdown(node, 1, 0, 0);
+      pointermove(node, 1, 20, 0); // 20px > default moveThreshold (10)
+      await new Promise(r => setTimeout(r, 50));
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("cancels when a second pointer goes down", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = longPress({ callback: pos => positions.push(pos), threshold: 30 });
+      ref(node);
+
+      pointerdown(node, 1, 0, 0);
+      pointerdown(node, 2, 50, 0); // second finger cancels
+      await new Promise(r => setTimeout(r, 50));
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("clears pending timer on component unmount", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      let fired = false;
+      const ref = longPress({ callback: () => { fired = true; }, threshold: 30 });
+      ref(node);
+
+      pointerdown(node, 1, 0, 0);
+      dispose(); // unmount before timer fires
+      await new Promise(r => setTimeout(r, 50));
+      expect(fired).toBe(false);
+
       document.body.removeChild(node);
     }));
 });

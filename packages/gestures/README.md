@@ -8,13 +8,22 @@
 
 Ref factory functions for reacting to user gestures via pointer events.
 
-**Coordinate system**: all `{ x, y }` positions returned by these primitives are **element-relative** — measured from the top-left corner of the target element's bounding box.
+**Coordinate system**: all `{ x, y }` positions returned by these primitives are **element-relative** — measured from the top-left corner of the target element's bounding box. Coordinates can be negative or exceed the element's dimensions during an active gesture.
 
-**Lifecycle**: each factory registers its pointer listeners when the `ref` callback fires and automatically removes them when the Solid component unmounts. The factories must be called inside a Solid component (they call `onCleanup` internally).
+**Pointer capture**: each primitive captures the pointer on `pointerdown` so gesture events continue to fire even when the pointer moves outside the element.
+
+**Lifecycle**: each factory registers its pointer listeners when the `ref` callback fires and automatically removes them when the Solid component unmounts. The factories must be called **inside a Solid component** — they call `onCleanup` internally.
+
+**`touch-action`**: on touch devices the browser's default scroll and zoom behaviors run in parallel with pointer events. Add `touch-action: none` (or a more specific value like `touch-action: pan-y`) to the element to prevent browser interference with your gesture handlers:
+
+```tsx
+<div style={{ "touch-action": "none" }} ref={pan({ callback: onPan })} />
+```
 
 ## Primitives
 
-- [`pan`](#pan) — fires on single-pointer drag movement within the element bounds
+- [`pan`](#pan) — fires on single-pointer drag movement
+- [`longPress`](#longpress) — fires when a pointer is held stationary past a time threshold
 - [`pinch`](#pinch) — fires on two-pointer pinch/spread gestures with scale
 - [`rotate`](#rotate) — fires on two-pointer rotation gestures with angle
 - [`swipe`](#swipe) — fires when a fast directional swipe is detected
@@ -33,11 +42,12 @@ pnpm add @solid-primitives/gestures
 All primitives are **ref factory functions** — call them with props and pass the result to `ref`:
 
 ```tsx
-import { pan, swipe, tap, pinch, rotate } from "@solid-primitives/gestures";
+import { pan, swipe, tap, pinch, rotate, longPress } from "@solid-primitives/gestures";
 
 function App() {
   return (
     <div
+      style={{ "touch-action": "none" }}
       ref={pan({
         callback: ({ x, y }) => console.log("panning at", x, y),
       })}
@@ -58,13 +68,29 @@ Multiple gesture refs can be combined on the same element using an array:
 
 ### `pan`
 
-Calls `callback` continuously as a single pointer moves within the element. The callback is **not** called when the pointer leaves the element rect.
+Calls `callback` continuously as a single pointer moves. Pointer capture keeps events flowing even when the pointer leaves the element during an active drag. The `x`/`y` values are element-relative and may be negative or exceed the element's dimensions.
 
 ```ts
 pan(props: PanProps): (node: HTMLElement) => void
 
 type PanProps = {
   callback: (position: { x: number; y: number }) => void;
+};
+```
+
+---
+
+### `longPress`
+
+Calls `callback` once after a pointer has been held stationary for at least `threshold` milliseconds. Cancels if the pointer moves more than `moveThreshold` pixels, is released early, or a second pointer goes down.
+
+```ts
+longPress(props: LongPressProps): (node: HTMLElement) => void
+
+type LongPressProps = {
+  callback: (position: { x: number; y: number }) => void;
+  threshold?: number;     // ms to hold before firing (default: 500)
+  moveThreshold?: number; // px of movement that cancels the gesture (default: 10)
 };
 ```
 
@@ -86,7 +112,7 @@ type PinchProps = {
 
 ### `rotate`
 
-Calls `callback` as two pointers rotate around their midpoint. `rotation` is in degrees relative to the initial angle when the second pointer was placed, clamped to the range **–180..180**.
+Calls `callback` as two pointers rotate around their midpoint. `rotation` is in degrees relative to the initial angle when the second pointer was placed, clamped to **–180..180**.
 
 ```ts
 rotate(props: RotateProps): (node: HTMLElement) => void
@@ -128,7 +154,7 @@ tap(props: TapProps): (node: HTMLElement) => void
 type TapProps = {
   callback: (position: { x: number; y: number }) => void;
   minimumTapLength?: number; // min ms the pointer must be held (default: 0)
-  maximumTapLength?: number; // max ms the pointer may be held before it is no longer a tap (default: none)
+  maximumTapLength?: number; // max ms before the interaction is no longer considered a tap (default: none)
 };
 ```
 
