@@ -20,26 +20,6 @@ yarn add @solid-primitives/controlled-props
 pnpm add @solid-primitives/controlled-props
 ```
 
-## SSR Support
-
-If you are using [solid-start](https://github.com/solidjs/solid-start) with SSR, you may see this error comming form the `@solid-primitives/props` package.
-
-```
-TypeError: web.template is not a function
-```
-
-To prevent this, add `"@solid-primitives/props"` entry to `noExternal` field in your vite config, like so:
-
-```tsx
-export default defineConfig({
-  plugins: [solid()],
-  ssr: {
-    // It allows Vite to preprocess the package
-    noExternal: ["@solid-primitives/props"],
-  },
-});
-```
-
 ## `createControlledProp`
 
 Primitive that provides controllable props signals like knobs/controls for simple component testing

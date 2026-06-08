@@ -1,5 +1,7 @@
-import { createMemo, createSignal, For } from "solid-js";
-import type { Accessor, Component, JSX, Setter } from "solid-js";
+import { createMemo, createSignal, For, untrack } from "solid-js";
+import type { Accessor, Component, Setter } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 export type TestPropType = "boolean" | "number" | "string" | "object";
 
@@ -88,7 +90,7 @@ export const SelectProp = <T,>(
       ? props.options.map((option: any) => [option, option])
       : filterEnum(props.options),
   );
-  const initialValue = options().findIndex(([, value]) => value === props.value());
+  const initialValue = untrack(() => options().findIndex(([, value]) => value === props.value()));
   return (
     <label>
       <span>{props.name}</span>{" "}
@@ -179,7 +181,7 @@ export function createControlledProp<T>(
     ? "object"
     : ((options as TestPropOptions<T>).type ?? (typeof initialValue as TestPropType));
 
-  const [value, setValue] = createSignal<T>(initialValue, { name });
+  const [value, setValue] = createSignal<T>(initialValue as Exclude<T, Function>, { ...INTERNAL_OPTIONS, name });
   return [
     value,
     setValue,

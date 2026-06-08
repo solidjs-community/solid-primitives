@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createControlledProp, createControlledProps } from "../src/index.js";
 
 describe("createControlledProp", () => {
@@ -8,6 +8,7 @@ describe("createControlledProp", () => {
       const [value, setValue, field] = createControlledProp("value", true);
       expect(value()).toBe(true);
       setValue(false);
+      flush();
       expect(value()).toBe(false);
       const label = field({}) as HTMLLabelElement;
       expect(label).instanceOf(HTMLLabelElement);
@@ -16,6 +17,7 @@ describe("createControlledProp", () => {
       expect(input.checked).toBe(false);
       input.checked = true;
       input.dispatchEvent(new Event("change"));
+      flush();
       expect(value()).toBe(true);
       dispose();
     }));
@@ -25,6 +27,7 @@ describe("createControlledProp", () => {
       const [value, setValue, field] = createControlledProp("value", 1);
       expect(value()).toBe(1);
       setValue(7);
+      flush();
       expect(value()).toBe(7);
       const label = field({}) as HTMLLabelElement;
       expect(label).instanceOf(HTMLLabelElement);
@@ -33,6 +36,7 @@ describe("createControlledProp", () => {
       expect(input.valueAsNumber).toBe(7);
       input.valueAsNumber = 42;
       input.dispatchEvent(new Event("change"));
+      flush();
       expect(value()).toBe(42);
       dispose();
     }));
@@ -42,6 +46,7 @@ describe("createControlledProp", () => {
       const [value, setValue, field] = createControlledProp("value", "prop");
       expect(value()).toBe("prop");
       setValue("primitive");
+      flush();
       expect(value()).toBe("primitive");
       const label = field({}) as HTMLLabelElement;
       expect(label).instanceOf(HTMLLabelElement);
@@ -50,6 +55,7 @@ describe("createControlledProp", () => {
       expect(input.value).toBe("primitive");
       input.value = "works";
       input.dispatchEvent(new Event("change"));
+      flush();
       expect(value()).toBe("works");
       dispose();
     }));
@@ -63,6 +69,7 @@ describe("createControlledProp", () => {
       });
       expect(value()).toBe("en");
       setValue("pl");
+      flush();
       expect(value()).toBe("pl");
       const label = field({}) as HTMLLabelElement;
       expect(label).instanceOf(HTMLLabelElement);
@@ -71,6 +78,7 @@ describe("createControlledProp", () => {
       expect(select.selectedOptions[0].innerHTML).toBe("pl");
       select.selectedIndex = 0;
       select.dispatchEvent(new Event("change"));
+      flush();
       expect(value()).toBe("de");
       dispose();
     }));
@@ -89,6 +97,7 @@ describe("createControlledProp", () => {
       });
       expect(value()).toBe(Test.Two);
       setValue(Test.One);
+      flush();
       expect(value()).toBe(Test.One);
       const label = field({}) as HTMLLabelElement;
       expect(label).instanceOf(HTMLLabelElement);
@@ -97,6 +106,7 @@ describe("createControlledProp", () => {
       expect(select.selectedOptions[0]?.innerHTML).toBe("One");
       select.selectedIndex = 0;
       select.dispatchEvent(new Event("change"));
+      flush();
       expect(value()).toBe(Test.Zero);
       dispose();
     }));
@@ -127,6 +137,7 @@ describe("createControlledProp", () => {
       props.setString("test");
       props.setArray("pl");
       props.setEnum(Test.Zero);
+      flush();
       expect(props.boolean()).toBe(false);
       expect(props.number()).toBe(9);
       expect(props.string()).toBe("test");
@@ -146,18 +157,19 @@ describe("createControlledProp", () => {
       expect(enumSelect).instanceOf(HTMLSelectElement);
       booleanInput.checked = true;
       booleanInput.dispatchEvent(new Event("change"));
-      expect(props.boolean()).toBe(true);
       numberInput.valueAsNumber = 17;
       numberInput.dispatchEvent(new Event("change"));
-      expect(props.number()).toBe(17);
       stringInput.value = "I like this!";
       stringInput.dispatchEvent(new Event("change"));
-      expect(props.string()).toBe("I like this!");
       arraySelect.selectedIndex = 2;
       arraySelect.dispatchEvent(new Event("change"));
-      expect(props.array()).toBe("it");
       enumSelect.selectedIndex = 1;
       enumSelect.dispatchEvent(new Event("change"));
+      flush();
+      expect(props.boolean()).toBe(true);
+      expect(props.number()).toBe(17);
+      expect(props.string()).toBe("I like this!");
+      expect(props.array()).toBe("it");
       expect(props.enum()).toBe(Test.One);
       dispose();
     }));
