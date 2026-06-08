@@ -10,6 +10,7 @@
 
 Package providing extra layer of lifecycle primitives for Solid.
 
+- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/reactivity-lifecycle--docs)
 - [`createIsMounted`](#createismounted) - Returns a boolean signal indicating whether the component is mounted or not.
 - [`isHydrated`](#ishydrated) - A signal with the same behavior as [`isHydrating`](#ishydrating) but this one focused only on client-side updates.
 - [`onElementConnect`](#onelementconnect) - Calls the given callback when the target element is connected to the DOM.
@@ -118,10 +119,6 @@ However, it is not certain that the elements are actually connected to the DOM w
   }}
 />
 ```
-
-## Demo
-
-You can see the primitives in action in the following sandbox: https://primitives.solidjs.community/playground/lifecycle/
 
 ## Changelog
 
