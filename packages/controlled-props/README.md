@@ -8,6 +8,8 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/controlled-props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/controlled-props)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
+[**Docs & demos**](https://primitives.solidjs.community/package/controlled-props)
+
 Library of helpers for creating your own component prototyping tool. _(a Storybook alternative if you will)_ The primitives in this package allow you to create controlls for component props.
 
 ## Installation
@@ -82,10 +84,6 @@ props == {
 
 fields == JSX.Element[];
 ```
-
-### Demo
-
-https://primitives.solidjs.community/playground/controlled-props/
 
 ## Changelog
 
