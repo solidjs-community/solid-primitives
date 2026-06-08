@@ -32,7 +32,7 @@ export function createEventDispatcher<Props>(props: Props): <
         [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
 ) => boolean {
   if (isServer) {
-    return () => false;
+    return () => true;
   }
   return function <N extends keyof Handlers<Props> & string>(
     ...args: Handlers<Props>[N] extends
