@@ -10,6 +10,8 @@
 
 `createEventDispatcher` creates a custom-event dispatcher for emitting component events.
 
+- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/utilities-event-dispatcher--docs)
+
 ## Installation
 
 ```bash
@@ -156,10 +158,6 @@ interface Props {
 dispatch("mandatoryPayload"); // => will throw: "Error: Expected 2-3 arguments, but got 1."
 dispatch("optionalPayload"); // will not complain, but suggest "(eventName: "optionalPayload", payload?: number | undefined, ...
 ```
-
-## Demo
-
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-create-event-dispatcher-example-fbj9ge
 
 ## Changelog
 
