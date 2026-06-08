@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { createRoot, flush } from "solid-js";
-import { createControlledProp, createControlledProps } from "../src/index.js";
+import { createControlledProp, createControlledProps, RangeProp } from "../src/index.js";
 
 describe("createControlledProp", () => {
   test("will output a boolean prop signal and a field", () =>
@@ -108,6 +108,75 @@ describe("createControlledProp", () => {
       select.dispatchEvent(new Event("change"));
       flush();
       expect(value()).toBe(Test.Zero);
+      dispose();
+    }));
+
+  test("number prop field receives min, max, and step from options", () =>
+    createRoot(dispose => {
+      const [, , field] = createControlledProp("count", {
+        initialValue: 5,
+        min: 1,
+        max: 10,
+        step: 2,
+      });
+      const label = field({}) as HTMLLabelElement;
+      const input = label.querySelector("input")!;
+      expect(input.min).toBe("1");
+      expect(input.max).toBe("10");
+      expect(input.step).toBe("2");
+      dispose();
+    }));
+
+  test("range prop field renders a slider and updates on input", () =>
+    createRoot(dispose => {
+      const [value, , field] = createControlledProp("opacity", {
+        initialValue: 50,
+        min: 0,
+        max: 100,
+        type: "range",
+      });
+      const label = field({}) as HTMLLabelElement;
+      const input = label.querySelector("input")!;
+      expect(input.type).toBe("range");
+      expect(input.min).toBe("0");
+      expect(input.max).toBe("100");
+      expect(input.valueAsNumber).toBe(50);
+      input.valueAsNumber = 75;
+      input.dispatchEvent(new Event("change"));
+      flush();
+      expect(value()).toBe(75);
+      dispose();
+    }));
+
+  test("RangeProp can be used standalone", () =>
+    createRoot(dispose => {
+      const label = RangeProp({
+        name: "vol",
+        value: () => 40,
+        setValue: () => void 0,
+        min: 0,
+        max: 100,
+      }) as HTMLLabelElement;
+      expect(label.querySelector("input")!.type).toBe("range");
+      expect(label.querySelector("input")!.min).toBe("0");
+      expect(label.querySelector("input")!.max).toBe("100");
+      dispose();
+    }));
+
+  test("select field reacts to setValue after render", () =>
+    createRoot(dispose => {
+      const languages = ["de", "en", "it", "pl"];
+      const [value, setValue, field] = createControlledProp("lang", {
+        initialValue: "en",
+        options: languages,
+      });
+      const label = field({}) as HTMLLabelElement;
+      const select = label.querySelector("select")!;
+      expect(select.selectedOptions[0]?.innerHTML).toBe("en");
+      setValue("it");
+      flush();
+      expect(value()).toBe("it");
+      expect(select.selectedOptions[0]?.innerHTML).toBe("it");
       dispose();
     }));
 

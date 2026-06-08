@@ -24,7 +24,7 @@ pnpm add @solid-primitives/controlled-props
 
 ## `createControlledProp`
 
-Primitive that provides controllable props signals like knobs/controls for simple component testing
+Primitive that provides controllable props signals like knobs/controls for simple component testing.
 
 ### How to use it
 
@@ -33,27 +33,37 @@ You can either create a single prop:
 ```ts
 // Second argument can be initialValue for boolean, number, string:
 const [string, setString, stringField] = createControlledProp("stringValue", "test");
+
+// Number with min/max/step:
+const [count, setCount, countField] = createControlledProp("count", {
+  initialValue: 5,
+  min: 1,
+  max: 10,
+  step: 2,
+});
+
+// Range slider:
+const [opacity, setOpacity, opacityField] = createControlledProp("opacity", {
+  initialValue: 50,
+  min: 0,
+  max: 100,
+  type: "range",
+});
+
 // Arrays or enums can be provided in an options object:
 const [language, setLanguage, languageField] = createControlledProp(
   "language",
   { initialValue: "en", options: ["de", "en", "fr", "it"] as const }
   // If you want your array to be able to influence the setter/getter types, use `as const`.
 );
-enum Currency {
-  AUD,
-  GBP,
-  EUR,
-  USD,
-  CHF,
-  JPY,
-  CNY
-}
+
+enum Currency { AUD, GBP, EUR, USD, CHF, JPY, CNY }
 const [currency, setCurrency, currencyField] = createControlledProp("currency", {
   initialValue: Currency.USD,
   options: Currency
 });
 
-return { languageField(); };
+return <>{languageField()}</>;
 ```
 
 or multiple props in one call:
@@ -84,6 +94,26 @@ props == {
 
 fields == JSX.Element[];
 ```
+
+### Control type inference
+
+| Initial value type | `type` option | Rendered control |
+|--------------------|---------------|------------------|
+| `boolean` | — | `<input type="checkbox">` |
+| `number` | — | `<input type="number">` |
+| `number` | `"range"` | `<input type="range">` (slider) |
+| `string` | — | `<input type="text">` |
+| any + `options` array/enum | — | `<select>` |
+
+### Exported field components
+
+The individual field components are exported if you need them standalone:
+
+```ts
+import { BoolProp, NumberProp, RangeProp, StringProp, SelectProp } from "@solid-primitives/controlled-props";
+```
+
+`RangeProp` renders a slider with a live value readout and accepts `min`, `max`, and `step` props.
 
 ## Changelog
 

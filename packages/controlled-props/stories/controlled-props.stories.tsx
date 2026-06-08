@@ -1,7 +1,7 @@
 import preview from "../../../.storybook/preview.js";
 import { createControlledProp, createControlledProps } from "@solid-primitives/controlled-props";
 import readme from "../README.md?raw";
-import { Badge, Code, Container, Card, Section, Separator, StatRow } from "../../../.storybook/ui/index.js";
+import { Badge, Code, Container, Card, Section, Separator, StatRow, ProgressBar } from "../../../.storybook/ui/index.js";
 import { colors, font, radii } from "../../../.storybook/ui/tokens.js";
 
 const meta = preview.meta({
@@ -139,7 +139,79 @@ export const SelectControls = meta.story({
   },
 });
 
-/* ── 3. Live component preview ───────────────────────────────────────────────── */
+/* ── 3. Range slider with step ──────────────────────────────────────────────── */
+
+export const RangeControls = meta.story({
+  name: "Range slider with step",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass `type: \"range\"` to render a slider. The optional `step` option snaps values to discrete increments. `RangeProp` also exports the underlying component directly so you can assemble custom layouts.",
+      },
+    },
+  },
+  render: () => {
+    const [opacity, , OpacityField] = createControlledProp("opacity", {
+      initialValue: 60,
+      min: 0,
+      max: 100,
+      type: "range",
+    });
+
+    const [volume, , VolumeField] = createControlledProp("volume", {
+      initialValue: 40,
+      min: 0,
+      max: 100,
+      step: 10,
+      type: "range",
+    });
+
+    const row = {
+      display: "flex",
+      "flex-direction": "column",
+      gap: "0.3rem",
+      padding: "0.5rem 0.6rem",
+      background: colors.surface,
+      "border-radius": radii.md,
+      border: `1px solid ${colors.border}`,
+      "font-size": font.sizeBase,
+      "font-family": font.system,
+    } as const;
+
+    return (
+      <Container width={320}>
+        <div style={row}>
+          {OpacityField({})}
+          <ProgressBar value={opacity()} min={0} max={100} label={`opacity: ${opacity()}%`} />
+        </div>
+        <div style={row}>
+          {VolumeField({})}
+          <ProgressBar
+            value={volume()}
+            min={0}
+            max={100}
+            label={`volume: ${volume()} (step 10)`}
+            color={colors.primary}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            "flex-wrap": "wrap",
+            "padding-top": "0.25rem",
+          }}
+        >
+          <Badge variant="info">type: "range"</Badge>
+          <Badge variant="info">step: 10</Badge>
+        </div>
+      </Container>
+    );
+  },
+});
+
+/* ── 4. Live component preview ───────────────────────────────────────────────── */
 
 export const ComponentPropPanel = meta.story({
   name: "Live component preview",
