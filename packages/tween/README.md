@@ -17,6 +17,8 @@ a given signal from its previous value to its next value whenever it changes.
 npm install @solid-primitives/tween
 # or
 yarn add @solid-primitives/tween
+# or
+pnpm add @solid-primitives/tween
 ```
 
 Requires `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`.

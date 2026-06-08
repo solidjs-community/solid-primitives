@@ -23,6 +23,8 @@ Control Flow primitives and components that require specifying explicit keys to 
 npm install @solid-primitives/keyed
 # or
 yarn add @solid-primitives/keyed
+# or
+pnpm add @solid-primitives/keyed
 ```
 
 ## `keyArray`

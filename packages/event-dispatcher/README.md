@@ -17,6 +17,8 @@ SolidJS equivalent of Svelte's [homonymous function](svelte.dev/docs#run-time-sv
 npm install @solid-primitives/event-dispatcher
 # or
 yarn add @solid-primitives/event-dispatcher
+# or
+pnpm add @solid-primitives/event-dispatcher
 ```
 
 ## How to use it

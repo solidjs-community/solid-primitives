@@ -19,6 +19,8 @@ A [`navigator.onLine`](https://developer.mozilla.org/en-US/docs/Web/API/Navigato
 npm install @solid-primitives/connectivity
 # or
 yarn add @solid-primitives/connectivity
+# or
+pnpm add @solid-primitives/connectivity
 ```
 
 ## `makeConnectivityListener`
