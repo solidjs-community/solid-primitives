@@ -28,6 +28,7 @@ Ref factory functions for reacting to user gestures via pointer events.
 - [`rotate`](#rotate) — fires on two-pointer rotation gestures with angle
 - [`swipe`](#swipe) — fires when a fast directional swipe is detected
 - [`tap`](#tap) — fires on a short, stationary pointer interaction
+- [`doubleTap`](#doubletap) — fires when two taps land in quick succession at the same location
 
 ## Installation
 
@@ -35,6 +36,8 @@ Ref factory functions for reacting to user gestures via pointer events.
 npm install @solid-primitives/gestures
 # or
 pnpm add @solid-primitives/gestures
+# or
+yarn add @solid-primitives/gestures
 ```
 
 ## Usage
@@ -155,6 +158,24 @@ type TapProps = {
   callback: (position: { x: number; y: number }) => void;
   minimumTapLength?: number; // min ms the pointer must be held (default: 0)
   maximumTapLength?: number; // max ms before the interaction is no longer considered a tap (default: none)
+};
+```
+
+---
+
+---
+
+### `doubleTap`
+
+Calls `callback` when two taps land within `timeframe` ms and `positionThreshold` px of each other. A single tap never fires the callback — no delay is imposed on other gesture handlers. Cancels if a second pointer goes down between the two taps.
+
+```ts
+doubleTap(props: DoubleTapProps): (node: HTMLElement) => void
+
+type DoubleTapProps = {
+  callback: (position: { x: number; y: number }) => void;
+  timeframe?: number;          // ms window for second tap (default: 300)
+  positionThreshold?: number;  // max px between tap positions (default: 30)
 };
 ```
 

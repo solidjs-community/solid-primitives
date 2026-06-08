@@ -1,4 +1,5 @@
 export * from "./core.js";
+export * from "./doubleTap.js";
 export * from "./longPress.js";
 export * from "./pinch.js";
 export * from "./pan.js";

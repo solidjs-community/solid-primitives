@@ -1,6 +1,6 @@
 import { createRoot } from "solid-js";
 import { describe, it, expect } from "vitest";
-import { pan, pinch, rotate, swipe, tap, longPress, registerPointerListener } from "../src/index.js";
+import { pan, pinch, rotate, swipe, tap, longPress, doubleTap, registerPointerListener } from "../src/index.js";
 
 // jsdom 25 does not implement PointerEvent — extend MouseEvent for tests
 if (typeof PointerEvent === "undefined") {
@@ -454,6 +454,137 @@ describe("longPress", () => {
       pointerdown(node, 1, 0, 0);
       dispose(); // unmount before timer fires
       await new Promise(r => setTimeout(r, 50));
+      expect(fired).toBe(false);
+
+      document.body.removeChild(node);
+    }));
+});
+
+describe("doubleTap", () => {
+  it("fires after two quick taps at the same position", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = doubleTap({ callback: pos => positions.push(pos) });
+      ref(node);
+
+      pointerdown(node, 1, 10, 20);
+      pointerup(node, 1, 10, 20);
+      await new Promise(r => setTimeout(r, 10));
+      pointerdown(node, 1, 10, 20);
+      pointerup(node, 1, 10, 20);
+      expect(positions).toHaveLength(1);
+      expect(positions[0]).toEqual({ x: 10, y: 20 });
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("does not fire on a single tap", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = doubleTap({ callback: pos => positions.push(pos), timeframe: 50 });
+      ref(node);
+
+      pointerdown(node, 1, 10, 10);
+      pointerup(node, 1, 10, 10);
+      await new Promise(r => setTimeout(r, 80)); // window expires
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("does not fire when second tap arrives after the timeframe", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = doubleTap({ callback: pos => positions.push(pos), timeframe: 30 });
+      ref(node);
+
+      pointerdown(node, 1, 10, 10);
+      pointerup(node, 1, 10, 10);
+      await new Promise(r => setTimeout(r, 60)); // past timeframe
+      pointerdown(node, 1, 10, 10);
+      pointerup(node, 1, 10, 10);
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("does not fire when taps are too far apart", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = doubleTap({ callback: pos => positions.push(pos), positionThreshold: 10 });
+      ref(node);
+
+      pointerdown(node, 1, 0, 0);
+      pointerup(node, 1, 0, 0);
+      await new Promise(r => setTimeout(r, 10));
+      pointerdown(node, 1, 50, 0); // 50px away — beyond threshold
+      pointerup(node, 1, 50, 0);
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("does not fire when pointer drifts >= 4px during a tap", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = doubleTap({ callback: pos => positions.push(pos) });
+      ref(node);
+
+      pointerdown(node, 1, 0, 0);
+      pointerup(node, 1, 5, 0); // 5px drift — not a valid tap
+      await new Promise(r => setTimeout(r, 10));
+      pointerdown(node, 1, 5, 0);
+      pointerup(node, 1, 5, 0);
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("cancels the pending window when a second pointer goes down", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = doubleTap({ callback: pos => positions.push(pos) });
+      ref(node);
+
+      pointerdown(node, 1, 10, 10);
+      pointerup(node, 1, 10, 10);
+      await new Promise(r => setTimeout(r, 10));
+      pointerdown(node, 1, 10, 10);
+      pointerdown(node, 2, 30, 10); // second pointer cancels
+      pointerup(node, 1, 10, 10);
+      pointerup(node, 2, 30, 10);
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("clears the pending timer on component unmount", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      let fired = false;
+      const ref = doubleTap({ callback: () => { fired = true; }, timeframe: 200 });
+      ref(node);
+
+      // first tap
+      pointerdown(node, 1, 10, 10);
+      pointerup(node, 1, 10, 10);
+      await new Promise(r => setTimeout(r, 10));
+      // second tap starts but component unmounts before up
+      pointerdown(node, 1, 10, 10);
+      dispose();
+      pointerup(node, 1, 10, 10);
       expect(fired).toBe(false);
 
       document.body.removeChild(node);
