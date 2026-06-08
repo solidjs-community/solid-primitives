@@ -28,10 +28,7 @@ function upHandler(
 ) {
   if (upEvent.pointerId === downEvent.pointerId) {
     activeEvents.delete(upEvent.pointerId);
-
-    if (activeEvents.size === 0) {
-      removeHandlersCallback();
-    }
+    removeHandlersCallback();
   }
   upCallback?.(Array.from(activeEvents.values()), upEvent);
 }

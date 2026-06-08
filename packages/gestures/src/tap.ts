@@ -20,8 +20,8 @@ export function tap(props: TapProps): (node: HTMLElement) => void {
 
     const downCallback: PointerCallback = (_, event) => {
       time = Date.now();
-      x = event.x;
-      y = event.y;
+      x = event.clientX;
+      y = event.clientY;
       down = true;
     };
 
@@ -29,8 +29,8 @@ export function tap(props: TapProps): (node: HTMLElement) => void {
       const now = Date.now();
       if (
         down &&
-        Math.abs(event.x - x) < 4 &&
-        Math.abs(event.y - y) < 4 &&
+        Math.abs(event.clientX - x) < 4 &&
+        Math.abs(event.clientY - y) < 4 &&
         time &&
         now - time >= (props.minimumTapLength ?? 0) &&
         (props.maximumTapLength === undefined || now - time < props.maximumTapLength)

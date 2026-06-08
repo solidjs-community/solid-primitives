@@ -46,6 +46,36 @@ describe("registerPointerListener", () => {
     expect(calls).toBe(1);
     document.body.removeChild(node);
   });
+
+  it("cleanup removes active move handlers registered after pointerdown", () => {
+    const node = makeNode();
+    let moveCalls = 0;
+    const cleanup = registerPointerListener(node, undefined, () => moveCalls++);
+    pointerdown(node);
+    pointermove(node);
+    expect(moveCalls).toBe(1);
+    // cleanup mid-gesture — the dynamic pointermove listener should also be removed
+    cleanup();
+    pointermove(node);
+    expect(moveCalls).toBe(1);
+    document.body.removeChild(node);
+  });
+
+  it("each pointer up removes only that pointer's dynamic handlers", () => {
+    const node = makeNode();
+    let moveCalls = 0;
+    registerPointerListener(node, undefined, () => moveCalls++);
+
+    pointerdown(node, 1);
+    pointerdown(node, 2);
+    // lift pointer 1 — its handlers should be gone
+    pointerup(node, 1);
+    // pointer 2 still down; a move should fire the callback exactly once
+    pointermove(node, 2, 10, 10);
+    expect(moveCalls).toBe(1);
+
+    document.body.removeChild(node);
+  });
 });
 
 describe("pan", () => {
@@ -77,6 +107,21 @@ describe("pan", () => {
       pointerdown(node, 1, 0, 0);
       pointerdown(node, 2, 10, 0);
       pointermove(node, 1, 5, 0);
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("does not fire when pointer is outside the element bounds", () =>
+    createRoot(dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      const ref = pan({ callback: pos => positions.push(pos) });
+      ref(node);
+
+      pointerdown(node, 1, 0, 0);
+      pointermove(node, 1, 200, 0); // x=200 > rect.width=100
       expect(positions).toHaveLength(0);
 
       dispose();
@@ -208,25 +253,70 @@ describe("tap", () => {
       dispose();
       document.body.removeChild(node);
     }));
+
+  it("does not fire when held longer than maximumTapLength", () =>
+    createRoot(async dispose => {
+      const node = makeNode();
+      const positions: { x: number; y: number }[] = [];
+      // maximumTapLength of 1ms — a real held tap in tests exceeds this
+      const ref = tap({ callback: pos => positions.push(pos), maximumTapLength: 1 });
+      ref(node);
+
+      pointerdown(node, 1, 10, 10);
+      // wait >1ms so the tap exceeds maximumTapLength
+      await new Promise(r => setTimeout(r, 10));
+      pointerup(node, 1, 10, 10);
+      expect(positions).toHaveLength(0);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
 });
 
 describe("pinch", () => {
-  it("calls callback with scale when two pointers move", () =>
+  it("calls callback with correct scale when two pointers spread", () =>
     createRoot(dispose => {
       const node = makeNode();
       const scales: number[] = [];
-      const ref = pinch({ callback: (scale) => scales.push(scale) });
+      const ref = pinch({ callback: scale => scales.push(scale) });
       ref(node);
 
-      // two fingers down 50px apart
+      // two fingers 100px apart horizontally
       pointerdown(node, 1, 0, 50);
       pointerdown(node, 2, 100, 50);
-      // initDistance = 100
-      // move to 200px apart
-      pointermove(node, 1, 0, 50);  // triggers initial prevDistance set
-      pointermove(node, 2, 200, 50); // triggers callback
-      // at this point: prevDistance was set from first move, curDistance = 200 → scale 2
-      expect(scales.length).toBeGreaterThan(0);
+      // initDistance = 100; set prevDistance with first move (no position change for ptr1)
+      pointermove(node, 1, 0, 50);
+      // spread ptr2 to 200px → scale = 200/100 = 2
+      pointermove(node, 2, 200, 50);
+      expect(scales).toHaveLength(1);
+      expect(scales[0]).toBeCloseTo(2);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("resets after last pointer lifts", () =>
+    createRoot(dispose => {
+      const node = makeNode();
+      const scales: number[] = [];
+      const ref = pinch({ callback: scale => scales.push(scale) });
+      ref(node);
+
+      pointerdown(node, 1, 0, 50);
+      pointerdown(node, 2, 100, 50);
+      pointermove(node, 1, 0, 50);
+      pointermove(node, 2, 200, 50);
+      pointerup(node, 1);
+      pointerup(node, 2);
+
+      // second pinch gesture should start fresh
+      const prevLen = scales.length;
+      pointerdown(node, 1, 0, 50);
+      pointerdown(node, 2, 100, 50);
+      pointermove(node, 1, 0, 50);
+      pointermove(node, 2, 150, 50); // scale = 150/100 = 1.5
+      expect(scales.length).toBeGreaterThan(prevLen);
+      expect(scales[scales.length - 1]).toBeCloseTo(1.5);
 
       dispose();
       document.body.removeChild(node);
@@ -234,20 +324,46 @@ describe("pinch", () => {
 });
 
 describe("rotate", () => {
-  it("calls callback with rotation when two pointers move", () =>
+  it("calls callback with a numeric rotation value", () =>
     createRoot(dispose => {
       const node = makeNode();
       const rotations: number[] = [];
-      const ref = rotate({ callback: (r) => rotations.push(r) });
+      const ref = rotate({ callback: r => rotations.push(r) });
       ref(node);
 
-      // two fingers horizontal: angle = 0 or 180 depending on quadrant
+      // two fingers side by side; rotating one upward changes the angle
       pointerdown(node, 1, 0, 50);
       pointerdown(node, 2, 100, 50);
-      // initial angle recorded on down
-      pointermove(node, 1, 0, 50);  // set prevAngle
-      pointermove(node, 1, 0, 100); // change angle → fires callback
+      pointermove(node, 1, 0, 50); // set prevAngle
+      pointermove(node, 1, 0, 0);  // move ptr1 up → angle changes
       expect(rotations.length).toBeGreaterThan(0);
+      expect(typeof rotations[0]).toBe("number");
+      expect(rotations[0]).toBeGreaterThanOrEqual(-180);
+      expect(rotations[0]).toBeLessThanOrEqual(180);
+
+      dispose();
+      document.body.removeChild(node);
+    }));
+
+  it("clamps rotation to [-180, 180]", () =>
+    createRoot(dispose => {
+      const node = makeNode();
+      const rotations: number[] = [];
+      const ref = rotate({ callback: r => rotations.push(r) });
+      ref(node);
+
+      // place fingers to establish an initial angle near 0
+      pointerdown(node, 1, 0, 50);
+      pointerdown(node, 2, 100, 50); // horizontal → initAngle near 0°
+      pointermove(node, 1, 0, 50);   // set prevAngle
+
+      // move ptr2 to a position that would give curAngle - initAngle ≈ -270 (= +90 clamped)
+      pointermove(node, 2, 50, 150); // below ptr1 — should give large negative unclamped angle
+
+      for (const r of rotations) {
+        expect(r).toBeGreaterThanOrEqual(-180);
+        expect(r).toBeLessThanOrEqual(180);
+      }
 
       dispose();
       document.body.removeChild(node);

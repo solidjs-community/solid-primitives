@@ -19,7 +19,7 @@ export function pinch(props: PinchProps): (node: HTMLElement) => void {
   return (node: HTMLElement) => {
     let prevDistance: number | undefined = undefined;
     let initDistance = 0;
-    let pinchCenter: { x: number; y: number };
+    let pinchCenter: { x: number; y: number } = { x: 0, y: 0 };
 
     function onUp(activeEvents: PointerEvent[]) {
       if (activeEvents.length === 1) {

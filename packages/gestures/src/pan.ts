@@ -14,8 +14,8 @@ export function pan(props: PanProps): (node: HTMLElement) => void {
     const moveCallback: PointerCallback = (activeEvents, event) => {
       if (activeEvents.length === 1) {
         const rect = node.getBoundingClientRect();
-        const x = Math.round(event.x - rect.left);
-        const y = Math.round(event.y - rect.top);
+        const x = Math.round(event.clientX - rect.left);
+        const y = Math.round(event.clientY - rect.top);
         if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
           props.callback({ x, y });
         }

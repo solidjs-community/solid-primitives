@@ -39,7 +39,7 @@ export function rotate(props: RotateProps): (node: HTMLElement) => void {
   return (node: HTMLElement) => {
     let prevAngle: number | undefined;
     let initAngle = 0;
-    let rotationCenter: { x: number; y: number };
+    let rotationCenter: { x: number; y: number } = { x: 0, y: 0 };
 
     function onUp(activeEvents: PointerEvent[]) {
       if (activeEvents.length === 1) {
@@ -63,11 +63,10 @@ export function rotate(props: RotateProps): (node: HTMLElement) => void {
         const curAngle = getPointersAngleDeg(activeEvents);
 
         if (prevAngle !== undefined && curAngle !== prevAngle) {
-          // normalize to zero at start; show -180..0 instead of 180..360
+          // normalize to zero at start; clamp to [-180, 180]
           let rotation = curAngle - initAngle;
-          if (rotation > 180) {
-            rotation -= 360;
-          }
+          if (rotation > 180) rotation -= 360;
+          else if (rotation < -180) rotation += 360;
 
           props.callback(rotation, rotationCenter);
         }
