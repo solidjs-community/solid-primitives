@@ -1,6 +1,6 @@
 import {
   type Accessor,
-  createComputed,
+  createEffect,
   createMemo,
   createRoot,
   getOwner,
@@ -112,12 +112,15 @@ export type Until<T> = Promise<Truthy<T>> & { dispose: VoidFunction };
 export const until = <T>(condition: Accessor<T>): Until<T> => {
   const promise = createRoot(dispose => {
     const memo = createMemo(condition);
-    const promise = new Promise((resolve, reject) => {
-      createComputed(() => {
-        if (!memo()) return;
-        resolve(memo() as Truthy<T>);
-        dispose();
-      });
+    const promise = new Promise<Truthy<T>>((resolve, reject) => {
+      createEffect(
+        () => memo(),
+        value => {
+          if (!value) return;
+          resolve(value as Truthy<T>);
+          dispose();
+        },
+      );
       onCleanup(reject);
     }) as Until<T>;
     promise.dispose = dispose;

@@ -1,4 +1,4 @@
-import { createRoot, createSignal, onCleanup } from "solid-js";
+import { createRoot, createSignal, flush, onCleanup } from "solid-js";
 import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
 import { until, changed, promiseTimeout, raceTimeout } from "../src/index.js";
 
@@ -102,7 +102,8 @@ describe("until", () => {
     expect(done).toBe(undefined);
 
     setState(true);
-    expect(done).toBe(undefined);
+    flush();
+    expect(done).toBe(undefined); // promise .then is still a microtask
 
     await Promise.resolve();
     expect(done).toBe(true);
@@ -162,15 +163,15 @@ describe("until", () => {
       });
 
       setCount(1);
-      await Promise.resolve();
+      flush();
       expect(value).toBe(undefined);
 
-      setCount(1);
-      await Promise.resolve();
+      setCount(1); // same value — no re-evaluation
       expect(value).toBe(undefined);
 
       setCount(2);
-      await Promise.resolve();
+      flush(); // effect apply runs → resolve(true) called
+      await Promise.resolve(); // .then runs → value = true
       expect(value).toBe(true);
 
       dispose();

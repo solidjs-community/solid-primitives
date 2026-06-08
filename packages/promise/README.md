@@ -68,11 +68,11 @@ Promised one-time watch for changes. Await a reactive condition.
 
 It takes a signal or a reactive condition — which will resolve the promise **if truthy** — as an argument.
 
-Returns a promise that resolves a truthy value of a condition. Or rejects when it's root get's disposed.
+Returns a promise that resolves a truthy value of a condition. Or rejects when its root gets disposed.
 
 #### With a custom reactive condition:
 
-no need for createMemo, it's memoized internally
+No need for `createMemo` — the condition is memoized internally.
 
 ```ts
 import { until } from "@solid-primitives/promise";
@@ -82,21 +82,9 @@ const [count, setCount] = createSignal(0);
 await until(() => count() > 5);
 ```
 
-#### With `createResource`
-
-It also can be used as a **source** for `createResource`.
-
-```ts
-import { until } from "@solid-primitives/promise";
-
-const [state, setState] = createSignal(null);
-
-const [data] = createResource(() => until(state));
-```
-
 #### With `raceTimeout`
 
-To limit the maximum time it has for resolving
+To limit the maximum time it has for resolving:
 
 ```ts
 import { until, raceTimeout } from "@solid-primitives/promise";
@@ -115,7 +103,7 @@ try {
 
 If you don't want to use `raceTimeout`, there are other ways to stop the reactive computation of `until` if needed.
 
-First, it will stop itself "onCleanup".
+First, it will stop itself on cleanup.
 
 ```ts
 // the same goes for components as they are roots too
@@ -134,20 +122,27 @@ createRoot(dispose => {
 Second, using the `.dispose()` method.
 
 ```ts
-// until returns a promise with a dispose method in it
+// until returns a promise with a dispose method on it
 const promise = until(condition);
 
-// you need to catch the rejection here too
+// catch the rejection here too
 promise.then().catch();
 
 promise.dispose();
 ```
 
-## Demo
+## `changed`
 
-`until` + `createResource` demo: https://codesandbox.io/s/until-resource-demo-sfs7c?file=/src/index.tsx
+A resolver for `until` that resolves when the source changes a given number of times.
 
-`until` as `createResource` fetcher: https://codesandbox.io/s/until-as-resource-fetcher-6sl0e?file=/src/index.tsx
+```ts
+import { until, changed } from "@solid-primitives/promise";
+
+const [count, setCount] = createSignal(0);
+
+// resolves after count changes 3 times
+await until(changed(count, 3));
+```
 
 ## Changelog
 
