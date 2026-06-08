@@ -16,8 +16,6 @@ import {
   inputStyle,
 } from "../../../.storybook/ui/index.js";
 
-// prevent tree-shaking of focus directive namespace extension
-focus;
 
 const meta = preview.meta({
   title: "Inputs/Active Element",
@@ -110,12 +108,12 @@ export const ActiveElementListener = meta.story({
 });
 
 export const FocusDirective = meta.story({
-  name: "Focus directive",
+  name: "Focus ref factory",
   parameters: {
     docs: {
       description: {
         story:
-          "The `focus` directive fires its callback with `true` when the element gains focus and `false` when it blurs. Attach it with `use:focus={setter}` on any focusable element — each element tracks its own active state independently.",
+          "`focus(callback)` is a ref factory — call it with a setter and pass the result to `ref`. It fires the callback with `true` when the element gains focus and `false` when it blurs. Each element tracks its own active state independently.",
       },
     },
   },
@@ -127,7 +125,7 @@ export const FocusDirective = meta.story({
       return (
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
           <input
-            use:focus={setIsFocused}
+            ref={focus(setIsFocused)}
             placeholder={props.label}
             style={{ ...inputStyle, flex: "1" }}
           />

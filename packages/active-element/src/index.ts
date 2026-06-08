@@ -1,17 +1,7 @@
-import { type Accessor, type JSX } from "solid-js";
+import { type Accessor, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { type Directive, createHydratableSignal } from "@solid-primitives/utils";
+import { createHydratableSignal } from "@solid-primitives/utils";
 import { makeEventListener } from "@solid-primitives/event-listener";
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      focus: (isActive: boolean) => void;
-    }
-  }
-}
-// This ensures the `JSX` import won't fall victim to tree shaking
-export type E = JSX.Directives;
 
 const getActiveElement = () =>
   document.activeElement === document.body ? null : document.activeElement;
@@ -57,20 +47,25 @@ export function createActiveElement(): Accessor<Element | null> {
 }
 
 /**
- * A directive that notifies you when the element becomes active or inactive.
+ * A ref factory that notifies you when the element becomes active or inactive.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#focus
  *
  * @example
  * const [active, setActive] = createSignal(false)
- * <input use:focus={setActive} />
+ * <input ref={focus(setActive)} />
  */
-export const focus: Directive<(isActive: boolean) => void> = (target, props) => {
-  if (isServer) {
-    return;
-  }
-  const callback = props();
-  callback(document.activeElement === target);
-  makeEventListener(target, "blur", callback.bind(void 0, false), true);
-  makeEventListener(target, "focus", callback.bind(void 0, true), true);
-};
+export function focus(callback: (isActive: boolean) => void): (target: Element) => void {
+  if (isServer) return () => {};
+  let cleanup: (() => void) | null = null;
+  onCleanup(() => cleanup?.());
+  return (target: Element) => {
+    callback(document.activeElement === target);
+    const c1 = makeEventListener(target, "blur", () => callback(false), true);
+    const c2 = makeEventListener(target, "focus", () => callback(true), true);
+    cleanup = () => {
+      c1();
+      c2();
+    };
+  };
+}

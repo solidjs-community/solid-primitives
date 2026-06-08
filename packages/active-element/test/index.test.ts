@@ -43,12 +43,13 @@ describe("createActiveElement", () => {
     }));
 });
 
-describe("use:focus", () => {
+describe("focus", () => {
   test("works properly", () =>
     createRoot(dispose => {
       const el = document.createElement("div");
       let captured!: boolean;
-      focus(el, () => e => (captured = e));
+      const ref = focus(e => (captured = e));
+      ref(el);
       expect(captured).toBe(false);
       dispatchFocusEvent(el, "focus");
       expect(captured).toBe(true);
