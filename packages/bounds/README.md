@@ -18,6 +18,8 @@ Primitives for tracking HTML element size and position on screen as it changes.
 npm install @solid-primitives/bounds
 # or
 yarn add @solid-primitives/bounds
+# or
+pnpm add @solid-primitives/bounds
 ```
 
 ## `createElementBounds`

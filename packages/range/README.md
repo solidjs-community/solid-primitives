@@ -24,6 +24,8 @@ Control Flow Primitives for displaying a number range or given number of element
 npm install @solid-primitives/range
 # or
 yarn add @solid-primitives/range
+# or
+pnpm add @solid-primitives/range
 ```
 
 Requires `solid-js` and `@solidjs/web` v2.0.0-beta.13 or later as peer dependencies.

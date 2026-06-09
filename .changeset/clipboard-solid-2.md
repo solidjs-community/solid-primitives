@@ -2,7 +2,7 @@
 "@solid-primitives/clipboard": major
 ---
 
-Upgrade to Solid 2.0 (`solid-js@^2.0.0-beta.7`).
+Upgrade to Solid 2.0 (`solid-js@^2.0.0-beta.14`).
 
 **`createClipboard`** — replaced `createResource` with a Solid 2.0 async `createMemo`. The accessor starts as `[]` synchronously (no initial suspension) and resolves asynchronously after `refetch()`. Use `isPending(() => clipboard())` for a loading indicator instead of `<Suspense>`.
 
