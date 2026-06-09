@@ -1,5 +1,6 @@
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { type Accessor, createEffect, createSignal, type SignalOptions, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 // https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/motion/utils.js
 
@@ -136,14 +137,13 @@ export function makeSpring<T extends SpringTarget>(
   cleanup: () => void,
 ] {
   const getOptions: () => SpringOptions =
-    typeof options === "function"
-      ? (options as Accessor<SpringOptions>)
-      : () => options as SpringOptions;
+    typeof options === "function" ? options : () => options;
 
-  const [signal, setSignal] = createSignal(initialValue as Exclude<T, Function>, {
-    ownedWrite: true,
-  });
-  const [animating, setAnimating] = createSignal(false, { ownedWrite: true });
+  const [signal, setSignal] = createSignal<T>(
+    initialValue as Exclude<T, Function>,
+    INTERNAL_OPTIONS as SignalOptions<T>,
+  );
+  const [animating, setAnimating] = createSignal(false, INTERNAL_OPTIONS as SignalOptions<boolean>);
 
   let value_current: any = initialValue;
   let value_last: any = initialValue;
@@ -298,13 +298,12 @@ export function createSpring<T extends SpringTarget>(
 ): [Accessor<WidenSpringTarget<T>>, SpringSetter<WidenSpringTarget<T>>, SpringExtras] {
   if (isServer) {
     const getOptions: () => SpringOptions =
-      typeof options === "function"
-        ? (options as Accessor<SpringOptions>)
-        : () => options as SpringOptions;
+      typeof options === "function" ? options : () => options;
 
-    const [signal, setSignal] = createSignal(initialValue as Exclude<T, Function>, {
-      ownedWrite: true,
-    });
+    const [signal, setSignal] = createSignal<T>(
+      initialValue as Exclude<T, Function>,
+      INTERNAL_OPTIONS as SignalOptions<T>,
+    );
     let value_current: any = initialValue;
 
     const setter: SpringSetter<any> = (param, opts = {}) => {
@@ -356,7 +355,7 @@ export function createDerivedSpring<T extends SpringTarget>(
   if (!isServer) {
     createEffect(
       () => target(),
-      value => {
+      (value: T) => {
         setSpringValue(value as WidenSpringTarget<T>);
       },
       { defer: true },

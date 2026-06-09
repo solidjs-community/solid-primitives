@@ -1110,6 +1110,9 @@ importers:
 
   packages/spring:
     devDependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@solidjs/web':
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
