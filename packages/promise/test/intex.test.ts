@@ -1,6 +1,6 @@
 import { createRoot, createSignal, flush, onCleanup } from "solid-js";
 import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
-import { until, changed, promiseTimeout, raceTimeout } from "../src/index.js";
+import { until, untilAll, untilAny, changed, promiseTimeout, raceTimeout, retry } from "../src/index.js";
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -193,5 +193,328 @@ describe("until", () => {
 
       expect(disposed).toBe(true);
     });
+  });
+});
+
+describe("untilAll", () => {
+  test("resolves when all conditions are truthy", async () => {
+    const [a, setA] = createSignal(false);
+    const [b, setB] = createSignal(false);
+    let resolved: unknown;
+
+    const dispose = createRoot(dispose => {
+      untilAll([a, b]).then(v => (resolved = v));
+      return dispose;
+    });
+
+    setA(true);
+    flush();
+    expect(resolved).toBe(undefined); // b is still false
+
+    setB(true);
+    flush();
+    await Promise.resolve();
+    expect(resolved).toEqual([true, true]);
+
+    dispose();
+  });
+
+  test("does not resolve when only some conditions are truthy", async () => {
+    const [a, setA] = createSignal(false);
+    const [b] = createSignal(false);
+    let resolved: unknown;
+
+    const dispose = createRoot(dispose => {
+      untilAll([a, b])
+        .then(v => (resolved = v))
+        .catch(() => {}); // dispose() below rejects the pending promise — suppress it
+      return dispose;
+    });
+
+    setA(true);
+    flush();
+    await Promise.resolve();
+    expect(resolved).toBe(undefined);
+
+    dispose();
+  });
+
+  test("resolves with the truthy values of all conditions", async () => {
+    const [a, setA] = createSignal(0);
+    const [b, setB] = createSignal("");
+    let resolved: unknown;
+
+    const dispose = createRoot(dispose => {
+      untilAll([a, b]).then(v => (resolved = v));
+      return dispose;
+    });
+
+    setA(42);
+    setB("hello");
+    flush();
+    await Promise.resolve();
+    expect(resolved).toEqual([42, "hello"]);
+
+    dispose();
+  });
+
+  test("resolves immediately with an empty conditions array", async () => {
+    let resolved: unknown;
+    untilAll([]).then(v => (resolved = v));
+    await Promise.resolve();
+    expect(resolved).toEqual([]);
+  });
+
+  test("rejects when the root disposes before all conditions are met", async () => {
+    const [a, setA] = createSignal(false);
+    let threw = false;
+
+    const dispose = createRoot(dispose => {
+      untilAll([a, () => false]).catch(() => (threw = true));
+      return dispose;
+    });
+
+    dispose();
+    await Promise.resolve();
+    expect(threw).toBe(true);
+  });
+
+  test(".dispose() stops computation", async () => {
+    const [a] = createSignal(false);
+    let threw = false;
+
+    const p = untilAll([a]);
+    p.catch(() => (threw = true));
+    p.dispose();
+
+    await Promise.resolve();
+    expect(threw).toBe(true);
+  });
+
+  test("dispose() is called when raceTimeout fires", async () => {
+    const [a] = createSignal(false);
+    let rejected = false;
+
+    const p = untilAll([a, () => false]);
+    p.catch(() => (rejected = true));
+    raceTimeout(p, 100); // start — do not await with fake timers
+
+    await vi.advanceTimersByTimeAsync(100); // fire the fake timer
+    expect(rejected).toBe(true); // p was disposed inside raceTimeout.finally
+  });
+});
+
+describe("untilAny", () => {
+  test("resolves when any condition becomes truthy", async () => {
+    const [a] = createSignal(false);
+    const [b, setB] = createSignal(false);
+    let resolved: unknown;
+
+    const dispose = createRoot(dispose => {
+      untilAny([a, b]).then(v => (resolved = v));
+      return dispose;
+    });
+
+    setB(true);
+    flush();
+    await Promise.resolve();
+    expect(resolved).toBe(true);
+
+    dispose();
+  });
+
+  test("resolves with the first truthy value", async () => {
+    const [a, setA] = createSignal(0);
+    const [b] = createSignal(0);
+    let resolved: unknown;
+
+    const dispose = createRoot(dispose => {
+      untilAny([a, b]).then(v => (resolved = v));
+      return dispose;
+    });
+
+    setA(42);
+    flush();
+    await Promise.resolve();
+    expect(resolved).toBe(42);
+
+    dispose();
+  });
+
+  test("does not resolve while all conditions are falsy", async () => {
+    const [a] = createSignal(false);
+    const [b] = createSignal(false);
+    let resolved: unknown;
+
+    const dispose = createRoot(dispose => {
+      untilAny([a, b])
+        .then(v => (resolved = v))
+        .catch(() => {}); // dispose() below rejects the pending promise — suppress it
+      return dispose;
+    });
+
+    flush();
+    await Promise.resolve();
+    expect(resolved).toBe(undefined);
+
+    dispose();
+  });
+
+  test("rejects when the root disposes", async () => {
+    const [a] = createSignal(false);
+    let threw = false;
+
+    const dispose = createRoot(dispose => {
+      untilAny([a]).catch(() => (threw = true));
+      return dispose;
+    });
+
+    dispose();
+    await Promise.resolve();
+    expect(threw).toBe(true);
+  });
+
+  test(".dispose() stops computation", async () => {
+    const [a] = createSignal(false);
+    let threw = false;
+
+    const p = untilAny([a]);
+    p.catch(() => (threw = true));
+    p.dispose();
+
+    await Promise.resolve();
+    expect(threw).toBe(true);
+  });
+
+  test("empty conditions array never resolves, disposes cleanly", async () => {
+    let threw = false;
+
+    const p = untilAny([]);
+    p.catch(() => (threw = true)); // register directly on p to avoid unhandled rejection
+
+    await Promise.resolve();
+    expect(threw).toBe(false); // still pending — nothing triggered a rejection yet
+
+    p.dispose();
+    await Promise.resolve();
+    expect(threw).toBe(true);
+  });
+});
+
+describe("retry", () => {
+  test("returns the value on the first successful attempt", async () => {
+    const result = await retry(() => Promise.resolve(42));
+    expect(result).toBe(42);
+  });
+
+  test("retries on failure and eventually succeeds", async () => {
+    let attempts = 0;
+    const result = await retry(() => {
+      attempts++;
+      if (attempts < 3) throw new Error("fail");
+      return Promise.resolve("success");
+    });
+    expect(result).toBe("success");
+    expect(attempts).toBe(3);
+  });
+
+  test("rejects after all retries are exhausted", async () => {
+    const err = new Error("always fails");
+    await expect(retry(() => Promise.reject(err), { times: 3 })).rejects.toBe(err);
+  });
+
+  test("respects the times option", async () => {
+    let attempts = 0;
+    const err = new Error("fail");
+    await expect(
+      retry(
+        () => {
+          attempts++;
+          return Promise.reject(err);
+        },
+        { times: 2 },
+      ),
+    ).rejects.toBe(err);
+    expect(attempts).toBe(2);
+  });
+
+  test("shouldRetry — stops immediately when it returns false", async () => {
+    let attempts = 0;
+    const err = new Error("auth error");
+    await expect(
+      retry(
+        () => {
+          attempts++;
+          return Promise.reject(err);
+        },
+        { times: 5, shouldRetry: e => (e as Error).message !== "auth error" },
+      ),
+    ).rejects.toBe(err);
+    expect(attempts).toBe(1);
+  });
+
+  test("waits for the numeric delay between attempts", async () => {
+    let attempts = 0;
+    const p = retry(
+      () => {
+        attempts++;
+        if (attempts < 3) throw new Error("fail");
+        return Promise.resolve("done");
+      },
+      { times: 3, delay: 100 },
+    );
+
+    expect(attempts).toBe(1); // first attempt ran synchronously before first await
+    await vi.advanceTimersByTimeAsync(50);
+    expect(attempts).toBe(1); // still in the 100ms delay
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(2); // delay elapsed, second attempt ran
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(3); // third attempt ran and succeeded
+
+    expect(await p).toBe("done");
+  });
+
+  test("calls the delay function with the attempt index for backoff", async () => {
+    const seenAttempts: number[] = [];
+    let callCount = 0;
+
+    const p = retry(
+      () => {
+        callCount++;
+        if (callCount < 3) throw new Error("fail");
+        return Promise.resolve("done");
+      },
+      { delay: attempt => { seenAttempts.push(attempt); return (attempt + 1) * 100; } },
+    );
+
+    await vi.advanceTimersByTimeAsync(100); // delay(0) = 100ms
+    await vi.advanceTimersByTimeAsync(200); // delay(1) = 200ms
+
+    expect(await p).toBe("done");
+    expect(seenAttempts).toEqual([0, 1]);
+  });
+
+  test("does not delay after the last failed attempt", async () => {
+    let attempts = 0;
+    const delayFn = vi.fn(() => 500);
+
+    // set up the rejection assertion before advancing the timer so p is never unhandled
+    const assertion = expect(
+      retry(
+        () => {
+          attempts++;
+          throw new Error("fail");
+        },
+        { times: 2, delay: delayFn },
+      ),
+    ).rejects.toThrow();
+
+    await vi.advanceTimersByTimeAsync(500);
+    await assertion;
+
+    // delay called once: between attempt 0 and 1, NOT after the final failed attempt
+    expect(delayFn).toHaveBeenCalledTimes(1);
+    expect(delayFn).toHaveBeenCalledWith(0);
   });
 });

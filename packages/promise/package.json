@@ -15,7 +15,11 @@
     "list": [
       "promiseTimeout",
       "raceTimeout",
-      "until"
+      "until",
+      "untilAll",
+      "untilAny",
+      "retry",
+      "changed"
     ],
     "category": "Utilities",
     "gzip": 491
