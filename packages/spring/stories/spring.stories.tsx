@@ -70,6 +70,7 @@ export const PhysicsPlayground = meta.story({
               </span>
               <input
                 type="range"
+                aria-label="Stiffness"
                 min="0.01"
                 max="1"
                 step="0.01"
@@ -95,6 +96,7 @@ export const PhysicsPlayground = meta.story({
               </span>
               <input
                 type="range"
+                aria-label="Damping"
                 min="0"
                 max="1"
                 step="0.01"
