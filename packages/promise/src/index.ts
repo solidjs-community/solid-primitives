@@ -266,14 +266,18 @@ export type RetryOptions = {
  */
 export async function retry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
   const { times = 3, delay = 0, shouldRetry = () => true } = options;
+  if (!Number.isFinite(times) || times < 1) {
+    throw new TypeError(`retry: options.times must be a finite number >= 1, got ${times}`);
+  }
+  const count = Math.floor(times);
   let lastError: unknown;
-  for (let attempt = 0; attempt < times; attempt++) {
+  for (let attempt = 0; attempt < count; attempt++) {
     try {
       return await fn();
     } catch (err) {
       lastError = err;
       if (!shouldRetry(err)) throw err;
-      if (attempt < times - 1 && delay) {
+      if (attempt < count - 1 && delay) {
         const ms = typeof delay === "function" ? delay(attempt) : delay;
         if (ms > 0) await promiseTimeout(ms);
       }
