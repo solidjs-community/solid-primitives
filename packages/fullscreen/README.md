@@ -20,6 +20,8 @@ Reactive wrapper around the [Fullscreen API](https://developer.mozilla.org/en-US
 ```bash
 npm install @solid-primitives/fullscreen
 # or
+yarn add @solid-primitives/fullscreen
+# or
 pnpm add @solid-primitives/fullscreen
 ```
 

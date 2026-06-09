@@ -16,6 +16,8 @@ Primitive that returns an event handler to mask the inputs of a text input eleme
 npm install @solid-primitives/input-mask
 # or
 yarn add @solid-primitives/input-mask
+# or
+pnpm add @solid-primitives/input-mask
 ```
 
 ## Usage

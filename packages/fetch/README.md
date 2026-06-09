@@ -16,6 +16,8 @@ Creates a composable primitive to support requests.
 npm install @solid-primitives/fetch
 # or
 yarn add @solid-primitives/fetch
+# or
+pnpm add @solid-primitives/fetch
 ```
 
 ### Additional requirements

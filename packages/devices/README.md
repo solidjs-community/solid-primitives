@@ -17,6 +17,8 @@ Reactive primitives for enumerating and filtering media input/output devices (mi
 ```
 npm install @solid-primitives/devices
 # or
+yarn add @solid-primitives/devices
+# or
 pnpm add @solid-primitives/devices
 ```
 

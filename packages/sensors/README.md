@@ -15,6 +15,8 @@ Reactive primitives for device motion, orientation, and hardware sensors using s
 ```bash
 npm install @solid-primitives/sensors
 # or
+yarn add @solid-primitives/sensors
+# or
 pnpm add @solid-primitives/sensors
 ```
 
