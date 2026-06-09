@@ -7,36 +7,39 @@ function is_date(obj: any): obj is Date {
   return Object.prototype.toString.call(obj) === "[object Date]";
 }
 
-// ===========================================================================
-// createSpring hook
-// ===========================================================================
-
 export type SpringOptions = {
   /**
-   * Stiffness of the spring. Higher values will create more sudden movement.
+   * Stiffness of the spring. Higher values create more sudden movement.
    * @default 0.15
    */
   stiffness?: number;
   /**
-   * Strength of opposing force. If set to 0, spring will oscillate indefinitely.
+   * Strength of the opposing (damping) force. Lower values produce a springier,
+   * more oscillating motion. Set to `0` for infinite oscillation.
    * @default 0.8
    */
   damping?: number;
   /**
-   * Precision is the threshold relative to the target value at which the
-   * animation will stop based on the current value.
+   * Minimum displacement below which the animation is considered settled.
+   * Smaller values require the animated value to get closer to the target before
+   * stopping — resulting in a longer, more precise animation.
    *
-   * From 0, if the target value is 500, and the precision is 500, it will stop
-   * the animation instantly (no animation, similar to `hard: true`).
-   *
-   * From 0, if the target value is 500, and the precision is 0.01, it will stop the
-   * animation when the current value reaches 499.99 or 500.01 (longer animation).
+   * @example
+   * // Stops when within 0.5 of the target (coarse, short animation)
+   * { precision: 0.5 }
+   * // Stops when within 0.001 of the target (fine, longer animation)
+   * { precision: 0.001 }
    *
    * @default 0.01
    */
   precision?: number;
 };
 
+/**
+ * Value types that can be spring-interpolated: a scalar number, a Date,
+ * an object with numeric/Date values, or an array of those types (including
+ * nested arrays and objects).
+ */
 export type SpringTarget =
   | number
   | Date
@@ -45,36 +48,75 @@ export type SpringTarget =
   | readonly SpringTarget[];
 
 /**
- * "Widen" Utility Type so that number types are not converted to
- * literal types when passed to `createSpring`.
- *
- * e.g. createSpring(0) returns `0`, not `number`.
+ * Widens a literal numeric type to `number` so that inferring from a literal
+ * (e.g. `createSpring(0)`) does not lock the signal to the literal type `0`.
  */
 export type WidenSpringTarget<T> = T extends number ? number : T;
 
-export type SpringSetterOptions = { hard?: boolean; soft?: boolean | number };
+export type SpringSetterOptions = {
+  /**
+   * When `true`, skips the animation and snaps immediately to the target value.
+   * The returned Promise resolves right away.
+   */
+  hard?: boolean;
+  /**
+   * Starts the animation with temporarily reduced stiffness, producing a
+   * softer launch before the spring regains full force.
+   *
+   * - `true` — use a default soft duration (~0.5 s)
+   * - `number` — number of seconds over which full stiffness is recovered
+   */
+  soft?: boolean | number;
+};
+
+/**
+ * Setter returned by {@link createSpring}. Drives the spring toward a new target value.
+ *
+ * @param newValue - The target value, or a function `(prev) => next` that derives it
+ *   from the current animated value.
+ * @param opts - Optional {@link SpringSetterOptions} controlling snap (`hard`) or
+ *   soft-launch (`soft`) behaviour.
+ * @returns A Promise that resolves when the spring settles at the target.
+ *   Resolves immediately with `hard: true` or when both stiffness and damping are ≥ 1.
+ *   Resolves when `onCleanup` fires (component unmounts). Never resolves during SSR.
+ */
 export type SpringSetter<T> = (
   newValue: T | ((prev: T) => T),
   opts?: SpringSetterOptions,
 ) => Promise<void>;
 
 /**
- * Creates a signal and a setter that uses spring physics when interpolating from
- * one value to another. This means when the value changes, instead of
- * transitioning at a steady rate, it "bounces" like a spring would,
- * depending on the physics parameters provided. This adds a level of realism to
- * the transitions and can enhance the user experience.
+ * Creates a reactive spring-physics value. Instead of jumping to the next value
+ * instantly, the signal animates toward it with a bouncy, spring-like motion
+ * governed by `stiffness`, `damping`, and `precision`.
  *
- * `T` - The type of the signal. It works for the basic data types that can be
- * interpolated: `number`, a `Date`, `Array<T>` or a nested object of T.
+ * Interpolates `number`, `Date`, flat arrays, and nested objects of those types.
  *
- * @param initialValue The initial value of the signal.
- * @param options Options to configure the physics of the spring.
- * @returns Returns the spring value and a setter.
- * The setter optionally accepts options object of type `{ ?hard: boolean; soft?: boolean | number }`
+ * @template T - Must satisfy {@link SpringTarget} (number, Date, array, or plain object).
+ * @param initialValue - The starting value of the spring.
+ * @param options - Physics parameters. See {@link SpringOptions}.
+ * @returns A tuple `[value, set]`:
+ *   - `value` — reactive accessor for the current animated value
+ *   - `set` — {@link SpringSetter} that drives the spring toward a new target
  *
  * @example
+ * // Animate a number
  * const [progress, setProgress] = createSpring(0, { stiffness: 0.15, damping: 0.8 });
+ * setProgress(100); // animates from 0 → 100
+ *
+ * @example
+ * // Snap immediately
+ * setProgress(100, { hard: true });
+ *
+ * @example
+ * // Animate a plain object
+ * const [xy, setXY] = createSpring({ x: 0, y: 0 }, { stiffness: 0.08, damping: 0.2 });
+ * setXY({ x: 200, y: 150 });
+ *
+ * @example
+ * // Await settlement
+ * await setProgress(100);
+ * console.log("animation complete");
  */
 export function createSpring<T extends SpringTarget>(
   initialValue: T,
@@ -144,7 +186,7 @@ export function createSpring<T extends SpringTarget>(
 
     if (opts.soft) {
       inv_mass_recovery_rate = 1 / (typeof opts.soft === "number" ? opts.soft * 60 : 30);
-      inv_mass = 0; // Infinite mass, unaffected by spring forces.
+      inv_mass = 0; // infinite mass: initial motion is unaffected by spring forces
     }
 
     if (raf_id === 0) {
@@ -168,7 +210,7 @@ export function createSpring<T extends SpringTarget>(
         return target; // settled
       }
 
-      settled = false; // signal loop to keep ticking
+      settled = false; // keep the RAF loop running
       return typeof current === "number" ? current + d : new Date(+current + d);
     }
 
@@ -192,22 +234,27 @@ export function createSpring<T extends SpringTarget>(
   return [signal as any, set as any];
 }
 
-// ===========================================================================
-// createDerivedSpring hook
-// ===========================================================================
-
 /**
- * Creates a spring value that interpolates based on changes to the passed signal.
- * Works similar to the `@solid-primitives/tween`
+ * A read-only spring that tracks an accessor. Whenever the source signal
+ * changes, the spring animates toward the new value automatically.
  *
- * @param target Target to be modified.
- * @param options Options to configure the physics of the spring.
- * @returns Returns the spring value accessor only.
+ * Equivalent to creating a {@link createSpring} and wiring it to an existing
+ * signal with an effect — useful when you don't need to drive the animation
+ * manually.
+ *
+ * @template T - Must satisfy {@link SpringTarget}.
+ * @param target - Accessor whose value the spring follows.
+ * @param options - Physics parameters. See {@link SpringOptions}.
+ * @returns A reactive accessor for the current animated value.
  *
  * @example
- * const percent = createMemo(() => current() / total() * 100);
+ * const percent = createMemo(() => (current() / total()) * 100);
+ * const springPercent = createDerivedSpring(percent, { stiffness: 0.15, damping: 0.8 });
  *
- * const springedPercent = createDerivedSpring(percent, { stiffness: 0.15, damping: 0.8 });
+ * @example
+ * // Works with any signal
+ * const [count, setCount] = createSignal(0);
+ * const springCount = createDerivedSpring(count);
  */
 export function createDerivedSpring<T extends SpringTarget>(
   target: Accessor<T>,
