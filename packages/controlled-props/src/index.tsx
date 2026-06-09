@@ -119,7 +119,11 @@ export const SelectProp = <T,>(
       <select
         name={props.name}
         value={String(selectedIndex())}
-        onChange={ev => props.setValue(options()[ev.currentTarget.selectedIndex]![1] as any)}
+        onChange={ev => {
+          const item = options()[ev.currentTarget.selectedIndex];
+          if (!item) return;
+          props.setValue(item[1] as any);
+        }}
       >
         <For each={options()} fallback={<option>options missing</option>}>
           {([key], index) => <option value={index()}>{key}</option>}
