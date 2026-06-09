@@ -1049,6 +1049,10 @@ importers:
         version: 1.9.7
 
   packages/transition-group:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       '@solidjs/web':
         specifier: ^2.0.0-beta.14

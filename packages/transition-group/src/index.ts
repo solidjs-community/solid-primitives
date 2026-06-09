@@ -7,13 +7,11 @@ import {
   $TRACK,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
+import { noop } from "@solid-primitives/utils";
 import type { ListTransitionOptions, SwitchTransitionOptions } from "./types.js";
 
 export type * from "./types.js";
 
-const noop = () => {
-  /* noop */
-};
 const noopTransition = (_el: any, done: () => void) => done();
 
 // Extracted to a variable so TypeScript's excess-property check doesn't flag `ownedWrite`
