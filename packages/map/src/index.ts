@@ -84,15 +84,13 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     const hasChanged = super.get(key) !== value;
     const result = super.set(key, value);
 
-    if (hadNoKey || hasChanged) {
-      if (hadNoKey) {
-        this.#keyTriggers.dirty($OBJECT);
-        this.#keyTriggers.dirty(key);
-      }
-      if (hasChanged) {
-        this.#valueTriggers.dirty($OBJECT);
-        this.#valueTriggers.dirty(key);
-      }
+    if (hadNoKey) {
+      this.#keyTriggers.dirty($OBJECT);
+      this.#keyTriggers.dirty(key);
+    }
+    if (hasChanged) {
+      this.#valueTriggers.dirty($OBJECT);
+      this.#valueTriggers.dirty(key);
     }
 
     return result;
@@ -173,10 +171,8 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
     const hasChanged = super.get(key) !== value;
     const result = super.set(key, value);
 
-    if (hadNoKey || hasChanged) {
-      if (hadNoKey) this.#keyTriggers.dirty(key);
-      if (hasChanged) this.#valueTriggers.dirty(key);
-    }
+    if (hadNoKey) this.#keyTriggers.dirty(key);
+    if (hasChanged) this.#valueTriggers.dirty(key);
 
     return result;
   }
