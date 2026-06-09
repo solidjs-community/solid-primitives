@@ -16,7 +16,8 @@
     "list": [
       "createControlledProp"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 849
   },
   "files": [
     "dist"
@@ -54,9 +55,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }

@@ -4,7 +4,7 @@
 
 # @solid-primitives/workers
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/workers?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/workers)
+[![size](https://img.shields.io/badge/size-1.19_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/workers)
 [![size](https://img.shields.io/npm/v/@solid-primitives/workers?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/workers)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -15,6 +15,16 @@ A set of utility to support using Web Workers and Shared Workers:
 `createWorkerPool` - Creates a pool of workers and round-robins requests between each.
 
 `createSignaledWorker` - Creates a work with that reads and writes to signals.
+
+## Installation
+
+```bash
+npm install @solid-primitives/workers
+# or
+yarn add @solid-primitives/workers
+# or
+pnpm add @solid-primitives/workers
+```
 
 ## How to use it
 

@@ -95,7 +95,8 @@ export type Update = {
 };
 
 /**
- * Signal Builder: Change single value in an object by key. Allows accessign nested objects by passing multiple keys.
+ * Immutably sets a value at a key path. The last argument is either a new value or a setter
+ * function `(prev) => next`. Pass multiple keys to reach into nested objects.
  */
 export const update: Update = (...args: any[]) =>
   createMemo(() => _update(...(accessArray(args) as [any, any, any])));

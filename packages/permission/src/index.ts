@@ -1,5 +1,5 @@
-import { type Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 /**
  * Querying the permission API
@@ -13,13 +13,17 @@ export const createPermission = (
   if (isServer) {
     return () => "unknown";
   }
-  const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");
-  const [status, setStatus] = createSignal<PermissionStatus>();
+  const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown", {
+    ownedWrite: true,
+  });
+  const [status, setStatus] = createSignal<PermissionStatus | undefined>(undefined, {
+    ownedWrite: true,
+  });
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (navigator) {
     navigator.permissions
       .query(typeof name === "string" ? { name } : name)
-      .then(setStatus)
+      .then(s => setStatus(() => s))
       .catch(error => {
         if (error.name !== "TypeError" || (name !== "microphone" && name !== "camera")) {
           return;
@@ -42,16 +46,23 @@ export const createPermission = (
                 })
             : getUserMedia(constraints);
       });
+    let removeChangeListener: VoidFunction | undefined;
+
     createEffect(
-      on(status, status => {
-        if (status) {
-          setPermission(status.state);
-          const listener = () => setPermission(status.state);
-          status.addEventListener("change", listener);
-          onCleanup(() => status.removeEventListener("change", listener));
+      () => status(),
+      currentStatus => {
+        removeChangeListener?.();
+        removeChangeListener = undefined;
+        if (currentStatus) {
+          setPermission(currentStatus.state);
+          const listener = () => setPermission(currentStatus.state);
+          currentStatus.addEventListener("change", listener);
+          removeChangeListener = () => currentStatus.removeEventListener("change", listener);
         }
-      }),
+      },
     );
+
+    onCleanup(() => removeChangeListener?.());
   }
   return permission;
 };

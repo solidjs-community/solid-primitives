@@ -4,7 +4,7 @@
 
 # @solid-primitives/geolocation
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/geolocation?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/geolocation)
+[![size](https://img.shields.io/badge/size-1.23_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/geolocation)
 [![size](https://img.shields.io/npm/v/@solid-primitives/geolocation?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/geolocation)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -14,6 +14,8 @@ Primitives to query and watch geolocation information from within the browser.
 
 ```bash
 npm install @solid-primitives/geolocation
+# or
+yarn add @solid-primitives/geolocation
 # or
 pnpm add @solid-primitives/geolocation
 ```
@@ -285,10 +287,6 @@ const geolocationDefaults: PositionOptions = {
   timeout: Number.POSITIVE_INFINITY,
 };
 ```
-
-## Demo
-
-You may view a working example here: https://stackblitz.com/edit/vitejs-vite-dvk4m4
 
 ## Changelog
 

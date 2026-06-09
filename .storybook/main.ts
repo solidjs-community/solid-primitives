@@ -4,7 +4,9 @@ import { mergeConfig } from "vite";
 const config: StorybookConfig = {
   stories: ["../packages/*/stories/*.stories.{ts,tsx}"],
   staticDirs: [
+    { from: "../packages/audio/stories/assets", to: "/audio" },
     { from: "../assets/img", to: "/img" },
+    { from: "../assets/video", to: "/video" },
     { from: "../node_modules/geist/dist/fonts", to: "/geist-fonts" },
   ],
   addons: ["@storybook/addon-docs"],
@@ -47,9 +49,8 @@ const config: StorybookConfig = {
       ],
       resolve: {
         conditions: ["@solid-primitives/source"],
-        // solid-js 2.0 removed the ./web subpath — redirect any lingering imports
-        // (e.g. from storybook-solidjs-vite's Solid 1.x code path) to @solidjs/web.
         alias: [{ find: "solid-js/web", replacement: "@solidjs/web" }],
+        dedupe: ["react", "react-dom"],
       },
     });
   },

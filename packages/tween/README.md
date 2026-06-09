@@ -4,7 +4,7 @@
 
 # @solid-primitives/tween
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/tween?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/tween)
+[![size](https://img.shields.io/badge/size-260_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/tween)
 [![size](https://img.shields.io/npm/v/@solid-primitives/tween?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/tween)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -17,6 +17,8 @@ a given signal from its previous value to its next value whenever it changes.
 npm install @solid-primitives/tween
 # or
 yarn add @solid-primitives/tween
+# or
+pnpm add @solid-primitives/tween
 ```
 
 Requires `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`.

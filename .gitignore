@@ -132,3 +132,4 @@ _temp_*
 
 # Local Netlify folder
 .netlify
+storybook-static

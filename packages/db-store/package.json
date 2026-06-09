@@ -20,7 +20,8 @@
       "createDbStore",
       "supabaseAdapter"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 1417
   },
   "keywords": [
     "solid",

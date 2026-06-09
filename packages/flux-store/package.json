@@ -18,11 +18,12 @@
     "stage": 0,
     "list": [
       "createFluxStore",
-      "createFluxFactory",
+      "createFluxStoreFactory",
       "createActions",
       "createAction"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 276
   },
   "keywords": [
     "solid",
@@ -57,10 +58,10 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "2.0.0-beta.14"
   }
 }
