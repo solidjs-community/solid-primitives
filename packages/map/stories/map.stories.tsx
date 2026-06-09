@@ -36,7 +36,7 @@ export const PerEntryCounters = meta.story({
     docs: {
       description: {
         story:
-          "`ReactiveMap.get(key)` is tracked independently per key — only the row whose key changed re-evaluates. Incrementing Alice's score leaves Bob and Carol untouched.",
+          "`get(key)` subscribes to that key's value only. Incrementing Alice's score notifies Alice's row — Bob and Carol do not re-evaluate. Compare with iteration methods like `values()`, which re-run on any value change.",
       },
     },
   },
@@ -98,7 +98,7 @@ export const AddRemoveEntries = meta.story({
     docs: {
       description: {
         story:
-          "`size`, `keys()`, `values()`, and `entries()` are all reactive — the list and count update immediately when the map changes.",
+          "Iteration methods (`entries()`, `size`) react to any structural change. Setting an existing key to the same value is a no-op and will not trigger the list to re-render.",
       },
     },
   },
@@ -189,7 +189,7 @@ export const ObjectKeyedState = meta.story({
     docs: {
       description: {
         story:
-          "`ReactiveWeakMap` uses object references as keys, associating reactive state with objects without preventing garbage collection. Each row reads `weakMap.get(obj)` independently.",
+          "`ReactiveWeakMap` keys are object references. State is associated with each object without preventing garbage collection when the object is no longer referenced elsewhere. Each row tracks its own key independently via `get(item)`.",
       },
     },
   },
