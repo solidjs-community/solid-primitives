@@ -119,9 +119,11 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     this.#keyTriggers.dirty($OBJECT);
     this.#valueTriggers.dirty($OBJECT);
     // Notify per-key subscribers only for keys that actually existed.
+    // Mirror delete() semantics: only dirty the value trigger when the stored
+    // value was not undefined (avoids spurious get(key) notifications).
     for (const key of super.keys()) {
       this.#keyTriggers.dirty(key);
-      this.#valueTriggers.dirty(key);
+      if (super.get(key) !== undefined) this.#valueTriggers.dirty(key);
     }
     super.clear();
   }
