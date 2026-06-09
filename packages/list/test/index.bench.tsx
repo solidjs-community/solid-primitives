@@ -1,7 +1,7 @@
 import { describe, bench, afterAll } from "vitest";
-import { onMount, For } from "solid-js";
+import { onSettled, For } from "solid-js";
 import { List } from "../src/index.js";
-import { render } from "solid-js/web";
+import { render } from "@solidjs/web";
 
 describe("benchmark", () => {
   const ITEMS = 1000;
@@ -16,7 +16,7 @@ describe("benchmark", () => {
     () =>
       new Promise(resolve => {
         const ItemFor = (props: { number: number }) => {
-          onMount(() => {
+          onSettled(() => {
             renderedFor.add(props.number);
             if (renderedFor.size === ITEMS) {
               resolve();
@@ -42,7 +42,7 @@ describe("benchmark", () => {
     () =>
       new Promise(resolve => {
         const ItemList = (props: { number: number }) => {
-          onMount(() => {
+          onSettled(() => {
             renderedList.add(props.number);
             if (renderedList.size === ITEMS) {
               resolve();

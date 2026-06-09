@@ -1,22 +1,23 @@
 import {
   createSignal,
   type Accessor,
-  type Setter,
   onCleanup,
   $TRACK,
   untrack,
   createRoot,
-  batch,
-  type JSX,
   createMemo,
+  getOwner,
+  runWithOwner,
+  createOwner,
 } from "solid-js";
-import { isDev } from "solid-js/web";
+import { type JSX } from "@solidjs/web";
+import { isDev, INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 type ListItem<T> = {
   value: T;
-  valueSetter?: Setter<T>;
+  updateValue?: (v: T) => void;
+  updateIndex?: (i: number) => void;
   index: number;
-  indexSetter?: Setter<number>;
   disposer: () => void;
 };
 
@@ -36,13 +37,17 @@ export function listArray<T, U>(
   mapFn: (v: Accessor<T>, i: Accessor<number>) => U,
   options: { fallback?: Accessor<any> } = {},
 ): () => U[] {
+  // Create a sibling owner (not a child of the memo node) to hold item roots.
+  // This mirrors mapArray's `data._owner` pattern: items created here survive
+  // memo recomputes because they aren't in the memo's child chain.
+  const listOwner = createOwner();
+
   const items: ListItem<T>[] = [];
   let mapped: U[] = [],
     unusedItems: number,
     i: number,
     j: number,
     item: ListItem<T>,
-    oldValue: T,
     oldIndex: number,
     newValue: T,
     fallback: U[] | undefined,
@@ -54,6 +59,10 @@ export function listArray<T, U>(
     disposeList(items);
   });
   return () => {
+    // Point listOwner at the memo node so child-owner height calculations are
+    // correct (mirrors mapArray's `data._owner._parentComputed = node`).
+    (listOwner as any)._parentComputed = getOwner();
+
     const newItems = list() || [];
     (newItems as any)[$TRACK]; // top level tracking
     return untrack(() => {
@@ -83,7 +92,7 @@ export function listArray<T, U>(
       const matcher = new Map<T, number[]>();
       const matchedItems = new Uint8Array(unusedItems);
       for (j = unusedItems - 1; j >= 0; --j) {
-        oldValue = items[j]!.value;
+        const oldValue = items[j]!.value;
         matcher.get(oldValue)?.push(j) ?? matcher.set(oldValue, [j]);
       }
 
@@ -97,7 +106,7 @@ export function listArray<T, U>(
           oldIndex = item.index;
           temp[i] = mapped[oldIndex]!;
           item.index = i;
-          item.indexSetter?.(i);
+          item.updateIndex?.(i);
           matchedItems[j] = 1;
         }
       }
@@ -119,7 +128,7 @@ export function listArray<T, U>(
           temp[oldIndex] = mapped[oldIndex]!;
           newValue = newItems[oldIndex]!;
           item.value = newValue;
-          item.valueSetter?.(newValueGetter);
+          item.updateValue?.(newValue);
           if (--unusedItems !== j) {
             items[j] = items[unusedItems]!;
             items[unusedItems] = item;
@@ -135,9 +144,11 @@ export function listArray<T, U>(
         if (unusedItems > 0) {
           item = items[--unusedItems]!;
           temp[i] = mapped[item.index]!;
-          batch(changeBoth);
+          changeBoth();
         } else {
-          temp[i] = createRoot(mapper);
+          // Run createRoot under listOwner so the item root becomes a child of
+          // listOwner (sibling of memo), not a child of the memo node.
+          temp[i] = runWithOwner(listOwner, () => createRoot(mapper))!;
         }
       }
 
@@ -147,10 +158,12 @@ export function listArray<T, U>(
       if (newItems.length === 0 && options.fallback) {
         if (!fallbackDisposer) {
           fallback = [
-            createRoot(d => {
-              fallbackDisposer = d;
-              return options.fallback!();
-            }),
+            runWithOwner(listOwner, () =>
+              createRoot(d => {
+                fallbackDisposer = d;
+                return options.fallback!();
+              }),
+            )!,
           ];
         }
         return fallback!;
@@ -158,40 +171,36 @@ export function listArray<T, U>(
       return (mapped = temp);
     });
   };
-  function newValueGetter() {
-    return newValue;
-  }
   function changeBoth() {
     item.index = i;
-    item.indexSetter?.(i);
     item.value = newValue;
-    item.valueSetter?.(newValueGetter);
+    item.updateIndex?.(i);
+    item.updateValue?.(newValue);
   }
   function mapper(disposer: () => void) {
+    const [vV, setV] = isDev
+      ? createSignal(newValue as T, { name: "value", ownedWrite: true } as any)
+      : createSignal(newValue as T, INTERNAL_OPTIONS as any);
+    const [vI, setI] = isDev
+      ? createSignal(i, { name: "index", ownedWrite: true })
+      : createSignal(i, INTERNAL_OPTIONS);
+
     const t: ListItem<T> = {
       value: newValue,
       index: i,
       disposer,
+      updateValue: (v: T) => {
+        t.value = v;
+        setV(() => v as any);
+      },
+      updateIndex: (idx: number) => {
+        t.index = idx;
+        setI(idx);
+      },
     };
     items.push(t);
-    // signal created when used
-    let sV: Accessor<T> = () => {
-        [sV, t.valueSetter] = isDev
-          ? createSignal(t.value, { name: "value" })
-          : createSignal(t.value);
-        return sV();
-      },
-      sI: Accessor<number> = () => {
-        [sI, t.indexSetter] = isDev
-          ? createSignal(t.index, { name: "index" })
-          : createSignal(t.index);
-        return sI();
-      };
 
-    return mapFn(
-      () => sV(),
-      () => sI(),
-    );
+    return mapFn(vV, vI);
   }
 }
 
@@ -215,7 +224,6 @@ export function List<T extends readonly any[], U extends JSX.Element>(props: {
   return (isDev
     ? createMemo(
         listArray(() => props.each, props.children, fallback || undefined),
-        undefined,
         { name: "value" },
       )
     : createMemo(

@@ -4,8 +4,7 @@ import {
   createEffect,
   onCleanup,
   untrack,
-  onMount,
-  batch,
+  onSettled,
 } from "solid-js";
 import { List } from "../src/index.js";
 
@@ -22,13 +21,13 @@ const App: Component = () => {
     console.log(description);
   };
 
-  createEffect(() => {
-    batch(() => {
+  createEffect(
+    () => signal(),
+    () => {
       setChanges("");
       addChange("-------------------");
-    });
-    signal();
-  });
+    },
+  );
 
   let customArr: HTMLInputElement;
 
@@ -54,21 +53,23 @@ const App: Component = () => {
           }
         >
           {(v, i) => {
-            onMount(() => addChange(`create ${i()}: ${v()}`));
-            createEffect(lastValue => {
-              const value = v();
-              if (lastValue != null) {
-                addChange(`${untrack(i)}: (${lastValue} -> ${value})`);
-              }
-              return v();
-            }, null);
-            createEffect((lastIndex: number | null) => {
-              const index = i();
-              if (lastIndex !== null) {
-                addChange(`(${lastIndex} -> ${index}): ${untrack(v)}`);
-              }
-              return i();
-            }, null);
+            onSettled(() => addChange(`create ${i()}: ${v()}`));
+            createEffect(
+              () => v(),
+              (value, prev) => {
+                if (prev != null) {
+                  addChange(`${untrack(i)}: (${prev} -> ${value})`);
+                }
+              },
+            );
+            createEffect(
+              () => i(),
+              (value: number, prev: number | undefined) => {
+                if (prev !== undefined) {
+                  addChange(`(${prev} -> ${value}): ${untrack(v)}`);
+                }
+              },
+            );
             onCleanup(() => setTimeout(() => addChange(`remove ${i()}: ${v()}`)));
             return (
               <div
