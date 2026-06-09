@@ -7,43 +7,18 @@ import {
   $TRACK,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
+import type { ListTransitionOptions, SwitchTransitionOptions } from "./types.js";
+
+export type * from "./types.js";
 
 const noop = () => {
   /* noop */
 };
-const noopTransition = (el: any, done: () => void) => done();
+const noopTransition = (_el: any, done: () => void) => done();
 
 // Extracted to a variable so TypeScript's excess-property check doesn't flag `ownedWrite`
 // when @solidjs/signals isn't directly symlinked (e.g. in strict pnpm hoisting environments).
 const VERSION_SIGNAL_OPTS = { equals: false, ownedWrite: true } as const;
-
-export type TransitionMode = "out-in" | "in-out" | "parallel";
-
-export type OnTransition<T> = (el: T, done: () => void) => void;
-
-export type SwitchTransitionOptions<T> = {
-  /**
-   * a function to be called when a new element is entering. {@link OnTransition}
-   *
-   * It receives the element and a callback to be called when the transition is done.
-   */
-  onEnter?: OnTransition<T>;
-  /**
-   * a function to be called when an exiting element is leaving. {@link OnTransition}
-   *
-   * It receives the element and a callback to be called when the transition is done.
-   * The element is kept in the DOM until the done() callback is called.
-   */
-  onExit?: OnTransition<T>;
-  /**
-   * transition mode. {@link TransitionMode}
-   *
-   * Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
-   */
-  mode?: TransitionMode;
-  /** whether to run the transition on the initial elements. Defaults to `false` */
-  appear?: boolean;
-};
 
 /**
  * Create an element transition interface for switching between single elements.
@@ -160,40 +135,6 @@ export function createSwitchTransition<T>(
   };
 }
 
-export type OnListChange<T> = (payload: {
-  /** full list of elements to be rendered */
-  list: T[];
-  /** list of elements that were added since the last change */
-  added: T[];
-  /** list of elements that were removed since the last change */
-  removed: T[];
-  /** list of elements that were already added before, and are not currently exiting */
-  unchanged: T[];
-  /** Callback for finishing the transition of exiting elements - removes them from rendered array */
-  finishRemoved: (els: T[]) => void;
-}) => void;
-
-export type ExitMethod = "remove" | "move-to-end" | "keep-index";
-
-export type ListTransitionOptions<T> = {
-  /**
-   * A function to be called when the list changes. {@link OnListChange}
-   *
-   * It receives the list of current, added, removed, and unchanged elements.
-   * It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
-   */
-  onChange: OnListChange<T>;
-  /** whether to run the transition on the initial elements. Defaults to `false` */
-  appear?: boolean;
-  /**
-   * This controls how the elements exit. {@link ExitMethod}
-   * - `"remove"` removes the element immediately.
-   * - `"move-to-end"` (default) will move elements which have exited to the end of the array.
-   * - `"keep-index"` will splice them in at their previous index.
-   */
-  exitMethod?: ExitMethod;
-};
-
 /**
  * Create an element list transition interface for changes to the list of elements.
  * It can be used to implement own transition effect, or a custom `<TransitionGroup>`-like component.
@@ -266,54 +207,52 @@ export function createListTransition<T extends object>(
   // createMemo is pull-based: it recomputes synchronously when read and its deps
   // are stale, so user effects that read this memo see the latest list immediately
   // after a flush without requiring an additional flush cycle.
-  return createMemo(
-    (prev: T[] = options.appear ? [] : initSource.slice()) => {
-      removeVersion(); // track version for finishRemoved-driven recomputation
-      const sourceList = source();
-      (sourceList as any)[$TRACK]; // top level store tracking
+  return createMemo((prev: T[] = options.appear ? [] : initSource.slice()) => {
+    removeVersion(); // track version for finishRemoved-driven recomputation
+    const sourceList = source();
+    (sourceList as any)[$TRACK]; // top level store tracking
 
-      if (pendingRemovals.length) {
-        const toRemove = pendingRemovals.splice(0); // take all and clear atomically
-        const next = prev.filter(e => !toRemove.includes(e));
-        untrack(() =>
-          onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved }),
-        );
-        return next;
+    if (pendingRemovals.length) {
+      const toRemove = pendingRemovals.splice(0); // take all and clear atomically
+      const next = prev.filter(e => !toRemove.includes(e));
+      untrack(() =>
+        onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved }),
+      );
+      return next;
+    }
+
+    return untrack(() => {
+      const nextSet: ReadonlySet<T> = new Set(sourceList);
+      const next: T[] = sourceList.slice();
+
+      const added: T[] = [];
+      const removed: T[] = [];
+      const unchanged: T[] = [];
+
+      for (const el of sourceList) {
+        (prevSet.has(el) ? unchanged : added).push(el);
       }
 
-      return untrack(() => {
-        const nextSet: ReadonlySet<T> = new Set(sourceList);
-        const next: T[] = sourceList.slice();
-
-        const added: T[] = [];
-        const removed: T[] = [];
-        const unchanged: T[] = [];
-
-        for (const el of sourceList) {
-          (prevSet.has(el) ? unchanged : added).push(el);
-        }
-
-        let nothingChanged = !added.length;
-        for (let i = 0; i < prev.length; i++) {
-          const el = prev[i]!;
-          if (!nextSet.has(el)) {
-            if (!exiting.has(el)) {
-              removed.push(el);
-              exiting.add(el);
-            }
-            handleRemoved(next, el, i);
+      let nothingChanged = !added.length;
+      for (let i = 0; i < prev.length; i++) {
+        const el = prev[i]!;
+        if (!nextSet.has(el)) {
+          if (!exiting.has(el)) {
+            removed.push(el);
+            exiting.add(el);
           }
-          if (nothingChanged && el !== next[i]) nothingChanged = false;
+          handleRemoved(next, el, i);
         }
+        if (nothingChanged && el !== next[i]) nothingChanged = false;
+      }
 
-        // skip if nothing changed
-        if (!removed.length && nothingChanged) return prev;
+      // skip if nothing changed
+      if (!removed.length && nothingChanged) return prev;
 
-        onChange({ list: next, added, removed, unchanged, finishRemoved });
+      onChange({ list: next, added, removed, unchanged, finishRemoved });
 
-        prevSet = nextSet;
-        return next;
-      });
-    },
-  );
+      prevSet = nextSet;
+      return next;
+    });
+  });
 }
