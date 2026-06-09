@@ -180,7 +180,7 @@ setPos({ x: 100, y: 200, z: 50 }); // ❌ z was not in the initial value
 
 Both primitives are SSR-safe. On the server:
 
-- `createSpring` returns the initial value unchanged. The setter resolves immediately for `hard: true`; otherwise it returns a Promise that never resolves (no animation runs).
+- `createSpring` returns the initial value unchanged. The setter resolves immediately for `hard: true` or when `stiffness >= 1` and `damping >= 1`; otherwise it returns a Promise that never resolves (no animation runs).
 - `createDerivedSpring` returns the initial accessor value unchanged.
 - `isAnimating` always returns `false` on the server.
 
