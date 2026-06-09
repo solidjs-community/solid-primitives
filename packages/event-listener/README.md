@@ -38,6 +38,8 @@ A set of primitives that help with listening to DOM and Custom Events.
 npm install @solid-primitives/event-listener
 # or
 yarn add @solid-primitives/event-listener
+# or
+pnpm add @solid-primitives/event-listener
 ```
 
 ## `makeEventListener`

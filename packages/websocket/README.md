@@ -12,6 +12,16 @@
 
 Primitives to help establish, maintain, and operate WebSocket connections in Solid.
 
+## Installation
+
+```bash
+npm install @solid-primitives/websocket
+# or
+yarn add @solid-primitives/websocket
+# or
+pnpm add @solid-primitives/websocket
+```
+
 ## Connection primitives
 
 - [`makeWS`](#makews) — raw WebSocket with a buffered send queue (manual cleanup)

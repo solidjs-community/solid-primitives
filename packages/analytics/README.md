@@ -17,6 +17,16 @@ Category: Utilities
 
 Creates a primitive for analytics management.
 
+## Installation
+
+```bash
+npm install @solid-primitives/analytics
+# or
+yarn add @solid-primitives/analytics
+# or
+pnpm add @solid-primitives/analytics
+```
+
 ## How to use it
 
 ```ts
