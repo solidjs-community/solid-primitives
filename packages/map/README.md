@@ -41,15 +41,25 @@ import { ReactiveWeakMap } from "@solid-primitives/map";
 
 The usage is almost the same as the original Javascript structures.
 
-```ts
+```tsx
 const userPoints = new ReactiveMap<User, number>();
-// reads can be listened to reactively
-createEffect(() => {
-  userPoints.get(user1); // => T: number | undefined (reactive)
-  userPoints.has(user1); // => T: boolean (reactive)
-  // ReactiveWeakMap won't have .size or any methods that loop over the values
-  userPoints.size; // => T: number (reactive)
-});
+
+// reads are tracked when accessed inside reactive contexts (JSX, createMemo, createEffect)
+function Component() {
+  return (
+    <div>
+      <p>Points: {userPoints.get(user1)}</p>
+      <p>Has user: {String(userPoints.has(user1))}</p>
+      {/* ReactiveWeakMap won't have .size or iteration methods */}
+      <p>Total users: {userPoints.size}</p>
+    </div>
+  );
+}
+
+// or derive values with createMemo
+const points = createMemo(() => userPoints.get(user1));
+const hasUser = createMemo(() => userPoints.has(user1));
+
 // apply changes
 userPoints.set(user1, 100);
 userPoints.delete(user2);

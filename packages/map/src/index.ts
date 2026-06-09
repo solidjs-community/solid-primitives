@@ -1,4 +1,4 @@
-import { type Accessor, batch } from "solid-js";
+import { type Accessor } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
 const $OBJECT = Symbol("track-object");
@@ -10,11 +10,10 @@ const $OBJECT = Symbol("track-object");
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#ReactiveMap
  * @example
  * const userPoints = new ReactiveMap<User, number>();
- * createEffect(() => {
- *    userPoints.get(user1) // => T: number | undefined (reactive)
- *    userPoints.has(user1) // => T: boolean (reactive)
- *    userPoints.size // => T: number (reactive)
- * });
+ * // reads are tracked in reactive contexts (JSX, createMemo, createEffect compute)
+ * const points = createMemo(() => userPoints.get(user1)); // => Accessor<number | undefined>
+ * const hasUser = createMemo(() => userPoints.has(user1)); // => Accessor<boolean>
+ * const count = createMemo(() => userPoints.size); // => Accessor<number>
  * // apply changes
  * userPoints.set(user1, 100);
  * userPoints.delete(user2);
@@ -85,16 +84,14 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     const result = super.set(key, value);
 
     if (hasChanged || hadNoKey) {
-      batch(() => {
-        if (hadNoKey) {
-          this.#keyTriggers.dirty($OBJECT);
-          this.#keyTriggers.dirty(key);
-        }
-        if (hasChanged) {
-          this.#valueTriggers.dirty($OBJECT);
-          this.#valueTriggers.dirty(key);
-        }
-      });
+      if (hadNoKey) {
+        this.#keyTriggers.dirty($OBJECT);
+        this.#keyTriggers.dirty(key);
+      }
+      if (hasChanged) {
+        this.#valueTriggers.dirty($OBJECT);
+        this.#valueTriggers.dirty(key);
+      }
     }
 
     return result;
@@ -105,15 +102,13 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     const result = super.delete(key);
 
     if (result) {
-      batch(() => {
-        this.#keyTriggers.dirty($OBJECT);
-        this.#valueTriggers.dirty($OBJECT);
-        this.#keyTriggers.dirty(key);
+      this.#keyTriggers.dirty($OBJECT);
+      this.#valueTriggers.dirty($OBJECT);
+      this.#keyTriggers.dirty(key);
 
-        if (isDefined) {
-          this.#valueTriggers.dirty(key);
-        }
-      });
+      if (isDefined) {
+        this.#valueTriggers.dirty(key);
+      }
     }
 
     return result;
@@ -121,16 +116,13 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 
   clear(): void {
     if (super.size === 0) return;
-    batch(() => {
-      this.#keyTriggers.dirty($OBJECT);
-      this.#valueTriggers.dirty($OBJECT);
-      for (const key of super.keys()) {
-        this.#keyTriggers.dirty(key);
-        this.#valueTriggers.dirty(key);
-      }
-
-      super.clear();
-    });
+    this.#keyTriggers.dirty($OBJECT);
+    this.#valueTriggers.dirty($OBJECT);
+    for (const key of super.keys()) {
+      this.#keyTriggers.dirty(key);
+      this.#valueTriggers.dirty(key);
+    }
+    super.clear();
   }
 }
 
@@ -141,10 +133,9 @@ export class ReactiveMap<K, V> extends Map<K, V> {
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#ReactiveWeakMap
  * @example
  * const userPoints = new ReactiveWeakMap<User, number>();
- * createEffect(() => {
- *    userPoints.get(user1) // => T: number | undefined (reactive)
- *    userPoints.has(user1) // => T: boolean (reactive)
- * });
+ * // reads are tracked in reactive contexts (JSX, createMemo, createEffect compute)
+ * const points = createMemo(() => userPoints.get(user1)); // => Accessor<number | undefined>
+ * const hasUser = createMemo(() => userPoints.has(user1)); // => Accessor<boolean>
  * // apply changes
  * userPoints.set(user1, 100);
  * userPoints.delete(user2);
@@ -173,10 +164,8 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
     const result = super.set(key, value);
 
     if (hasChanged || hadNoKey) {
-      batch(() => {
-        if (hadNoKey) this.#keyTriggers.dirty(key);
-        if (hasChanged) this.#valueTriggers.dirty(key);
-      });
+      if (hadNoKey) this.#keyTriggers.dirty(key);
+      if (hasChanged) this.#valueTriggers.dirty(key);
     }
 
     return result;
@@ -186,10 +175,8 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
     const result = super.delete(key);
 
     if (result) {
-      batch(() => {
-        this.#keyTriggers.dirty(key);
-        if (isDefined) this.#valueTriggers.dirty(key);
-      });
+      this.#keyTriggers.dirty(key);
+      if (isDefined) this.#valueTriggers.dirty(key);
     }
 
     return result;
