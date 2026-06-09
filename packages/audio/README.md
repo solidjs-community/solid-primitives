@@ -18,6 +18,8 @@ Within an SSR context these primitives perform noops and never interrupt the pro
 npm install @solid-primitives/audio
 # or
 yarn add @solid-primitives/audio
+# or
+pnpm add @solid-primitives/audio
 ```
 
 ## How to use it

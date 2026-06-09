@@ -28,6 +28,8 @@
 npm install @solid-primitives/active-element
 # or
 yarn add @solid-primitives/active-element
+# or
+pnpm add @solid-primitives/active-element
 ```
 
 ## `makeActiveElementListener`

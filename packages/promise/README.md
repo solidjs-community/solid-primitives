@@ -20,6 +20,8 @@ A library of reactive primitives and helpers for handling promises.
 npm install @solid-primitives/promise
 # or
 yarn add @solid-primitives/promise
+# or
+pnpm add @solid-primitives/promise
 ```
 
 ## `promiseTimeout`

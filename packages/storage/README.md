@@ -17,6 +17,8 @@ to `localStorage`.
 npm install @solid-primitives/storage
 # or
 yarn add @solid-primitives/storage
+# or
+pnpm add @solid-primitives/storage
 ```
 
 ## How to use it

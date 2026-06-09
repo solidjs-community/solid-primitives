@@ -22,6 +22,8 @@ Primitives for [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web
 ```bash
 npm install @solid-primitives/sse
 # or
+yarn add @solid-primitives/sse
+# or
 pnpm add @solid-primitives/sse
 ```
 

@@ -16,6 +16,8 @@ Primitive that helps reactively reading/setting cursor position and selections b
 npm install @solid-primitives/selection
 # or
 yarn add @solid-primitives/selection
+# or
+pnpm add @solid-primitives/selection
 ```
 
 **Requires**: `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`

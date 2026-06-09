@@ -15,6 +15,8 @@ Layered primitives for managing HTML video playback. The `make*` variants are no
 ```bash
 npm install @solid-primitives/video
 # or
+yarn add @solid-primitives/video
+# or
 pnpm add @solid-primitives/video
 ```
 
