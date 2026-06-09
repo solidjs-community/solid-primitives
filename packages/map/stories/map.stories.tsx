@@ -207,16 +207,21 @@ export const ObjectKeyedState = meta.story({
       <Container width={280}>
         <For each={items}>
           {item => (
-            <div
+            <button
+              type="button"
+              aria-pressed={checked.get(item) ?? false}
               style={{
                 display: "flex",
                 "justify-content": "space-between",
                 "align-items": "center",
+                width: "100%",
                 padding: "0.5rem 0.75rem",
                 background: checked.get(item) ? "#ede9fe" : colors.surface,
                 border: `1px solid ${checked.get(item) ? "#8b5cf6" : colors.border}`,
                 "border-radius": radii.md,
                 cursor: "pointer",
+                font: "inherit",
+                "text-align": "left",
               }}
               onClick={() => checked.set(item, !checked.get(item))}
             >
@@ -229,7 +234,7 @@ export const ObjectKeyedState = meta.story({
               >
                 <span style={{ color: "#7c3aed" }}>✓</span>
               </Show>
-            </div>
+            </button>
           )}
         </For>
         <Separator />
