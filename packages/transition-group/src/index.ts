@@ -13,6 +13,10 @@ const noop = () => {
 };
 const noopTransition = (el: any, done: () => void) => done();
 
+// Extracted to a variable so TypeScript's excess-property check doesn't flag `ownedWrite`
+// when @solidjs/signals isn't directly symlinked (e.g. in strict pnpm hoisting environments).
+const VERSION_SIGNAL_OPTS = { equals: false, ownedWrite: true } as const;
+
 export type TransitionMode = "out-in" | "in-out" | "parallel";
 
 export type OnTransition<T> = (el: T, done: () => void) => void;
@@ -76,7 +80,7 @@ export function createSwitchTransition<T>(
   options: SwitchTransitionOptions<NonNullable<T>>,
 ): Accessor<NonNullable<T>[]> {
   const initSource = untrack(source);
-  const initReturned = initSource ? [initSource as NonNullable<T>] : [];
+  const initReturned = initSource ? [initSource] : [];
 
   if (isServer) {
     return () => initReturned;
@@ -89,7 +93,7 @@ export function createSwitchTransition<T>(
   // when written, so the memo recomputes synchronously on the next read — even
   // inside a user effect running in the same flush cycle.
   let currentList: NonNullable<T>[] = options.appear ? [] : initReturned.slice();
-  const [listVersion, bumpVersion] = createSignal(0, { equals: false, ownedWrite: true });
+  const [listVersion, bumpVersion] = createSignal(0, VERSION_SIGNAL_OPTS);
 
   function updateList(fn: (prev: NonNullable<T>[]) => NonNullable<T>[]) {
     currentList = fn(currentList);
@@ -105,7 +109,7 @@ export function createSwitchTransition<T>(
   function exitTransition(el: T | undefined, after?: () => void) {
     if (!el) return after && after();
     isExiting = true;
-    onExit(el as NonNullable<T>, () => {
+    onExit(el, () => {
       isExiting = false;
       updateList(p => p.filter(e => e !== el));
       after && after();
@@ -116,8 +120,8 @@ export function createSwitchTransition<T>(
     const el = next;
     if (!el) return after && after();
     next = undefined;
-    updateList(p => [el as NonNullable<T>, ...p]);
-    onEnter(el as NonNullable<T>, after ?? noop);
+    updateList(p => [el, ...p]);
+    onEnter(el, after ?? noop);
   }
 
   const triggerTransitions: (prev: T | undefined) => void =
@@ -138,7 +142,7 @@ export function createSwitchTransition<T>(
   // happen before any user createEffect runs in the same flush.
   createRenderEffect(
     () => source() as T | undefined,
-    el => {
+    (el: T | undefined) => {
       if (el !== prevEl) {
         next = el;
         const prev = prevEl;
@@ -240,8 +244,8 @@ export function createListTransition<T extends object>(
   // Pending removals are accumulated in a plain array and consumed atomically by
   // the memo. Using a version counter signal instead of storing in a signal avoids
   // mutating signal-owned values.
-  let pendingRemovals: T[] = [];
-  const [removeVersion, setRemoveVersion] = createSignal(0, { equals: false });
+  const pendingRemovals: T[] = [];
+  const [removeVersion, setRemoveVersion] = createSignal(0, VERSION_SIGNAL_OPTS);
 
   const finishRemoved: (els: T[]) => void =
     options.exitMethod === "remove"
