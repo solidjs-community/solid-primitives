@@ -1,5 +1,5 @@
 import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 // https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/motion/utils.js
 
@@ -80,7 +80,7 @@ export function createSpring<T extends SpringTarget>(
   initialValue: T,
   options: SpringOptions = {},
 ): [Accessor<WidenSpringTarget<T>>, SpringSetter<WidenSpringTarget<T>>] {
-  const [signal, setSignal] = createSignal(initialValue);
+  const [signal, setSignal] = createSignal(initialValue as Exclude<T, Function>, { ownedWrite: true });
   const { stiffness = 0.15, damping = 0.8, precision = 0.01 } = options;
 
   if (isServer) {
@@ -107,11 +107,12 @@ export function createSpring<T extends SpringTarget>(
   let time_delta = 0;
   let resolve = () => {};
 
-  const cleanup = onCleanup(() => {
+  const stopAnimation = () => {
     cancelAnimationFrame(raf_id);
     raf_id = 0;
     resolve();
-  });
+  };
+  onCleanup(stopAnimation);
 
   const frame: FrameRequestCallback = time => {
     time_delta = Math.max(1 / 60, ((time - time_last) * 60) / 1000); // guard against d<=0
@@ -126,7 +127,7 @@ export function createSpring<T extends SpringTarget>(
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (settled) {
-      cleanup();
+      stopAnimation();
     } else {
       raf_id = requestAnimationFrame(frame);
     }
@@ -136,7 +137,7 @@ export function createSpring<T extends SpringTarget>(
     value_target = typeof param === "function" ? param(value_current) : param;
 
     if (opts.hard || (stiffness >= 1 && damping >= 1)) {
-      cleanup();
+      stopAnimation();
       setSignal(_ => (value_current = value_last = value_target));
       return Promise.resolve();
     }
@@ -214,7 +215,15 @@ export function createDerivedSpring<T extends SpringTarget>(
 ) {
   const [springValue, setSpringValue] = createSpring(target(), options);
 
-  createEffect(() => setSpringValue(target() as WidenSpringTarget<T>));
+  if (!isServer) {
+    createEffect(
+      () => target(),
+      value => {
+        setSpringValue(value as WidenSpringTarget<T>);
+      },
+      { defer: true },
+    );
+  }
 
   return springValue;
 }

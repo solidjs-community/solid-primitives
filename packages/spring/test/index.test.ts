@@ -1,4 +1,4 @@
-import { createEffect, createRoot, createSignal } from "solid-js";
+import { createEffect, createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it, vi, afterAll } from "vitest";
 import { createDerivedSpring, createSpring } from "../src/index.js";
 
@@ -44,25 +44,26 @@ describe("createSpring", () => {
     const [setSpring, dispose] = createRoot(dispose => {
       const [, setSpring] = createSpring(0);
 
-      createEffect(() => {
-        runs++;
-        setSpring(
-          p => {
-            signal(); // this one should be tracked
-            return p + 1;
-          },
-          { hard: true },
-        );
-      });
+      createEffect(
+        () => signal(),
+        () => {
+          runs++;
+          setSpring(p => p + 1, { hard: true });
+        },
+      );
 
       return [setSpring, dispose];
     });
+
+    flush();
     expect(runs).toBe(1);
 
     setSpring(p => p + 1, { hard: true });
+    flush();
     expect(runs).toBe(1);
 
     setSignal(1);
+    flush();
     expect(runs).toBe(2);
 
     dispose();
@@ -76,6 +77,7 @@ describe("createSpring", () => {
 
     expect(spring()).toBe(start);
     setSpring(end, { hard: true });
+    flush();
 
     expect(spring()).toBe(end);
 
@@ -89,7 +91,8 @@ describe("createSpring", () => {
     const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
     expect(spring().getDate()).toBe(start.getDate());
-    setSpring(end, { hard: true }); // Set to 100 here.
+    setSpring(end, { hard: true });
+    flush();
 
     expect(spring().getDate()).toBe(end.getDate());
 
@@ -103,7 +106,8 @@ describe("createSpring", () => {
     const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
     expect(spring()).toMatchObject(start);
-    setSpring(end, { hard: true }); // Set to 100 here.
+    setSpring(end, { hard: true });
+    flush();
 
     expect(spring()).toMatchObject(end);
 
@@ -117,7 +121,8 @@ describe("createSpring", () => {
     const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
     expect(spring()).toMatchObject(start);
-    setSpring(end, { hard: true }); // Set to 100 here.
+    setSpring(end, { hard: true });
+    flush();
 
     expect(spring()).toMatchObject(end);
 
@@ -131,7 +136,8 @@ describe("createSpring", () => {
     const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
     expect(spring()).toBe(start);
-    setSpring(_ => end, { hard: true }); // Using a function as an argument.
+    setSpring(_ => end, { hard: true });
+    flush();
 
     expect(spring()).toBe(end);
 
@@ -145,7 +151,8 @@ describe("createSpring", () => {
     const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
     expect(spring()).toMatchObject(start);
-    setSpring(_ => ({ progress: 100 }), { hard: true }); // Using a function as an argument.
+    setSpring(_ => ({ progress: 100 }), { hard: true });
+    flush();
 
     expect(spring()).toMatchObject(end);
 
@@ -160,6 +167,7 @@ describe("createSpring", () => {
     expect(spring()).toBe(0);
 
     _progress_time(300);
+    flush();
 
     // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
     expect(spring()).not.toBe(50);
@@ -177,6 +185,8 @@ describe("createSpring", () => {
     setSpring(end);
 
     _progress_time(300);
+    flush();
+
     for (let i = 0; i < start.length; i++) {
       expect(spring()[i]!.foo).toBeGreaterThan(end[i]!.foo / 2);
     }
@@ -191,10 +201,11 @@ describe("createDerivedSpring", () => {
     const [spring, dispose] = createRoot(d => [createDerivedSpring(signal), d]);
 
     expect(spring()).toBe(0);
-    setSignal(50); // Set to 100 here.
-    expect(spring()).toBe(0);
+    setSignal(50);
+    flush(); // update signal + run effect which starts RAF
 
     _progress_time(300);
+    flush();
 
     // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
     expect(spring()).not.toBe(50);
