@@ -20,6 +20,8 @@ Reactive primitives to react to element/window scrolling, and to prevent scroll 
 npm install @solid-primitives/scroll
 # or
 yarn add @solid-primitives/scroll
+# or
+pnpm add @solid-primitives/scroll
 ```
 
 ## `createScrollPosition`

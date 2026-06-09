@@ -23,6 +23,8 @@ Primitives for creating scheduled — throttled or debounced — callbacks.
 npm install @solid-primitives/scheduled
 # or
 yarn add @solid-primitives/scheduled
+# or
+pnpm add @solid-primitives/scheduled
 ```
 
 ## `debounce`

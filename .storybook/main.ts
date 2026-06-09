@@ -6,6 +6,7 @@ const config: StorybookConfig = {
   staticDirs: [
     { from: "../packages/audio/stories/assets", to: "/audio" },
     { from: "../assets/img", to: "/img" },
+    { from: "../assets/video", to: "/video" },
     { from: "../node_modules/geist/dist/fonts", to: "/geist-fonts" },
   ],
   addons: ["@storybook/addon-docs"],
@@ -49,6 +50,7 @@ const config: StorybookConfig = {
       resolve: {
         conditions: ["@solid-primitives/source"],
         alias: [{ find: "solid-js/web", replacement: "@solidjs/web" }],
+        dedupe: ["react", "react-dom"],
       },
     });
   },

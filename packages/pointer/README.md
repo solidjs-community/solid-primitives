@@ -22,6 +22,8 @@ A collection of primitives, giving you a nicer API to handle pointer events in a
 npm install @solid-primitives/pointer
 # or
 yarn add @solid-primitives/pointer
+# or
+pnpm add @solid-primitives/pointer
 ```
 
 ## `createPointerListeners`

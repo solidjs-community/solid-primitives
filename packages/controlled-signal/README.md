@@ -11,6 +11,8 @@ Reactive signals that support both **controlled** (externally managed) and **unc
 ```bash
 npm install @solid-primitives/controlled-signal
 # or
+yarn add @solid-primitives/controlled-signal
+# or
 pnpm add @solid-primitives/controlled-signal
 ```
 

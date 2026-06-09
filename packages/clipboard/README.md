@@ -20,6 +20,8 @@ Primitives for reading and writing to the [Clipboard API](https://developer.mozi
 ```bash
 npm install @solid-primitives/clipboard
 # or
+yarn add @solid-primitives/clipboard
+# or
 pnpm add @solid-primitives/clipboard
 ```
 

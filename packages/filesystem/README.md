@@ -160,11 +160,6 @@ In some cases, you might need to move data from one file system (or adapter) to 
 rsync(srcFs, srcPath, destFs, destPath): Promise<void>;
 ```
 
-## Demo
-
-You may view a working example of `createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem` here:
-https://primitives.solidjs.community/playground/filesystem/
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

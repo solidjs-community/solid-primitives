@@ -2,11 +2,11 @@
 "@solid-primitives/props": major
 ---
 
-Migrate to Solid.js v2.0 (beta.13)
+Migrate to Solid.js v2.0 (beta.14)
 
 ## Breaking Changes
 
-**Peer dependencies**: `solid-js@^2.0.0-beta.13` and `@solidjs/web@^2.0.0-beta.13` are now required.
+**Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
 **`classList` support removed**: Solid 2.0 removes the `classList` JSX prop in favour of the `class` prop accepting objects and arrays. `combineProps` no longer handles a `classList` key. Use `class` with an object or array instead:
 
