@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { 
+import {
+  createEffect,
+  createRoot,
   createSignal,
   createStore,
   createOptimistic,
@@ -120,6 +122,26 @@ describe("makePersisted", () => {
     flush();
     expect(store.test).toBe("persisted");
     expect(mockStorage.getItem("test4")).toBe(JSON.stringify({ test: "persisted" }));
+  });
+  
+  it("only updates the leaves in initialization", async () => {
+    mockAsyncStorage.setItem("test4a", JSON.stringify({ a: { b: { c: 1 } } }));
+    let triggered = { a: 0, b: 0, c: 0 };
+    await createRoot(async (dispose) => {
+      const [state, setState] = createStore({ a: { b: { c: 0 } } });
+      createEffect(() => state.a, (_) => { triggered.a++; });
+      createEffect(() => state.a.b, (_) => { triggered.b++; });
+      createEffect(() => state.a.b.c, (_) => { triggered.c++; });
+      const [store, setStore, init] = makePersisted(
+        [state, setState],
+        { storage: mockAsyncStorage, name: "test4a" }
+      );
+      await new Promise(r => setTimeout(r, 50));
+      flush();
+      expect(store).toEqual({ a: { b: { c: 1 } } });
+      expect(triggered).toEqual({ a: 1, b: 1, c: 2 });
+      queueMicrotask(dispose);;
+    });
   });
 
   it("persists a signal in an async storage", async () => {

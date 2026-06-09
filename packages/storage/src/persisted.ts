@@ -1,5 +1,5 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { action, createUniqueId, latest, untrack, snapshot, DEV } from "solid-js";
+import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV } from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
 export type SyncStorage = {
@@ -73,7 +73,7 @@ export type PersistenceOptions<
       storageOptions?: O;
     });
 
-export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | string | null] : never;
+export type PersistedState<S, I = Promise<string> | string | null> = S extends [any, any] ? [...S, I] : never;
 
 export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
 
@@ -114,7 +114,15 @@ export function makePersisted<
 export function makePersisted<
   T,
   O extends Record<string, any>
+>(signal: Signal<T>, options: PersistenceOptions<Signal<T>, O> & { storage: AsyncStorage | AsyncStorageWithOptions<O> }): PersistedState<Signal<T>, Promise<string> | null>;
+export function makePersisted<
+  T,
+  O extends Record<string, any>
 >(signal: StoreTuple<T>, options: PersistenceOptions<StoreTuple<T>, O>): PersistedState<StoreTuple<T>>;
+export function makePersisted<
+  T,
+  O extends Record<string, any>
+>(signal: StoreTuple<T>, options: PersistenceOptions<StoreTuple<T>, O> & { storage: AsyncStorage | AsyncStorageWithOptions<O> }): PersistedState<StoreTuple<T>, Promise<string> | null>;
 export function makePersisted<
   T,
   O extends Record<string, any> | undefined,
@@ -150,8 +158,7 @@ export function makePersisted<
     : (data: string) => {
         try {
           const value = deserialize(data);
-          // TODO: restore the previous reconcile functionality
-          (signal[1] as any)(() => value);
+          (signal[1] as any)(reconcile(value, () => true));
         } catch (e) {
           // eslint-disable-next-line no-console
           if (DEV) console.warn(e);
