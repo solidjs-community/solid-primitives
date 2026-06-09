@@ -1,14 +1,13 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal, flush } from "solid-js";
-import { List, listArray } from "../src/index.js";
+import { createSignal, flush } from "solid-js";
+import { List } from "../src/index.js";
 import { render } from "@solidjs/web";
 
 describe("debug", () => {
   test("index signal updates with one flush", () => {
     const container = document.createElement("div");
-    const startingArray = [1, 2, 3, 4];
-    const [s, set] = createSignal(startingArray);
-    
+    const [s, set] = createSignal([1, 2, 3, 4]);
+
     const callbacks: (() => { v: number; i: number })[] = [];
     const unmount = render(
       () => (
@@ -22,25 +21,31 @@ describe("debug", () => {
       container,
     );
 
-    // Check initial
-    console.log("Initial:", callbacks.map(c => c()));
-    console.log("Initial DOM:", Array.from(container.childNodes).map(n => n.textContent));
-    
-    set([1, 3, 2, 4]); // swap 2 and 3
-    
-    // Check before flush
-    console.log("After set (no flush):", callbacks.map(c => c()));
-    
+    const domText = () => Array.from(container.childNodes).map(n => n.textContent);
+    const cbValues = () => callbacks.map(c => c());
+
+    // Initial state
+    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 1 }, { v: 3, i: 2 }, { v: 4, i: 3 }]);
+    expect(domText()).toEqual(["0: 2", "1: 4", "2: 6", "3: 8"]);
+
+    set([1, 3, 2, 4]); // swap positions of 2 and 3
+
+    // Before flush — callbacks and DOM are still stale
+    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 1 }, { v: 3, i: 2 }, { v: 4, i: 3 }]);
+    expect(domText()).toEqual(["0: 2", "1: 4", "2: 6", "3: 8"]);
+
     flush();
-    
-    console.log("After 1 flush:", callbacks.map(c => c()));
-    console.log("After 1 flush DOM:", Array.from(container.childNodes).map(n => n.textContent));
-    
+
+    // After one flush — index signals updated; callbacks ordered by creation (v:2 was created 2nd)
+    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 2 }, { v: 3, i: 1 }, { v: 4, i: 3 }]);
+    expect(domText()).toEqual(["0: 2", "1: 6", "2: 4", "3: 8"]);
+
     flush();
-    
-    console.log("After 2 flushes:", callbacks.map(c => c()));
-    console.log("After 2 flushes DOM:", Array.from(container.childNodes).map(n => n.textContent));
-    
+
+    // Second flush — nothing changes
+    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 2 }, { v: 3, i: 1 }, { v: 4, i: 3 }]);
+    expect(domText()).toEqual(["0: 2", "1: 6", "2: 4", "3: 8"]);
+
     unmount();
   });
 });

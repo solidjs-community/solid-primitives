@@ -122,7 +122,6 @@ describe("List", () => {
 
     const nextArray = [1, 3, 2, 4];
     set(nextArray);
-    flush();
     flush(); // apply batched index setter writes
 
     const newMapped: ChildNode[] = new Array(container.childNodes.length);

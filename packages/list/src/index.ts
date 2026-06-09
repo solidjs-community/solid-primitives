@@ -204,6 +204,7 @@ export function listArray<T, U>(
       disposeList(items.splice(0, unusedItems));
 
       if (newItems.length === 0 && options.fallback) {
+        mapped = temp;
         if (!fallbackDisposer) {
           fallback = [
             runWithOwner(listOwner, () =>
