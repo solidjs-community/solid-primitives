@@ -157,6 +157,8 @@ export function makeSpring<T extends SpringTarget>(
   let resolvers: (() => void)[] = [];
 
   const stopAnimation = () => {
+    inv_mass = 1;
+    inv_mass_recovery_rate = 0;
     cancelAnimationFrame(raf_id);
     raf_id = 0;
     setAnimating(false);
