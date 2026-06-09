@@ -15,6 +15,8 @@ Primitives to query and watch geolocation information from within the browser.
 ```bash
 npm install @solid-primitives/geolocation
 # or
+yarn add @solid-primitives/geolocation
+# or
 pnpm add @solid-primitives/geolocation
 ```
 

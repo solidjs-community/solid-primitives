@@ -2,11 +2,11 @@
 "@solid-primitives/focus": major
 ---
 
-Migrate to Solid.js v2.0 (beta.12)
+Migrate to Solid.js v2.0 (beta.14)
 
 ## Breaking Changes
 
-**Peer dependencies**: `solid-js@^2.0.0-beta.12` and `@solidjs/web@^2.0.0-beta.12` are now required.
+**Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
 - `autofocus` is now a **ref callback factory** (`use:autofocus` directive removed; Solid 2.0 no longer supports `use:` directives):
   ```tsx

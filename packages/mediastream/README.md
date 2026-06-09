@@ -15,6 +15,8 @@ Reactive primitives for working with [MediaStream](https://developer.mozilla.org
 ```bash
 npm install @solid-primitives/mediastream
 # or
+yarn add @solid-primitives/mediastream
+# or
 pnpm add @solid-primitives/mediastream
 ```
 

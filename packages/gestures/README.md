@@ -14,6 +14,16 @@ Helpful directives to react to user gestures.
 `swipe` -
 `tap` -
 
+## Installation
+
+```bash
+npm install @solid-primitives/gestures
+# or
+yarn add @solid-primitives/gestures
+# or
+pnpm add @solid-primitives/gestures
+```
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

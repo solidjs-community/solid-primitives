@@ -16,6 +16,16 @@ A set of utility to support using Web Workers and Shared Workers:
 
 `createSignaledWorker` - Creates a work with that reads and writes to signals.
 
+## Installation
+
+```bash
+npm install @solid-primitives/workers
+# or
+yarn add @solid-primitives/workers
+# or
+pnpm add @solid-primitives/workers
+```
+
 ## How to use it
 
 ### createWorker
