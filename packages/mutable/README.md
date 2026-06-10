@@ -8,10 +8,10 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/mutable?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mutable)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A primitive for creating a mutable store proxy object. An alternative to `createStore` from `"solid-js/store"`.
+A primitive for creating a mutable store proxy object. A compatibility layer for code that relies on direct mutation semantics (similar to MobX/Vue reactivity).
 
 - [`createMutable`](#createmutable) - Creates a mutable store proxy object.
-- [`modifyMutable`](#modifymutable) - Helper for applying store mutation utilities - like `produce` or `reconcile` from `"solid-js/store"` - to a mutable store.
+- [`modifyMutable`](#modifymutable) - Helper for applying multiple mutations to a mutable store in one call.
 
 ## Installation
 
@@ -28,14 +28,14 @@ yarn add @solid-primitives/mutable
 ```ts
 import { createMutable } from "@solid-primitives/mutable";
 
-declare function createMutable<T extends StoreNode>(state: T): T;
+declare function createMutable<T extends object>(state: T): T;
 ```
 
 Creates a new mutable Store proxy object. Stores only trigger updates on values changing. Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
 
 Useful for integrating external systems or as a compatibility layer with MobX/Vue.
 
-> **Note:** A mutable state can be passed around and mutated anywhere, which can make it harder to follow and easier to break unidirectional flow. It is generally recommended to use `createStore` instead. The `produce` modifier can give many of the same benefits without any of the downsides.
+> **Note:** A mutable state can be passed around and mutated anywhere, which can make it harder to follow and easier to break unidirectional flow. It is generally recommended to use `createStore` instead.
 
 ```js
 const state = createMutable(initialValue);
@@ -64,28 +64,21 @@ const user = createMutable({
 });
 ```
 
+Only plain objects and arrays are deep-proxied. Class instances (e.g. `Date`, `Map`, `Set`) are stored and returned as-is.
+
 ## `modifyMutable`
 
 ```ts
 import { modifyMutable } from "@solid-primitives/mutable";
 
-declare function modifyMutable<T>(mutable: T, modifier: (state: T) => T): void;
+declare function modifyMutable<T>(mutable: T, modifier: (state: T) => void): void;
 ```
 
-This helper function simplifies making multiple changes to a mutable Store
-(as returned by [`createMutable`](#createmutable))
-in a single [`batch`](#batch),
-so that dependant computations update just once instead of once per update.
+Applies multiple mutations to a mutable Store via a single modifier function. Since all writes in Solid are automatically batched, dependent computations update once after all changes are applied.
 
-The first argument is the mutable Store to modify,
-and the second argument is a Store modifier such as those returned by
-[`reconcile`](#reconcile) or [`produce`](#produce).
-_(If you pass in your own modifier function, beware that its argument is
-an unwrapped version of the Store.)_
+The modifier receives the mutable proxy directly and should mutate it in place:
 
-For example, suppose we have a UI depending on multiple fields of a mutable:
-
-```tsx
+```ts
 const state = createMutable({
   user: {
     firstName: "John",
@@ -93,37 +86,8 @@ const state = createMutable({
   },
 });
 
-<h1>Hello {state.user.firstName + " " + state.user.lastName}</h1>;
-```
-
-Modifying _n_ fields in sequence will cause the UI to update _n_ times:
-
-```ts
-state.user.firstName = "Jake"; // triggers update
-state.user.lastName = "Johnson"; // triggers another update
-```
-
-To trigger just a single update, we could modify the fields in a `batch`:
-
-```ts
-batch(() => {
-  state.user.firstName = "Jake";
-  state.user.lastName = "Johnson";
-});
-```
-
-`modifyMutable` combined with `reconcile` or `produce`
-provides two alternate ways to do similar things:
-
-```ts
-// Replace state.user with the specified object (deleting any other fields)
-modifyMutable(state.user, reconcile({
-  firstName: "Jake",
-  lastName: "Johnson",
-});
-
-// Modify two fields in batch, triggering just one update
-modifyMutable(state.user, produce((u) => {
+// Modify two fields — single reactive update
+modifyMutable(state.user, u => {
   u.firstName = "Jake";
   u.lastName = "Johnson";
 });

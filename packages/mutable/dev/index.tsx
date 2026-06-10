@@ -1,5 +1,4 @@
-import { onMount, type Component } from "solid-js";
-import { For } from "solid-js/web";
+import { For, onSettled, type Component } from "solid-js";
 import { createMutable } from "../src/index.js";
 
 interface Todo {
@@ -49,7 +48,7 @@ const App: Component = () => {
           <div
             class="w-64 py-1 opacity-0"
             ref={el => {
-              onMount(() => {
+              onSettled(() => {
                 el.animate(
                   [
                     { opacity: 0, transform: "translateX(-100%)" },
@@ -63,7 +62,7 @@ const App: Component = () => {
             <input
               type="checkbox"
               checked={todo.completed}
-              onchange={() => (todo.completed = !todo.completed)}
+              onChange={() => (todo.completed = !todo.completed)}
             />
             <span style={{ "text-decoration": todo.completed ? "line-through" : "none" }}>
               {todo.text}
