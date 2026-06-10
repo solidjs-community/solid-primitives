@@ -14,8 +14,6 @@ export type * from "./types.js";
 
 const noopTransition = (_el: any, done: () => void) => done();
 
-// Extracted to a variable so TypeScript's excess-property check doesn't flag `ownedWrite`
-// when @solidjs/signals isn't directly symlinked (e.g. in strict pnpm hoisting environments).
 const VERSION_SIGNAL_OPTS = { equals: false, ownedWrite: true } as const;
 
 /**

@@ -267,7 +267,7 @@ export const ListAddRemove = meta.story({
                 { duration: 200 },
               ).finished;
             });
-            Promise.all(anims).then(() => finishRemoved(removed));
+            Promise.all(anims).finally(() => finishRemoved(removed));
           }
         });
       },
