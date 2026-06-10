@@ -149,8 +149,8 @@ importers:
   packages/async:
     devDependencies:
       solid-js:
-        specifier: 2.0.0-beta.10
-        version: 2.0.0-beta.10
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/audio:
     dependencies:

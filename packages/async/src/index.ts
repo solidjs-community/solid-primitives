@@ -1,5 +1,6 @@
 import { onCleanup, createMemo } from "solid-js";
 import type { Accessor, ComputeFunction } from "solid-js";
+import type { ReadableStream as NodeReadableStream } from "stream/web"
 
 const chained = new Map<() => AbortSignal, (() => void)[]>();
 
@@ -13,7 +14,7 @@ const chained = new Map<() => AbortSignal, (() => void)[]>();
  * const streamed = createMemo(fromStream(() => getStream()));
  * ```
  */
-export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream> | Response | ReadableStream) {
+export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream) {
   return async function*(...args: Args) {
     let parts = '', decoder;
     const source = await fetcher(...args);
@@ -65,7 +66,7 @@ const closeJSONPart = (json: string) =>
  * const streamed = createMemo(fromStream(() => getStream()));
  * ```
  */
-export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream> | Response | ReadableStream) {
+export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream) {
   return async function*(...args: Args) {
     let parts = '', decoder;
     const source = await fetcher(...args);
