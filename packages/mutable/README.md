@@ -28,7 +28,7 @@ yarn add @solid-primitives/mutable
 ```ts
 import { createMutable } from "@solid-primitives/mutable";
 
-declare function createMutable<T extends object>(state: T): T;
+declare function createMutable<T extends object>(state: T, options?: {}): T;
 ```
 
 Creates a new mutable Store proxy object. Stores only trigger updates on values changing. Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
@@ -66,17 +66,34 @@ const user = createMutable({
 
 Only plain objects and arrays are deep-proxied. Class instances (e.g. `Date`, `Map`, `Set`) are stored and returned as-is.
 
+### Reactivity and flushing
+
+Signal writes are automatically batched to the next microtask. Reads outside a reactive context (effects, memos, JSX) always reflect the latest written value immediately without waiting for a flush.
+
+In tests, call `flush()` (from `solid-js`) after writes to synchronously apply pending updates before asserting on reactive state:
+
+```ts
+import { flush } from "solid-js";
+import { createMutable } from "@solid-primitives/mutable";
+
+const state = createMutable({ count: 0 });
+
+createEffect(() => state.count, value => console.log(value));
+flush(); // runs initial effect
+
+state.count = 1;
+flush(); // applies update, re-runs effect
+```
+
 ## `modifyMutable`
 
 ```ts
 import { modifyMutable } from "@solid-primitives/mutable";
 
-declare function modifyMutable<T>(mutable: T, modifier: (state: T) => void): void;
+declare function modifyMutable<T>(state: T, modifier: (state: T) => void): void;
 ```
 
-Applies multiple mutations to a mutable Store via a single modifier function. Since all writes in Solid are automatically batched, dependent computations update once after all changes are applied.
-
-The modifier receives the mutable proxy directly and should mutate it in place:
+Applies multiple mutations to a mutable Store via a single modifier function. The modifier receives the mutable proxy (or nested proxy) directly and mutates it in place. Because all signal writes are automatically batched, dependent computations update once after the modifier returns.
 
 ```ts
 const state = createMutable({

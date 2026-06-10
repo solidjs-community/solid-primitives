@@ -1,6 +1,6 @@
 /*
 
-Version 1.0 of the primitive is a direct copy from SolidJS version 1.7.12:
+Derived from the mutable store implementation in SolidJS:
 https://github.com/solidjs/solid/blob/063db14c4e69f411ac2c09f5044e2d262fa667b9/packages/solid/store/src/mutable.ts
 
 
@@ -263,7 +263,7 @@ function wrap<T extends MutableNode>(value: T): T {
   return proxy;
 }
 
-export type MutableOptions = { name?: string };
+export type MutableOptions = Record<string, never>;
 
 /**
  * Creates a new mutable Store proxy object. Stores only trigger updates on values changing
@@ -272,7 +272,7 @@ export type MutableOptions = { name?: string };
  * Useful for integrating external systems or as a compatibility layer with MobX/Vue.
  *
  * @param state original object to be wrapped in a proxy (the object is not cloned)
- * @param options Name of the store (used for debugging)
+ * @param options reserved for future use
  * @returns mutable proxy of the {@link state} object
  *
  * @example
@@ -310,12 +310,12 @@ export function createMutable<T extends MutableNode>(state: T, _options?: Mutabl
 }
 
 /**
- * Helper function that applies multiple changes to a mutable Store via a single modifier function.
- * All writes to the store are automatically batched, so dependent computations update once
- * rather than once per individual change.
+ * Helper function that applies multiple mutations to a mutable Store via a single modifier function.
+ * Provides a named grouping for related mutations; dependent computations update once after all
+ * changes are applied because all signal writes in Solid are automatically batched.
  *
- * @param state The mutable Store to modify
- * @param modifier a function that receives the mutable proxy and applies changes directly
+ * @param state The mutable Store (or nested proxy thereof) to modify
+ * @param modifier a function that receives the mutable proxy and mutates it directly
  *
  * @example
  * ```ts
@@ -326,7 +326,6 @@ export function createMutable<T extends MutableNode>(state: T, _options?: Mutabl
  *   },
  * });
  *
- * // Modify two fields, all writes batched automatically
  * modifyMutable(state.user, u => {
  *   u.firstName = "Jake";
  *   u.lastName = "Johnson";
