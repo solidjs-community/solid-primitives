@@ -216,23 +216,23 @@ export function makeRetrying<T, C extends ComputeFunction<undefined | NoInfer<T>
     let result: T | PromiseLike<T> | AsyncIterable<T> | undefined;
     while (true) {
       try {
-        result ??= fetcher(v);
+        result = fetcher(v);
         if (isPromiseLike(result)) { 
           yield await result;
-          result = undefined;
         } else if (isIterable(result)) {
           for (const item of result) 
-            if (isPromiseLike(item)) yield await item as PromiseLike<T>;
+            if (isPromiseLike(item)) yield item as PromiseLike<T>;
             else yield Promise.resolve(item) as Promise<T>;
           return;
+        } else if (isAsyncIterable(result)) {
+          for await (const item of result) yield Promise.resolve(item) as PromiseLike<T>;
         } else {
-          yield Promise.resolve(result) as Promise<T>;
-          result = undefined;
+          yield Promise.resolve(result) as PromiseLike<T>;
         }
       } catch(error) {
         if (retries-- <= 0) {
           retries = options.retries || 3;
-          throw error;
+          throw new Error(`retry failed ${options.retries || 3} times`);
         }
         if (delay) await new Promise<void>(resolve => setTimeout(resolve, delay));
       }

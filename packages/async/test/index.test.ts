@@ -157,6 +157,15 @@ describe("makeRetrying", () => {
     const responses: Promise<unknown>[] = [Promise.reject(new Error("retry"))];
     const fetcher = (_prev: unknown) => responses.shift() || Promise.resolve(true);
     const wrapped = makeRetrying(fetcher, { delay: 15 });
-    expect(await wrapped()).toBe(true);
+    expect(await wrapped()[Symbol.asyncIterator]().next()).toEqual({ done: false, value: true });
+  });
+  
+  test("throws after the retry limit", async () => {
+  const responses: Promise<unknown>[] = Array.from({ length: 4 }, () => Promise.reject(new Error("retry")));
+    const fetcher = (_prev: unknown) => responses.shift() || Promise.resolve(true);
+    const wrapped = makeRetrying(fetcher, { delay: 15 });
+    const result = wrapped()[Symbol.asyncIterator]().next();
+    console.log(result)
+    await expect(result).rejects.toThrow();
   });
 });

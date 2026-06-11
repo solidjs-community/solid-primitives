@@ -5,7 +5,9 @@ import { createReadStream } from "fs";
 import { Readable } from "stream";
 
 describe("fromStream", () => {
-  test("works on readable streams in SSR", async () => {
+  // this is only relevant on streaming SSR, which is not supported by our tests,
+  // so we will test it outside of Solid
+  test("works on node readable streams", async () => {
     const stream = Readable.toWeb(createReadStream('../../README.md'));
     const readme = fromStream(() => stream);
     let parts = 0;
