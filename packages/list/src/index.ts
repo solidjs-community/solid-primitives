@@ -196,10 +196,6 @@ export function listArray<Item, MappedItem>(
     _fallback: options?.fallback,
   };
   const node = createMemo(updateKeyedMap.bind(data as MapData<unknown, unknown>));
-  // Untracked reads inside the internal owner resolve via _parentComputed; routing
-  // them through node lets store-proxy lookups see pending writes (not stale _value).
-  // data._owner._parentComputed = node;
-  // node._config &= ~CONFIG_AUTO_DISPOSE;
   return () => node();
 }
 

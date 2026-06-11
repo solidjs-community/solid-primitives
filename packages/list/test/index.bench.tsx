@@ -116,7 +116,7 @@ describe("create 1000 elements, settle time", () => {
   let unmountFor = () => {};
 
   bench(
-    "Keyed For",
+    "For",
     () =>
       new Promise(resolve => {
         const ItemFor = (props: { number: number }) => {
@@ -142,7 +142,7 @@ describe("create 1000 elements, settle time", () => {
   let unmountList = () => {};
 
   bench(
-    "Recycle List",
+    "List",
     () =>
       new Promise(resolve => {
         const ItemList = (props: { number: number }) => {
