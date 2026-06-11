@@ -286,7 +286,7 @@ function updateKeyedMap<Item, MappedItem>(this: MapData<Item, MappedItem>): any[
           this._items[start] === newItems[start] ||
           (this._rows &&
             this._key !== undefined &&
-            compare(this._key, this._items[start], newItems[start])));
+            this._key(this._items[start]) === this._key(newItems[start])));
         start++
       ) {
         if (this._rows) this._rows[start]![1](() => newItems[start]!);
@@ -301,7 +301,7 @@ function updateKeyedMap<Item, MappedItem>(this: MapData<Item, MappedItem>): any[
           this._items[end] === newItems[newEnd] ||
           (this._rows &&
             this._key !== undefined &&
-            compare(this._key, this._items[end], newItems[newEnd])));
+            this._key(this._items[start]) === this._key(newItems[start])));
         end--, newEnd--
       ) {
         temp[newEnd] = this._mappings[end]!;
@@ -401,10 +401,6 @@ function updateKeyedMap<Item, MappedItem>(this: MapData<Item, MappedItem>): any[
   });
 
   return this._mappings;
-}
-
-function compare<Item>(key: ((i: any) => any) | undefined, a: Item, b: Item): boolean {
-  return key ? key(a) === key(b) : true;
 }
 
 interface MapData<Item = any, MappedItem = any> {
