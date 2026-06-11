@@ -97,7 +97,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       validate: () => () => null,
       setValues: () => void 0,
       setError: () => void 0,
-      formData: () => new FormData(),
+      formData: () => toFormData(initialValues),
       reset: () => void 0,
       submit: async () => void 0,
     };
