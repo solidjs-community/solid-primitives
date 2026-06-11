@@ -125,15 +125,12 @@ export const makeReconnectingWS = (
   let retries = options.retries || Infinity;
   let ws: ReconnectingWebSocket;
   const queue: WSMessage[] = [];
-  let events: Parameters<WebSocket["addEventListener"]>[] = [
-    [
-      "close",
-      () => {
-        retries-- > 0 && setTimeout(getWS, options.delay || 3000);
-      },
-    ],
-  ];
+  const onClose = () => {
+    retries-- > 0 && setTimeout(getWS, options.delay || 3000);
+  };
+  let events: Parameters<WebSocket["addEventListener"]>[] = [["close", onClose]];
   const getWS = () => {
+    ws?.removeEventListener("close", onClose);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (ws && ws.readyState < 2) ws.close();
     ws = Object.assign(makeWS(url, protocols, queue), {

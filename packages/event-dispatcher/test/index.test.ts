@@ -1,5 +1,5 @@
 import { createEventDispatcher } from "../src/index.js";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, test, expect } from "vitest";
 interface Props {
   onChangeStep: (evt: CustomEvent<string>) => void;
@@ -11,7 +11,7 @@ interface Props {
 describe("createEventDispatcher primitive test", () => {
   test("createEventDispatcher return values and callback execution", () =>
     createRoot(dispose => {
-      const [step, setStep] = createSignal("first");
+      const [step, setStep] = createSignal("first", { ownedWrite: true });
       const props: Props = {
         onChangeStep: evt => setStep(evt.detail),
         onCancel: evt => {
@@ -28,6 +28,7 @@ describe("createEventDispatcher primitive test", () => {
         "it should return true, as the callback has been called and the event is not cancellable",
       ).toBe(true);
 
+      flush();
       expect(step(), "step should have changed to second").toBe("second");
 
       expect(
@@ -40,6 +41,7 @@ describe("createEventDispatcher primitive test", () => {
         "it should return false, as the event was cancelable and preventDefault was invoked",
       ).toBe(false);
 
+      flush();
       expect(step(), "the callback should be reactive to the props change").toBe(
         "one after the second",
       );

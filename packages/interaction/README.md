@@ -12,6 +12,8 @@ Primitives for detecting and hiding interactions that originate **outside** a gi
 ```bash
 npm install @solid-primitives/interaction
 # or
+yarn add @solid-primitives/interaction
+# or
 pnpm add @solid-primitives/interaction
 ```
 

@@ -21,6 +21,8 @@ Collection of reactive primitives to deal with media queries.
 npm install @solid-primitives/media
 # or
 yarn add @solid-primitives/media
+# or
+pnpm add @solid-primitives/media
 ```
 
 > **Requires Solid.js v2.0 (beta.7+)**

@@ -15,6 +15,8 @@ A collection of chainable, composable reactive computations — **Signal Builder
 ```bash
 npm install @solid-primitives/signal-builders
 # or
+yarn add @solid-primitives/signal-builders
+# or
 pnpm add @solid-primitives/signal-builders
 ```
 

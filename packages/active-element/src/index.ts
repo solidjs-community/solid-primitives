@@ -1,21 +1,7 @@
-import { type Accessor, type JSX } from "solid-js";
-import { isServer } from "solid-js/web";
-import {
-  type MaybeAccessor,
-  type Directive,
-  createHydratableSignal,
-} from "@solid-primitives/utils";
-import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      focus: (isActive: boolean) => void;
-    }
-  }
-}
-// This ensures the `JSX` import won't fall victim to tree shaking
-export type E = JSX.Element;
+import { type Accessor, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
+import { createHydratableSignal } from "@solid-primitives/utils";
+import { makeEventListener } from "@solid-primitives/event-listener";
 
 const getActiveElement = () =>
   document.activeElement === document.body ? null : document.activeElement;
@@ -61,67 +47,25 @@ export function createActiveElement(): Accessor<Element | null> {
 }
 
 /**
- * Attaches "blur" and "focus" event listeners to the element.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#makeFocusListener
- * @param target element
- * @param callback handle focus change
- * @param useCapture activates capturing, which allows to listen on events at the root that don't support bubbling.
- * @returns function for clearing event listeners
- * @example
- * const [isFocused, setIsFocused] = createSignal(false)
- * const clear = makeFocusListener(focused => setIsFocused(focused));
- * // remove listeners (happens also on cleanup)
- * clear();
- */
-export function makeFocusListener(
-  target: Element,
-  callback: (isActive: boolean) => void,
-  useCapture = true,
-): VoidFunction {
-  if (isServer) {
-    return () => void 0;
-  }
-  const clear1 = makeEventListener(target, "blur", callback.bind(void 0, false), useCapture);
-  const clear2 = makeEventListener(target, "focus", callback.bind(void 0, true), useCapture);
-  return () => (clear1(), clear2());
-}
-
-/**
- * Provides a signal representing element's focus state.
- * @param target element or a reactive function returning one
- * @returns boolean signal representing element's focus state
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createFocusSignal
- * @example
- * const isFocused = createFocusSignal(() => el)
- * isFocused() // T: boolean
- */
-export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<boolean> {
-  if (isServer) {
-    return () => false;
-  }
-  const [isActive, setIsActive] = createHydratableSignal(
-    false,
-    () => document.activeElement === target,
-  );
-  createEventListener(target, "blur", () => setIsActive(false), true);
-  createEventListener(target, "focus", () => setIsActive(true), true);
-  return isActive;
-}
-
-/**
- * A directive that notifies you when the element becomes active or inactive.
+ * A ref factory that notifies you when the element becomes active or inactive.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#focus
  *
  * @example
  * const [active, setActive] = createSignal(false)
- * <input use:focus={setActive} />
+ * <input ref={focus(setActive)} />
  */
-export const focus: Directive<(isActive: boolean) => void> = (target, props) => {
-  if (isServer) {
-    return;
-  }
-  const callback = props();
-  callback(document.activeElement === target);
-  makeFocusListener(target, callback);
-};
+export function focus(callback: (isActive: boolean) => void): (target: Element) => void {
+  if (isServer) return () => {};
+  let cleanup: (() => void) | null = null;
+  onCleanup(() => cleanup?.());
+  return (target: Element) => {
+    callback(document.activeElement === target);
+    const c1 = makeEventListener(target, "blur", () => callback(false), true);
+    const c2 = makeEventListener(target, "focus", () => callback(true), true);
+    cleanup = () => {
+      c1();
+      c2();
+    };
+  };
+}

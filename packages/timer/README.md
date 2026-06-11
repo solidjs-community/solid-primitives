@@ -21,6 +21,8 @@ Timer primitives related to [`setInterval`](https://developer.mozilla.org/en-US/
 ```bash
 npm install @solid-primitives/timer
 # or
+yarn add @solid-primitives/timer
+# or
 pnpm add @solid-primitives/timer
 ```
 

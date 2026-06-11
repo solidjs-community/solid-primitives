@@ -36,9 +36,11 @@ v.describe("Match", () => {
     v.expect(data.result()).toEqual(undefined);
 
     setValue({ type: "foo", foo: "foo-value" });
+    s.flush();
     v.expect(data.result()).toEqual(<>foo-value</>);
 
     setValue({ type: "bar", bar: "bar-value" });
+    s.flush();
     v.expect(data.result()).toEqual(<>bar-value</>);
 
     data.dispose();
@@ -78,9 +80,11 @@ v.describe("Match", () => {
     v.expect(data.result()).toEqual(undefined);
 
     setValue({ kind: "foo", foo: "foo-value" });
+    s.flush();
     v.expect(data.result()).toEqual(<>foo-value</>);
 
     setValue({ kind: "bar", bar: "bar-value" });
+    s.flush();
     v.expect(data.result()).toEqual(<>bar-value</>);
 
     data.dispose();
@@ -119,9 +123,11 @@ v.describe("Match", () => {
     v.expect(data.result()).toEqual(undefined);
 
     setValue({ type: "foo", foo: "foo-value" });
+    s.flush();
     v.expect(data.result()).toEqual(<>foo-value</>);
 
     setValue({ type: "bar", bar: "bar-value" });
+    s.flush();
     v.expect(data.result()).toEqual(undefined);
 
     data.dispose();
@@ -161,9 +167,11 @@ v.describe("Match", () => {
     v.expect(data.result()).toEqual(<>fallback</>);
 
     setValue({ type: "foo", foo: "foo-value" });
+    s.flush();
     v.expect(data.result()).toEqual(<>foo-value</>);
 
     setValue(undefined);
+    s.flush();
     v.expect(data.result()).toEqual(<>fallback</>);
 
     data.dispose();
@@ -189,13 +197,17 @@ v.describe("MatchValue", () => {
       )),
     }));
     v.expect(data.result()).toEqual(undefined);
+
     setValue("foo");
+    s.flush();
     v.expect(data.result()).toEqual(
       <>
         <p>foo</p>
       </>,
     );
+
     setValue("bar");
+    s.flush();
     v.expect(data.result()).toEqual(
       <>
         <p>bar</p>
@@ -222,13 +234,17 @@ v.describe("MatchValue", () => {
       )),
     }));
     v.expect(data.result()).toEqual(undefined);
+
     setValue("foo");
+    s.flush();
     v.expect(data.result()).toEqual(
       <>
         <p>foo</p>
       </>,
     );
+
     setValue("bar");
+    s.flush();
     v.expect(data.result()).toEqual(undefined);
     data.dispose();
   });
@@ -256,13 +272,17 @@ v.describe("MatchValue", () => {
         <p>fallback</p>
       </>,
     );
+
     setValue("foo");
+    s.flush();
     v.expect(data.result()).toEqual(
       <>
         <p>foo</p>
       </>,
     );
+
     setValue(undefined);
+    s.flush();
     v.expect(data.result()).toEqual(
       <>
         <p>fallback</p>
