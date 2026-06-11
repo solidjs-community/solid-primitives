@@ -282,7 +282,8 @@ function updateKeyedMap<Item, MappedItem>(this: MapData<Item, MappedItem>): any[
       for (
         start = 0, end = Math.min(this._len, newLen);
         start < end &&
-        (this._items[start] === newItems[start] ||
+        (this._unkeyed ||
+          this._items[start] === newItems[start] ||
           (this._rows &&
             this._key !== undefined &&
             compare(this._key, this._items[start], newItems[start])));
@@ -296,7 +297,8 @@ function updateKeyedMap<Item, MappedItem>(this: MapData<Item, MappedItem>): any[
         end = this._len - 1, newEnd = newLen - 1;
         end >= start &&
         newEnd >= start &&
-        (this._items[end] === newItems[newEnd] ||
+        (this._unkeyed ||
+          this._items[end] === newItems[newEnd] ||
           (this._rows &&
             this._key !== undefined &&
             compare(this._key, this._items[end], newItems[newEnd])));
