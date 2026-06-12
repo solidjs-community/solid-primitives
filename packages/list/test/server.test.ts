@@ -8,6 +8,9 @@ describe("listArray SSR", () => {
       const result = listArray(
         () => [1, 2, 3],
         v => v() * 2,
+        {
+          recycle: true,
+        },
       );
       expect(result()).toEqual([2, 4, 6]);
       dispose();
@@ -18,7 +21,10 @@ describe("listArray SSR", () => {
       const result = listArray<number, number | string>(
         () => [],
         v => v(),
-        { fallback: () => "Empty" },
+        {
+          fallback: () => "Empty",
+          recycle: true,
+        },
       );
       expect(result()).toEqual(["Empty"]);
       dispose();

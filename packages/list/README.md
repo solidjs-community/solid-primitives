@@ -9,9 +9,10 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/list?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/list)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A control-flow component and underlying helper for iterating over arrays where **both** the item value and its position can change independently — without recreating elements.
+A control-flow component and underlying helper for iterating over arrays. Provides additional `recycle` option. If enabled, the mapped elements are reused.
+`<List>` is based on `<For>` and has all of it's functionalities, but it can also recycle elements. The examples are interchangeable with `<For>`, wherever `recycle` is not used.
 
-- [`List`](#list) — Component that provides a reactive `item` accessor and a reactive `index` accessor per element.
+- [`List`](#list) — Component that provides additional `recycle` option besides standard `For` functionality.
 - [`listArray`](#listarray) — The underlying reactive array mapper that powers `<List>`, usable outside JSX.
 
 ## Installation
@@ -22,63 +23,65 @@ npm install @solid-primitives/list
 pnpm add @solid-primitives/list
 ```
 
-## Comparison with `<For>` and `<Index>`
+## Keyed vs Unkeyed vs Recycled
 
-Solid ships with two built-in list primitives. `<List>` sits between them and is the right choice when both values and positions can change.
+`<List recycle>` is the middleground between keyed and unkeyed. It's keyed for elements that are reordered and it's unkeyed for elements that are replaced. Recycling can also reorder and replace an element simultaneously, to maximize reusability.
 
-| | `<For>` | `<Index>` | `<List>` |
-|---|---|---|---|
-| **Keyed by** | value identity | position | value identity (priority) + position |
-| **`item` accessor** | static (re-runs on change) | reactive | reactive |
-| **`index` accessor** | reactive | static (re-runs on change) | reactive |
-| **Element recreated when…** | value is new to the array | array grows | array grows |
-| **Best for** | stable values that move | stable positions with changing values | both values and positions change |
+|                        | Keyed `<List>`        | Unkeyed `<List keyed={false}>`          | Recycled `<List recycle>`            |
+| ---------------------- | --------------------- | --------------------------------------- | ------------------------------------ |
+| **Keyed by**           | value identity        | position                                | value identity (priority) + position |
+| **On value change**    | recreate element      | change value                            | change value                         |
+| **On position change** | reorder elements      | change values at all affected positions | reorder elements                     |
+| **Best for**           | reorderable read-only | static editable                         | reorderable editable                 |
 
-### `<For>` — keyed by value
+### Keyed `<List>`
 
-`<For>` creates one element per unique value and tracks it by identity. If `"alice"` moves from index 0 to index 2, the element is reused and its `index()` updates. If the value at a position changes from `"alice"` to `"bob"`, the `"alice"` element is destroyed and a new `"bob"` element is created.
+Creates one element per unique value and tracks it by identity. If `"alice"` moves from index 0 to index 2, the element is reused and its `index()` updates. If the value at a position changes from `"alice"` to `"bob"`, the `"alice"` element is destroyed and a new `"bob"` element is created.
 
 ```tsx
 // The render function re-runs whenever an item is new to the array.
 // index() is reactive; item value is fixed per element.
-<For each={items()}>
-  {(item, index) => <Row label={item} position={index()} />}
-</For>
+<List each={items()}>{(item, index) => <Row label={item} position={index()} />}</List>
 ```
 
-### `<Index>` — keyed by position
+#### When to use:
 
-`<Index>` creates one element per slot (index) and keeps elements fixed to their position. If a value moves from index 0 to index 2, the element at position 0 is updated with the new value and the element at position 2 is also updated — no element moves, but two `item()` signals fire.
+- **Reorderable read-only** - If the items don't change, but might reorder. However if the elements change often and destroying / creating element is slower than updating value, then it's better to avoid it.
+- **Animations** - If the animations rely on element persistence. When you replace an item, it is destroyed (leaving) and recreated (entering), it also can be reordered (moving).
+
+### Unkeyed `<List keyed={false}>`
+
+Creates one element per slot (index) and keeps elements fixed to their position. If a value moves from index 0 to index 2, the element at position 0 is updated with the new value and the element at position 2 is also updated — no element moves, but two `item()` signals fire.
 
 ```tsx
 // The render function re-runs whenever a new slot is created (array grows).
 // item() is reactive; position is fixed per element.
-<Index each={items()}>
+<List keyed={false} each={items()}>
   {(item, index) => <Row label={item()} position={index} />}
-</Index>
+</List>
 ```
 
-### `<List>` — keyed by value, with reactive index
+#### When to use:
+
+- **Static editable** - If the items change often, but stay in place (don't reorder). However if the elements do reorder or are for example prepended, then every value in the list has to be updated - in this case it's better to avoid it.
+
+### Recycle `<List recycle>`
 
 `<List>` combines both reactive accessors. The render function runs **only when the array grows**. When a value moves to a new position only its `index()` fires. When a value changes at a position only its `item()` fires. In both cases the element is reused, not recreated.
 
 ```tsx
 // The render function runs only when a truly new element is needed.
 // Both item() and index() are reactive.
-<List each={items()}>
+<List recycle each={items()}>
   {(item, index) => <Row label={item()} position={index()} />}
 </List>
 ```
 
-### When to reach for `<List>`
+#### When to reach for `<List>`
 
-- **Sortable / reorderable lists** — items change position frequently; you want index badges or position-dependent styles to update without tearing down the element.
-- **Editable lists** — values are replaced in place; you want the element to survive the update so local state (focus, animation, scroll position) is preserved.
-- **Both at once** — a list that is both reordered and edited, where `<For>` would recreate on value change and `<Index>` would update the wrong element's signal on reorder.
+- **Reorderable editable** — If the items change and might reorder. It handles both of these cases, but if there are persistance reliant animations, leaving and entering wouldn't be triggered on item replace. Also if there are multiple of the same values and some of them change, this might trigger unexpected reordering which usually is slower than just updating the values - in this case unkeyed could be more efficient.
 
-If your list is read-only and never reordered, `<For>` is simpler and sufficient. If positions never change but values do (e.g. a live feed in a fixed number of slots), `<Index>` is the right fit.
-
-## `List`
+## Recycle `List`
 
 ```tsx
 import { List } from "@solid-primitives/list";
@@ -87,7 +90,7 @@ function Component() {
   const [items, setItems] = createSignal(["alice", "bob", "carol"]);
 
   return (
-    <List each={items()} fallback={<p>No items.</p>}>
+    <List recycle each={items()} fallback={<p>No items.</p>}>
       {(item, index) => (
         <div>
           #{index() + 1} — {item()}
@@ -100,13 +103,27 @@ function Component() {
 
 ### Props
 
-| Prop | Type | Description |
-|---|---|---|
-| `each` | `T[] \| undefined \| null \| false` | The source array. Falsy values are treated as empty. |
-| `fallback` | `JSX.Element` | Rendered when `each` is empty or falsy. |
-| `children` | `(item: Accessor<T>, index: Accessor<number>) => JSX.Element` | Render function, called once per new element. |
+| Prop       | Type                                                                                                                                                                                      | Description                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `each`     | `T[] \| undefined \| null \| false`                                                                                                                                                       | The source array. Falsy values are treated as empty.                                                           |
+| `fallback` | `JSX.Element \| undefined`                                                                                                                                                                | Rendered when `each` is empty or falsy.                                                                        |
+| `children` | `(value: T, index: Accessor<number>) => JSX.Element)` <br /> `(value: Accessor<T>, index: number) => JSX.Element)` <br /> `(value: Accessor<T>, index: Accessor<number>) => JSX.Element)` | Render function, called once per new element. The argument types depend on options, see [types](#types) below. |
+| `recycle`  | `boolean \| undefined`                                                                                                                                                                    | Set to `true` for list to reuse elements.                                                                      |
+| `keyed`    | `boolean \| (item: T) => any \| undefined`                                                                                                                                                | Custom key function to match elements or `false` for unkeyed flow. Works exactly like in `<For>`.              |
 
-### Reactivity guarantees
+### Types
+
+The render function can use reactive index, reactive value or both depending on `keyed` and `recycle` options. The reactive argument is of type `Accessor<...>`. The reactivity of argument is presented in table below:
+
+| Argument reactivity        | `recycle: undefined \| false` | `recycle: true` |
+| -------------------------- | ----------------------------- | --------------- |
+| `keyed: false`             | 🟢⚪ Value                    | 🟢⚪ Value      |
+| `keyed: undefined \| true` | ⚪🟢 Index                    | 🟢🟢 Both       |
+| `keyed: (item: T) => any`  | 🟢🟢 Both                     | 🟢🟢 Both       |
+
+Note that when `keyed: false` there won't be any reordering, so index doesn't need to be reactive. Ultimately `<List keyed={false} recycle>` would be just unkeyed.
+
+### Reactivity guarantees of recycling
 
 - The `children` render function is called **only when a new element is created** (i.e. the array has grown beyond its previous maximum length).
 - When an item **moves** to a new position, only its `index()` signal fires — no re-render.
@@ -120,10 +137,14 @@ function Component() {
 ```ts
 import { listArray } from "@solid-primitives/list";
 
-const rows = listArray(items, (item, index) => ({
-  label: () => `${index() + 1}. ${item().name}`,
-  score: () => item().score,
-}));
+const rows = listArray(
+  items,
+  (item, index) => ({
+    label: () => `${index() + 1}. ${item().name}`,
+    score: () => item().score,
+  }),
+  { recycle: true },
+);
 
 // rows() returns the current array of mapped objects.
 // Each object is stable across reorders and value updates.
@@ -134,11 +155,19 @@ The `mapFn` receives the same stable reactive accessors as `<List>`'s render fun
 ### Signature
 
 ```ts
-function listArray<T, U>(
-  list: Accessor<readonly T[] | undefined | null | false>,
-  mapFn: (value: Accessor<T>, index: Accessor<number>) => U,
-  options?: { fallback?: Accessor<JSX.Element> },
-): () => U[]
+export function listArray<Item, MappedItem>(
+  list: Accessor<Maybe<readonly Item[]>>,
+  map:
+    | ((value: Item, index: Accessor<number>) => MappedItem)
+    | ((value: Accessor<Item>, index: number) => MappedItem)
+    | ((value: Accessor<Item>, index: Accessor<number>) => MappedItem),
+  options?: {
+    keyed?: boolean | ((item: Item) => any);
+    recycle?: boolean;
+    fallback?: Accessor<any>;
+    name?: string;
+  },
+): Accessor<MappedItem[]>;
 ```
 
 ## Changelog

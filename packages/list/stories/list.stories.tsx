@@ -77,7 +77,7 @@ export const IndexOnReorder = meta.story({
         </ButtonRow>
         <Separator />
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-          <List each={items()}>
+          <List each={items()} recycle>
             {(item, index) => {
               const color = PALETTE[colorSeq++ % PALETTE.length]!;
               return (
@@ -93,7 +93,9 @@ export const IndexOnReorder = meta.story({
                     "font-family": font.mono,
                   }}
                 >
-                  <span style={{ color: colors.muted, "min-width": "0.9rem", "text-align": "right" }}>
+                  <span
+                    style={{ color: colors.muted, "min-width": "0.9rem", "text-align": "right" }}
+                  >
                     {index()}
                   </span>
                   <span>{item()}</span>
@@ -145,7 +147,7 @@ export const ValueInPlace = meta.story({
     return (
       <Container width={280}>
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-          <List each={items()}>
+          <List each={items()} recycle>
             {(item, index) => {
               const color = PALETTE[colorSeq++ % PALETTE.length]!;
               return (
@@ -228,6 +230,7 @@ export const FallbackOnEmpty = meta.story({
         <Separator />
         <List
           each={items()}
+          recycle
           fallback={
             <div
               style={{
@@ -277,10 +280,14 @@ export const ListArrayMapper = meta.story({
     let seq = 0;
     let counter = 3;
 
-    const rows = listArray(items, (item, index) => {
-      const id = ++seq;
-      return () => `[id:${id}]  ${index() + 1}. ${item()}`;
-    });
+    const rows = listArray(
+      items,
+      (item, index) => {
+        const id = ++seq;
+        return () => `[id:${id}]  ${index() + 1}. ${item()}`;
+      },
+      { recycle: true },
+    );
 
     const shuffle = () =>
       setItems(arr => {
@@ -297,7 +304,10 @@ export const ListArrayMapper = meta.story({
     return (
       <Container width={280}>
         <ButtonRow>
-          <Button onClick={() => setItems(arr => [...arr, `item-${++counter}`])} style={{ flex: 1 }}>
+          <Button
+            onClick={() => setItems(arr => [...arr, `item-${++counter}`])}
+            style={{ flex: 1 }}
+          >
             Add item
           </Button>
           <Button onClick={shuffle} variant="outline" style={{ flex: 1 }}>

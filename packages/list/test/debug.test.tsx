@@ -13,8 +13,12 @@ describe("debug", () => {
       () => (
         <List each={s()}>
           {(v, i) => {
-            callbacks.push(() => ({ v: v(), i: i() }));
-            return <div>{i()}: {v() * 2}</div>;
+            callbacks.push(() => ({ v: v, i: i() }));
+            return (
+              <div>
+                {i()}: {v * 2}
+              </div>
+            );
           }}
         </List>
       ),
@@ -25,25 +29,45 @@ describe("debug", () => {
     const cbValues = () => callbacks.map(c => c());
 
     // Initial state
-    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 1 }, { v: 3, i: 2 }, { v: 4, i: 3 }]);
+    expect(cbValues()).toEqual([
+      { v: 1, i: 0 },
+      { v: 2, i: 1 },
+      { v: 3, i: 2 },
+      { v: 4, i: 3 },
+    ]);
     expect(domText()).toEqual(["0: 2", "1: 4", "2: 6", "3: 8"]);
 
     set([1, 3, 2, 4]); // swap positions of 2 and 3
 
     // Before flush — callbacks and DOM are still stale
-    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 1 }, { v: 3, i: 2 }, { v: 4, i: 3 }]);
+    expect(cbValues()).toEqual([
+      { v: 1, i: 0 },
+      { v: 2, i: 1 },
+      { v: 3, i: 2 },
+      { v: 4, i: 3 },
+    ]);
     expect(domText()).toEqual(["0: 2", "1: 4", "2: 6", "3: 8"]);
 
     flush();
 
     // After one flush — index signals updated; callbacks ordered by creation (v:2 was created 2nd)
-    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 2 }, { v: 3, i: 1 }, { v: 4, i: 3 }]);
+    expect(cbValues()).toEqual([
+      { v: 1, i: 0 },
+      { v: 2, i: 2 },
+      { v: 3, i: 1 },
+      { v: 4, i: 3 },
+    ]);
     expect(domText()).toEqual(["0: 2", "1: 6", "2: 4", "3: 8"]);
 
     flush();
 
     // Second flush — nothing changes
-    expect(cbValues()).toEqual([{ v: 1, i: 0 }, { v: 2, i: 2 }, { v: 3, i: 1 }, { v: 4, i: 3 }]);
+    expect(cbValues()).toEqual([
+      { v: 1, i: 0 },
+      { v: 2, i: 2 },
+      { v: 3, i: 1 },
+      { v: 4, i: 3 },
+    ]);
     expect(domText()).toEqual(["0: 2", "1: 6", "2: 4", "3: 8"]);
 
     unmount();
