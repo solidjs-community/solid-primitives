@@ -38,12 +38,22 @@
         "types": "./dist/immutable/index.d.ts",
         "default": "./dist/immutable/index.js"
       }
+    },
+    "./colors": {
+      "import": {
+        "@solid-primitives/source": "./src/colors/index.ts",
+        "types": "./dist/colors/index.d.ts",
+        "default": "./dist/colors/index.js"
+      }
     }
   },
   "typesVersions": {
     "*": {
       "immutable": [
         "./dist/immutable/index.d.ts"
+      ],
+      "colors": [
+        "./dist/colors/index.d.ts"
       ]
     }
   },
