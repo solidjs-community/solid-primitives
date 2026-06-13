@@ -1,3 +1,11 @@
+/*
+ * Portions of this file are based on code from Kobalte.
+ * MIT License, Copyright Fabien Marie-Louise.
+ *
+ * Credits to the Kobalte team:
+ * https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/colors
+ */
+
 /**
  * Default English translations for color channel names, descriptors, and hue families.
  * Pass this object (or a translated equivalent) to {@link Color.getColorName} and
@@ -48,10 +56,11 @@ export const COLOR_INTL_TRANSLATIONS = {
   white: "white",
   gray: "gray",
 
-  // Hue families (in OKLCH hue order)
+  // Hue families (in OKLCH hue order).
+  // Note: "red", "green", "blue" are intentionally absent — the channel name
+  // entries above ("Red", "Green", "Blue") serve as their hue family labels too.
   pink: "pink",
   "pink red": "pink red",
-  red: "red",
   "red orange": "red orange",
   brown: "brown",
   orange: "orange",
@@ -59,11 +68,9 @@ export const COLOR_INTL_TRANSLATIONS = {
   "brown yellow": "brown yellow",
   yellow: "yellow",
   "yellow green": "yellow green",
-  green: "green",
   "green cyan": "green cyan",
   cyan: "cyan",
   "cyan blue": "cyan blue",
-  blue: "blue",
   "blue purple": "blue purple",
   purple: "purple",
   "purple magenta": "purple magenta",

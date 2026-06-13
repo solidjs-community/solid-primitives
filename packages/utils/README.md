@@ -154,6 +154,8 @@ const [count, setCount, data] = wrapSetter(
 
 Multi-format color parsing, conversion, and accessibility naming — available as a separate subpath so you only pay for what you use.
 
+> **Credits** — The core color types, parsing, and color-space conversion logic (`types.ts`, `helpers.ts`, `intl.ts`) are adapted from [Kobalte](https://github.com/kobaltedev/kobalte) (MIT, Copyright Fabien Marie-Louise), which itself credits the [React Spectrum](https://github.com/adobe/react-spectrum) team (Apache 2.0, Copyright 2020 Adobe). The OKLCH inverse pipeline in `manipulation.ts` uses coefficients from [Björn Ottosson's OKLab](https://bottosson.github.io/posts/oklab/) work.
+
 ```ts
 import { parseColor, normalizeColor, getColorChannels, normalizeHue } from "@solid-primitives/utils/colors";
 import { COLOR_INTL_TRANSLATIONS } from "@solid-primitives/utils/colors";
@@ -264,14 +266,106 @@ const frTranslations: ColorIntlTranslations = {
 };
 ```
 
+### Safe parsing
+
+```ts
+tryParseColor("#3264C8") // Color
+tryParseColor("nope")   // undefined — never throws
+
+isValidColor("#3264C8") // true
+isValidColor("nope")    // false
+
+detectColorFormat("rgb(50, 100, 200)")   // "rgb"
+detectColorFormat("#3264C8FF")           // "hexa"
+detectColorFormat("hsla(220, 60%, 49%, 0.5)") // "hsla"
+detectColorFormat("nope")               // undefined
+```
+
+### Manipulation
+
+All manipulation functions return a new `Color`; the input is never mutated. `amount` is a 0–1 ratio representing percentage points on the relevant HSL channel (e.g. `0.1` = 10 pp).
+
+```ts
+import {
+  lighten, darken, saturate, desaturate, complement, mix
+} from "@solid-primitives/utils/colors";
+
+lighten(color, 0.1)    // +10 lightness (HSL)
+darken(color, 0.1)     // −10 lightness (HSL)
+saturate(color, 0.2)   // +20 saturation (HSL)
+desaturate(color, 0.2) // −20 saturation (HSL)
+complement(color)      // hue + 180° (HSL)
+
+mix(black, white)          // 50/50 blend in RGB
+mix(black, white, 0.25)    // 25% toward white
+```
+
+### Accessibility (WCAG 2.1)
+
+```ts
+import { contrastRatio, isReadable } from "@solid-primitives/utils/colors";
+
+contrastRatio(parseColor("#000"), parseColor("#fff")) // 21
+contrastRatio(parseColor("#3264C8"), parseColor("#fff")) // ~3.9
+
+// AA / AAA, normal / large text
+isReadable(fg, bg)                   // AA normal  (≥ 4.5 : 1)
+isReadable(fg, bg, "AA", "large")    // AA large   (≥ 3.0 : 1)
+isReadable(fg, bg, "AAA")            // AAA normal (≥ 7.0 : 1)
+isReadable(fg, bg, "AAA", "large")   // AAA large  (≥ 4.5 : 1)
+```
+
+### Color scales
+
+```ts
+import { colorScale, perceptualColorScale } from "@solid-primitives/utils/colors";
+
+// 5-step RGB gradient from black to white
+colorScale(parseColor("#000"), parseColor("#fff"), 5)
+// [#000000, #404040, #808080, #BFBFBF, #FFFFFF]
+
+// 5-step perceptual gradient (OKLCH space, shortest hue arc)
+// Red → Blue goes through purple, not green
+perceptualColorScale(
+  parseColor("hsl(0, 80%, 50%)"),
+  parseColor("hsl(240, 80%, 50%)"),
+  5
+)
+```
+
 ### List of exports
 
-- **`parseColor(value)`** - Parse a color string into a `Color` object; throws on invalid input
+**Parsing**
+- **`parseColor(value)`** - Parse a color string; throws on invalid input
 - **`normalizeColor(value)`** - Accept a string or `Color`, always return a `Color`
-- **`getColorChannels(space)`** - Return the ordered channel triple for a color space
-- **`normalizeHue(hue)`** - Clamp a hue angle into `[0, 360]`
-- **`COLOR_INTL_TRANSLATIONS`** - Default English translation object
+- **`tryParseColor(value)`** - Like `parseColor` but returns `undefined` instead of throwing
+- **`isValidColor(value)`** - Boolean check without parsing overhead
+- **`detectColorFormat(value)`** - Detect the syntax format of a color string
+
+**Color space / channels**
+- **`getColorChannels(space)`** - Ordered channel triple for a color space
+- **`normalizeHue(hue)`** - Wrap a hue angle to `[0, 360]`
+- **`colorToOKLCH(color)`** - Convert any `Color` to `[L, C, H]` in OKLCH space
+
+**Manipulation**
+- **`lighten(color, amount)`** / **`darken(color, amount)`** - Adjust HSL lightness
+- **`saturate(color, amount)`** / **`desaturate(color, amount)`** - Adjust HSL saturation
+- **`complement(color)`** - Hue + 180°
+- **`mix(a, b, ratio?)`** - Blend two colors in RGB space
+
+**Accessibility**
+- **`contrastRatio(a, b)`** - WCAG 2.1 contrast ratio (1–21)
+- **`isReadable(fg, bg, level?, size?)`** - WCAG 2.1 AA / AAA compliance check
+
+**Color scales**
+- **`colorScale(from, to, steps)`** - Linear RGB gradient
+- **`perceptualColorScale(from, to, steps)`** - Perceptually uniform OKLCH gradient
+
+**i18n / naming**
+- **`COLOR_INTL_TRANSLATIONS`** - Default English translations
 - **`ColorIntlTranslations`** _(type)_ - Shape of a translations object
+
+**Types**
 - **`Color`** _(interface)_ - The immutable color value type
 - **`ColorFormat`** _(type)_ - `"hex" | "hexa" | "rgb" | "rgba" | "hsl" | "hsla" | "hsb" | "hsba"`
 - **`ColorSpace`** _(type)_ - `"rgb" | "hsl" | "hsb"`

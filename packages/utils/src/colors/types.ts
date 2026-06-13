@@ -1,5 +1,11 @@
 /*
- * Portions of this file are based on code from react-spectrum.
+ * Portions of this file are based on code from Kobalte.
+ * MIT License, Copyright Fabien Marie-Louise.
+ *
+ * Credits to the Kobalte team:
+ * https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/colors
+ *
+ * Which in turn is based on code from React Spectrum.
  * Apache License Version 2.0, Copyright 2020 Adobe.
  *
  * Credits to the React Spectrum team:
