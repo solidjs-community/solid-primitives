@@ -5,7 +5,7 @@ import {
   createFormControlInput,
   FormControlContext,
   useFormControl,
-} from "@solid-primitives/form";
+} from "@solid-primitives/a11y";
 import { colors, font, radii } from "./tokens.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────

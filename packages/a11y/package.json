@@ -1,41 +1,34 @@
 {
-  "name": "@solid-primitives/form",
+  "name": "@solid-primitives/a11y",
   "version": "0.0.100",
-  "description": "Reactive form primitive for Solid.js with per-field signals, sync/async validation, validateOn control, and DOM binding.",
+  "description": "Accessibility primitives for Solid.js — labeled field groups, ARIA graph helpers, and more.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/form",
+  "homepage": "https://primitives.solidjs.community/package/a11y",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
-    "name": "form",
+    "name": "a11y",
     "stage": 0,
     "list": [
-      "createForm",
-      "toFormData",
       "createFormControl",
       "createFormControlInput",
       "FormControlContext",
       "useFormControl"
     ],
-    "category": "Reactivity"
+    "category": "Accessibility"
   },
   "keywords": [
     "solid",
     "primitives",
-    "form",
-    "validation",
-    "reactive",
-    "async"
+    "a11y",
+    "accessibility",
+    "aria",
+    "form-control"
   ],
-  "dependencies": {
-    "@solid-primitives/a11y": "workspace:^",
-    "@solid-primitives/event-listener": "workspace:^",
-    "@solid-primitives/utils": "workspace:^"
-  },
   "private": false,
   "sideEffects": false,
   "files": [
@@ -52,18 +45,21 @@
       "default": "./dist/index.js"
     }
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
-    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "@solidjs/web": "^2.0.0-beta.14",
     "solid-js": "^2.0.0-beta.14"
   },
-  "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.14",
     "solid-js": "2.0.0-beta.14"
