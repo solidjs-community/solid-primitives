@@ -1,4 +1,4 @@
-import { type JSX, For, Show, createSignal, onCleanup } from "solid-js";
+import { type Element, For, Show, createSignal, onCleanup } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import readme from "../README.md?raw";
 import {
@@ -6,6 +6,8 @@ import {
   createFormControlInput,
   FormControlContext,
   useFormControl,
+  createAnnounce,
+  createReducedMotion,
 } from "../src/index.js";
 import {
   BoolRow,
@@ -27,7 +29,7 @@ import {
 
 // ─── Local helpers ────────────────────────────────────────────────────────────
 
-const MonoValue = (props: { children: JSX.Element }) => (
+const MonoValue = (props: { children: Element }) => (
   <span
     style={{
       "font-family": font.mono,
@@ -86,6 +88,181 @@ const meta = preview.meta({
 });
 
 export default meta;
+
+// ─── createAnnounce ───────────────────────────────────────────────────────────
+
+export const Announce = meta.story({
+  name: "Screen reader announcements",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createAnnounce` appends two hidden ARIA live regions to `document.body` and returns an `announce(message, politeness?)` function. Use `\"polite\"` (default) for status updates and `\"assertive\"` for urgent errors. Open your screen reader to hear the announcements.",
+      },
+    },
+  },
+  render: () => {
+    const announce = createAnnounce();
+    const [message, setMessage] = createSignal("Changes saved successfully");
+    const [politeness, setPoliteness] = createSignal<"polite" | "assertive">("polite");
+    const [log, setLog] = createSignal<{ text: string; p: string }[]>([]);
+
+    const send = () => {
+      const text = message();
+      const p = politeness();
+      if (!text.trim()) return;
+      announce(text, p);
+      setLog(prev => [{ text, p }, ...prev].slice(0, 5));
+    };
+
+    return (
+      <Container width={400}>
+        <div style={{ display: "flex", "flex-direction": "column", gap: "0.75rem" }}>
+          <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
+            <label style={{ "font-size": font.sizeSm, color: colors.muted, "font-weight": "500" }}>
+              Message
+            </label>
+            <input
+              value={message()}
+              onInput={e => setMessage(e.currentTarget.value)}
+              style={{ ...inputStyle, outline: "none" }}
+              placeholder="Enter announcement text…"
+            />
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <Button
+              variant={politeness() === "polite" ? "primary" : "outline"}
+              onClick={() => setPoliteness("polite")}
+            >
+              polite
+            </Button>
+            <Button
+              variant={politeness() === "assertive" ? "primary" : "outline"}
+              onClick={() => setPoliteness("assertive")}
+            >
+              assertive
+            </Button>
+          </div>
+          <Button onClick={send}>Announce</Button>
+        </div>
+        <Separator />
+        <Section title="Announcement log">
+          <Show
+            when={log().length > 0}
+            fallback={
+              <span style={{ "font-size": font.sizeSm, color: colors.mutedFg }}>
+                No announcements yet — click Announce above.
+              </span>
+            }
+          >
+            <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
+              <For each={log()}>
+                {entry => (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.5rem",
+                      "align-items": "baseline",
+                      "font-size": font.sizeSm,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: entry.p === "assertive" ? "#e11d48" : colors.primary,
+                        "font-weight": "600",
+                        "min-width": "5.5rem",
+                        "flex-shrink": "0",
+                      }}
+                    >
+                      {entry.p}
+                    </span>
+                    <span style={{ color: colors.dark }}>{entry.text}</span>
+                  </div>
+                )}
+              </For>
+            </div>
+          </Show>
+        </Section>
+      </Container>
+    );
+  },
+});
+
+// ─── createReducedMotion ──────────────────────────────────────────────────────
+
+export const ReducedMotion = meta.story({
+  name: "Reduced motion preference",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createReducedMotion` returns a reactive `Accessor<boolean>` that mirrors the user's `prefers-reduced-motion` OS setting. When `true`, suppress or replace animations. Toggle in macOS: System Settings → Accessibility → Display → Reduce Motion.",
+      },
+    },
+  },
+  render: () => {
+    const osPrefersReduced = createReducedMotion();
+    const [override, setOverride] = createSignal<boolean | undefined>(undefined);
+    const prefersReduced = () => override() ?? osPrefersReduced();
+
+    return (
+      <Container width={380}>
+        <div style={{ display: "flex", "flex-direction": "column", gap: "1rem" }}>
+          <BoolRow label="prefersReduced()" value={prefersReduced()} />
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <Button
+              variant={prefersReduced() ? "primary" : "outline"}
+              onClick={() => setOverride(v => (v === true ? undefined : true))}
+            >
+              Enable reduced motion
+            </Button>
+            <Button
+              variant={!prefersReduced() ? "primary" : "outline"}
+              onClick={() => setOverride(v => (v === false ? undefined : false))}
+            >
+              Disable reduced motion
+            </Button>
+          </div>
+          <Separator />
+          <div style={{ display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
+            <span style={{ "font-size": font.sizeSm, color: colors.muted, "font-weight": "500" }}>
+              Demo element
+            </span>
+            <div
+              style={{
+                padding: "0.75rem 1rem",
+                background: colors.surface,
+                border: `1px solid ${colors.border}`,
+                "border-radius": radii.md,
+                "font-size": font.sizeSm,
+                color: colors.dark,
+                animation: prefersReduced() ? "none" : "a11y-pulse 2s ease-in-out infinite",
+              }}
+            >
+              <Show
+                when={prefersReduced()}
+                fallback={<span>Animation active — enable Reduce Motion to suppress it.</span>}
+              >
+                <span>Motion reduced — animation suppressed.</span>
+              </Show>
+            </div>
+          </div>
+          <style>{`
+            @keyframes a11y-pulse {
+              0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+              50% { box-shadow: 0 0 0 8px rgba(99,102,241,0); }
+            }
+          `}</style>
+          <Show when={override() !== undefined}>
+            <span style={{ "font-size": font.sizeSm, color: colors.mutedFg }}>
+              Overriding OS preference. Click the active button again to clear.
+            </span>
+          </Show>
+        </div>
+      </Container>
+    );
+  },
+});
 
 // ─── Accessible field (raw API) ───────────────────────────────────────────────
 
@@ -216,6 +393,117 @@ export const SubComponentPattern = meta.story({
   },
 });
 
+// ─── Context provider pattern ─────────────────────────────────────────────────
+
+export const ContextProviderPattern = meta.story({
+  name: "Context provider pattern",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Shows how to wire `<FormControlContext value={ctx}>` and `useFormControl()` directly — without any storybook UI helpers. Each sub-component calls `useFormControl()`, derives its ID with `ctx.generateId()`, registers on mount via `onCleanup(ctx.register*(id))`, and the input calls `createFormControlInput()` to get its computed ARIA props.",
+      },
+    },
+  },
+  render: () => {
+    const [validationState, setValidationState] = createSignal<"valid" | "invalid" | undefined>(
+      undefined,
+    );
+
+    // ── Sub-components built inline to show the raw wiring ───────────────────
+
+    const Label = (props: { children: Element }) => {
+      const ctx = useFormControl();
+      const id = ctx.generateId("label");
+      onCleanup(ctx.registerLabel(id));
+      return (
+        <label
+          id={id}
+          style={{ "font-size": font.sizeSm, "font-weight": "500", color: colors.muted }}
+        >
+          {props.children}
+        </label>
+      );
+    };
+
+    const Input = (props: { placeholder?: string; type?: string }) => {
+      const { fieldProps } = createFormControlInput();
+      const ctx = useFormControl();
+      return (
+        <input
+          id={fieldProps.id()}
+          type={props.type ?? "text"}
+          placeholder={props.placeholder}
+          aria-labelledby={fieldProps.ariaLabelledBy()}
+          aria-describedby={fieldProps.ariaDescribedBy()}
+          aria-invalid={ctx.validationState() === "invalid" ? "true" : undefined}
+          aria-required={ctx.isRequired() ? "true" : undefined}
+          style={{ ...inputStyle, outline: "none" }}
+        />
+      );
+    };
+
+    const Description = (props: { children: Element }) => {
+      const ctx = useFormControl();
+      const id = ctx.generateId("description");
+      onCleanup(ctx.registerDescription(id));
+      return (
+        <span id={id} style={{ "font-size": font.sizeSm, color: colors.mutedFg }}>
+          {props.children}
+        </span>
+      );
+    };
+
+    const ErrorMessageInner = (props: { children: Element }) => {
+      const ctx = useFormControl();
+      const id = ctx.generateId("error-message");
+      onCleanup(ctx.registerErrorMessage(id));
+      return (
+        <span id={id} role="alert" style={{ "font-size": font.sizeSm, color: "#e11d48" }}>
+          {props.children}
+        </span>
+      );
+    };
+
+    const ErrorMessage = (props: { children: Element }) => {
+      const ctx = useFormControl();
+      return (
+        <Show when={ctx.validationState() === "invalid"}>
+          <ErrorMessageInner>{props.children}</ErrorMessageInner>
+        </Show>
+      );
+    };
+
+    // ── Root: creates context, provides it ───────────────────────────────────
+
+    const ctx = createFormControl({ id: "ctx-demo", validationState, required: true });
+
+    return (
+      <Container width={360}>
+        <FormControlContext value={ctx}>
+          <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
+            <Label>Username</Label>
+            <Input placeholder="Enter a username…" />
+            <Description>Must be unique across all accounts.</Description>
+            <ErrorMessage>Username is required.</ErrorMessage>
+          </div>
+        </FormControlContext>
+        <Separator />
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Button onClick={() => setValidationState("valid")}>Set valid</Button>
+          <Button onClick={() => setValidationState("invalid")}>Set invalid</Button>
+          <Button variant="outline" onClick={() => setValidationState(undefined)}>Reset</Button>
+        </div>
+        <StatRow label="validationState" value={validationState() ?? "—"} />
+        <span style={{ "font-size": font.sizeSm, color: colors.mutedFg }}>
+          Inspect the input in DevTools — aria-labelledby, aria-describedby, and aria-invalid
+          update as the state changes.
+        </span>
+      </Container>
+    );
+  },
+});
+
 // ─── Validation states ────────────────────────────────────────────────────────
 
 export const ValidationStates = meta.story({
@@ -276,7 +564,7 @@ export const ValidationStates = meta.story({
 // ─── aria-labelledby chain ────────────────────────────────────────────────────
 
 export const AriaLabelledByChain = meta.story({
-  name: "aria-labelledby chain",
+  name: "Label chain resolution",
   parameters: {
     docs: {
       description: {

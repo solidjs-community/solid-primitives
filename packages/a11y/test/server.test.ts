@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createFormControl, useFormControl } from "../src/index.js";
+import { createFormControl, useFormControl, makeAnnounce, createAnnounce, createReducedMotion } from "../src/index.js";
 
 describe("createFormControl (SSR)", () => {
   it("returns static accessors without throwing", () => {
@@ -49,6 +49,37 @@ describe("createFormControl (SSR)", () => {
   it("useFormControl throws outside a provider", () => {
     createRoot(dispose => {
       expect(() => useFormControl()).toThrow();
+      dispose();
+    });
+  });
+});
+
+describe("makeAnnounce (SSR)", () => {
+  it("returns no-op functions without touching the DOM", () => {
+    const [announce, cleanup] = makeAnnounce();
+    expect(typeof announce).toBe("function");
+    expect(typeof cleanup).toBe("function");
+    expect(() => announce("test")).not.toThrow();
+    expect(() => cleanup()).not.toThrow();
+  });
+});
+
+describe("createAnnounce (SSR)", () => {
+  it("returns a no-op announce function without throwing", () => {
+    createRoot(dispose => {
+      const announce = createAnnounce();
+      expect(typeof announce).toBe("function");
+      expect(() => announce("test")).not.toThrow();
+      dispose();
+    });
+  });
+});
+
+describe("createReducedMotion (SSR)", () => {
+  it("returns false without accessing window", () => {
+    createRoot(dispose => {
+      const prefersReduced = createReducedMotion();
+      expect(prefersReduced()).toBe(false);
       dispose();
     });
   });

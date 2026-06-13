@@ -8,9 +8,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/a11y?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/a11y)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Low-level accessibility primitives for Solid.js. Builds the ARIA graph for labeled form fields: stable IDs, registration slots for label/description/error elements, and reactive `aria-labelledby` / `aria-describedby` chains — so headless component libraries don't have to manage ARIA IDs manually.
-
-Adapted from [Kobalte](https://kobalte.dev) (MIT), which itself is based on [React Aria](https://react-spectrum.adobe.com/react-aria/) by Adobe (Apache 2.0).
+Reactive accessibility primitives. Programmatically announce changes to screen readers via ARIA live regions, track the user's `prefers-reduced-motion` preference as a reactive signal, and wire the ARIA ID graph that connects labels, descriptions, and error messages to form inputs — the foundation for accessible headless components.
 
 ## Installation
 
@@ -21,6 +19,113 @@ yarn add @solid-primitives/a11y
 # or
 pnpm add @solid-primitives/a11y
 ```
+
+---
+
+## `createAnnounce` / `makeAnnounce`
+
+Programmatically sends messages to screen readers via ARIA live regions. Two visually-hidden
+`<div>` elements are appended to `document.body` — one `aria-live="polite"`, one
+`aria-live="assertive"` — and removed on cleanup.
+
+```ts
+import { createAnnounce } from "@solid-primitives/a11y";
+```
+
+### Usage
+
+```ts
+const announce = createAnnounce();
+
+// Status update — screen reader waits for idle before reading
+announce("3 results found");
+
+// Urgent error — interrupts the screen reader immediately
+announce("Session expired. Please sign in again.", "assertive");
+```
+
+### Politeness levels
+
+| Level | Behaviour | When to use |
+|-------|-----------|-------------|
+| `"polite"` (default) | Waits for the screen reader to finish its current sentence | Status updates, confirmations, search result counts |
+| `"assertive"` | Interrupts immediately | Urgent errors that require immediate attention |
+
+> Prefer `"polite"` in almost all cases. `"assertive"` is disruptive and should be reserved for true errors.
+
+### `makeAnnounce`
+
+Non-reactive base. Returns `[announce, cleanup]` so you can use it outside a Solid component — useful for notification services or stores.
+
+```ts
+import { makeAnnounce } from "@solid-primitives/a11y";
+
+const [announce, cleanup] = makeAnnounce();
+announce("File downloaded");
+// later, when your app unmounts:
+cleanup();
+```
+
+### Definition
+
+```ts
+function createAnnounce(): Announce;
+function makeAnnounce(): [announce: Announce, cleanup: () => void];
+
+type Announce = (message: string, politeness?: AnnouncePoliteness) => void;
+type AnnouncePoliteness = "polite" | "assertive";
+```
+
+---
+
+## `createReducedMotion`
+
+Returns a reactive accessor that reflects the user's `prefers-reduced-motion` system preference.
+Updates automatically when the OS setting changes. Returns `false` on the server (SSR-safe).
+
+```ts
+import { createReducedMotion } from "@solid-primitives/a11y";
+```
+
+### Usage
+
+```tsx
+const prefersReduced = createReducedMotion();
+
+return (
+  <div class={prefersReduced() ? "" : "animate-fade-in"}>
+    Content
+  </div>
+);
+```
+
+```ts
+// Gate inline styles
+const style = () => ({
+  transition: prefersReduced() ? "none" : "transform 0.3s ease",
+});
+```
+
+### When to apply
+
+- Disable CSS animations and transitions
+- Stop auto-playing carousels or slideshows
+- Remove parallax and scroll-triggered effects
+- Reduce motion in canvas/WebGL rendering
+
+### Testing locally
+
+macOS: **System Settings → Accessibility → Display → Reduce Motion**
+
+Windows: **Settings → Ease of Access → Display → Show animations**
+
+### Definition
+
+```ts
+function createReducedMotion(): Accessor<boolean>;
+```
+
+---
 
 ## `createFormControl`
 
@@ -40,7 +145,7 @@ import {
 The intended usage is a `Root` component that owns the context and a set of named sub-components that each register themselves on mount. This is the same pattern Kobalte uses internally for `TextField`, `Checkbox`, etc.
 
 ```tsx
-import { type JSX, Show, onCleanup } from "solid-js";
+import { type Element, Show, onCleanup } from "solid-js";
 import {
   createFormControl,
   createFormControlInput,
@@ -54,14 +159,14 @@ const TextFieldRoot = (props: {
   validationState?: "valid" | "invalid";
   required?: boolean;
   disabled?: boolean;
-  children: JSX.Element;
+  children: Element;
 }) => {
   const ctx = createFormControl(props);
   return <FormControlContext value={ctx}>{props.children}</FormControlContext>;
 };
 
 // 2. Label — registers its ID so the input can reference it
-const TextFieldLabel = (props: { children: JSX.Element }) => {
+const TextFieldLabel = (props: { children: Element }) => {
   const ctx = useFormControl();
   const id = ctx.generateId("label");
   onCleanup(ctx.registerLabel(id));
@@ -86,7 +191,7 @@ const TextFieldInput = (props: { placeholder?: string }) => {
 };
 
 // 4. Description — registers so it's included in aria-describedby
-const TextFieldDescription = (props: { children: JSX.Element }) => {
+const TextFieldDescription = (props: { children: Element }) => {
   const ctx = useFormControl();
   const id = ctx.generateId("description");
   onCleanup(ctx.registerDescription(id));
@@ -94,12 +199,12 @@ const TextFieldDescription = (props: { children: JSX.Element }) => {
 };
 
 // 5. ErrorMessage — registers only while rendered (Show handles mount/unmount)
-const ErrorMessageInner = (props: { ctx: ReturnType<typeof createFormControl>; children: JSX.Element }) => {
+const ErrorMessageInner = (props: { ctx: ReturnType<typeof createFormControl>; children: Element }) => {
   const id = props.ctx.generateId("error-message");
   onCleanup(props.ctx.registerErrorMessage(id));
   return <span id={id} role="alert">{props.children}</span>;
 };
-const TextFieldErrorMessage = (props: { children: JSX.Element }) => {
+const TextFieldErrorMessage = (props: { children: Element }) => {
   const ctx = useFormControl();
   return (
     <Show when={ctx.validationState() === "invalid"}>

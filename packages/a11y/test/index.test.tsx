@@ -1,11 +1,15 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
+import type { Accessor } from "solid-js";
 import { render } from "@solidjs/web";
 import {
   createFormControl,
   createFormControlInput,
   FormControlContext,
   useFormControl,
+  makeAnnounce,
+  createAnnounce,
+  createReducedMotion,
 } from "../src/index.js";
 
 // ─── createFormControl ────────────────────────────────────────────────────────
@@ -471,5 +475,180 @@ describe("useFormControl", () => {
 
     expect(captured).toBe(ctx);
     dispose();
+  });
+});
+
+// ─── makeAnnounce / createAnnounce ────────────────────────────────────────────
+
+describe("makeAnnounce", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    document.querySelectorAll("[aria-live]").forEach(el => el.remove());
+  });
+
+  it("appends polite and assertive live regions to document.body", () => {
+    const [, cleanup] = makeAnnounce();
+    expect(document.querySelector('[aria-live="polite"]')).toBeTruthy();
+    expect(document.querySelector('[aria-live="assertive"]')).toBeTruthy();
+    cleanup();
+  });
+
+  it("populates the polite region after the debounce delay", () => {
+    const [announce, cleanup] = makeAnnounce();
+    const polite = document.querySelector('[aria-live="polite"]')!;
+    announce("File saved");
+    expect(polite.textContent).toBe(""); // not yet set
+    vi.runAllTimers();
+    expect(polite.textContent).toBe("File saved");
+    cleanup();
+  });
+
+  it("populates the assertive region when politeness is assertive", () => {
+    const [announce, cleanup] = makeAnnounce();
+    const assertive = document.querySelector('[aria-live="assertive"]')!;
+    announce("Upload failed", "assertive");
+    vi.runAllTimers();
+    expect(assertive.textContent).toBe("Upload failed");
+    cleanup();
+  });
+
+  it("re-announces identical messages by clearing the region first", () => {
+    const [announce, cleanup] = makeAnnounce();
+    const polite = document.querySelector('[aria-live="polite"]')!;
+    announce("Same message");
+    vi.runAllTimers();
+    expect(polite.textContent).toBe("Same message");
+
+    announce("Same message");
+    expect(polite.textContent).toBe(""); // cleared before re-set
+    vi.runAllTimers();
+    expect(polite.textContent).toBe("Same message");
+    cleanup();
+  });
+
+  it("cleanup removes both live regions from the DOM", () => {
+    const [, cleanup] = makeAnnounce();
+    expect(document.querySelector('[aria-live="polite"]')).toBeTruthy();
+    cleanup();
+    expect(document.querySelector('[aria-live="polite"]')).toBeNull();
+    expect(document.querySelector('[aria-live="assertive"]')).toBeNull();
+  });
+});
+
+describe("createAnnounce", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    document.querySelectorAll("[aria-live]").forEach(el => el.remove());
+  });
+
+  it("returns an announce function", () => {
+    createRoot(dispose => {
+      const announce = createAnnounce();
+      expect(typeof announce).toBe("function");
+      dispose();
+    });
+  });
+
+  it("removes live regions from DOM when the owner disposes", () => {
+    const dispose = createRoot(d => {
+      createAnnounce();
+      return d;
+    });
+    expect(document.querySelector('[aria-live="polite"]')).toBeTruthy();
+    dispose();
+    expect(document.querySelector('[aria-live="polite"]')).toBeNull();
+    expect(document.querySelector('[aria-live="assertive"]')).toBeNull();
+  });
+
+  it("announces a message to the polite region", () => {
+    createRoot(dispose => {
+      const announce = createAnnounce();
+      const polite = document.querySelector('[aria-live="polite"]')!;
+      announce("3 results found");
+      vi.runAllTimers();
+      expect(polite.textContent).toBe("3 results found");
+      dispose();
+    });
+  });
+});
+
+// ─── createReducedMotion ──────────────────────────────────────────────────────
+
+describe("createReducedMotion", () => {
+  let changeListeners: Array<(e: MediaQueryListEvent) => void> = [];
+  let mqMatches = false;
+
+  beforeEach(() => {
+    changeListeners = [];
+    mqMatches = false;
+    vi.spyOn(window, "matchMedia").mockImplementation(query => ({
+      matches: mqMatches,
+      media: query,
+      addEventListener: vi.fn((_: string, handler: (e: MediaQueryListEvent) => void) => {
+        changeListeners.push(handler);
+      }),
+      removeEventListener: vi.fn((_: string, handler: (e: MediaQueryListEvent) => void) => {
+        const i = changeListeners.indexOf(handler);
+        if (i !== -1) changeListeners.splice(i, 1);
+      }),
+      dispatchEvent: vi.fn(),
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    }) as unknown as MediaQueryList);
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  const fireChange = (matches: boolean) =>
+    changeListeners.forEach(h => h({ matches } as MediaQueryListEvent));
+
+  it("returns false when no preference is set", () => {
+    createRoot(dispose => {
+      const prefersReduced = createReducedMotion();
+      expect(prefersReduced()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("returns true when prefers-reduced-motion matches", () => {
+    mqMatches = true;
+    createRoot(dispose => {
+      const prefersReduced = createReducedMotion();
+      expect(prefersReduced()).toBe(true);
+      dispose();
+    });
+  });
+
+  it("updates reactively when the OS preference changes", () => {
+    let prefersReduced!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      prefersReduced = createReducedMotion();
+      return d;
+    });
+
+    expect(prefersReduced()).toBe(false);
+
+    fireChange(true);
+    flush();
+    expect(prefersReduced()).toBe(true);
+
+    fireChange(false);
+    flush();
+    expect(prefersReduced()).toBe(false);
+
+    dispose();
+  });
+
+  it("removes the media query listener when the owner disposes", () => {
+    const dispose = createRoot(d => {
+      createReducedMotion();
+      return d;
+    });
+    expect(changeListeners).toHaveLength(1);
+    dispose();
+    expect(changeListeners).toHaveLength(0);
   });
 });

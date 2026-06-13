@@ -11,3 +11,8 @@ export type {
   FormControlDataSet,
   FormControlContextValue,
 } from "./types.js";
+
+export { makeAnnounce, createAnnounce } from "./announce.js";
+export type { Announce, AnnouncePoliteness } from "./announce.js";
+
+export { createReducedMotion } from "./reduced-motion.js";
