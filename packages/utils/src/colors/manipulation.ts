@@ -217,7 +217,7 @@ export function isReadable(
  * Returns an array of `steps` colors linearly interpolated in RGB space between
  * `from` and `to`. The first element is `from`, the last is `to`.
  *
- * @throws if `steps` is less than 2.
+ * @throws if `steps` is not a finite integer >= 2.
  *
  * @example
  * ```ts
@@ -226,7 +226,8 @@ export function isReadable(
  * ```
  */
 export function colorScale(from: Color, to: Color, steps: number): Color[] {
-  if (steps < 2) throw new Error("colorScale: steps must be at least 2");
+  if (!Number.isFinite(steps) || !Number.isInteger(steps) || steps < 2)
+    throw new Error("colorScale: steps must be a finite integer >= 2");
   return Array.from({ length: steps }, (_, i) => mix(from, to, i / (steps - 1)));
 }
 
@@ -282,7 +283,7 @@ function oklchToColor(l: number, c: number, h: number, alpha: number): Color {
  * Hue interpolation takes the shortest arc around the color wheel.
  * Alpha is linearly interpolated. The returned colors are in RGB.
  *
- * @throws if `steps` is less than 2.
+ * @throws if `steps` is not a finite integer >= 2.
  *
  * @example
  * ```ts
@@ -291,7 +292,8 @@ function oklchToColor(l: number, c: number, h: number, alpha: number): Color {
  * ```
  */
 export function perceptualColorScale(from: Color, to: Color, steps: number): Color[] {
-  if (steps < 2) throw new Error("perceptualColorScale: steps must be at least 2");
+  if (!Number.isFinite(steps) || !Number.isInteger(steps) || steps < 2)
+    throw new Error("perceptualColorScale: steps must be a finite integer >= 2");
   const fromOKLCH = colorToOKLCH(from);
   const toOKLCH = colorToOKLCH(to);
   const alphaFrom = from.getChannelValue("alpha");

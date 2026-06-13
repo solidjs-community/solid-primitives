@@ -208,6 +208,14 @@ describe("colorScale", () => {
   it("throws for steps < 2", () => {
     expect(() => colorScale(parseColor("#000"), parseColor("#fff"), 1)).toThrow("colorScale");
   });
+
+  it("throws for NaN steps", () => {
+    expect(() => colorScale(parseColor("#000"), parseColor("#fff"), NaN)).toThrow("colorScale");
+  });
+
+  it("throws for fractional steps", () => {
+    expect(() => colorScale(parseColor("#000"), parseColor("#fff"), 2.5)).toThrow("colorScale");
+  });
 });
 
 describe("perceptualColorScale", () => {
@@ -228,6 +236,18 @@ describe("perceptualColorScale", () => {
 
   it("throws for steps < 2", () => {
     expect(() => perceptualColorScale(parseColor("#000"), parseColor("#fff"), 1)).toThrow(
+      "perceptualColorScale",
+    );
+  });
+
+  it("throws for NaN steps", () => {
+    expect(() => perceptualColorScale(parseColor("#000"), parseColor("#fff"), NaN)).toThrow(
+      "perceptualColorScale",
+    );
+  });
+
+  it("throws for fractional steps", () => {
+    expect(() => perceptualColorScale(parseColor("#000"), parseColor("#fff"), 2.5)).toThrow(
       "perceptualColorScale",
     );
   });
