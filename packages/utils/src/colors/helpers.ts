@@ -566,9 +566,9 @@ class RGBColor extends Color {
 }
 
 // Matches `hsb(h, s%, b%)` and `hsba(h, s%, b%, a)`.
-// Components are comma-separated; values may be signed or decimal.
+// Components may be comma- or space-separated; values may be signed or decimal.
 const HSB_REGEX =
-  /hsb\(([-+]?\d+(?:.\d+)?\s*,\s*[-+]?\d+(?:.\d+)?%\s*,\s*[-+]?\d+(?:.\d+)?%)\)|hsba\(([-+]?\d+(?:.\d+)?\s*,\s*[-+]?\d+(?:.\d+)?%\s*,\s*[-+]?\d+(?:.\d+)?%\s*,\s*[-+]?\d(.\d+)?)\)/;
+  /hsb\(([-+]?\d+(?:\.\d+)?(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%)\)|hsba\(([-+]?\d+(?:\.\d+)?(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?)\)/;
 
 /**
  * HSB (Hue–Saturation–Brightness) color, also known as HSV (Hue–Saturation–Value).
@@ -595,12 +595,15 @@ class HSBColor extends Color {
     let m: RegExpMatchArray | null;
     if ((m = value.match(HSB_REGEX))) {
       const [h, s, b, a] = (m[1] ?? m[2])!
-        .split(",")
+        .split(/[,\s]+/)
+        .filter(Boolean)
         .map(n => Number(n.trim().replace("%", "")));
+      if (!Number.isFinite(h) || !Number.isFinite(s) || !Number.isFinite(b)) return undefined;
+      if (a !== undefined && !Number.isFinite(a)) return undefined;
       return new HSBColor(
-        normalizeHue(h!),
-        clamp(s!, 0, 100),
-        clamp(b!, 0, 100),
+        normalizeHue(h),
+        clamp(s, 0, 100),
+        clamp(b, 0, 100),
         clamp(a ?? 1, 0, 1),
       );
     }
@@ -734,10 +737,10 @@ class HSBColor extends Color {
   }
 }
 
-// Matches `hsl(h, s%, l%)` and `hsla(h, s%, l%, a)`.
-// Components are comma-separated; values may be signed or decimal.
+// Matches `hsl(h, s%, l%)` / `hsl(h s% l% / a)` and `hsla(h, s%, l%, a)` / `hsla(h s% l% / a)`.
+// Components may be comma- or space-separated; the alpha separator also accepts `/` (CSS Color 4).
 const HSL_REGEX =
-  /hsl\(([-+]?\d+(?:.\d+)?\s*,\s*[-+]?\d+(?:.\d+)?%\s*,\s*[-+]?\d+(?:.\d+)?%)\)|hsla\(([-+]?\d+(?:.\d+)?\s*,\s*[-+]?\d+(?:.\d+)?%\s*,\s*[-+]?\d+(?:.\d+)?%\s*,\s*[-+]?\d(.\d+)?)\)/;
+  /hsl\(([-+]?\d+(?:\.\d+)?(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%(?:(?:\s*[,/]\s*|\s+)[-+]?\d+(?:\.\d+)?)?)\)|hsla\(([-+]?\d+(?:\.\d+)?(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?%(?:\s*[,/]\s*|\s+)[-+]?\d+(?:\.\d+)?)\)/;
 
 /**
  * HSL (Hue–Saturation–Lightness) color — the native CSS color notation.
@@ -763,13 +766,18 @@ class HSLColor extends Color {
   static parse(value: string): HSLColor | undefined {
     let m: RegExpMatchArray | null;
     if ((m = value.match(HSL_REGEX))) {
+      // Replace `/` (CSS Color 4 alpha separator) with a space before splitting.
       const [h, s, l, a] = (m[1] ?? m[2])!
-        .split(",")
+        .replace(/\//g, " ")
+        .split(/[,\s]+/)
+        .filter(Boolean)
         .map(n => Number(n.trim().replace("%", "")));
+      if (!Number.isFinite(h) || !Number.isFinite(s) || !Number.isFinite(l)) return undefined;
+      if (a !== undefined && !Number.isFinite(a)) return undefined;
       return new HSLColor(
-        normalizeHue(h!),
-        clamp(s!, 0, 100),
-        clamp(l!, 0, 100),
+        normalizeHue(h),
+        clamp(s, 0, 100),
+        clamp(l, 0, 100),
         clamp(a ?? 1, 0, 1),
       );
     }

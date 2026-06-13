@@ -121,6 +121,67 @@ describe("parseColor", () => {
     });
   });
 
+  describe("HSBColor", () => {
+    it("parses space-separated hsb()", () => {
+      const c = parseColor("hsb(220 75% 78.43%)");
+      expect(c.getColorSpace()).toBe("hsb");
+      expect(c.getChannelValue("hue")).toBeCloseTo(220);
+    });
+
+    it("parses space-separated hsba()", () => {
+      const c = parseColor("hsba(220 75% 78.43% 0.5)");
+      expect(c.getChannelValue("alpha")).toBeCloseTo(0.5);
+    });
+
+    it("round-trips hsb toString → parseColor", () => {
+      const original = parseColor("rgb(50 100 200)");
+      const serialized = original.toFormat("hsb").toString("hsb");
+      expect(serialized).toBe("hsb(220 75% 78.43%)");
+      const reparsed = parseColor(serialized);
+      expect(reparsed.getColorSpace()).toBe("hsb");
+      expect(reparsed.getChannelValue("hue")).toBeCloseTo(220);
+    });
+
+    it("round-trips hsba toString → parseColor", () => {
+      const serialized = parseColor("rgb(50 100 200 / 0.5)").toFormat("hsba").toString("hsba");
+      expect(serialized).toBe("hsba(220 75% 78.43% 0.5)");
+      expect(parseColor(serialized).getChannelValue("alpha")).toBeCloseTo(0.5);
+    });
+  });
+
+  describe("HSLColor", () => {
+    it("parses space-separated hsl()", () => {
+      const c = parseColor("hsl(220 60% 49.02%)");
+      expect(c.getColorSpace()).toBe("hsl");
+      expect(c.getChannelValue("hue")).toBeCloseTo(220);
+    });
+
+    it("parses hsl() with / alpha (CSS Color 4)", () => {
+      const c = parseColor("hsl(220 60% 49.02% / 0.2)");
+      expect(c.getChannelValue("alpha")).toBeCloseTo(0.2);
+    });
+
+    it("parses space-separated hsla() with / alpha", () => {
+      const c = parseColor("hsla(220 60% 49.02% / 0.5)");
+      expect(c.getChannelValue("alpha")).toBeCloseTo(0.5);
+    });
+
+    it("round-trips hsl toString → parseColor", () => {
+      const serialized = parseColor("rgb(50 100 200)").toFormat("hsl").toString("hsl");
+      expect(serialized).toBe("hsl(220 60% 49.02%)");
+      const reparsed = parseColor(serialized);
+      expect(reparsed.getColorSpace()).toBe("hsl");
+      expect(reparsed.getChannelValue("lightness")).toBeCloseTo(49.02);
+    });
+
+    it("round-trips hsla toString → parseColor", () => {
+      const serialized = parseColor("rgb(50 100 200 / 0.2)").toFormat("hsla").toString("hsla");
+      expect(serialized).toBe("hsla(220 60% 49.02% / 0.2)");
+      const reparsed = parseColor(serialized);
+      expect(reparsed.getChannelValue("alpha")).toBeCloseTo(0.2);
+    });
+  });
+
   describe("normalizeHue", () => {
     it("keeps 360 as-is", () => {
       expect(normalizeHue(360)).toBe(360);
