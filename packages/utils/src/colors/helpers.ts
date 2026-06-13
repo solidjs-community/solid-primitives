@@ -331,7 +331,8 @@ class RGBColor extends Color {
    * Hex shorthand is expanded by doubling each nibble (`#abc` → `#aabbcc`).
    * The alpha byte (if present in hex) is normalized from the `[0, 255]` range to `[0, 1]`.
    * Both space-separated (`rgb(r g b / a)`) and comma-separated (`rgb(r, g, b)`) syntaxes
-   * are accepted; a trailing `%` on the alpha token is treated as a fraction.
+   * are accepted. Tokens with a `%` suffix are converted: RGB channels to 0–255,
+   * alpha to a 0–1 fraction. Non-numeric or non-finite tokens reject the whole match.
    */
   static parse(value: string): RGBColor | undefined {
     let colors: Array<number | undefined> = [];
@@ -350,15 +351,32 @@ class RGBColor extends Color {
 
     const match = value.match(/^rgba?\((.*)\)$/);
     if (match?.[1]) {
-      colors = match[1]
-        .replace(/(\d+)%$/u, (_substring, numberValue) =>
-          (Number(numberValue) / 100).toString(),
-        )
+      // Normalize separators (comma, slash) to spaces, trim, then split on any
+      // run of whitespace so leading/trailing spaces don't produce empty tokens.
+      const tokens = match[1]
         .replaceAll(/,|\//gu, " ")
-        .replaceAll(/\s{2,}/gu, " ")
-        .split(" ")
-        .map(v => Number(v.trim()));
-      colors = colors.map((num, i) => clamp(num ?? 0, 0, i < 3 ? 255 : 1));
+        .trim()
+        .split(/\s+/);
+
+      // Require exactly 3 (rgb) or 4 (rgba) tokens.
+      if (tokens.length !== 3 && tokens.length !== 4) return undefined;
+
+      const parsed: number[] = [];
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i]!;
+        let num: number;
+        if (token.endsWith("%")) {
+          const pct = Number(token.slice(0, -1));
+          if (!Number.isFinite(pct)) return undefined;
+          // RGB channels: % of 255; alpha channel: % as 0–1 fraction.
+          num = i < 3 ? (pct / 100) * 255 : pct / 100;
+        } else {
+          num = Number(token);
+          if (!Number.isFinite(num)) return undefined;
+        }
+        parsed.push(clamp(num, 0, i < 3 ? 255 : 1));
+      }
+      colors = parsed;
     }
 
     if (colors[0] === undefined || colors[1] === undefined || colors[2] === undefined) {

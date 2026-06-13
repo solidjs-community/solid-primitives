@@ -84,6 +84,36 @@ describe("parseColor", () => {
       expect(() => parseColor("#zzzzzz")).toThrowError("Invalid color value: #zzzzzz");
     });
 
+    it("rejects rgb() with non-finite tokens", () => {
+      expect(() => parseColor("rgb(50, abc, 200)")).toThrow();
+      expect(() => parseColor("rgb(Infinity, 0, 0)")).toThrow();
+    });
+
+    it("rejects rgb() with wrong token count", () => {
+      expect(() => parseColor("rgb(50 100)")).toThrow();
+      expect(() => parseColor("rgb(50 100 200 0.5 1)")).toThrow();
+    });
+
+    it("correctly parses rgb() with leading/trailing whitespace inside parens", () => {
+      const c = parseColor("rgb( 50, 100, 200 )");
+      expect(c.getChannelValue("red")).toBe(50);
+      expect(c.getChannelValue("green")).toBe(100);
+      expect(c.getChannelValue("blue")).toBe(200);
+    });
+
+    it("parses rgb() channel percentage tokens", () => {
+      // 50% of 255 = 127.5 → clamped to 127 after rounding
+      const c = parseColor("rgb(50%, 100%, 0%)");
+      expect(c.getChannelValue("red")).toBeCloseTo(127.5, 0);
+      expect(c.getChannelValue("green")).toBe(255);
+      expect(c.getChannelValue("blue")).toBe(0);
+    });
+
+    it("parses rgba() alpha percentage token", () => {
+      const c = parseColor("rgba(50, 100, 200, 20%)");
+      expect(c.getChannelValue("alpha")).toBeCloseTo(0.2);
+    });
+
     it("handles alpha = 0", () => {
       expect(parseColor("rgb(50 100 200 / 0)").toFormat("hsba").toString("hsba")).toBe(
         "hsba(220 75% 78.43% 0)",
