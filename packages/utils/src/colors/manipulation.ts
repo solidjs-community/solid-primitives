@@ -1,3 +1,15 @@
+/*
+ * Portions of this file incorporate color science from the following sources:
+ *
+ * OKLab/OKLCH color space by Björn Ottosson.
+ * MIT License, Copyright Björn Ottosson.
+ * https://bottosson.github.io/posts/oklab/
+ *
+ * WCAG 2.1 relative luminance and contrast ratio formulas.
+ * W3C Web Content Accessibility Guidelines 2.1, Copyright W3C.
+ * https://www.w3.org/TR/WCAG21/#contrast-minimum
+ */
+
 import { clamp } from "../index.js";
 import { colorToOKLCH, normalizeHue, parseColor } from "./helpers.js";
 import type { Color, ColorFormat } from "./types.js";
