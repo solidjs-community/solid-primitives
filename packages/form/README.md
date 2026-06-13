@@ -534,6 +534,239 @@ const form = createForm({
 
 ---
 
+## `createFormControl`
+
+Builds the ARIA accessibility graph for a labeled form field: a stable ID, registration slots for a label, description, and error message, and the computed `aria-labelledby` / `aria-describedby` strings that tie them together.
+
+This is a low-level primitive aimed at headless component libraries (such as [Kobalte](https://kobalte.dev)). If you are building a component that wraps a label + input + helper text, `createFormControl` handles the ARIA wiring so you don't have to manage IDs manually.
+
+```tsx
+import {
+  createFormControl,
+  createFormControlInput,
+  FormControlContext,
+  useFormControl,
+} from "@solid-primitives/form";
+```
+
+### The sub-component pattern
+
+The intended usage is a `Root` component that owns the context and a set of named sub-components that each register themselves on mount. This is the same pattern Kobalte uses internally for `TextField`, `Checkbox`, etc.
+
+```tsx
+// 1. Root — creates the graph and provides it via context
+const TextFieldRoot = (props: {
+  id?: string;
+  validationState?: "valid" | "invalid";
+  required?: boolean;
+  disabled?: boolean;
+  children: JSX.Element;
+}) => {
+  const ctx = createFormControl(props);
+  return <FormControlContext value={ctx}>{props.children}</FormControlContext>;
+};
+
+// 2. Label — registers its ID so the input can reference it
+const TextFieldLabel = (props: { children: JSX.Element }) => {
+  const ctx = useFormControl();
+  const id = ctx.generateId("label");
+  onCleanup(ctx.registerLabel(id));
+  return <label id={id}>{props.children}</label>;
+};
+
+// 3. Input — reads context and spreads computed ARIA props
+const TextFieldInput = (props: { placeholder?: string }) => {
+  const { fieldProps } = createFormControlInput();
+  const ctx = useFormControl();
+  return (
+    <input
+      id={fieldProps.id()}
+      placeholder={props.placeholder}
+      aria-labelledby={fieldProps.ariaLabelledBy()}
+      aria-describedby={fieldProps.ariaDescribedBy()}
+      aria-invalid={ctx.validationState() === "invalid" ? "true" : undefined}
+      aria-required={ctx.isRequired() ? "true" : undefined}
+      disabled={ctx.isDisabled() ?? false}
+    />
+  );
+};
+
+// 4. Description — registers so it's included in aria-describedby
+const TextFieldDescription = (props: { children: JSX.Element }) => {
+  const ctx = useFormControl();
+  const id = ctx.generateId("description");
+  onCleanup(ctx.registerDescription(id));
+  return <span id={id}>{props.children}</span>;
+};
+
+// 5. ErrorMessage — registers only while rendered (Show handles mount/unmount)
+const TextFieldErrorMessage = (props: { children: JSX.Element }) => {
+  const ctx = useFormControl();
+  return (
+    <Show when={ctx.validationState() === "invalid"}>
+      {() => {
+        const id = ctx.generateId("error-message");
+        onCleanup(ctx.registerErrorMessage(id));
+        return <span id={id} role="alert">{props.children}</span>;
+      }}
+    </Show>
+  );
+};
+
+// Usage
+<TextFieldRoot id="email" validationState={fieldError() ? "invalid" : undefined} required>
+  <TextFieldLabel>Email address</TextFieldLabel>
+  <TextFieldInput placeholder="you@example.com" />
+  <TextFieldDescription>We'll never share your email.</TextFieldDescription>
+  <TextFieldErrorMessage>Enter a valid email address.</TextFieldErrorMessage>
+</TextFieldRoot>
+```
+
+When `validationState` is `"invalid"`, the error message component mounts, registers its ID, and `aria-describedby` on the input automatically expands to include it. When the state clears, the component unmounts and `onCleanup` removes its ID from the graph.
+
+### `createFormControl(props)`
+
+Creates the ARIA context for a labeled field group. Returns a `FormControlContextValue` directly — usable standalone or passed to `<FormControlContext>` for sub-components to consume via `useFormControl()`.
+
+**Props**
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `id` | `MaybeAccessor<string>` | Base ID for the field group. Auto-generated if omitted. |
+| `name` | `MaybeAccessor<string>` | Form submission name. Falls back to `id`. |
+| `validationState` | `MaybeAccessor<"valid" \| "invalid" \| undefined>` | Sets `data-valid` / `data-invalid` and controls whether `aria-describedby` includes the error message ID. |
+| `required` | `MaybeAccessor<boolean \| undefined>` | Sets `data-required`. |
+| `disabled` | `MaybeAccessor<boolean \| undefined>` | Sets `data-disabled`. |
+| `readOnly` | `MaybeAccessor<boolean \| undefined>` | Sets `data-readonly`. |
+
+All props accept either a plain value or a reactive accessor `() => value`, so they compose naturally with signals.
+
+**Context value**
+
+| Member | Description |
+|--------|-------------|
+| `name()` | Resolved name (falls back to id) |
+| `validationState()` | Current validation state |
+| `isRequired()` / `isDisabled()` / `isReadOnly()` | State accessors |
+| `dataset()` | Memo of all `data-*` attribute values — spread onto any element that should reflect state |
+| `generateId(part)` | Returns `"${baseId}-${part}"` — use this to derive stable IDs for sub-elements |
+| `labelId()` / `fieldId()` / `descriptionId()` / `errorMessageId()` | Currently registered IDs for each slot |
+| `registerLabel(id)` | Registers a label ID; returns a cleanup function |
+| `registerField(id)` | Registers the field ID; returns a cleanup function |
+| `registerDescription(id)` | Registers a description ID; returns a cleanup function |
+| `registerErrorMessage(id)` | Registers an error message ID; returns a cleanup function |
+| `getAriaLabelledBy(fieldId, ariaLabel, ariaLabelledBy)` | Computes the full `aria-labelledby` value |
+| `getAriaDescribedBy(ariaDescribedBy)` | Computes the full `aria-describedby` value |
+
+### `createFormControlInput(props?)`
+
+Reads from `FormControlContext` (must be called inside a `<FormControlContext>`) and returns a `fieldProps` object for the actual input element. Uses `createEffect` to register/deregister the field's ID reactively.
+
+**Props**
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `id` | `MaybeAccessor<string>` | Override the generated field ID. Defaults to `context.generateId("field")`. |
+| `aria-label` | `MaybeAccessor<string>` | Passed through to `fieldProps.ariaLabel()`. |
+| `aria-labelledby` | `MaybeAccessor<string>` | Merged into the computed `aria-labelledby` chain. |
+| `aria-describedby` | `MaybeAccessor<string>` | Appended to the computed `aria-describedby` value. |
+
+**Returns**
+
+```ts
+{
+  fieldProps: {
+    id:               () => string;
+    ariaLabel:        () => string | undefined;
+    ariaLabelledBy:   () => string | undefined;
+    ariaDescribedBy:  () => string | undefined;
+  }
+}
+```
+
+### `FormControlContext` + `useFormControl()`
+
+`FormControlContext` is a standard Solid context. Provide a value from `createFormControl` and consume it in any descendant:
+
+```tsx
+const ctx = createFormControl({ id: "my-field" });
+
+<FormControlContext value={ctx}>
+  <MyLabel />
+  <MyInput />
+</FormControlContext>
+```
+
+```ts
+// Inside any descendant component:
+const ctx = useFormControl();
+```
+
+`useFormControl()` throws if called outside a `<FormControlContext>`.
+
+### `aria-labelledby` chain
+
+`getAriaLabelledBy` follows Kobalte's three-argument logic: if both a visible label (`labelId`) and an explicit `aria-label` are present on the input, the **field's own ID** is appended to the chain. This ensures screen readers can announce all three — the label element, the field element, and the inline description — in the correct order.
+
+```
+// No label registered, no aria-label                  → undefined
+// Label registered, no aria-label                     → "field-label"
+// Label registered + explicit aria-labelledby         → "external-label field-label"
+// Label registered + aria-label on input              → "field-label field-field"
+```
+
+### `validationState` and error messages
+
+The error message ID is included in `aria-describedby` whenever the error message element is registered — regardless of `validationState`. The conditional behaviour comes from whether the error message component is mounted (typically gated by `<Show when={ctx.validationState() === "invalid"}`). This matches Kobalte's approach: use `aria-describedby` for error messages rather than `aria-errormessage`, which has poor screen reader support.
+
+#### Definition
+
+```ts
+function createFormControl(props: CreateFormControlProps): FormControlContextValue;
+function createFormControlInput(props?: CreateFormControlInputProps): { fieldProps: FieldProps };
+
+const FormControlContext: Context<FormControlContextValue | undefined>;
+function useFormControl(): FormControlContextValue;
+
+type CreateFormControlProps = {
+  id?:              MaybeAccessor<string>;
+  name?:            MaybeAccessor<string>;
+  validationState?: MaybeAccessor<"valid" | "invalid" | undefined>;
+  required?:        MaybeAccessor<boolean | undefined>;
+  disabled?:        MaybeAccessor<boolean | undefined>;
+  readOnly?:        MaybeAccessor<boolean | undefined>;
+};
+
+type CreateFormControlInputProps = {
+  id?:                MaybeAccessor<string>;
+  "aria-label"?:      MaybeAccessor<string>;
+  "aria-labelledby"?: MaybeAccessor<string>;
+  "aria-describedby"?: MaybeAccessor<string>;
+};
+
+type FormControlContextValue = {
+  name:                Accessor<string>;
+  validationState:     Accessor<"valid" | "invalid" | undefined>;
+  isRequired:          Accessor<boolean | undefined>;
+  isDisabled:          Accessor<boolean | undefined>;
+  isReadOnly:          Accessor<boolean | undefined>;
+  dataset:             Accessor<FormControlDataSet>;
+  labelId:             Accessor<string | undefined>;
+  fieldId:             Accessor<string | undefined>;
+  descriptionId:       Accessor<string | undefined>;
+  errorMessageId:      Accessor<string | undefined>;
+  generateId:          (part: string) => string;
+  registerLabel:       (id: string) => () => void;
+  registerField:       (id: string) => () => void;
+  registerDescription: (id: string) => () => void;
+  registerErrorMessage:(id: string) => () => void;
+  getAriaLabelledBy:   (fieldId, ariaLabel, ariaLabelledBy) => string | undefined;
+  getAriaDescribedBy:  (ariaDescribedBy) => string | undefined;
+};
+```
+
+---
+
 ## Future work
 
 ### Field sanitizers

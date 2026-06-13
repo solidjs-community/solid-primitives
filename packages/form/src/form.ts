@@ -103,7 +103,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     };
   }
 
-  // submitted is read inside per-field error memos, so it must exist before the loop.
+  // Must be declared before the field loop: validateOn:"submit" error memos close over this signal.
   const [submitted, setSubmitted] = createSignal(false, { ownedWrite: true });
   const formValidateOn = config.validateOn ?? "change";
 
@@ -130,8 +130,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     const [value, _setValueRaw] = createSignal<any>(fc.initial, { ownedWrite: true });
     const [touched, setTouched] = createSignal(false, { ownedWrite: true });
     const [externalError, setExternalError] = createSignal<string | null>(null, { ownedWrite: true });
-    // Clearing the external error when the user edits the field is the expected UX:
-    // the server's previous verdict is stale the moment the user starts correcting.
+    // A server-side error is stale the moment the user edits the field; clear it automatically.
     const setValue = (v: any) => { _setValueRaw(v); setExternalError(null); };
 
     let asyncError: Accessor<string | null> = () => null;
@@ -144,9 +143,9 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       asyncError = ae;
       _asyncPending = ap;
 
-      // Classify validators by probing with the initial value — one call per validator.
-      // Sync: returns string | null → goes into syncFns (used by the reactive memo).
-      // Async: returns Promise → goes into asyncFns; initial promises are saved for reuse.
+      // Probe each validator with the initial value to classify it as sync or async.
+      // The initial promises are saved so the first async run can reuse them rather than
+      // invoking the validator a second time with the same value.
       const syncFns: ValidatorFn<any>[] = [];
       const asyncFns: ValidatorFn<any>[] = [];
       const initProms: Promise<string | null>[] = [];
@@ -161,8 +160,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
         }
       }
 
-      // Sync-only memo: reactive to value(), never touches async validators.
-      // Lazy so the probe above serves as the only initial evaluation.
+      // Lazy so the probe above counts as the first evaluation; no double-run on mount.
       const syncMemo: Accessor<string | null> = syncFns.length > 0
         ? createMemo(() => {
             const val = value();
@@ -177,19 +175,17 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
       if (asyncFns.length > 0) {
         let seq = 0;
-        // First run: reuse initProms (already started during classification).
-        // Subsequent runs: call asyncFns fresh — one invocation per value change.
         let isFirstRun = true;
 
         createEffect(
-          // Compute reads value() and syncMemo() so the effect re-runs on value changes.
           () => ({ val: value(), syncError: syncMemo() }),
           ({ val, syncError }) => {
-            // Reuse initProms only if the value hasn't changed from the initial; otherwise
-          // the initial promises validated a stale value and must be discarded.
-          const asyncProms = (isFirstRun && val === fc.initial)
-            ? (isFirstRun = false, initProms)
-            : (isFirstRun = false, asyncFns.map(fn => fn(val) as Promise<string | null>));
+            // Reuse initProms when the value hasn't changed from initial — they're already
+            // in flight and represent the correct result. If the value changed, those
+            // promises validated a stale input and must be discarded.
+            const asyncProms = (isFirstRun && val === fc.initial)
+              ? (isFirstRun = false, initProms)
+              : (isFirstRun = false, asyncFns.map(fn => fn(val) as Promise<string | null>));
 
             if (syncError !== null || asyncProms.length === 0) { setAe(null); setAp(false); return; }
             const s = ++seq;
@@ -208,13 +204,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       }
     }
 
-    // _rawError reads the sync memo, async error, and external error signals.
-    // Never calls validators itself. External error is cleared whenever setValue is called.
+    // Always tracks the true validation state; never gated by validateOn.
     const _rawError: Accessor<string | null> = validators.length === 0
       ? externalError
       : createMemo(() => _syncError() ?? asyncError() ?? externalError());
 
-    // Display error is gated by validateOn; raw error is always computed above.
+    // Displayed error respects validateOn; raw error (used by valid() and errors()) does not.
     const error = validateOn === "change"
       ? _rawError
       : createMemo(() => (validateOn === "blur" ? touched() : submitted()) ? _rawError() : null);
@@ -263,8 +258,8 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     return result;
   }) as Accessor<Partial<Record<keyof C & string, string>>>;
 
-  // Bumped by reset(newValues) so dirty recomputes even when field values didn't change
-  // (the baseline changed, not the value).
+  // Dirty is "current value ≠ initial". When reset(newValues) changes the initial baseline,
+  // field values might be unchanged but dirty must still recompute — this counter triggers that.
   const [dirtyVer, bumpDirtyVer] = createSignal(0, { ownedWrite: true });
   const dirty = createMemo(() => {
     dirtyVer();
@@ -272,8 +267,8 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
   });
   const pending = createMemo(() => fieldEntries.some(([, f]) => f._asyncPending()));
 
-  // Counter signal: bumped by validate() so valid() re-computes immediately
-  // when a cross-field rule is registered after valid has already been read.
+  // validate() pushes new cross-field rules after valid() may already be memoised.
+  // Bumping this counter forces valid() to recompute the next time it's read.
   const [validVer, bumpValidVer] = createSignal(0, { ownedWrite: true });
   const formValidators: Accessor<string | null>[] = [];
 
@@ -336,8 +331,8 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     }
   };
 
-  // bind() uses a single Phase 2 ref callback. The sync-to-DOM effect is scoped
-  // to the element's lifetime via createRoot, disposed when the element unmounts.
+  // bind() returns a Phase 2 ref callback. The DOM-sync effect lives inside a createRoot
+  // scoped to the element's lifetime so it disposes automatically on unmount.
   const bind = (name: string) => {
     const f = internalFields[name];
     if (!f) throw new Error(`createForm: unknown field "${name}"`);

@@ -8,6 +8,9 @@
   "references": [
     {
       "path": "../event-listener"
+    },
+    {
+      "path": "../utils"
     }
   ],
   "include": [

@@ -15,7 +15,11 @@
     "stage": 0,
     "list": [
       "createForm",
-      "toFormData"
+      "toFormData",
+      "createFormControl",
+      "createFormControlInput",
+      "FormControlContext",
+      "useFormControl"
     ],
     "category": "Reactivity"
   },
@@ -28,7 +32,8 @@
     "async"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^"
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "private": false,
   "sideEffects": false,
