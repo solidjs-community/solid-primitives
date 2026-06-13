@@ -21,7 +21,7 @@
       "FormControlContext",
       "useFormControl"
     ],
-    "category": "Reactivity"
+    "category": "Forms"
   },
   "keywords": [
     "solid",

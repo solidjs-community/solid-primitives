@@ -19,7 +19,7 @@
       "FormControlContext",
       "useFormControl"
     ],
-    "category": "Accessibility"
+    "category": "Inputs"
   },
   "keywords": [
     "solid",
