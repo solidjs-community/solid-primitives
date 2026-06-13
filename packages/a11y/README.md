@@ -12,7 +12,7 @@ Reactive accessibility primitives. Programmatically announce changes to screen r
 
 ## Installation
 
-```
+```bash
 npm install @solid-primitives/a11y
 # or
 yarn add @solid-primitives/a11y
@@ -357,7 +357,7 @@ const ctx = useFormControl();
 
 `getAriaLabelledBy` follows Kobalte's three-argument resolution logic. When both a visible label (`labelId`) and an explicit `aria-label` are present on the input, the **field's own ID** is appended to the chain. This ensures screen readers can announce all three — the visible label element, the field element itself, and the inline `aria-label` — in the correct order.
 
-```
+```txt
 // No label registered, no aria-label                    → undefined
 // Label registered, no aria-label                       → "field-label"
 // Label registered + explicit aria-labelledby           → "external-label field-label"
