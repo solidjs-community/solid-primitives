@@ -140,9 +140,10 @@ export function complement(color: Color): Color {
  * ```
  */
 export function mix(a: Color, b: Color, ratio = 0.5): Color {
+  const r = Number.isFinite(ratio) ? clamp(ratio, 0, 1) : 0.5;
   const ra = a.toFormat("rgb");
   const rb = b.toFormat("rgb");
-  const lerp = (x: number, y: number) => x + (y - x) * ratio;
+  const lerp = (x: number, y: number) => x + (y - x) * r;
   return ra
     .withChannelValue("red", Math.round(lerp(ra.getChannelValue("red"), rb.getChannelValue("red"))))
     .withChannelValue("green", Math.round(lerp(ra.getChannelValue("green"), rb.getChannelValue("green"))))

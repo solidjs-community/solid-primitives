@@ -147,6 +147,21 @@ describe("mix", () => {
     const b = parseColor("rgba(0, 0, 0, 1)");
     expect(mix(a, b, 0.5).getChannelValue("alpha")).toBeCloseTo(0.5);
   });
+
+  it("treats NaN ratio as 0.5", () => {
+    const result = mix(parseColor("#000000"), parseColor("#ffffff"), NaN);
+    expect(result.getChannelValue("red")).toBe(128);
+  });
+
+  it("clamps ratio > 1 to 1", () => {
+    const result = mix(parseColor("#000000"), parseColor("#ffffff"), 2);
+    expect(result.getChannelValue("red")).toBe(255);
+  });
+
+  it("clamps ratio < 0 to 0", () => {
+    const result = mix(parseColor("#000000"), parseColor("#ffffff"), -1);
+    expect(result.getChannelValue("red")).toBe(0);
+  });
 });
 
 // ─── Accessibility ────────────────────────────────────────────────────────────
