@@ -1,5 +1,5 @@
 import { describe, it, test, expect, vi } from "vitest";
-import { createEffect, createRoot, createSignal, untrack } from "solid-js";
+import { createEffect, createRoot, createSignal, flush, untrack } from "solid-js";
 import { createListTransition, OnListChange } from "../src/index.js";
 
 type OnChangeParams = Parameters<OnListChange<Element>>[0];
@@ -34,6 +34,7 @@ describe("createListTransition", () => {
     expect(result()).toHaveLength(0);
 
     setChildren([el1, el2]);
+    flush();
     expect(result()).toHaveLength(2);
     expect(result()[0]).toBe(el1);
     expect(result()[1]).toBe(el2);
@@ -57,6 +58,7 @@ describe("createListTransition", () => {
     expect(fn).not.toHaveBeenCalled();
 
     setChildren([el3, el1, el4]);
+    flush();
     expect(result()).toHaveLength(4);
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith({
@@ -69,6 +71,7 @@ describe("createListTransition", () => {
 
     const done = fn.mock.calls[0]![0].finishRemoved;
     done([el2]);
+    flush();
     expect(result()).toHaveLength(3);
 
     dispose();
@@ -83,6 +86,7 @@ describe("createListTransition", () => {
         appear: true,
       });
 
+      flush();
       expect(result()).toHaveLength(2);
       expect(fn).toHaveBeenCalledOnce();
       expect(fn).toHaveBeenCalledWith({
@@ -110,6 +114,7 @@ describe("createListTransition", () => {
     });
 
     setChildren([el2, el3]);
+    flush();
     expect(result()).toHaveLength(3);
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith({
@@ -123,7 +128,7 @@ describe("createListTransition", () => {
     const done1 = fn.mock.calls[0]![0].finishRemoved;
 
     setChildren([]);
-
+    flush();
     expect(result()).toHaveLength(3);
     expect(fn).toHaveBeenCalledTimes(2);
     expect(fn).toHaveBeenLastCalledWith({
@@ -137,40 +142,44 @@ describe("createListTransition", () => {
     const done2 = fn.mock.calls[1]![0].finishRemoved;
 
     done1([el1]);
+    flush();
     expect(result()).toHaveLength(2);
     expect(result()[0]).toBe(el2);
     expect(result()[1]).toBe(el3);
 
     done2([el2, el3]);
+    flush();
     expect(result()).toHaveLength(0);
 
     dispose();
   });
 
   it("removes elements immediately if enabled", () => {
-    createRoot(dispose => {
-      const [children, setChildren] = createSignal<Element[]>([el1, el2]);
-      const fn = vi.fn();
+    const [children, setChildren] = createSignal<Element[]>([el1, el2]);
+    const fn = vi.fn();
 
+    const { result, dispose } = createRoot(dispose => {
       const result = createListTransition(children, {
         onChange: fn,
         exitMethod: "remove",
       });
       expect(result()).toHaveLength(2);
-
-      setChildren([el2, el3]);
-      expect(result()).toHaveLength(2);
-      expect(fn).toHaveBeenCalledOnce();
-      expect(fn).toHaveBeenCalledWith({
-        list: [el2, el3],
-        added: [el3],
-        removed: [el1],
-        unchanged: [el2],
-        finishRemoved: expect.any(Function),
-      } satisfies OnChangeParams);
-
-      dispose();
+      return { result, dispose };
     });
+
+    setChildren([el2, el3]);
+    flush();
+    expect(result()).toHaveLength(2);
+    expect(fn).toHaveBeenCalledOnce();
+    expect(fn).toHaveBeenCalledWith({
+      list: [el2, el3],
+      added: [el3],
+      removed: [el1],
+      unchanged: [el2],
+      finishRemoved: expect.any(Function),
+    } satisfies OnChangeParams);
+
+    dispose();
   });
 
   it("keeps index if removed elements if enabled", () => {
@@ -185,6 +194,7 @@ describe("createListTransition", () => {
     expect(result()).toHaveLength(3);
 
     setChildren([el1, el3]);
+    flush();
     expect(result()).toHaveLength(3);
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith({
@@ -198,86 +208,32 @@ describe("createListTransition", () => {
     dispose();
   });
 
-  /*
-
-  Transitions will run even if under suspense.
-
-  it("suspends under Suspense", () => {
-    const onChange = vi.fn();
-
-    const [children, setChildren] = createSignal<Element[]>([el1]);
-    const [runResource, setRunResource] = createSignal(true);
-    let resolve = () => {};
-
-    const dispose = createRoot(dispose => {
-      const [res] = createResource(runResource, () => new Promise<void>(r => (resolve = r)));
-      Suspense({
-        get children() {
-          createRenderEffect(res);
-          return createListTransition(children, { onChange });
-        },
-      });
-      return dispose;
-    });
-
-    expect(onChange).not.toHaveBeenCalled();
-
-    setChildren([el2]);
-
-    expect(onChange).not.toHaveBeenCalled();
-
-    resolve();
-    setRunResource(false);
-
-    expect(onChange).toHaveBeenCalledOnce();
-    expect(onChange).toHaveBeenLastCalledWith({
-      added: [el2],
-      removed: [el1],
-      moved: [],
-      finishRemoved: expect.any(Function),
-    });
-
-    setChildren([el1, el3]);
-
-    expect(onChange).toHaveBeenCalledTimes(2);
-    expect(onChange).toHaveBeenLastCalledWith({
-      added: [el1, el3],
-      removed: [el2],
-      moved: [],
-      finishRemoved: expect.any(Function),
-    });
-
-    dispose();
-
-  });
-  
-  */
-
   test("updated list should be available in user effects", () => {
     let effRuns = 0;
+    const [children, setChildren] = createSignal<Element[]>([]);
 
     const dispose = createRoot(dispose => {
-      const [children, setChildren] = createSignal<Element[]>([]);
-
-      createEffect(() => {
-        effRuns++;
-        children();
-        expect(untrack(result), "effect after root").toHaveLength(1);
-        expect(untrack(result)[0]).toBe(el1);
-      });
-
+      // Transition created first so its internal effect runs before the user effect below.
       const result = createListTransition(children, {
         onChange: () => {},
         exitMethod: "remove",
       });
       expect(result(), "initial").toHaveLength(0);
 
-      setChildren([el1]);
-      expect(result(), "after sync assign").toHaveLength(1);
-      expect(result()[0]).toBe(el1);
+      createEffect(
+        () => children(),
+        () => {
+          effRuns++;
+          expect(untrack(result), "effect after root").toHaveLength(1);
+          expect(untrack(result)[0]).toBe(el1);
+        },
+      );
 
       return dispose;
     });
+
+    setChildren([el1]);
+    flush();
 
     expect(effRuns).toBe(1);
 
