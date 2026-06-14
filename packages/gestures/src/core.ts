@@ -1,13 +1,13 @@
-import { onCleanup } from "solid-js";
 export type PointerCallback = (activeEvents: PointerEvent[], event: PointerEvent) => void;
 
 function downHandler(
+  node: HTMLElement,
   downEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
   downCallback: PointerCallback | undefined,
 ) {
   activeEvents.set(downEvent.pointerId, downEvent);
-
+  node.setPointerCapture(downEvent.pointerId);
   downCallback?.(Array.from(activeEvents.values()), downEvent);
 }
 
@@ -29,10 +29,7 @@ function upHandler(
 ) {
   if (upEvent.pointerId === downEvent.pointerId) {
     activeEvents.delete(upEvent.pointerId);
-
-    if (activeEvents.size === 0) {
-      removeHandlersCallback();
-    }
+    removeHandlersCallback();
   }
   upCallback?.(Array.from(activeEvents.values()), upEvent);
 }
@@ -42,27 +39,44 @@ export function registerPointerListener(
   downCallback?: PointerCallback,
   moveCallback?: PointerCallback,
   upCallback?: PointerCallback,
-) {
+): () => void {
   const activeEvents = new Map<number, PointerEvent>();
+  const activeMoveHandlers = new Set<(e: PointerEvent) => void>();
+  const activeUpHandlers = new Set<(e: PointerEvent) => void>();
 
   const handler = (downEvent: PointerEvent) => {
-    downHandler(downEvent, activeEvents, downCallback);
-    const moveHandlerWrapper = (e: PointerEvent) => moveHandler(e, activeEvents, moveCallback);
-    const upHandlerWrapper = (e: PointerEvent) =>
-      upHandler(e, downEvent, activeEvents, upCallback, () => {
-        node.removeEventListener("pointermove", moveHandlerWrapper);
-        node.removeEventListener("pointerup", upHandlerWrapper);
-        node.removeEventListener("lostpointercapture", upHandlerWrapper);
-      });
+    downHandler(node, downEvent, activeEvents, downCallback);
+    const moveHandlerWrapper = (e: PointerEvent) => {
+      if (e.pointerId === downEvent.pointerId) moveHandler(e, activeEvents, moveCallback);
+    };
+    const upHandlerWrapper = (e: PointerEvent) => {
+      if (e.pointerId === downEvent.pointerId)
+        upHandler(e, downEvent, activeEvents, upCallback, () => {
+          node.removeEventListener("pointermove", moveHandlerWrapper);
+          node.removeEventListener("pointerup", upHandlerWrapper);
+          node.removeEventListener("lostpointercapture", upHandlerWrapper);
+          activeMoveHandlers.delete(moveHandlerWrapper);
+          activeUpHandlers.delete(upHandlerWrapper);
+        });
+    };
+    activeMoveHandlers.add(moveHandlerWrapper);
+    activeUpHandlers.add(upHandlerWrapper);
     node.addEventListener("pointermove", moveHandlerWrapper);
     node.addEventListener("pointerup", upHandlerWrapper);
     node.addEventListener("lostpointercapture", upHandlerWrapper);
   };
 
   node.addEventListener("pointerdown", handler);
-  onCleanup(() => {
+  return () => {
     node.removeEventListener("pointerdown", handler);
-  });
+    for (const h of activeMoveHandlers) node.removeEventListener("pointermove", h);
+    for (const h of activeUpHandlers) {
+      node.removeEventListener("pointerup", h);
+      node.removeEventListener("lostpointercapture", h);
+    }
+    activeMoveHandlers.clear();
+    activeUpHandlers.clear();
+  };
 }
 
 export const DEFAULT_DELAY = 300;

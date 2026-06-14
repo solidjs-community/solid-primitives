@@ -453,8 +453,8 @@ importers:
   packages/gestures:
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/graphql:
     dependencies:
@@ -630,10 +630,17 @@ importers:
         version: 2.0.0-beta.14
 
   packages/list:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/list-state:
     dependencies:
@@ -1201,16 +1208,17 @@ importers:
         version: 2.0.0-beta.14
 
   packages/transition-group:
-    devDependencies:
-      '@solid-primitives/refs':
-        specifier: workspace:^
-        version: link:../refs
+    dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: ^2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: ^2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/trigger:
     dependencies:

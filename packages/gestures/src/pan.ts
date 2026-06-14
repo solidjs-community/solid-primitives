@@ -1,29 +1,26 @@
+import { onCleanup } from "solid-js";
 import { registerPointerListener } from "./core.js";
 import type { PointerCallback } from "./core.js";
 
-type Props = {
-  callback: (position: { x: number; y: number }) => any;
+export type PanProps = {
+  callback: (position: { x: number; y: number }) => void;
 };
 
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-      ["use:pan"]?: Props;
-    }
-  }
-}
+export function pan(props: PanProps): (node: HTMLElement) => void {
+  let cleanup: (() => void) | undefined;
+  onCleanup(() => cleanup?.());
 
-export const pan = (node: HTMLElement, props: () => Props) => {
-  const moveCallback: PointerCallback = (activeEvents, event) => {
-    if (activeEvents.length === 1) {
-      const rect = node.getBoundingClientRect();
-      const x = Math.round(event.x - rect.left);
-      const y = Math.round(event.y - rect.top);
-      if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
-        props().callback({ x, y });
+  return (node: HTMLElement) => {
+    const moveCallback: PointerCallback = (activeEvents, event) => {
+      if (activeEvents.length === 1) {
+        const rect = node.getBoundingClientRect();
+        props.callback({
+          x: Math.round(event.clientX - rect.left),
+          y: Math.round(event.clientY - rect.top),
+        });
       }
-    }
-  };
+    };
 
-  registerPointerListener(node, undefined, moveCallback);
-};
+    cleanup = registerPointerListener(node, undefined, moveCallback);
+  };
+}
