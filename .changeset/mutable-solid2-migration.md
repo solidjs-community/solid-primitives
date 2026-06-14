@@ -23,7 +23,7 @@ modifyMutable(state, s => {
 });
 ```
 
-`produce` and the `reconcile`/`produce` helpers from `solid-js/store` no longer exist in Solid 2.0. Use a plain mutation function instead.
+`produce` no longer exists in Solid 2.0 — store setters are now draft-first by default, so plain mutation functions replace it. `reconcile` still exists but is now imported from `solid-js` directly (not `solid-js/store`).
 
 ### `solid-js/store` removed
 

@@ -297,13 +297,9 @@ export function createMutable<T extends MutableNode>(state: T, _options?: Mutabl
 
   const unwrappedStore = state;
 
-  if (
-    DEV &&
-    (unwrappedStore === null ||
-      (typeof unwrappedStore !== "object" && typeof unwrappedStore !== "function"))
-  )
+  if (DEV && ((state as any) === null || (typeof state !== "object" && typeof state !== "function")))
     throw new Error(
-      `Unexpected value ${unwrappedStore} received when initializing 'createMutable'. Expected a non-null object or function.`,
+      `Unexpected value ${String(state)} received when initializing 'createMutable'. Expected a non-null object or function.`,
     );
 
   const wrappedStore = wrap(unwrappedStore);
