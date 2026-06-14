@@ -1,5 +1,13 @@
 # @solid-primitives/map
 
+## 0.8.0
+
+### Major Changes
+
+- Migrate to Solid.js v2.0 (beta.14). Peer dependencies are now `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`.
+- Removed internal `batch()` usage — Solid 2.0 auto-batches all signal writes.
+- Added `test/server.test.ts` for SSR safety verification.
+
 ## 0.7.3
 
 ### Patch Changes

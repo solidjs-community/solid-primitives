@@ -1,4 +1,4 @@
-import { getRequestEvent, isServer, type RequestEvent } from "solid-js/web";
+import { getRequestEvent, isServer, type RequestEvent } from "@solidjs/web";
 import { type SyncStorageWithOptions } from "./index.js";
 import { addWithOptionsMethod, addClearMethod } from "./tools.js";
 

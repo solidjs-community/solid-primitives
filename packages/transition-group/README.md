@@ -183,10 +183,6 @@ return createListTransition(resolved.toArray, {
 });
 ```
 
-## Demo
-
-[Deployed example](https://primitives.solidjs.community/playground/transition-group) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group/dev)
-
 ## Usage references
 
 Packages that use `@solid-primitives/transition-group`:

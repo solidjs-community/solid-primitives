@@ -38,12 +38,22 @@
         "types": "./dist/immutable/index.d.ts",
         "default": "./dist/immutable/index.js"
       }
+    },
+    "./colors": {
+      "import": {
+        "@solid-primitives/source": "./src/colors/index.ts",
+        "types": "./dist/colors/index.d.ts",
+        "default": "./dist/colors/index.js"
+      }
     }
   },
   "typesVersions": {
     "*": {
       "immutable": [
         "./dist/immutable/index.d.ts"
+      ],
+      "colors": [
+        "./dist/colors/index.d.ts"
       ]
     }
   },
@@ -105,7 +115,26 @@
       "number",
       "safe",
       "pipe",
-      "wrapSetter"
+      "wrapSetter",
+      "parseColor",
+      "normalizeColor",
+      "tryParseColor",
+      "isValidColor",
+      "detectColorFormat",
+      "getColorChannels",
+      "normalizeHue",
+      "colorToOKLCH",
+      "lighten",
+      "darken",
+      "saturate",
+      "desaturate",
+      "complement",
+      "mix",
+      "contrastRatio",
+      "isReadable",
+      "colorScale",
+      "perceptualColorScale",
+      "COLOR_INTL_TRANSLATIONS"
     ],
     "category": "Utilities",
     "gzip": 1399
