@@ -1,6 +1,6 @@
 /*
 
-Version 1.0 of the primitive is a direct copy from SolidJS version 1.7.12:
+Derived from the mutable store implementation in SolidJS:
 https://github.com/solidjs/solid/blob/063db14c4e69f411ac2c09f5044e2d262fa667b9/packages/solid/store/src/mutable.ts
 
 
@@ -47,9 +47,23 @@ https://github.com/solidjs/solid/issues/1733
 
 */
 
-import * as solid from "solid-js";
-import * as solid_store from "solid-js/store";
-import { isDev, isServer } from "solid-js/web";
+import { createSignal, getObserver, getOwner, $PROXY, $TRACK, DEV, type Setter } from "solid-js";
+
+/** Raw target type for the mutable proxy — any plain object or array. */
+type MutableNode = Record<PropertyKey, any>;
+import { isServer } from "@solidjs/web";
+
+/**
+ * Returns true only for plain objects and arrays — the types that can be
+ * safely deep-proxied. Excludes class instances (Date, Map, Set, …) whose
+ * prototype methods require the real object as `this`.
+ */
+function isWrappable<T>(obj: T | null | undefined): obj is T;
+function isWrappable(obj: any): boolean {
+  if (obj == null || typeof obj !== "object" || Object.isFrozen(obj)) return false;
+  const proto = Object.getPrototypeOf(obj);
+  return proto === null || proto === Object.prototype || Array.isArray(obj);
+}
 
 const $NODE = Symbol("mutable-node"),
   $HAS = Symbol("mutable-has"),
@@ -63,24 +77,7 @@ type DataNode = {
 };
 type DataNodes = Record<PropertyKey, DataNode | undefined>;
 
-/**
- * This function is copied from solid-js/store/src/store.ts
- * TODO: probably should be exported from solid-js/store
- */
-function isWrappable<T>(obj: T | solid_store.NotWrappable): obj is T;
-function isWrappable(obj: any) {
-  let proto;
-  return (
-    obj != null &&
-    typeof obj === "object" &&
-    (obj[solid.$PROXY] ||
-      !(proto = Object.getPrototypeOf(obj)) ||
-      proto === Object.prototype ||
-      Array.isArray(obj))
-  );
-}
-
-function getNodes(target: solid_store.StoreNode, symbol: typeof $NODE | typeof $HAS): DataNodes {
+function getNodes(target: MutableNode, symbol: typeof $NODE | typeof $HAS): DataNodes {
   let nodes = target[symbol];
   if (!nodes)
     Object.defineProperty(target, symbol, { value: (nodes = Object.create(null) as DataNodes) });
@@ -90,26 +87,26 @@ function getNodes(target: solid_store.StoreNode, symbol: typeof $NODE | typeof $
 function getNode(nodes: DataNodes, property: PropertyKey, value?: any): DataNode | undefined {
   if (nodes[property]) return nodes[property];
 
-  const [s, set] = solid.createSignal(value, {
+  const [s, set] = createSignal(value, {
     equals: false,
-    internal: true,
-  }) as [DataNode, solid.Setter<any>];
+    ownedWrite: true,
+  }) as unknown as [DataNode, Setter<any>];
 
   s.$ = set;
   return (nodes[property] = s);
 }
 
-function trackSelf(target: solid_store.StoreNode): void {
-  solid.getListener() && getNode(getNodes(target, $NODE), $SELF)!();
+function trackSelf(target: MutableNode): void {
+  getObserver() && getNode(getNodes(target, $NODE), $SELF)!();
 }
 
-function ownKeys(target: solid_store.StoreNode) {
+function ownKeys(target: MutableNode) {
   trackSelf(target);
   return Reflect.ownKeys(target);
 }
 
 function setProperty(
-  state: solid_store.StoreNode,
+  state: MutableNode,
   property: PropertyKey,
   value: any,
   deleting: boolean = false,
@@ -119,9 +116,9 @@ function setProperty(
   const prev = state[property],
     len = state.length;
 
-  if (isDev)
-    solid_store.DEV!.hooks.onStoreNodeUpdate &&
-      solid_store.DEV!.hooks.onStoreNodeUpdate(state, property, value, prev);
+  if (DEV)
+    DEV.hooks.onStoreNodeUpdate &&
+      DEV.hooks.onStoreNodeUpdate(state, property, value, prev);
 
   /*
     TODO: setting to undefined should not delete the property
@@ -149,7 +146,7 @@ function setProperty(
   (node = nodes[$SELF]) && node.$();
 }
 
-function proxyDescriptor(target: solid_store.StoreNode, property: PropertyKey) {
+function proxyDescriptor(target: MutableNode, property: PropertyKey) {
   const desc = Reflect.getOwnPropertyDescriptor(target, property);
 
   if (
@@ -157,42 +154,55 @@ function proxyDescriptor(target: solid_store.StoreNode, property: PropertyKey) {
     !desc.get &&
     !desc.set &&
     desc.configurable &&
-    property !== solid.$PROXY &&
+    property !== $PROXY &&
     property !== $NODE
   ) {
     delete desc.value;
     delete desc.writable;
-    desc.get = () => target[solid.$PROXY][property];
-    desc.set = v => (target[solid.$PROXY][property] = v);
+    desc.get = () => target[$PROXY][property];
+    desc.set = v => (target[$PROXY][property] = v);
   }
 
   return desc;
 }
 
-const proxyTraps: ProxyHandler<solid_store.StoreNode> = {
+const proxyTraps: ProxyHandler<MutableNode> = {
   get(target, property, receiver) {
-    if (property === solid_store.$RAW) return target;
-    if (property === solid.$PROXY) return receiver;
-    if (property === solid.$TRACK) {
+    if (property === $PROXY) return receiver;
+    if (property === $TRACK) {
       trackSelf(target);
       return receiver;
     }
 
     const nodes = getNodes(target, $NODE),
       tracked = nodes[property];
-    let value = tracked ? tracked() : target[property];
 
-    if (property === $NODE || property === $HAS || property === "__proto__") return value;
+    if (property === $NODE || property === $HAS || property === "__proto__")
+      return tracked ? tracked() : target[property];
 
-    if (!tracked) {
-      const desc = Object.getOwnPropertyDescriptor(target, property),
-        isFn = typeof value === "function";
+    const desc = Object.getOwnPropertyDescriptor(target, property),
+      isFn = typeof target[property] === "function";
 
-      if (solid.getListener() && (!isFn || target.hasOwnProperty(property)) && !(desc && desc.get))
-        value = getNode(nodes, property, value)!();
-      else if (value != null && isFn && value === Array.prototype[property as any])
-        return (...args: unknown[]) =>
-          solid.batch(() => Array.prototype[property as any].apply(receiver, args));
+    let value: any;
+
+    if (getObserver()) {
+      // Inside a reactive context: use signals for dependency tracking.
+      // Signal values are stable (last-flushed) — correct inside effects/memos.
+      if (tracked) {
+        value = tracked();
+      } else if ((!isFn || target.hasOwnProperty(property)) && !(desc && desc.get)) {
+        value = getNode(nodes, property, target[property])!();
+      } else {
+        value = target[property];
+      }
+    } else {
+      // Outside reactive context: read directly from the target.
+      // Signals may hold stale values between a write and the next flush.
+      value = target[property];
+
+      // Bind array prototype methods to the receiver so mutations go through the proxy.
+      if (value != null && isFn && value === Array.prototype[property as any])
+        return (...args: unknown[]) => Array.prototype[property as any].apply(receiver, args);
     }
 
     return isWrappable(value) ? wrap(value) : value;
@@ -200,25 +210,24 @@ const proxyTraps: ProxyHandler<solid_store.StoreNode> = {
 
   has(target, property) {
     if (
-      property === solid_store.$RAW ||
-      property === solid.$PROXY ||
-      property === solid.$TRACK ||
+      property === $PROXY ||
+      property === $TRACK ||
       property === $NODE ||
       property === $HAS ||
       property === "__proto__"
     )
       return true;
-    solid.getListener() && getNode(getNodes(target, $HAS), property)!();
+    getObserver() && getNode(getNodes(target, $HAS), property)!();
     return property in target;
   },
 
   set(target, property, value) {
-    solid.batch(() => setProperty(target, property, solid_store.unwrap(value)));
+    setProperty(target, property, value);
     return true;
   },
 
   deleteProperty(target, property) {
-    solid.batch(() => setProperty(target, property, undefined, true));
+    setProperty(target, property, undefined, true);
     return true;
   },
 
@@ -232,11 +241,11 @@ const proxyTraps: ProxyHandler<solid_store.StoreNode> = {
   */
 };
 
-function wrap<T extends solid_store.StoreNode>(value: T): T {
-  let proxy = value[solid.$PROXY];
+function wrap<T extends MutableNode>(value: T): T {
+  let proxy = value[$PROXY];
 
   if (!proxy) {
-    Object.defineProperty(value, solid.$PROXY, { value: (proxy = new Proxy(value, proxyTraps)) });
+    Object.defineProperty(value, $PROXY, { value: (proxy = new Proxy(value, proxyTraps)) });
 
     const desc = Object.getOwnPropertyDescriptors(value);
 
@@ -246,7 +255,7 @@ function wrap<T extends solid_store.StoreNode>(value: T): T {
       if (desc[prop]!.set) {
         const og = desc[prop]!.set;
 
-        Object.defineProperty(value, prop, { set: v => solid.batch(() => og.call(proxy, v)) });
+        Object.defineProperty(value, prop, { set: v => og.call(proxy, v) });
       }
     }
   }
@@ -254,7 +263,7 @@ function wrap<T extends solid_store.StoreNode>(value: T): T {
   return proxy;
 }
 
-export type MutableOptions = { name?: string };
+export type MutableOptions = Record<string, never>;
 
 /**
  * Creates a new mutable Store proxy object. Stores only trigger updates on values changing
@@ -263,7 +272,7 @@ export type MutableOptions = { name?: string };
  * Useful for integrating external systems or as a compatibility layer with MobX/Vue.
  *
  * @param state original object to be wrapped in a proxy (the object is not cloned)
- * @param options Name of the store (used for debugging)
+ * @param options reserved for future use
  * @returns mutable proxy of the {@link state} object
  *
  * @example
@@ -279,37 +288,34 @@ export type MutableOptions = { name?: string };
  * state.list.push(anotherValue);
  * ```
  */
-export function createMutable<T extends solid_store.StoreNode>(
-  state: T,
-  options?: MutableOptions,
-): T {
+export function createMutable<T extends MutableNode>(state: T, _options?: MutableOptions): T {
   /*
     TODO: improve server noop
     https://github.com/solidjs/solid/issues/1733
   */
   if (isServer) return state;
 
-  // TODO: remove this later
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  const unwrappedStore = solid_store.unwrap(state || {});
+  const unwrappedStore = state;
 
-  if (isDev && typeof unwrappedStore !== "object" && typeof unwrappedStore !== "function")
+  if (DEV && ((state as any) === null || (typeof state !== "object" && typeof state !== "function")))
     throw new Error(
-      `Unexpected type ${typeof unwrappedStore} received when initializing 'createMutable'. Expected an object.`,
+      `Unexpected value ${String(state)} received when initializing 'createMutable'. Expected a non-null object or function.`,
     );
 
   const wrappedStore = wrap(unwrappedStore);
 
-  if (isDev) solid.DEV!.registerGraph({ value: unwrappedStore, name: options && options.name });
+  if (DEV) DEV.hooks.onGraph?.(unwrappedStore, getOwner());
 
   return wrappedStore;
 }
 
 /**
- * Helper function that simplifies making multiple changes to a mutable Store in a single batch, so that dependant computations update just once instead of once per update.
+ * Helper function that applies multiple mutations to a mutable Store via a single modifier function.
+ * Provides a named grouping for related mutations; dependent computations update once after all
+ * changes are applied because all signal writes in Solid are automatically batched.
  *
- * @param state The mutable Store to modify
- * @param modifier a Store modifier such as those returned by `reconcile` or `produce` (from `"solid-js/store"`). *(If you pass in your own modifier function, beware that its argument is an unwrapped version of the Store.)*
+ * @param state The mutable Store (or nested proxy thereof) to modify
+ * @param modifier a function that receives the mutable proxy and mutates it directly
  *
  * @example
  * ```ts
@@ -320,19 +326,12 @@ export function createMutable<T extends solid_store.StoreNode>(
  *   },
  * });
  *
- * // Replace state.user with the specified object (deleting any other fields)
- * modifyMutable(state.user, reconcile({
- *   firstName: "Jake",
- *   lastName: "Johnson",
- * });
- *
- * // Modify two fields in batch, triggering just one update
- * modifyMutable(state.user, produce((u) => {
+ * modifyMutable(state.user, u => {
  *   u.firstName = "Jake";
  *   u.lastName = "Johnson";
  * });
  * ```
  */
-export function modifyMutable<T>(state: T, modifier: (state: T) => T): void {
-  solid.batch(() => modifier(solid_store.unwrap(state)));
+export function modifyMutable<T>(state: T, modifier: (state: T) => void): void {
+  modifier(state);
 }
