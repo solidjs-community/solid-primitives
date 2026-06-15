@@ -1,5 +1,11 @@
 # @solid-primitives/gestures
 
+## 2.0.0
+
+### Major Changes
+
+- Migrate to Solid.js v2.0 (beta.14). All gesture primitives converted from `use:` directives to ref factory functions. See changeset for full breaking change details.
+
 ## 1.2.0
 
 ### Minor Changes

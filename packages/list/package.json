@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/list",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A List component, an alternative to For and Index.",
   "author": "Maciek50322 <34212298+maciek50322@users.noreply.github.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "list",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "listArray",
       "List"
@@ -52,10 +52,15 @@
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }
