@@ -21,20 +21,12 @@ A set of primitives for working with Web Workers:
 ```bash
 npm install @solid-primitives/workers
 # or
-pnpm add @solid-primitives/workers
-```
-
----
-
-## Installation
-
-```bash
-npm install @solid-primitives/workers
-# or
 yarn add @solid-primitives/workers
 # or
 pnpm add @solid-primitives/workers
 ```
+
+---
 
 ## How to use it
 
