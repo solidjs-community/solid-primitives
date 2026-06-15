@@ -54,6 +54,7 @@ export function buildWorkerCode(fns: Record<string, Function>, exports: Set<stri
     exports.add(name);
     code += `${exportObj}[${JSON.stringify(name)}]=(${Function.prototype.toString.call(fns[name]!)});\n`;
   }
+  code += `var RPC=${RPC};\n`;
   code += `(${Function.prototype.toString.call(setup)})(self,${exportObj},{});\n`;
   return code;
 }
