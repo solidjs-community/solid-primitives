@@ -4,8 +4,8 @@
 
 # @solid-primitives/workers
 
-[![size](https://img.shields.io/badge/size-1.19_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/workers)
-[![size](https://img.shields.io/npm/v/@solid-primitives/workers?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/workers)
+[![size](https://img.shields.io/badge/size-2.0_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/workers)
+[![version](https://img.shields.io/npm/v/@solid-primitives/workers?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/workers)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A set of primitives for working with Web Workers:
@@ -46,9 +46,9 @@ console.log(await worker.multiply(3, 4)); // 12
 
 **Returns:** `[worker, start, stop, exports]`
 
-- `worker` — the underlying `Worker` instance with typed async methods attached
+- `worker` — the underlying `Worker` instance with typed async methods attached. Each method returns a `CancellablePromise<T>` — a standard Promise extended with an `.abort()` method.
 - `start` — re-attaches the RPC message listener; called automatically on creation. Safe to call again (replaces the old listener rather than stacking).
-- `stop` — removes the listener and terminates the worker. `terminate` is idempotent — subsequent calls (e.g. from `onCleanup`) are no-ops.
+- `stop` — removes the listener and terminates the worker. Idempotent — subsequent calls (e.g. from `onCleanup`) are no-ops.
 - `exports` — `Set<string>` of the exported function names
 
 **Signature:**
@@ -58,6 +58,32 @@ function createWorker<T extends Record<string, Function>>(
   fns: T,
   options?: WorkerOptions,
 ): CreateWorkerResult<T>
+```
+
+#### Cancellation
+
+Every RPC call returns a `CancellablePromise` with an `.abort()` method. Calling it immediately rejects the promise with an `AbortError` and notifies the worker to stop:
+
+```ts
+const [worker] = createWorker({ wait });
+
+const call = worker.wait(5000);
+call.catch(e => console.log(e.name)); // "AbortError"
+
+setTimeout(() => call.abort(), 500); // cancel after 500 ms
+```
+
+Worker functions receive an `AbortSignal` as their **last argument** automatically. Self-contained async functions can use it to terminate early:
+
+```ts
+const [worker] = createWorker({
+  async wait(ms: number, signal?: AbortSignal): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      const t = setTimeout(resolve, ms);
+      signal?.addEventListener("abort", () => { clearTimeout(t); reject(new DOMException("Aborted", "AbortError")); }, { once: true });
+    });
+  },
+});
 ```
 
 #### ⚠️ Functions must be self-contained
@@ -120,10 +146,11 @@ function createWorkerPool<T extends Record<string, Function>>(
 
 A reactive async query that re-runs whenever reactive inputs inside `fn` change. Built on Solid's async `createMemo`, so it integrates with `<Loading>` for suspense-aware rendering. Returns `undefined` until the first resolution (on the server, always `undefined`).
 
+When inputs change before a previous call resolves, the previous call is **automatically aborted** if it returned a `CancellablePromise` — no stale results reach the accessor.
+
 ```ts
-import { createWorkerQuery } from "@solid-primitives/workers";
-import { createSignal } from "solid-js";
-import { Loading } from "solid-js";
+import { createWorker, createWorkerQuery } from "@solid-primitives/workers";
+import { createSignal, Loading } from "solid-js";
 
 const [worker] = createWorker({ add([a, b]: [number, number]) { return a + b; } });
 const [input, setInput] = createSignal<[number, number]>([1, 1]);
@@ -134,7 +161,7 @@ const result = createWorkerQuery<number>(() => worker.add(input()));
 //   <span>{result()}</span>
 // </Loading>
 
-setInput([3, 4]); // triggers a new worker call; result() updates when resolved
+setInput([3, 4]); // aborts the previous call and dispatches a new one
 ```
 
 **Returns:** `Accessor<T | undefined>`

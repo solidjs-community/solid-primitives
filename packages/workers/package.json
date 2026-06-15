@@ -20,7 +20,7 @@
       "workerScope"
     ],
     "category": "Browser APIs",
-    "gzip": 1185
+    "gzip": 2064
   },
   "files": [
     "dist"
