@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
-import { combineProps } from "../src/index.js";
+import { createRoot, createSignal, flush, merge } from "solid-js";
+import { combineProps, combineHandlers } from "../src/index.js";
 
 describe("combineProps", () => {
   it("handles one argument", () =>
@@ -18,8 +18,8 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("combines handlers", async () => {
-    createRoot(async dispose => {
+  it("combines handlers", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
@@ -69,8 +69,8 @@ describe("combineProps", () => {
     });
   });
 
-  it("event handlers can be overwritten", async () => {
-    createRoot(async dispose => {
+  it("event handlers can be overwritten", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
@@ -92,8 +92,8 @@ describe("combineProps", () => {
     });
   });
 
-  it("last value overwrites the event-listeners", async () => {
-    createRoot(async dispose => {
+  it("last value overwrites the event-listeners", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
@@ -134,8 +134,8 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("merges props with different keys", async () => {
-    createRoot(async dispose => {
+  it("merges props with different keys", () => {
+    createRoot(dispose => {
       const mockFn = vi.fn();
       const click1 = "click1";
       const click2 = "click2";
@@ -169,8 +169,8 @@ describe("combineProps", () => {
     });
   });
 
-  it("combines css classes", async () => {
-    createRoot(async dispose => {
+  it("combines css classes", () => {
+    createRoot(dispose => {
       const className1 = "primary";
       const className2 = "hover";
       const className3 = "focus";
@@ -195,27 +195,14 @@ describe("combineProps", () => {
     });
   });
 
-  it("combines css classList", async () => {
-    createRoot(async dispose => {
-      const classList1 = {
-        primary: true,
-        outline: true,
-        compact: true,
-      };
+  it("combines css class objects", () => {
+    createRoot(dispose => {
+      const classObj1 = { primary: true, outline: true, compact: true };
+      const classObj2 = { large: true, compact: false };
 
-      const classList2 = {
-        large: true,
-        compact: false,
-      };
+      const combinedProps = combineProps({ class: classObj1 }, { class: classObj2 });
 
-      const combinedProps = combineProps({ classList: classList1 }, { classList: classList2 });
-
-      expect(combinedProps.classList).toEqual({
-        primary: true,
-        outline: true,
-        large: true,
-        compact: false,
-      });
+      expect(combinedProps.class).toEqual([classObj1, classObj2]);
 
       dispose();
     });
@@ -273,11 +260,11 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("works with mergeProps", () => {
+  it("works with merge", () => {
     const cb1 = vi.fn();
     const cb2 = vi.fn();
     const combined = combineProps({ onClick: cb1 }, { onClick: cb2 });
-    const merged = mergeProps(combined);
+    const merged = merge(combined);
 
     merged.onClick("foo");
 
@@ -288,38 +275,83 @@ describe("combineProps", () => {
   });
 
   it("accepts function sources", () => {
-    createRoot(() => {
-      const [signal, setSignal] = createSignal<any>({
-        class: "primary",
-        style: {
-          margin: "10px",
-        },
-      });
+    const [signal, setSignal] = createSignal<any>({
+      class: "primary",
+      style: {
+        margin: "10px",
+      },
+    });
 
-      const combinedProps = combineProps(
+    let combinedProps: any;
+    createRoot(() => {
+      combinedProps = combineProps(
         signal,
         { class: "secondary" },
         { style: { padding: "10px" } },
       );
 
-      let i = 0;
-
-      createComputed(() => {
-        if (i === 0) {
-          expect(combinedProps.class).toBe("primary secondary");
-          expect(combinedProps.style).toEqual({
-            margin: "10px",
-            padding: "10px",
-          });
-          i++;
-        } else {
-          expect(combinedProps.class).toBe("tertiary secondary");
-          expect(combinedProps.style).toEqual({ padding: "10px" });
-          expect(combinedProps.foo).toEqual("bar");
-        }
-      });
-
-      setSignal({ class: "tertiary", foo: "bar" });
+      expect(combinedProps.class).toBe("primary secondary");
+      expect(combinedProps.style).toEqual({ margin: "10px", padding: "10px" });
     });
+
+    setSignal({ class: "tertiary", foo: "bar" });
+    flush();
+
+    expect(combinedProps.class).toBe("tertiary secondary");
+    expect(combinedProps.style).toEqual({ padding: "10px" });
+    expect(combinedProps.foo).toBe("bar");
+  });
+});
+
+describe("combineHandlers", () => {
+  it("chains handlers left-to-right", () => {
+    const order: number[] = [];
+    const combined = combineHandlers(
+      () => order.push(1),
+      () => order.push(2),
+      () => order.push(3),
+    )!;
+    combined();
+    expect(order).toEqual([1, 2, 3]);
+  });
+
+  it("passes all arguments to every handler", () => {
+    const mock1 = vi.fn();
+    const mock2 = vi.fn();
+    const combined = combineHandlers(mock1, mock2)!;
+    combined("a", "b");
+    expect(mock1).toHaveBeenCalledWith("a", "b");
+    expect(mock2).toHaveBeenCalledWith("a", "b");
+  });
+
+  it("skips null, undefined, and false", () => {
+    const mock = vi.fn();
+    const combined = combineHandlers(null, undefined, false, mock, undefined)!;
+    combined("arg");
+    expect(mock).toHaveBeenCalledOnce();
+    expect(mock).toHaveBeenCalledWith("arg");
+  });
+
+  it("supports conditional handlers", () => {
+    const mock1 = vi.fn();
+    const mock2 = vi.fn();
+
+    const inactive = combineHandlers(mock1, false ? mock2 : null)!;
+    inactive("x");
+    expect(mock1).toHaveBeenCalledWith("x");
+    expect(mock2).not.toHaveBeenCalled();
+
+    const active = combineHandlers(mock1, mock2)!;
+    active("y");
+    expect(mock2).toHaveBeenCalledWith("y");
+  });
+
+  it("returns undefined when all handlers are absent", () => {
+    expect(combineHandlers(null, undefined, false)).toBeUndefined();
+  });
+
+  it("returns the single handler unchanged (no wrapping)", () => {
+    const fn = vi.fn();
+    expect(combineHandlers(fn)).toBe(fn);
   });
 });

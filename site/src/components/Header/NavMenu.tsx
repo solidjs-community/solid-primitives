@@ -20,7 +20,8 @@ const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = p
         <ul class="flex flex-col text-lg">
           <For each={list}>
             {item => {
-              const hashName = item.replace(/\s/g, "-").toLowerCase();
+              const text = item();
+              const hashName = text.replace(/\s/g, "-").toLowerCase();
               const href = `#${hashName}`;
 
               return (
@@ -36,7 +37,7 @@ const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = p
                       }
                     }}
                   >
-                    {item}
+                    {text}
                   </a>
                 </li>
               );

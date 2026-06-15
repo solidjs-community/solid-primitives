@@ -19,7 +19,8 @@
     "list": [
       "createElementBounds"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 884
   },
   "keywords": [
     "solid",
@@ -53,16 +54,16 @@
   },
   "devDependencies": {
     "@solid-primitives/scheduled": "workspace:^",
-    "@solidjs/web": "^2.0.0-beta.12",
-    "solid-js": "^2.0.0-beta.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.12",
-    "solid-js": "^2.0.0-beta.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {}
 }

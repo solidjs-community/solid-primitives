@@ -27,7 +27,8 @@
       "createBreakpoints",
       "usePrefersDark"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 1285
   },
   "keywords": [
     "media",
@@ -68,12 +69,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.13",
-    "solid-js": "^2.0.0-beta.13"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.13",
-    "solid-js": "2.0.0-beta.13"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }

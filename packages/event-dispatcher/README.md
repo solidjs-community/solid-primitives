@@ -4,12 +4,13 @@
 
 # @solid-primitives/event-dispatcher
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-dispatcher?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/event-dispatcher)
+[![size](https://img.shields.io/badge/size-232_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-dispatcher)
 [![version](https://img.shields.io/npm/v/@solid-primitives/event-dispatcher?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-dispatcher)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 `createEventDispatcher` creates a custom-event dispatcher for emitting component events.
-SolidJS equivalent of Svelte's [homonymous function](svelte.dev/docs#run-time-svelte-createeventdispatcher).
+
+- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/utilities-event-dispatcher--docs)
 
 ## Installation
 
@@ -17,11 +18,15 @@ SolidJS equivalent of Svelte's [homonymous function](svelte.dev/docs#run-time-sv
 npm install @solid-primitives/event-dispatcher
 # or
 yarn add @solid-primitives/event-dispatcher
+# or
+pnpm add @solid-primitives/event-dispatcher
 ```
+
+Requires `solid-js` and `@solidjs/web` as peer dependencies.
 
 ## How to use it
 
-### Exemple: create and dispatch the event
+### Example: create and dispatch the event
 
 ```tsx
 import { createEventDispatcher } from "@solid-primitives/event-dispatcher";
@@ -153,10 +158,6 @@ interface Props {
 dispatch("mandatoryPayload"); // => will throw: "Error: Expected 2-3 arguments, but got 1."
 dispatch("optionalPayload"); // will not complain, but suggest "(eventName: "optionalPayload", payload?: number | undefined, ...
 ```
-
-## Demo
-
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-create-event-dispatcher-example-fbj9ge
 
 ## Changelog
 

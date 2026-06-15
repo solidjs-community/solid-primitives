@@ -1,4 +1,4 @@
-import { children, createRoot, createSignal, Show } from "solid-js";
+import { children, createRoot, createSignal, flush, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
 import {
   createTokenizer,
@@ -70,24 +70,27 @@ describe("jsx-tokenizer", () => {
   });
 
   it("handled reactive children", () => {
-    createRoot(() => {
-      const [show, setShow] = createSignal(true);
+    const [show, setShow] = createSignal(true);
 
-      const tokens = resolveTokens(parser1, () => (
+    const { tokens, dispose } = createRoot(dispose => ({
+      tokens: resolveTokens(parser1, () => (
         <>
           <Show when={show()}>
             <MyToken1 text="foo" />
           </Show>
           <MyToken1 text="bar" />
         </>
-      ));
+      )),
+      dispose,
+    }));
 
-      expect(tokens()).toHaveLength(2);
+    expect(tokens()).toHaveLength(2);
 
-      setShow(false);
+    setShow(false);
+    flush();
+    expect(tokens()).toHaveLength(1);
 
-      expect(tokens()).toHaveLength(1);
-    });
+    dispose();
   });
 
   it("should render tokens", () => {

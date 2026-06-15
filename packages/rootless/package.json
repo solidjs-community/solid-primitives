@@ -19,7 +19,8 @@
       "createSharedRoot",
       "createRootPool"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 936
   },
   "private": false,
   "sideEffects": false,
@@ -56,11 +57,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.13",
-    "solid-js": "^2.0.0-beta.13"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.13",
-    "solid-js": "2.0.0-beta.13"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }

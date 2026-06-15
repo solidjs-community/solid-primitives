@@ -19,7 +19,8 @@
       "createReactiveWorker",
       "workerScope"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 1185
   },
   "files": [
     "dist"

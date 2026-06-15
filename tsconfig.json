@@ -3,7 +3,10 @@
     "module": "NodeNext",
     "target": "ESNext",
     "newLine": "LF",
-    "lib": ["DOM", "ESNext"],
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
     "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -14,12 +17,19 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["node"],
+    "jsxImportSource": "@solidjs/web",
+    "types": [
+      "node"
+    ],
     /*
      Use source files locally
     */
-    "customConditions": ["@solid-primitives/source"]
+    "customConditions": [
+      "@solid-primitives/source"
+    ]
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

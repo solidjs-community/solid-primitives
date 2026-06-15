@@ -5,7 +5,8 @@
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>",
-    "Tom Pichaud <dev.tompichaud@icloud.com>"
+    "Tom Pichaud <dev.tompichaud@icloud.com>",
+    "David Di Biase <dave@solidjs.com>"
   ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/connectivity",
@@ -19,7 +20,8 @@
     "list": [
       "createConnectivitySignal"
     ],
-    "category": "Network"
+    "category": "Network",
+    "gzip": 785
   },
   "files": [
     "dist"
@@ -47,8 +49,7 @@
   "keywords": [
     "network",
     "online",
-    "solid",
-    "primitives"
+    "connectivity"
   ],
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
@@ -56,10 +57,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   },
   "typesVersions": {}
 }

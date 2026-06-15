@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, vi, afterAll, beforeAll } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createIdleTimer } from "../src/index.js";
 
 beforeAll(() => {
@@ -26,16 +26,20 @@ describe("createIdleTimer", () => {
       return { ...timer, dispose };
     });
 
+    flush(); // trigger onSettled to auto-start the timer
+
     vi.advanceTimersByTime(2);
 
     expect(timer.isPrompted(), "user is not prompted yet").toBe(false);
     expect(timer.isIdle(), "user is not idle yet").toBe(false);
 
     vi.advanceTimersByTime(5);
+    flush(); // commit setIsPrompted(true) from idle timeout callback
     expect(timer.isPrompted(), "user has been prompted").toBe(true);
     expect(timer.isIdle(), "user is not idle yet").toBe(false);
 
     vi.advanceTimersByTime(5);
+    flush(); // commit setIsIdle(true), setIsPrompted(false) from prompt timeout callback
     expect(timer.isPrompted(), "user is not in the prompted phase anymore").toBe(false);
     expect(timer.isIdle(), "user is idle").toBe(true);
 
@@ -56,18 +60,23 @@ describe("createIdleTimer", () => {
     expect(timer.isIdle(), "user is not idle yet, events are not bound yet").toBe(false);
 
     timer.start();
+    flush(); // commit cleanState signal writes from startListening
 
     vi.advanceTimersByTime(50);
+    flush(); // commit setIsIdle(true) from idle and prompt timeout callbacks
     expect(timer.isIdle(), "user is idle, timer should have expired by now").toBe(true);
 
     timer.reset();
+    flush(); // commit setIsIdle(false) from cleanState in timerReset
 
     vi.advanceTimersByTime(4);
     expect(timer.isIdle(), "user is not idle yet, timers have restarted").toBe(false);
     vi.advanceTimersByTime(50);
+    flush(); // commit setIsIdle(true) again from timeout callbacks
     expect(timer.isIdle(), "user is idle again").toBe(true);
 
     timer.stop();
+    flush(); // commit setIsIdle(false) from cleanState in stopListening
     vi.advanceTimersByTime(1);
     expect(timer.isIdle(), "user is not idle anymore, timers have been cleaned up").toBe(false);
 
@@ -103,6 +112,7 @@ describe("createIdleTimer", () => {
     expect(timer.isIdle(), "user is not idle yet").toBe(false);
 
     timer.triggerIdle();
+    flush(); // commit setIsIdle(true)
 
     expect(timer.isIdle(), "user is now idle").toBe(true);
     expect(handleIdle, "onIdle should have been called").toHaveBeenCalled();
@@ -114,12 +124,14 @@ describe("createIdleTimer", () => {
     expect(handleActive, "onActive should not have been called").not.toHaveBeenCalled();
 
     element.click();
+    flush(); // commit setIsIdle(false) from cleanState in timerReset
     expect(timer.isIdle(), "listenes should still be working and user is not idle anymore").toBe(
       false,
     );
     expect(handleActive, "onActive should have been called").toHaveBeenCalled();
 
     vi.advanceTimersByTime(15);
+    flush(); // commit setIsIdle(true) from idle and prompt timeout callbacks
     expect(
       timer.isIdle(),
       "the primitive's flow has not changed, user is idle again after idle timeout expires",
@@ -154,13 +166,16 @@ describe("createIdleTimer", () => {
     expect(currStatus, "events are not bound yet, the status has not changed").toBe("initial");
 
     timer.start();
+    flush(); // commit cleanState signal writes from startListening
 
     vi.advanceTimersByTime(50);
+    flush(); // commit setIsPrompted(true) so handleEvent reads it correctly on click
     expect(
       currStatus,
       "timers have started, user should be in the prompt phase, onPrompt should have been called by now",
     ).toBe("prompted");
     vi.advanceTimersByTime(60);
+    flush(); // commit setIsIdle(true) so handleEvent reads isIdle() correctly on click
     expect(currStatus, "prompt timer has expired, onIdle should have been called by now").toBe(
       "idle",
     );

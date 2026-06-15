@@ -4,7 +4,7 @@
 
 # @solid-primitives/media
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/media?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/media)
+[![size](https://img.shields.io/badge/size-1.28_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/media)
 [![size](https://img.shields.io/npm/v/@solid-primitives/media?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/media)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -21,6 +21,8 @@ Collection of reactive primitives to deal with media queries.
 npm install @solid-primitives/media
 # or
 yarn add @solid-primitives/media
+# or
+pnpm add @solid-primitives/media
 ```
 
 > **Requires Solid.js v2.0 (beta.7+)**

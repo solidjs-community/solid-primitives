@@ -4,7 +4,7 @@ export class MyClass {
   constructor(public name: string) {}
 }
 
-export const en_dict = {
+export const enDict = {
   hello: i18n.template<{ name: string; thing: string }>("Hello {{name}}! How is your {{thing}}?"),
   numbers: {
     1: "one",
@@ -32,10 +32,10 @@ export const en_dict = {
   ),
 };
 
-export type Dict = typeof en_dict;
+export type Dict = typeof enDict;
 export type Locale = "en" | "pl";
 
-export const pl_dict = {
+export const plDict = {
   hello: i18n.template("Cześć {{name}}!"),
   numbers: {
     1: "jeden",

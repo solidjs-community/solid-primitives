@@ -15,7 +15,8 @@
     "list": [
       "createPresence"
     ],
-    "category": "Animation"
+    "category": "Animation",
+    "gzip": 649
   },
   "files": [
     "dist"
@@ -50,10 +51,10 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.12"
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^2.0.0-beta.12"
+    "solid-js": "^2.0.0-beta.14"
   }
 }

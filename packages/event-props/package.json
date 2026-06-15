@@ -15,7 +15,8 @@
     "list": [
       "createEventProps"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 172
   },
   "files": [
     "dist"
@@ -49,10 +50,10 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.13"
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.13"
+    "solid-js": "2.0.0-beta.14"
   }
 }

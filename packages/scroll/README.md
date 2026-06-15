@@ -4,7 +4,7 @@
 
 # @solid-primitives/scroll
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scroll?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
+[![size](https://img.shields.io/badge/size-2.25_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
 [![size](https://img.shields.io/npm/v/@solid-primitives/scroll?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scroll)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -20,6 +20,8 @@ Reactive primitives to react to element/window scrolling, and to prevent scroll 
 npm install @solid-primitives/scroll
 # or
 yarn add @solid-primitives/scroll
+# or
+pnpm add @solid-primitives/scroll
 ```
 
 ## `createScrollPosition`
@@ -92,10 +94,6 @@ const { x, y } = destructure(createScrollPosition());
 x(); // => number
 y(); // => number
 ```
-
-### Demo
-
-https://codesandbox.io/s/solid-primitives-scroll-xy19c8?file=/index.tsx
 
 ## `useWindowScrollPosition`
 

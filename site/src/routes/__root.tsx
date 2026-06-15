@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
-import { ErrorBoundary, type ParentProps, Suspense } from "solid-js";
-import { HydrationScript } from "solid-js/web";
+import { Errored, type ParentProps, Loading } from "solid-js";
+import { HydrationScript } from "@solidjs/web";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/solid-router";
 
 import "../app.scss";
@@ -78,8 +78,8 @@ function RootDocument(props: ParentProps) {
         <HeadContent />
       </head>
       <body class="dark:text-[#F1F0F2]">
-        <Suspense>
-          <ErrorBoundary fallback={err => <div>Error: {String(err)}</div>}>
+        <Loading>
+          <Errored fallback={err => <div>Error: {String(err)}</div>}>
             <div id="root">
               <Header />
               <div id="root-subcontainer" class="md:overflow-x-clip">
@@ -88,8 +88,8 @@ function RootDocument(props: ParentProps) {
                 <Footer />
               </div>
             </div>
-          </ErrorBoundary>
-        </Suspense>
+          </Errored>
+        </Loading>
         <Scripts />
       </body>
     </html>

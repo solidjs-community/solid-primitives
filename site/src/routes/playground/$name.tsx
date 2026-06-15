@@ -1,5 +1,5 @@
-import { type Component, Suspense, lazy } from "solid-js";
-import { Dynamic } from "solid-js/web";
+import { type Component, Loading, lazy } from "solid-js";
+import { Dynamic } from "@solidjs/web";
 import { createFileRoute, notFound } from "@tanstack/solid-router";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
 import NotFound from "~/components/NotFound.jsx";
@@ -57,9 +57,9 @@ function PlaygroundPage() {
 
       <div class="package-playground">
         <ClientOnly>
-          <Suspense>
+          <Loading>
             <Dynamic component={modules[params().name]} />
-          </Suspense>
+          </Loading>
         </ClientOnly>
       </div>
     </main>

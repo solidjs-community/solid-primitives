@@ -1,5 +1,24 @@
 # @solid-primitives/fullscreen
 
+## 2.0.0-beta.0
+
+### Breaking Changes
+
+- Migrate `@solid-primitives/fullscreen` to Solid.js 2.0 (beta.14).
+- Peer dependency updated from `solid-js ^1.6.12` to `solid-js ^2.0.0-beta.14` and `@solidjs/web ^2.0.0-beta.14`.
+- The `use:createFullscreen` JSX directive (Solid 1.x `use:` namespace) is removed. Use the new `fullscreen()` ref directive factory instead:
+
+  ```tsx
+  // Before (Solid 1.x)
+  <div use:createFullscreen={fs} />
+
+  // After (Solid 2.0)
+  <div ref={fullscreen()} />
+  ```
+
+- `isServer` is now imported from `@solidjs/web` instead of `solid-js/web`.
+- `createResource` removed upstream — `createFullscreen` now uses an async `createMemo` pattern internally.
+
 ## 1.3.4
 
 ### Patch Changes

@@ -28,7 +28,8 @@
       "addWithOptionsMethod",
       "makeObjectStorage"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 2013
   },
   "files": [
     "dist"
@@ -63,7 +64,6 @@
     }
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -81,17 +81,16 @@
   },
   "peerDependencies": {
     "@tauri-apps/plugin-store": "*",
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "peerDependenciesMeta": {
-    "solid-start": {
-      "optional": true
-    },
     "@tauri-apps/plugin-store": {
       "optional": true
     }
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "2.0.0-beta.14",
+    "@solidjs/web": "2.0.0-beta.14"
   }
 }

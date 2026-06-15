@@ -18,7 +18,8 @@
       "createEventHub",
       "createEventStack"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1053
   },
   "private": false,
   "sideEffects": false,
@@ -56,10 +57,10 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.13"
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.13"
+    "solid-js": "2.0.0-beta.14"
   }
 }

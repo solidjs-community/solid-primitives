@@ -18,7 +18,8 @@
       "createPointerPosition",
       "createPointerList"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 1900
   },
   "keywords": [
     "solid",
@@ -58,12 +59,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.13",
-    "solid-js": "^2.0.0-beta.13"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.13",
-    "solid-js": "2.0.0-beta.13"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }

@@ -4,7 +4,7 @@
 
 # @solid-primitives/scheduled
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scheduled?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/scheduled)
+[![size](https://img.shields.io/badge/size-671_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scheduled)
 [![version](https://img.shields.io/npm/v/@solid-primitives/scheduled?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scheduled)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
@@ -23,6 +23,8 @@ Primitives for creating scheduled — throttled or debounced — callbacks.
 npm install @solid-primitives/scheduled
 # or
 yarn add @solid-primitives/scheduled
+# or
+pnpm add @solid-primitives/scheduled
 ```
 
 ## `debounce`
@@ -205,8 +207,6 @@ BOTTOM: called user callback
 5. █                █
 6. █      █         █
 ```
-
-[**Interactive DEMO of the schematic above**](https://primitives.solidjs.community/playground/scheduled)
 
 ## Changelog
 
