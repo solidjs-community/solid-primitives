@@ -9,6 +9,8 @@ workerScope<
 >(({ inputs, setOutputs }) => {
   const filtered = createMemo(() => inputs.values.filter(v => v > inputs.threshold));
 
+  let pendingTimer: ReturnType<typeof setTimeout> | undefined;
+
   createEffect(
     () => {
       const arr = filtered();
@@ -18,8 +20,9 @@ workerScope<
       return { count, mean, max };
     },
     stats => {
+      clearTimeout(pendingTimer);
       const delay = 500 + Math.floor(Math.random() * 2000);
-      setTimeout(() => {
+      pendingTimer = setTimeout(() => {
         setOutputs(s => {
           (s as any).count = stats.count;
           (s as any).mean = stats.mean;
