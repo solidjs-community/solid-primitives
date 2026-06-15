@@ -12,18 +12,32 @@ export function setup(
   rpcMethods: { [key: string]: Function },
   callbacks: WorkerCallbacks,
 ): () => void {
+  const controllers = new Map<string, AbortController>();
+
   const handler = ({ data }: { data: WorkerMessage }) => {
     const id = data.id;
     if (data.type !== RPC || id == null) return;
+
+    if (data.cancel) {
+      controllers.get(id)?.abort();
+      controllers.delete(id);
+      return;
+    }
+
     if (data.method) {
       const method = rpcMethods[data.method];
       if (method == null) {
         ctx.postMessage({ id, type: RPC, error: "NO_SUCH_METHOD" });
       } else {
-        const post = (result?: unknown, error?: string) =>
+        const controller = new AbortController();
+        controllers.set(id, controller);
+        const post = (result?: unknown, error?: string) => {
+          if (!controllers.has(id)) return; // already cancelled
+          controllers.delete(id);
           ctx.postMessage({ id, type: RPC, result, error });
+        };
         Promise.resolve()
-          .then(() => method.apply(null, data.params as unknown[]))
+          .then(() => method.apply(null, [...(data.params as unknown[]), controller.signal]))
           .then(result => post(result))
           .catch(err => post(undefined, `${err}`));
       }

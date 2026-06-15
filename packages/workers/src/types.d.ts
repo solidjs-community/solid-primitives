@@ -12,12 +12,16 @@ export type WorkerMessage = {
   method?: string;
   result?: unknown;
   params?: unknown[];
+  cancel?: true;
 };
+
+/** A Promise with an `abort()` method that rejects it immediately and notifies the worker. */
+export type CancellablePromise<T> = Promise<T> & { abort: () => void };
 
 /** Maps each function in T to its async RPC counterpart on the main thread. */
 export type WorkerMethods<T extends Record<string, Function>> = {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R
-    ? (...args: A) => Promise<Awaited<R>>
+    ? (...args: A) => CancellablePromise<Awaited<R>>
     : never;
 };
 

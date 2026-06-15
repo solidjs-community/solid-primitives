@@ -1,6 +1,7 @@
 import { type Accessor, createMemo, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
 import type {
+  CancellablePromise,
   WorkerCallbacks,
   WorkerMessage,
   WorkerMethods,
@@ -75,12 +76,21 @@ export function createWorker<T extends Record<string, Function>>(
     terminate();
   };
 
-  const call = (method: string, params: unknown[]) =>
-    new Promise<unknown>((resolve, reject) => {
-      const id = `rpc${counter++}`;
+  const call = (method: string, params: unknown[]): CancellablePromise<unknown> => {
+    const id = `rpc${counter++}`;
+    const promise = new Promise<unknown>((resolve, reject) => {
       callbacks.set(id, [resolve, reject]);
       worker.postMessage({ type: RPC, id, method, params } satisfies WorkerMessage);
     });
+    const abort = () => {
+      const cb = callbacks.get(id);
+      if (!cb) return;
+      callbacks.delete(id);
+      worker.postMessage({ type: RPC, id, cancel: true } satisfies WorkerMessage);
+      cb[1](Object.assign(new Error("Worker call aborted"), { name: "AbortError" }));
+    };
+    return Object.assign(promise, { abort });
+  };
 
   const proxy = worker as Worker & WorkerMethods<T>;
   for (const name of exports) {
@@ -177,8 +187,12 @@ export function createWorkerPool<T extends Record<string, Function>>(
  * ```
  */
 export function createWorkerQuery<T>(fn: () => Promise<T>): Accessor<T | undefined> {
-  if (isServer) {
-    return () => undefined;
-  }
-  return createMemo(fn) as Accessor<T | undefined>;
+  if (isServer) return () => undefined;
+  let abort: (() => void) | undefined;
+  return createMemo(async () => {
+    abort?.();
+    const p = fn();
+    abort = typeof (p as any).abort === "function" ? (p as any).abort : undefined;
+    return p;
+  }) as Accessor<T | undefined>;
 }

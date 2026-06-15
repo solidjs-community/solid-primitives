@@ -1,4 +1,4 @@
-import { createSignal, For, isPending, Loading, Show } from "solid-js";
+import { createSignal, For, isPending, Loading, Match, Show, Switch } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createWorker, createWorkerPool, createWorkerQuery, createReactiveWorker } from "@solid-primitives/workers";
 import readme from "../README.md?raw";
@@ -29,8 +29,11 @@ async function isPrime(n: number): Promise<boolean> {
   return true;
 }
 
-async function wait(ms: number): Promise<number> {
-  await new Promise(r => setTimeout(r, ms));
+async function wait(ms: number, signal?: AbortSignal): Promise<number> {
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => { clearTimeout(timer); reject(new DOMException("Aborted", "AbortError")); }, { once: true });
+  });
   return ms;
 }
 
@@ -366,6 +369,116 @@ export const ReactiveStoreBridge = meta.story({
 
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
           Dataset: {DATASET.length} integers (1–100). Filtering and stats computed reactively inside the worker.
+        </p>
+      </Container>
+    );
+  },
+});
+
+// ─── Story 5: Cancellable operation ─────────────────────────────────────────
+
+type Phase = "idle" | "running" | "done" | "cancelled";
+
+export const CancellableOperation = meta.story({
+  name: "Cancellable operation",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Every RPC call returns a `CancellablePromise` with an `.abort()` method. Calling it immediately rejects the promise with `AbortError`, sends a cancel message to the worker, and — because the worker function accepts an `AbortSignal` — clears the pending timer so the worker thread actually stops working.",
+      },
+    },
+  },
+  render: () => {
+    const [worker] = createWorker({ wait });
+    const [delay, setDelay] = createSignal(3000);
+    const [phase, setPhase] = createSignal<Phase>("idle");
+    const [elapsed, setElapsed] = createSignal(0);
+    let activeCall: ReturnType<typeof worker.wait> | null = null;
+    let t0 = 0;
+
+    const start = () => {
+      setPhase("running");
+      t0 = Date.now();
+      activeCall = worker.wait(delay());
+      activeCall
+        .then(() => {
+          setElapsed(Date.now() - t0);
+          setPhase("done");
+          activeCall = null;
+        })
+        .catch((e: Error) => {
+          setElapsed(Date.now() - t0);
+          setPhase(e.name === "AbortError" ? "cancelled" : "idle");
+          activeCall = null;
+        });
+    };
+
+    const cancel = () => activeCall?.abort();
+
+    return (
+      <Container width={340}>
+        <Section title="Duration">
+          <div style={{ display: "flex", "align-items": "center", gap: "0.75rem" }}>
+            <input
+              type="range"
+              min={1000}
+              max={5000}
+              step={500}
+              value={delay()}
+              onInput={e => setDelay(Number(e.currentTarget.value))}
+              style={{ flex: 1 }}
+            />
+            <code style={{ "font-family": font.mono, "min-width": "3rem", "text-align": "right" }}>
+              {delay() / 1000}s
+            </code>
+          </div>
+        </Section>
+
+        <ButtonRow>
+          <Button onClick={start} disabled={phase() === "running"}>Start</Button>
+          <Show when={phase() === "running"}>
+            <Button onClick={cancel} variant="outline">Cancel</Button>
+          </Show>
+        </ButtonRow>
+
+        <Card>
+          <Switch>
+            <Match when={phase() === "idle"}>
+              <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>
+                Press Start — then Cancel to abort mid-flight.
+              </span>
+            </Match>
+            <Match when={phase() === "running"}>
+              <div style={{ display: "flex", "align-items": "center", gap: "0.5rem" }}>
+                <Badge variant="warning">Running…</Badge>
+                <span style={{ "font-size": font.sizeSm, color: colors.muted }}>
+                  {delay() / 1000}s scheduled
+                </span>
+              </div>
+            </Match>
+            <Match when={phase() === "done"}>
+              <div style={{ display: "flex", "align-items": "center", gap: "0.5rem" }}>
+                <Badge variant="success">Completed</Badge>
+                <span style={{ "font-family": font.mono, "font-size": font.sizeSm }}>
+                  {elapsed()}ms
+                </span>
+              </div>
+            </Match>
+            <Match when={phase() === "cancelled"}>
+              <div style={{ display: "flex", "align-items": "center", gap: "0.5rem" }}>
+                <Badge variant="error">Cancelled</Badge>
+                <span style={{ "font-size": font.sizeSm, color: colors.muted }}>
+                  after {elapsed()}ms
+                </span>
+              </div>
+            </Match>
+          </Switch>
+        </Card>
+
+        <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
+          The worker function accepts an <code style={{ "font-family": font.mono }}>AbortSignal</code>{" "}
+          — Cancel fires it immediately, clearing the timer before it completes.
         </p>
       </Container>
     );

@@ -224,6 +224,109 @@ describe("createWorkerQuery", () => {
 
 });
 
+// ─── abort ───────────────────────────────────────────────────────────────────
+
+describe("abort", () => {
+  let mockWorker: { addEventListener: ReturnType<typeof vi.fn>; removeEventListener: ReturnType<typeof vi.fn>; postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
+
+  beforeEach(() => {
+    mockWorker = {
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      postMessage: vi.fn(),
+      terminate: vi.fn(),
+    };
+    vi.stubGlobal("Worker", vi.fn(() => mockWorker));
+  });
+
+  it("abort() rejects the promise with AbortError before the worker responds", async () => {
+    let call!: ReturnType<typeof createWorker<{ noop: () => void }>>[0]["noop"];
+    createRoot(dispose => {
+      const [worker] = createWorker({ noop() {} });
+      call = worker.noop;
+      dispose();
+    });
+
+    const p = call();
+    let error: unknown;
+    p.catch(e => { error = e; });
+
+    p.abort();
+    await Promise.resolve();
+
+    expect((error as Error).name).toBe("AbortError");
+  });
+
+  it("abort() sends a cancel message to the worker", () => {
+    let call!: ReturnType<typeof createWorker<{ noop: () => void }>>[0]["noop"];
+    createRoot(dispose => {
+      const [worker] = createWorker({ noop() {} });
+      call = worker.noop;
+      dispose();
+    });
+
+    const p = call();
+    p.catch(() => {});
+    p.abort();
+
+    const cancelMsg = mockWorker.postMessage.mock.calls.find(([msg]: [any]) => msg.cancel === true);
+    expect(cancelMsg).toBeDefined();
+  });
+
+  it("abort() after the promise already resolved is a no-op", async () => {
+    let mainListeners: ((e: { data: unknown }) => void)[] = [];
+    const mock = {
+      addEventListener: vi.fn((_: string, h: (e: { data: unknown }) => void) => { mainListeners.push(h); }),
+      removeEventListener: vi.fn(),
+      postMessage: vi.fn(),
+      terminate: vi.fn(),
+    };
+    vi.stubGlobal("Worker", vi.fn(() => mock));
+
+    let call!: ReturnType<typeof createWorker<{ add: (a: number, b: number) => number }>>[0]["add"];
+    createRoot(dispose => {
+      const [worker] = createWorker({ add(a: number, b: number) { return a + b; } });
+      call = worker.add;
+      dispose();
+    });
+
+    const p = call(1, 2);
+    const callMsg = mock.postMessage.mock.calls.find(([m]: [any]) => m.method === "add");
+    const { id } = callMsg[0];
+    mainListeners.forEach(h => h({ data: { type: 1, id, result: 3 } }));
+
+    await Promise.resolve();
+    expect(await p).toBe(3);
+
+    expect(() => p.abort()).not.toThrow();
+    expect(mock.postMessage.mock.calls.every(([m]: [any]) => !m.cancel)).toBe(true);
+  });
+});
+
+describe("createWorkerQuery abort", () => {
+  it("auto-aborts the previous in-flight call when reactive inputs change", async () => {
+    const aborted: string[] = [];
+    let callIdx = 0;
+
+    const [n, setN] = createSignal(1);
+    createRoot(() => {
+      createWorkerQuery(() => {
+        n(); // read the signal so the memo tracks it as a dep
+        const id = `call-${callIdx++}`;
+        const p = new Promise(() => {}) as any; // never resolves — simulates slow worker
+        p.abort = () => aborted.push(id);
+        return p as Promise<number>;
+      });
+    });
+
+    await settle();
+    setN(2); // triggers re-run; createWorkerQuery should abort call-0 before dispatching call-1
+    await settle();
+
+    expect(aborted).toContain("call-0");
+  });
+});
+
 // ─── createReactiveWorker + workerScope ──────────────────────────────────────
 
 describe("createReactiveWorker + workerScope", () => {
