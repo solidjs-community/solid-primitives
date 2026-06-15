@@ -28,7 +28,7 @@ async function settle(cycles = 5) {
 // ─── createWorker ────────────────────────────────────────────────────────────
 
 describe("createWorker", () => {
-  let mockWorker: { addEventListener: ReturnType<typeof vi.fn>; postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
+  let mockWorker: { addEventListener: ReturnType<typeof vi.fn>; removeEventListener: ReturnType<typeof vi.fn>; postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     mockWorker = {
