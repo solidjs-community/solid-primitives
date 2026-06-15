@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/workers",
-  "version": "0.4.3",
+  "version": "2.0.0",
   "description": "Primitives that support creating Web Workers.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",
@@ -11,14 +11,16 @@
   },
   "primitive": {
     "name": "workers",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createWorker",
       "createWorkerPool",
-      "createSignaledWorker"
+      "createWorkerQuery",
+      "createReactiveWorker",
+      "workerScope"
     ],
     "category": "Browser APIs",
-    "gzip": 1185
+    "gzip": 2064
   },
   "files": [
     "dist"
@@ -30,14 +32,22 @@
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
-    "import": {
-      "@solid-primitives/source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "import": {
+        "@solid-primitives/source": "./src/index.ts",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./worker": {
+      "import": {
+        "@solid-primitives/source": "./src/worker-scope.ts",
+        "types": "./dist/worker-scope.d.ts",
+        "default": "./dist/worker-scope.js"
+      }
     }
   },
   "scripts": {
-    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
@@ -51,10 +61,12 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.14",
+    "solid-js": "^2.0.0-beta.14"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.14",
+    "solid-js": "2.0.0-beta.14"
   }
 }
