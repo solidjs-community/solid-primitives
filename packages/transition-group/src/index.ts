@@ -1,47 +1,20 @@
 import {
   type Accessor,
-  batch,
   createSignal,
+  createMemo,
+  createRenderEffect,
   untrack,
   $TRACK,
-  createComputed,
-  createMemo,
-  useTransition,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
+import { noop } from "@solid-primitives/utils";
+import type { ListTransitionOptions, SwitchTransitionOptions } from "./types.js";
 
-const noop = () => {
-  /* noop */
-};
-const noopTransition = (el: any, done: () => void) => done();
+export type * from "./types.js";
 
-export type TransitionMode = "out-in" | "in-out" | "parallel";
+const noopTransition = (_el: any, done: () => void) => done();
 
-export type OnTransition<T> = (el: T, done: () => void) => void;
-
-export type SwitchTransitionOptions<T> = {
-  /**
-   * a function to be called when a new element is entering. {@link OnTransition}
-   *
-   * It receives the element and a callback to be called when the transition is done.
-   */
-  onEnter?: OnTransition<T>;
-  /**
-   * a function to be called when an exiting element is leaving. {@link OnTransition}
-   *
-   * It receives the element and a callback to be called when the transition is done.
-   * The element is kept in the DOM until the done() callback is called.
-   */
-  onExit?: OnTransition<T>;
-  /**
-   * transition mode. {@link TransitionMode}
-   *
-   * Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
-   */
-  mode?: TransitionMode;
-  /** whether to run the transition on the initial elements. Defaults to `false` */
-  appear?: boolean;
-};
+const VERSION_SIGNAL_OPTS = { equals: false, ownedWrite: true } as const;
 
 /**
  * Create an element transition interface for switching between single elements.
@@ -86,23 +59,31 @@ export function createSwitchTransition<T>(
 
   const { onEnter = noopTransition, onExit = noopTransition } = options;
 
-  const [returned, setReturned] = createSignal<NonNullable<T>[]>(
-    options.appear ? [] : initReturned,
-  );
-  const [isTransitionPending] = useTransition();
+  // The list is maintained in a plain closure variable (synchronous mutations) and
+  // a version counter signal. The version signal marks the memo stale immediately
+  // when written, so the memo recomputes synchronously on the next read — even
+  // inside a user effect running in the same flush cycle.
+  let currentList: NonNullable<T>[] = options.appear ? [] : initReturned.slice();
+  const [listVersion, bumpVersion] = createSignal(0, VERSION_SIGNAL_OPTS);
+
+  function updateList(fn: (prev: NonNullable<T>[]) => NonNullable<T>[]) {
+    currentList = fn(currentList);
+    bumpVersion(v => v + 1);
+  }
 
   let next: T | undefined;
   let isExiting = false;
+  // Pre-seeded with initSource so the first render-effect run skips the transition
+  // when appear is false (the initial element is already shown).
+  let prevEl: T | undefined = options.appear ? undefined : (initSource as T | undefined);
 
   function exitTransition(el: T | undefined, after?: () => void) {
     if (!el) return after && after();
     isExiting = true;
     onExit(el, () => {
-      batch(() => {
-        isExiting = false;
-        setReturned(p => p.filter(e => e !== el));
-        after && after();
-      });
+      isExiting = false;
+      updateList(p => p.filter(e => e !== el));
+      after && after();
     });
   }
 
@@ -110,7 +91,7 @@ export function createSwitchTransition<T>(
     const el = next;
     if (!el) return after && after();
     next = undefined;
-    setReturned(p => [el, ...p]);
+    updateList(p => [el, ...p]);
     onEnter(el, after ?? noop);
   }
 
@@ -127,62 +108,28 @@ export function createSwitchTransition<T>(
             enterTransition();
           };
 
-  createComputed(
-    (prev: T | undefined) => {
-      const el = source();
-
-      if (untrack(isTransitionPending)) {
-        // wait for pending transition to end before animating
-        isTransitionPending();
-        return prev;
-      }
-
-      if (el !== prev) {
+  // createRenderEffect runs its apply synchronously in the reactive pass, before
+  // deferred effects, so triggerTransitions (and the updateList calls within it)
+  // happen before any user createEffect runs in the same flush.
+  createRenderEffect(
+    () => source() as T | undefined,
+    (el: T | undefined) => {
+      if (el !== prevEl) {
         next = el;
-        batch(() => untrack(() => triggerTransitions(prev)));
+        const prev = prevEl;
+        prevEl = el;
+        triggerTransitions(prev);
       }
-
-      return el;
     },
-    options.appear ? undefined : initSource,
   );
 
-  return returned;
+  // Call listVersion() only to set up reactive subscriptions; always return
+  // currentList directly so reads during the same flush see the latest state.
+  return () => {
+    listVersion();
+    return currentList;
+  };
 }
-
-export type OnListChange<T> = (payload: {
-  /** full list of elements to be rendered */
-  list: T[];
-  /** list of elements that were added since the last change */
-  added: T[];
-  /** list of elements that were removed since the last change */
-  removed: T[];
-  /** list of elements that were already added before, and are not currently exiting */
-  unchanged: T[];
-  /** Callback for finishing the transition of exiting elements - removes them from rendered array */
-  finishRemoved: (els: T[]) => void;
-}) => void;
-
-export type ExitMethod = "remove" | "move-to-end" | "keep-index";
-
-export type ListTransitionOptions<T> = {
-  /**
-   * A function to be called when the list changes. {@link OnListChange}
-   *
-   * It receives the list of current, added, removed, and unchanged elements.
-   * It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
-   */
-  onChange: OnListChange<T>;
-  /** whether to run the transition on the initial elements. Defaults to `false` */
-  appear?: boolean;
-  /**
-   * This controls how the elements exit. {@link ExitMethod}
-   * - `"remove"` removes the element immediately.
-   * - `"move-to-end"` (default) will move elements which have exited to the end of the array.
-   * - `"keep-index"` will splice them in at their previous index.
-   */
-  exitMethod?: ExitMethod;
-};
 
 /**
  * Create an element list transition interface for changes to the list of elements.
@@ -226,20 +173,24 @@ export function createListTransition<T extends object>(
 
   const { onChange } = options;
 
-  // if appear is enabled, the initial transition won't have any previous elements.
-  // otherwise the elements will match and transition skipped, or transitioned if the source is different from the initial value
+  // Pre-seeded with initSource so the first memo run skips the transition
+  // when appear is false (all elements are already "known").
   let prevSet: ReadonlySet<T> = new Set(options.appear ? undefined : initSource);
   const exiting = new WeakSet<T>();
 
-  const [toRemove, setToRemove] = createSignal<T[]>([], { equals: false });
-  const [isTransitionPending] = useTransition();
+  // Pending removals are accumulated in a plain array and consumed atomically by
+  // the memo. Using a version counter signal instead of storing in a signal avoids
+  // mutating signal-owned values.
+  const pendingRemovals: T[] = [];
+  const [removeVersion, setRemoveVersion] = createSignal(0, VERSION_SIGNAL_OPTS);
 
   const finishRemoved: (els: T[]) => void =
     options.exitMethod === "remove"
       ? noop
       : els => {
-          setToRemove(p => (p.push.apply(p, els), p));
+          pendingRemovals.push(...els);
           for (const el of els) exiting.delete(el);
+          setRemoveVersion(v => v + 1);
         };
 
   const handleRemoved: (els: T[], el: T, i: number) => void =
@@ -249,59 +200,55 @@ export function createListTransition<T extends object>(
         ? (els, el, i) => els.splice(i, 0, el)
         : (els, el) => els.push(el);
 
-  return createMemo(
-    prev => {
-      const elsToRemove = toRemove();
-      const sourceList = source();
-      (sourceList as any)[$TRACK]; // top level store tracking
+  // createMemo is pull-based: it recomputes synchronously when read and its deps
+  // are stale, so user effects that read this memo see the latest list immediately
+  // after a flush without requiring an additional flush cycle.
+  return createMemo((prev: T[] = options.appear ? [] : initSource.slice()) => {
+    removeVersion(); // track version for finishRemoved-driven recomputation
+    const sourceList = source();
+    (sourceList as any)[$TRACK]; // top level store tracking
 
-      if (untrack(isTransitionPending)) {
-        // wait for pending transition to end before animating
-        isTransitionPending();
-        return prev;
+    if (pendingRemovals.length) {
+      const toRemove = pendingRemovals.splice(0); // take all and clear atomically
+      const next = prev.filter(e => !toRemove.includes(e));
+      untrack(() =>
+        onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved }),
+      );
+      return next;
+    }
+
+    return untrack(() => {
+      const nextSet: ReadonlySet<T> = new Set(sourceList);
+      const next: T[] = sourceList.slice();
+
+      const added: T[] = [];
+      const removed: T[] = [];
+      const unchanged: T[] = [];
+
+      for (const el of sourceList) {
+        (prevSet.has(el) ? unchanged : added).push(el);
       }
 
-      if (elsToRemove.length) {
-        const next = prev.filter(e => !elsToRemove.includes(e));
-        elsToRemove.length = 0;
-        onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved });
-        return next;
-      }
-
-      return untrack(() => {
-        const nextSet: ReadonlySet<T> = new Set(sourceList);
-        const next: T[] = sourceList.slice();
-
-        const added: T[] = [];
-        const removed: T[] = [];
-        const unchanged: T[] = [];
-
-        for (const el of sourceList) {
-          (prevSet.has(el) ? unchanged : added).push(el);
-        }
-
-        let nothingChanged = !added.length;
-        for (let i = 0; i < prev.length; i++) {
-          const el = prev[i]!;
-          if (!nextSet.has(el)) {
-            if (!exiting.has(el)) {
-              removed.push(el);
-              exiting.add(el);
-            }
-            handleRemoved(next, el, i);
+      let nothingChanged = !added.length;
+      for (let i = 0; i < prev.length; i++) {
+        const el = prev[i]!;
+        if (!nextSet.has(el)) {
+          if (!exiting.has(el)) {
+            removed.push(el);
+            exiting.add(el);
           }
-          if (nothingChanged && el !== next[i]) nothingChanged = false;
+          handleRemoved(next, el, i);
         }
+        if (nothingChanged && el !== next[i]) nothingChanged = false;
+      }
 
-        // skip if nothing changed
-        if (!removed.length && nothingChanged) return prev;
+      // skip if nothing changed
+      if (!removed.length && nothingChanged) return prev;
 
-        onChange({ list: next, added, removed, unchanged, finishRemoved });
+      onChange({ list: next, added, removed, unchanged, finishRemoved });
 
-        prevSet = nextSet;
-        return next;
-      });
-    },
-    options.appear ? [] : initSource.slice(),
-  );
+      prevSet = nextSet;
+      return next;
+    });
+  });
 }
