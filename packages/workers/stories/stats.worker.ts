@@ -18,11 +18,14 @@ workerScope<
       return { count, mean, max };
     },
     stats => {
-      setOutputs(s => {
-        (s as any).count = stats.count;
-        (s as any).mean = stats.mean;
-        (s as any).max = stats.max;
-      });
+      const delay = 500 + Math.floor(Math.random() * 2000);
+      setTimeout(() => {
+        setOutputs(s => {
+          (s as any).count = stats.count;
+          (s as any).mean = stats.mean;
+          (s as any).max = stats.max;
+        });
+      }, delay);
     },
   );
 });

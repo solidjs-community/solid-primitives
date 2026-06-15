@@ -1,4 +1,4 @@
-import { createSignal, For, Loading, Show } from "solid-js";
+import { createSignal, For, isPending, Loading, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createWorker, createWorkerPool, createWorkerQuery, createReactiveWorker } from "@solid-primitives/workers";
 import readme from "../README.md?raw";
@@ -18,7 +18,8 @@ import {
 // ─── Shared self-contained worker functions ───────────────────────────────────
 // These are serialized via Function.prototype.toString — no closures or imports.
 
-function isPrime(n: number): boolean {
+async function isPrime(n: number): Promise<boolean> {
+  await new Promise(r => setTimeout(r, 500 + Math.floor(Math.random() * 2000)));
   if (n < 2) return false;
   if (n === 2 || n === 3) return true;
   if (n % 2 === 0 || n % 3 === 0) return false;
@@ -28,18 +29,9 @@ function isPrime(n: number): boolean {
   return true;
 }
 
-function countPrimes(limit: number): number {
-  let count = 0;
-  for (let n = 2; n <= limit; n++) {
-    if (n === 2 || n === 3) { count++; continue; }
-    if (n % 2 === 0 || n % 3 === 0) continue;
-    let prime = true;
-    for (let i = 5; i * i <= n; i += 6) {
-      if (n % i === 0 || n % (i + 2) === 0) { prime = false; break; }
-    }
-    if (prime) count++;
-  }
-  return count;
+async function wait(ms: number): Promise<number> {
+  await new Promise(r => setTimeout(r, ms));
+  return ms;
 }
 
 // Fixed dataset for the reactive bridge story — deterministic across renders
@@ -241,26 +233,27 @@ export const AutoRefreshingQuery = meta.story({
     docs: {
       description: {
         story:
-          "`createWorkerQuery(fn)` wraps a worker call in an async `createMemo`. It re-runs automatically whenever reactive inputs inside `fn` change, integrating with `<Loading>` for the pending state.",
+          "`createWorkerQuery(fn)` wraps a worker call in an async `createMemo`. It re-runs whenever reactive inputs change. `<Loading>` covers the initial load; `isPending` detects subsequent revalidations so the stale result stays visible with a refresh indicator.",
       },
     },
   },
   render: () => {
-    const [worker] = createWorker({ countPrimes });
-    const [limit, setLimit] = createSignal(10000);
-    const count = createWorkerQuery(() => worker.countPrimes(limit()));
+    const [worker] = createWorker({ wait });
+    const [delay, setDelay] = createSignal(1000);
+    const result = createWorkerQuery(() => worker.wait(delay()));
+    const refreshing = () => isPending(() => result());
 
     return (
       <Container width={340}>
-        <Section title="Limit">
+        <Section title="Delay (ms)">
           <div style={{ display: "flex", "align-items": "center", gap: "0.75rem" }}>
             <input
               type="range"
-              min={1000}
-              max={50000}
-              step={1000}
-              value={limit()}
-              onInput={e => setLimit(Number(e.currentTarget.value))}
+              min={500}
+              max={2500}
+              step={100}
+              value={delay()}
+              onInput={e => setDelay(Number(e.currentTarget.value))}
               style={{ flex: 1 }}
             />
             <code style={{
@@ -269,17 +262,22 @@ export const AutoRefreshingQuery = meta.story({
               "min-width": "3.5rem",
               "text-align": "right",
             }}>
-              {limit().toLocaleString()}
+              {delay()}ms
             </code>
           </div>
         </Section>
 
         <Card>
-          <span style={{ "font-size": font.sizeSm, color: colors.muted }}>
-            Primes up to {limit().toLocaleString()}
-          </span>
+          <div style={{ display: "flex", "justify-content": "space-between", "align-items": "center" }}>
+            <span style={{ "font-size": font.sizeSm, color: colors.muted }}>Worker echoed</span>
+            <Show when={refreshing()}>
+              <Badge variant="warning">Refreshing…</Badge>
+            </Show>
+          </div>
           <Loading fallback={
-            <span style={{ color: colors.warning, "font-family": font.mono }}>computing…</span>
+            <span style={{ color: colors.warning, "font-family": font.mono }}>
+              Waiting {delay()}ms…
+            </span>
           }>
             <span style={{
               "font-size": "1.5rem",
@@ -287,14 +285,14 @@ export const AutoRefreshingQuery = meta.story({
               "font-family": font.mono,
               color: colors.primary,
             }}>
-              {count()?.toLocaleString()}
+              {result()}ms
             </span>
           </Loading>
         </Card>
 
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
-          Move the slider — each change dispatches a new worker call and shows the{" "}
-          <code style={{ "font-family": font.mono }}>{"<Loading>"}</code> fallback while pending.
+          Drag the slider to change the delay. The stale value stays visible with a{" "}
+          <strong>Refreshing…</strong> badge until the worker resolves.
         </p>
       </Container>
     );

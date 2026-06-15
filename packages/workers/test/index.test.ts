@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.setConfig({ testTimeout: 2000 });
 import { createEffect, createRoot, createSignal, flush } from "solid-js";
 import { createReactiveWorker, createWorker, createWorkerPool, createWorkerQuery } from "../src/index.js";
 import { workerScope } from "../src/worker-scope.js";
