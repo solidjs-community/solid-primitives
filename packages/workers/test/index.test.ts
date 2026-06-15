@@ -241,10 +241,10 @@ describe("abort", () => {
 
   it("abort() rejects the promise with AbortError before the worker responds", async () => {
     let call!: ReturnType<typeof createWorker<{ noop: () => void }>>[0]["noop"];
-    createRoot(dispose => {
+    const dispose = createRoot(d => {
       const [worker] = createWorker({ noop() {} });
       call = worker.noop;
-      dispose();
+      return d;
     });
 
     const p = call();
@@ -255,14 +255,15 @@ describe("abort", () => {
     await Promise.resolve();
 
     expect((error as Error).name).toBe("AbortError");
+    dispose();
   });
 
   it("abort() sends a cancel message to the worker", () => {
     let call!: ReturnType<typeof createWorker<{ noop: () => void }>>[0]["noop"];
-    createRoot(dispose => {
+    const dispose = createRoot(d => {
       const [worker] = createWorker({ noop() {} });
       call = worker.noop;
-      dispose();
+      return d;
     });
 
     const p = call();
@@ -271,6 +272,7 @@ describe("abort", () => {
 
     const cancelMsg = mockWorker.postMessage.mock.calls.find(([msg]: [any]) => msg.cancel === true);
     expect(cancelMsg).toBeDefined();
+    dispose();
   });
 
   it("abort() after the promise already resolved is a no-op", async () => {
@@ -284,10 +286,10 @@ describe("abort", () => {
     vi.stubGlobal("Worker", vi.fn(() => mock));
 
     let call!: ReturnType<typeof createWorker<{ add: (a: number, b: number) => number }>>[0]["add"];
-    createRoot(dispose => {
+    const dispose = createRoot(d => {
       const [worker] = createWorker({ add(a: number, b: number) { return a + b; } });
       call = worker.add;
-      dispose();
+      return d;
     });
 
     const p = call(1, 2);
@@ -300,6 +302,7 @@ describe("abort", () => {
 
     expect(() => p.abort()).not.toThrow();
     expect(mock.postMessage.mock.calls.every(([m]: [any]) => !m.cancel)).toBe(true);
+    dispose();
   });
 });
 
