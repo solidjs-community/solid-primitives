@@ -1,67 +1,59 @@
-import type { WorkerSignal, WorkerCallbacks, WorkerMessage } from "./types.js";
+import type { WorkerCallbacks, WorkerMessage } from "./types.js";
 
-export const KILL: WorkerSignal = 0;
-export const RPC: WorkerSignal = 1;
+export const RPC: number = 1;
 
 /**
- * Binds the message event and other setup tasks to the worker context.
- *
- * @param ctx Worker that will be setup.
- * @param rpcMethods RPC methods that should be bound to the worker.
- * @param callbacks Callbacks that will be bound to the worker.
+ * Binds a message handler to ctx for RPC dispatch (worker side) and response
+ * resolution (main-thread side). Returns a cleanup that removes the listener,
+ * preventing stale handlers if start() is called more than once.
  */
 export function setup(
   ctx: Worker,
   rpcMethods: { [key: string]: Function },
   callbacks: WorkerCallbacks,
-) {
+): () => void {
   const handler = ({ data }: { data: WorkerMessage }) => {
     const id = data.id;
-    if (data.type !== 1 || id == null) return;
+    if (data.type !== RPC || id == null) return;
     if (data.method) {
       const method = rpcMethods[data.method];
       if (method == null) {
-        ctx.postMessage({
-          id,
-          type: 1,
-          error: "NO_SUCH_METHOD",
-        });
+        ctx.postMessage({ id, type: RPC, error: "NO_SUCH_METHOD" });
       } else {
-        const post = (result?: string, error?: string) =>
-          ctx.postMessage({ id, type: 1, result, error });
+        const post = (result?: unknown, error?: string) =>
+          ctx.postMessage({ id, type: RPC, result, error });
         Promise.resolve()
-          .then(() => method.apply(null, data.params))
+          .then(() => method.apply(null, data.params as unknown[]))
           .then(result => post(result))
           .catch(err => post(undefined, `${err}`));
       }
     } else {
-      if (!callbacks.get(id)) return;
+      const cb = callbacks.get(id);
+      if (!cb) return;
       if (data.error) {
-        callbacks.get(id)![1](Error(data.error));
+        cb[1](Error(data.error));
       } else {
-        callbacks.get(id)![0](data.result);
+        cb[0](data.result);
       }
       callbacks.delete(id);
     }
   };
   ctx.addEventListener("message", handler);
+  return () => ctx.removeEventListener("message", handler);
 }
 
 /**
- * Converst raw code to CJS useable output.
- *
- * @param code Code to generate into CJS compliant.
- * @param exportsObjName Object names to export
- * @param exports Actual export values
- * @returns String to return with CJS values.
+ * Serializes a record of named functions into a self-contained worker script.
+ * All functions are inlined via Function.prototype.toString — they must be
+ * self-contained (no closures, no imports).
  */
-export function cjs(code: string, exportsObjName: string, exports: Set<string>): string {
-  code = code.replace(
-    /^(\s*)export\s+((?:async\s*)?function(?:\s*\*)?|const|let|var)(\s+)([a-zA-Z$_][a-zA-Z0-9$_]*)/gm,
-    (_, before, type, ws, name) => {
-      exports.add(name);
-      return `${before}${exportsObjName}.${name}=${type}${ws}${name}`;
-    },
-  );
-  return `var ${exportsObjName}={};\n${code}\n${exportsObjName};`;
+export function buildWorkerCode(fns: Record<string, Function>, exports: Set<string>): string {
+  const exportObj = `__xpo${Math.random().toString(36).substring(2)}__`;
+  let code = `var ${exportObj}={};\n`;
+  for (const name of Object.keys(fns)) {
+    exports.add(name);
+    code += `${exportObj}[${JSON.stringify(name)}]=(${Function.prototype.toString.call(fns[name]!)});\n`;
+  }
+  code += `(${Function.prototype.toString.call(setup)})(self,${exportObj},{});\n`;
+  return code;
 }

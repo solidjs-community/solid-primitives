@@ -2,42 +2,31 @@ import { type Component, Loading, createSignal, onSettled } from "solid-js";
 
 import { createWorker, createWorkerPool, createWorkerQuery } from "../src/index.js";
 
+const workerFns = {
+  add(a: number, b: number) { return a + b; },
+  subtract(a: number, b: number) { return a - b; },
+};
+
 const App: Component = () => {
-  // Worker
+  // Worker — fully typed, no cast required
   const [values, setValues] = createSignal([1, 1]);
   const [result, setResult] = createSignal(0);
-  const [worker] = createWorker(
-    function add(a, b) {
-      return a + b;
-    },
-    function subtract(a, b) {
-      return a - b;
-    },
-  );
-  const calculate = async () => setResult(await worker.add(...values()));
+  const [worker] = createWorker(workerFns);
+  const calculate = async () => setResult(await worker.add(...values() as [number, number]));
 
   // Pool
   const [poolValues, setPoolValues] = createSignal([1, 1]);
   const [poolResult, setPoolResult] = createSignal(0);
-  const [pool] = createWorkerPool(
-    4,
-    function add(a, b) {
-      return a + b;
-    },
-    function subtract(a, b) {
-      return a - b;
-    },
-  );
-  const calculatePooled = async () => setPoolResult(await pool.add(...poolValues()));
+  const [pool] = createWorkerPool(4, workerFns);
+  const calculatePooled = async () =>
+    setPoolResult(await pool.add(...poolValues() as [number, number]));
+
   calculate();
   calculatePooled();
 
-  // Query
+  // Query — reactive, integrates with <Loading>
   const [input, setInput] = createSignal<[number, number]>([1, 1]);
-  const [queryWorker] = createWorker(function add([a, b]: [number, number]) {
-    return a + b;
-  });
-  // @ts-ignore — worker methods are dynamically attached
+  const [queryWorker] = createWorker({ add([a, b]: [number, number]) { return a + b; } });
   const queryResult = createWorkerQuery<number>(() => queryWorker.add(input()));
 
   return (
@@ -48,7 +37,7 @@ const App: Component = () => {
           type="number"
           class="w-30 p-3 text-2xl"
           onInput={evt => {
-            setValues(vals => [parseInt(evt.currentTarget.value), vals[1]]);
+            setValues(vals => [parseInt(evt.currentTarget.value), vals[1]!]);
             calculate();
           }}
           value={values()[0]}
@@ -58,7 +47,7 @@ const App: Component = () => {
           type="number"
           class="w-30 p-3 text-2xl"
           onInput={evt => {
-            setValues(vals => [vals[0], parseInt(evt.currentTarget.value)]);
+            setValues(vals => [vals[0]!, parseInt(evt.currentTarget.value)]);
             calculate();
           }}
           value={values()[1]}
@@ -71,7 +60,7 @@ const App: Component = () => {
           type="number"
           class="w-30 p-3 text-2xl"
           onInput={evt => {
-            setPoolValues(vals => [parseInt(evt.currentTarget.value), vals[1]]);
+            setPoolValues(vals => [parseInt(evt.currentTarget.value), vals[1]!]);
             calculatePooled();
           }}
           value={poolValues()[0]}
@@ -81,7 +70,7 @@ const App: Component = () => {
           type="number"
           class="w-30 p-3 text-2xl"
           onInput={evt => {
-            setPoolValues(vals => [vals[0], parseInt(evt.currentTarget.value)]);
+            setPoolValues(vals => [vals[0]!, parseInt(evt.currentTarget.value)]);
             calculatePooled();
           }}
           value={poolValues()[1]}

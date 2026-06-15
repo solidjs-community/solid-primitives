@@ -10,6 +10,7 @@ import { vi } from "vitest";
 export function makeChannel() {
   let workerListeners: ((e: MessageEvent) => void)[] = [];
   let mainListeners: ((e: MessageEvent) => void)[] = [];
+  let errorListeners: ((e: ErrorEvent) => void)[] = [];
   const pendingToWorker: unknown[] = [];
 
   function dispatch(data: unknown, listeners: ((e: MessageEvent) => void)[]) {
@@ -25,13 +26,19 @@ export function makeChannel() {
         pendingToWorker.push(data);
       }
     }),
-    addEventListener: vi.fn((type: string, h: (e: MessageEvent) => void) => {
-      if (type === "message") mainListeners.push(h);
+    addEventListener: vi.fn((type: string, h: (e: any) => void) => {
+      if (type === "message") mainListeners.push(h as (e: MessageEvent) => void);
+      if (type === "error") errorListeners.push(h as (e: ErrorEvent) => void);
     }),
-    removeEventListener: vi.fn((type: string, h: (e: MessageEvent) => void) => {
-      mainListeners = mainListeners.filter(l => l !== h);
+    removeEventListener: vi.fn((type: string, h: (e: any) => void) => {
+      if (type === "message") mainListeners = mainListeners.filter(l => l !== h);
+      if (type === "error") errorListeners = errorListeners.filter(l => l !== h);
     }),
     terminate: vi.fn(),
+    /** Simulate a worker error event dispatched to main-thread error listeners. */
+    dispatchError(ev: ErrorEvent) {
+      errorListeners.forEach(h => h(ev));
+    },
   };
 
   // Replaces `self` inside workerScope

@@ -1,4 +1,4 @@
-import { createEffect, createRoot, createStore, deep, type StoreSetter } from "solid-js";
+import { createEffect, createRoot, createStore, deep, onCleanup, type StoreSetter } from "solid-js";
 import type { BridgeMessage } from "./types.js";
 
 // Minimal interface covering DedicatedWorkerGlobalScope without requiring webworker lib
@@ -20,10 +20,15 @@ export type WorkerScopeResult<
 
 /**
  * Companion to `createReactiveWorker`. Call at the top of your worker module to receive
- * a reactive `inputs` store and an `setOutputs` setter that bridges writes back to main.
+ * a reactive `inputs` store and a `setOutputs` setter that bridges writes back to main.
  *
  * The `setup` callback runs inside a `createRoot` so any `createEffect` or `createMemo`
- * you create there has a proper owner for the lifetime of the worker.
+ * you create there has a proper owner for the lifetime of the worker. **Do not** use
+ * `await workerScope()` and then create reactive primitives after the await — they will
+ * have no owner. Prefer the callback form for all reactive work.
+ *
+ * > **Note:** `workerScope` must not be called on the server. Guard with `isServer` if
+ * > your module is imported in SSR contexts.
  *
  * @example
  * ```ts
@@ -34,7 +39,7 @@ export type WorkerScopeResult<
  * workerScope<{ data: number[]; threshold: number }, { result: number }>(
  *   ({ inputs, setOutputs }) => {
  *     const filtered = createMemo(() => inputs.data.filter(v => v > inputs.threshold));
- *     createEffect(() => filtered(), v => setOutputs(s => { s.result = v.length; }));
+ *     createEffect(() => filtered(), count => setOutputs(s => { s.result = count.length; }));
  *   }
  * );
  * ```
@@ -54,14 +59,16 @@ export function workerScope<
         const [inputs, _setInputs] = createStore<I>(data.inputs as any);
         const [outputs, _setOutputs] = createStore<O>(data.outputs as any);
 
-        // Apply input changes pushed from the main thread
-        ctx.addEventListener("message", ({ data: msg }: MessageEvent<BridgeMessage>) => {
+        // Apply input changes pushed from the main thread.
+        const onInput = ({ data: msg }: MessageEvent<BridgeMessage>) => {
           if (msg.type === "input") {
             _setInputs(s => {
               (s as any)[msg.key] = msg.value;
             });
           }
-        });
+        };
+        ctx.addEventListener("message", onInput);
+        onCleanup(() => ctx.removeEventListener("message", onInput));
 
         // Forward output changes back to the main thread.
         // deep(outputs) deeply tracks the entire outputs store and returns a plain snapshot.

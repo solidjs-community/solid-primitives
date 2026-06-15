@@ -31,14 +31,19 @@ describe("createWorker", () => {
   let mockWorker: { addEventListener: ReturnType<typeof vi.fn>; postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    mockWorker = { addEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() };
+    mockWorker = {
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      postMessage: vi.fn(),
+      terminate: vi.fn(),
+    };
     vi.stubGlobal("Worker", vi.fn(() => mockWorker));
   });
 
   it("returns a [worker, start, stop, exports] tuple", () => {
-    let result!: ReturnType<typeof createWorker>;
+    let result!: ReturnType<typeof createWorker<{ add: (a: number, b: number) => number }>>;
     createRoot(dispose => {
-      result = createWorker(function add(a: number, b: number) { return a + b; });
+      result = createWorker({ add(a: number, b: number) { return a + b; } });
       dispose();
     });
     expect(result[0]).toBeDefined();
@@ -50,32 +55,60 @@ describe("createWorker", () => {
   it("exports Set contains all passed function names", () => {
     let exports!: Set<string>;
     createRoot(dispose => {
-      [, , , exports] = createWorker(
-        function multiply(a: number, b: number) { return a * b; },
-        function divide(a: number, b: number) { return a / b; },
-      );
+      [, , , exports] = createWorker({
+        multiply(a: number, b: number) { return a * b; },
+        divide(a: number, b: number) { return a / b; },
+      });
       dispose();
     });
     expect(exports.has("multiply")).toBe(true);
     expect(exports.has("divide")).toBe(true);
   });
 
-  it("attaches a callable proxy method for each exported function", () => {
-    let worker!: Worker;
+  it("attaches a typed callable method for each exported function", () => {
+    let worker!: ReturnType<typeof createWorker<{ greet: (name: string) => string }>>[0];
     createRoot(dispose => {
-      [worker] = createWorker(function greet(name: string) { return `hi ${name}`; });
+      [worker] = createWorker({ greet(name: string) { return `hi ${name}`; } });
       dispose();
     });
-    expect(typeof (worker as any).greet).toBe("function");
+    // Typed — no cast required
+    expect(typeof worker.greet).toBe("function");
   });
 
   it("terminates the Worker on owner cleanup", () => {
     const dispose = createRoot(d => {
-      createWorker(function noop() {});
+      createWorker({ noop() {} });
       return d;
     });
     dispose();
-    expect(mockWorker.terminate).toHaveBeenCalled();
+    expect(mockWorker.terminate).toHaveBeenCalledTimes(1);
+  });
+
+  it("terminate is idempotent — double-call does not throw or re-terminate", () => {
+    let stop!: () => void;
+    const dispose = createRoot(d => {
+      [, , stop] = createWorker({ noop() {} });
+      return d;
+    });
+    stop();
+    // onCleanup fires a second time — should be a no-op
+    expect(() => dispose()).not.toThrow();
+    expect(mockWorker.terminate).toHaveBeenCalledTimes(1);
+  });
+
+  it("start() replaces the old listener rather than stacking", () => {
+    let start!: () => void;
+    createRoot(dispose => {
+      [, start] = createWorker({ noop() {} });
+      start(); // second call
+      start(); // third call
+      dispose();
+    });
+    // addEventListener should have been called 3 times (initial + 2 manual),
+    // but removeEventListener must have been called 2 times to de-register
+    // the previous handler before each re-attach.
+    expect(mockWorker.addEventListener).toHaveBeenCalledTimes(3);
+    expect(mockWorker.removeEventListener).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -85,15 +118,16 @@ describe("createWorkerPool", () => {
   beforeEach(() => {
     vi.stubGlobal("Worker", vi.fn(() => ({
       addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
       postMessage: vi.fn(),
       terminate: vi.fn(),
     })));
   });
 
   it("returns a [proxy, start, stop] tuple", () => {
-    let result!: ReturnType<typeof createWorkerPool>;
+    let result!: ReturnType<typeof createWorkerPool<{ add: (a: number, b: number) => number }>>;
     createRoot(dispose => {
-      result = createWorkerPool(2, function add(a: number, b: number) { return a + b; });
+      result = createWorkerPool(2, { add(a: number, b: number) { return a + b; } });
       dispose();
     });
     expect(result[0]).toBeDefined();
@@ -102,15 +136,46 @@ describe("createWorkerPool", () => {
   });
 
   it("spawns exactly concurrency workers", () => {
-    const MockW = vi.fn(() => ({ addEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() }));
+    const mockFn = () => ({ addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() });
+    const MockW = vi.fn(mockFn);
     vi.stubGlobal("Worker", MockW);
 
     createRoot(dispose => {
-      createWorkerPool(4, function fn() {});
+      createWorkerPool(4, { fn() {} });
       dispose();
     });
 
     expect(MockW).toHaveBeenCalledTimes(4);
+  });
+
+  it("start() is idempotent — does not spawn additional workers when pool is running", () => {
+    const mockFn = () => ({ addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() });
+    const MockW = vi.fn(mockFn);
+    vi.stubGlobal("Worker", MockW);
+
+    createRoot(dispose => {
+      const [, start] = createWorkerPool(3, { fn() {} });
+      start(); // second call — should be a no-op
+      start(); // third call — should be a no-op
+      dispose();
+    });
+
+    expect(MockW).toHaveBeenCalledTimes(3);
+  });
+
+  it("stop() clears the worker pool so start() can respawn", () => {
+    const mockFn = () => ({ addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() });
+    const MockW = vi.fn(mockFn);
+    vi.stubGlobal("Worker", MockW);
+
+    createRoot(dispose => {
+      const [, start, stop] = createWorkerPool(2, { fn() {} });
+      stop();
+      start(); // should spawn 2 new workers
+      dispose();
+    });
+
+    expect(MockW).toHaveBeenCalledTimes(4); // 2 initial + 2 after restart
   });
 });
 
@@ -154,6 +219,7 @@ describe("createWorkerQuery", () => {
     await settle();
     expect(result()).toBe(4);
   });
+
 });
 
 // ─── createReactiveWorker + workerScope ──────────────────────────────────────
@@ -214,7 +280,7 @@ describe("createReactiveWorker + workerScope", () => {
   });
 
   it("output writes in the worker propagate back to the main thread store", async () => {
-    let mainOutputs!: { doubled: number };
+    let mainOutputs!: Readonly<{ doubled: number }>;
     let setInputs!: ReturnType<typeof createReactiveWorker<{ count: number }, { doubled: number }>>["setInputs"];
 
     createRoot(d => {
@@ -259,6 +325,26 @@ describe("createReactiveWorker + workerScope", () => {
     setInputs(s => { (s as any).a = 10; });
     await settle();
     expect(pairs.at(-1)).toEqual([10, 2]);
+  });
+
+  it("exposes an error signal that reflects worker ErrorEvents", async () => {
+    let errorAccessor!: ReturnType<typeof createReactiveWorker<Record<string, never>, Record<string, never>>>["error"];
+
+    createRoot(d => {
+      dispose = d;
+      ({ error: errorAccessor } = createReactiveWorker("blob:fake-worker", {
+        inputs: {},
+        outputs: {},
+      }));
+    });
+
+    // Simulate a worker error event
+    const fakeError = new ErrorEvent("error", { message: "worker crashed" });
+    channel.workerObj.dispatchError(fakeError);
+    flush();
+    await Promise.resolve();
+
+    expect(errorAccessor()).toBe(fakeError);
   });
 
   it("terminates the Worker when the owner disposes", () => {

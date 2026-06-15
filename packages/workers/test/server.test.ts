@@ -6,25 +6,24 @@ import { workerScope } from "../src/worker-scope.js";
 // All tests run with --mode ssr so isServer === true
 
 describe("createWorker (SSR)", () => {
-  it("returns a stub [EventTarget, noop, noop, undefined] tuple without throwing", () => {
-    let result: ReturnType<typeof createWorker>;
+  it("returns a stub [EventTarget, noop, noop, Set] tuple without throwing", () => {
+    let result: ReturnType<typeof createWorker<{ add: (a: number, b: number) => number }>>;
     createRoot(dispose => {
-      result = createWorker(function add(a: number, b: number) {
-        return a + b;
-      });
+      result = createWorker({ add(a: number, b: number) { return a + b; } });
       dispose();
     });
     expect(result![0]).toBeInstanceOf(EventTarget);
     expect(typeof result![1]).toBe("function");
     expect(typeof result![2]).toBe("function");
+    expect(result![3]).toBeInstanceOf(Set);
   });
 });
 
 describe("createWorkerPool (SSR)", () => {
-  it("returns a stub tuple without throwing", () => {
-    let result: ReturnType<typeof createWorkerPool>;
+  it("returns a stub [EventTarget, noop, noop] tuple without throwing", () => {
+    let result: ReturnType<typeof createWorkerPool<{ fn: () => void }>>;
     createRoot(dispose => {
-      result = createWorkerPool(2, function fn() {});
+      result = createWorkerPool(2, { fn() {} });
       dispose();
     });
     expect(result![0]).toBeInstanceOf(EventTarget);
@@ -45,18 +44,18 @@ describe("createWorkerQuery (SSR)", () => {
 });
 
 describe("createReactiveWorker (SSR)", () => {
-  it("returns stub stores without throwing", () => {
-    let inputs: any, outputs: any;
+  it("returns stub stores and a null error signal without throwing", () => {
+    let inputs: any, outputs: any, error: any;
     createRoot(dispose => {
-      ({ inputs, outputs } = createReactiveWorker(
+      ({ inputs, outputs, error } = createReactiveWorker(
         new URL("./fake.worker.ts", import.meta.url),
         { inputs: { count: 5 }, outputs: { doubled: 0 } },
       ));
       dispose();
     });
-    // Stores should reflect the initial schema values on the server
     expect(inputs.count).toBe(5);
     expect(outputs.doubled).toBe(0);
+    expect(error()).toBeNull();
   });
 });
 
