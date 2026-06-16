@@ -24,7 +24,7 @@
       "makeRetrying",
       "createAggregated"
     ],
-    "category": "Display & Media"
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",

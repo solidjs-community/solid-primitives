@@ -67,33 +67,16 @@ const closeJSONPart = (json: string) =>
  * ```
  */
 export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream) {
+  const wrappedFetcher = fromStream(fetcher);
   return async function*(...args: Args) {
-    let parts = '', decoder;
-    const source = await fetcher(...args);
-    const stream = source instanceof Response ? source.body : source;
-    const reader = stream?.getReader();
-    if (!reader) {
-      console.warn('No ReadableStream found!')
-      return;
-    }
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) return;
-      if (value) {
-        if (typeof value !== 'string') {
-          parts += (decoder ??= new TextDecoder()).decode(value, { stream: true });
-        } else {
-          parts += value;
-        }
-      }
+    for await (const data of wrappedFetcher(...args)) {
       try {
-        const parsed = JSON.parse(closeJSONPart(parts))
+        const parsed = JSON.parse(closeJSONPart(data));
         yield parsed;
       } catch (e) { /* ignore erroneous states, recover later */ }
     }
   }
 }
-
 
 export type AbortableReturn = [
   signal: () => AbortSignal,
@@ -247,7 +230,7 @@ function toArray(item: any) {
 /**
  * **Automatically aggregates resource changes**
  * ```ts
- * const pages = makeAggregated(currentPage, [], { id: "infinite-scroll" });
+ * const pages = createAggregated(currentPage, [], { id: "infinite-scroll" });
  * ```
  * @param res {Accessor<R>} - The accessor that should be aggregated
  * @param initialValue {I | undefined} - an optional initial value
