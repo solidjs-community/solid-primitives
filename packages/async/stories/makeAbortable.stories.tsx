@@ -16,7 +16,7 @@ declare global {
   class AbortError extends Error {}
 }
 
-export const MakeAbortableAutoSuggest = meta.story({
+export const Abortable = meta.story({
   name: "makeAbortable AutoSuggest",
   parameters: {
     docs: {

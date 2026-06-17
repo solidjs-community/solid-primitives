@@ -13,7 +13,7 @@ const meta = preview.meta({
 export default meta;
 
 export const FromStream = meta.story({
-  name: "makeAbortable AutoSuggest",
+  name: "fromStream streamed loading",
   parameters: {
     docs: {
       description: {

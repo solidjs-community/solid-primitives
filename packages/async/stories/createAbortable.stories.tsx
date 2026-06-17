@@ -16,7 +16,7 @@ declare global {
   class AbortError extends Error {}
 }
 
-export const CreateAbortableAutoSuggest = meta.story({
+export const AbortableWithAutoCleanup = meta.story({
   name: "createAbortable AutoSuggest",
   parameters: {
     docs: {

@@ -1,5 +1,5 @@
 import { onCleanup, createMemo } from "solid-js";
-import type { Accessor, ComputeFunction } from "solid-js";
+import type { Accessor } from "solid-js";
 import type { ReadableStream as NodeReadableStream } from "stream/web"
 
 const chained = new Map<() => AbortSignal, (() => void)[]>();
@@ -188,10 +188,10 @@ export type RetryOptions = {
  * - `delay` - number of Milliseconds to wait before retrying; default is 5s
  * - `retries` - number of times a request should be repeated before giving up throwing the last error; default is 3 times
  */
-export function makeRetrying<T, C extends ComputeFunction<undefined | NoInfer<T>, T>>(
-  fetcher: C,
+export function makeRetrying<T>(
+  fetcher: (v?: T) => PromiseLike<T> | AsyncIterable<T> | T,
   options: RetryOptions = {},
-): () => AsyncGenerator<T> {
+): () => AsyncGenerator<T, void> {
   const delay = options.delay ?? 5000;
   let retries = options.retries || 3;
   
