@@ -4,7 +4,7 @@ import data from "./data.json";
 import { createMemo, Loading } from "solid-js";
 
 const meta = preview.meta({
-  title: "Reactivity",
+  title: "Reactivity/Async",
   parameters: {
     layout: "centered",
   },
@@ -33,7 +33,7 @@ export const FromJSONStream = meta.story({
           (_, idx) => source.slice(idx * sliceLength, (idx + 1) * sliceLength - 1)
         );
         const encoder = new TextEncoder();
-        for (const part in parts) {
+        for (const part of parts) {
           await new Promise(r => setTimeout(r, 200));
           controller.enqueue(encoder.encode(part));
         }
@@ -43,7 +43,7 @@ export const FromJSONStream = meta.story({
     const items = createMemo(fromJSONStream(() => stream));
     
     return <Loading fallback="Loading...">
-      {JSON.stringify(items())}
+      <p style="max-width: 90vw; white-space: wrap; word-break: break-word;">{JSON.stringify(items())}</p>
     </Loading>
   },
 });

@@ -1,9 +1,9 @@
 import { makeRetrying } from "@solid-primitives/async";
 import preview from "../../../.storybook/preview.js";;
-import { createMemo, Loading, Errored } from "solid-js";
+import { createMemo, isPending, Errored } from "solid-js";
 
 const meta = preview.meta({
-  title: "Reactivity",
+  title: "Reactivity/Async",
   parameters: {
     layout: "centered",
   },
@@ -35,20 +35,20 @@ export const Retrying = meta.story({
     const result1 = createMemo(makeRetrying(() => service1.get()));
     const result2 = createMemo(() => service2.get());
     
-    return <Loading fallback="Loading...">
+    return <>
       <p>This simulates a service that rejects 2 times before resolving.</p>
       <h3>With retrying:</h3>
       <Errored 
         fallback={(err, reset) => <p>Failed: {err?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
       >
-        <p>{result1()}</p>
+        <p>{!isPending(result1) && result1()}</p>
       </Errored>
       <h3>Without retrying:</h3>
       <Errored 
         fallback={(err, reset) => <p>Failed: {err?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
       >
-        <p>{result2()}</p>
+        <p>{!isPending(result2) && result2()}</p>
       </Errored>
-    </Loading>
+    </>
   },
 });

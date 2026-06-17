@@ -3,7 +3,7 @@ import preview from "../../../.storybook/preview.js";
 import { createSignal, For, onCleanup } from "solid-js";
 
 const meta = preview.meta({
-  title: "Reactivity",
+  title: "Reactivity/Async",
   parameters: {
     layout: "centered",
   },
