@@ -29,7 +29,7 @@ export const Aggregation = meta.story({
     return <main id="pages">
       <ol>
         <For each={pages()}>
-          {(page) => <li style="display: flex; min-height: 1.2vh; justify-content: center; align-items: center;">{page}</li>}
+          {(page) => <li style="display: flex; height: 80vh; justify-content: center; align-items: center;">{page}</li>}
         </For>
       </ol>
       <button type="button" onClick={loadNextPage}>Load next page</button>

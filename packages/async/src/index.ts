@@ -202,6 +202,7 @@ export function makeRetrying<T>(
         result = fetcher(v);
         if (isPromiseLike(result)) { 
           yield await result;
+          return;
         } else if (isIterable(result)) {
           for (const item of result) 
             if (isPromiseLike(item)) yield item as PromiseLike<T>;
@@ -209,8 +210,10 @@ export function makeRetrying<T>(
           return;
         } else if (isAsyncIterable(result)) {
           for await (const item of result) yield Promise.resolve(item) as PromiseLike<T>;
+          return;
         } else {
           yield Promise.resolve(result) as PromiseLike<T>;
+          return;
         }
       } catch(error) {
         if (retries-- <= 0) {

@@ -39,13 +39,13 @@ export const Retrying = meta.story({
       <p>This simulates a service that rejects 2 times before resolving.</p>
       <h3>With retrying:</h3>
       <Errored 
-        fallback={(err, reset) => <p>Failed: {err?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
+        fallback={(err, reset) => <p>Failed: {err?.()?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
       >
         <p>{!isPending(result1) && result1()}</p>
       </Errored>
       <h3>Without retrying:</h3>
       <Errored 
-        fallback={(err, reset) => <p>Failed: {err?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
+        fallback={(err, reset) => <p>Failed: {err?.()?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
       >
         <p>{!isPending(result2) && result2()}</p>
       </Errored>
