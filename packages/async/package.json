@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/async",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "A collection of primitives for asynchronous handling.",
+  "author": "Alex Lohr <alexthkloss@web.de>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/async",

@@ -10,12 +10,12 @@
 
 A collection of primitves for handling of asynchronous memos, optimistic signals, stores and actions:
 
-- [`fromStream`](#fromStream) - wraps a fetch request to support web streams in memos or optimistic signals
-- [`fromJSONStream`](#fromJSONStream) - wraps a fetch request returning a web stream containing (incomplete) JSON for the use in memos or optimistic signals
+- [`fromStream`](#fromstream) - wraps a fetch request to support web streams in memos or optimistic signals
+- [`fromJSONStream`](#fromjsonstream) - wraps a fetch request returning a web stream containing (incomplete) JSON for the use in memos or optimistic signals
 - [`makeAbortable`](#makeabortable) - sets up an AbortSignal with auto-abort on re-fetch or timeout
 - [`createAbortable`](#createabortable) - like `makeAbortable`, but with automatic abort on cleanup
 - [`makeRetrying`](#makeretrying) - wraps the fetcher to retry requests after a delay
-- [`createAggregated`](#createAggregated) - aggregates the values of an accessor
+- [`createAggregated`](#createaggregated) - aggregates the values of an accessor
 
 ## Installation
 
@@ -61,7 +61,7 @@ The same as `fromStream`, but it auto-closes a partial JSON string to allow for 
 
 ```ts
 // definition
-fromStream<Args extends any[], JSON extends any>(
+fromJSONStream<Args extends any[], JSON extends any>(
   webStreamOrResponse: (...args: Args) => ReadableStream | Response
 ): (...args: Args) => AsyncGenerator<JSON, void, unknown>;
 
@@ -105,7 +105,7 @@ const [
   filterErrors: <E>(err: E) => E instanceof AbortError ? void : E
 ] = makeAbortable({
   timeout?: 10000,
-  noAutoAbort?: true,
+  autoAbort?: false,
 });
 
 // usage
@@ -115,7 +115,7 @@ const data = createMemo(fromStream(() => fetch(url(), { signal: signal() }).catc
 onCleanup(abort);
 ```
 
-* The signal function always returns a signal that is not yet aborted; if noAutoAbort is not set to true, calling it will also abort a previous signal, if present
+* The signal function always returns a signal that is not yet aborted; if `options.autoAbort` is not set to `false`, calling it will also abort a previous signal, if present
 * The abort callback will always abort the current signal
 * If timeout is set, the signal will be aborted after that many Milliseconds
 * The filterErrors function can be used to filter out abort errors

@@ -168,9 +168,11 @@ export function createAbortable(
 const isPromiseLike = (obj: unknown): obj is PromiseLike<unknown> => !!obj &&
   ['object', 'function'].includes(typeof obj) && typeof (obj as PromiseLike<unknown>).then === 'function';
 
-const isIterable = (obj: unknown): obj is Iterable<unknown> => !!obj && Object.hasOwn(obj, Symbol.iterator);
+const isIterable = (obj: unknown): obj is Iterable<unknown> =>
+  typeof (obj as { [Symbol.iterator]?: unknown })?.[Symbol.iterator] === 'function';
   
-const isAsyncIterable = (obj: unknown): obj is AsyncIterable<unknown> => !!obj && Object.hasOwn(obj, Symbol.asyncIterator);
+const isAsyncIterable = (obj: unknown): obj is AsyncIterable<unknown> =>
+  typeof (obj as { [Symbol.asyncIterator]?: unknown })?.[Symbol.asyncIterator] === 'function';
   
 export type RetryOptions = {
   delay?: number;
@@ -193,7 +195,7 @@ export function makeRetrying<T>(
   options: RetryOptions = {},
 ): () => AsyncGenerator<T, void> {
   const delay = options.delay ?? 5000;
-  let retries = options.retries || 3;
+  let retries = options.retries ?? 3;
   
   return async function* retrying(v?: T): AsyncGenerator<T> {
     let result: T | PromiseLike<T> | AsyncIterable<T> | undefined;
@@ -217,8 +219,8 @@ export function makeRetrying<T>(
         }
       } catch(error) {
         if (retries-- <= 0) {
-          retries = options.retries || 3;
-          throw new Error(`retry failed ${options.retries || 3} times`);
+          retries = options.retries ?? 3;
+          throw new Error(`retry failed ${options.retries ?? 3} times`);
         }
         if (delay) await new Promise<void>(resolve => setTimeout(resolve, delay));
       }

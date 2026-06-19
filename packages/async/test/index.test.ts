@@ -11,7 +11,7 @@ describe("fromStream", () => {
       const encoder = new TextEncoder();
       const step = () => {
         const { value, done } = chars.next();
-        if (done) return;
+        if (done) return controller.close();
         controller.enqueue(encoder.encode(value));
         delay(15).then(step);
       }
@@ -59,7 +59,7 @@ describe("fromJSONStream", () => {
       const encoder = new TextEncoder();
       const step = () => {
         const { value, done } = parts.next();
-        if (done) return;
+        if (done) return controller.close();
         controller.enqueue(encoder.encode(value));
         delay(15).then(step);
       }
