@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/video": minor
+"@solid-primitives/video": major
 ---
 
 New package: `@solid-primitives/video`

@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/vibrate": minor
+"@solid-primitives/vibrate": major
 ---
 
 Add `@solid-primitives/vibrate` package (Stage 0)

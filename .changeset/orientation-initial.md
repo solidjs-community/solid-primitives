@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/orientation": minor
+"@solid-primitives/orientation": major
 ---
 
 Add `@solid-primitives/orientation` package (Stage 0)

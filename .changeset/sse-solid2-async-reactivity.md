@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/sse": minor
+"@solid-primitives/sse": major
 ---
 
 Align `createSSE` with Solid 2.0 async reactivity patterns
