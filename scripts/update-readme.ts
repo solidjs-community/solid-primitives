@@ -28,9 +28,7 @@ const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process";
 
 const categories: Record<string, PackageData[]> = {};
-const rootDependencies: string[] = [
-  `@solid-primitives/utils`, // utils are not included in the modulesData
-];
+const allPackageNames: string[] = [];
 
 (async () => {
   const modulesData = await utils.getModulesData();
@@ -41,14 +39,12 @@ const rootDependencies: string[] = [
 
     if (module.name === "utils") {
       utilsList = module.primitive.list;
+      allPackageNames.push(`@solid-primitives/utils`);
       continue;
     }
 
     const packageName = `@solid-primitives/${module.name}`;
-
-    if (module.workspace_deps.length === 0) {
-      rootDependencies.push(packageName);
-    }
+    allPackageNames.push(packageName);
 
     const data = {} as PackageData;
 
@@ -129,7 +125,7 @@ const rootDependencies: string[] = [
 
   // Update Combined Downloads Badge
 
-  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${rootDependencies.join(
+  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${allPackageNames.join(
     ",",
   )})](https://dash.deno.com/playground/combined-npm-downloads)`;
 
