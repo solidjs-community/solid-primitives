@@ -39,7 +39,6 @@ const allPackageNames: string[] = [];
 
     if (module.name === "utils") {
       utilsList = module.primitive.list;
-      allPackageNames.push(`@solid-primitives/utils`);
       continue;
     }
 
