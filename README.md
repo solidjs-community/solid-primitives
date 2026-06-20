@@ -125,3 +125,9 @@ The goal of Solid Primitives is to wrap client and server side functionality to 
 |[tween](https://github.com/solidjs-community/solid-primitives/tree/main/packages/tween#readme)|[![STAGE](https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process)|[createTween](https://github.com/solidjs-community/solid-primitives/tree/main/packages/tween#createtween)|[![SIZE](https://img.shields.io/badge/size-260_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/tween)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/tween?style=for-the-badge&label=)](https://www.npmjs.com/package/@solid-primitives/tween)|✓|
 
 <!-- INSERT-PRIMITIVES-TABLE:END -->
+
+## Build & Exports
+
+Each package exposes its raw TypeScript source via a custom `@solid-primitives/source` export condition. This lets tests, the playground, and cross-package imports inside the monorepo resolve directly to `.ts` files without a build step, while external consumers always receive the compiled `dist/` output.
+
+See [**EXPORTS.md**](./EXPORTS.md) for a full explanation of how this works and why we use it.
