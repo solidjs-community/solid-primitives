@@ -12,7 +12,7 @@
   },
   "primitive": {
     "name": "form",
-    "stage": 3,
+    "stage": 2,
     "list": [
       "createForm",
       "toFormData",

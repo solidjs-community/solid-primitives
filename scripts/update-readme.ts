@@ -34,9 +34,15 @@ const rootDependencies: string[] = [
 
 (async () => {
   const modulesData = await utils.getModulesData();
+  let utilsList: string[] = [];
 
   for (const module of modulesData) {
     if (module.primitive == null) continue;
+
+    if (module.name === "utils") {
+      utilsList = module.primitive.list;
+      continue;
+    }
 
     const packageName = `@solid-primitives/${module.name}`;
 
@@ -78,9 +84,13 @@ const rootDependencies: string[] = [
       data.NPM = `[![VERSION](${npmShield}${packageName}?style=for-the-badge&label=)](${npmURL}${packageName})`;
     }
     data.Stage = `[![STAGE](${stageShieldBaseURL}${module.primitive.stage}.json)](${stageShieldLink})`;
-    data.Primitives = module.primitive.list
-      .map(prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`)
-      .join("<br />");
+    const primLinks = module.primitive.list.map(
+      prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`,
+    );
+    data.Primitives =
+      primLinks.length > 15
+        ? `<details><summary>${primLinks.length} primitives</summary>${primLinks.join(", ")}</details>`
+        : primLinks.join("<br />");
     data["Solid 2"] = /^[\^~]?2\./.test(module.solid_peer_version ?? "") ? "✓" : "";
     // Merge the package into the correct category
     const cat = categories[module.primitive.category];
@@ -103,6 +113,19 @@ const rootDependencies: string[] = [
   }, "|Name|Stage|Primitives|Size|NPM|Solid 2|\n|----|----|----|----|----|----|\n");
 
   readme = utils.insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
+
+  // Update Utils Table
+
+  const COLS = 4;
+  const utilsGithubURL = `${githubURL}utils#`;
+  const utilsRows: string[] = [];
+  for (let i = 0; i < utilsList.length; i += COLS) {
+    const cells = utilsList.slice(i, i + COLS).map(fn => `[${fn}](${utilsGithubURL}${fn.toLowerCase()})`);
+    while (cells.length < COLS) cells.push("");
+    utilsRows.push(`|${cells.join("|")}|`);
+  }
+  const utilsTable = [`|${"  |".repeat(COLS)}`, `|${"---|".repeat(COLS)}`, ...utilsRows].join("\n");
+  readme = utils.insertTextBetweenComments(readme, utilsTable, "INSERT-UTILS-TABLE");
 
   // Update Combined Downloads Badge
 
