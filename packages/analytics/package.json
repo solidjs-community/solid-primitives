@@ -5,7 +5,7 @@
   "author": "David Di Biase <dave@solidjs.com>",
   "primitive": {
     "name": "analytics",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createAnalytics"
     ],

@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "bounds",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "createElementBounds"
     ],

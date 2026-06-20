@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "broadcast-channel",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "makeBroadcastChannel",
       "createBroadcastChannel"

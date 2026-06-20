@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "transition-group",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createSwitchTransition",
       "createListTransition"

@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "event-dispatcher",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createEventDispatcher"
     ],

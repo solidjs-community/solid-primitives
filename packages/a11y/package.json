@@ -12,7 +12,7 @@
   },
   "primitive": {
     "name": "a11y",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createFormControl",
       "createFormControlInput",
@@ -22,7 +22,8 @@
       "createAnnounce",
       "createReducedMotion"
     ],
-    "category": "Inputs"
+    "category": "Inputs",
+    "gzip": 1367
   },
   "keywords": [
     "solid",

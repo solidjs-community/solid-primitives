@@ -17,7 +17,7 @@
   },
   "primitive": {
     "name": "deep",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "trackDeep",
       "trackStore",

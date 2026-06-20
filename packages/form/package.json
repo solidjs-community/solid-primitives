@@ -12,7 +12,7 @@
   },
   "primitive": {
     "name": "form",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createForm",
       "toFormData",
@@ -21,7 +21,8 @@
       "FormControlContext",
       "useFormControl"
     ],
-    "category": "Forms"
+    "category": "Forms",
+    "gzip": 2495
   },
   "keywords": [
     "solid",

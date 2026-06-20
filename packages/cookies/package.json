@@ -18,7 +18,7 @@
   },
   "primitive": {
     "name": "cookies",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createServerCookie",
       "createUserTheme",

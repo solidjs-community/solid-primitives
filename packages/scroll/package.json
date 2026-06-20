@@ -21,7 +21,7 @@
   },
   "primitive": {
     "name": "scroll",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createScrollPosition",
       "useWindowScrollPosition",

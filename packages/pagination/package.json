@@ -18,7 +18,7 @@
   },
   "primitive": {
     "name": "pagination",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createPagination",
       "createSegment",

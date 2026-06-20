@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "virtual",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createVirutalList",
       "VirtualList"

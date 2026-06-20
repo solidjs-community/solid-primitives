@@ -15,14 +15,15 @@
   },
   "primitive": {
     "name": "video",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "makeVideo",
       "makeVideoPlayer",
       "createVideo",
       "createVideoPlayer"
     ],
-    "category": "Display & Media"
+    "category": "Display & Media",
+    "gzip": 1644
   },
   "keywords": [
     "solid",

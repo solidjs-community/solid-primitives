@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "state-machine",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createMachine"
     ],

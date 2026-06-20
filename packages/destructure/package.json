@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "destructure",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "destructure"
     ],

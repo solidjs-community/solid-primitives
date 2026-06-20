@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "cursor",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "makeBodyCursor",
       "makeElementCursor",

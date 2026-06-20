@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "idle",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createIdleTimer"
     ],

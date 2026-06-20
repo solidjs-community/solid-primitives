@@ -17,7 +17,7 @@
   },
   "primitive": {
     "name": "mediastream",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createStream",
       "createAmplitudeStream",
@@ -25,7 +25,8 @@
       "createMediaPermissionRequest",
       "createScreen"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 1049
   },
   "files": [
     "dist"

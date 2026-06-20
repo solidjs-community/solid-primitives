@@ -72,7 +72,7 @@
   ],
   "primitive": {
     "name": "utils",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "shallowArrayCopy",
       "shallowObjectCopy",

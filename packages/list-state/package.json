@@ -24,7 +24,7 @@
   },
   "primitive": {
     "name": "list-state",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "createListState",
       "createMultiSelectListState"

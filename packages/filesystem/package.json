@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "filesystem",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createFileSystem",
       "createSyncFileSystem",

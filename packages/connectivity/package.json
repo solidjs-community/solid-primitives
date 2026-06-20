@@ -16,7 +16,7 @@
   },
   "primitive": {
     "name": "connectivity",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createConnectivitySignal"
     ],

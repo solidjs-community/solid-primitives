@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "static-store",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createStaticStore",
       "createDerivedStaticStore"

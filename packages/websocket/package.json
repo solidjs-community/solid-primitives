@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "websocket",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "makeWS",
       "createWS",

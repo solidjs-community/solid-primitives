@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "sse",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "makeSSE",
       "createSSE",
