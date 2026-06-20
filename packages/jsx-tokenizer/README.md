@@ -170,7 +170,7 @@ createEffect(
     // token is a function that returns the JSX Element fallback
     // token.data is the data returned by the tokenData function
     tokens.forEach(token => console.log(token.data));
-  }
+  },
 );
 
 // the return value of resolveTokens can be used in JSX (will render the fallback JSX Elements)
@@ -202,7 +202,7 @@ createEffect(
       // token.data is the data returned by the tokenData function
       console.log(el.data);
     });
-  }
+  },
 );
 
 // the return value of resolveTokens can be used in JSX

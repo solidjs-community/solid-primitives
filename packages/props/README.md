@@ -93,7 +93,6 @@ combined.onClick(); // "child" "parent"
 
 ### Additional helpers
 
-
 A couple of lower-lever helpers that power `combineProps`:
 
 #### `stringStyleToObject`
@@ -188,8 +187,8 @@ Splits a props object into two reactive views: one containing only the keys that
 import { partitionProps } from "@solid-primitives/props";
 
 const MyButton = (props: ButtonProps & JSX.HTMLAttributes<HTMLButtonElement>) => {
-  const [ownProps, htmlProps] = partitionProps(props,
-    key => ["label", "variant", "size"].includes(key as string)
+  const [ownProps, htmlProps] = partitionProps(props, key =>
+    ["label", "variant", "size"].includes(key as string),
   );
 
   return <button {...htmlProps}>{ownProps.label}</button>;

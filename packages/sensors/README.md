@@ -45,10 +45,10 @@ cleanup();
 
 **Options:**
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
+| Option           | Type      | Default | Description                                                                |
+| ---------------- | --------- | ------- | -------------------------------------------------------------------------- |
 | `includeGravity` | `boolean` | `false` | When `true`, uses `accelerationIncludingGravity` instead of `acceleration` |
-| `interval` | `number` | `100` | Minimum milliseconds between `onChange` calls |
+| `interval`       | `number`  | `100`   | Minimum milliseconds between `onChange` calls                              |
 
 **Returns:** `VoidFunction` — call to remove the event listener.
 
@@ -75,8 +75,8 @@ function MyComponent() {
 
 ```ts
 function createAccelerometer(
-  includeGravity?: boolean,  // default: false
-  interval?: number,         // default: 100ms
+  includeGravity?: boolean, // default: false
+  interval?: number, // default: 100ms
 ): Accessor<AccelerometerReading | undefined>;
 
 type AccelerometerReading = DeviceMotionEventAcceleration | null;
@@ -108,9 +108,9 @@ cleanup();
 
 **Options:**
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `interval` | `number` | `100` | Minimum milliseconds between `onChange` calls |
+| Option     | Type     | Default | Description                                   |
+| ---------- | -------- | ------- | --------------------------------------------- |
+| `interval` | `number` | `100`   | Minimum milliseconds between `onChange` calls |
 
 **Returns:** `VoidFunction` — call to remove the event listener.
 
@@ -171,7 +171,7 @@ if (cleanup) {
 
 ```ts
 function makeSensor<T extends GenericSensor>(
-  SensorClass: { new(options?: any): T },
+  SensorClass: { new (options?: any): T },
   onChange: (sensor: T) => void,
   options?: SensorOptions,
 ): VoidFunction | null;
@@ -203,7 +203,7 @@ function MyComponent() {
 
 ```ts
 function createSensor<T extends GenericSensor>(
-  SensorClass: { new(options?: any): T },
+  SensorClass: { new (options?: any): T },
   options?: SensorOptions,
 ): Accessor<T | undefined>;
 ```
@@ -219,19 +219,19 @@ Uses `window.Magnetometer` from the [Generic Sensor API](https://developer.mozil
 ```ts
 import { makeCompass } from "@solid-primitives/sensors";
 
-const cleanup = makeCompass(
-  ({ x, y, z }) => console.log(`Field: ${x}µT, ${y}µT, ${z}µT`),
-  { frequency: 10, referenceFrame: "device" },
-);
+const cleanup = makeCompass(({ x, y, z }) => console.log(`Field: ${x}µT, ${y}µT, ${z}µT`), {
+  frequency: 10,
+  referenceFrame: "device",
+});
 
 if (cleanup) cleanup();
 ```
 
 **Options:**
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `frequency` | `number` | — | Readings per second |
+| Option           | Type                   | Default    | Description                |
+| ---------------- | ---------------------- | ---------- | -------------------------- |
+| `frequency`      | `number`               | —          | Readings per second        |
 | `referenceFrame` | `"device" \| "screen"` | `"device"` | Coordinate reference frame |
 
 **Returns:** `VoidFunction` or `null` if `window.Magnetometer` is unavailable.
@@ -287,9 +287,9 @@ function makeBattery(onChange: (reading: BatteryReading) => void): VoidFunction;
 
 type BatteryReading = {
   charging: boolean;
-  chargingTime: number;    // seconds until full; Infinity if not charging
+  chargingTime: number; // seconds until full; Infinity if not charging
   dischargingTime: number; // seconds until empty; Infinity if charging
-  level: number;           // 0.0–1.0
+  level: number; // 0.0–1.0
 };
 ```
 

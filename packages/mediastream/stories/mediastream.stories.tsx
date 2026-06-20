@@ -204,9 +204,7 @@ export const AmplitudeFromStream = meta.story({
           </Show>
         </ButtonRow>
         <Show when={constraints() && !stream()}>
-          <span style={{ color: colors.muted, "font-size": font.sizeSm }}>
-            Requesting access…
-          </span>
+          <span style={{ color: colors.muted, "font-size": font.sizeSm }}>Requesting access…</span>
         </Show>
         <Show when={stream()}>
           <video
@@ -333,11 +331,7 @@ export const PermissionPrompt = meta.story({
           >
             Video
           </Button>
-          <Button
-            variant="outline"
-            disabled={status() === "pending"}
-            onClick={() => request()}
-          >
+          <Button variant="outline" disabled={status() === "pending"} onClick={() => request()}>
             Both
           </Button>
         </ButtonRow>

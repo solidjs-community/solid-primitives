@@ -583,21 +583,24 @@ describe("createReducedMotion", () => {
   beforeEach(() => {
     changeListeners = [];
     mqMatches = false;
-    vi.spyOn(window, "matchMedia").mockImplementation(query => ({
-      matches: mqMatches,
-      media: query,
-      addEventListener: vi.fn((_: string, handler: (e: MediaQueryListEvent) => void) => {
-        changeListeners.push(handler);
-      }),
-      removeEventListener: vi.fn((_: string, handler: (e: MediaQueryListEvent) => void) => {
-        const i = changeListeners.indexOf(handler);
-        if (i !== -1) changeListeners.splice(i, 1);
-      }),
-      dispatchEvent: vi.fn(),
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-    }) as unknown as MediaQueryList);
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      query =>
+        ({
+          matches: mqMatches,
+          media: query,
+          addEventListener: vi.fn((_: string, handler: (e: MediaQueryListEvent) => void) => {
+            changeListeners.push(handler);
+          }),
+          removeEventListener: vi.fn((_: string, handler: (e: MediaQueryListEvent) => void) => {
+            const i = changeListeners.indexOf(handler);
+            if (i !== -1) changeListeners.splice(i, 1);
+          }),
+          dispatchEvent: vi.fn(),
+          onchange: null,
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+        }) as unknown as MediaQueryList,
+    );
   });
 
   afterEach(() => vi.restoreAllMocks());

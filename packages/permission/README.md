@@ -53,12 +53,12 @@ const notifs = createPermission("notifications");
 
 **Return values** map to [PermissionState](https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state):
 
-| Value | Meaning |
-|-------|---------|
-| `"unknown"` | Initial state — query has not resolved yet |
-| `"granted"` | Permission has been granted |
-| `"denied"` | Permission has been denied |
-| `"prompt"` | Not yet asked; prompting the user is possible |
+| Value       | Meaning                                       |
+| ----------- | --------------------------------------------- |
+| `"unknown"` | Initial state — query has not resolved yet    |
+| `"granted"` | Permission has been granted                   |
+| `"denied"`  | Permission has been denied                    |
+| `"prompt"`  | Not yet asked; prompting the user is possible |
 
 ### SSR
 

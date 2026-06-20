@@ -55,7 +55,7 @@ import { createServerCookie } from "@solid-primitives/cookies";
 
 const [serverCookie, setServerCookie] = createServerCookie("coolCookie", {
   deserialize: str => (str ? str.split(" ") : []), // Deserializes cookie into a string[]
-  serialize: val => (val ? val.join(" ") : ""),     // Serializes the value back into a string
+  serialize: val => (val ? val.join(" ") : ""), // Serializes the value back into a string
 });
 
 serverCookie(); // => string[]

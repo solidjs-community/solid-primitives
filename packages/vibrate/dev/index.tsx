@@ -23,9 +23,7 @@ const App: Component = () => {
             Stop
           </button>
         </div>
-        <p class="caption">
-          Supported: {String(isVibrationSupported())}
-        </p>
+        <p class="caption">Supported: {String(isVibrationSupported())}</p>
       </div>
     </div>
   );

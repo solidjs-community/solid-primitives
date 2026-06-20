@@ -89,7 +89,8 @@ export const BasicRAF = meta.story({
             </strong>
           </span>
           <span>
-            frames: <strong style={{ "font-variant-numeric": "tabular-nums" }}>{frameCount()}</strong>
+            frames:{" "}
+            <strong style={{ "font-variant-numeric": "tabular-nums" }}>{frameCount()}</strong>
           </span>
           <span>
             angle: <strong style={{ "font-variant-numeric": "tabular-nums" }}>{angle()}°</strong>
@@ -199,8 +200,8 @@ export const TargetFPSStory = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Switch targets while running — the rate adjusts immediately. Limiting works by
-          skipping frames, so individual frame durations may be uneven at low targets.
+          Switch targets while running — the rate adjusts immediately. Limiting works by skipping
+          frames, so individual frame durations may be uneven at low targets.
         </p>
       </Container>
     );
@@ -275,7 +276,12 @@ export const CreateMsStory = meta.story({
           <Button onClick={() => ms.start()} disabled={ms.running()} style={{ flex: 1 }}>
             ▶ Start
           </Button>
-          <Button onClick={() => ms.stop()} disabled={!ms.running()} variant="outline" style={{ flex: 1 }}>
+          <Button
+            onClick={() => ms.stop()}
+            disabled={!ms.running()}
+            variant="outline"
+            style={{ flex: 1 }}
+          >
             ■ Stop
           </Button>
           <Button onClick={() => ms.reset()} variant="secondary" style={{ flex: 1 }}>
@@ -284,8 +290,8 @@ export const CreateMsStory = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          The counter auto-resets every {LIMIT}ms (the <code>limit</code> option). Drag the
-          fps slider to change the tick resolution while running.
+          The counter auto-resets every {LIMIT}ms (the <code>limit</code> option). Drag the fps
+          slider to change the tick resolution while running.
         </p>
       </Container>
     );

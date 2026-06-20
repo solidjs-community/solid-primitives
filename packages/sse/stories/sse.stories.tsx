@@ -38,7 +38,12 @@ function buildHandle() {
       return false;
     },
   } as unknown as SSESourceHandle;
-  return { source, setRs: (v: number) => { rs = v; } };
+  return {
+    source,
+    setRs: (v: number) => {
+      rs = v;
+    },
+  };
 }
 
 /** Emits `messages` in round-robin on `interval` ms after `openDelay`. */
@@ -94,9 +99,7 @@ const makeFailingMock = (failAfterMs = 3000, msgCount = 2): SSESourceFn => {
             setTimeout(
               () => {
                 if (!closed)
-                  options.onMessage?.(
-                    new MessageEvent("message", { data: `message ${i + 1}` }),
-                  );
+                  options.onMessage?.(new MessageEvent("message", { data: `message ${i + 1}` }));
               },
               (i + 1) * 700,
             ),
@@ -188,9 +191,7 @@ export const StreamWithControlsStory = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>readyState</span>
-          <Badge variant={STATE_VARIANT[readyState()]}>
-            {STATE_LABEL[readyState()]}
-          </Badge>
+          <Badge variant={STATE_VARIANT[readyState()]}>{STATE_LABEL[readyState()]}</Badge>
         </div>
         <StatRow label="data()" value={data()} />
         <ButtonRow>
@@ -237,9 +238,7 @@ export const BoundaryStory = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>readyState</span>
-          <Badge variant={STATE_VARIANT[readyState()]}>
-            {STATE_LABEL[readyState()]}
-          </Badge>
+          <Badge variant={STATE_VARIANT[readyState()]}>{STATE_LABEL[readyState()]}</Badge>
         </div>
         <Errored
           fallback={_err => (
@@ -314,9 +313,7 @@ export const JsonTransformStory = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>Sensor feed</span>
-          <Badge variant={STATE_VARIANT[readyState()]}>
-            {STATE_LABEL[readyState()]}
-          </Badge>
+          <Badge variant={STATE_VARIANT[readyState()]}>{STATE_LABEL[readyState()]}</Badge>
         </div>
         <Card>
           <StatRow label="sensor" value={data().sensor} />

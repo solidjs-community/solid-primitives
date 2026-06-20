@@ -86,7 +86,8 @@ export const ReactiveVibrate = meta.story({
         <h3 style={{ margin: 0 }}>createVibrate</h3>
         <Show when={!isVibrationSupported()}>
           <Alert variant="warning">
-            Vibration API not available in this browser. Controls and state still work — haptics are no-ops on desktop and iOS.
+            Vibration API not available in this browser. Controls and state still work — haptics are
+            no-ops on desktop and iOS.
           </Alert>
         </Show>
 
@@ -151,7 +152,8 @@ export const ReactiveVibrate = meta.story({
             "font-family": "monospace",
           }}
         >
-          resolved pattern: [{Array.isArray(pattern()) ? (pattern() as number[]).join(", ") : pattern()}]
+          resolved pattern: [
+          {Array.isArray(pattern()) ? (pattern() as number[]).join(", ") : pattern()}]
         </div>
       </Container>
     );
@@ -187,7 +189,8 @@ export const NonReactiveVibrate = meta.story({
         <h3 style={{ margin: 0 }}>makeVibrate — non-reactive</h3>
         <Show when={!isVibrationSupported()}>
           <Alert variant="warning">
-            Vibration API not available in this browser. Controls and state still work — haptics are no-ops on desktop and iOS.
+            Vibration API not available in this browser. Controls and state still work — haptics are
+            no-ops on desktop and iOS.
           </Alert>
         </Show>
 
@@ -255,7 +258,8 @@ export const ReactivePulse = meta.story({
         <h3 style={{ margin: 0 }}>createPulse</h3>
         <Show when={!isVibrationSupported()}>
           <Alert variant="warning">
-            Vibration API not available in this browser. Controls and state still work — haptics are no-ops on desktop and iOS.
+            Vibration API not available in this browser. Controls and state still work — haptics are
+            no-ops on desktop and iOS.
           </Alert>
         </Show>
 
@@ -494,7 +498,9 @@ export const FrequencyCalculator = meta.story({
               }}
             >
               <span style={{ color: "#64748b", "font-size": "0.75rem" }}>{label}</span>
-              <strong style={{ "font-variant-numeric": "tabular-nums", "font-family": "monospace" }}>
+              <strong
+                style={{ "font-variant-numeric": "tabular-nums", "font-family": "monospace" }}
+              >
                 {val()}
               </strong>
             </div>

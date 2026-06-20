@@ -78,15 +78,7 @@ const FsNode = (props: {
             "line-height": "1",
           }}
         >
-          {type() === "dir"
-            ? open()
-              ? "▼"
-              : "▶"
-            : props.onWrite
-              ? open()
-                ? "▾"
-                : "▸"
-              : "·"}
+          {type() === "dir" ? (open() ? "▼" : "▶") : props.onWrite ? (open() ? "▾" : "▸") : "·"}
         </button>
         <span
           style={{
@@ -170,7 +162,7 @@ export const VirtualTree = meta.story({
   render: () => {
     const adapter = makeVirtualFileSystem({
       src: {
-        "index.ts": 'export const greet = (name: string) => `Hello, ${name}!`;\n',
+        "index.ts": "export const greet = (name: string) => `Hello, ${name}!`;\n",
         "types.ts": "export type ID = string;\n",
       },
       "README.md": "# My Project\n",
@@ -613,7 +605,11 @@ export const BrowserDirectoryAccess = meta.story({
       <Container width={340}>
         <ButtonRow>
           <Button onClick={pick} disabled={picking()} variant={currentFs() ? "outline" : "primary"}>
-            {picking() ? "Waiting for picker…" : currentFs() ? "Pick another directory" : "Pick a directory"}
+            {picking()
+              ? "Waiting for picker…"
+              : currentFs()
+                ? "Pick another directory"
+                : "Pick a directory"}
           </Button>
         </ButtonRow>
 

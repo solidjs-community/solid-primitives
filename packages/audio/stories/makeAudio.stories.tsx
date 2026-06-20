@@ -41,17 +41,28 @@ export const NonReactive = meta.story({
           Direct <code>HTMLAudioElement</code> — no reactive signals.
         </p>
 
-        <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
-          <Button
-            onClick={() => (playing() ? player.pause() : player.play())}
-            variant="secondary"
-          >
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            "align-items": "center",
+            "margin-bottom": "0.75rem",
+          }}
+        >
+          <Button onClick={() => (playing() ? player.pause() : player.play())} variant="secondary">
             {playing() ? "⏸ Pause" : "▶ Play"}
           </Button>
-          <Button onClick={cleanup} variant="outline">■ Cleanup</Button>
+          <Button onClick={cleanup} variant="outline">
+            ■ Cleanup
+          </Button>
         </div>
 
-        <VolumeSlider value={volume} onChange={v => { player.volume = v; }} />
+        <VolumeSlider
+          value={volume}
+          onChange={v => {
+            player.volume = v;
+          }}
+        />
       </div>
     );
   },

@@ -95,7 +95,7 @@ setPattern([100, 30, 100, 30, 100]);
 ```ts
 const { vibrating, start, stop } = createVibrate(200, { interval: 1000 });
 start(); // repeats every second
-stop();  // cancels interval + active vibration
+stop(); // cancels interval + active vibration
 ```
 
 ## `frequencyToPattern`
@@ -105,8 +105,8 @@ Converts a frequency in Hz and an optional duty cycle into a single-cycle `[onMs
 ```ts
 import { frequencyToPattern } from "@solid-primitives/vibrate";
 
-frequencyToPattern(2)        // [250, 250] — 2 Hz, equal on/off
-frequencyToPattern(4, 0.25)  // ~[63, 188] — 4 Hz, short tap
+frequencyToPattern(2); // [250, 250] — 2 Hz, equal on/off
+frequencyToPattern(4, 0.25); // ~[63, 188] — 4 Hz, short tap
 ```
 
 ## `makePulse`
@@ -118,7 +118,7 @@ import { makePulse } from "@solid-primitives/vibrate";
 
 const [start, stop] = makePulse(4); // 4 taps per second
 button.addEventListener("pointerdown", start);
-button.addEventListener("pointerup",   stop);
+button.addEventListener("pointerup", stop);
 ```
 
 ## `createPulse`

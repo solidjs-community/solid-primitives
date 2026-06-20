@@ -38,9 +38,7 @@ export const SearchHighlightStory = meta.story({
   render: () => {
     const [search, setSearch] = createSignal("");
 
-    const highlight = createMarker(text => (
-      <mark style={markStyle}>{text()}</mark>
-    ));
+    const highlight = createMarker(text => <mark style={markStyle}>{text()}</mark>);
 
     const regex = createMemo(() => makeSearchRegex(search()));
 

@@ -51,20 +51,24 @@ const counterStore = createFluxStore(
     }),
     actions: setState => ({
       increment(by = 1) {
-        setState(s => { s.value += by; });
+        setState(s => {
+          s.value += by;
+        });
       },
       reset() {
-        setState(s => { s.value = 0; });
+        setState(s => {
+          s.value = 0;
+        });
       },
     }),
   },
 );
 
-counterStore.getters.count();     // => 5
+counterStore.getters.count(); // => 5
 counterStore.actions.increment();
-counterStore.getters.count();     // => 6
+counterStore.getters.count(); // => 6
 counterStore.actions.reset();
-counterStore.getters.count();     // => 0
+counterStore.getters.count(); // => 0
 ```
 
 ## `createFluxStoreFactory`
@@ -84,7 +88,9 @@ const createToggleStore = createFluxStoreFactory(
     }),
     actions: setState => ({
       toggle() {
-        setState(s => { s.value = !s.value; });
+        setState(s => {
+          s.value = !s.value;
+        });
       },
     }),
   },

@@ -35,7 +35,7 @@ import { makeOrientation } from "@solid-primitives/orientation";
 
 const cleanup = makeOrientation(({ angle, type }) => {
   console.log(angle); // 0 | 90 | 180 | 270
-  console.log(type);  // "portrait-primary" | "landscape-primary" | ...
+  console.log(type); // "portrait-primary" | "landscape-primary" | ...
 });
 
 // remove listener when done
@@ -58,8 +58,8 @@ createEffect(
   () => ({ angle: angle(), type: type() }),
   ({ angle, type }) => {
     console.log(angle); // 0 | 90 | 180 | 270
-    console.log(type);  // "portrait-primary" | "landscape-primary" | ...
-  }
+    console.log(type); // "portrait-primary" | "landscape-primary" | ...
+  },
 );
 ```
 

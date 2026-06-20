@@ -24,19 +24,19 @@ import { deep } from "solid-js";
 
 createEffect(
   () => deep(store),
-  snapshot => localStorage.setItem("state", JSON.stringify(snapshot))
+  snapshot => localStorage.setItem("state", JSON.stringify(snapshot)),
 );
 ```
 
 This package complements that with three distinct utilities:
 
-| | Solid's `deep` | `trackDeep` | `trackStore` | `captureStoreUpdates` |
-|---|---|---|---|---|
-| Tracks all nested changes | ✓ | ✓ | ✓ | ✓ |
-| Returns live store proxy | — | ✓ | ✓ | — |
-| Returns plain snapshot | ✓ | — | — | — |
-| Works on plain objects wrapping stores | — | ✓ | — | — |
-| Reports what changed and where | — | — | — | ✓ |
+|                                        | Solid's `deep` | `trackDeep` | `trackStore` | `captureStoreUpdates` |
+| -------------------------------------- | -------------- | ----------- | ------------ | --------------------- |
+| Tracks all nested changes              | ✓              | ✓           | ✓            | ✓                     |
+| Returns live store proxy               | —              | ✓           | ✓            | —                     |
+| Returns plain snapshot                 | ✓              | —           | —            | —                     |
+| Works on plain objects wrapping stores | —              | ✓           | —            | —                     |
+| Reports what changed and where         | —              | —           | —            | ✓                     |
 
 **Use Solid's `deep`** when you want to observe all changes and immediately consume a serializable value (e.g. persist to localStorage, send over the wire).
 
@@ -75,7 +75,7 @@ createEffect(
   () => trackDeep(state),
   () => {
     /* execute some logic whenever the state changes */
-  }
+  },
 );
 ```
 
@@ -86,7 +86,7 @@ const deeplyTrackedStore = () => trackDeep(sign);
 createEffect(
   () => deeplyTrackedStore(),
   //    ^ this causes a re-execution of the effect on deep changes of properties
-  value => console.log("Store is:", value)
+  value => console.log("Store is:", value),
 );
 ```
 
@@ -108,7 +108,7 @@ const plain = snapshot(state);
 
 createEffect(
   () => trackDeep(plain), // This will NOT work — plain objects are not reactive
-  () => {}
+  () => {},
 );
 ```
 
@@ -131,7 +131,7 @@ createEffect(
   () => trackStore(state),
   () => {
     /* execute some logic whenever the state changes */
-  }
+  },
 );
 ```
 
@@ -152,7 +152,9 @@ const getDelta = captureStoreUpdates(state);
 
 getDelta(); // [{ path: [], value: { todos: [] } }]
 
-setState(s => { s.todos = ["foo"]; });
+setState(s => {
+  s.todos = ["foo"];
+});
 
 getDelta(); // [{ path: ["todos"], value: ["foo"] }]
 ```
@@ -169,7 +171,7 @@ createEffect(
   delta => {
     /* execute some logic whenever the state changes */
     console.log(delta);
-  }
+  },
 );
 ```
 
@@ -185,11 +187,11 @@ const delta = createMemo(captureStoreUpdates(state));
 // both of these effects will receive the same delta
 createEffect(
   () => delta(),
-  value => console.log(value)
+  value => console.log(value),
 );
 createEffect(
   () => delta(),
-  value => console.log(value)
+  value => console.log(value),
 );
 ```
 

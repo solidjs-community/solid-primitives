@@ -18,12 +18,17 @@ import {
 
 const required = (v: string) => (v.trim() === "" ? "Required" : null);
 const isEmail = (v: string) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email");
-const minLength = (n: number) => (v: string) => v.length < n ? `Min ${n} chars` : null;
+const minLength = (n: number) => (v: string) => (v.length < n ? `Min ${n} chars` : null);
 const hasUppercase = (v: string) => (/[A-Z]/.test(v) ? null : "Needs an uppercase letter");
 
 // ─── Local story helpers ──────────────────────────────────────────────────────
 
-const FieldRow = (props: { label: string; error?: string | null; hint?: string; children: JSX.Element }) => (
+const FieldRow = (props: {
+  label: string;
+  error?: string | null;
+  hint?: string;
+  children: JSX.Element;
+}) => (
   <div style={{ display: "flex", "flex-direction": "column", gap: "0.25rem" }}>
     <label style={{ "font-size": font.sizeSm, color: colors.muted }}>{props.label}</label>
     {props.children}
@@ -70,7 +75,7 @@ export const ValidateOnChange = meta.story({
 
     const form = createForm({
       fields: {
-        email:    { initial: "", validate: [required, isEmail] },
+        email: { initial: "", validate: [required, isEmail] },
         password: { initial: "", validate: [required, minLength(8), hasUppercase] },
       },
       onSubmit: async () => {
@@ -84,20 +89,33 @@ export const ValidateOnChange = meta.story({
         <Show when={success()}>
           <Badge variant="success">Signed in!</Badge>
         </Show>
-        <form ref={form.ref} style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}>
+        <form
+          ref={form.ref}
+          style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}
+        >
           <FieldRow label="Email" error={form.fields.email.error()}>
-            <input ref={form.bind("email")} type="email" placeholder="you@example.com" style={inputStyle} />
+            <input
+              ref={form.bind("email")}
+              type="email"
+              placeholder="you@example.com"
+              style={inputStyle}
+            />
           </FieldRow>
           <FieldRow label="Password" error={form.fields.password.error()}>
-            <input ref={form.bind("password")} type="password" placeholder="Min 8 chars, 1 uppercase" style={inputStyle} />
+            <input
+              ref={form.bind("password")}
+              type="password"
+              placeholder="Min 8 chars, 1 uppercase"
+              style={inputStyle}
+            />
           </FieldRow>
           <Button type="submit" disabled={!form.valid() || form.submitting()}>
             {form.submitting() ? "Signing in…" : "Sign in"}
           </Button>
         </form>
         <Separator />
-        <BoolRow label="valid"      value={form.valid()} />
-        <BoolRow label="dirty"      value={form.dirty()} />
+        <BoolRow label="valid" value={form.valid()} />
+        <BoolRow label="dirty" value={form.dirty()} />
         <BoolRow label="submitting" value={form.submitting()} />
       </Container>
     );
@@ -120,26 +138,40 @@ export const ValidateOnBlur = meta.story({
     const form = createForm({
       fields: {
         username: { initial: "", validate: [required, minLength(3)] },
-        email:    { initial: "", validate: [required, isEmail] },
+        email: { initial: "", validate: [required, isEmail] },
       },
       validateOn: "blur",
     });
 
     return (
       <Container width={320}>
-        <form ref={form.ref} style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}>
-          <FieldRow label="Username" error={form.fields.username.error()} hint="Tab away to validate">
+        <form
+          ref={form.ref}
+          style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}
+        >
+          <FieldRow
+            label="Username"
+            error={form.fields.username.error()}
+            hint="Tab away to validate"
+          >
             <input ref={form.bind("username")} placeholder="At least 3 chars" style={inputStyle} />
           </FieldRow>
           <FieldRow label="Email" error={form.fields.email.error()} hint="Tab away to validate">
-            <input ref={form.bind("email")} type="email" placeholder="you@example.com" style={inputStyle} />
+            <input
+              ref={form.bind("email")}
+              type="email"
+              placeholder="you@example.com"
+              style={inputStyle}
+            />
           </FieldRow>
-          <Button type="submit" disabled={!form.valid()}>Continue</Button>
+          <Button type="submit" disabled={!form.valid()}>
+            Continue
+          </Button>
         </form>
         <Separator />
         <BoolRow label="username.touched" value={form.fields.username.touched()} />
-        <BoolRow label="email.touched"    value={form.fields.email.touched()} />
-        <BoolRow label="valid"            value={form.valid()} />
+        <BoolRow label="email.touched" value={form.fields.email.touched()} />
+        <BoolRow label="valid" value={form.valid()} />
       </Container>
     );
   },
@@ -161,7 +193,7 @@ export const ValidateOnSubmit = meta.story({
     const form = createForm({
       fields: {
         first: { initial: "", validate: required },
-        last:  { initial: "", validate: required },
+        last: { initial: "", validate: required },
         email: { initial: "", validate: [required, isEmail] },
       },
       validateOn: "submit",
@@ -169,7 +201,10 @@ export const ValidateOnSubmit = meta.story({
 
     return (
       <Container width={320}>
-        <form ref={form.ref} style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}>
+        <form
+          ref={form.ref}
+          style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}
+        >
           <FieldRow label="First name" error={form.fields.first.error()}>
             <input ref={form.bind("first")} placeholder="Jane" style={inputStyle} />
           </FieldRow>
@@ -177,18 +212,25 @@ export const ValidateOnSubmit = meta.story({
             <input ref={form.bind("last")} placeholder="Doe" style={inputStyle} />
           </FieldRow>
           <FieldRow label="Email" error={form.fields.email.error()}>
-            <input ref={form.bind("email")} type="email" placeholder="jane@example.com" style={inputStyle} />
+            <input
+              ref={form.bind("email")}
+              type="email"
+              placeholder="jane@example.com"
+              style={inputStyle}
+            />
           </FieldRow>
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <Button type="submit">Submit</Button>
             <Show when={form.submitted()}>
-              <Button variant="outline" onClick={() => form.reset()}>Reset</Button>
+              <Button variant="outline" onClick={() => form.reset()}>
+                Reset
+              </Button>
             </Show>
           </div>
         </form>
         <Separator />
         <BoolRow label="submitted" value={form.submitted()} />
-        <BoolRow label="valid"     value={form.valid()} />
+        <BoolRow label="valid" value={form.valid()} />
         <StatRow label="error count" value={Object.keys(form.errors()).length} />
       </Container>
     );
@@ -211,7 +253,7 @@ export const CrossFieldRule = meta.story({
     const form = createForm({
       fields: {
         password: { initial: "", validate: [required, minLength(8)] },
-        confirm:  { initial: "", validate: required },
+        confirm: { initial: "", validate: required },
       },
     });
 
@@ -221,14 +263,29 @@ export const CrossFieldRule = meta.story({
 
     return (
       <Container width={320}>
-        <form ref={form.ref} style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}>
+        <form
+          ref={form.ref}
+          style={{ display: "flex", "flex-direction": "column", gap: "0.85rem" }}
+        >
           <FieldRow label="Password" error={form.fields.password.error()}>
-            <input ref={form.bind("password")} type="password" placeholder="Min 8 chars" style={inputStyle} />
+            <input
+              ref={form.bind("password")}
+              type="password"
+              placeholder="Min 8 chars"
+              style={inputStyle}
+            />
           </FieldRow>
           <FieldRow label="Confirm" error={form.fields.confirm.error() ?? matchError()}>
-            <input ref={form.bind("confirm")} type="password" placeholder="Repeat password" style={inputStyle} />
+            <input
+              ref={form.bind("confirm")}
+              type="password"
+              placeholder="Repeat password"
+              style={inputStyle}
+            />
           </FieldRow>
-          <Button type="submit" disabled={!form.valid()}>Create account</Button>
+          <Button type="submit" disabled={!form.valid()}>
+            Create account
+          </Button>
         </form>
         <Separator />
         <BoolRow label="valid" value={form.valid()} />
@@ -245,10 +302,7 @@ export const CrossFieldRule = meta.story({
 const TAKEN = new Set(["admin", "root", "solid"]);
 const checkAvailable = (username: string): Promise<string | null> =>
   new Promise(resolve =>
-    setTimeout(
-      () => resolve(TAKEN.has(username.toLowerCase()) ? "Username is taken" : null),
-      700,
-    ),
+    setTimeout(() => resolve(TAKEN.has(username.toLowerCase()) ? "Username is taken" : null), 700),
   );
 
 export const AsyncAvailabilityCheck = meta.story({
@@ -274,7 +328,11 @@ export const AsyncAvailabilityCheck = meta.story({
 
     return (
       <Container width={320}>
-        <FieldRow label="Username" error={form.fields.username.error()} hint="Tab away to check availability">
+        <FieldRow
+          label="Username"
+          error={form.fields.username.error()}
+          hint="Tab away to check availability"
+        >
           <div style={{ position: "relative" }}>
             <input
               ref={form.bind("username")}
@@ -303,7 +361,7 @@ export const AsyncAvailabilityCheck = meta.story({
         </Button>
         <Separator />
         <BoolRow label="pending" value={form.fields.username.pending()} />
-        <BoolRow label="valid"   value={form.valid()} />
+        <BoolRow label="valid" value={form.valid()} />
       </Container>
     );
   },

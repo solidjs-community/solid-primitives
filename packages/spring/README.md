@@ -19,11 +19,11 @@ Inspired by and directly ported from [`svelte/motion`](https://svelte.dev/docs/s
 
 ## Physics options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `stiffness` | `number` | `0.15` | How tightly the spring pulls toward the target. Higher = snappier. |
-| `damping` | `number` | `0.8` | How quickly oscillation decays. Lower = more bouncy. `0` = infinite oscillation. |
-| `precision` | `number` | `0.01` | Displacement threshold below which the spring is considered settled. |
+| Option      | Type     | Default | Description                                                                      |
+| ----------- | -------- | ------- | -------------------------------------------------------------------------------- |
+| `stiffness` | `number` | `0.15`  | How tightly the spring pulls toward the target. Higher = snappier.               |
+| `damping`   | `number` | `0.8`   | How quickly oscillation decays. Lower = more bouncy. `0` = infinite oscillation. |
+| `precision` | `number` | `0.01`  | Displacement threshold below which the spring is considered settled.             |
 
 Options can be passed as a plain object **or** as a reactive accessor (`() => options`) to change physics parameters dynamically — see [Reactive options](#reactive-options) below.
 
@@ -99,8 +99,8 @@ reduced stiffness. The spring "eases in" before regaining full force, preventing
 jarring kick when interrupting an ongoing animation.
 
 ```ts
-setProgress(100, { soft: true });      // ~0.5 s soft window
-setProgress(100, { soft: 0.3 });       // 0.3 s soft window
+setProgress(100, { soft: true }); // ~0.5 s soft window
+setProgress(100, { soft: 0.3 }); // 0.3 s soft window
 ```
 
 ### Reactive options
@@ -116,7 +116,7 @@ const reducedMotion = createMediaQuery("(prefers-reduced-motion: reduce)");
 
 const [value, setValue] = createSpring(0, () => ({
   stiffness: reducedMotion() ? 1 : 0.15,
-  damping:   reducedMotion() ? 1 : 0.8,
+  damping: reducedMotion() ? 1 : 0.8,
 }));
 ```
 
@@ -158,7 +158,7 @@ const [value, setValue, { isAnimating }, cleanup] = makeSpring(0);
 
 setValue(100); // starts animating
 // later…
-cleanup();     // cancels animation, resolves all pending promises
+cleanup(); // cancels animation, resolves all pending promises
 ```
 
 ### Shape stability

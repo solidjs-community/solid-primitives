@@ -231,11 +231,11 @@ const data = createMemo(async () =>
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `times` | `number` | `3` | Maximum number of attempts |
-| `delay` | `number \| (attempt: number) => number` | `0` | Ms to wait between attempts. Pass a function for dynamic backoff. |
-| `shouldRetry` | `(error: unknown) => boolean` | `() => true` | Return `false` to stop retrying immediately and rethrow |
+| Option        | Type                                    | Default      | Description                                                       |
+| ------------- | --------------------------------------- | ------------ | ----------------------------------------------------------------- |
+| `times`       | `number`                                | `3`          | Maximum number of attempts                                        |
+| `delay`       | `number \| (attempt: number) => number` | `0`          | Ms to wait between attempts. Pass a function for dynamic backoff. |
+| `shouldRetry` | `(error: unknown) => boolean`           | `() => true` | Return `false` to stop retrying immediately and rethrow           |
 
 ## `changed`
 

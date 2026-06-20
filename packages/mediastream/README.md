@@ -49,8 +49,15 @@ import { Loading } from "@solidjs/web";
 const [stream] = createStream({ video: true });
 
 <Loading fallback={<p>Requesting camera...</p>}>
-  <video ref={el => createEffect(stream, s => { el.srcObject = s ?? null; })} autoplay />
-</Loading>
+  <video
+    ref={el =>
+      createEffect(stream, s => {
+        el.srcObject = s ?? null;
+      })
+    }
+    autoplay
+  />
+</Loading>;
 ```
 
 ### `createScreen`
@@ -71,8 +78,15 @@ Same controls as `createStream` but uses `getDisplayMedia` instead of `getUserMe
 const [stream] = createScreen({ video: true });
 
 <Loading fallback={<p>Requesting screen capture...</p>}>
-  <video ref={el => createEffect(stream, s => { el.srcObject = s ?? null; })} autoplay />
-</Loading>
+  <video
+    ref={el =>
+      createEffect(stream, s => {
+        el.srcObject = s ?? null;
+      })
+    }
+    autoplay
+  />
+</Loading>;
 ```
 
 ### `createAmplitudeStream`
@@ -102,7 +116,7 @@ const [level] = createAmplitudeStream(audioConstraints);
   fallback={<button onClick={() => setAudioConstraints({ audio: true })}>Start</button>}
 >
   <meter min="0" max="100" value={level()} />
-</Show>
+</Show>;
 ```
 
 ### `createAmplitudeFromStream`
@@ -143,7 +157,7 @@ Returns a `Promise<void>` that resolves when permission is granted, and rejects 
 await createMediaPermissionRequest();
 
 // Request only microphone permission
-await createMediaPermissionRequest('audio');
+await createMediaPermissionRequest("audio");
 ```
 
 Use `createPermission` from `@solid-primitives/permission` to reactively observe the resulting permission state.

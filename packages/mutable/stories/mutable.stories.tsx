@@ -108,7 +108,10 @@ export const ArrayMutations = meta.story({
               "min-height": "2rem",
             }}
           >
-            <For each={tags} fallback={<span style={{ color: "#94a3b8", "font-size": "0.82rem" }}>empty</span>}>
+            <For
+              each={tags}
+              fallback={<span style={{ color: "#94a3b8", "font-size": "0.82rem" }}>empty</span>}
+            >
               {tag => <Badge>{tag}</Badge>}
             </For>
           </div>
@@ -167,11 +170,7 @@ export const GetterSetter = meta.story({
           <StatRow label="fullName (get)" value={user.fullName} />
         </Card>
         <Section title="Write via setter">
-          <TextField
-            value={draft()}
-            onChange={setDraft}
-            placeholder="First Last"
-          />
+          <TextField value={draft()} onChange={setDraft} placeholder="First Last" />
           <Button onClick={() => (user.fullName = draft())}>Apply</Button>
         </Section>
       </Container>

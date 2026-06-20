@@ -28,7 +28,6 @@ const App: Component = () => {
           <button class="btn" onClick={() => video.setMuted(!video.muted())}>
             {video.muted() ? "Unmute" : "Mute"}
           </button>
-
         </div>
 
         <div class="space-y-1 text-sm">

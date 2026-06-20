@@ -62,7 +62,7 @@ export const DiscriminatedUnion = meta.story({
       if (!s) return null;
       if (s.type === "circle") return (Math.PI * s.radius ** 2).toFixed(1);
       if (s.type === "rect") return (s.width * s.height).toFixed(1);
-      return ((0.5 * s.base * s.height)).toFixed(1);
+      return (0.5 * s.base * s.height).toFixed(1);
     };
 
     return (
@@ -168,7 +168,7 @@ export const CustomTagField = meta.story({
     docs: {
       description: {
         story:
-          "Pass `tag=\"kind\"` when the discriminant field isn't named `type`. The `case` keys and accessor shape update accordingly.",
+          'Pass `tag="kind"` when the discriminant field isn\'t named `type`. The `case` keys and accessor shape update accordingly.',
       },
     },
   },
@@ -405,9 +405,7 @@ export const LiteralUnion = meta.story({
                 </span>
               ),
               error: () => (
-                <span style={{ "font-size": font.sizeSm, color: "#ef4444" }}>
-                  Request failed
-                </span>
+                <span style={{ "font-size": font.sizeSm, color: "#ef4444" }}>Request failed</span>
               ),
             }}
           />

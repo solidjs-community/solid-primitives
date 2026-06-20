@@ -62,9 +62,7 @@ export const OnlineOfflineBadge = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>isOnline()</span>
-          <Badge variant={isOnline() ? "success" : "error"}>
-            {isOnline() ? "true" : "false"}
-          </Badge>
+          <Badge variant={isOnline() ? "success" : "error"}>{isOnline() ? "true" : "false"}</Badge>
         </div>
 
         <Card>
@@ -99,9 +97,7 @@ export const OnlineOfflineBadge = meta.story({
           </span>
         </Card>
 
-        <Alert variant="info">
-          Toggle: DevTools → Network → throttle preset → Offline
-        </Alert>
+        <Alert variant="info">Toggle: DevTools → Network → throttle preset → Offline</Alert>
       </Container>
     );
   },
@@ -185,9 +181,7 @@ export const ConnectionQualitySignals = meta.story({
           </Section>
         </Show>
 
-        <Alert variant="info">
-          Throttle: DevTools → Network → set a connection preset
-        </Alert>
+        <Alert variant="info">Throttle: DevTools → Network → set a connection preset</Alert>
       </Container>
     );
   },

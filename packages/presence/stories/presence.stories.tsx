@@ -75,8 +75,8 @@ export const ShowHide = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          The element stays in the DOM until the 500ms exit transition finishes — unmounting
-          happens only after the animation completes.
+          The element stays in the DOM until the 500ms exit transition finishes — unmounting happens
+          only after the animation completes.
         </p>
       </Container>
     );
@@ -165,8 +165,8 @@ export const ItemSwitcher = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Click a button to switch items. The exiting item slides out before the next one
-          slides in. Click the active button again to deselect.
+          Click a button to switch items. The exiting item slides out before the next one slides in.
+          Click the active button again to deselect.
         </p>
       </Container>
     );
@@ -233,8 +233,8 @@ export const SeparateDurations = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Toggle quickly to see the transitions overlap. The CSS duration switches between
-          200ms and 800ms based on which phase is active.
+          Toggle quickly to see the transitions overlap. The CSS duration switches between 200ms and
+          800ms based on which phase is active.
         </p>
       </Container>
     );

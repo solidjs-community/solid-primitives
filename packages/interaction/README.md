@@ -24,7 +24,7 @@ pnpm add @solid-primitives/interaction
 function makeInteractOutside<T extends Element>(
   el: T,
   options: MakeInteractOutsideOptions,
-): () => void
+): () => void;
 ```
 
 A non-reactive, pure-ref primitive. Attaches outside-interaction listeners to `el` immediately and returns a cleanup function. Use this when you already have a stable element reference and don't need reactive re-attachment.
@@ -43,7 +43,7 @@ cleanup();
 ## `interactOutside`
 
 ```ts
-function interactOutside(options: MakeInteractOutsideOptions): (el: Element) => void
+function interactOutside(options: MakeInteractOutsideOptions): (el: Element) => void;
 ```
 
 A ref factory for `makeInteractOutside`. The most concise way to build dismissable UI — pass the result directly to a JSX `ref` prop and the element will close itself when the user interacts outside it. Cleanup is registered via `onCleanup` in the component's reactive scope, so listeners are removed automatically when the component disposes — no signal ref needed.
@@ -57,9 +57,7 @@ function Popover() {
 
   return (
     <Show when={open()}>
-      <div ref={interactOutside({ onInteractOutside: () => setOpen(false) })}>
-        Popover content
-      </div>
+      <div ref={interactOutside({ onInteractOutside: () => setOpen(false) })}>Popover content</div>
     </Show>
   );
 }
@@ -71,20 +69,20 @@ function Popover() {
 function createInteractOutside<T extends Element>(
   options: CreateInteractOutsideOptions,
   ref: Accessor<T | undefined>,
-): void
+): void;
 ```
 
 Reactive wrapper around `makeInteractOutside`. Sets up document-level event listeners that fire whenever the user interacts outside the element returned by `ref`. Re-attaches automatically when `ref` or `options.disabled` changes. Cleans up with the reactive owner.
 
 ### Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `disabled` | `MaybeAccessor<boolean \| undefined>` | Disables all listeners when `true`. Reactive — can be an accessor. |
-| `shouldExcludeElement` | `(element: Element) => boolean` | Return `true` to suppress handlers for a specific element. |
-| `onPointerDownOutside` | `(event: PointerDownOutsideEvent) => void` | Fired when a `pointerdown` event occurs outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing. |
-| `onFocusOutside` | `(event: FocusOutsideEvent) => void` | Fired when focus moves outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing. |
-| `onInteractOutside` | `(event: InteractOutsideEvent) => void` | Fired for any outside interaction — both pointer and focus. Always fires after the specific handler unless that handler called `preventDefault`. |
+| Option                 | Type                                       | Description                                                                                                                                      |
+| ---------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `disabled`             | `MaybeAccessor<boolean \| undefined>`      | Disables all listeners when `true`. Reactive — can be an accessor.                                                                               |
+| `shouldExcludeElement` | `(element: Element) => boolean`            | Return `true` to suppress handlers for a specific element.                                                                                       |
+| `onPointerDownOutside` | `(event: PointerDownOutsideEvent) => void` | Fired when a `pointerdown` event occurs outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing.                    |
+| `onFocusOutside`       | `(event: FocusOutsideEvent) => void`       | Fired when focus moves outside `ref`. Call `event.preventDefault()` to stop `onInteractOutside` from firing.                                     |
+| `onInteractOutside`    | `(event: InteractOutsideEvent) => void`    | Fired for any outside interaction — both pointer and focus. Always fires after the specific handler unless that handler called `preventDefault`. |
 
 ### Event types
 
@@ -92,13 +90,13 @@ All handlers receive a `CustomEvent` that wraps the original DOM event.
 
 ```ts
 type EventDetails<T> = {
-  originalEvent: T;        // the original PointerEvent or FocusEvent
-  isContextMenu: boolean;  // true for right-click / Ctrl+click on Mac
+  originalEvent: T; // the original PointerEvent or FocusEvent
+  isContextMenu: boolean; // true for right-click / Ctrl+click on Mac
 };
 
 type PointerDownOutsideEvent = CustomEvent<EventDetails<PointerEvent>>;
-type FocusOutsideEvent       = CustomEvent<EventDetails<FocusEvent>>;
-type InteractOutsideEvent    = PointerDownOutsideEvent | FocusOutsideEvent;
+type FocusOutsideEvent = CustomEvent<EventDetails<FocusEvent>>;
+type InteractOutsideEvent = PointerDownOutsideEvent | FocusOutsideEvent;
 ```
 
 ## Usage
@@ -113,10 +111,7 @@ function Popover() {
   const [ref, setRef] = createSignal<HTMLDivElement>();
   const [open, setOpen] = createSignal(false);
 
-  createInteractOutside(
-    { onInteractOutside: () => setOpen(false) },
-    ref,
-  );
+  createInteractOutside({ onInteractOutside: () => setOpen(false) }, ref);
 
   return (
     <Show when={open()}>
@@ -170,7 +165,9 @@ function Dialog(props: { open: boolean }) {
   createInteractOutside(
     {
       disabled: () => !props.open,
-      onInteractOutside: () => { /* close */ },
+      onInteractOutside: () => {
+        /* close */
+      },
     },
     ref,
   );
@@ -193,7 +190,9 @@ function Dropdown() {
     {
       // Prevent the trigger button from closing the dropdown when clicked
       shouldExcludeElement: el => el === triggerRef() || !!triggerRef()?.contains(el),
-      onInteractOutside: () => { /* close */ },
+      onInteractOutside: () => {
+        /* close */
+      },
     },
     ref,
   );

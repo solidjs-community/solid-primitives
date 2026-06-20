@@ -64,10 +64,11 @@ export const VisibilityObserverStory = meta.story({
           <For each={ITEMS}>
             {item => {
               let ref!: HTMLDivElement;
-              const isVisible = createVisibilityObserver(
-                () => ref,
-                { root: containerRef, threshold: 0.6, initialValue: false },
-              );
+              const isVisible = createVisibilityObserver(() => ref, {
+                root: containerRef,
+                threshold: 0.6,
+                initialValue: false,
+              });
               return (
                 <div
                   ref={el => (ref = el)}
@@ -146,10 +147,14 @@ export const VisibilityOccurrenceStory = meta.story({
 
               const color = () => {
                 switch (occ()) {
-                  case "Entering": return "#10b981";
-                  case "Inside":   return "#6366f1";
-                  case "Leaving":  return "#f97316";
-                  default:         return "#e2e8f0";
+                  case "Entering":
+                    return "#10b981";
+                  case "Inside":
+                    return "#6366f1";
+                  case "Leaving":
+                    return "#f97316";
+                  default:
+                    return "#e2e8f0";
                 }
               };
 
@@ -287,12 +292,16 @@ export const MakeIntersectionObserverStory = meta.story({
         <div
           ref={el => {
             containerRef = el;
-            const { add } = makeIntersectionObserver([], entries => {
-              for (const entry of entries) {
-                const label = (entry.target as HTMLElement).dataset["label"] ?? "?";
-                pushLog(`${label}: ${entry.isIntersecting ? "visible" : "hidden"}`);
-              }
-            }, { root: containerRef, threshold: 0.5 });
+            const { add } = makeIntersectionObserver(
+              [],
+              entries => {
+                for (const entry of entries) {
+                  const label = (entry.target as HTMLElement).dataset["label"] ?? "?";
+                  pushLog(`${label}: ${entry.isIntersecting ? "visible" : "hidden"}`);
+                }
+              },
+              { root: containerRef, threshold: 0.5 },
+            );
             addEl = add;
           }}
           style={{

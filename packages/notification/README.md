@@ -88,9 +88,15 @@ const { show, close, notification, supported } = createNotification(
   () => `You have ${unread()} messages`,
   { icon: "/icon.png" },
   {
-    onClick: n => { window.focus(); },
-    onClose: n => { console.log("dismissed"); },
-    onError: n => { console.error("notification failed"); },
+    onClick: n => {
+      window.focus();
+    },
+    onClose: n => {
+      console.log("dismissed");
+    },
+    onError: n => {
+      console.error("notification failed");
+    },
   },
 );
 

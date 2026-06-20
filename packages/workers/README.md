@@ -37,11 +37,15 @@ Spawn a worker from an object of self-contained functions. Each method becomes a
 
 ```ts
 const [worker] = createWorker({
-  add(a: number, b: number) { return a + b; },
-  multiply(a: number, b: number) { return a * b; },
+  add(a: number, b: number) {
+    return a + b;
+  },
+  multiply(a: number, b: number) {
+    return a * b;
+  },
 });
 
-console.log(await worker.add(1, 2));      // 3  — fully typed, no cast required
+console.log(await worker.add(1, 2)); // 3  — fully typed, no cast required
 console.log(await worker.multiply(3, 4)); // 12
 ```
 
@@ -58,7 +62,7 @@ console.log(await worker.multiply(3, 4)); // 12
 function createWorker<T extends Record<string, Function>>(
   fns: T,
   options?: WorkerOptions,
-): CreateWorkerResult<T>
+): CreateWorkerResult<T>;
 ```
 
 #### Cancellation
@@ -81,7 +85,14 @@ const [worker] = createWorker({
   async wait(ms: number, signal?: AbortSignal): Promise<void> {
     await new Promise<void>((resolve, reject) => {
       const t = setTimeout(resolve, ms);
-      signal?.addEventListener("abort", () => { clearTimeout(t); reject(new DOMException("Aborted", "AbortError")); }, { once: true });
+      signal?.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(t);
+          reject(new DOMException("Aborted", "AbortError"));
+        },
+        { once: true },
+      );
     });
   },
 });
@@ -95,12 +106,16 @@ Worker functions are serialized via `Function.prototype.toString` and run in a s
 // ❌ broken — `multiplier` is not in the worker's scope
 const multiplier = 2;
 const [w] = createWorker({
-  double(n: number) { return n * multiplier; }, // ReferenceError at runtime
+  double(n: number) {
+    return n * multiplier;
+  }, // ReferenceError at runtime
 });
 
 // ✅ correct — self-contained
 const [w] = createWorker({
-  double(n: number) { return n * 2; },
+  double(n: number) {
+    return n * 2;
+  },
 });
 ```
 
@@ -112,15 +127,13 @@ Like `createWorker`, but distributes calls across `concurrency` workers using ro
 
 ```ts
 const [pool] = createWorkerPool(4, {
-  add(a: number, b: number) { return a + b; },
+  add(a: number, b: number) {
+    return a + b;
+  },
 });
 
 // Calls are spread across 4 worker instances
-const results = await Promise.all([
-  pool.add(1, 2),
-  pool.add(3, 4),
-  pool.add(5, 6),
-]);
+const results = await Promise.all([pool.add(1, 2), pool.add(3, 4), pool.add(5, 6)]);
 // [3, 7, 11]
 ```
 
@@ -136,7 +149,7 @@ function createWorkerPool<T extends Record<string, Function>>(
   concurrency: number,
   fns: T,
   options?: WorkerOptions,
-): CreateWorkerPoolResult<T>
+): CreateWorkerPoolResult<T>;
 ```
 
 > The same self-contained function constraint from `createWorker` applies.
@@ -153,7 +166,11 @@ When inputs change before a previous call resolves, the previous call is **autom
 import { createWorker, createWorkerQuery } from "@solid-primitives/workers";
 import { createSignal, Loading } from "solid-js";
 
-const [worker] = createWorker({ add([a, b]: [number, number]) { return a + b; } });
+const [worker] = createWorker({
+  add([a, b]: [number, number]) {
+    return a + b;
+  },
+});
 const [input, setInput] = createSignal<[number, number]>([1, 1]);
 const result = createWorkerQuery<number>(() => worker.add(input()));
 
@@ -183,13 +200,15 @@ import { createReactiveWorker } from "@solid-primitives/workers";
 const { inputs, setInputs, outputs, error } = createReactiveWorker(
   new URL("./my.worker.ts", import.meta.url),
   {
-    inputs:  { data: [] as number[], threshold: 0.5 },
+    inputs: { data: [] as number[], threshold: 0.5 },
     outputs: { result: 0 },
   },
 );
 
 // Write to inputs — changes are deep-tracked and forwarded to the worker
-setInputs(s => { s.threshold = 0.8; });
+setInputs(s => {
+  s.threshold = 0.8;
+});
 
 // Read outputs reactively (store proxy — no `()`)
 createEffect(
@@ -198,19 +217,22 @@ createEffect(
 );
 
 // Surface worker errors
-createEffect(() => error(), ev => {
-  if (ev) console.error("worker crashed:", ev.message);
-});
+createEffect(
+  () => error(),
+  ev => {
+    if (ev) console.error("worker crashed:", ev.message);
+  },
+);
 ```
 
 **Returns:** `{ inputs, setInputs, outputs, error }`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `inputs` | `I` (store proxy) | Read-only on main thread; mutate via `setInputs` |
-| `setInputs` | `StoreSetter<I>` | Draft-first store setter; changes deep-track and sync to the worker |
-| `outputs` | `Readonly<O>` (store proxy) | Updated whenever the worker writes new values |
-| `error` | `Accessor<ErrorEvent \| null>` | Last unhandled worker error, or `null` |
+| Field       | Type                           | Description                                                         |
+| ----------- | ------------------------------ | ------------------------------------------------------------------- |
+| `inputs`    | `I` (store proxy)              | Read-only on main thread; mutate via `setInputs`                    |
+| `setInputs` | `StoreSetter<I>`               | Draft-first store setter; changes deep-track and sync to the worker |
+| `outputs`   | `Readonly<O>` (store proxy)    | Updated whenever the worker writes new values                       |
+| `error`     | `Accessor<ErrorEvent \| null>` | Last unhandled worker error, or `null`                              |
 
 > **Large data:** each input key change serializes the full value of that key. For large arrays or deeply nested objects, prefer `Transferable` objects (e.g. `ArrayBuffer`) or chunked updates to avoid serialization overhead.
 
@@ -222,15 +244,14 @@ Import from the `/worker` sub-entry so the bundle only includes worker-side code
 import { createEffect } from "solid-js";
 import { workerScope } from "@solid-primitives/workers/worker";
 
-workerScope<
-  { data: number[]; threshold: number },
-  { result: number }
->(({ inputs, setOutputs }) => {
+workerScope<{ data: number[]; threshold: number }, { result: number }>(({ inputs, setOutputs }) => {
   createEffect(
     () => ({ data: inputs.data, threshold: inputs.threshold }),
     ({ data, threshold }) => {
       const filtered = data.filter(v => v > threshold);
-      setOutputs(s => { s.result = filtered.length; });
+      setOutputs(s => {
+        s.result = filtered.length;
+      });
     },
   );
 });
@@ -256,11 +277,11 @@ Add `"WebWorker"` to `lib` in the worker file's `tsconfig.json` so TypeScript re
 
 #### Bridge message protocol
 
-| Direction | Message type | Purpose |
-|-----------|-------------|---------|
-| main → worker | `{ type: "init", inputs, outputs }` | Sent once on construction with initial store values |
-| main → worker | `{ type: "input", key, value }` | Sent whenever an input key changes (full key value, not a diff) |
-| worker → main | `{ type: "outputs", snapshot }` | Sent whenever any output changes; carries a full plain-object snapshot |
+| Direction     | Message type                        | Purpose                                                                |
+| ------------- | ----------------------------------- | ---------------------------------------------------------------------- |
+| main → worker | `{ type: "init", inputs, outputs }` | Sent once on construction with initial store values                    |
+| main → worker | `{ type: "input", key, value }`     | Sent whenever an input key changes (full key value, not a diff)        |
+| worker → main | `{ type: "outputs", snapshot }`     | Sent whenever any output changes; carries a full plain-object snapshot |
 
 ---
 
@@ -268,13 +289,13 @@ Add `"WebWorker"` to `lib` in the worker file's `tsconfig.json` so TypeScript re
 
 All primitives are SSR-safe. On the server (`isServer === true`):
 
-| Primitive | SSR stub |
-|-----------|----------|
-| `createWorker` | Returns `[EventTarget, noop, noop, Set()]` — no worker spawned |
-| `createWorkerPool` | Returns `[EventTarget, noop, noop]` — no workers spawned |
-| `createWorkerQuery` | Returns `() => undefined` |
+| Primitive              | SSR stub                                                            |
+| ---------------------- | ------------------------------------------------------------------- |
+| `createWorker`         | Returns `[EventTarget, noop, noop, Set()]` — no worker spawned      |
+| `createWorkerPool`     | Returns `[EventTarget, noop, noop]` — no workers spawned            |
+| `createWorkerQuery`    | Returns `() => undefined`                                           |
 | `createReactiveWorker` | Returns stores initialised from schema values + `error: () => null` |
-| `workerScope` | Safe to import; do not call on the server |
+| `workerScope`          | Safe to import; do not call on the server                           |
 
 ---
 

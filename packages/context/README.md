@@ -85,11 +85,9 @@ The `useContext` function always returns `Exclude<T, undefined>`. If the factory
 An optional `name` can be passed as part of the third argument. It labels the context's Symbol for Solid DevTools and improves `ContextNotFoundError` stack traces (dev mode only).
 
 ```ts
-const [ThemeProvider, useTheme] = createContextProvider(
-  () => createTheme(),
-  defaultTheme,
-  { name: "Theme" },
-);
+const [ThemeProvider, useTheme] = createContextProvider(() => createTheme(), defaultTheme, {
+  name: "Theme",
+});
 ```
 
 ## `createOptionalContextProvider`
@@ -113,7 +111,7 @@ An optional `name` can be passed as the third argument.
 
 ## `createLayeredContext`
 
-Like `createContextProvider`, but each provider in the tree *extends* the parent context value rather than replacing it entirely. The factory function receives the nearest parent's context value as its second argument.
+Like `createContextProvider`, but each provider in the tree _extends_ the parent context value rather than replacing it entirely. The factory function receives the nearest parent's context value as its second argument.
 
 This is useful for incremental overrides such as themes, permissions layers, or i18n patches where a child provider should inherit what it does not explicitly change.
 

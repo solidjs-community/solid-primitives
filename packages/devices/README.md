@@ -66,6 +66,7 @@ function createCameras(): Accessor<MediaDeviceInfo[]>;
 ```
 
 All four primitives:
+
 - Are SSR-safe — return an empty array on the server.
 - Require no arguments.
 - Subscribe to [`devicechange`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/devicechange_event) events and clean up automatically via `onCleanup`.

@@ -33,7 +33,7 @@ import { createForm } from "@solid-primitives/form";
 function LoginForm() {
   const form = createForm({
     fields: {
-      email:    { initial: "", validate: isEmail },
+      email: { initial: "", validate: isEmail },
       password: { initial: "", validate: [minLength(8), hasUppercase] },
     },
     onSubmit: async values => {
@@ -65,19 +65,19 @@ function LoginForm() {
 
 `createForm` accepts a config object:
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `fields` | `Record<string, FieldConfig>` | Field definitions (see below) |
-| `onSubmit` | `(values) => void \| Promise<void>` | Called with all field values when the form submits and all fields are valid |
-| `validateOn` | `"change" \| "blur" \| "submit"` | Default display timing for field errors. Defaults to `"change"`. |
+| Property     | Type                                | Description                                                                 |
+| ------------ | ----------------------------------- | --------------------------------------------------------------------------- |
+| `fields`     | `Record<string, FieldConfig>`       | Field definitions (see below)                                               |
+| `onSubmit`   | `(values) => void \| Promise<void>` | Called with all field values when the form submits and all fields are valid |
+| `validateOn` | `"change" \| "blur" \| "submit"`    | Default display timing for field errors. Defaults to `"change"`.            |
 
 **`FieldConfig`**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `initial` | `V` | Initial value for the field |
-| `validate` | `ValidatorFn \| ValidatorFn[]` | One or more validator functions. Validators run in order; the first failure is the error. |
-| `validateOn` | `"change" \| "blur" \| "submit"` | When to display this field's error in the UI. Overrides the form-level `validateOn`. |
+| Property     | Type                             | Description                                                                               |
+| ------------ | -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `initial`    | `V`                              | Initial value for the field                                                               |
+| `validate`   | `ValidatorFn \| ValidatorFn[]`   | One or more validator functions. Validators run in order; the first failure is the error. |
+| `validateOn` | `"change" \| "blur" \| "submit"` | When to display this field's error in the UI. Overrides the form-level `validateOn`.      |
 
 A **`ValidatorFn`** is any function with the signature `(value: V) => string | null | Promise<string | null>` — returning an error message string on failure, `null` when valid, or a Promise that resolves to either.
 
@@ -85,52 +85,52 @@ A **`ValidatorFn`** is any function with the signature `(value: V) => string | n
 
 Each entry in `form.fields` exposes:
 
-| Member | Type | Description |
-|--------|------|-------------|
-| `value()` | `Accessor<V>` | Current field value |
-| `error()` | `Accessor<string \| null>` | First validation error, or `null` if valid. Respects `validateOn`. |
-| `touched()` | `Accessor<boolean>` | Whether the field has been blurred |
-| `pending()` | `Accessor<boolean>` | `true` while an async validator is in flight for this field |
-| `setValue(v)` | `(v: V) => void` | Imperatively set the value |
-| `setTouched(v)` | `(v: boolean) => void` | Imperatively set the touched flag |
+| Member          | Type                              | Description                                                                                              |
+| --------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `value()`       | `Accessor<V>`                     | Current field value                                                                                      |
+| `error()`       | `Accessor<string \| null>`        | First validation error, or `null` if valid. Respects `validateOn`.                                       |
+| `touched()`     | `Accessor<boolean>`               | Whether the field has been blurred                                                                       |
+| `pending()`     | `Accessor<boolean>`               | `true` while an async validator is in flight for this field                                              |
+| `setValue(v)`   | `(v: V) => void`                  | Imperatively set the value                                                                               |
+| `setTouched(v)` | `(v: boolean) => void`            | Imperatively set the touched flag                                                                        |
 | `setError(msg)` | `(error: string \| null) => void` | Inject an external error (e.g. from a server response). Cleared automatically when `setValue` is called. |
-| `reset()` | `() => void` | Reset this field to its initial value and clear touched |
+| `reset()`       | `() => void`                      | Reset this field to its initial value and clear touched                                                  |
 
 ### Form-level API
 
-| Member | Type | Description |
-|--------|------|-------------|
-| `dirty()` | `Accessor<boolean>` | `true` when any field differs from its initial value |
-| `valid()` | `Accessor<boolean>` | `true` when all fields pass validation and no async validators are pending |
-| `pending()` | `Accessor<boolean>` | `true` while any field has an async validator in flight |
-| `submitting()` | `Accessor<boolean>` | `true` while `onSubmit` is in flight |
-| `submitted()` | `Accessor<boolean>` | `true` after the first submit attempt; reset by `reset()` |
-| `values()` | `Accessor<Values>` | Plain object of all current field values |
-| `errors()` | `Accessor<Partial<Record<...>>>` | Object containing only **field-level** errors (always reflects true validity, regardless of `validateOn`). Cross-field errors registered via `validate()` are not included — access those through the accessor each `validate()` call returns. |
-| `bind(name)` | Ref directive factory | Wires an `<input>` or `<select>` to the named field (see below) |
-| `ref` | Ref callback | Attaches submit handling to a `<form>` element |
-| `validate(fn)` | Cross-field rule | Registers a form-level validation rule (see below) |
-| `setError(name, msg)` | `(name, error: string \| null) => void` | Inject an external error on a named field (e.g. server-side validation). Cleared automatically when that field's value changes. |
-| `formData()` | `() => FormData` | Snapshot of current field values as a `FormData` instance |
-| `setValues(values)` | `(values: Partial<Values>) => void` | Imperatively update one or more field values. Equivalent to calling `setValue` on each named field — clears any external error on each updated field and re-runs validation per `validateOn`. Does **not** alter baselines; use `reset(newValues)` if you also want to update baselines. |
-| `reset(newValues?)` | `(newValues?: Partial<Values>) => void` | Reset all fields. If `newValues` is provided, the named fields adopt those as their new baseline (useful for edit forms after a successful save). |
-| `submit()` | `() => Promise<void>` | Programmatically trigger submission |
+| Member                | Type                                    | Description                                                                                                                                                                                                                                                                              |
+| --------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dirty()`             | `Accessor<boolean>`                     | `true` when any field differs from its initial value                                                                                                                                                                                                                                     |
+| `valid()`             | `Accessor<boolean>`                     | `true` when all fields pass validation and no async validators are pending                                                                                                                                                                                                               |
+| `pending()`           | `Accessor<boolean>`                     | `true` while any field has an async validator in flight                                                                                                                                                                                                                                  |
+| `submitting()`        | `Accessor<boolean>`                     | `true` while `onSubmit` is in flight                                                                                                                                                                                                                                                     |
+| `submitted()`         | `Accessor<boolean>`                     | `true` after the first submit attempt; reset by `reset()`                                                                                                                                                                                                                                |
+| `values()`            | `Accessor<Values>`                      | Plain object of all current field values                                                                                                                                                                                                                                                 |
+| `errors()`            | `Accessor<Partial<Record<...>>>`        | Object containing only **field-level** errors (always reflects true validity, regardless of `validateOn`). Cross-field errors registered via `validate()` are not included — access those through the accessor each `validate()` call returns.                                           |
+| `bind(name)`          | Ref directive factory                   | Wires an `<input>` or `<select>` to the named field (see below)                                                                                                                                                                                                                          |
+| `ref`                 | Ref callback                            | Attaches submit handling to a `<form>` element                                                                                                                                                                                                                                           |
+| `validate(fn)`        | Cross-field rule                        | Registers a form-level validation rule (see below)                                                                                                                                                                                                                                       |
+| `setError(name, msg)` | `(name, error: string \| null) => void` | Inject an external error on a named field (e.g. server-side validation). Cleared automatically when that field's value changes.                                                                                                                                                          |
+| `formData()`          | `() => FormData`                        | Snapshot of current field values as a `FormData` instance                                                                                                                                                                                                                                |
+| `setValues(values)`   | `(values: Partial<Values>) => void`     | Imperatively update one or more field values. Equivalent to calling `setValue` on each named field — clears any external error on each updated field and re-runs validation per `validateOn`. Does **not** alter baselines; use `reset(newValues)` if you also want to update baselines. |
+| `reset(newValues?)`   | `(newValues?: Partial<Values>) => void` | Reset all fields. If `newValues` is provided, the named fields adopt those as their new baseline (useful for edit forms after a successful save).                                                                                                                                        |
+| `submit()`            | `() => Promise<void>`                   | Programmatically trigger submission                                                                                                                                                                                                                                                      |
 
 ### `validateOn`
 
 Controls when field errors become visible to the user. Can be set at the form level (applies to all fields) or overridden per field.
 
-| Mode | Error appears when… |
-|------|---------------------|
-| `"change"` (default) | Immediately as the user types |
-| `"blur"` | After the field loses focus |
-| `"submit"` | After the first submit attempt |
+| Mode                 | Error appears when…            |
+| -------------------- | ------------------------------ |
+| `"change"` (default) | Immediately as the user types  |
+| `"blur"`             | After the field loses focus    |
+| `"submit"`           | After the first submit attempt |
 
 ```tsx
 // All fields only show errors after blur
 const form = createForm({
   fields: {
-    email:    { initial: "", validate: isEmail },
+    email: { initial: "", validate: isEmail },
     password: { initial: "", validate: minLength(8) },
   },
   validateOn: "blur",
@@ -140,7 +140,7 @@ const form = createForm({
 const form = createForm({
   fields: {
     username: { initial: "", validate: isAvailable, validateOn: "blur" },
-    email:    { initial: "", validate: isEmail,     validateOn: "submit" },
+    email: { initial: "", validate: isEmail, validateOn: "submit" },
   },
 });
 ```
@@ -158,6 +158,7 @@ const form = createForm({
 ```
 
 This sets up bidirectional sync:
+
 - **Signal → DOM:** the input's value (or `checked` state for checkboxes/radios) stays in sync with the field signal
 - **DOM → signal:** `input` events update the field value; `blur` events mark the field as touched
 
@@ -224,9 +225,11 @@ function SignupForm() {
   const form = createForm({
     fields: {
       password: { initial: "" },
-      confirm:  { initial: "" },
+      confirm: { initial: "" },
     },
-    onSubmit: async values => { /* ... */ },
+    onSubmit: async values => {
+      /* ... */
+    },
   });
 
   const confirmError = form.validate(values =>
@@ -236,11 +239,13 @@ function SignupForm() {
   return (
     <form ref={form.ref}>
       <input ref={form.bind("password")} type="password" />
-      <input ref={form.bind("confirm")}  type="password" />
+      <input ref={form.bind("confirm")} type="password" />
       <Show when={confirmError()}>
         <p>{confirmError()}</p>
       </Show>
-      <button type="submit" disabled={!form.valid()}>Sign up</button>
+      <button type="submit" disabled={!form.valid()}>
+        Sign up
+      </button>
     </form>
   );
 }
@@ -285,7 +290,7 @@ This calls `e.preventDefault()` and runs the submit flow: touches all fields, se
 ```tsx
 const form = createForm({
   fields: {
-    email:    { initial: "", validate: isEmail,    validateOn: "submit" },
+    email: { initial: "", validate: isEmail, validateOn: "submit" },
     password: { initial: "", validate: minLength(8), validateOn: "submit" },
   },
 });
@@ -331,7 +336,7 @@ The external error is cleared automatically the moment the user edits the field 
 ```tsx
 const form = createForm({
   fields: {
-    email:    { initial: "" },
+    email: { initial: "" },
     username: { initial: "" },
   },
   onSubmit: async values => {
@@ -372,14 +377,14 @@ Field value types are inferred from `initial`:
 ```ts
 const form = createForm({
   fields: {
-    age:  { initial: 0 },              // FormField<number>
-    name: { initial: "" },             // FormField<string>
+    age: { initial: 0 }, // FormField<number>
+    name: { initial: "" }, // FormField<string>
     tags: { initial: [] as string[] }, // FormField<string[]>
   },
 });
 
-form.fields.age.value();   // number
-form.fields.name.value();  // string
+form.fields.age.value(); // number
+form.fields.name.value(); // string
 ```
 
 #### Definition
@@ -402,32 +407,34 @@ type FieldConfig<V = string> = {
 };
 
 type FormField<V = string> = {
-  value:      Accessor<V>;
-  error:      Accessor<string | null>;
-  touched:    Accessor<boolean>;
-  pending:    Accessor<boolean>;
-  setValue:   (v: V) => void;
+  value: Accessor<V>;
+  error: Accessor<string | null>;
+  touched: Accessor<boolean>;
+  pending: Accessor<boolean>;
+  setValue: (v: V) => void;
   setTouched: (v: boolean) => void;
-  setError:   (error: string | null) => void;
-  reset:      () => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
 };
 
 type FormReturn<C extends FieldsConfig> = {
-  fields:     { [K in keyof C]: FormField<InferValue<C[K]>> };
-  values:     Accessor<{ [K in keyof C]: InferValue<C[K]> }>;
-  errors:     Accessor<Partial<Record<keyof C & string, string>>>;
-  dirty:      Accessor<boolean>;
-  valid:      Accessor<boolean>;
-  pending:    Accessor<boolean>;
+  fields: { [K in keyof C]: FormField<InferValue<C[K]>> };
+  values: Accessor<{ [K in keyof C]: InferValue<C[K]> }>;
+  errors: Accessor<Partial<Record<keyof C & string, string>>>;
+  dirty: Accessor<boolean>;
+  valid: Accessor<boolean>;
+  pending: Accessor<boolean>;
   submitting: Accessor<boolean>;
-  submitted:  Accessor<boolean>;
-  bind:       (name: keyof C & string) => (el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => () => void;
-  ref:        (el: HTMLFormElement) => () => void;
-  validate:   (fn: (values: Values) => string | null) => Accessor<string | null>;
-  setError:   (name: keyof C & string, error: string | null) => void;
-  formData:   () => FormData;
-  reset:      (newValues?: Partial<Values>) => void;
-  submit:     () => Promise<void>;
+  submitted: Accessor<boolean>;
+  bind: (
+    name: keyof C & string,
+  ) => (el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => () => void;
+  ref: (el: HTMLFormElement) => () => void;
+  validate: (fn: (values: Values) => string | null) => Accessor<string | null>;
+  setError: (name: keyof C & string, error: string | null) => void;
+  formData: () => FormData;
+  reset: (newValues?: Partial<Values>) => void;
+  submit: () => Promise<void>;
 };
 ```
 
@@ -453,11 +460,13 @@ function valibot<T>(schema: v.BaseSchema<T, T, v.BaseIssue<unknown>>) {
 
 const form = createForm({
   fields: {
-    email:    { initial: "", validate: valibot(v.pipe(v.string(), v.email())) },
+    email: { initial: "", validate: valibot(v.pipe(v.string(), v.email())) },
     password: { initial: "", validate: valibot(v.pipe(v.string(), v.minLength(8))) },
-    age:      { initial: 0,  validate: valibot(v.pipe(v.number(), v.minValue(18))) },
+    age: { initial: 0, validate: valibot(v.pipe(v.number(), v.minValue(18))) },
   },
-  onSubmit: async values => { /* ... */ },
+  onSubmit: async values => {
+    /* ... */
+  },
 });
 ```
 
@@ -477,11 +486,13 @@ function zod<T>(schema: z.ZodType<T>) {
 
 const form = createForm({
   fields: {
-    email:    { initial: "", validate: zod(z.string().email()) },
+    email: { initial: "", validate: zod(z.string().email()) },
     password: { initial: "", validate: zod(z.string().min(8)) },
-    age:      { initial: 0,  validate: zod(z.number().min(18)) },
+    age: { initial: 0, validate: zod(z.number().min(18)) },
   },
-  onSubmit: async values => { /* ... */ },
+  onSubmit: async values => {
+    /* ... */
+  },
 });
 ```
 
@@ -495,7 +506,7 @@ import * as v from "valibot";
 const SignupSchema = v.pipe(
   v.object({
     password: v.string(),
-    confirm:  v.string(),
+    confirm: v.string(),
   }),
   v.check(({ password, confirm }) => password === confirm, "Passwords do not match"),
 );
@@ -503,7 +514,7 @@ const SignupSchema = v.pipe(
 const form = createForm({
   fields: {
     password: { initial: "" },
-    confirm:  { initial: "" },
+    confirm: { initial: "" },
   },
   onSubmit: values => {
     const result = v.safeParse(SignupSchema, values);
@@ -520,11 +531,9 @@ const form = createForm({
 Plain functions work too — no library required:
 
 ```ts
-const required = (value: string) =>
-  value.trim().length === 0 ? "Required" : null;
+const required = (value: string) => (value.trim().length === 0 ? "Required" : null);
 
-const noSpaces = (value: string) =>
-  value.includes(" ") ? "No spaces allowed" : null;
+const noSpaces = (value: string) => (value.includes(" ") ? "No spaces allowed" : null);
 
 const form = createForm({
   fields: {
@@ -608,7 +617,11 @@ const TextFieldErrorMessage = (props: { children: JSX.Element }) => {
       {() => {
         const id = ctx.generateId("error-message");
         onCleanup(ctx.registerErrorMessage(id));
-        return <span id={id} role="alert">{props.children}</span>;
+        return (
+          <span id={id} role="alert">
+            {props.children}
+          </span>
+        );
       }}
     </Show>
   );
@@ -620,7 +633,7 @@ const TextFieldErrorMessage = (props: { children: JSX.Element }) => {
   <TextFieldInput placeholder="you@example.com" />
   <TextFieldDescription>We'll never share your email.</TextFieldDescription>
   <TextFieldErrorMessage>Enter a valid email address.</TextFieldErrorMessage>
-</TextFieldRoot>
+</TextFieldRoot>;
 ```
 
 When `validationState` is `"invalid"`, the error message component mounts, registers its ID, and `aria-describedby` on the input automatically expands to include it. When the state clears, the component unmounts and `onCleanup` removes its ID from the graph.
@@ -631,33 +644,33 @@ Creates the ARIA context for a labeled field group. Returns a `FormControlContex
 
 **Props**
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `id` | `MaybeAccessor<string>` | Base ID for the field group. Auto-generated if omitted. |
-| `name` | `MaybeAccessor<string>` | Form submission name. Falls back to `id`. |
+| Prop              | Type                                               | Description                                                                                               |
+| ----------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `id`              | `MaybeAccessor<string>`                            | Base ID for the field group. Auto-generated if omitted.                                                   |
+| `name`            | `MaybeAccessor<string>`                            | Form submission name. Falls back to `id`.                                                                 |
 | `validationState` | `MaybeAccessor<"valid" \| "invalid" \| undefined>` | Sets `data-valid` / `data-invalid` and controls whether `aria-describedby` includes the error message ID. |
-| `required` | `MaybeAccessor<boolean \| undefined>` | Sets `data-required`. |
-| `disabled` | `MaybeAccessor<boolean \| undefined>` | Sets `data-disabled`. |
-| `readOnly` | `MaybeAccessor<boolean \| undefined>` | Sets `data-readonly`. |
+| `required`        | `MaybeAccessor<boolean \| undefined>`              | Sets `data-required`.                                                                                     |
+| `disabled`        | `MaybeAccessor<boolean \| undefined>`              | Sets `data-disabled`.                                                                                     |
+| `readOnly`        | `MaybeAccessor<boolean \| undefined>`              | Sets `data-readonly`.                                                                                     |
 
 All props accept either a plain value or a reactive accessor `() => value`, so they compose naturally with signals.
 
 **Context value**
 
-| Member | Description |
-|--------|-------------|
-| `name()` | Resolved name (falls back to id) |
-| `validationState()` | Current validation state |
-| `isRequired()` / `isDisabled()` / `isReadOnly()` | State accessors |
-| `dataset()` | Memo of all `data-*` attribute values — spread onto any element that should reflect state |
-| `generateId(part)` | Returns `"${baseId}-${part}"` — use this to derive stable IDs for sub-elements |
-| `labelId()` / `fieldId()` / `descriptionId()` / `errorMessageId()` | Currently registered IDs for each slot |
-| `registerLabel(id)` | Registers a label ID; returns a cleanup function |
-| `registerField(id)` | Registers the field ID; returns a cleanup function |
-| `registerDescription(id)` | Registers a description ID; returns a cleanup function |
-| `registerErrorMessage(id)` | Registers an error message ID; returns a cleanup function |
-| `getAriaLabelledBy(fieldId, ariaLabel, ariaLabelledBy)` | Computes the full `aria-labelledby` value |
-| `getAriaDescribedBy(ariaDescribedBy)` | Computes the full `aria-describedby` value |
+| Member                                                             | Description                                                                               |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `name()`                                                           | Resolved name (falls back to id)                                                          |
+| `validationState()`                                                | Current validation state                                                                  |
+| `isRequired()` / `isDisabled()` / `isReadOnly()`                   | State accessors                                                                           |
+| `dataset()`                                                        | Memo of all `data-*` attribute values — spread onto any element that should reflect state |
+| `generateId(part)`                                                 | Returns `"${baseId}-${part}"` — use this to derive stable IDs for sub-elements            |
+| `labelId()` / `fieldId()` / `descriptionId()` / `errorMessageId()` | Currently registered IDs for each slot                                                    |
+| `registerLabel(id)`                                                | Registers a label ID; returns a cleanup function                                          |
+| `registerField(id)`                                                | Registers the field ID; returns a cleanup function                                        |
+| `registerDescription(id)`                                          | Registers a description ID; returns a cleanup function                                    |
+| `registerErrorMessage(id)`                                         | Registers an error message ID; returns a cleanup function                                 |
+| `getAriaLabelledBy(fieldId, ariaLabel, ariaLabelledBy)`            | Computes the full `aria-labelledby` value                                                 |
+| `getAriaDescribedBy(ariaDescribedBy)`                              | Computes the full `aria-describedby` value                                                |
 
 ### `createFormControlInput(props?)`
 
@@ -665,22 +678,22 @@ Reads from `FormControlContext` (must be called inside a `<FormControlContext>`)
 
 **Props**
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `id` | `MaybeAccessor<string>` | Override the generated field ID. Defaults to `context.generateId("field")`. |
-| `aria-label` | `MaybeAccessor<string>` | Passed through to `fieldProps.ariaLabel()`. |
-| `aria-labelledby` | `MaybeAccessor<string>` | Merged into the computed `aria-labelledby` chain. |
-| `aria-describedby` | `MaybeAccessor<string>` | Appended to the computed `aria-describedby` value. |
+| Prop               | Type                    | Description                                                                 |
+| ------------------ | ----------------------- | --------------------------------------------------------------------------- |
+| `id`               | `MaybeAccessor<string>` | Override the generated field ID. Defaults to `context.generateId("field")`. |
+| `aria-label`       | `MaybeAccessor<string>` | Passed through to `fieldProps.ariaLabel()`.                                 |
+| `aria-labelledby`  | `MaybeAccessor<string>` | Merged into the computed `aria-labelledby` chain.                           |
+| `aria-describedby` | `MaybeAccessor<string>` | Appended to the computed `aria-describedby` value.                          |
 
 **Returns**
 
 ```ts
 {
   fieldProps: {
-    id:               () => string;
-    ariaLabel:        () => string | undefined;
-    ariaLabelledBy:   () => string | undefined;
-    ariaDescribedBy:  () => string | undefined;
+    id: () => string;
+    ariaLabel: () => string | undefined;
+    ariaLabelledBy: () => string | undefined;
+    ariaDescribedBy: () => string | undefined;
   }
 }
 ```
@@ -695,7 +708,7 @@ const ctx = createFormControl({ id: "my-field" });
 <FormControlContext value={ctx}>
   <MyLabel />
   <MyInput />
-</FormControlContext>
+</FormControlContext>;
 ```
 
 ```ts
@@ -730,39 +743,39 @@ const FormControlContext: Context<FormControlContextValue | undefined>;
 function useFormControl(): FormControlContextValue;
 
 type CreateFormControlProps = {
-  id?:              MaybeAccessor<string>;
-  name?:            MaybeAccessor<string>;
+  id?: MaybeAccessor<string>;
+  name?: MaybeAccessor<string>;
   validationState?: MaybeAccessor<"valid" | "invalid" | undefined>;
-  required?:        MaybeAccessor<boolean | undefined>;
-  disabled?:        MaybeAccessor<boolean | undefined>;
-  readOnly?:        MaybeAccessor<boolean | undefined>;
+  required?: MaybeAccessor<boolean | undefined>;
+  disabled?: MaybeAccessor<boolean | undefined>;
+  readOnly?: MaybeAccessor<boolean | undefined>;
 };
 
 type CreateFormControlInputProps = {
-  id?:                MaybeAccessor<string>;
-  "aria-label"?:      MaybeAccessor<string>;
+  id?: MaybeAccessor<string>;
+  "aria-label"?: MaybeAccessor<string>;
   "aria-labelledby"?: MaybeAccessor<string>;
   "aria-describedby"?: MaybeAccessor<string>;
 };
 
 type FormControlContextValue = {
-  name:                Accessor<string>;
-  validationState:     Accessor<"valid" | "invalid" | undefined>;
-  isRequired:          Accessor<boolean | undefined>;
-  isDisabled:          Accessor<boolean | undefined>;
-  isReadOnly:          Accessor<boolean | undefined>;
-  dataset:             Accessor<FormControlDataSet>;
-  labelId:             Accessor<string | undefined>;
-  fieldId:             Accessor<string | undefined>;
-  descriptionId:       Accessor<string | undefined>;
-  errorMessageId:      Accessor<string | undefined>;
-  generateId:          (part: string) => string;
-  registerLabel:       (id: string) => () => void;
-  registerField:       (id: string) => () => void;
+  name: Accessor<string>;
+  validationState: Accessor<"valid" | "invalid" | undefined>;
+  isRequired: Accessor<boolean | undefined>;
+  isDisabled: Accessor<boolean | undefined>;
+  isReadOnly: Accessor<boolean | undefined>;
+  dataset: Accessor<FormControlDataSet>;
+  labelId: Accessor<string | undefined>;
+  fieldId: Accessor<string | undefined>;
+  descriptionId: Accessor<string | undefined>;
+  errorMessageId: Accessor<string | undefined>;
+  generateId: (part: string) => string;
+  registerLabel: (id: string) => () => void;
+  registerField: (id: string) => () => void;
   registerDescription: (id: string) => () => void;
-  registerErrorMessage:(id: string) => () => void;
-  getAriaLabelledBy:   (fieldId, ariaLabel, ariaLabelledBy) => string | undefined;
-  getAriaDescribedBy:  (ariaDescribedBy) => string | undefined;
+  registerErrorMessage: (id: string) => () => void;
+  getAriaLabelledBy: (fieldId, ariaLabel, ariaLabelledBy) => string | undefined;
+  getAriaDescribedBy: (ariaDescribedBy) => string | undefined;
 };
 ```
 

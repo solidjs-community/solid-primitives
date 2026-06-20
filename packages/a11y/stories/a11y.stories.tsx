@@ -56,14 +56,33 @@ const AriaDebug = (props: { entries: { attr: string; value: string | undefined }
       padding: "0.6rem 0.75rem",
     }}
   >
-    <span style={{ "font-size": font.sizeSm, color: colors.muted, "margin-bottom": "0.15rem", "font-weight": "600" }}>
+    <span
+      style={{
+        "font-size": font.sizeSm,
+        color: colors.muted,
+        "margin-bottom": "0.15rem",
+        "font-weight": "600",
+      }}
+    >
       Computed ARIA
     </span>
     <For each={props.entries}>
       {entry => (
-        <div style={{ display: "flex", gap: "0.5rem", "align-items": "baseline", "font-size": font.sizeSm }}>
-          <span style={{ color: colors.muted, "min-width": "11rem", "flex-shrink": "0" }}>{entry.attr}</span>
-          <Show when={entry.value !== undefined} fallback={<span style={{ color: colors.mutedFg }}>—</span>}>
+        <div
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            "align-items": "baseline",
+            "font-size": font.sizeSm,
+          }}
+        >
+          <span style={{ color: colors.muted, "min-width": "11rem", "flex-shrink": "0" }}>
+            {entry.attr}
+          </span>
+          <Show
+            when={entry.value !== undefined}
+            fallback={<span style={{ color: colors.mutedFg }}>—</span>}
+          >
             <MonoValue>{entry.value}</MonoValue>
           </Show>
         </div>
@@ -97,7 +116,7 @@ export const Announce = meta.story({
     docs: {
       description: {
         story:
-          "`createAnnounce` appends two hidden ARIA live regions to `document.body` and returns an `announce(message, politeness?)` function. Use `\"polite\"` (default) for status updates and `\"assertive\"` for urgent errors. Open your screen reader to hear the announcements.",
+          '`createAnnounce` appends two hidden ARIA live regions to `document.body` and returns an `announce(message, politeness?)` function. Use `"polite"` (default) for status updates and `"assertive"` for urgent errors. Open your screen reader to hear the announcements.',
       },
     },
   },
@@ -281,7 +300,8 @@ export const StandaloneField = meta.story({
 
     const [value, setValue] = createSignal("");
     const [touched, setTouched] = createSignal(false);
-    const error = () => (touched() && !value().includes("@") ? "Enter a valid email address" : null);
+    const error = () =>
+      touched() && !value().includes("@") ? "Enter a valid email address" : null;
 
     onCleanup(ctx.registerLabel("email-label"));
     onCleanup(ctx.registerDescription("email-desc"));
@@ -380,13 +400,16 @@ export const SubComponentPattern = meta.story({
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <Button onClick={() => setState("valid")}>Set valid</Button>
             <Button onClick={() => setState("invalid")}>Set invalid</Button>
-            <Button variant="outline" onClick={() => setState(undefined)}>Reset</Button>
+            <Button variant="outline" onClick={() => setState(undefined)}>
+              Reset
+            </Button>
           </div>
         </div>
         <Separator />
         <StatRow label="validationState" value={state() ?? "—"} />
         <span style={{ "font-size": font.sizeSm, color: colors.mutedFg }}>
-          Inspect the input in DevTools to see aria-labelledby, aria-describedby, and aria-invalid update.
+          Inspect the input in DevTools to see aria-labelledby, aria-describedby, and aria-invalid
+          update.
         </span>
       </Container>
     );
@@ -492,12 +515,14 @@ export const ContextProviderPattern = meta.story({
         <div style={{ display: "flex", gap: "0.5rem" }}>
           <Button onClick={() => setValidationState("valid")}>Set valid</Button>
           <Button onClick={() => setValidationState("invalid")}>Set invalid</Button>
-          <Button variant="outline" onClick={() => setValidationState(undefined)}>Reset</Button>
+          <Button variant="outline" onClick={() => setValidationState(undefined)}>
+            Reset
+          </Button>
         </div>
         <StatRow label="validationState" value={validationState() ?? "—"} />
         <span style={{ "font-size": font.sizeSm, color: colors.mutedFg }}>
-          Inspect the input in DevTools — aria-labelledby, aria-describedby, and aria-invalid
-          update as the state changes.
+          Inspect the input in DevTools — aria-labelledby, aria-describedby, and aria-invalid update
+          as the state changes.
         </span>
       </Container>
     );
@@ -517,7 +542,9 @@ export const ValidationStates = meta.story({
     },
   },
   render: () => {
-    const [validationState, setValidationState] = createSignal<"valid" | "invalid" | undefined>(undefined);
+    const [validationState, setValidationState] = createSignal<"valid" | "invalid" | undefined>(
+      undefined,
+    );
     const [req, setReq] = createSignal(false);
     const [dis, setDis] = createSignal(false);
     const [ro, setRo] = createSignal(false);
@@ -551,9 +578,15 @@ export const ValidationStates = meta.story({
             >
               invalid
             </Button>
-            <Button variant={req() ? "primary" : "outline"} onClick={() => setReq(v => !v)}>required</Button>
-            <Button variant={dis() ? "primary" : "outline"} onClick={() => setDis(v => !v)}>disabled</Button>
-            <Button variant={ro() ? "primary" : "outline"} onClick={() => setRo(v => !v)}>readOnly</Button>
+            <Button variant={req() ? "primary" : "outline"} onClick={() => setReq(v => !v)}>
+              required
+            </Button>
+            <Button variant={dis() ? "primary" : "outline"} onClick={() => setDis(v => !v)}>
+              disabled
+            </Button>
+            <Button variant={ro() ? "primary" : "outline"} onClick={() => setRo(v => !v)}>
+              readOnly
+            </Button>
           </div>
         </Section>
       </Container>
@@ -614,7 +647,8 @@ export const AriaLabelledByChain = meta.story({
             ]}
           />
           <span style={{ "font-size": font.sizeSm, color: colors.mutedFg }}>
-            When <MonoValue>aria-label</MonoValue> is present alongside a visible label, the field's own ID is appended so screen readers announce all three.
+            When <MonoValue>aria-label</MonoValue> is present alongside a visible label, the field's
+            own ID is appended so screen readers announce all three.
           </span>
         </div>
       </Container>

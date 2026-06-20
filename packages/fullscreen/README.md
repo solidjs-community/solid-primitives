@@ -73,17 +73,17 @@ const { enter, exit, isActive } = createFullscreen(ref);
 const [ref, setRef] = createSignal<HTMLDivElement>();
 const { enter, isActive } = createFullscreen(ref);
 
-<div ref={setRef}>...</div>
+<div ref={setRef}>...</div>;
 ```
 
 #### `FullscreenPrimitiveOptions`
 
 Extends the standard [`FullscreenOptions`](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#options) with:
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `exitOnCleanup` | `boolean` | `true` | Exit fullscreen when the reactive scope is disposed. |
-| `navigationUI` | `string` | — | Passed to `requestFullscreen`. |
+| Option          | Type      | Default | Description                                          |
+| --------------- | --------- | ------- | ---------------------------------------------------- |
+| `exitOnCleanup` | `boolean` | `true`  | Exit fullscreen when the reactive scope is disposed. |
+| `navigationUI`  | `string`  | —       | Passed to `requestFullscreen`.                       |
 
 ```ts
 const { enter } = createFullscreen(ref, { exitOnCleanup: false, navigationUI: "hide" });

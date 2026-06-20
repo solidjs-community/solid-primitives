@@ -1,6 +1,11 @@
 import { createSignal, For, isPending, Loading, Match, Show, Switch } from "solid-js";
 import preview from "../../../.storybook/preview.js";
-import { createWorker, createWorkerPool, createWorkerQuery, createReactiveWorker } from "@solid-primitives/workers";
+import {
+  createWorker,
+  createWorkerPool,
+  createWorkerQuery,
+  createReactiveWorker,
+} from "@solid-primitives/workers";
 import readme from "../README.md?raw";
 import {
   Badge,
@@ -32,16 +37,24 @@ async function isPrime(n: number): Promise<boolean> {
 async function wait(ms: number, signal?: AbortSignal): Promise<number> {
   await new Promise<void>((resolve, reject) => {
     const timer = setTimeout(resolve, ms);
-    signal?.addEventListener("abort", () => { clearTimeout(timer); reject(new DOMException("Aborted", "AbortError")); }, { once: true });
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        reject(new DOMException("Aborted", "AbortError"));
+      },
+      { once: true },
+    );
   });
   return ms;
 }
 
 // Fixed dataset for the reactive bridge story — deterministic across renders
-const DATASET = [72, 45, 88, 31, 67, 94, 12, 55, 78, 23, 91, 46, 63, 17, 84,
-                  39, 71, 58, 26, 97, 43, 69, 15, 82, 34, 76, 51, 28, 95, 62,
-                  18, 87, 40, 73, 57, 29, 92, 48, 66, 21, 85, 36, 79, 53, 24,
-                  98, 44, 70, 38, 60];
+const DATASET = [
+  72, 45, 88, 31, 67, 94, 12, 55, 78, 23, 91, 46, 63, 17, 84, 39, 71, 58, 26, 97, 43, 69, 15, 82,
+  34, 76, 51, 28, 95, 62, 18, 87, 40, 73, 57, 29, 92, 48, 66, 21, 85, 36, 79, 53, 24, 98, 44, 70,
+  38, 60,
+];
 
 const POOL_NUMBERS = [982451653, 999999937, 104729, 524287, 1000000007, 32452843] as const;
 
@@ -115,18 +128,19 @@ export const OffloadedCompute = meta.story({
         </div>
 
         <Card>
-          <Show when={result() !== null} fallback={
-            <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>
-              {busy() ? "Running in worker…" : "Enter a number and click Check"}
-            </span>
-          }>
+          <Show
+            when={result() !== null}
+            fallback={
+              <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>
+                {busy() ? "Running in worker…" : "Enter a number and click Check"}
+              </span>
+            }
+          >
             <div style={{ display: "flex", "align-items": "center", gap: "0.75rem" }}>
               <Badge variant={result() ? "success" : "error"}>
                 {result() ? "Prime" : "Not prime"}
               </Badge>
-              <span style={{ "font-size": font.sizeSm, color: colors.muted }}>
-                {elapsed()}ms
-              </span>
+              <span style={{ "font-size": font.sizeSm, color: colors.muted }}>{elapsed()}ms</span>
             </div>
           </Show>
         </Card>
@@ -178,12 +192,18 @@ export const PoolRoundRobin = meta.story({
 
     return (
       <Container width={340}>
-        <div style={{ display: "flex", "align-items": "center", "justify-content": "space-between" }}>
+        <div
+          style={{ display: "flex", "align-items": "center", "justify-content": "space-between" }}
+        >
           <span style={{ "font-size": font.sizeSm, color: colors.muted }}>
             3-worker pool · {POOL_NUMBERS.length} tasks
           </span>
           <ButtonRow>
-            <Button onClick={runAll} disabled={anyRunning()} variant={allDone() ? "outline" : "primary"}>
+            <Button
+              onClick={runAll}
+              disabled={anyRunning()}
+              variant={allDone() ? "outline" : "primary"}
+            >
               {anyRunning() ? "Running…" : allDone() ? "Re-run" : "Run all"}
             </Button>
           </ButtonRow>
@@ -192,16 +212,18 @@ export const PoolRoundRobin = meta.story({
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
           <For each={tasks()}>
             {task => (
-              <div style={{
-                display: "flex",
-                "align-items": "center",
-                "justify-content": "space-between",
-                padding: "0.4rem 0.6rem",
-                background: colors.surface,
-                border: `1px solid ${colors.border}`,
-                "border-radius": radii.md,
-                "font-size": font.sizeSm,
-              }}>
+              <div
+                style={{
+                  display: "flex",
+                  "align-items": "center",
+                  "justify-content": "space-between",
+                  padding: "0.4rem 0.6rem",
+                  background: colors.surface,
+                  border: `1px solid ${colors.border}`,
+                  "border-radius": radii.md,
+                  "font-size": font.sizeSm,
+                }}
+              >
                 <code style={{ "font-family": font.mono }}>{task.n.toLocaleString()}</code>
                 <div style={{ display: "flex", "align-items": "center", gap: "0.5rem" }}>
                   <Show when={task.state === "done"}>
@@ -259,35 +281,43 @@ export const AutoRefreshingQuery = meta.story({
               onInput={e => setDelay(Number(e.currentTarget.value))}
               style={{ flex: 1 }}
             />
-            <code style={{
-              "font-family": font.mono,
-              "font-size": font.sizeBase,
-              "min-width": "3.5rem",
-              "text-align": "right",
-            }}>
+            <code
+              style={{
+                "font-family": font.mono,
+                "font-size": font.sizeBase,
+                "min-width": "3.5rem",
+                "text-align": "right",
+              }}
+            >
               {delay()}ms
             </code>
           </div>
         </Section>
 
         <Card>
-          <div style={{ display: "flex", "justify-content": "space-between", "align-items": "center" }}>
+          <div
+            style={{ display: "flex", "justify-content": "space-between", "align-items": "center" }}
+          >
             <span style={{ "font-size": font.sizeSm, color: colors.muted }}>Worker echoed</span>
             <Show when={refreshing()}>
               <Badge variant="warning">Refreshing…</Badge>
             </Show>
           </div>
-          <Loading fallback={
-            <span style={{ color: colors.warning, "font-family": font.mono }}>
-              Waiting {delay()}ms…
-            </span>
-          }>
-            <span style={{
-              "font-size": "1.5rem",
-              "font-weight": "700",
-              "font-family": font.mono,
-              color: colors.primary,
-            }}>
+          <Loading
+            fallback={
+              <span style={{ color: colors.warning, "font-family": font.mono }}>
+                Waiting {delay()}ms…
+              </span>
+            }
+          >
+            <span
+              style={{
+                "font-size": "1.5rem",
+                "font-weight": "700",
+                "font-family": font.mono,
+                color: colors.primary,
+              }}
+            >
               {result()}ms
             </span>
           </Loading>
@@ -327,14 +357,16 @@ export const ReactiveStoreBridge = meta.story({
       <Container width={340}>
         <Show when={error()} keyed>
           {ev => (
-            <div style={{
-              background: "#fee2e2",
-              border: "1px solid #fca5a5",
-              "border-radius": radii.md,
-              padding: "0.6rem 0.8rem",
-              "font-size": font.sizeSm,
-              color: "#dc2626",
-            }}>
+            <div
+              style={{
+                background: "#fee2e2",
+                border: "1px solid #fca5a5",
+                "border-radius": radii.md,
+                padding: "0.6rem 0.8rem",
+                "font-size": font.sizeSm,
+                color: "#dc2626",
+              }}
+            >
               Worker error: {ev.message}
             </div>
           )}
@@ -347,15 +379,21 @@ export const ReactiveStoreBridge = meta.story({
               min={0}
               max={100}
               value={(inputs as any).threshold}
-              onInput={e => setInputs(s => { (s as any).threshold = Number(e.currentTarget.value); })}
+              onInput={e =>
+                setInputs(s => {
+                  (s as any).threshold = Number(e.currentTarget.value);
+                })
+              }
               style={{ flex: 1 }}
             />
-            <code style={{
-              "font-family": font.mono,
-              "font-size": font.sizeBase,
-              "min-width": "2rem",
-              "text-align": "right",
-            }}>
+            <code
+              style={{
+                "font-family": font.mono,
+                "font-size": font.sizeBase,
+                "min-width": "2rem",
+                "text-align": "right",
+              }}
+            >
               {(inputs as any).threshold}
             </code>
           </div>
@@ -368,7 +406,8 @@ export const ReactiveStoreBridge = meta.story({
         </Section>
 
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
-          Dataset: {DATASET.length} integers (1–100). Filtering and stats computed reactively inside the worker.
+          Dataset: {DATASET.length} integers (1–100). Filtering and stats computed reactively inside
+          the worker.
         </p>
       </Container>
     );
@@ -436,9 +475,13 @@ export const CancellableOperation = meta.story({
         </Section>
 
         <ButtonRow>
-          <Button onClick={start} disabled={phase() === "running"}>Start</Button>
+          <Button onClick={start} disabled={phase() === "running"}>
+            Start
+          </Button>
           <Show when={phase() === "running"}>
-            <Button onClick={cancel} variant="outline">Cancel</Button>
+            <Button onClick={cancel} variant="outline">
+              Cancel
+            </Button>
           </Show>
         </ButtonRow>
 
@@ -477,8 +520,9 @@ export const CancellableOperation = meta.story({
         </Card>
 
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
-          The worker function accepts an <code style={{ "font-family": font.mono }}>AbortSignal</code>{" "}
-          — Cancel fires it immediately, clearing the timer before it completes.
+          The worker function accepts an{" "}
+          <code style={{ "font-family": font.mono }}>AbortSignal</code> — Cancel fires it
+          immediately, clearing the timer before it completes.
         </p>
       </Container>
     );

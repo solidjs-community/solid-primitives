@@ -57,7 +57,7 @@ Automatically starts observing after the component settles (via `onSettled`) and
 ```tsx
 import { mutationObserver } from "@solid-primitives/mutation-observer";
 
-<div ref={mutationObserver({ childList: true }, records => console.log(records))} />
+<div ref={mutationObserver({ childList: true }, records => console.log(records))} />;
 ```
 
 ### Types

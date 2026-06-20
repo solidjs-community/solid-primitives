@@ -42,7 +42,7 @@ const PubsubTest: Component = () => {
     props.subscribe(setOn);
     return (
       <div
-        class="w-18 h-18 rounded-full bg-gray-500"
+        class="h-18 w-18 rounded-full bg-gray-500"
         classList={{
           "bg-yellow-200": on(),
         }}
@@ -124,7 +124,7 @@ const HubChildNode: Component<{
   return (
     <div ref={ref}>
       <div
-        class="center-child h-24 w-32 rounded-lg bg-orange-700 bg-opacity-80 transition-transform duration-300"
+        class="center-child bg-opacity-80 h-24 w-32 rounded-lg bg-orange-700 transition-transform duration-300"
         style={{
           transform: `rotate(${angle()}deg)`,
         }}
@@ -178,7 +178,7 @@ const Toaster: Component<{
   props.useEventBus(bus);
 
   return (
-    <div class="fixed right-4 top-4 flex flex-col items-end space-y-4">
+    <div class="fixed top-4 right-4 flex flex-col items-end space-y-4">
       <For each={bus.value()}>
         {item => (
           <div class="animate-fade-in-down animate-count-1 animate-duration-150 bg-gray-600 p-2 px-3">

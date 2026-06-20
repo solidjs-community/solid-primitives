@@ -52,14 +52,14 @@ selectFiles(async files => {
 
 **Returned object:**
 
-| Name          | Type                                | Description                                                      |
-| ------------- | ----------------------------------- | ---------------------------------------------------------------- |
-| `files`       | `Accessor<UploadFile[]>`            | Reactive list of selected files; updated on every selection      |
-| `error`       | `Accessor<unknown>`                 | Error thrown by the last `selectFiles` callback; `null` if none  |
-| `isLoading`   | `Accessor<boolean>`                 | `true` while the `selectFiles` callback is pending               |
-| `selectFiles` | `(callback?: UserCallback) => void` | Opens the file-picker and runs the optional callback on change   |
-| `removeFile`  | `(fileName: string) => void`        | Removes a single file from the list by name                      |
-| `clearFiles`  | `() => void`                        | Clears all selected files                                        |
+| Name          | Type                                | Description                                                     |
+| ------------- | ----------------------------------- | --------------------------------------------------------------- |
+| `files`       | `Accessor<UploadFile[]>`            | Reactive list of selected files; updated on every selection     |
+| `error`       | `Accessor<unknown>`                 | Error thrown by the last `selectFiles` callback; `null` if none |
+| `isLoading`   | `Accessor<boolean>`                 | `true` while the `selectFiles` callback is pending              |
+| `selectFiles` | `(callback?: UserCallback) => void` | Opens the file-picker and runs the optional callback on change  |
+| `removeFile`  | `(fileName: string) => void`        | Removes a single file from the list by name                     |
+| `clearFiles`  | `() => void`                        | Clears all selected files                                       |
 
 > **Note:** `removeFile` matches by file name. If the list contains duplicate file names, only the first match is removed.
 
@@ -112,15 +112,15 @@ const results = await upload(myFiles);
 
 **Returned object:**
 
-| Name       | Type                                         | Description                                                       |
-| ---------- | -------------------------------------------- | ----------------------------------------------------------------- |
-| `upload`   | `(files: UploadFile[]) => Promise<unknown[]>` | Send files in parallel; resolves when all settle                  |
-| `files`    | `readonly FileUploadEntry[]`                 | Store array — per-file progress, status, error, and response      |
-| `progress` | `Accessor<UploadProgress>`                   | Aggregate `{ loaded, total, percentage }` across all files        |
-| `status`   | `Accessor<UploadStatus>`                     | Aggregate status: `uploading > error > aborted > success > idle`  |
-| `abort`      | `() => void`                                 | Cancel all in-flight uploads                                      |
-| `removeFile` | `(fileName: string) => void`                 | Remove one entry by name; aborts all in-flight uploads            |
-| `clearFiles` | `() => void`                                 | Remove all entries; aborts all in-flight uploads                  |
+| Name         | Type                                          | Description                                                      |
+| ------------ | --------------------------------------------- | ---------------------------------------------------------------- |
+| `upload`     | `(files: UploadFile[]) => Promise<unknown[]>` | Send files in parallel; resolves when all settle                 |
+| `files`      | `readonly FileUploadEntry[]`                  | Store array — per-file progress, status, error, and response     |
+| `progress`   | `Accessor<UploadProgress>`                    | Aggregate `{ loaded, total, percentage }` across all files       |
+| `status`     | `Accessor<UploadStatus>`                      | Aggregate status: `uploading > error > aborted > success > idle` |
+| `abort`      | `() => void`                                  | Cancel all in-flight uploads                                     |
+| `removeFile` | `(fileName: string) => void`                  | Remove one entry by name; aborts all in-flight uploads           |
+| `clearFiles` | `() => void`                                  | Remove all entries; aborts all in-flight uploads                 |
 
 > **Note:** `removeFile` matches by `file.name`. If a batch contains duplicate file names, only the first match is removed. Avoid batching files with duplicate names when using `removeFile`.
 
@@ -130,23 +130,25 @@ Each entry in `files` has the shape:
 type FileUploadEntry = {
   file: UploadFile;
   progress: UploadProgress; // { loaded, total, percentage }
-  status: UploadStatus;     // "idle" | "uploading" | "success" | "error" | "aborted"
-  error: unknown;           // error from a failed upload; null otherwise
-  response: unknown;        // parsed server response on success; null otherwise
+  status: UploadStatus; // "idle" | "uploading" | "success" | "error" | "aborted"
+  error: unknown; // error from a failed upload; null otherwise
+  response: unknown; // parsed server response on success; null otherwise
 };
 ```
 
 Read `files[i]` directly in JSX for fine-grained per-file reactivity — only the row that changed re-renders:
 
 ```tsx
-<For each={files}>{f =>
-  <div>
-    {f.file.name} — {f.progress.percentage}%
-    <Show when={f.status === "error"}>
-      <span>Error: {String(f.error)}</span>
-    </Show>
-  </div>
-}</For>
+<For each={files}>
+  {f => (
+    <div>
+      {f.file.name} — {f.progress.percentage}%
+      <Show when={f.status === "error"}>
+        <span>Error: {String(f.error)}</span>
+      </Show>
+    </div>
+  )}
+</For>
 ```
 
 **Calling `upload` again while one is in-flight cancels the previous upload** and resets all per-file state. Use `abort()` to cancel without starting a new one.
@@ -162,14 +164,16 @@ import { fileSender } from "@solid-primitives/upload";
 createFileUploader(fileSender("/api/upload"));
 
 // With options
-createFileUploader(fileSender("/api/upload", { fieldName: "attachment", headers: { "X-Auth": token } }));
+createFileUploader(
+  fileSender("/api/upload", { fieldName: "attachment", headers: { "X-Auth": token } }),
+);
 ```
 
 **Options:**
 
-| Option      | Type                     | Default  | Description                                                                           |
-| ----------- | ------------------------ | -------- | ------------------------------------------------------------------------------------- |
-| `fieldName` | `string`                 | `"file"` | FormData field name used for each file                                                |
+| Option      | Type                     | Default  | Description                                                                              |
+| ----------- | ------------------------ | -------- | ---------------------------------------------------------------------------------------- |
+| `fieldName` | `string`                 | `"file"` | FormData field name used for each file                                                   |
 | `headers`   | `Record<string, string>` | `{}`     | Additional request headers (do not set `Content-Type`; the browser sets it for FormData) |
 
 **Custom `SendFunction`:**
@@ -249,7 +253,7 @@ const { ref, files, isDragging, error } = createDropzone({
     <p>Error: {String(error())}</p>
   </Show>
   <For each={files()}>{file => <p>{file.name}</p>}</For>
-</div>
+</div>;
 ```
 
 **Returned object:**
@@ -291,7 +295,7 @@ const { upload, progress, status } = createFileUploader(fileSender("/api/upload"
 
 <div
   ref={dropzone({
-    onDrop: files => upload(files)
+    onDrop: files => upload(files),
   })}
   style={{
     background: dz.isDragging() ? "lightblue" : "lightgray",
@@ -303,7 +307,7 @@ const { upload, progress, status } = createFileUploader(fileSender("/api/upload"
     Uploading… {progress().percentage}%
   </Show>
   <For each={dz.files()}>{file => <p>{file.name}</p>}</For>
-</div>
+</div>;
 ```
 
 The returned value is a function (the ref callback) with all `createDropzone` state properties attached directly to it — `files`, `error`, `isLoading`, `isDragging`, `removeFile`, and `clearFiles`. Accepts the same `DropzoneOptions` as `createDropzone`.

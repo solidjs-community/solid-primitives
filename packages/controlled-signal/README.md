@@ -38,11 +38,11 @@ const [value, setValue] = createControllableSignal<T>(props);
 
 **Props:**
 
-| Prop           | Type                       | Description                                      |
-| -------------- | -------------------------- | ------------------------------------------------ |
+| Prop           | Type                       | Description                                              |
+| -------------- | -------------------------- | -------------------------------------------------------- |
 | `value`        | `Accessor<T \| undefined>` | Controlled value. When defined, enables controlled mode. |
-| `defaultValue` | `Accessor<T \| undefined>` | Initial value for uncontrolled mode.             |
-| `onChange`     | `(value: T) => void`       | Called whenever the value would change.          |
+| `defaultValue` | `Accessor<T \| undefined>` | Initial value for uncontrolled mode.                     |
+| `onChange`     | `(value: T) => void`       | Called whenever the value would change.                  |
 
 **Returns:** `[value: Accessor<T | undefined>, setValue: (next) => void]`
 
@@ -51,7 +51,7 @@ const [value, setValue] = createControllableSignal<T>(props);
 ```ts
 const [open, setOpen] = createControllableSignal({ defaultValue: () => false });
 
-setOpen(true);         // updates internal state and calls onChange if provided
+setOpen(true); // updates internal state and calls onChange if provided
 setOpen(prev => !prev); // functional form
 ```
 

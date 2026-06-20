@@ -54,14 +54,13 @@ const meetingId = [/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_the_replacement
 const meetingName = [
   /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(www\.|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
-  () => ""
+  () => "",
 ];
 // function mask: (value, [start, end]) => [value, [start, end]]
 const meetingIdOrName = (value, selection) =>
   (/^\d{1,3}$|^\d{2,4}-?\d{0,3}$|^\d{2,4}-?\d{2,4}-?\d{0,3}$/.test(value)
     ? anyMaskToFn(meetingId)
-    : anyMaskToFn(meetingName)
-  )(value, selection);
+    : anyMaskToFn(meetingName))(value, selection);
 
 // converting string mask to array:
 const maskArrayFromString = stringMaskToArray(maskString);
@@ -78,7 +77,7 @@ const inputMask = {
   ref,
   get value() {
     return inputMask.ref?.value;
-  }
+  },
 };
 
 const dateMask = createInputMask("99/99/9999");

@@ -42,7 +42,14 @@ export const Controls = meta.story({
       <div style={{ "font-family": "system-ui", padding: "1.5rem", "min-width": "320px" }}>
         <h3 style={{ margin: "0 0 1rem" }}>makeAudioPlayer</h3>
 
-        <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            "align-items": "center",
+            "margin-bottom": "0.75rem",
+          }}
+        >
           <Button
             onClick={() => (playing() ? controls.pause() : controls.play())}
             variant="secondary"

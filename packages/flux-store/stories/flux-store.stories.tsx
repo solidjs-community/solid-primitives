@@ -61,8 +61,14 @@ export const BudgetTracker = meta.story({
           isOverBudget: () => s.spent > s.total,
         }),
         actions: setState => ({
-          add: (n: number) => setState(s => { s.spent = Math.min(400, s.spent + n); }),
-          reset: () => setState(s => { s.spent = 0; }),
+          add: (n: number) =>
+            setState(s => {
+              s.spent = Math.min(400, s.spent + n);
+            }),
+          reset: () =>
+            setState(s => {
+              s.spent = 0;
+            }),
         }),
       },
     );
@@ -116,8 +122,14 @@ export const IsolatedInstances = meta.story({
           score: () => s.score,
         }),
         actions: setState => ({
-          point: () => setState(s => { s.score += 1; }),
-          reset: () => setState(s => { s.score = 0; }),
+          point: () =>
+            setState(s => {
+              s.score += 1;
+            }),
+          reset: () =>
+            setState(s => {
+              s.score = 0;
+            }),
         }),
       },
     );
@@ -270,7 +282,11 @@ export const UntrackWrappers = meta.story({
         </Section>
 
         <BoolRow label="animations" value={animations()} />
-        <Button variant="secondary" onClick={actions.toggleAnimations} style={{ "align-self": "flex-start" }}>
+        <Button
+          variant="secondary"
+          onClick={actions.toggleAnimations}
+          style={{ "align-self": "flex-start" }}
+        >
           {animations() ? "Disable" : "Enable"} animations
         </Button>
 

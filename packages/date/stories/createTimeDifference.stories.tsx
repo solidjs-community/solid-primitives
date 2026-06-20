@@ -1,5 +1,9 @@
 import preview from "../../../.storybook/preview.js";
-import { createDate, createTimeDifference, createTimeDifferenceFromNow } from "@solid-primitives/date";
+import {
+  createDate,
+  createTimeDifference,
+  createTimeDifferenceFromNow,
+} from "@solid-primitives/date";
 import { formatMs, toDatetimeLocal } from "./_helpers.js";
 import { Stat, Button, Container } from "../../../.storybook/ui/index.js";
 
@@ -30,7 +34,14 @@ export const TimeDifference = meta.story({
         <h3 style={{ margin: 0 }}>createTimeDifference</h3>
 
         <div style={{ display: "flex", gap: "1rem", "flex-wrap": "wrap" }}>
-          <label style={{ display: "flex", "flex-direction": "column", gap: "0.25rem", "font-size": "0.85rem" }}>
+          <label
+            style={{
+              display: "flex",
+              "flex-direction": "column",
+              gap: "0.25rem",
+              "font-size": "0.85rem",
+            }}
+          >
             From
             <input
               type="datetime-local"
@@ -38,7 +49,14 @@ export const TimeDifference = meta.story({
               onInput={e => setFrom(new Date(e.currentTarget.value))}
             />
           </label>
-          <label style={{ display: "flex", "flex-direction": "column", gap: "0.25rem", "font-size": "0.85rem" }}>
+          <label
+            style={{
+              display: "flex",
+              "flex-direction": "column",
+              gap: "0.25rem",
+              "font-size": "0.85rem",
+            }}
+          >
             To
             <input
               type="datetime-local"
@@ -64,7 +82,7 @@ export const TimeDifferenceFromNow = meta.story({
     docs: {
       description: {
         story:
-          "`createTimeDifferenceFromNow` auto-updates the \"now\" side of the difference on a configurable interval, so the result stays current without manual wiring.",
+          '`createTimeDifferenceFromNow` auto-updates the "now" side of the difference on a configurable interval, so the result stays current without manual wiring.',
       },
     },
   },
@@ -76,7 +94,14 @@ export const TimeDifferenceFromNow = meta.story({
       <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createTimeDifferenceFromNow</h3>
 
-        <label style={{ display: "flex", "flex-direction": "column", gap: "0.25rem", "font-size": "0.85rem" }}>
+        <label
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.25rem",
+            "font-size": "0.85rem",
+          }}
+        >
           Target date
           <input
             type="datetime-local"

@@ -65,8 +65,8 @@ export const FocusOnRender = meta.story({
           {mounted() ? "Unmount" : "Remount (re-focuses)"}
         </Button>
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
-          Unmount and remount to see <code>autofocus()</code> fire again — the browser won't do
-          this on its own.
+          Unmount and remount to see <code>autofocus()</code> fire again — the browser won't do this
+          on its own.
         </p>
       </Container>
     );
@@ -89,9 +89,7 @@ export const SignalDrivenFocus = meta.story({
     const FocusedField = () => {
       const [ref, setRef] = createSignal<HTMLInputElement>();
       createAutofocus(ref);
-      return (
-        <input ref={setRef} placeholder="Focused via signal ref" style={inputStyle} />
-      );
+      return <input ref={setRef} placeholder="Focused via signal ref" style={inputStyle} />;
     };
 
     return (
@@ -163,9 +161,7 @@ export const FocusEventLog = meta.story({
   render: () => {
     const [log, setLog] = createSignal<{ label: string; time: string }[]>([]);
     const addLog = (msg: string) =>
-      setLog(prev =>
-        [{ label: msg, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 5),
-      );
+      setLog(prev => [{ label: msg, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 5));
 
     let el1!: HTMLInputElement;
     let el2!: HTMLInputElement;
@@ -226,9 +222,7 @@ export const TabWrapsInDialog = meta.story({
               "box-shadow": "0 4px 16px rgba(0,0,0,0.08)",
             }}
           >
-            <p style={{ margin: 0, "font-size": font.sizeBase, "font-weight": "600" }}>
-              Dialog
-            </p>
+            <p style={{ margin: 0, "font-size": font.sizeBase, "font-weight": "600" }}>Dialog</p>
             <input placeholder="Name" style={inputStyle} />
             <input placeholder="Email" style={inputStyle} />
             <ButtonRow>
@@ -265,9 +259,7 @@ export const CustomInitialFocus = meta.story({
     const [log, setLog] = createSignal<{ label: string; time: string }[]>([]);
 
     const addLog = (msg: string) =>
-      setLog(prev =>
-        [{ label: msg, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 4),
-      );
+      setLog(prev => [{ label: msg, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 4));
 
     createFocusTrap({
       element: trapRef,

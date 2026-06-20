@@ -79,15 +79,22 @@ export const MakePersistedStore = meta.story({
     },
   },
   render: () => {
-    const [store, setStore] = makePersisted(
-      createStore({ count: 0, label: "clicks" }),
-      { name: "sp_demo_store" },
-    );
+    const [store, setStore] = makePersisted(createStore({ count: 0, label: "clicks" }), {
+      name: "sp_demo_store",
+    });
 
     return (
       <Container width={360}>
         <div style={{ display: "flex", "align-items": "center", gap: "1rem" }}>
-          <Button onClick={() => setStore(s => { s.count++; })}>+ Increment</Button>
+          <Button
+            onClick={() =>
+              setStore(s => {
+                s.count++;
+              })
+            }
+          >
+            + Increment
+          </Button>
           <span
             style={{
               "font-size": "2rem",
@@ -106,7 +113,14 @@ export const MakePersistedStore = meta.story({
         </Section>
 
         <ButtonRow>
-          <Button onClick={() => setStore(s => { s.count = 0; })} variant="ghost">
+          <Button
+            onClick={() =>
+              setStore(s => {
+                s.count = 0;
+              })
+            }
+            variant="ghost"
+          >
             Reset
           </Button>
         </ButtonRow>

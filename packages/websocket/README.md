@@ -131,7 +131,7 @@ These three primitives leverage Solid's async reactivity — `createMemo` with `
 ### `wsMessageIterable`
 
 ```ts
-function wsMessageIterable<T = string>(ws: WebSocket): AsyncIterable<T>
+function wsMessageIterable<T = string>(ws: WebSocket): AsyncIterable<T>;
 ```
 
 The foundational building block. Returns a buffered `AsyncIterable<T>` over a WebSocket's message stream. Messages that arrive while a consumer is busy are queued; none are dropped. The event listener is removed automatically when the iterator's `return()` method is called (Solid does this on memo disposal).
@@ -155,7 +155,7 @@ Works correctly with `makeReconnectingWS` — event listeners are re-attached to
 function createWSData<T = string, U = T>(
   ws: WebSocket,
   options?: { transform?: (msg: T) => U },
-): Accessor<U>
+): Accessor<U>;
 ```
 
 An async memo wrapping `wsMessageIterable`. Suspends the nearest `<Loading>` boundary until the first message arrives; subsequent updates work with `isPending` and `latest`. The optional `transform` is applied to each raw message before the memo value is updated.
@@ -193,7 +193,7 @@ function createWSStore<S extends object, T = string>(
     initial: S;
     patch: (draft: S, msg: T) => void;
   },
-): [store: Store<S>, setStore: StoreSetter<S>]
+): [store: Store<S>, setStore: StoreSetter<S>];
 ```
 
 A reactive store driven by WebSocket messages as incremental patches. `patch` is called for each incoming message with a mutable draft of the store — mutate it directly, no return value needed. The event listener is removed on owner disposal.
@@ -221,7 +221,9 @@ You can also use the returned setter to apply local updates:
 const [state, setState] = createWSStore(ws, { initial: { count: 0 }, patch });
 
 // imperative write from a button click, etc.
-setState(s => { s.count = 0; });
+setState(s => {
+  s.count = 0;
+});
 ```
 
 ---
@@ -264,7 +266,7 @@ const queryServer = action(function* (payload: RequestPayload) {
 type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
 type WSReconnectOptions = {
-  delay?: number;   // ms between reconnect attempts — default: 3000
+  delay?: number; // ms between reconnect attempts — default: 3000
   retries?: number; // max reconnect attempts — default: Infinity
 };
 
@@ -275,8 +277,8 @@ type ReconnectingWebSocket = WebSocket & {
 
 type WSHeartbeatOptions = {
   message?: WSMessage; // default: "ping"
-  interval?: number;   // ms between heartbeats — default: 1000
-  wait?: number;       // ms to wait for pong before reconnecting — default: 1500
+  interval?: number; // ms between heartbeats — default: 1000
+  wait?: number; // ms to wait for pong before reconnecting — default: 1500
 };
 
 type WSDataOptions<T, U = T> = {
@@ -284,7 +286,7 @@ type WSDataOptions<T, U = T> = {
 };
 
 type WSStoreOptions<S, T = string> = {
-  initial: S;                        // starting store state
+  initial: S; // starting store state
   patch: (draft: S, msg: T) => void; // mutate the draft for each incoming message
 };
 ```

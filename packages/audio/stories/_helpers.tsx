@@ -11,7 +11,9 @@ export const formatTime = (s: number) => {
 };
 
 export const VolumeSlider = (props: { value: () => number; onChange: (v: number) => void }) => (
-  <label style={{ display: "flex", "align-items": "center", gap: "0.5rem", "font-size": "0.85rem" }}>
+  <label
+    style={{ display: "flex", "align-items": "center", gap: "0.5rem", "font-size": "0.85rem" }}
+  >
     Vol
     <input
       type="range"
@@ -31,7 +33,9 @@ export const SeekSlider = (props: {
   max: number;
   onSeek: (t: number) => void;
 }) => (
-  <label style={{ display: "flex", "align-items": "center", gap: "0.5rem", "font-size": "0.85rem" }}>
+  <label
+    style={{ display: "flex", "align-items": "center", gap: "0.5rem", "font-size": "0.85rem" }}
+  >
     Seek
     <input
       type="range"

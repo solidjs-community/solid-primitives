@@ -49,7 +49,7 @@ const App: Component = () => {
                     return (
                       <div
                         ref={el => (ref = el)}
-                        class="w-90 center-child duration-1500 m-5 h-20 flex-shrink-0 rounded-lg text-white transition"
+                        class="center-child m-5 h-20 w-90 flex-shrink-0 rounded-lg text-white transition duration-1500"
                         classList={{
                           "bg-slate-500 scale-x-75": !isVisible(),
                           "bg-blue-900": isVisible(),

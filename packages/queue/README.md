@@ -128,22 +128,19 @@ import { makeQueue, makePriorityQueue } from "@solid-primitives/queue";
 const cmp = (a: number, b: number) => a - b;
 const q = makePriorityQueue(makeQueue([3, 1, 2].sort(cmp)), cmp);
 
-q.first;    // 1
-q.last;     // 3
+q.first; // 1
+q.last; // 3
 q.remove(); // 1
-q.first;    // 2
+q.first; // 2
 
 q.add(0);
-q.first;    // 0
+q.first; // 0
 ```
 
 ### Type
 
 ```ts
-function makePriorityQueue<T, Q extends Queue<T>>(
-  q: Q,
-  comparator: (a: T, b: T) => number,
-): Q;
+function makePriorityQueue<T, Q extends Queue<T>>(q: Q, comparator: (a: T, b: T) => number): Q;
 ```
 
 ## `createPriorityQueue`

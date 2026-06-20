@@ -149,15 +149,15 @@ createPreventScroll({ enabled: open });
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `element` | `MaybeAccessor<HTMLElement \| undefined>` | `undefined` | Allow scroll inside this element. Events outside it are cancelled. |
-| `enabled` | `MaybeAccessor<boolean>` | `true` | Whether scroll prevention is active. |
-| `hideScrollbar` | `MaybeAccessor<boolean>` | `true` | Hide the `<body>` scrollbar while active. |
-| `preventScrollbarShift` | `MaybeAccessor<boolean>` | `true` | Compensate for the hidden scrollbar width to avoid layout shift. |
-| `preventScrollbarShiftMode` | `MaybeAccessor<"padding" \| "margin">` | `"padding"` | Which CSS property to use for the scrollbar shift compensation. |
-| `restoreScrollPosition` | `MaybeAccessor<boolean>` | `true` | Restore `<body>` scroll position via `window.scrollTo` when disabled. |
-| `allowPinchZoom` | `MaybeAccessor<boolean>` | `false` | Allow two-finger pinch-zoom gestures. |
+| Prop                        | Type                                      | Default     | Description                                                           |
+| --------------------------- | ----------------------------------------- | ----------- | --------------------------------------------------------------------- |
+| `element`                   | `MaybeAccessor<HTMLElement \| undefined>` | `undefined` | Allow scroll inside this element. Events outside it are cancelled.    |
+| `enabled`                   | `MaybeAccessor<boolean>`                  | `true`      | Whether scroll prevention is active.                                  |
+| `hideScrollbar`             | `MaybeAccessor<boolean>`                  | `true`      | Hide the `<body>` scrollbar while active.                             |
+| `preventScrollbarShift`     | `MaybeAccessor<boolean>`                  | `true`      | Compensate for the hidden scrollbar width to avoid layout shift.      |
+| `preventScrollbarShiftMode` | `MaybeAccessor<"padding" \| "margin">`    | `"padding"` | Which CSS property to use for the scrollbar shift compensation.       |
+| `restoreScrollPosition`     | `MaybeAccessor<boolean>`                  | `true`      | Restore `<body>` scroll position via `window.scrollTo` when disabled. |
+| `allowPinchZoom`            | `MaybeAccessor<boolean>`                  | `false`     | Allow two-finger pinch-zoom gestures.                                 |
 
 Multiple active instances are stacked; only the topmost one installs event listeners. Body styles are shared and only restored once all instances clean up.
 

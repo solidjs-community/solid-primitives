@@ -215,10 +215,7 @@ export const NullHandlerSkip = meta.story({
     return (
       <Container minWidth={300}>
         <ButtonRow>
-          <Button
-            variant={extraOn() ? "primary" : "outline"}
-            onClick={() => setExtraOn(v => !v)}
-          >
+          <Button variant={extraOn() ? "primary" : "outline"} onClick={() => setExtraOn(v => !v)}>
             Extra handler: {extraOn() ? "enabled" : "null"}
           </Button>
         </ButtonRow>
@@ -301,7 +298,9 @@ export const OwnVsDomSplit = meta.story({
             </Button>
           ))}
         </ButtonRow>
-        <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}>
+        <div
+          style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}
+        >
           <StatusBadge
             status={status()}
             label="Deploy"

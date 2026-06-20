@@ -282,7 +282,11 @@ export const EmptyFallback = meta.story({
       <Container minWidth={380}>
         <h3 style={{ margin: 0 }}>Empty list fallback</h3>
 
-        <Button onClick={() => setShowItems(s => !s)} variant="secondary" style={{ "align-self": "flex-start" }}>
+        <Button
+          onClick={() => setShowItems(s => !s)}
+          variant="secondary"
+          style={{ "align-self": "flex-start" }}
+        >
           {showItems() ? "Clear list" : "Load items"}
         </Button>
 

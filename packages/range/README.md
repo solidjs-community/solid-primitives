@@ -69,12 +69,17 @@ function createNumericRange(
 Reactively maps a number range of specified length with a callback function - underlying helper for the `<Repeat>` control flow.
 
 ```ts
-const [length, setLength] = createSignal(10)
+const [length, setLength] = createSignal(10);
 const mapped = repeat(length, index => {
-   const [value, setValue] = createSignal(index);
-   createEffect(() => value(), v => { /* react to value */ })
-   return value
-})
+  const [value, setValue] = createSignal(index);
+  createEffect(
+    () => value(),
+    v => {
+      /* react to value */
+    },
+  );
+  return value;
+});
 ```
 
 #### Definition
@@ -149,14 +154,24 @@ All `start`, `to` and `step` arguments are accessors, and changing them will cau
 `step` will become negative _(the range will be descending)_ if `to` is smaller than `start`. Range stops at `to`, it is not included in the range.
 
 ```ts
-const [to, setTo] = createSignal(5)
-const mapped = mapRange(() => 0, to, () => 0.5, number => {
-   const [value, setValue] = createSignal(number);
-   createEffect(() => value(), v => { /* react to value */ })
-   return value
-})
-mapped() // => [0, 0.5, 1, 1.5, 2...]
-setTo(3) // changes the output array, mapping only added numbers
+const [to, setTo] = createSignal(5);
+const mapped = mapRange(
+  () => 0,
+  to,
+  () => 0.5,
+  number => {
+    const [value, setValue] = createSignal(number);
+    createEffect(
+      () => value(),
+      v => {
+        /* react to value */
+      },
+    );
+    return value;
+  },
+);
+mapped(); // => [0, 0.5, 1, 1.5, 2...]
+setTo(3); // changes the output array, mapping only added numbers
 ```
 
 #### Definition
@@ -242,7 +257,10 @@ const mapped = indexRange(
   () => 0.5,
   number => {
     const [value, setValue] = createSignal(number());
-    createEffect(() => number(), n => handleNewNumber(n));
+    createEffect(
+      () => number(),
+      n => handleNewNumber(n),
+    );
     return value;
   },
 );

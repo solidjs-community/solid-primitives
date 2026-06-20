@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
 import { createRoot, flush } from "solid-js";
-import { createFilePicker, createFileUploader, fileSender, createDropzone, dropzone, fileUploader } from "../src/index.js";
+import {
+  createFilePicker,
+  createFileUploader,
+  fileSender,
+  createDropzone,
+  dropzone,
+  fileUploader,
+} from "../src/index.js";
 import { transformFiles } from "../src/helpers.js";
 import type { UploadFile } from "../src/types.js";
 
@@ -340,7 +347,11 @@ describe("createDropzone", () => {
 
   it("isLoading is false after onDrop throws", async () => {
     const { isLoading, ref, dispose } = createRoot(dispose => ({
-      ...createDropzone({ onDrop: async () => { throw new Error("oops"); } }),
+      ...createDropzone({
+        onDrop: async () => {
+          throw new Error("oops");
+        },
+      }),
       dispose,
     }));
 
@@ -563,14 +574,22 @@ function makeUploadFile(name = "test.png"): UploadFile {
 // Custom send helper: called once per file; tracks all concurrent calls for multi-file tests.
 function makeBlockingSend() {
   type ProgressCb = (p: { loaded: number; total: number; percentage: number }) => void;
-  type Call = { file: UploadFile; resolve: (v: unknown) => void; reject: (e: unknown) => void; onProgress: ProgressCb };
+  type Call = {
+    file: UploadFile;
+    resolve: (v: unknown) => void;
+    reject: (e: unknown) => void;
+    onProgress: ProgressCb;
+  };
   const calls: Call[] = [];
 
-  const send = vi.fn((file: UploadFile, onProgress: ProgressCb, signal: AbortSignal) =>
-    new Promise<unknown>((res, rej) => {
-      calls.push({ file, resolve: res, reject: rej, onProgress });
-      signal.addEventListener("abort", () => rej(new DOMException("Upload aborted", "AbortError")));
-    }),
+  const send = vi.fn(
+    (file: UploadFile, onProgress: ProgressCb, signal: AbortSignal) =>
+      new Promise<unknown>((res, rej) => {
+        calls.push({ file, resolve: res, reject: rej, onProgress });
+        signal.addEventListener("abort", () =>
+          rej(new DOMException("Upload aborted", "AbortError")),
+        );
+      }),
   );
 
   const emitProgressCall = (i: number, loaded: number, total: number) =>
@@ -700,7 +719,8 @@ describe("createFileUploader", () => {
   it("progress resets to zero when a new upload starts", async () => {
     const blocker1 = makeBlockingSend();
     const blocker2 = makeBlockingSend();
-    const sendFn = vi.fn()
+    const sendFn = vi
+      .fn()
       .mockImplementationOnce(blocker1.send)
       .mockImplementationOnce(blocker2.send);
 
@@ -805,7 +825,9 @@ describe("createFileUploader", () => {
       dispose,
     }));
 
-    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]).catch(() => {});
+    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]).catch(
+      () => {},
+    );
     await Promise.resolve();
     flush();
     expect(files.length).toBe(2);
@@ -825,7 +847,9 @@ describe("createFileUploader", () => {
       dispose,
     }));
 
-    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]).catch(() => {});
+    const uploadPromise = upload([makeUploadFile("a.png"), makeUploadFile("b.png")]).catch(
+      () => {},
+    );
     await Promise.resolve();
     flush();
     expect(files.length).toBe(2);
@@ -888,7 +912,10 @@ describe("createFileUploader — XHR", () => {
 
   it("opens a POST to the provided URL and sends FormData", async () => {
     const { xhr, triggerLoad } = makeMockXhr();
-    vi.stubGlobal("XMLHttpRequest", vi.fn(() => xhr));
+    vi.stubGlobal(
+      "XMLHttpRequest",
+      vi.fn(() => xhr),
+    );
 
     const { upload, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload")),
@@ -905,7 +932,10 @@ describe("createFileUploader — XHR", () => {
 
   it("resolves with parsed JSON on 200 load", async () => {
     const mock = makeMockXhr();
-    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+    vi.stubGlobal(
+      "XMLHttpRequest",
+      vi.fn(() => mock.xhr),
+    );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload")),
@@ -926,7 +956,10 @@ describe("createFileUploader — XHR", () => {
     const mock = makeMockXhr();
     mock.xhr.status = 413;
     mock.xhr.statusText = "Payload Too Large";
-    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+    vi.stubGlobal(
+      "XMLHttpRequest",
+      vi.fn(() => mock.xhr),
+    );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload")),
@@ -945,7 +978,10 @@ describe("createFileUploader — XHR", () => {
 
   it("sets network error status when XHR fires error", async () => {
     const mock = makeMockXhr();
-    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+    vi.stubGlobal(
+      "XMLHttpRequest",
+      vi.fn(() => mock.xhr),
+    );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload")),
@@ -964,7 +1000,10 @@ describe("createFileUploader — XHR", () => {
 
   it("forwards progress events to the progress signal", async () => {
     const mock = makeMockXhr();
-    vi.stubGlobal("XMLHttpRequest", vi.fn(() => mock.xhr));
+    vi.stubGlobal(
+      "XMLHttpRequest",
+      vi.fn(() => mock.xhr),
+    );
 
     const { upload, progress, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload")),
@@ -983,7 +1022,10 @@ describe("createFileUploader — XHR", () => {
 
   it("sets custom headers on the XHR request", async () => {
     const { xhr, triggerLoad } = makeMockXhr();
-    vi.stubGlobal("XMLHttpRequest", vi.fn(() => xhr));
+    vi.stubGlobal(
+      "XMLHttpRequest",
+      vi.fn(() => xhr),
+    );
 
     const { upload, dispose } = createRoot(dispose => ({
       ...createFileUploader(fileSender("/api/upload", { headers: { "X-Auth": "token123" } })),

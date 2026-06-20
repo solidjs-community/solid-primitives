@@ -9,7 +9,14 @@ import {
   createMemoCache,
 } from "@solid-primitives/memo";
 import readme from "../README.md?raw";
-import { StatRow, Card, Separator as Divider, ButtonRow, Button, Container } from "../../../.storybook/ui/index.js";
+import {
+  StatRow,
+  Card,
+  Separator as Divider,
+  ButtonRow,
+  Button,
+  Container,
+} from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Memo",
@@ -58,8 +65,12 @@ export const WritableMemo = meta.story({
         </ButtonRow>
 
         <ButtonRow>
-          <Button onClick={() => setResult(99)} variant="outline">Override → 99</Button>
-          <Button onClick={() => setResult(0)} variant="outline">Override → 0</Button>
+          <Button onClick={() => setResult(99)} variant="outline">
+            Override → 99
+          </Button>
+          <Button onClick={() => setResult(0)} variant="outline">
+            Override → 0
+          </Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -99,7 +110,9 @@ export const LazyMemo = meta.story({
 
         <ButtonRow>
           <Button onClick={() => setN(v => v + 1)}>n++</Button>
-          <Button onClick={() => setN(0)} variant="outline">Reset</Button>
+          <Button onClick={() => setN(0)} variant="outline">
+            Reset
+          </Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -213,9 +226,13 @@ export const Reducer = meta.story({
 
         <div style={{ display: "grid", "grid-template-columns": "1fr 1fr", gap: "0.5rem" }}>
           <Button onClick={() => dispatch("increment")}>+ Increment</Button>
-          <Button onClick={() => dispatch("decrement")} variant="outline">− Decrement</Button>
+          <Button onClick={() => dispatch("decrement")} variant="outline">
+            − Decrement
+          </Button>
           <Button onClick={() => dispatch("double")}>× Double</Button>
-          <Button onClick={() => dispatch("reset")} variant="outline">↺ Reset</Button>
+          <Button onClick={() => dispatch("reset")} variant="outline">
+            ↺ Reset
+          </Button>
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
@@ -256,10 +273,7 @@ export const MemoCache = meta.story({
       const hit = computedKeys.has(n);
       if (!hit) computedKeys.add(n);
       setKey(n);
-      setLog(h => [
-        ...h.slice(-4),
-        hit ? `↩ cache hit — fib(${n})` : `✦ computed — fib(${n})`,
-      ]);
+      setLog(h => [...h.slice(-4), hit ? `↩ cache hit — fib(${n})` : `✦ computed — fib(${n})`]);
     };
 
     return (
@@ -273,7 +287,9 @@ export const MemoCache = meta.story({
 
         <ButtonRow>
           {[5, 10, 15, 20, 10, 5].map(n => (
-            <Button onClick={() => selectKey(n)} variant="outline">fib({n})</Button>
+            <Button onClick={() => selectKey(n)} variant="outline">
+              fib({n})
+            </Button>
           ))}
         </ButtonRow>
 

@@ -109,9 +109,7 @@ export const EasingComparison = meta.story({
   render: () => {
     const [target, setTarget] = createSignal(0);
 
-    const tweens = EASINGS.map(({ fn }) =>
-      createTween(target, { duration: 1200, ease: fn }),
-    );
+    const tweens = EASINGS.map(({ fn }) => createTween(target, { duration: 1200, ease: fn }));
 
     const fire = (v: number) => setTarget(v);
 

@@ -63,8 +63,14 @@ export const DelayedResolveReject = meta.story({
       const t0 = Date.now();
       timer = setInterval(() => setElapsed(Math.min(Date.now() - t0, DURATION)), 50);
       promiseTimeout(DURATION, shouldReject).then(
-        () => { clearInterval(timer); setStatus("resolved"); },
-        () => { clearInterval(timer); setStatus("rejected"); },
+        () => {
+          clearInterval(timer);
+          setStatus("resolved");
+        },
+        () => {
+          clearInterval(timer);
+          setStatus("rejected");
+        },
       );
     };
 
@@ -80,11 +86,7 @@ export const DelayedResolveReject = meta.story({
           <Button onClick={() => start(false)} disabled={status() === "running"}>
             Resolve after 2 s
           </Button>
-          <Button
-            onClick={() => start(true)}
-            disabled={status() === "running"}
-            variant="secondary"
-          >
+          <Button onClick={() => start(true)} disabled={status() === "running"} variant="secondary">
             Reject after 2 s
           </Button>
         </ButtonRow>
@@ -192,7 +194,13 @@ export const ReactiveGateAsPromise = meta.story({
     const [resolvedWith, setResolvedWith] = createSignal<number | null>(null);
 
     const p = until(() => (count() >= THRESHOLD ? count() : false));
-    p.then(v => { setResolvedWith(v as number); setStatus("resolved"); }, () => {});
+    p.then(
+      v => {
+        setResolvedWith(v as number);
+        setStatus("resolved");
+      },
+      () => {},
+    );
 
     return (
       <Container width={300}>
@@ -203,11 +211,7 @@ export const ReactiveGateAsPromise = meta.story({
           <Button onClick={() => setCount(c => c + 1)} disabled={status() === "resolved"}>
             Increment
           </Button>
-          <Button
-            onClick={() => setCount(0)}
-            variant="ghost"
-            disabled={status() === "resolved"}
-          >
+          <Button onClick={() => setCount(0)} variant="ghost" disabled={status() === "resolved"}>
             Reset count
           </Button>
         </ButtonRow>
@@ -243,7 +247,10 @@ export const ResolveAfterNChanges = meta.story({
     );
 
     const p = until(changed(count, CHANGES_NEEDED));
-    p.then(() => setStatus("resolved"), () => {});
+    p.then(
+      () => setStatus("resolved"),
+      () => {},
+    );
 
     return (
       <Container width={300}>
@@ -280,15 +287,14 @@ export const AllConditionsBeforeProceeding = meta.story({
     const [status, setStatus] = createSignal<"waiting" | "resolved">("waiting");
 
     const p = untilAll([auth, data, ready]);
-    p.then(() => setStatus("resolved"), () => {});
+    p.then(
+      () => setStatus("resolved"),
+      () => {},
+    );
 
     const met = () => [auth(), data(), ready()].filter(Boolean).length;
 
-    const ToggleRow = (rowProps: {
-      label: string;
-      value: () => boolean;
-      onToggle: () => void;
-    }) => (
+    const ToggleRow = (rowProps: { label: string; value: () => boolean; onToggle: () => void }) => (
       <div
         style={{
           display: "flex",
@@ -347,7 +353,10 @@ export const FirstConditionWins = meta.story({
       () => (bTriggered() ? "Option B" : false),
       () => (cTriggered() ? "Option C" : false),
     ]);
-    p.then(v => setWinner(v as string), () => {});
+    p.then(
+      v => setWinner(v as string),
+      () => {},
+    );
 
     return (
       <Container width={300}>

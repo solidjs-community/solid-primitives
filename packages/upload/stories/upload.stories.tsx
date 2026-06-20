@@ -304,7 +304,7 @@ export const FileUploaderRefStory = meta.story({
     docs: {
       description: {
         story:
-          "`fileUploader` returns a ref callback that wires an `<input type=\"file\">` into reactive state. The input can be hidden and triggered programmatically — useful when you need full control over the element's markup and styling.",
+          '`fileUploader` returns a ref callback that wires an `<input type="file">` into reactive state. The input can be hidden and triggered programmatically — useful when you need full control over the element\'s markup and styling.',
       },
     },
   },
@@ -337,9 +337,7 @@ export const FileUploaderRefStory = meta.story({
         <Show
           when={files().length > 0}
           fallback={
-            <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>
-              No files chosen
-            </span>
+            <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>No files chosen</span>
           }
         >
           <Section title={`Files (${files().length})`}>

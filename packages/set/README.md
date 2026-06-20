@@ -11,15 +11,15 @@
 
 Reactive `Set` and `WeakSet` primitives, plus a suite of derived set-algebra operations.
 
-| Export | Type | Description |
-|---|---|---|
-| [`ReactiveSet`](#reactiveset) | `class` | Drop-in reactive replacement for `Set` |
-| [`ReactiveWeakSet`](#reactiveweakset) | `class` | Drop-in reactive replacement for `WeakSet` |
-| [`union`](#union) | `function` | Elements in `a` or `b` |
-| [`intersection`](#intersection) | `function` | Elements in both `a` and `b` |
-| [`difference`](#difference) | `function` | Elements in `a` not in `b` |
-| [`symmetricDifference`](#symmetricdifference) | `function` | Elements in `a` or `b`, but not both |
-| [`readonlySet`](#readonlyset) | `function` | Cast a `ReactiveSet` to `ReadonlySet` |
+| Export                                        | Type       | Description                                |
+| --------------------------------------------- | ---------- | ------------------------------------------ |
+| [`ReactiveSet`](#reactiveset)                 | `class`    | Drop-in reactive replacement for `Set`     |
+| [`ReactiveWeakSet`](#reactiveweakset)         | `class`    | Drop-in reactive replacement for `WeakSet` |
+| [`union`](#union)                             | `function` | Elements in `a` or `b`                     |
+| [`intersection`](#intersection)               | `function` | Elements in both `a` and `b`               |
+| [`difference`](#difference)                   | `function` | Elements in `a` not in `b`                 |
+| [`symmetricDifference`](#symmetricdifference) | `function` | Elements in `a` or `b`, but not both       |
+| [`readonlySet`](#readonlyset)                 | `function` | Cast a `ReactiveSet` to `ReadonlySet`      |
 
 ## Installation
 
@@ -140,8 +140,12 @@ function createTodoList() {
   const _todos = new ReactiveSet<string>();
   return {
     todos: readonlySet(_todos),
-    add(todo: string) { _todos.add(todo); },
-    remove(todo: string) { _todos.delete(todo); },
+    add(todo: string) {
+      _todos.add(todo);
+    },
+    remove(todo: string) {
+      _todos.delete(todo);
+    },
   };
 }
 

@@ -2,7 +2,15 @@ import { createSignal } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { pan, longPress, pinch, rotate, swipe, tap, doubleTap } from "@solid-primitives/gestures";
 import readme from "../README.md?raw";
-import { Container, EventLog, Section, StatRow, colors, font, radii } from "../../../.storybook/ui/index.js";
+import {
+  Container,
+  EventLog,
+  Section,
+  StatRow,
+  colors,
+  font,
+  radii,
+} from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Inputs/Gestures",
@@ -146,7 +154,12 @@ export const PinchStory = meta.story({
     return (
       <Container width={280}>
         <div
-          ref={pinch({ callback: (s, c) => { setScale(s); setCenter(c); } })}
+          ref={pinch({
+            callback: (s, c) => {
+              setScale(s);
+              setCenter(c);
+            },
+          })}
           style={{ ...zone, border: `2px dashed ${colors.border}` }}
         >
           <span style={{ color: colors.muted, "font-size": font.sizeSm, "font-family": font.mono }}>
@@ -183,7 +196,12 @@ export const RotateStory = meta.story({
     return (
       <Container width={280}>
         <div
-          ref={rotate({ callback: (r, c) => { setAngle(r); setCenter(c); } })}
+          ref={rotate({
+            callback: (r, c) => {
+              setAngle(r);
+              setCenter(c);
+            },
+          })}
           style={{ ...zone, border: `2px dashed ${colors.border}` }}
         >
           <span style={{ color: colors.muted, "font-size": font.sizeSm, "font-family": font.mono }}>

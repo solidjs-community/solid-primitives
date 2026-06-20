@@ -66,16 +66,22 @@ export const SwitchFade = meta.story({
         queueMicrotask(() => {
           if (!el.isConnected) return done();
           el.animate(
-            [{ opacity: 0, transform: "translateY(5px)" }, { opacity: 1, transform: "none" }],
+            [
+              { opacity: 0, transform: "translateY(5px)" },
+              { opacity: 1, transform: "none" },
+            ],
             { duration: 250, easing: "ease-out" },
-          ).finished.then(done).catch(done);
+          )
+            .finished.then(done)
+            .catch(done);
         });
       },
       onExit(el, done) {
-        el.animate(
-          [{ opacity: 1 }, { opacity: 0, transform: "translateY(-5px)" }],
-          { duration: 200 },
-        ).finished.then(done).catch(done);
+        el.animate([{ opacity: 1 }, { opacity: 0, transform: "translateY(-5px)" }], {
+          duration: 200,
+        })
+          .finished.then(done)
+          .catch(done);
       },
     });
 
@@ -106,7 +112,7 @@ export const SwitchModes = meta.story({
     docs: {
       description: {
         story:
-          "The `mode` option controls timing. `\"parallel\"` — both run at once. `\"out-in\"` — exit finishes before enter starts. `\"in-out\"` — enter starts first, exit fires after enter completes.",
+          'The `mode` option controls timing. `"parallel"` — both run at once. `"out-in"` — exit finishes before enter starts. `"in-out"` — enter starts first, exit fires after enter completes.',
       },
     },
   },
@@ -139,16 +145,26 @@ export const SwitchModes = meta.story({
           queueMicrotask(() => {
             if (!el.isConnected) return done();
             el.animate(
-              [{ opacity: 0, transform: "translateX(12px)" }, { opacity: 1, transform: "none" }],
+              [
+                { opacity: 0, transform: "translateX(12px)" },
+                { opacity: 1, transform: "none" },
+              ],
               { duration: 260, easing: "ease-out" },
-            ).finished.then(done).catch(done);
+            )
+              .finished.then(done)
+              .catch(done);
           });
         },
         onExit(el, done) {
           el.animate(
-            [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-12px)" }],
+            [
+              { opacity: 1, transform: "none" },
+              { opacity: 0, transform: "translateX(-12px)" },
+            ],
             { duration: 210 },
-          ).finished.then(done).catch(done);
+          )
+            .finished.then(done)
+            .catch(done);
         },
         mode: props.mode,
         appear: true,
@@ -164,7 +180,14 @@ export const SwitchModes = meta.story({
             Toggle
           </Button>
           <div style={{ position: "relative", flex: "1", height: "38px" }}>{transition()}</div>
-          <code style={{ "font-size": "0.75rem", color: "#64748b", "min-width": "64px", "text-align": "right" }}>
+          <code
+            style={{
+              "font-size": "0.75rem",
+              color: "#64748b",
+              "min-width": "64px",
+              "text-align": "right",
+            }}
+          >
             {props.mode}
           </code>
         </div>
@@ -232,9 +255,7 @@ export const ListAddRemove = meta.story({
           padding: "0 0.2rem",
           "line-height": "1",
         });
-        btn.addEventListener("click", () =>
-          setItems(prev => prev.filter(i => i.id !== item.id)),
-        );
+        btn.addEventListener("click", () => setItems(prev => prev.filter(i => i.id !== item.id)));
         el.appendChild(span);
         el.appendChild(btn);
         elCache.set(item.id, el);
@@ -263,7 +284,10 @@ export const ListAddRemove = meta.story({
             const anims = removed.map(el => {
               if (!el.isConnected) return Promise.resolve();
               return el.animate(
-                [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(0.95)" }],
+                [
+                  { opacity: 1, transform: "none" },
+                  { opacity: 0, transform: "scale(0.95)" },
+                ],
                 { duration: 200 },
               ).finished;
             });
@@ -354,10 +378,10 @@ export const ListFlip = meta.story({
             const now = el.getBoundingClientRect();
             const dy = old.top - now.top;
             if (dy !== 0) {
-              el.animate(
-                [{ transform: `translateY(${dy}px)` }, { transform: "none" }],
-                { duration: 320, easing: "cubic-bezier(0.4, 0, 0.2, 1)" },
-              );
+              el.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], {
+                duration: 320,
+                easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+              });
             }
           });
         });
@@ -379,17 +403,10 @@ export const ListFlip = meta.story({
           {transition()}
         </div>
         <ButtonRow>
-          <Button
-            onClick={() => setItems(prev => [...prev].reverse())}
-            style={{ flex: "1" }}
-          >
+          <Button onClick={() => setItems(prev => [...prev].reverse())} style={{ flex: "1" }}>
             Reverse
           </Button>
-          <Button
-            onClick={() => setItems(shuffle)}
-            variant="outline"
-            style={{ flex: "1" }}
-          >
+          <Button onClick={() => setItems(shuffle)} variant="outline" style={{ flex: "1" }}>
             Shuffle
           </Button>
         </ButtonRow>

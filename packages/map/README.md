@@ -71,14 +71,14 @@ const map = new ReactiveMap([
 
 Reads are tracked at two independent granularities, so components only re-run for the exact change they care about:
 
-| Method | Re-runs when… |
-|--------|---------------|
-| `has(key)` | That key is added or removed |
-| `get(key)` | That key's value changes (by reference) |
-| `size` | Any key is added or removed |
-| `keys()` | Any key is added or removed |
-| `values()` | Any value changes, or any key is added/removed |
-| `entries()`, `forEach()` | Any key or value changes |
+| Method                   | Re-runs when…                                  |
+| ------------------------ | ---------------------------------------------- |
+| `has(key)`               | That key is added or removed                   |
+| `get(key)`               | That key's value changes (by reference)        |
+| `size`                   | Any key is added or removed                    |
+| `keys()`                 | Any key is added or removed                    |
+| `values()`               | Any value changes, or any key is added/removed |
+| `entries()`, `forEach()` | Any key or value changes                       |
 
 **Setting the same value is a no-op.** `map.set(k, map.get(k))` does not notify any subscribers.
 

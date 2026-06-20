@@ -80,7 +80,10 @@ import { createMutable } from "@solid-primitives/mutable";
 
 const state = createMutable({ count: 0 });
 
-createEffect(() => state.count, value => console.log(value));
+createEffect(
+  () => state.count,
+  value => console.log(value),
+);
 flush(); // runs initial effect
 
 state.count = 1;

@@ -71,9 +71,7 @@ export const PerEntryCounters = meta.story({
                   </strong>
                   <Button
                     variant="outline"
-                    onClick={() =>
-                      scores.set(player, Math.max(0, (scores.get(player) ?? 0) - 1))
-                    }
+                    onClick={() => scores.set(player, Math.max(0, (scores.get(player) ?? 0) - 1))}
                   >
                     −
                   </Button>
@@ -129,7 +127,9 @@ export const AddRemoveEntries = meta.story({
           <Show
             when={store.size > 0}
             fallback={
-              <span style={{ color: colors.mutedFg, "font-size": font.sizeSm, "font-style": "italic" }}>
+              <span
+                style={{ color: colors.mutedFg, "font-size": font.sizeSm, "font-style": "italic" }}
+              >
                 No entries yet
               </span>
             }

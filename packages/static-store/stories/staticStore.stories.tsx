@@ -68,9 +68,7 @@ export const CreateStaticStoreStory = meta.story({
         </div>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-          <span
-            style={{ "font-size": "0.8rem", color: "#64748b", "font-family": "monospace" }}
-          >
+          <span style={{ "font-size": "0.8rem", color: "#64748b", "font-family": "monospace" }}>
             setSize("width", fn) — key-value
           </span>
           <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -92,9 +90,7 @@ export const CreateStaticStoreStory = meta.story({
         </div>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-          <span
-            style={{ "font-size": "0.8rem", color: "#64748b", "font-family": "monospace" }}
-          >
+          <span style={{ "font-size": "0.8rem", color: "#64748b", "font-family": "monospace" }}>
             {`setSize({ height }) — partial object`}
           </span>
           <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -116,9 +112,7 @@ export const CreateStaticStoreStory = meta.story({
         </div>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-          <span
-            style={{ "font-size": "0.8rem", color: "#64748b", "font-family": "monospace" }}
-          >
+          <span style={{ "font-size": "0.8rem", color: "#64748b", "font-family": "monospace" }}>
             setSize(prev =&gt; ...) — function
           </span>
           <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -162,8 +156,14 @@ export const DerivedStaticStoreStory = meta.story({
     const [widthTicks, setWidthTicks] = createSignal(0, { ownedWrite: true });
     const [heightTicks, setHeightTicks] = createSignal(0, { ownedWrite: true });
 
-    createTrackedEffect(() => { store.width; setWidthTicks(n => n + 1); });
-    createTrackedEffect(() => { store.height; setHeightTicks(n => n + 1); });
+    createTrackedEffect(() => {
+      store.width;
+      setWidthTicks(n => n + 1);
+    });
+    createTrackedEffect(() => {
+      store.height;
+      setHeightTicks(n => n + 1);
+    });
 
     return (
       <Container width={380}>

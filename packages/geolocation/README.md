@@ -96,7 +96,10 @@ With a server-side seed (e.g. IP geolocation from Cloudflare):
 ```ts
 // On the server, location() resolves immediately with the seed instead of throwing NotReadyError.
 // On the client, the seed is ignored and GPS is queried directly.
-const [location, refetch] = createGeolocation(undefined, { latitude: cf.latitude, longitude: cf.longitude });
+const [location, refetch] = createGeolocation(undefined, {
+  latitude: cf.latitude,
+  longitude: cf.longitude,
+});
 ```
 
 ### Definition
@@ -255,6 +258,7 @@ const { location } = createGeolocationWatcher(true, undefined, data()?.ipCoords)
 ```
 
 When a seed is provided:
+
 - **Server** — `location()` / `distance()` / `within()` return values derived from the seed instead of throwing or returning `null`/`false`.
 - **Client** — the seed is the starting value; the GPS watcher overwrites it as soon as the first fix arrives. No `<Loading>` suspension occurs if the seed is present.
 - Fields beyond `latitude`/`longitude` (`accuracy`, `altitude`, `heading`, `speed`) are `0` or `null` until real GPS data arrives.

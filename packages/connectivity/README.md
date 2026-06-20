@@ -129,16 +129,24 @@ function createNetworkInformation(): NetworkInformationReturn;
 
 type NetworkInformationReturn = {
   online: Accessor<boolean>;
-  downlink: Accessor<number | undefined>;       // bandwidth estimate in Mbit/s
-  downlinkMax: Accessor<number | undefined>;    // max downlink speed (non-standard)
+  downlink: Accessor<number | undefined>; // bandwidth estimate in Mbit/s
+  downlinkMax: Accessor<number | undefined>; // max downlink speed (non-standard)
   effectiveType: Accessor<EffectiveConnectionType | undefined>; // "slow-2g" | "2g" | "3g" | "4g"
-  rtt: Accessor<number | undefined>;            // estimated round-trip time in ms
-  saveData: Accessor<boolean | undefined>;      // user has requested reduced data usage
-  type: Accessor<ConnectionType | undefined>;   // underlying connection technology
+  rtt: Accessor<number | undefined>; // estimated round-trip time in ms
+  saveData: Accessor<boolean | undefined>; // user has requested reduced data usage
+  type: Accessor<ConnectionType | undefined>; // underlying connection technology
 };
 
 type EffectiveConnectionType = "slow-2g" | "2g" | "3g" | "4g";
-type ConnectionType = "bluetooth" | "cellular" | "ethernet" | "none" | "wifi" | "wimax" | "other" | "unknown";
+type ConnectionType =
+  | "bluetooth"
+  | "cellular"
+  | "ethernet"
+  | "none"
+  | "wifi"
+  | "wimax"
+  | "other"
+  | "unknown";
 ```
 
 ## `useNetworkInformation`
@@ -169,10 +177,10 @@ type NetworkState = {
 
 ## Browser Support
 
-| Primitive | Chrome | Firefox | Safari |
-|-----------|--------|---------|--------|
-| `makeConnectivityListener` / `createConnectivitySignal` | ✅ | ✅ | ✅ |
-| Network Information API fields (`effectiveType`, `downlink`, etc.) | ✅ | ❌ | ❌ |
+| Primitive                                                          | Chrome | Firefox | Safari |
+| ------------------------------------------------------------------ | ------ | ------- | ------ |
+| `makeConnectivityListener` / `createConnectivitySignal`            | ✅     | ✅      | ✅     |
+| Network Information API fields (`effectiveType`, `downlink`, etc.) | ✅     | ❌      | ❌     |
 
 The Network Information API fields return `undefined` where unsupported — no errors are thrown.
 

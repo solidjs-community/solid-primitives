@@ -23,7 +23,7 @@ export function SingleSelectDemo() {
         }}
       >
         <For each={items}>
-          {(item) => (
+          {item => (
             <li
               class={{
                 active: active() === item,
@@ -66,7 +66,7 @@ export function MultiSelectDemo() {
         }}
       >
         <For each={items}>
-          {(item) => (
+          {item => (
             <li
               class={{
                 cursor: cursor() === item,
@@ -76,7 +76,12 @@ export function MultiSelectDemo() {
               onDoubleClick={() => toggleSelected(item)}
               style={{
                 padding: "0.5rem",
-                background: cursor() === item ? "#0066cc" : selected().includes(item) ? "#cce5ff" : "transparent",
+                background:
+                  cursor() === item
+                    ? "#0066cc"
+                    : selected().includes(item)
+                      ? "#cce5ff"
+                      : "transparent",
                 color: cursor() === item ? "white" : "black",
                 cursor: "pointer",
               }}
@@ -86,9 +91,7 @@ export function MultiSelectDemo() {
           )}
         </For>
       </ul>
-      <p style={{ "font-size": "0.85em", color: "#666" }}>
-        Double-click to toggle selection
-      </p>
+      <p style={{ "font-size": "0.85em", color: "#666" }}>Double-click to toggle selection</p>
     </div>
   );
 }

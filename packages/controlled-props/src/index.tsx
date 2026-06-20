@@ -110,9 +110,7 @@ export const SelectProp = <T,>(
       ? props.options.map((option: any) => [option, option])
       : filterEnum(props.options),
   );
-  const selectedIndex = createMemo(() =>
-    options().findIndex(([, v]) => v === props.value()),
-  );
+  const selectedIndex = createMemo(() => options().findIndex(([, v]) => v === props.value()));
   return (
     <label>
       <span>{props.name}</span>{" "}
@@ -214,7 +212,10 @@ export function createControlledProp<T>(
   const max = numOpts?.max;
   const step = numOpts?.step;
 
-  const [value, setValue] = createSignal<T>(initialValue as Exclude<T, Function>, { ...INTERNAL_OPTIONS, name });
+  const [value, setValue] = createSignal<T>(initialValue as Exclude<T, Function>, {
+    ...INTERNAL_OPTIONS,
+    name,
+  });
   return [
     value,
     setValue,
@@ -222,13 +223,31 @@ export function createControlledProp<T>(
       ? () => BoolProp({ name, value: value as any, setValue: setValue as any as Setter<boolean> })
       : propType === "number"
         ? () =>
-            NumberProp({ name, value: value as any, setValue: setValue as any as Setter<number>, min, max, step })
+            NumberProp({
+              name,
+              value: value as any,
+              setValue: setValue as any as Setter<number>,
+              min,
+              max,
+              step,
+            })
         : propType === "range"
           ? () =>
-              RangeProp({ name, value: value as any, setValue: setValue as any as Setter<number>, min, max, step })
+              RangeProp({
+                name,
+                value: value as any,
+                setValue: setValue as any as Setter<number>,
+                min,
+                max,
+                step,
+              })
           : propType === "string"
             ? () =>
-                StringProp({ name, value: value as any, setValue: setValue as any as Setter<string> })
+                StringProp({
+                  name,
+                  value: value as any,
+                  setValue: setValue as any as Setter<string>,
+                })
             : () =>
                 SelectProp<T>({
                   name,

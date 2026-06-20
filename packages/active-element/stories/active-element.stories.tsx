@@ -16,7 +16,6 @@ import {
   inputStyle,
 } from "../../../.storybook/ui/index.js";
 
-
 const meta = preview.meta({
   title: "Inputs/Active Element",
   tags: ["autodocs"],
@@ -86,9 +85,7 @@ export const ActiveElementListener = meta.story({
     const [log, setLog] = createSignal<{ label: string; time: string }[]>([]);
 
     const addLog = (el: Element | null) => {
-      const name = el
-        ? (el as HTMLInputElement).placeholder || el.tagName.toLowerCase()
-        : "(none)";
+      const name = el ? (el as HTMLInputElement).placeholder || el.tagName.toLowerCase() : "(none)";
       setLog(prev =>
         [{ label: `→ ${name}`, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 5),
       );

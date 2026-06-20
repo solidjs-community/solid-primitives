@@ -1,7 +1,16 @@
 import preview from "../../../.storybook/preview.js";
 import { createControlledProp, createControlledProps } from "@solid-primitives/controlled-props";
 import readme from "../README.md?raw";
-import { Badge, Code, Container, Card, Section, Separator, StatRow, ProgressBar } from "../../../.storybook/ui/index.js";
+import {
+  Badge,
+  Code,
+  Container,
+  Card,
+  Section,
+  Separator,
+  StatRow,
+  ProgressBar,
+} from "../../../.storybook/ui/index.js";
 import { colors, font, radii } from "../../../.storybook/ui/tokens.js";
 
 const meta = preview.meta({
@@ -33,7 +42,11 @@ export const ScalarControls = meta.story({
   },
   render: () => {
     const [enabled, , EnabledField] = createControlledProp("enabled", false);
-    const [count, , CountField] = createControlledProp("count", { initialValue: 3, min: 0, max: 10 });
+    const [count, , CountField] = createControlledProp("count", {
+      initialValue: 3,
+      min: 0,
+      max: 10,
+    });
     const [label, , LabelField] = createControlledProp("label", "Submit");
 
     const row = {
@@ -147,7 +160,7 @@ export const RangeControls = meta.story({
     docs: {
       description: {
         story:
-          "Pass `type: \"range\"` to render a slider. The optional `step` option snaps values to discrete increments. `RangeProp` also exports the underlying component directly so you can assemble custom layouts.",
+          'Pass `type: "range"` to render a slider. The optional `step` option snaps values to discrete increments. `RangeProp` also exports the underlying component directly so you can assemble custom layouts.',
       },
     },
   },
@@ -238,9 +251,15 @@ export const ComponentPropPanel = meta.story({
 
     const variantStyle = (): Record<string, string> => {
       const v = props.variant() as Variant;
-      if (v === "primary") return { background: colors.primary, color: colors.primaryFg, border: "none" };
-      if (v === "secondary") return { background: colors.secondary, color: colors.secondaryFg, border: "none" };
-      return { background: "transparent", color: colors.secondaryFg, border: `1px solid ${colors.border}` };
+      if (v === "primary")
+        return { background: colors.primary, color: colors.primaryFg, border: "none" };
+      if (v === "secondary")
+        return { background: colors.secondary, color: colors.secondaryFg, border: "none" };
+      return {
+        background: "transparent",
+        color: colors.secondaryFg,
+        border: `1px solid ${colors.border}`,
+      };
     };
 
     const sizeStyle = (): Record<string, string> => {

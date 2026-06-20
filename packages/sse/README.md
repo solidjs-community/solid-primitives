@@ -179,13 +179,13 @@ Without `on`, `<Loading>` keeps showing stale content during revalidation. With 
 
 ### Return value
 
-| Property     | Type                                     | Description                                                                              |
-| ------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `source`     | `Accessor<SSESourceHandle \| undefined>` | Underlying source instance; `undefined` on SSR                                           |
+| Property     | Type                                     | Description                                                                                 |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `source`     | `Accessor<SSESourceHandle \| undefined>` | Underlying source instance; `undefined` on SSR                                              |
 | `data`       | `Accessor<T>`                            | Latest message data; throws `NotReadyError` until first message, terminal errors thereafter |
-| `readyState` | `Accessor<SSEReadyState>`                | `SSEReadyState.CONNECTING` / `.OPEN` / `.CLOSED`                                         |
-| `close`      | `VoidFunction`                           | Close the connection                                                                     |
-| `reconnect`  | `VoidFunction`                           | Force-close and reopen; resets `data` to pending                                         |
+| `readyState` | `Accessor<SSEReadyState>`                | `SSEReadyState.CONNECTING` / `.OPEN` / `.CLOSED`                                            |
+| `close`      | `VoidFunction`                           | Close the connection                                                                        |
+| `reconnect`  | `VoidFunction`                           | Force-close and reopen; resets `data` to pending                                            |
 
 ### Initial value
 

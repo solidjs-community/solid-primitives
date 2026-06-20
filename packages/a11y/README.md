@@ -47,10 +47,10 @@ announce("Session expired. Please sign in again.", "assertive");
 
 ### Politeness levels
 
-| Level | Behaviour | When to use |
-|-------|-----------|-------------|
+| Level                | Behaviour                                                  | When to use                                         |
+| -------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
 | `"polite"` (default) | Waits for the screen reader to finish its current sentence | Status updates, confirmations, search result counts |
-| `"assertive"` | Interrupts immediately | Urgent errors that require immediate attention |
+| `"assertive"`        | Interrupts immediately                                     | Urgent errors that require immediate attention      |
 
 > Prefer `"polite"` in almost all cases. `"assertive"` is disruptive and should be reserved for true errors.
 
@@ -93,11 +93,7 @@ import { createReducedMotion } from "@solid-primitives/a11y";
 ```tsx
 const prefersReduced = createReducedMotion();
 
-return (
-  <div class={prefersReduced() ? "" : "animate-fade-in"}>
-    Content
-  </div>
-);
+return <div class={prefersReduced() ? "" : "animate-fade-in"}>Content</div>;
 ```
 
 ```ts
@@ -200,10 +196,17 @@ const TextFieldDescription = (props: { children: Element }) => {
 };
 
 // 5. ErrorMessage — registers only while rendered (Show handles mount/unmount)
-const ErrorMessageInner = (props: { ctx: ReturnType<typeof createFormControl>; children: Element }) => {
+const ErrorMessageInner = (props: {
+  ctx: ReturnType<typeof createFormControl>;
+  children: Element;
+}) => {
   const id = props.ctx.generateId("error-message");
   onCleanup(props.ctx.registerErrorMessage(id));
-  return <span id={id} role="alert">{props.children}</span>;
+  return (
+    <span id={id} role="alert">
+      {props.children}
+    </span>
+  );
 };
 const TextFieldErrorMessage = (props: { children: Element }) => {
   const ctx = useFormControl();
@@ -220,7 +223,7 @@ const TextFieldErrorMessage = (props: { children: Element }) => {
   <TextFieldInput placeholder="you@example.com" />
   <TextFieldDescription>We'll never share your email.</TextFieldDescription>
   <TextFieldErrorMessage>Enter a valid email address.</TextFieldErrorMessage>
-</TextFieldRoot>
+</TextFieldRoot>;
 ```
 
 When `validationState` is `"invalid"`, the error message component mounts, registers its ID, and `aria-describedby` on the input automatically expands to include it. When the state clears, the component unmounts and `onCleanup` removes its ID from the graph.
@@ -229,48 +232,56 @@ When `validationState` is `"invalid"`, the error message component mounts, regis
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `id` | `MaybeAccessor<string>` | Base ID for the field group. Auto-generated if omitted. |
-| `name` | `MaybeAccessor<string>` | Form submission name. Falls back to `id`. |
+| Prop              | Type                                               | Description                                                                                                     |
+| ----------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `id`              | `MaybeAccessor<string>`                            | Base ID for the field group. Auto-generated if omitted.                                                         |
+| `name`            | `MaybeAccessor<string>`                            | Form submission name. Falls back to `id`.                                                                       |
 | `validationState` | `MaybeAccessor<"valid" \| "invalid" \| undefined>` | Sets `data-valid` / `data-invalid` and controls whether the error message ID is included in `aria-describedby`. |
-| `required` | `MaybeAccessor<boolean \| undefined>` | Sets `data-required`. |
-| `disabled` | `MaybeAccessor<boolean \| undefined>` | Sets `data-disabled`. |
-| `readOnly` | `MaybeAccessor<boolean \| undefined>` | Sets `data-readonly`. |
+| `required`        | `MaybeAccessor<boolean \| undefined>`              | Sets `data-required`.                                                                                           |
+| `disabled`        | `MaybeAccessor<boolean \| undefined>`              | Sets `data-disabled`.                                                                                           |
+| `readOnly`        | `MaybeAccessor<boolean \| undefined>`              | Sets `data-readonly`.                                                                                           |
 
 All props accept either a plain value or a reactive accessor `() => value`, so they compose naturally with signals.
 
 ### Context value (`FormControlContextValue`)
 
-| Member | Type | Description |
-|--------|------|-------------|
-| `name()` | `Accessor<string>` | Resolved name (falls back to id) |
-| `validationState()` | `Accessor<"valid" \| "invalid" \| undefined>` | Current validation state |
-| `isRequired()` | `Accessor<boolean \| undefined>` | Whether the field is required |
-| `isDisabled()` | `Accessor<boolean \| undefined>` | Whether the field is disabled |
-| `isReadOnly()` | `Accessor<boolean \| undefined>` | Whether the field is read-only |
-| `dataset()` | `Accessor<FormControlDataSet>` | All `data-*` attribute values — spread onto any element that should reflect state |
-| `generateId(part)` | `(part: string) => string` | Returns `"${baseId}-${part}"` — use this to derive stable IDs for sub-elements |
-| `labelId()` | `Accessor<string \| undefined>` | Currently registered label element ID |
-| `fieldId()` | `Accessor<string \| undefined>` | Currently registered field element ID |
-| `descriptionId()` | `Accessor<string \| undefined>` | Currently registered description element ID |
-| `errorMessageId()` | `Accessor<string \| undefined>` | Currently registered error message element ID |
-| `registerLabel(id)` | `(id: string) => () => void` | Registers a label ID; returns a cleanup function |
-| `registerField(id)` | `(id: string) => () => void` | Registers the field ID; returns a cleanup function |
-| `registerDescription(id)` | `(id: string) => () => void` | Registers a description ID; returns a cleanup function |
-| `registerErrorMessage(id)` | `(id: string) => () => void` | Registers an error message ID; returns a cleanup function |
-| `getAriaLabelledBy(fieldId, ariaLabel, ariaLabelledBy)` | `(fieldId, ariaLabel, ariaLabelledBy) => string \| undefined` | Computes the full `aria-labelledby` value |
-| `getAriaDescribedBy(ariaDescribedBy)` | `(ariaDescribedBy) => string \| undefined` | Computes the full `aria-describedby` value |
+| Member                                                  | Type                                                          | Description                                                                       |
+| ------------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `name()`                                                | `Accessor<string>`                                            | Resolved name (falls back to id)                                                  |
+| `validationState()`                                     | `Accessor<"valid" \| "invalid" \| undefined>`                 | Current validation state                                                          |
+| `isRequired()`                                          | `Accessor<boolean \| undefined>`                              | Whether the field is required                                                     |
+| `isDisabled()`                                          | `Accessor<boolean \| undefined>`                              | Whether the field is disabled                                                     |
+| `isReadOnly()`                                          | `Accessor<boolean \| undefined>`                              | Whether the field is read-only                                                    |
+| `dataset()`                                             | `Accessor<FormControlDataSet>`                                | All `data-*` attribute values — spread onto any element that should reflect state |
+| `generateId(part)`                                      | `(part: string) => string`                                    | Returns `"${baseId}-${part}"` — use this to derive stable IDs for sub-elements    |
+| `labelId()`                                             | `Accessor<string \| undefined>`                               | Currently registered label element ID                                             |
+| `fieldId()`                                             | `Accessor<string \| undefined>`                               | Currently registered field element ID                                             |
+| `descriptionId()`                                       | `Accessor<string \| undefined>`                               | Currently registered description element ID                                       |
+| `errorMessageId()`                                      | `Accessor<string \| undefined>`                               | Currently registered error message element ID                                     |
+| `registerLabel(id)`                                     | `(id: string) => () => void`                                  | Registers a label ID; returns a cleanup function                                  |
+| `registerField(id)`                                     | `(id: string) => () => void`                                  | Registers the field ID; returns a cleanup function                                |
+| `registerDescription(id)`                               | `(id: string) => () => void`                                  | Registers a description ID; returns a cleanup function                            |
+| `registerErrorMessage(id)`                              | `(id: string) => () => void`                                  | Registers an error message ID; returns a cleanup function                         |
+| `getAriaLabelledBy(fieldId, ariaLabel, ariaLabelledBy)` | `(fieldId, ariaLabel, ariaLabelledBy) => string \| undefined` | Computes the full `aria-labelledby` value                                         |
+| `getAriaDescribedBy(ariaDescribedBy)`                   | `(ariaDescribedBy) => string \| undefined`                    | Computes the full `aria-describedby` value                                        |
 
 ### `data-*` attributes
 
 `dataset()` returns an object where each active state is `""` (empty string) and inactive states are `undefined`. This follows the HTML convention for boolean data attributes — you can target them in CSS with attribute presence selectors:
 
 ```css
-[data-invalid] { border-color: red; }
-[data-disabled] { opacity: 0.5; }
-[data-required] { /* required styling */ }
-[data-readonly] { background: #f5f5f5; }
+[data-invalid] {
+  border-color: red;
+}
+[data-disabled] {
+  opacity: 0.5;
+}
+[data-required] {
+  /* required styling */
+}
+[data-readonly] {
+  background: #f5f5f5;
+}
 ```
 
 ```tsx
@@ -286,21 +297,21 @@ Reads from `FormControlContext` (must be called inside a `<FormControlContext>`)
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `id` | `MaybeAccessor<string>` | Override the generated field ID. Defaults to `context.generateId("field")`. |
-| `aria-label` | `MaybeAccessor<string>` | Passed through to `fieldProps.ariaLabel()`. |
-| `aria-labelledby` | `MaybeAccessor<string>` | Merged into the computed `aria-labelledby` chain. |
-| `aria-describedby` | `MaybeAccessor<string>` | Appended to the computed `aria-describedby` value. |
+| Prop               | Type                    | Description                                                                 |
+| ------------------ | ----------------------- | --------------------------------------------------------------------------- |
+| `id`               | `MaybeAccessor<string>` | Override the generated field ID. Defaults to `context.generateId("field")`. |
+| `aria-label`       | `MaybeAccessor<string>` | Passed through to `fieldProps.ariaLabel()`.                                 |
+| `aria-labelledby`  | `MaybeAccessor<string>` | Merged into the computed `aria-labelledby` chain.                           |
+| `aria-describedby` | `MaybeAccessor<string>` | Appended to the computed `aria-describedby` value.                          |
 
 ### Return value
 
 ```ts
 {
   fieldProps: {
-    id:              () => string;
-    ariaLabel:       () => string | undefined;
-    ariaLabelledBy:  () => string | undefined;
+    id: () => string;
+    ariaLabel: () => string | undefined;
+    ariaLabelledBy: () => string | undefined;
     ariaDescribedBy: () => string | undefined;
   }
 }
@@ -344,7 +355,7 @@ const ctx = createFormControl({ id: "my-field", required: true });
   <MyLabel />
   <MyInput />
   <MyDescription />
-</FormControlContext>
+</FormControlContext>;
 
 // Consumer (inside any descendant component)
 const ctx = useFormControl();
@@ -392,12 +403,18 @@ function AccessibleField() {
 
   const ErrorMessage = () => {
     onCleanup(ctx.registerErrorMessage("email-error"));
-    return <span id="email-error" role="alert">{error()}</span>;
+    return (
+      <span id="email-error" role="alert">
+        {error()}
+      </span>
+    );
   };
 
   return (
     <div>
-      <label id="email-label" for={fieldId}>Email</label>
+      <label id="email-label" for={fieldId}>
+        Email
+      </label>
       <input
         id={fieldId}
         type="email"
@@ -430,47 +447,51 @@ const FormControlContext: Context<FormControlContextValue | undefined>;
 function useFormControl(): FormControlContextValue;
 
 type CreateFormControlProps = {
-  id?:              MaybeAccessor<string>;
-  name?:            MaybeAccessor<string>;
+  id?: MaybeAccessor<string>;
+  name?: MaybeAccessor<string>;
   validationState?: MaybeAccessor<"valid" | "invalid" | undefined>;
-  required?:        MaybeAccessor<boolean | undefined>;
-  disabled?:        MaybeAccessor<boolean | undefined>;
-  readOnly?:        MaybeAccessor<boolean | undefined>;
+  required?: MaybeAccessor<boolean | undefined>;
+  disabled?: MaybeAccessor<boolean | undefined>;
+  readOnly?: MaybeAccessor<boolean | undefined>;
 };
 
 type CreateFormControlInputProps = {
-  id?:                 MaybeAccessor<string>;
-  "aria-label"?:       MaybeAccessor<string>;
-  "aria-labelledby"?:  MaybeAccessor<string>;
+  id?: MaybeAccessor<string>;
+  "aria-label"?: MaybeAccessor<string>;
+  "aria-labelledby"?: MaybeAccessor<string>;
   "aria-describedby"?: MaybeAccessor<string>;
 };
 
 type FormControlDataSet = {
-  "data-valid"?:    "" | undefined;
-  "data-invalid"?:  "" | undefined;
+  "data-valid"?: "" | undefined;
+  "data-invalid"?: "" | undefined;
   "data-required"?: "" | undefined;
   "data-disabled"?: "" | undefined;
   "data-readonly"?: "" | undefined;
 };
 
 type FormControlContextValue = {
-  name:                Accessor<string>;
-  validationState:     Accessor<"valid" | "invalid" | undefined>;
-  isRequired:          Accessor<boolean | undefined>;
-  isDisabled:          Accessor<boolean | undefined>;
-  isReadOnly:          Accessor<boolean | undefined>;
-  dataset:             Accessor<FormControlDataSet>;
-  labelId:             Accessor<string | undefined>;
-  fieldId:             Accessor<string | undefined>;
-  descriptionId:       Accessor<string | undefined>;
-  errorMessageId:      Accessor<string | undefined>;
-  generateId:          (part: string) => string;
-  registerLabel:       (id: string) => () => void;
-  registerField:       (id: string) => () => void;
+  name: Accessor<string>;
+  validationState: Accessor<"valid" | "invalid" | undefined>;
+  isRequired: Accessor<boolean | undefined>;
+  isDisabled: Accessor<boolean | undefined>;
+  isReadOnly: Accessor<boolean | undefined>;
+  dataset: Accessor<FormControlDataSet>;
+  labelId: Accessor<string | undefined>;
+  fieldId: Accessor<string | undefined>;
+  descriptionId: Accessor<string | undefined>;
+  errorMessageId: Accessor<string | undefined>;
+  generateId: (part: string) => string;
+  registerLabel: (id: string) => () => void;
+  registerField: (id: string) => () => void;
   registerDescription: (id: string) => () => void;
-  registerErrorMessage:(id: string) => () => void;
-  getAriaLabelledBy:   (fieldId: string | undefined, ariaLabel: string | undefined, ariaLabelledBy: string | undefined) => string | undefined;
-  getAriaDescribedBy:  (ariaDescribedBy: string | undefined) => string | undefined;
+  registerErrorMessage: (id: string) => () => void;
+  getAriaLabelledBy: (
+    fieldId: string | undefined,
+    ariaLabel: string | undefined,
+    ariaLabelledBy: string | undefined,
+  ) => string | undefined;
+  getAriaDescribedBy: (ariaDescribedBy: string | undefined) => string | undefined;
 };
 ```
 
