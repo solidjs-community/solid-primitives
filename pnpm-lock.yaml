@@ -17,6 +17,9 @@ importers:
       '@nothing-but/node-resolve-ts':
         specifier: ^1.0.1
         version: 1.0.1
+      '@solid-primitives/a11y':
+        specifier: workspace:*
+        version: link:packages/a11y
       '@solidjs/signals':
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14
@@ -107,6 +110,19 @@ importers:
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.15.31)(jsdom@25.0.1)(lightningcss@1.32.0)(sass@1.77.8)
+
+  packages/a11y:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
+      solid-js:
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
 
   packages/active-element:
     dependencies:
@@ -398,6 +414,25 @@ importers:
 
   packages/focus:
     dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
+      solid-js:
+        specifier: 2.0.0-beta.14
+        version: 2.0.0-beta.14
+
+  packages/form:
+    dependencies:
+      '@solid-primitives/a11y':
+        specifier: workspace:^
+        version: link:../a11y
       '@solid-primitives/event-listener':
         specifier: workspace:^
         version: link:../event-listener

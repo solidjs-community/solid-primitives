@@ -34,6 +34,7 @@
     "postinstall": "pnpm update-tsconfigs"
   },
   "devDependencies": {
+    "@solid-primitives/a11y": "workspace:*",
     "@babel/core": "^7.27.0",
     "@changesets/cli": "^2.29.4",
     "@nothing-but/node-resolve-ts": "^1.0.1",
