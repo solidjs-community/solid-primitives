@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-498_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/destructure)
 [![version](https://img.shields.io/npm/v/@solid-primitives/destructure?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/destructure)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitive for destructuring reactive objects _– like props or stores –_ or signals of them into a separate accessors updated individually.
 

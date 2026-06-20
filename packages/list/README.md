@@ -8,6 +8,7 @@
 [![size](https://img.shields.io/badge/size-774_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/list)
 [![version](https://img.shields.io/npm/v/@solid-primitives/list?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/list)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 A control-flow component and underlying helper for iterating over arrays. Provides additional `recycle` option. If enabled, the mapped elements are reused.
 `<List>` is based on `<For>` and has all of it's functionalities, but it can also recycle elements. The examples are interchangeable with `<For>`, wherever `recycle` is not used.

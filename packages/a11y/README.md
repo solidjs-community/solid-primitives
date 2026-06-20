@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/a11y?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/a11y)
 [![size](https://img.shields.io/npm/v/@solid-primitives/a11y?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/a11y)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive accessibility primitives. Programmatically announce changes to screen readers via ARIA live regions, track the user's `prefers-reduced-motion` preference as a reactive signal, and wire the ARIA ID graph that connects labels, descriptions, and error messages to form inputs — the foundation for accessible headless components.
 

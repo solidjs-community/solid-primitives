@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-569_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/broadcast-channel)
 [![version](https://img.shields.io/npm/v/@solid-primitives/broadcast-channel?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/broadcast-channel)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitive to manage [Broadcast Channel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API). The Broadcast Channel is a browser API that allows basic communication between [browsing contexts](https://developer.mozilla.org/en-US/docs/Glossary/Browsing_context) (that is, windows, tabs, frames, or iframes) on the same [origin](https://developer.mozilla.org/en-US/docs/Glossary/Origin).
 
