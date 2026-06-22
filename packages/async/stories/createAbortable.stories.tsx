@@ -12,10 +12,6 @@ const meta = preview.meta({
 
 export default meta;
 
-declare global {
-  class AbortError extends Error {}
-}
-
 export const AbortableWithAutoCleanup = meta.story({
   name: "createAbortable AutoSuggest",
   parameters: {
@@ -73,7 +69,7 @@ export const AbortableWithAutoCleanup = meta.story({
     return <Loading>
       <input 
         placeholder="type for autosuggest"
-        onChange={(ev) => { setQuery(ev.currentTarget.value)}}
+        onInput={(ev) => { setQuery(ev.currentTarget.value)}}
       />
       <ul>
         <For each={suggest()} fallback={<li>no suggestions found</li>}>

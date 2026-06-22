@@ -10,7 +10,7 @@
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 > [!TIP]
-> solid-js@>=2.0.0` no longer uses resources. You can find most of these helpers for the new version in the `@solid-primitives/async` package.
+> `solid-js@>=2.0.0` no longer uses resources. You can find most of these helpers for the new version in the `@solid-primitives/async` package.
 
 
 A collection of composable primitives to augment [`createResource`](https://www.solidjs.com/docs/latest/api#createresource)

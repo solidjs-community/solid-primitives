@@ -39,7 +39,7 @@ export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args:
   }
 }
 
-const endMatcher = /(?:\W)(t|tru?|f|fa|fals?|n|nul?)$/;
+const endMatcher = /(?:[,:]\s*)(t|tru?|f|fa|fals?|n|nul?)$/;
 const endLiterals: Record<string, string> = {
   t: "rue", tr: "ue", tru: "e", 
   f: "alse", fa: "lse", fal: "se", fals: "e",
@@ -60,10 +60,10 @@ const closeJSONPart = (json: string) =>
  * **aggregates web stream chunks into a memo supporting partial JSON**
  * ```ts
  * // from Response:
- * const streamed = createMemo(fromStream(() => fetch(url())));
+ * const streamed = createMemo(fromJSONStream(() => fetch(url())));
  *
  * // from another ReadableStream:
- * const streamed = createMemo(fromStream(() => getStream()));
+ * const streamed = createMemo(fromJSONStream(() => getStream()));
  * ```
  */
 export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream) {

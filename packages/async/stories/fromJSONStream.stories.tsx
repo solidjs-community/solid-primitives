@@ -30,7 +30,7 @@ export const FromJSONStream = meta.story({
         const sliceLength = Math.ceil(source.length / 16);
         const parts = Array.from(
           { length: packetCount },
-          (_, idx) => source.slice(idx * sliceLength, (idx + 1) * sliceLength - 1)
+          (_, idx) => source.slice(idx * sliceLength, (idx + 1) * sliceLength)
         );
         const encoder = new TextEncoder();
         for (const part of parts) {

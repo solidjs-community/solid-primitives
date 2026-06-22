@@ -165,7 +165,6 @@ describe("makeRetrying", () => {
     const fetcher = (_prev: unknown) => responses.shift() || Promise.resolve(true);
     const wrapped = makeRetrying(fetcher, { delay: 15 });
     const result = wrapped()[Symbol.asyncIterator]().next();
-    console.log(result)
     await expect(result).rejects.toThrow();
   });
 });

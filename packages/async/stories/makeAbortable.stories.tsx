@@ -74,7 +74,7 @@ export const Abortable = meta.story({
     return <Loading>
       <input 
         placeholder="type for autosuggest"
-        onChange={(ev) => { setQuery(ev.currentTarget.value)}}
+        onInput={(ev) => { setQuery(ev.currentTarget.value)}}
       />
       <ul>
         <For each={suggest()} fallback={<li>no suggestions found</li>}>
