@@ -317,7 +317,12 @@ export function makeInteractOutside<T extends Element>(
   if (isServer) return noop;
 
   let clickHandler: () => void = noop;
-  const ownerDoc = el.ownerDocument;
+
+  // el.ownerDocument may be an about:blank document at ref-apply time if the element was
+  // created by a renderer whose `document` global resolved before the real document was ready
+  // (e.g. Vite pre-bundled deps in Storybook iframes). Reading el.ownerDocument inside the
+  // setTimeout ensures we get the document after the element has been adopted into the real DOM.
+  let ownerDoc: Document = el.ownerDocument;
 
   const isEventOutside = (e: Event): boolean => {
     const target = e.target as Element | null;
@@ -379,13 +384,15 @@ export function makeInteractOutside<T extends Element>(
     );
   };
 
-  // Delay pointerdown registration to avoid triggering on the event that caused this mount.
+  // Delay listener registration to:
+  // 1. Avoid triggering on the event that caused this mount.
+  // 2. Re-read el.ownerDocument after the element has been adopted into the real DOM
+  //    (it may have been created in an about:blank context by a pre-bundled renderer).
   const pointerDownTimeoutId = window.setTimeout(() => {
-    console.log("[makeInteractOutside] adding pointerdown listener to", ownerDoc);
+    ownerDoc = el.ownerDocument;
     ownerDoc.addEventListener("pointerdown", onPointerDown, true);
+    ownerDoc.addEventListener("focusin", onFocusIn, true);
   }, 0);
-
-  ownerDoc.addEventListener("focusin", onFocusIn, true);
 
   return () => {
     window.clearTimeout(pointerDownTimeoutId);
@@ -420,11 +427,8 @@ export function makeInteractOutside<T extends Element>(
 export function interactOutside(options: MakeInteractOutsideOptions): (el: Element) => void {
   let cleanup: (() => void) | undefined;
   onCleanup(() => cleanup?.());
-  console.log("[interactOutside] factory created");
   return el => {
-    console.log("[interactOutside] ref callback called with el:", el);
     cleanup = makeInteractOutside(el, options);
-    console.log("[interactOutside] makeInteractOutside registered");
   };
 }
 
