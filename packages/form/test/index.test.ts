@@ -1829,27 +1829,25 @@ describe("createFormResetListener", () => {
     form2.appendChild(div2);
     const handler = vi.fn();
 
+    const [el, setEl] = createSignal<HTMLElement>(div1, { ownedWrite: true });
+
     const dispose = createRoot(d => {
-      const [el, setEl] = createSignal<HTMLElement>(div1);
       createFormResetListener(el, handler);
-
-      flush();
-      form1.dispatchEvent(new Event("reset"));
-      expect(handler).toHaveBeenCalledTimes(1);
-
-      setEl(div2);
-      flush();
-
-      // old form no longer triggers handler
-      form1.dispatchEvent(new Event("reset"));
-      expect(handler).toHaveBeenCalledTimes(1);
-
-      // new form does
-      form2.dispatchEvent(new Event("reset"));
-      expect(handler).toHaveBeenCalledTimes(2);
-
       return d;
     });
+
+    flush();
+    form1.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    setEl(div2);
+    flush();
+
+    form1.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    form2.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(2);
 
     dispose();
     cleanup(form1);
@@ -1862,22 +1860,22 @@ describe("createFormResetListener", () => {
     form.appendChild(div);
     const handler = vi.fn();
 
+    const [el, setEl] = createSignal<HTMLElement | null>(div, { ownedWrite: true });
+
     const dispose = createRoot(d => {
-      const [el, setEl] = createSignal<HTMLElement | null>(div);
       createFormResetListener(el, handler);
-
-      flush();
-      form.dispatchEvent(new Event("reset"));
-      expect(handler).toHaveBeenCalledTimes(1);
-
-      setEl(null);
-      flush();
-
-      form.dispatchEvent(new Event("reset"));
-      expect(handler).toHaveBeenCalledTimes(1);
-
       return d;
     });
+
+    flush();
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    setEl(null);
+    flush();
+
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
 
     dispose();
     cleanup(form);
