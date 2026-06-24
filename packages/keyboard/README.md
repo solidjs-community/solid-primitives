@@ -18,6 +18,7 @@ A library of reactive primitives for handling user keyboard input.
 - [`useKeyDownSequence`](#usekeydownsequence) — Provides a signal with a sequence of currently held keys, as they were pressed down and up.
 - [`createKeyHold`](#createkeyhold) — Provides a signal indicating if provided key is currently being held down.
 - [`createShortcut`](#createshortcut) — Creates a keyboard shortcut observer.
+- [`createKeyDown`](#createkeydown) — Listens for a keydown event for a specific key on a document.
 
 ## Installation
 
@@ -173,6 +174,32 @@ createShortcut(
 When `preventDefault` is `true`, `e.preventDefault()` will be called not only on the keydown event that has triggered the callback, but it will **optimistically** also prevent the default behavior of every previous keydown that will have the possibility to lead to the shortcut being pressed.
 
 E.g. when listening for `Control + Shift + A`, all three keydown events will be prevented.
+
+## `createKeyDown`
+
+Listens for a `keydown` event for a specific key on a document. Useful for global keyboard handlers that need to respond to a single key without setting up a full shortcut.
+
+### How to use it
+
+`createKeyDown` takes three arguments:
+
+- `key` — the key to listen for (matched against `event.key`)
+- `callback` — handler called when the key is pressed, receives the `KeyboardEvent`
+- `options` — additional configuration:
+  - `disabled` — a `boolean` or accessor; when `true` the listener is inactive. Reactive — the listener is added/removed as the value changes.
+  - `ownerDocument` — accessor returning the `Document` to attach the listener to. Defaults to `window.document`. Useful for iframes and portals.
+
+```tsx
+import { createKeyDown } from "@solid-primitives/keyboard";
+
+createKeyDown("Escape", e => close());
+
+// with options
+createKeyDown("Escape", e => close(), {
+  disabled: () => !isOpen(),
+  ownerDocument: () => iframeEl.contentDocument ?? document,
+});
+```
 
 ## Changelog
 

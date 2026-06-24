@@ -1,7 +1,7 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSingletonRoot } from "@solid-primitives/rootless";
-import { arrayEquals, INTERNAL_OPTIONS } from "@solid-primitives/utils";
-import { type Accessor, createMemo, createSignal, untrack } from "solid-js";
+import { arrayEquals, INTERNAL_OPTIONS, type MaybeAccessor, access } from "@solid-primitives/utils";
+import { type Accessor, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";
@@ -379,4 +379,49 @@ export function createShortcut(
   makeEventListener(window, "contextmenu", (e: MouseEvent) => {
     e.defaultPrevented || resetAll();
   });
+}
+
+export interface CreateKeyDownOptions {
+  /** Whether the listener should be inactive. */
+  disabled?: MaybeAccessor<boolean | undefined>;
+  /** The document to attach the listener to. Defaults to `window.document`. Useful for iframes. */
+  ownerDocument?: Accessor<Document | undefined>;
+}
+
+/**
+ * Listens for a keydown event for a specific key on a document.
+ * Supports a custom `ownerDocument` for use in iframes and portals.
+ *
+ * @param key The key to listen for (matched against `event.key`).
+ * @param callback Handler called when the key is pressed.
+ * @param options `disabled` and `ownerDocument` accessors.
+ *
+ * @example
+ * ```ts
+ * createKeyDown("Escape", e => close(), {
+ *   ownerDocument: () => iframeEl.contentDocument ?? document,
+ * });
+ * ```
+ */
+export function createKeyDown(
+  key: KbdKey,
+  callback: (event: KeyboardEvent) => void,
+  options?: CreateKeyDownOptions,
+): void {
+  if (isServer) return;
+
+  createEffect(
+    () => ({
+      disabled: !!access(options?.disabled),
+      document: options?.ownerDocument?.() ?? window.document,
+    }),
+    ({ disabled, document }: { disabled: boolean; document: Document }) => {
+      if (disabled) return;
+      const handler = (e: KeyboardEvent) => {
+        if (e.key === key) callback(e);
+      };
+      document.addEventListener("keydown", handler);
+      return () => document.removeEventListener("keydown", handler);
+    },
+  );
 }
