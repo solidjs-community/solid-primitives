@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { createRoot, flush } from "solid-js";
-import { createForm, toFormData } from "../src/index.js";
+import { createRoot, createSignal, flush } from "solid-js";
+import { createForm, createFormResetListener, toFormData } from "../src/index.js";
 
 // ─── Inline validators used across tests ──────────────────────────────────────
 
@@ -1654,5 +1654,232 @@ describe("form ref", () => {
     await new Promise(r => setTimeout(r, 0));
     expect(onSubmit).toHaveBeenCalledWith({ name: "Alice" });
     dispose();
+  });
+});
+
+// ─── createFormResetListener ──────────────────────────────────────────────────
+
+describe("createFormResetListener", () => {
+  const makeForm = () => {
+    const form = document.createElement("form");
+    document.body.appendChild(form);
+    return form;
+  };
+
+  const cleanup = (form: HTMLFormElement) => {
+    document.body.removeChild(form);
+  };
+
+  it("calls handler when the parent form is reset", () => {
+    const form = makeForm();
+    const div = document.createElement("div");
+    form.appendChild(div);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => div, handler);
+      return d;
+    });
+
+    flush();
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    dispose();
+    cleanup(form);
+  });
+
+  it("calls handler multiple times on repeated resets", () => {
+    const form = makeForm();
+    const div = document.createElement("div");
+    form.appendChild(div);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => div, handler);
+      return d;
+    });
+
+    flush();
+    form.dispatchEvent(new Event("reset"));
+    form.dispatchEvent(new Event("reset"));
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(3);
+
+    dispose();
+    cleanup(form);
+  });
+
+  it("uses the .form property for native form elements (input)", () => {
+    const form = makeForm();
+    const input = document.createElement("input");
+    form.appendChild(input);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => input, handler);
+      return d;
+    });
+
+    flush();
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    dispose();
+    cleanup(form);
+  });
+
+  it("uses the .form property for select elements", () => {
+    const form = makeForm();
+    const select = document.createElement("select");
+    form.appendChild(select);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => select, handler);
+      return d;
+    });
+
+    flush();
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    dispose();
+    cleanup(form);
+  });
+
+  it("uses the .form property for textarea elements", () => {
+    const form = makeForm();
+    const textarea = document.createElement("textarea");
+    form.appendChild(textarea);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => textarea, handler);
+      return d;
+    });
+
+    flush();
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    dispose();
+    cleanup(form);
+  });
+
+  it("does not call handler when element is null", () => {
+    const form = makeForm();
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => null, handler);
+      return d;
+    });
+
+    flush();
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).not.toHaveBeenCalled();
+
+    dispose();
+    cleanup(form);
+  });
+
+  it("does not call handler when element has no parent form", () => {
+    const orphan = document.createElement("div");
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => orphan, handler);
+      return d;
+    });
+
+    flush();
+    // no form to dispatch on — just verify no throw and no call
+    expect(handler).not.toHaveBeenCalled();
+
+    dispose();
+  });
+
+  it("removes the listener when disposed", () => {
+    const form = makeForm();
+    const div = document.createElement("div");
+    form.appendChild(div);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      createFormResetListener(() => div, handler);
+      return d;
+    });
+
+    flush();
+    dispose();
+
+    form.dispatchEvent(new Event("reset"));
+    expect(handler).not.toHaveBeenCalled();
+
+    cleanup(form);
+  });
+
+  it("switches listener when the element signal changes", () => {
+    const form1 = makeForm();
+    const form2 = makeForm();
+    const div1 = document.createElement("div");
+    const div2 = document.createElement("div");
+    form1.appendChild(div1);
+    form2.appendChild(div2);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      const [el, setEl] = createSignal<HTMLElement>(div1);
+      createFormResetListener(el, handler);
+
+      flush();
+      form1.dispatchEvent(new Event("reset"));
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      setEl(div2);
+      flush();
+
+      // old form no longer triggers handler
+      form1.dispatchEvent(new Event("reset"));
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      // new form does
+      form2.dispatchEvent(new Event("reset"));
+      expect(handler).toHaveBeenCalledTimes(2);
+
+      return d;
+    });
+
+    dispose();
+    cleanup(form1);
+    cleanup(form2);
+  });
+
+  it("removes listener when element signal becomes null", () => {
+    const form = makeForm();
+    const div = document.createElement("div");
+    form.appendChild(div);
+    const handler = vi.fn();
+
+    const dispose = createRoot(d => {
+      const [el, setEl] = createSignal<HTMLElement | null>(div);
+      createFormResetListener(el, handler);
+
+      flush();
+      form.dispatchEvent(new Event("reset"));
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      setEl(null);
+      flush();
+
+      form.dispatchEvent(new Event("reset"));
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      return d;
+    });
+
+    dispose();
+    cleanup(form);
   });
 });
