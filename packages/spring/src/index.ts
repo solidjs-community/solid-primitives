@@ -214,7 +214,7 @@ export function makeSpring<T extends SpringTarget>(
     value_last = value_current;
     setSignal((value_current = new_value));
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (settled) {
       stopAnimation();
     } else {

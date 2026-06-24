@@ -48,7 +48,7 @@ export function makeNotification(
   const show = (): Notification | null => {
     if (Notification.permission !== "granted") {
       if (isDev)
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         console.warn(
           `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
         );
@@ -138,7 +138,7 @@ export function createNotification(
   const show = (): Notification | null => {
     if (Notification.permission !== "granted") {
       if (isDev)
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         console.warn(
           `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
         );

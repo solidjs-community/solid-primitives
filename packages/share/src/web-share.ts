@@ -20,13 +20,13 @@ import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 export const makeWebShare = () => {
   const share = (data: ShareData) => {
     // Some browsers do not support `WebShare`, so sharing failed.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!navigator.share) {
       return Promise.reject("your browser does not support web share.");
     }
 
     // Some browsers do not support `files` and `navigator.canShare`, so sharing failed.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (data.files && (!navigator.canShare || !navigator.canShare(data))) {
       return Promise.reject("your browser does not support share files.");
     }

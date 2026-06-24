@@ -48,6 +48,7 @@ describe("filterProps", () => {
       );
       flush();
       expect(captured).toEqual({ a: 1, c: 3 });
+      queueMicrotask(dispose);
     });
 
     setProps({ a: 1, b: 2, c: 3, d: 4, e: 5 });
@@ -119,6 +120,7 @@ describe("filterProps + createPropsPredicate", () => {
       expect(captured).toEqual({ a: 1, c: 3 });
       expect(checked).toEqual(["a", "b", "c"]);
       checked.length = 0;
+      queueMicrotask(dispose);
     });
 
     setProps({ a: 1, b: 2, c: 3, d: 4, e: 5 });
@@ -173,6 +175,7 @@ describe("partitionProps", () => {
       flush();
       expect(capturedMatched).toEqual({ a: 1, c: 3 });
       expect(capturedRest).toEqual({ b: 2 });
+      queueMicrotask(dispose);
     });
 
     setProps({ a: 10, b: 20, c: 30, d: 40 });

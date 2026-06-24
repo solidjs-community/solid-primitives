@@ -126,13 +126,13 @@ describe("makePersisted", () => {
   
   it("only updates the leaves in initialization", async () => {
     mockAsyncStorage.setItem("test4a", JSON.stringify({ a: { b: { c: 1 } } }));
-    let triggered = { a: 0, b: 0, c: 0 };
+    const triggered = { a: 0, b: 0, c: 0 };
     await createRoot(async (dispose) => {
       const [state, setState] = createStore({ a: { b: { c: 0 } } });
       createEffect(() => state.a, (_) => { triggered.a++; });
       createEffect(() => state.a.b, (_) => { triggered.b++; });
       createEffect(() => state.a.b.c, (_) => { triggered.c++; });
-      const [store, setStore, init] = makePersisted(
+      const [store, _setStore] = makePersisted(
         [state, setState],
         { storage: mockAsyncStorage, name: "test4a" }
       );

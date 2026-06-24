@@ -14,7 +14,7 @@ type PackageData = {
   "Solid 2": string;
 };
 
-// eslint-disable-next-line no-console
+// oxlint-disable-next-line no-console
 console.log("updateReadme", "Updating README documentation");
 
 const githubURL = "https://github.com/solidjs-community/solid-primitives/tree/main/packages/";

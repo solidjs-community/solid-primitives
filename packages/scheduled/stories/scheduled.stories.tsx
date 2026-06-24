@@ -8,7 +8,7 @@ import {
   createScheduled,
 } from "@solid-primitives/scheduled";
 import readme from "../README.md?raw";
-import { StatRow, EventLog, Button as Btn, Container } from "../../../.storybook/ui/index.js";
+import { StatRow, Button as Btn, Container } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Utilities/Scheduled",

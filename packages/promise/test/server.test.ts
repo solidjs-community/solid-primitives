@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { until, changed, promiseTimeout, raceTimeout } from "../src/index.js";
 
 describe("SSR", () => {

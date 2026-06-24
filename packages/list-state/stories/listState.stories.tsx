@@ -222,6 +222,7 @@ export const MultiSelect = meta.story({
   },
 });
 
+// oxlint-disable-next-line no-unused-vars
 const ORIENTATIONS = ["vertical", "horizontal"] as const;
 
 export const HorizontalList = meta.story({

@@ -122,6 +122,7 @@ export const makeReconnectingWS = (
   protocols?: string | string[],
   options: WSReconnectOptions = {},
 ) => {
+  // oxlint-disable-next-line no-unused-vars
   let retries = options.retries || Infinity;
   let ws: ReconnectingWebSocket;
   const queue: WSMessage[] = [];
@@ -131,7 +132,7 @@ export const makeReconnectingWS = (
   let events: Parameters<WebSocket["addEventListener"]>[] = [["close", onClose]];
   const getWS = () => {
     ws?.removeEventListener("close", onClose);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (ws && ws.readyState < 2) ws.close();
     ws = Object.assign(makeWS(url, protocols, queue), {
       reconnect: getWS,

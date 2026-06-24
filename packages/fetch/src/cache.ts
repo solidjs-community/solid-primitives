@@ -84,7 +84,7 @@ export const withCache: RequestModifier =
       } catch (e) {
         !isServer &&
           DEV &&
-          // eslint-disable-next-line no-console
+          // oxlint-disable-next-line no-console
           console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
       }
     };
@@ -136,7 +136,7 @@ export const withCacheStorage: RequestModifier =
     } catch (e) {
       !isServer &&
         DEV &&
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         console.warn("attempt to parse stored request cache failed with error", e);
     }
     const originalWriteCache = requestContext.writeCache;
@@ -145,7 +145,7 @@ export const withCacheStorage: RequestModifier =
       try {
         storage.setItem(key, JSON.stringify(requestContext.cache));
       } catch (e) {
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         !isServer && DEV && console.warn("attempt to store request cache failed with error", e);
       }
     };
