@@ -1,0 +1,77 @@
+{
+  "name": "@solid-primitives/animation",
+  "version": "0.0.1",
+  "description": "SolidJS primitives for the Web Animations API (WAAPI) — reactive wrappers for element.animate, scroll timelines, view timelines, FLIP, stagger, and animation groups.",
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/animation",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "animation",
+    "stage": 0,
+    "list": [
+      "makeAnimate",
+      "createAnimate",
+      "makeScrollAnimation",
+      "createScrollAnimation",
+      "makeViewAnimation",
+      "createViewAnimation",
+      "makeFlip",
+      "makeStagger",
+      "createStagger",
+      "makeAnimationGroup",
+      "createAnimationGroup",
+      "makeMotionPath",
+      "createMotionPath",
+      "makeSequence"
+    ],
+    "category": "Animation"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "keywords": [
+    "animation",
+    "animate",
+    "waapi",
+    "web-animations",
+    "scroll-timeline",
+    "view-timeline",
+    "flip",
+    "stagger",
+    "solid",
+    "solidjs"
+  ],
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "solid-js": "^2.0.0-beta.15"
+  },
+  "typesVersions": {},
+  "devDependencies": {
+    "solid-js": "2.0.0-beta.15"
+  }
+}
