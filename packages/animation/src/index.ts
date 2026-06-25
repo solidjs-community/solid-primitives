@@ -6,3 +6,4 @@ export * from "./stagger.js";
 export * from "./animation-group.js";
 export * from "./motion-path.js";
 export * from "./sequence.js";
+export * from "./presence-animation.js";

@@ -32,6 +32,7 @@ pnpm add @solid-primitives/animation
 | [`createStagger`](#makestagger--createstagger) | Reactive `makeStagger` |
 | [`makeAnimationGroup`](#makeanimationgroup--createanimationgroup) | Coordinate multiple animations as a unit |
 | [`createAnimationGroup`](#makeanimationgroup--createanimationgroup) | Reactive `makeAnimationGroup` |
+| [`createPresenceAnimation`](#createpresenceanimation) | Mount/unmount lifecycle with WAAPI enter/exit animations |
 
 ---
 
@@ -283,6 +284,63 @@ function makeAnimationGroup(
 function createAnimationGroup(
   animations: Accessor<(Animation | null | undefined)[]>,
 ): AnimationGroupControls
+```
+
+---
+
+## `createPresenceAnimation`
+
+Manages mount/unmount lifecycle with WAAPI enter and exit animations. Pass a `target` ref accessor, a `show` signal, and enter/exit keyframes. The returned `isMounted` accessor should gate the element's presence in the DOM — the element stays mounted until its exit animation finishes.
+
+Exit keyframes default to the enter keyframes reversed. If `show` toggles back to `true` while an exit is in progress, the exit is cancelled and the enter restarts.
+
+```tsx
+const [show, setShow] = createSignal(false);
+let el!: HTMLDivElement;
+
+const { isMounted } = createPresenceAnimation(() => el, show, {
+  enter: [
+    { opacity: 0, transform: "translateY(8px)" },
+    { opacity: 1, transform: "none" },
+  ],
+  enterOptions: { duration: 250, easing: "ease-out" },
+  // exit defaults to reversed enter — fade out and slide down
+});
+
+return (
+  <>
+    <button onClick={() => setShow(v => !v)}>Toggle</button>
+    <Show when={isMounted()}>
+      <div ref={el}>Hello</div>
+    </Show>
+  </>
+);
+```
+
+```tsx
+// Separate enter and exit keyframes + options
+const { isMounted } = createPresenceAnimation(() => el, show, {
+  enter: [{ opacity: 0, transform: "scale(0.95)" }, { opacity: 1, transform: "none" }],
+  exit:  [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(0.95)" }],
+  enterOptions: { duration: 200, easing: "ease-out" },
+  exitOptions:  { duration: 150, easing: "ease-in" },
+});
+```
+
+```ts
+type PresenceAnimationOptions = {
+  enter: Keyframe[] | PropertyIndexedKeyframes | null;
+  exit?: Keyframe[] | PropertyIndexedKeyframes | null;  // defaults to reversed enter
+  enterOptions?: KeyframeAnimationOptions;
+  exitOptions?: KeyframeAnimationOptions;               // defaults to enterOptions
+  initialEnter?: boolean;                               // animate on first mount (default: false)
+};
+
+function createPresenceAnimation(
+  target: Accessor<HTMLElement | null | undefined>,
+  show: MaybeAccessor<boolean>,
+  options: PresenceAnimationOptions,
+): { isMounted: Accessor<boolean> }
 ```
 
 ---

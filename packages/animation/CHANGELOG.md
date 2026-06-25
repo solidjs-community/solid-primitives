@@ -7,4 +7,4 @@
 - Initial release. WAAPI-based animation primitives for SolidJS: `makeAnimate`, `createAnimate`,
   `makeScrollAnimation`, `createScrollAnimation`, `makeViewAnimation`, `createViewAnimation`,
   `makeFlip`, `makeStagger`, `createStagger`, `makeAnimationGroup`, `createAnimationGroup`,
-  `makeMotionPath`, `createMotionPath`, `makeSequence`.
+  `makeMotionPath`, `createMotionPath`, `makeSequence`, `createPresenceAnimation`.

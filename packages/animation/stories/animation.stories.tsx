@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onSettled } from "solid-js";
+import { createEffect, createSignal, For, onSettled, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
   createAnimate,
@@ -10,6 +10,7 @@ import {
   makeAnimate,
   makeMotionPath,
   makeSequence,
+  createPresenceAnimation,
 } from "@solid-primitives/animation";
 import readme from "../README.md?raw";
 import { Button, ButtonRow, Container, Section, StatRow } from "../../../.storybook/ui/index.js";
@@ -703,6 +704,384 @@ export const Sequence = meta.story({
           <Button onClick={() => seq.play()}>Play sequence</Button>
           <Button onClick={() => seq.cancel()} variant="outline">Cancel</Button>
         </ButtonRow>
+      </Container>
+    );
+  },
+});
+
+
+const TOAST_PRESETS = [
+  { title: "Changes saved", body: "Your edits have been saved successfully.", color: "#10b981", icon: "✓" },
+  { title: "Upload failed", body: "The file could not be uploaded. Please try again.", color: "#f43f5e", icon: "✕" },
+  { title: "Invite sent", body: "An invitation was sent to the address on file.", color: "#6366f1", icon: "→" },
+  { title: "Low storage", body: "You are approaching your storage limit.", color: "#f59e0b", icon: "!" },
+] as const;
+
+export const PresenceToasts = meta.story({
+  name: "Dismissible toast notifications",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Each toast is independently controlled by a `createPresenceAnimation` instance. " +
+          "Clicking × sets that toast's `show` signal to false — the exit animation plays and the DOM " +
+          "node is removed only after it completes. All toasts can exit simultaneously.",
+      },
+    },
+  },
+  render: () => {
+    type ToastEntry = {
+      id: number;
+      title: string;
+      body: string;
+      color: string;
+      icon: string;
+      show: () => boolean;
+      dismiss: () => void;
+    };
+
+    const [toasts, setToasts] = createSignal<ToastEntry[]>([]);
+    let nextId = 0;
+    let presetCursor = 0;
+
+    const removeToast = (id: number) => setToasts(prev => prev.filter(t => t.id !== id));
+
+    const addToast = () => {
+      const preset = TOAST_PRESETS[presetCursor++ % TOAST_PRESETS.length]!;
+      const id = nextId++;
+      const [show, setShow] = createSignal(true);
+      setToasts(prev => [...prev, { id, ...preset, show, dismiss: () => setShow(false) }]);
+    };
+
+    return (
+      <Container width={360}>
+        <h3 style={{ margin: 0 }}>createPresenceAnimation</h3>
+
+        <ButtonRow>
+          <Button onClick={addToast}>Add toast</Button>
+          <Button onClick={() => toasts().forEach(t => t.dismiss())} variant="outline">
+            Dismiss all
+          </Button>
+        </ButtonRow>
+
+        <div style={{ position: "relative", "min-height": "240px" }}>
+          <div
+            style={{
+              position: "absolute",
+              bottom: "0",
+              left: "0",
+              right: "0",
+              display: "flex",
+              "flex-direction": "column",
+              gap: "0.5rem",
+            }}
+          >
+            <For each={toasts()}>
+              {toast => {
+                let el!: HTMLDivElement;
+
+                const { isMounted } = createPresenceAnimation(() => el, toast.show, {
+                  enter: [
+                    { opacity: 0, transform: "translateX(110%) scale(0.92)" },
+                    { opacity: 1, transform: "none" },
+                  ],
+                  exit: [
+                    { opacity: 1, transform: "none" },
+                    { opacity: 0, transform: "translateX(110%) scale(0.95)" },
+                  ],
+                  enterOptions: { duration: 400, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "both" },
+                  exitOptions:  { duration: 240, easing: "ease-in", fill: "forwards" },
+                  initialEnter: true,
+                });
+
+                createEffect(
+                  () => isMounted(),
+                  mounted => { if (!mounted) removeToast(toast.id); },
+                  { defer: true },
+                );
+
+                return (
+                  <Show when={isMounted()}>
+                    <div
+                      ref={el}
+                      style={{
+                        display: "flex",
+                        "align-items": "flex-start",
+                        gap: "0.75rem",
+                        padding: "0.85rem 1rem",
+                        background: "white",
+                        "border-radius": "10px",
+                        "box-shadow": "0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)",
+                        "border-left": `4px solid ${toast.color}`,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "24px",
+                          height: "24px",
+                          "border-radius": "50%",
+                          background: toast.color,
+                          color: "white",
+                          display: "flex",
+                          "align-items": "center",
+                          "justify-content": "center",
+                          "font-size": "0.75rem",
+                          "font-weight": "700",
+                          "flex-shrink": "0",
+                        }}
+                      >
+                        {toast.icon}
+                      </div>
+                      <div style={{ flex: "1", "min-width": "0" }}>
+                        <div style={{ "font-weight": "600", "font-size": "0.875rem", color: "#0f172a", "margin-bottom": "0.15rem" }}>
+                          {toast.title}
+                        </div>
+                        <div style={{ "font-size": "0.8rem", color: "#64748b", "line-height": "1.45" }}>
+                          {toast.body}
+                        </div>
+                      </div>
+                      <button
+                        onClick={toast.dismiss}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#94a3b8",
+                          cursor: "pointer",
+                          padding: "0",
+                          "font-size": "1.1rem",
+                          "line-height": "1",
+                          "flex-shrink": "0",
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </Show>
+                );
+              }}
+            </For>
+          </div>
+        </div>
+      </Container>
+    );
+  },
+});
+
+
+const MODAL_CARDS = [
+  { title: "Save changes?", body: "Your unsaved edits will be lost if you close without saving.", confirm: "Save", color: "#6366f1" },
+  { title: "Delete item?", body: "This action cannot be undone. The item will be permanently removed.", confirm: "Delete", color: "#f43f5e" },
+  { title: "Send invite?", body: "An email invitation will be sent to the address you entered.", confirm: "Send", color: "#10b981" },
+] as const;
+
+export const PresenceModal = meta.story({
+  name: "Animate a modal dialog",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A backdrop + modal pair, each with independent `createPresenceAnimation` instances. " +
+          "The modal scales and fades in while the backdrop fades — both exit fully before the DOM is cleaned up.",
+      },
+    },
+  },
+  render: () => {
+    const [cardIndex, setCardIndex] = createSignal(0);
+    const [show, setShow] = createSignal(false);
+    let backdropEl!: HTMLDivElement;
+    let modalEl!: HTMLDivElement;
+
+    const { isMounted: backdropMounted } = createPresenceAnimation(
+      () => backdropEl,
+      show,
+      {
+        enter: [{ opacity: 0 }, { opacity: 1 }],
+        enterOptions: { duration: 200, easing: "ease-out", fill: "both" },
+        exitOptions:  { duration: 180, easing: "ease-in",  fill: "forwards" },
+      },
+    );
+
+    const { isMounted: modalMounted } = createPresenceAnimation(
+      () => modalEl,
+      show,
+      {
+        enter: [
+          { opacity: 0, transform: "scale(0.88) translateY(16px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        exit: [
+          { opacity: 1, transform: "none" },
+          { opacity: 0, transform: "scale(0.92) translateY(8px)" },
+        ],
+        enterOptions: { duration: 320, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "both" },
+        exitOptions:  { duration: 180, easing: "ease-in", fill: "forwards" },
+      },
+    );
+
+    const card = () => MODAL_CARDS[cardIndex()];
+
+    return (
+      <Container width={360}>
+        <h3 style={{ margin: 0 }}>createPresenceAnimation</h3>
+
+        <Section title="Open a dialog">
+          <ButtonRow>
+            <For each={[...MODAL_CARDS]}>
+              {(c, i) => (
+                <Button
+                  onClick={() => { setCardIndex(i()); setShow(true); }}
+                  variant={cardIndex() === i() ? "primary" : "outline"}
+                >
+                  {c.title.split(" ")[0]}
+                </Button>
+              )}
+            </For>
+          </ButtonRow>
+        </Section>
+
+        {/* Backdrop + modal share one Show so the modal never needs transform-based centering */}
+        <Show when={backdropMounted()}>
+          <div
+            ref={backdropEl}
+            onClick={() => setShow(false)}
+            style={{
+              position: "fixed",
+              inset: "0",
+              background: "rgba(0,0,0,0.4)",
+              display: "flex",
+              "align-items": "center",
+              "justify-content": "center",
+              "z-index": "50",
+            }}
+          >
+            <Show when={modalMounted()}>
+              <div
+                ref={modalEl}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  width: "300px",
+                  background: "white",
+                  "border-radius": "14px",
+                  padding: "1.5rem",
+                  "box-shadow": "0 20px 60px rgba(0,0,0,0.25)",
+                  "z-index": "51",
+                  display: "flex",
+                  "flex-direction": "column",
+                  gap: "0.75rem",
+                }}
+              >
+                <h4 style={{ margin: 0, color: "#0f172a" }}>{card().title}</h4>
+                <p style={{ margin: 0, color: "#64748b", "font-size": "0.875rem", "line-height": "1.5" }}>
+                  {card().body}
+                </p>
+                <ButtonRow>
+                  <Button
+                    onClick={() => setShow(false)}
+                    style={{ background: card().color }}
+                  >
+                    {card().confirm}
+                  </Button>
+                  <Button onClick={() => setShow(false)} variant="outline">
+                    Cancel
+                  </Button>
+                </ButtonRow>
+              </div>
+            </Show>
+          </div>
+        </Show>
+      </Container>
+    );
+  },
+});
+
+
+const TABS = [
+  { label: "Profile", color: "#6366f1", body: "Manage your name, avatar, and contact details." },
+  { label: "Security", color: "#f43f5e", body: "Update your password and two-factor authentication settings." },
+  { label: "Billing", color: "#10b981", body: "View invoices, update your payment method, or cancel your plan." },
+] as const;
+
+export const PresenceTabs = meta.story({
+  name: "Crossfade between tab panels",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Each tab panel is a separate `createPresenceAnimation` instance keyed to whether it is active. " +
+          "Switching tabs plays the outgoing panel's exit animation before removing it, then plays the " +
+          "incoming panel's enter animation.",
+      },
+    },
+  },
+  render: () => {
+    const [active, setActive] = createSignal(0);
+
+    return (
+      <Container width={340}>
+        <h3 style={{ margin: 0 }}>createPresenceAnimation — tabs</h3>
+
+        <div style={{ display: "flex", gap: "0.4rem" }}>
+          <For each={[...TABS]}>
+            {(tab, i) => (
+              <button
+                onClick={() => setActive(i())}
+                style={{
+                  flex: "1",
+                  padding: "0.5rem",
+                  background: active() === i() ? tab.color : "#f1f5f9",
+                  color: active() === i() ? "white" : "#64748b",
+                  border: "none",
+                  "border-radius": "8px",
+                  "font-weight": "600",
+                  "font-size": "0.82rem",
+                  cursor: "pointer",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                {tab.label}
+              </button>
+            )}
+          </For>
+        </div>
+
+        <div style={{ position: "relative", "min-height": "80px" }}>
+          <For each={[...TABS]}>
+            {(tab, i) => {
+              let el!: HTMLDivElement;
+              const { isMounted } = createPresenceAnimation(
+                () => el,
+                () => active() === i(),
+                {
+                  enter: [{ opacity: 0, transform: "translateX(10px)" }, { opacity: 1, transform: "none" }],
+                  exit:  [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-10px)" }],
+                  enterOptions: { duration: 200, easing: "ease-out" },
+                  exitOptions:  { duration: 150, easing: "ease-in" },
+                },
+              );
+
+              return (
+                <Show when={isMounted()}>
+                  <div
+                    ref={el}
+                    style={{
+                      position: "absolute",
+                      inset: "0",
+                      padding: "1rem",
+                      background: tab.color,
+                      color: "white",
+                      "border-radius": "10px",
+                      "font-size": "0.9rem",
+                      "line-height": "1.5",
+                    }}
+                  >
+                    <strong>{tab.label}</strong> — {tab.body}
+                  </div>
+                </Show>
+              );
+            }}
+          </For>
+        </div>
       </Container>
     );
   },

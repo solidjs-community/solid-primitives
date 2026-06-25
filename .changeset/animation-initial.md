@@ -18,3 +18,4 @@ New package. Provides reactive and imperative wrappers for the [Web Animations A
 - `makeMotionPath(el, path, options?)` — animates an element along a CSS `offset-path` using WAAPI
 - `createMotionPath(target, path, options?)` — reactive `makeMotionPath`
 - `makeSequence(factories)` — chains animation factories into a sequential playlist; each factory is called lazily when its predecessor finishes
+- `createPresenceAnimation(target, show, options)` — manages mount/unmount lifecycle with WAAPI enter/exit animations; element stays mounted until its exit animation completes
