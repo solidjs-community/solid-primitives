@@ -47,11 +47,9 @@ function createPresenceBase(
     "enterDuration" in options ? options.enterDuration : options.transitionDuration,
   );
 
-  const initialSource = untrack(source);
-  const initialState = options.initialEnter ? false : initialSource;
-  const [isVisible, setIsVisible] = createSignal<boolean>(initialState, INTERNAL_OPTIONS);
-  const [isMounted, setIsMounted] = createSignal<boolean>(initialSource, INTERNAL_OPTIONS);
-  const [hasEntered, setHasEntered] = createSignal<boolean>(initialState, INTERNAL_OPTIONS);
+  const [isVisible, setIsVisible] = createSignal<boolean>((prev = !options.initialEnter) => source() ? prev : false, INTERNAL_OPTIONS);
+  const [isMounted, setIsMounted] = createSignal<boolean>(source, INTERNAL_OPTIONS);
+  const [hasEntered, setHasEntered] = createSignal<boolean>((prev = !options.initialEnter) => source() ? prev : false, INTERNAL_OPTIONS);
 
   const isExiting = createMemo(() => isMounted() && !source());
   const isEntering = createMemo(() => source() && !hasEntered());
@@ -60,11 +58,7 @@ function createPresenceBase(
   createEffect(
     () => source(),
     isActive => {
-      if (isActive) {
-        setIsMounted(true);
-      } else {
-        setHasEntered(false);
-        setIsVisible(false);
+      if (!isActive) {
         const timeoutId = setTimeout(() => setIsMounted(false), exitDuration());
         return () => clearTimeout(timeoutId);
       }
@@ -143,32 +137,21 @@ export function createPresence<TItem>(
   item: Accessor<TItem | undefined>,
   options: Options,
 ): PresenceResult<TItem> {
-  const initial = untrack(item);
-  const [mountedItem, setMountedItem] = createSignal<TItem | undefined>(initial as Exclude<TItem, Function>, INTERNAL_OPTIONS);
-  const [shouldBeMounted, setShouldBeMounted] = createSignal<boolean>(itemShouldBeMounted(initial), INTERNAL_OPTIONS);
-  const { isMounted, ...rest } = createPresenceBase(shouldBeMounted, options);
+  const mountedItem = createMemo<TItem | undefined>((prev) => {
+    if (prev !== item() && !isMounted() && itemShouldBeMounted(item())) {
+      return item()
+    }
+    return prev
+  });
 
-  createEffect(
-    () => ({
-      currentItem: item(),
-      mounted: mountedItem(),
-      isM: isMounted(),
-    }),
-    ({ currentItem, mounted, isM }) => {
-      if (mounted !== currentItem) {
-        if (isM) {
-          setShouldBeMounted(false);
-        } else if (itemShouldBeMounted(currentItem)) {
-          setMountedItem(currentItem as Exclude<TItem, Function>);
-          setShouldBeMounted(true);
-        }
-      } else if (!itemShouldBeMounted(currentItem)) {
-        setShouldBeMounted(false);
-      } else if (itemShouldBeMounted(currentItem)) {
-        setShouldBeMounted(true);
-      }
-    },
-  );
+  const shouldBeMounted = createMemo(() => {
+    if (mountedItem() !== item() && isMounted()) {
+      return false;
+    }
+    return itemShouldBeMounted(item())
+  });
+
+  const { isMounted, ...rest } = createPresenceBase(shouldBeMounted, options);
 
   return {
     ...rest,
