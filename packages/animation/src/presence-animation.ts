@@ -26,8 +26,14 @@ export type PresenceAnimationOptions = {
 function reverseKeyframes(
   kf: Keyframe[] | PropertyIndexedKeyframes | null,
 ): Keyframe[] | PropertyIndexedKeyframes | null {
-  if (!kf || !Array.isArray(kf)) return kf;
-  return [...kf].reverse();
+  if (!kf) return kf;
+  if (Array.isArray(kf)) return [...kf].reverse();
+  const reversed: PropertyIndexedKeyframes = {};
+  for (const key in kf) {
+    const val = (kf as Record<string, unknown>)[key];
+    reversed[key] = Array.isArray(val) ? [...val].reverse() : val;
+  }
+  return reversed;
 }
 
 /**
