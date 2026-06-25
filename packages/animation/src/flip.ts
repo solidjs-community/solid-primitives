@@ -22,11 +22,13 @@ export function makeFlip(
     flip() {
       if (!rect) return;
       const next = el.getBoundingClientRect();
-      const dx = rect.left - next.left;
-      const dy = rect.top - next.top;
-      const sx = rect.width / next.width;
-      const sy = rect.height / next.height;
+      const prev = rect;
       rect = undefined;
+      if (next.width === 0 || next.height === 0) return;
+      const dx = prev.left - next.left;
+      const dy = prev.top - next.top;
+      const sx = prev.width / next.width;
+      const sy = prev.height / next.height;
       if (dx === 0 && dy === 0 && sx === 1 && sy === 1) return;
       return el.animate(
         [
