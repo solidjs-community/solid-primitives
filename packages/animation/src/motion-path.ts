@@ -25,7 +25,7 @@ export function makeMotionPath(
   options?: MotionPathOptions,
 ): Animation {
   const { rotate = "auto", ...animOptions } = options ?? {};
-  el.style.offsetPath = path.startsWith("path(") ? path : `path("${path}")`;
+  el.style.offsetPath = path.includes("(") ? path : `path("${path}")`;
   el.style.offsetRotate = rotate;
   el.style.offsetAnchor = "center";
   return el.animate(
