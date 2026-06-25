@@ -1,5 +1,41 @@
 # @solid-primitives/fullscreen
 
+## 2.0.0-next.1
+
+### Major Changes
+
+- a25fa88: Migrate `@solid-primitives/fullscreen` to Solid.js 2.0 (beta.14).
+
+  **Breaking changes:**
+
+  - Peer dependency updated from `solid-js ^1.6.12` to `solid-js ^2.0.0-beta.14` and `@solidjs/web ^2.0.0-beta.14`.
+  - The `use:createFullscreen` JSX directive (Solid 1.x `use:` namespace) is removed. Use the new `fullscreen()` ref directive factory instead:
+
+    ```tsx
+    // Before (Solid 1.x)
+    <div use:createFullscreen={fs} />
+
+    // After (Solid 2.0)
+    <div ref={fullscreen(fs)} />
+    ```
+
+  **New exports:**
+
+  - `fullscreen(active?, options?)` — ref directive factory that wraps `createFullscreen` for direct use on JSX elements via the `ref` prop.
+
+  **Internal changes:**
+
+  - `isServer` now imported from `@solidjs/web` (was `solid-js/web`).
+  - `createEffect` updated to Solid 2.0 split compute/effect signature.
+  - Test mock fixed: `document.fullscreenElement` is now a dynamic getter reflecting current fullscreen state; `document.exitFullscreen` now dispatches `fullscreenchange` matching browser behaviour.
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+
 ## 2.0.0-beta.0
 
 ### Breaking Changes

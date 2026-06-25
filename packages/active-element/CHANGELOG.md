@@ -1,5 +1,31 @@
 # @solid-primitives/active-element
 
+## 3.0.0-next.0
+
+### Major Changes
+
+- 1e9a524: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `makeFocusListener` and `createFocusSignal` have moved to `@solid-primitives/focus`. Import them from there instead:
+    ```ts
+    // Before
+    import { makeFocusListener, createFocusSignal } from "@solid-primitives/active-element";
+    // After
+    import { makeFocusListener, createFocusSignal } from "@solid-primitives/focus";
+    ```
+  - `isServer` is now sourced from `@solidjs/web` internally (no user-facing API change)
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+
 ## 2.1.5
 
 ### Patch Changes

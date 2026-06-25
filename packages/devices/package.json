@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/devices",
-  "version": "2.0.0",
+  "version": "3.0.0-next.0",
   "description": "Reactive primitives for enumerating and filtering media input/output devices (microphones, speakers, cameras).",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [

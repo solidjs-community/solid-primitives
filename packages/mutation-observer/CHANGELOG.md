@@ -1,5 +1,28 @@
 # @solid-primitives/mutation-observer
 
+## 3.0.0-next.0
+
+### Major Changes
+
+- 975b175: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/mutation-observer`
+
+  - `onMount` replaced with `onSettled` — observation starts after the component fully settles (async-aware) rather than after initial synchronous render
+  - `isServer` now imported from `@solidjs/web`; `isSupported` returns `false` on the server without touching `window`
+  - `start()` is a no-op on the server, guarding against missing DOM globals in Node.js
+  - Added `test/server.test.ts` to verify safe SSR behavior
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 2.0.0
 
 ### Major Changes

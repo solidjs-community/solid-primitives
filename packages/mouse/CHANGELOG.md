@@ -1,5 +1,32 @@
 # @solid-primitives/mouse
 
+## 4.0.0-next.0
+
+### Major Changes
+
+- 4a930d0: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/mouse`
+
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `onMount` replaced by `onSettled` for post-render initialization
+  - `sharedConfig.context` replaced by `sharedConfig.hydrating` for hydration detection
+  - `createEffect` migrated to split compute/apply form — reactive target re-attachment now uses explicit cleanup return from the apply phase
+  - Added `test/server.test.ts` with SSR safety coverage for `createMousePosition` and `createPositionToElement`
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+  - @solid-primitives/rootless@2.0.0-next.0
+  - @solid-primitives/static-store@1.0.0-next.0
+
 ## 2.1.6
 
 ### Patch Changes

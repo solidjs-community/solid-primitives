@@ -1,5 +1,32 @@
 # @solid-primitives/resize-observer
 
+## 4.0.0-next.0
+
+### Major Changes
+
+- 68b803a: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/resize-observer`
+
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `createResizeObserver`: internal `createEffect` converted to the Solid 2.0 split compute/apply pattern
+  - `createElementSize`: internal `createEffect` converted to split compute/apply pattern; element cleanup (`unobserve`) is returned from apply phase instead of using `onCleanup`
+  - `createElementSize`: `sharedConfig.context` replaced with `sharedConfig.hydrating` for hydration detection
+  - `createStore` setter in consuming code now requires a function argument (Solid 2.0 store API change)
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+  - @solid-primitives/rootless@2.0.0-next.0
+  - @solid-primitives/static-store@1.0.0-next.0
+
 ## 2.1.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/gestures",
-  "version": "2.0.0",
+  "version": "3.0.0-next.0",
   "description": "Ref factories to react to gestures",
   "author": "Moshe Uminer",
   "license": "MIT",

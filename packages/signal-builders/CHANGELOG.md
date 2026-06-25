@@ -1,5 +1,24 @@
 # @solid-primitives/signal-builders
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- 1d6c9d3: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
+
+  - The `on` helper from `solid-js` (used internally by `capitalize`) is removed in Solid 2.0; `capitalize` now uses a plain `createMemo` which is equivalent
+  - `get` and `merge` now correctly return reactive `Accessor<T>` values via `createMemo` — previously they returned plain (non-reactive) values despite their type signatures claiming otherwise; any code that was working around this bug by calling the result as a plain value will break
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 0.2.3
 
 ### Patch Changes

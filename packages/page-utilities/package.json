@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/page-utilities",
-  "version": "2.1.5",
+  "version": "3.0.0-next.0",
   "description": "Primitives for page visibility and navigation blocking",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [

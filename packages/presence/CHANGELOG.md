@@ -1,5 +1,27 @@
 # @solid-primitives/presence
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- 2ea3768: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
+
+  ### `@solid-primitives/presence`
+
+  - `createEffect` calls converted to the split compute/apply pattern required by Solid 2.0; cleanup is returned from the apply phase instead of calling `onCleanup`
+  - Internal signals now use `{ ownedWrite: true }` to allow writes from the effect apply phases
+  - No changes to the public `createPresence` API or `PresenceResult` type
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 0.1.3
 
 ### Patch Changes

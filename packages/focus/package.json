@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/focus",
-  "version": "0.2.0",
+  "version": "1.0.0-next.0",
   "description": "Primitives for autofocusing HTML elements and trapping focus within a container",
   "author": "jer3m01 <jer3m01@jer3m01.com>",
   "contributors": [
