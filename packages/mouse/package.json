@@ -52,8 +52,8 @@
   ],
   "devDependencies": {
     "@solid-primitives/raf": "workspace:^",
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
@@ -62,8 +62,8 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {}
 }

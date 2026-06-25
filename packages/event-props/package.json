@@ -50,10 +50,10 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.14"
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.14"
+    "solid-js": "2.0.0-beta.15"
   }
 }

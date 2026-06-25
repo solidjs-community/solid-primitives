@@ -52,14 +52,14 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
     "@babel/core": "^7.27.0",
-    "@solidjs/web": "2.0.0-beta.14",
+    "@solidjs/web": "2.0.0-beta.15",
     "babel-preset-solid": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "solid-js": "2.0.0-beta.15"
   }
 }
