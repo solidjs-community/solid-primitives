@@ -146,6 +146,16 @@ importers:
         specifier: ^1.9.7
         version: 1.9.7
 
+  packages/animation:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      solid-js:
+        specifier: 2.0.0-beta.15
+        version: 2.0.0-beta.15
+
   packages/audio:
     dependencies:
       '@solid-primitives/static-store':
