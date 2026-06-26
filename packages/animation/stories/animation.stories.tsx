@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onSettled, Show } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onSettled, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
   createAnimate,
@@ -1543,6 +1543,275 @@ export const PresenceBStory = meta.story({
         >
           active: <strong style={{ color: "#0f172a" }}>{active().label}</strong>
         </div>
+      </Container>
+    );
+  },
+});
+
+// ─── createPresenceB diagnostic / stress-test ────────────────────────────────
+
+// Card defined at module level for a stable reactive scope (same pattern as SlideCardB).
+// Props receive gate/isExiting from the parent so the parent can read them for diagnostics.
+const DiagCard = (props: {
+  ref: (el: HTMLDivElement) => void;
+  label: string;
+  color: string;
+  isExiting: () => boolean;
+}) => {
+  const [count, setCount] = createSignal(0);
+  const c = props.color;
+
+  return (
+    <div
+      ref={props.ref}
+      style={{
+        position: "absolute",
+        inset: "0",
+        padding: "0.9rem 1.25rem",
+        background: props.isExiting() ? `${c}28` : `${c}14`,
+        border: `2px solid ${c}`,
+        "border-radius": "12px",
+        display: "flex",
+        "align-items": "center",
+        gap: "1rem",
+        transition: "background 0.25s",
+      }}
+    >
+      <strong style={{ color: c, "font-size": "1rem", "min-width": "3.5rem" }}>
+        {props.label}
+      </strong>
+
+      <div style={{ display: "flex", "align-items": "center", gap: "0.4rem" }}>
+        <button
+          onClick={() => setCount(v => v - 1)}
+          style={{
+            width: "26px",
+            height: "26px",
+            "border-radius": "50%",
+            border: "none",
+            background: `${c}22`,
+            color: c,
+            cursor: "pointer",
+          }}
+        >
+          −
+        </button>
+        <span
+          style={{
+            "min-width": "2ch",
+            "text-align": "center",
+            "font-variant-numeric": "tabular-nums",
+            "font-weight": "700",
+          }}
+        >
+          {count()}
+        </span>
+        <button
+          onClick={() => setCount(v => v + 1)}
+          style={{
+            width: "26px",
+            height: "26px",
+            "border-radius": "50%",
+            border: "none",
+            background: `${c}22`,
+            color: c,
+            cursor: "pointer",
+          }}
+        >
+          +
+        </button>
+      </div>
+
+      <Show when={props.isExiting()}>
+        <span
+          style={{
+            "margin-left": "auto",
+            "font-size": "0.7rem",
+            "font-weight": "700",
+            color: c,
+            opacity: "0.8",
+            "letter-spacing": "0.06em",
+          }}
+        >
+          EXITING
+        </span>
+      </Show>
+    </div>
+  );
+};
+
+export const PresenceBDiagnostic = meta.story({
+  name: "createPresenceB — rapid-toggle diagnostic",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Stress-test harness for `createPresenceB`. Click tabs rapidly or hit **Stress test** " +
+          "to fire 20 toggles at 80 ms intervals — far faster than the 1.2 s exit animation. " +
+          "The diagnostic row shows each slide's live reactive state derived from `isExiting()` " +
+          "and the `active` signal. A healthy run always has exactly one slide **active** or " +
+          "**exiting**. If both go **–** simultaneously, or a slide stays stuck as **exiting** " +
+          "while it should be **active**, the primitive has glitched.",
+      },
+    },
+  },
+  render: () => {
+    const [active, setActive] = createSignal(0);
+    const [stressRunning, setStressRunning] = createSignal(false);
+
+    // Refs live in parent scope so createPresenceB can capture them while also
+    // allowing isExiting/gate to be read at the parent level for the diagnostic row.
+    let alphaEl: HTMLDivElement | undefined;
+    let betaEl: HTMLDivElement | undefined;
+
+    const DIAG_OPTS = {
+      enter: [
+        { opacity: 0, transform: "translateX(18px)" },
+        { opacity: 1, transform: "none" },
+      ],
+      exit: [
+        { opacity: 1, transform: "none" },
+        { opacity: 0, transform: "translateX(-18px)" },
+      ],
+      enterOptions: { duration: 350, easing: "ease-out", fill: "both" as FillMode },
+      // Long exit so rapid clicks reliably interrupt the animation mid-flight.
+      exitOptions: { duration: 1200, easing: "ease-in", fill: "forwards" as FillMode },
+      initialEnter: true,
+    };
+
+    const { gate: alphaGate, isExiting: alphaExiting } = createPresenceB(
+      () => alphaEl,
+      () => active() === 0,
+      DIAG_OPTS,
+    );
+
+    const { gate: betaGate, isExiting: betaExiting } = createPresenceB(
+      () => betaEl,
+      () => active() === 1,
+      DIAG_OPTS,
+    );
+
+    let stressTimer: ReturnType<typeof setInterval> | undefined;
+
+    const runStress = () => {
+      clearInterval(stressTimer);
+      setStressRunning(true);
+      let ticks = 0;
+      stressTimer = setInterval(() => {
+        setActive(v => 1 - v);
+        ticks++;
+        if (ticks >= 20) {
+          clearInterval(stressTimer);
+          stressTimer = undefined;
+          setStressRunning(false);
+        }
+      }, 80);
+    };
+
+    onCleanup(() => clearInterval(stressTimer));
+
+    const PAIR = [
+      { label: "Alpha", color: "#6366f1" },
+      { label: "Beta", color: "#ec4899" },
+    ] as const;
+
+    const slideState = (i: number, isExiting: () => boolean): string => {
+      if (isExiting()) return "exiting";
+      if (active() === i) return "active";
+      return "–";
+    };
+
+    const stateColor = (s: string): string =>
+      s === "active" ? "#16a34a" : s === "exiting" ? "#d97706" : "#94a3b8";
+
+    return (
+      <Container width={380}>
+        <h3 style={{ margin: 0 }}>createPresenceB — stress test</h3>
+
+        <div style={{ display: "flex", gap: "0.4rem" }}>
+          <For each={[...PAIR]}>
+            {(p, i) => (
+              <button
+                onClick={() => setActive(i())}
+                style={{
+                  flex: "1",
+                  padding: "0.5rem",
+                  background: active() === i() ? p.color : "#f1f5f9",
+                  color: active() === i() ? "white" : "#64748b",
+                  border: "none",
+                  "border-radius": "8px",
+                  "font-weight": "600",
+                  "font-size": "0.85rem",
+                  cursor: "pointer",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                {p.label}
+              </button>
+            )}
+          </For>
+        </div>
+
+        {/* Stacked panels — entering and exiting slides overlap during crossfade */}
+        <div style={{ position: "relative", height: "80px" }}>
+          <Show when={alphaGate()}>
+            <DiagCard
+              ref={el => (alphaEl = el)}
+              label="Alpha"
+              color="#6366f1"
+              isExiting={alphaExiting}
+            />
+          </Show>
+          <Show when={betaGate()}>
+            <DiagCard
+              ref={el => (betaEl = el)}
+              label="Beta"
+              color="#ec4899"
+              isExiting={betaExiting}
+            />
+          </Show>
+        </div>
+
+        {/* Diagnostic row — reads only sync signals, no async gate interaction */}
+        <div
+          style={{
+            display: "grid",
+            "grid-template-columns": "auto 1fr 1fr",
+            gap: "0.3rem 1.5rem",
+            "font-size": "0.8rem",
+            "font-family": '"Geist Mono", monospace',
+            padding: "0.6rem 0.75rem",
+            background: "#f8fafc",
+            "border-radius": "8px",
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <span style={{ color: "#94a3b8" }} />
+          <span style={{ color: "#94a3b8" }}>Alpha</span>
+          <span style={{ color: "#94a3b8" }}>Beta</span>
+          <span style={{ color: "#94a3b8" }}>state</span>
+          <strong style={{ color: stateColor(slideState(0, alphaExiting)) }}>
+            {slideState(0, alphaExiting)}
+          </strong>
+          <strong style={{ color: stateColor(slideState(1, betaExiting)) }}>
+            {slideState(1, betaExiting)}
+          </strong>
+        </div>
+
+        <ButtonRow>
+          <Button onClick={runStress} variant={stressRunning() ? "secondary" : "primary"}>
+            {stressRunning() ? "Running…" : "Stress test (×20 @ 80 ms)"}
+          </Button>
+        </ButtonRow>
+
+        <p style={{ margin: 0, "font-size": "0.79rem", color: "#64748b", "line-height": "1.55" }}>
+          Expected: at any moment exactly one slide shows{" "}
+          <strong style={{ color: "#16a34a" }}>active</strong> or{" "}
+          <strong style={{ color: "#d97706" }}>exiting</strong>. If both become{" "}
+          <strong style={{ color: "#94a3b8" }}>–</strong> simultaneously, or a slide stays{" "}
+          <strong style={{ color: "#d97706" }}>exiting</strong> after it should be active again,
+          the animation has glitched.
+        </p>
       </Container>
     );
   },

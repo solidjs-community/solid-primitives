@@ -283,6 +283,11 @@ export function createPresenceB(
   let exitAnim: Animation | undefined;
   let animPromise: Promise<void> | undefined;
   let enterGen = 0;
+  let exitGen = 0;
+  // exitCompleted prevents the gate from re-creating the exit Promise after the
+  // animation finishes. Without it, asyncWrite triggers a gate recompute where
+  // animPromise is already undefined → new Promise created → infinite exit loop.
+  let exitCompleted = false;
   // Track whether this instance has ever been shown. Before the first mount,
   // the gate should return plain `false` rather than a Promise — returning a
   // Promise on a never-mounted slide would trigger handleAsync/initTransition
@@ -300,11 +305,21 @@ export function createPresenceB(
 
     if (shouldShow) {
       hasBeenShown = true;
+      exitCompleted = false;
+      // Increment exitGen to cancel any pending exit microtask that hasn't
+      // fired yet. Without this, the microtask starts the exit animation even
+      // though show is already true again — causing both exit and enter
+      // animations to compete on the same element.
+      exitGen++;
       if (exitAnim) {
         exitAnim.cancel();
         exitAnim = undefined;
-        animPromise = undefined;
       }
+      // Always clear animPromise, not just when exitAnim was set. If the exit
+      // microtask hasn't run yet exitAnim is undefined, but animPromise holds
+      // the stale Promise. Clearing it here prevents asyncWrite from running
+      // after the stale microtask calls resolve().
+      animPromise = undefined;
       return true;
     }
 
@@ -312,14 +327,29 @@ export function createPresenceB(
     // animation is needed and no Promise should be created.
     if (!hasBeenShown) return false;
 
+    // After a completed exit, return false cleanly so Show can dispose the
+    // component. Without this guard the gate would create a new Promise every
+    // time asyncWrite re-triggers it, looping forever.
+    if (exitCompleted) return false;
+
     // Create the exit Promise once. Returning the same Promise object on
     // subsequent recomputes is safe: handleAsync guards stale asyncWrite
     // callbacks via `el._inFlight !== result`.
     if (!animPromise) {
+      // Cancel any pending enter microtask so enter and exit don't race.
+      enterGen++;
+      const gen = ++exitGen;
       animPromise = new Promise<void>(resolve => {
         queueMicrotask(() => {
+          // If show flipped back to true before this microtask ran, exitGen
+          // was already incremented in the shouldShow=true branch above.
+          if (gen !== exitGen) {
+            resolve(); // stale — asyncWrite is a no-op (guarded by _inFlight)
+            return;
+          }
           const el = untrack(target);
           if (!el) {
+            exitCompleted = true;
             animPromise = undefined;
             setIsExiting(false);
             resolve();
@@ -333,6 +363,7 @@ export function createPresenceB(
             () => {
               exitAnim = undefined;
               animPromise = undefined;
+              exitCompleted = true;
               setIsExiting(false);
               resolve(); // → asyncWrite → gate._value = undefined → Show removes component
             },
