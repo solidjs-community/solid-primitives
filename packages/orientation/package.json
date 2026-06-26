@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/orientation",
-  "version": "0.0.100",
+  "version": "1.0.0-next.0",
   "description": "Primitives to track screen orientation using the Screen Orientation API",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],

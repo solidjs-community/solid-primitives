@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/form",
-  "version": "0.0.100",
+  "version": "1.0.0-next.0",
   "description": "Reactive form primitive for Solid.js with per-field signals, sync/async validation, validateOn control, and DOM binding.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
