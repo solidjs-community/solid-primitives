@@ -281,6 +281,7 @@ export function createPresenceB(
   const [isExiting, setIsExiting] = createSignal(false, INTERNAL_OPTIONS);
 
   let exitAnim: Animation | undefined;
+  let enterAnim: Animation | undefined;
   let animPromise: Promise<void> | undefined;
   let enterGen = 0;
   let exitGen = 0;
@@ -336,8 +337,14 @@ export function createPresenceB(
     // subsequent recomputes is safe: handleAsync guards stale asyncWrite
     // callbacks via `el._inFlight !== result`.
     if (!animPromise) {
-      // Cancel any pending enter microtask so enter and exit don't race.
+      // Cancel any pending enter microtask (gen check) AND any enter animation
+      // that already started. Without the latter, a running enter animation
+      // competes with the new exit animation on the same element.
       enterGen++;
+      if (enterAnim) {
+        enterAnim.cancel();
+        enterAnim = undefined;
+      }
       const gen = ++exitGen;
       animPromise = new Promise<void>(resolve => {
         queueMicrotask(() => {
@@ -392,7 +399,8 @@ export function createPresenceB(
         if (gen !== enterGen) return;
         const el = untrack(target);
         if (!el) return;
-        el.animate(options.enter, options.enterOptions);
+        enterAnim = el.animate(options.enter, options.enterOptions);
+        enterAnim.addEventListener("finish", () => { enterAnim = undefined; }, { once: true });
       });
     },
   );
@@ -403,7 +411,8 @@ export function createPresenceB(
       if (gen !== enterGen) return;
       const el = untrack(target);
       if (!el) return;
-      el.animate(options.enter, options.enterOptions);
+      enterAnim = el.animate(options.enter, options.enterOptions);
+      enterAnim.addEventListener("finish", () => { enterAnim = undefined; }, { once: true });
     });
   }
 
