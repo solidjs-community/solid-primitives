@@ -4,6 +4,7 @@ import {
   createRenderEffect,
   createMemo,
   untrack,
+  isPending,
   type Accessor,
 } from "solid-js";
 import { type MaybeAccessor, asAccessor, INTERNAL_OPTIONS } from "@solid-primitives/utils";
@@ -103,7 +104,7 @@ export function createPresenceAnimation(
 
   createEffect(
     () => getShow(),
-    (shouldShow) => {
+    shouldShow => {
       if (shouldShow) {
         setIsMounted(true);
         scheduleEnter();
@@ -117,7 +118,14 @@ export function createPresenceAnimation(
         const exitKf = options.exit ?? reverseKeyframes(options.enter);
         const anim = el.animate(exitKf, options.exitOptions ?? options.enterOptions);
         let done = false;
-        anim.addEventListener("finish", () => { done = true; setIsMounted(false); }, { once: true });
+        anim.addEventListener(
+          "finish",
+          () => {
+            done = true;
+            setIsMounted(false);
+          },
+          { once: true },
+        );
         return () => {
           if (!done) anim.cancel();
         };
@@ -278,7 +286,12 @@ export function createPresenceB(
   options: PresenceAnimationOptions,
 ): { gate: Accessor<boolean>; isExiting: Accessor<boolean> } {
   const getShow = asAccessor(show);
-  const [isExiting, setIsExiting] = createSignal(false, INTERNAL_OPTIONS);
+  // exitAnimRunning tracks whether the WAAPI exit animation is physically playing.
+  // isExiting is derived: it's automatically false whenever getShow() is true,
+  // so no effect is needed to reset it when show flips back — the memo re-derives
+  // the correct value synchronously in the same flush as the signal write.
+  const [exitAnimRunning, setExitAnimRunning] = createSignal(false, INTERNAL_OPTIONS);
+  const isExiting = createMemo(() => !getShow() && exitAnimRunning());
 
   let exitAnim: Animation | undefined;
   let enterAnim: Animation | undefined;
@@ -358,21 +371,34 @@ export function createPresenceB(
           if (!el) {
             exitCompleted = true;
             animPromise = undefined;
-            setIsExiting(false);
+            setExitAnimRunning(false);
             resolve();
             return;
           }
-          setIsExiting(true);
+          setExitAnimRunning(true);
           const exitKf = options.exit ?? reverseKeyframes(options.enter);
-          exitAnim = el.animate(exitKf, options.exitOptions ?? options.enterOptions);
-          exitAnim.addEventListener(
+          const anim = el.animate(exitKf, options.exitOptions ?? options.enterOptions);
+          exitAnim = anim;
+          anim.addEventListener(
             "finish",
             () => {
-              exitAnim = undefined;
+              if (exitAnim === anim) exitAnim = undefined;
               animPromise = undefined;
               exitCompleted = true;
-              setIsExiting(false);
+              setExitAnimRunning(false);
               resolve(); // → asyncWrite → gate._value = undefined → Show removes component
+            },
+            { once: true },
+          );
+          // When the exit animation is cancelled (show flipped true mid-exit), the
+          // finish event never fires. Listen to cancel to reset exitAnimRunning so
+          // the signal matches reality. Guard against the case where a newer exit
+          // animation is already running when this event fires.
+          anim.addEventListener(
+            "cancel",
+            () => {
+              if (exitAnim === anim) exitAnim = undefined;
+              setExitAnimRunning(false);
             },
             { once: true },
           );
@@ -383,23 +409,25 @@ export function createPresenceB(
     return animPromise;
   }) as unknown as Accessor<boolean>;
 
-  // Track getShow() directly (a plain boolean, never async) rather than gate()
-  // (the async memo). Tracking gate() puts this effect into _pendingNodes while
-  // the exit Promise is live; if show flips back to true before the Promise
-  // resolves, Solid may not re-queue the stuck effect, so setIsExiting(false)
-  // and the enter animation would never fire. getShow() always triggers reliably.
+  // isExiting is derived (memo), so it resets automatically when getShow() goes
+  // true — no manual reset needed. This effect only handles the enter animation.
   createEffect(
     () => getShow(),
-    (shouldShow) => {
+    shouldShow => {
       if (!shouldShow) return;
-      setIsExiting(false);
       const gen = ++enterGen;
       queueMicrotask(() => {
         if (gen !== enterGen) return;
         const el = untrack(target);
         if (!el) return;
         enterAnim = el.animate(options.enter, options.enterOptions);
-        enterAnim.addEventListener("finish", () => { enterAnim = undefined; }, { once: true });
+        enterAnim.addEventListener(
+          "finish",
+          () => {
+            enterAnim = undefined;
+          },
+          { once: true },
+        );
       });
     },
     { defer: true },
@@ -412,9 +440,66 @@ export function createPresenceB(
       const el = untrack(target);
       if (!el) return;
       enterAnim = el.animate(options.enter, options.enterOptions);
-      enterAnim.addEventListener("finish", () => { enterAnim = undefined; }, { once: true });
+      enterAnim.addEventListener(
+        "finish",
+        () => {
+          enterAnim = undefined;
+        },
+        { once: true },
+      );
     });
   }
 
   return { gate, isExiting };
+}
+
+export function createPresenceC(
+  target: Accessor<HTMLElement>,
+  show: Accessor<boolean>,
+  options: any,
+) {
+  let animationP: Promise<void> | undefined = undefined;
+
+  const isMounted = createMemo(async () => {
+    if (show()) {
+      return true;
+    } else {
+      if (!animationP) return false;
+      await animationP;
+      return false;
+    }
+  });
+
+  const isEntered = createMemo(async () => {
+    if (show()) {
+      if (!animationP) return true;
+      await animationP;
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  const isEntering = () => isPending(isEntered);
+  const isExiting = () => isPending(isMounted);
+
+  createEffect(show, show => {
+    const anim = show
+      ? target().animate(options.enter, options.enterOptions)
+      : target().animate(options.exit, options.exitOptions ?? options.enterOptions);
+
+    animationP = new Promise(resolve => {
+      anim.addEventListener(
+        "finish",
+        () => {
+          animationP = undefined;
+          resolve();
+        },
+        { once: true },
+      );
+    });
+    return () => animationP && anim.cancel();
+  });
+
+  return { isMounted, isEntered, isEntering, isExiting };
 }

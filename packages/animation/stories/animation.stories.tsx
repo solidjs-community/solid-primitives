@@ -13,6 +13,7 @@ import {
   createPresenceAnimation,
   createPresenceA,
   createPresenceB,
+  createPresenceC,
 } from "@solid-primitives/animation";
 import readme from "../README.md?raw";
 import { Button, ButtonRow, Container, Section, StatRow } from "../../../.storybook/ui/index.js";
@@ -1811,6 +1812,358 @@ export const PresenceBDiagnostic = meta.story({
           <strong style={{ color: "#94a3b8" }}>–</strong> simultaneously, or a slide stays{" "}
           <strong style={{ color: "#d97706" }}>exiting</strong> after it should be active again,
           the animation has glitched.
+        </p>
+      </Container>
+    );
+  },
+});
+
+// ─── createPresenceC diagnostic ──────────────────────────────────────────────
+
+export const PresenceCDiagnostic = meta.story({
+  name: "createPresenceC — async-memo diagnostic",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Diagnostic harness for `createPresenceC`. Shows all four returned values " +
+          "(`isMounted`, `isEntered`, `isEntering`, `isExiting`) live as you toggle or stress-test. " +
+          "**Note**: `target()` is called unconditionally in the effect so `show` must start `true` " +
+          "or the initial effect apply throws on a null element — this story starts visible. " +
+          "The key question: does `isMounted` stay `true` for the full 1 s exit animation, " +
+          "and do `isExiting`/`isEntering` correctly reflect animation state?",
+      },
+    },
+  },
+  render: () => {
+    const [show, setShow] = createSignal(true);
+    const [stressRunning, setStressRunning] = createSignal(false);
+
+    let el: HTMLDivElement | undefined;
+
+    const C_OPTS = {
+      enter: [
+        { opacity: 0, transform: "translateX(20px)" },
+        { opacity: 1, transform: "none" },
+      ],
+      exit: [
+        { opacity: 1, transform: "none" },
+        { opacity: 0, transform: "translateX(-20px)" },
+      ],
+      enterOptions: { duration: 400, easing: "ease-out", fill: "both" as FillMode },
+      // Long exit so timing issues are clearly visible.
+      exitOptions: { duration: 1000, easing: "ease-in", fill: "forwards" as FillMode },
+    };
+
+    // createPresenceC: show must start true so target() is non-null when the
+    // non-deferred effect apply fires on initial mount.
+    const { isMounted, isEntered, isEntering, isExiting } = createPresenceC(
+      () => el!,
+      show,
+      C_OPTS,
+    );
+
+    let stressTimer: ReturnType<typeof setInterval> | undefined;
+
+    const runStress = () => {
+      clearInterval(stressTimer);
+      setStressRunning(true);
+      let ticks = 0;
+      stressTimer = setInterval(() => {
+        setShow(v => !v);
+        ticks++;
+        if (ticks >= 20) {
+          clearInterval(stressTimer);
+          stressTimer = undefined;
+          setShow(true);
+          setStressRunning(false);
+        }
+      }, 80);
+    };
+
+    onCleanup(() => clearInterval(stressTimer));
+
+    const Flag = (props: { label: string; value: () => boolean }) => (
+      <div
+        style={{
+          display: "flex",
+          "align-items": "center",
+          gap: "0.5rem",
+          "font-size": "0.8rem",
+          "font-family": '"Geist Mono", monospace',
+        }}
+      >
+        <span style={{ color: "#94a3b8", "min-width": "6.5rem" }}>{props.label}</span>
+        <strong style={{ color: props.value() ? "#16a34a" : "#cbd5e1", "min-width": "3rem" }}>
+          {String(props.value())}
+        </strong>
+        <div
+          style={{
+            width: "8px",
+            height: "8px",
+            "border-radius": "50%",
+            background: props.value() ? "#16a34a" : "#e2e8f0",
+            transition: "background 0.15s",
+          }}
+        />
+      </div>
+    );
+
+    return (
+      <Container width={360}>
+        <h3 style={{ margin: 0 }}>createPresenceC — diagnostic</h3>
+
+        <button
+          onClick={() => setShow(v => !v)}
+          style={{
+            padding: "0.5rem 1.5rem",
+            background: show() ? "#6366f1" : "#f1f5f9",
+            color: show() ? "white" : "#64748b",
+            border: "none",
+            "border-radius": "8px",
+            "font-weight": "600",
+            cursor: "pointer",
+            transition: "background 0.15s, color 0.15s",
+          }}
+        >
+          {show() ? "Hide (1 s exit)" : "Show (0.4 s enter)"}
+        </button>
+
+        {/* Panel — gated on isMounted to stay alive during exit animation */}
+        <div style={{ position: "relative", height: "72px" }}>
+          <Show when={(isMounted as unknown as () => boolean)()}>
+            <div
+              ref={r => (el = r)}
+              style={{
+                position: "absolute",
+                inset: "0",
+                background: "#eef2ff",
+                border: "2px solid #6366f1",
+                "border-radius": "10px",
+                display: "flex",
+                "align-items": "center",
+                "justify-content": "center",
+                "font-weight": "700",
+                color: "#4f46e5",
+                "font-size": "0.9rem",
+              }}
+            >
+              {isExiting() ? "Exiting…" : isEntering() ? "Entering…" : "Mounted"}
+            </div>
+          </Show>
+        </div>
+
+        {/* Live state table */}
+        <div
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.35rem",
+            padding: "0.75rem",
+            background: "#f8fafc",
+            "border-radius": "8px",
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <Flag label="isMounted" value={isMounted as unknown as () => boolean} />
+          <Flag label="isEntered" value={isEntered as unknown as () => boolean} />
+          <Flag label="isEntering" value={isEntering} />
+          <Flag label="isExiting" value={isExiting} />
+        </div>
+
+        <ButtonRow>
+          <Button onClick={runStress} variant={stressRunning() ? "secondary" : "primary"}>
+            {stressRunning() ? "Running…" : "Stress test (×20 @ 80 ms)"}
+          </Button>
+        </ButtonRow>
+
+        <p style={{ margin: 0, "font-size": "0.79rem", color: "#64748b", "line-height": "1.55" }}>
+          Expected: <strong>isMounted</strong> stays <strong style={{ color: "#16a34a" }}>true</strong>{" "}
+          for the full 1 s exit. <strong>isExiting</strong> ={" "}
+          <strong style={{ color: "#16a34a" }}>true</strong> during exit,{" "}
+          <strong>isEntering</strong> = <strong style={{ color: "#16a34a" }}>true</strong>{" "}
+          during enter. If <strong>isMounted</strong> flips to{" "}
+          <strong style={{ color: "#ef4444" }}>false</strong> instantly on hide, the async-memo
+          timing is off — <code>animationP</code> isn't reactive so the memo reads it before the
+          effect sets it.
+        </p>
+      </Container>
+    );
+  },
+});
+
+// ─── createPresenceC gate test ────────────────────────────────────────────────
+
+export const PresenceCGateTest = meta.story({
+  name: "createPresenceC — deferred disposal gate test",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tests whether `isMounted` acts as a true deferred-disposal gate. " +
+          "The inner component holds a counter (reactive signal) and a live tick timer. " +
+          "Gate `<Show>` on `isMounted()` — if deferred disposal works, both the counter " +
+          "and the tick keep running during the 1.2 s exit animation. " +
+          "If the component is disposed immediately when `show` flips to `false`, " +
+          "the counter and tick disappear instantly — the gate mechanism is broken.",
+      },
+    },
+  },
+  render: () => {
+    const [show, setShow] = createSignal(true);
+
+    let el: HTMLDivElement | undefined;
+
+    const GATE_OPTS = {
+      enter: [{ opacity: 0, transform: "scale(0.92)" }, { opacity: 1, transform: "none" }],
+      exit: [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(0.92)" }],
+      enterOptions: { duration: 350, easing: "ease-out", fill: "both" as FillMode },
+      exitOptions: { duration: 1200, easing: "ease-in", fill: "forwards" as FillMode },
+    };
+
+    const { isMounted, isEntering, isExiting } = createPresenceC(
+      () => el!,
+      show,
+      GATE_OPTS,
+    );
+
+    // Inner component: has its own reactive state to prove it survives during exit.
+    const Inner = () => {
+      const [count, setCount] = createSignal(0);
+      const [ticks, setTicks] = createSignal(0);
+
+      // Tick every 200 ms — proves the reactive scope is still alive.
+      const timer = setInterval(() => setTicks(t => t + 1), 200);
+      onCleanup(() => clearInterval(timer));
+
+      const c = "#6366f1";
+      return (
+        <div
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.6rem",
+            padding: "0.9rem 1.1rem",
+          }}
+        >
+          <div style={{ display: "flex", "align-items": "center", gap: "0.5rem" }}>
+            <span style={{ "font-weight": "700", color: c }}>Counter</span>
+            <button
+              onClick={() => setCount(v => v - 1)}
+              style={{
+                width: "26px",
+                height: "26px",
+                "border-radius": "50%",
+                border: "none",
+                background: `${c}22`,
+                color: c,
+                cursor: "pointer",
+              }}
+            >
+              −
+            </button>
+            <span
+              style={{
+                "min-width": "2ch",
+                "text-align": "center",
+                "font-weight": "700",
+                "font-variant-numeric": "tabular-nums",
+              }}
+            >
+              {count()}
+            </span>
+            <button
+              onClick={() => setCount(v => v + 1)}
+              style={{
+                width: "26px",
+                height: "26px",
+                "border-radius": "50%",
+                border: "none",
+                background: `${c}22`,
+                color: c,
+                cursor: "pointer",
+              }}
+            >
+              +
+            </button>
+          </div>
+          <div style={{ "font-size": "0.78rem", color: "#64748b", "font-family": '"Geist Mono", monospace' }}>
+            ticks: {ticks()} &nbsp;·&nbsp;{isExiting() ? "⟵ exiting" : isEntering() ? "⟶ entering" : "mounted"}
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <Container width={360}>
+        <h3 style={{ margin: 0 }}>createPresenceC — gate test</h3>
+
+        <button
+          onClick={() => setShow(v => !v)}
+          style={{
+            padding: "0.5rem 1.5rem",
+            background: show() ? "#6366f1" : "#f1f5f9",
+            color: show() ? "white" : "#64748b",
+            border: "none",
+            "border-radius": "8px",
+            "font-weight": "600",
+            cursor: "pointer",
+            transition: "background 0.15s, color 0.15s",
+          }}
+        >
+          {show() ? "Hide (1.2 s exit)" : "Show (0.35 s enter)"}
+        </button>
+
+        {/* Gate on isMounted — component should stay alive during exit */}
+        <div style={{ position: "relative", "min-height": "90px" }}>
+          <Show when={(isMounted as unknown as () => boolean)()}>
+            <div
+              ref={r => (el = r)}
+              style={{
+                background: "#f5f3ff",
+                border: `2px solid ${isExiting() ? "#a78bfa" : "#6366f1"}`,
+                "border-radius": "12px",
+                transition: "border-color 0.2s",
+              }}
+            >
+              <Inner />
+            </div>
+          </Show>
+        </div>
+
+        {/* Gate state */}
+        <div
+          style={{
+            display: "grid",
+            "grid-template-columns": "auto 1fr",
+            gap: "0.25rem 1rem",
+            "font-size": "0.8rem",
+            "font-family": '"Geist Mono", monospace',
+            padding: "0.6rem 0.75rem",
+            background: "#f8fafc",
+            "border-radius": "8px",
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <span style={{ color: "#94a3b8" }}>isMounted</span>
+          <strong style={{ color: (isMounted as unknown as () => boolean)() ? "#16a34a" : "#ef4444" }}>
+            {String((isMounted as unknown as () => boolean)())}
+          </strong>
+          <span style={{ color: "#94a3b8" }}>isExiting</span>
+          <strong style={{ color: isExiting() ? "#d97706" : "#94a3b8" }}>
+            {String(isExiting())}
+          </strong>
+          <span style={{ color: "#94a3b8" }}>isEntering</span>
+          <strong style={{ color: isEntering() ? "#0ea5e9" : "#94a3b8" }}>
+            {String(isEntering())}
+          </strong>
+        </div>
+
+        <p style={{ margin: 0, "font-size": "0.79rem", color: "#64748b", "line-height": "1.55" }}>
+          Click <strong>Hide</strong> then immediately click the counter buttons. If the counter
+          responds for ~1.2 s before disappearing, deferred disposal works. If it vanishes
+          instantly, <code>isMounted</code> returned <code>false</code> synchronously instead of
+          staying pending.
         </p>
       </Container>
     );
