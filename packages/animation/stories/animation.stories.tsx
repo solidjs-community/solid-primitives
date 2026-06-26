@@ -11,6 +11,8 @@ import {
   makeMotionPath,
   makeSequence,
   createPresenceAnimation,
+  createPresenceA,
+  createPresenceB,
 } from "@solid-primitives/animation";
 import readme from "../README.md?raw";
 import { Button, ButtonRow, Container, Section, StatRow } from "../../../.storybook/ui/index.js";
@@ -27,7 +29,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
 
 const ACCENT_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"] as const;
 
@@ -81,7 +82,9 @@ export const Animate = meta.story({
       },
     );
 
-    onSettled(() => { setTarget(boxRef); });
+    onSettled(() => {
+      setTarget(boxRef);
+    });
 
     return (
       <Container width={320}>
@@ -151,7 +154,6 @@ export const Animate = meta.story({
     );
   },
 });
-
 
 export const ScrollAnim = meta.story({
   name: "Scroll-driven progress bar",
@@ -242,7 +244,6 @@ export const ScrollAnim = meta.story({
   },
 });
 
-
 const VIEW_CARDS = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta"];
 const VIEW_COLORS = [
   "#6366f1",
@@ -327,7 +328,6 @@ export const ViewAnim = meta.story({
   },
 });
 
-
 export const Flip = meta.story({
   name: "FLIP a box between sides",
   parameters: {
@@ -395,7 +395,6 @@ export const Flip = meta.story({
   },
 });
 
-
 const STAGGER_COLORS = ["#6366f1", "#8b5cf6", "#a855f7", "#ec4899", "#f97316", "#10b981"];
 
 export const Stagger = meta.story({
@@ -423,7 +422,9 @@ export const Stagger = meta.story({
         { duration: 500, stagger: 80, fill: "both", easing: "ease-out" },
       );
 
-    onSettled(() => { animate(); });
+    onSettled(() => {
+      animate();
+    });
 
     return (
       <Container width={340}>
@@ -456,7 +457,6 @@ export const Stagger = meta.story({
     );
   },
 });
-
 
 const PANEL_LABELS = ["Header", "Body", "Footer"] as const;
 const PANEL_COLORS = ["#6366f1", "#ec4899", "#10b981"] as const;
@@ -541,10 +541,9 @@ export const AnimGroup = meta.story({
   },
 });
 
-
 const PATHS = {
-  Wave:   "M 20,80 C 80,20 140,140 200,80 S 320,20 380,80",
-  Loop:   "M 200,140 C 280,140 340,80 340,40 S 280,-60 200,-60 S 60,0 60,40 S 120,140 200,140",
+  Wave: "M 20,80 C 80,20 140,140 200,80 S 320,20 380,80",
+  Loop: "M 200,140 C 280,140 340,80 340,40 S 280,-60 200,-60 S 60,0 60,40 S 120,140 200,140",
   Corner: "M 20,20 L 360,20 L 360,160",
 } as const;
 
@@ -575,7 +574,9 @@ export const MotionPath = meta.story({
       });
     };
 
-    onSettled(() => { play("Wave"); });
+    onSettled(() => {
+      play("Wave");
+    });
 
     return (
       <Container width={448}>
@@ -622,7 +623,10 @@ export const MotionPath = meta.story({
             <For each={Object.keys(PATHS) as (keyof typeof PATHS)[]}>
               {key => (
                 <Button
-                  onClick={() => { setPathKey(key); play(key); }}
+                  onClick={() => {
+                    setPathKey(key);
+                    play(key);
+                  }}
                   variant={pathKey() === key ? "primary" : "outline"}
                 >
                   {key}
@@ -636,11 +640,10 @@ export const MotionPath = meta.story({
   },
 });
 
-
 const SEQ_STEPS = [
   { label: "Step 1 — fade in header", color: "#6366f1" },
-  { label: "Step 2 — slide in body",  color: "#ec4899" },
-  { label: "Step 3 — pop in footer",  color: "#10b981" },
+  { label: "Step 2 — slide in body", color: "#ec4899" },
+  { label: "Step 3 — pop in footer", color: "#10b981" },
 ] as const;
 
 export const Sequence = meta.story({
@@ -661,15 +664,19 @@ export const Sequence = meta.story({
 
     onSettled(() => {
       seq = makeSequence(
-        SEQ_STEPS.map((_, i) => () =>
-          makeAnimate(
-            stepRefs[i]!,
-            [
-              { opacity: 0, transform: i === 2 ? "scale(0.7)" : `translateX(${i % 2 === 0 ? "-" : ""}24px)` },
-              { opacity: 1, transform: i === 2 ? "scale(1)"   : "none" },
-            ],
-            { duration: 500, easing: "ease-out", fill: "both" },
-          ),
+        SEQ_STEPS.map(
+          (_, i) => () =>
+            makeAnimate(
+              stepRefs[i]!,
+              [
+                {
+                  opacity: 0,
+                  transform: i === 2 ? "scale(0.7)" : `translateX(${i % 2 === 0 ? "-" : ""}24px)`,
+                },
+                { opacity: 1, transform: i === 2 ? "scale(1)" : "none" },
+              ],
+              { duration: 500, easing: "ease-out", fill: "both" },
+            ),
         ),
       );
       seq.play();
@@ -702,19 +709,40 @@ export const Sequence = meta.story({
 
         <ButtonRow>
           <Button onClick={() => seq.play()}>Play sequence</Button>
-          <Button onClick={() => seq.cancel()} variant="outline">Cancel</Button>
+          <Button onClick={() => seq.cancel()} variant="outline">
+            Cancel
+          </Button>
         </ButtonRow>
       </Container>
     );
   },
 });
 
-
 const TOAST_PRESETS = [
-  { title: "Changes saved", body: "Your edits have been saved successfully.", color: "#10b981", icon: "✓" },
-  { title: "Upload failed", body: "The file could not be uploaded. Please try again.", color: "#f43f5e", icon: "✕" },
-  { title: "Invite sent", body: "An invitation was sent to the address on file.", color: "#6366f1", icon: "→" },
-  { title: "Low storage", body: "You are approaching your storage limit.", color: "#f59e0b", icon: "!" },
+  {
+    title: "Changes saved",
+    body: "Your edits have been saved successfully.",
+    color: "#10b981",
+    icon: "✓",
+  },
+  {
+    title: "Upload failed",
+    body: "The file could not be uploaded. Please try again.",
+    color: "#f43f5e",
+    icon: "✕",
+  },
+  {
+    title: "Invite sent",
+    body: "An invitation was sent to the address on file.",
+    color: "#6366f1",
+    icon: "→",
+  },
+  {
+    title: "Low storage",
+    body: "You are approaching your storage limit.",
+    color: "#f59e0b",
+    icon: "!",
+  },
 ] as const;
 
 export const PresenceToasts = meta.story({
@@ -789,14 +817,20 @@ export const PresenceToasts = meta.story({
                     { opacity: 1, transform: "none" },
                     { opacity: 0, transform: "translateX(110%) scale(0.95)" },
                   ],
-                  enterOptions: { duration: 400, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "both" },
-                  exitOptions:  { duration: 240, easing: "ease-in", fill: "forwards" },
+                  enterOptions: {
+                    duration: 400,
+                    easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    fill: "both",
+                  },
+                  exitOptions: { duration: 240, easing: "ease-in", fill: "forwards" },
                   initialEnter: true,
                 });
 
                 createEffect(
                   () => isMounted(),
-                  mounted => { if (!mounted) removeToast(toast.id); },
+                  mounted => {
+                    if (!mounted) removeToast(toast.id);
+                  },
                   { defer: true },
                 );
 
@@ -834,10 +868,19 @@ export const PresenceToasts = meta.story({
                         {toast.icon}
                       </div>
                       <div style={{ flex: "1", "min-width": "0" }}>
-                        <div style={{ "font-weight": "600", "font-size": "0.875rem", color: "#0f172a", "margin-bottom": "0.15rem" }}>
+                        <div
+                          style={{
+                            "font-weight": "600",
+                            "font-size": "0.875rem",
+                            color: "#0f172a",
+                            "margin-bottom": "0.15rem",
+                          }}
+                        >
                           {toast.title}
                         </div>
-                        <div style={{ "font-size": "0.8rem", color: "#64748b", "line-height": "1.45" }}>
+                        <div
+                          style={{ "font-size": "0.8rem", color: "#64748b", "line-height": "1.45" }}
+                        >
                           {toast.body}
                         </div>
                       </div>
@@ -868,11 +911,25 @@ export const PresenceToasts = meta.story({
   },
 });
 
-
 const MODAL_CARDS = [
-  { title: "Save changes?", body: "Your unsaved edits will be lost if you close without saving.", confirm: "Save", color: "#6366f1" },
-  { title: "Delete item?", body: "This action cannot be undone. The item will be permanently removed.", confirm: "Delete", color: "#f43f5e" },
-  { title: "Send invite?", body: "An email invitation will be sent to the address you entered.", confirm: "Send", color: "#10b981" },
+  {
+    title: "Save changes?",
+    body: "Your unsaved edits will be lost if you close without saving.",
+    confirm: "Save",
+    color: "#6366f1",
+  },
+  {
+    title: "Delete item?",
+    body: "This action cannot be undone. The item will be permanently removed.",
+    confirm: "Delete",
+    color: "#f43f5e",
+  },
+  {
+    title: "Send invite?",
+    body: "An email invitation will be sent to the address you entered.",
+    confirm: "Send",
+    color: "#10b981",
+  },
 ] as const;
 
 export const PresenceModal = meta.story({
@@ -892,32 +949,24 @@ export const PresenceModal = meta.story({
     let backdropEl!: HTMLDivElement;
     let modalEl!: HTMLDivElement;
 
-    const { isMounted: backdropMounted } = createPresenceAnimation(
-      () => backdropEl,
-      show,
-      {
-        enter: [{ opacity: 0 }, { opacity: 1 }],
-        enterOptions: { duration: 200, easing: "ease-out", fill: "both" },
-        exitOptions:  { duration: 180, easing: "ease-in",  fill: "forwards" },
-      },
-    );
+    const { isMounted: backdropMounted } = createPresenceAnimation(() => backdropEl, show, {
+      enter: [{ opacity: 0 }, { opacity: 1 }],
+      enterOptions: { duration: 200, easing: "ease-out", fill: "both" },
+      exitOptions: { duration: 180, easing: "ease-in", fill: "forwards" },
+    });
 
-    const { isMounted: modalMounted } = createPresenceAnimation(
-      () => modalEl,
-      show,
-      {
-        enter: [
-          { opacity: 0, transform: "scale(0.88) translateY(16px)" },
-          { opacity: 1, transform: "none" },
-        ],
-        exit: [
-          { opacity: 1, transform: "none" },
-          { opacity: 0, transform: "scale(0.92) translateY(8px)" },
-        ],
-        enterOptions: { duration: 320, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "both" },
-        exitOptions:  { duration: 180, easing: "ease-in", fill: "forwards" },
-      },
-    );
+    const { isMounted: modalMounted } = createPresenceAnimation(() => modalEl, show, {
+      enter: [
+        { opacity: 0, transform: "scale(0.88) translateY(16px)" },
+        { opacity: 1, transform: "none" },
+      ],
+      exit: [
+        { opacity: 1, transform: "none" },
+        { opacity: 0, transform: "scale(0.92) translateY(8px)" },
+      ],
+      enterOptions: { duration: 320, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "both" },
+      exitOptions: { duration: 180, easing: "ease-in", fill: "forwards" },
+    });
 
     const card = () => MODAL_CARDS[cardIndex()];
 
@@ -930,7 +979,10 @@ export const PresenceModal = meta.story({
             <For each={[...MODAL_CARDS]}>
               {(c, i) => (
                 <Button
-                  onClick={() => { setCardIndex(i()); setShow(true); }}
+                  onClick={() => {
+                    setCardIndex(i());
+                    setShow(true);
+                  }}
                   variant={cardIndex() === i() ? "primary" : "outline"}
                 >
                   {c.title.split(" ")[0]}
@@ -972,14 +1024,18 @@ export const PresenceModal = meta.story({
                 }}
               >
                 <h4 style={{ margin: 0, color: "#0f172a" }}>{card().title}</h4>
-                <p style={{ margin: 0, color: "#64748b", "font-size": "0.875rem", "line-height": "1.5" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#64748b",
+                    "font-size": "0.875rem",
+                    "line-height": "1.5",
+                  }}
+                >
                   {card().body}
                 </p>
                 <ButtonRow>
-                  <Button
-                    onClick={() => setShow(false)}
-                    style={{ background: card().color }}
-                  >
+                  <Button onClick={() => setShow(false)} style={{ background: card().color }}>
                     {card().confirm}
                   </Button>
                   <Button onClick={() => setShow(false)} variant="outline">
@@ -995,11 +1051,18 @@ export const PresenceModal = meta.story({
   },
 });
 
-
 const TABS = [
   { label: "Profile", color: "#6366f1", body: "Manage your name, avatar, and contact details." },
-  { label: "Security", color: "#f43f5e", body: "Update your password and two-factor authentication settings." },
-  { label: "Billing", color: "#10b981", body: "View invoices, update your payment method, or cancel your plan." },
+  {
+    label: "Security",
+    color: "#f43f5e",
+    body: "Update your password and two-factor authentication settings.",
+  },
+  {
+    label: "Billing",
+    color: "#10b981",
+    body: "View invoices, update your payment method, or cancel your plan.",
+  },
 ] as const;
 
 export const PresenceTabs = meta.story({
@@ -1053,10 +1116,16 @@ export const PresenceTabs = meta.story({
                 () => el,
                 () => active() === i(),
                 {
-                  enter: [{ opacity: 0, transform: "translateX(10px)" }, { opacity: 1, transform: "none" }],
-                  exit:  [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-10px)" }],
+                  enter: [
+                    { opacity: 0, transform: "translateX(10px)" },
+                    { opacity: 1, transform: "none" },
+                  ],
+                  exit: [
+                    { opacity: 1, transform: "none" },
+                    { opacity: 0, transform: "translateX(-10px)" },
+                  ],
                   enterOptions: { duration: 200, easing: "ease-out" },
-                  exitOptions:  { duration: 150, easing: "ease-in" },
+                  exitOptions: { duration: 150, easing: "ease-in" },
                 },
               );
 
@@ -1081,6 +1150,398 @@ export const PresenceTabs = meta.story({
               );
             }}
           </For>
+        </div>
+      </Container>
+    );
+  },
+});
+
+// ─── createPresenceA ──────────────────────────────────────────────────────────
+
+// A self-contained interactive widget defined outside any reactive scope so
+// its identity is stable across renders.
+const InteractiveCard = (props: {
+  ref: (el: HTMLDivElement) => void;
+  isExiting: () => boolean;
+}) => {
+  const [count, setCount] = createSignal(0);
+  const [note, setNote] = createSignal("");
+
+  return (
+    <div
+      ref={props.ref}
+      style={{
+        padding: "1.25rem",
+        background: props.isExiting() ? "#fffbeb" : "#f0f9ff",
+        border: `2px solid ${props.isExiting() ? "#f59e0b" : "#0ea5e9"}`,
+        "border-radius": "12px",
+        display: "flex",
+        "flex-direction": "column",
+        gap: "0.85rem",
+        transition: "background 0.3s, border-color 0.3s",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          "justify-content": "space-between",
+          "align-items": "center",
+        }}
+      >
+        <span
+          style={{
+            "font-weight": "700",
+            "font-size": "0.8rem",
+            "text-transform": "uppercase",
+            "letter-spacing": "0.06em",
+            color: props.isExiting() ? "#d97706" : "#0369a1",
+          }}
+        >
+          {props.isExiting() ? "Exiting — signals still live" : "Mounted"}
+        </span>
+      </div>
+
+      {/* Counter — signal lives inside this component */}
+      <div style={{ display: "flex", "align-items": "center", gap: "0.75rem" }}>
+        <button
+          onClick={() => setCount(v => v - 1)}
+          style={{
+            width: "36px",
+            height: "36px",
+            "border-radius": "50%",
+            border: "none",
+            background: "#e0f2fe",
+            color: "#0369a1",
+            "font-size": "1.2rem",
+            cursor: "pointer",
+          }}
+        >
+          −
+        </button>
+        <span
+          style={{
+            "font-size": "1.6rem",
+            "font-weight": "700",
+            "font-variant-numeric": "tabular-nums",
+            "min-width": "3ch",
+            "text-align": "center",
+            color: "#0f172a",
+          }}
+        >
+          {count()}
+        </span>
+        <button
+          onClick={() => setCount(v => v + 1)}
+          style={{
+            width: "36px",
+            height: "36px",
+            "border-radius": "50%",
+            border: "none",
+            background: "#e0f2fe",
+            color: "#0369a1",
+            "font-size": "1.2rem",
+            cursor: "pointer",
+          }}
+        >
+          +
+        </button>
+        <span style={{ "font-size": "0.8rem", color: "#64748b" }}>counter signal</span>
+      </div>
+
+      {/* Text input — local state lives inside this component */}
+      <input
+        type="text"
+        value={note()}
+        onInput={e => setNote(e.currentTarget.value)}
+        placeholder="Type something…"
+        style={{
+          padding: "0.45rem 0.75rem",
+          border: "1px solid #bae6fd",
+          "border-radius": "6px",
+          "font-size": "0.875rem",
+          background: "white",
+          outline: "none",
+        }}
+      />
+      <span style={{ "font-size": "0.78rem", color: "#64748b" }}>
+        input state: <strong>"{note()}"</strong>
+      </span>
+    </div>
+  );
+};
+
+export const PresenceAStory = meta.story({
+  name: "createPresenceA — signals alive during exit",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createPresenceA` extends `createPresenceAnimation` with an `isExiting` accessor and makes the " +
+          "signal-survival guarantee explicit. The exit animation runs for **2 seconds** so you can " +
+          "interact with the counter and input while the card is animating out — both keep working " +
+          "because the component owner is only disposed after `isMounted` goes `false`, which happens " +
+          "only after the WAAPI `.finish` event fires.",
+      },
+    },
+  },
+  render: () => {
+    const [show, setShow] = createSignal(true);
+    let el!: HTMLDivElement;
+
+    const { isMounted, isExiting } = createPresenceA(() => el, show, {
+      enter: [
+        { opacity: 0, transform: "translateY(12px) scale(0.94)" },
+        { opacity: 1, transform: "none" },
+      ],
+      exit: [
+        { opacity: 1, transform: "none" },
+        { opacity: 0, transform: "translateY(12px) scale(0.94)" },
+      ],
+      enterOptions: { duration: 350, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "both" },
+      // Slow exit so you can observe interactivity during animation
+      exitOptions: { duration: 1250, easing: "ease-in", fill: "forwards" },
+      initialEnter: true,
+    });
+
+    return (
+      <Container width={340}>
+        <h3 style={{ margin: 0 }}>createPresenceA</h3>
+        <p style={{ margin: 0, "font-size": "0.85rem", color: "#64748b" }}>
+          Click +/− or type while the card is exiting (2 s animation) — signals keep working.
+        </p>
+
+        <Show when={isMounted()}>
+          <InteractiveCard ref={el} isExiting={isExiting} />
+        </Show>
+
+        <div
+          style={{
+            padding: "0.5rem 0.9rem",
+            background: "#f8fafc",
+            "border-radius": "8px",
+            border: "1px solid #e2e8f0",
+            "font-size": "0.82rem",
+            "font-family": '"Geist Mono", monospace',
+            display: "flex",
+            gap: "1.5rem",
+          }}
+        >
+          <span>
+            isMounted:{" "}
+            <strong style={{ color: isMounted() ? "#16a34a" : "#dc2626" }}>
+              {String(isMounted())}
+            </strong>
+          </span>
+          <span>
+            isExiting:{" "}
+            <strong style={{ color: isExiting() ? "#d97706" : "#94a3b8" }}>
+              {String(isExiting())}
+            </strong>
+          </span>
+        </div>
+
+        <ButtonRow>
+          <Button onClick={() => setShow(v => !v)} variant={show() ? "outline" : "primary"}>
+            {show() ? "Hide (2 s exit)" : "Show"}
+          </Button>
+        </ButtonRow>
+      </Container>
+    );
+  },
+});
+
+// ─── createPresenceB ──────────────────────────────────────────────────────────
+
+const SLIDES = [
+  { id: "alpha", label: "Alpha", color: "#6366f1", emoji: "🔮" },
+  { id: "beta", label: "Beta", color: "#ec4899", emoji: "🌸" },
+  { id: "gamma", label: "Gamma", color: "#10b981", emoji: "🌿" },
+] as const;
+
+type Slide = (typeof SLIDES)[number];
+
+const SLIDE_ANIM_OPTIONS = {
+  enter: [
+    { opacity: 0, transform: "translateX(24px) scale(0.95)" },
+    { opacity: 1, transform: "none" },
+  ],
+  exit: [
+    { opacity: 1, transform: "none" },
+    { opacity: 0, transform: "translateX(-24px) scale(0.95)" },
+  ],
+  enterOptions: {
+    duration: 280,
+    easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    fill: "both" as FillMode,
+  },
+  // Slow exit so you can observe the counter value persisting while animating out
+  exitOptions: { duration: 400, easing: "ease-in", fill: "forwards" as FillMode },
+  initialEnter: true,
+};
+
+// Defined at module level so each instance has a stable, independent reactive scope.
+const SlideCardB = (props: { slide: Slide; active: () => Slide }) => {
+  let el!: HTMLDivElement;
+  const [count, setCount] = createSignal(0);
+
+  const { gate, isExiting } = createPresenceB(
+    () => el,
+    () => props.active() === props.slide,
+    SLIDE_ANIM_OPTIONS,
+  );
+
+  const s = props.slide;
+
+  return (
+    <Show when={gate()}>
+      <div
+        ref={el}
+        style={{
+          position: "absolute",
+          inset: "0",
+          padding: "1.25rem",
+          background: isExiting() ? `${s.color}33` : `${s.color}18`,
+          border: `2px solid ${s.color}`,
+          "border-radius": "12px",
+          display: "flex",
+          "flex-direction": "column",
+          gap: "0.75rem",
+          transition: "background 0.3s",
+        }}
+      >
+        <div style={{ display: "flex", "align-items": "center", gap: "0.5rem" }}>
+          <span style={{ "font-size": "1.4rem" }}>{s.emoji}</span>
+          <strong style={{ color: s.color, "font-size": "1rem" }}>{s.label}</strong>
+          <Show when={isExiting()}>
+            <span
+              style={{
+                "margin-left": "auto",
+                "font-size": "0.75rem",
+                color: s.color,
+                opacity: "0.8",
+              }}
+            >
+              exiting…
+            </span>
+          </Show>
+        </div>
+
+        <div style={{ display: "flex", "align-items": "center", gap: "0.6rem" }}>
+          <button
+            onClick={() => setCount(v => v - 1)}
+            style={{
+              width: "30px",
+              height: "30px",
+              "border-radius": "50%",
+              border: "none",
+              background: `${s.color}22`,
+              color: s.color,
+              "font-size": "1rem",
+              cursor: "pointer",
+            }}
+          >
+            −
+          </button>
+          <span
+            style={{
+              "font-size": "1.4rem",
+              "font-weight": "700",
+              "min-width": "2.5ch",
+              "text-align": "center",
+              color: "#0f172a",
+              "font-variant-numeric": "tabular-nums",
+            }}
+          >
+            {count()}
+          </span>
+          <button
+            onClick={() => setCount(v => v + 1)}
+            style={{
+              width: "30px",
+              height: "30px",
+              "border-radius": "50%",
+              border: "none",
+              background: `${s.color}22`,
+              color: s.color,
+              "font-size": "1rem",
+              cursor: "pointer",
+            }}
+          >
+            +
+          </button>
+          <span style={{ "font-size": "0.78rem", color: "#64748b" }}>{s.label}'s counter</span>
+        </div>
+      </div>
+    </Show>
+  );
+};
+
+export const PresenceBStory = meta.story({
+  name: "createPresenceB — deferred disposal via async gate",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createPresenceB` uses Solid 2.0's built-in deferred-disposal mechanism. When `show` goes " +
+          "false, the `gate` memo returns a `Promise` instead of `false`. Returning a Promise causes " +
+          "`handleAsync` to throw `NotReadyError`, putting `gate` into `STATUS_PENDING`. " +
+          "`notifyStatus` propagates to Show's internal `createRenderEffect` via `queuePendingNode` " +
+          "(not the dirty heap), so Show never recomputes and the component owner is **not disposed**. " +
+          "When the WAAPI animation finishes the Promise resolves, `asyncWrite` makes Show recompute, " +
+          "and the component is finally removed. Each slide below has its own `count` signal — " +
+          "increment it, switch slides, and observe the old value during the 1.4 s exit.",
+      },
+    },
+  },
+  render: () => {
+    const [active, setActive] = createSignal<Slide>(SLIDES[0]);
+
+    return (
+      <Container width={360}>
+        <h3 style={{ margin: 0 }}>createPresenceB</h3>
+        <p style={{ margin: 0, "font-size": "0.85rem", color: "#64748b" }}>
+          Increment a counter, then switch slides. The old slide's count persists during its 1.4 s
+          exit — the component owner is deferred via an async <code>gate</code> memo.
+        </p>
+
+        <div style={{ display: "flex", gap: "0.4rem" }}>
+          <For each={[...SLIDES]}>
+            {slide => (
+              <button
+                onClick={() => setActive(slide)}
+                style={{
+                  flex: "1",
+                  padding: "0.5rem",
+                  background: active() === slide ? slide.color : "#f1f5f9",
+                  color: active() === slide ? "white" : "#64748b",
+                  border: "none",
+                  "border-radius": "8px",
+                  "font-weight": "600",
+                  "font-size": "0.82rem",
+                  cursor: "pointer",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                {slide.emoji} {slide.label}
+              </button>
+            )}
+          </For>
+        </div>
+
+        {/* Stacked so entering and exiting slides overlap during crossfade */}
+        <div style={{ position: "relative", height: "130px" }}>
+          <For each={[...SLIDES]}>{slide => <SlideCardB slide={slide} active={active} />}</For>
+        </div>
+
+        <div
+          style={{
+            "font-size": "0.8rem",
+            color: "#94a3b8",
+            "font-family": '"Geist Mono", monospace',
+            "padding-top": "0.25rem",
+          }}
+        >
+          active: <strong style={{ color: "#0f172a" }}>{active().label}</strong>
         </div>
       </Container>
     );
