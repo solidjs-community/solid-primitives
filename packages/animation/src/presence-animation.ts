@@ -383,16 +383,15 @@ export function createPresenceB(
     return animPromise;
   }) as unknown as Accessor<boolean>;
 
-  // Read gate() — the async signal — inside a createRenderEffect.
-  // When gate is STATUS_PENDING (exit animation running), this render effect
-  // is also placed into _pendingNodes via queuePendingNode (apply does not
-  // run while pending). When gate resolves to true (show becomes true),
-  // apply fires and starts the enter animation.
-  createRenderEffect(
-    () => gate(),
-    (gateValue: unknown, prev: unknown) => {
-      if (prev === undefined) return; // skip initial mount
-      if (gateValue !== true) return; // pending or false — exit handled by gate memo
+  // Track getShow() directly (a plain boolean, never async) rather than gate()
+  // (the async memo). Tracking gate() puts this effect into _pendingNodes while
+  // the exit Promise is live; if show flips back to true before the Promise
+  // resolves, Solid may not re-queue the stuck effect, so setIsExiting(false)
+  // and the enter animation would never fire. getShow() always triggers reliably.
+  createEffect(
+    () => getShow(),
+    (shouldShow) => {
+      if (!shouldShow) return;
       setIsExiting(false);
       const gen = ++enterGen;
       queueMicrotask(() => {
@@ -403,6 +402,7 @@ export function createPresenceB(
         enterAnim.addEventListener("finish", () => { enterAnim = undefined; }, { once: true });
       });
     },
+    { defer: true },
   );
 
   if (options.initialEnter && untrack(getShow)) {
