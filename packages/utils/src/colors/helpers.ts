@@ -601,9 +601,9 @@ class HSBColor extends Color {
       if (!Number.isFinite(h) || !Number.isFinite(s) || !Number.isFinite(b)) return undefined;
       if (a !== undefined && !Number.isFinite(a)) return undefined;
       return new HSBColor(
-        normalizeHue(h),
-        clamp(s, 0, 100),
-        clamp(b, 0, 100),
+        normalizeHue(h!),
+        clamp(s!, 0, 100),
+        clamp(b!, 0, 100),
         clamp(a ?? 1, 0, 1),
       );
     }
@@ -775,9 +775,9 @@ class HSLColor extends Color {
       if (!Number.isFinite(h) || !Number.isFinite(s) || !Number.isFinite(l)) return undefined;
       if (a !== undefined && !Number.isFinite(a)) return undefined;
       return new HSLColor(
-        normalizeHue(h),
-        clamp(s, 0, 100),
-        clamp(l, 0, 100),
+        normalizeHue(h!),
+        clamp(s!, 0, 100),
+        clamp(l!, 0, 100),
         clamp(a ?? 1, 0, 1),
       );
     }
