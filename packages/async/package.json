@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/async",
-  "version": "0.0.100",
+  "version": "0.0.101-next.0",
   "description": "A collection of primitives for asynchronous handling.",
   "author": "Alex Lohr <alexthkloss@web.de>",
   "contributors": [],
