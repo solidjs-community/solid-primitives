@@ -9,6 +9,10 @@
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
+> [!TIP]
+> `solid-js@>=2.0.0` no longer uses resources. You can find most of these helpers for the new version in the `@solid-primitives/async` package.
+
+
 A collection of composable primitives to augment [`createResource`](https://www.solidjs.com/docs/latest/api#createresource)
 
 - [`createAggregated`](#createaggregated) - wraps the resource to aggregate data instead of overwriting it
