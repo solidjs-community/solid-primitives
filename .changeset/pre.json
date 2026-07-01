@@ -98,7 +98,8 @@
     "@solid-primitives/queue": "0.1.0",
     "@solid-primitives/sensors": "0.1.0",
     "@solid-primitives/vibrate": "0.0.100",
-    "@solid-primitives/video": "0.0.100"
+    "@solid-primitives/video": "0.0.100",
+    "@solid-primitives/async": "0.0.100"
   },
   "changesets": [
     "a11y-solid2-initial",
@@ -181,6 +182,7 @@
     "state-machine-solid2-migration",
     "styles-solid2-migration",
     "sweet-olives-talk",
+    "ten-parks-allow",
     "transition-group-solid2-migration",
     "trigger-solid2-migration",
     "tween-solid2-migration",
