@@ -24,7 +24,8 @@
       "makeRetrying",
       "createAggregated"
     ],
-    "category": "Reactivity"
+    "category": "Reactivity",
+    "gzip": 1168
   },
   "keywords": [
     "solid",
