@@ -1,6 +1,14 @@
 import { createAggregated } from "@solid-primitives/async";
 import preview from "../../../.storybook/preview.js";
-import { createSignal, For, onCleanup } from "solid-js";
+import { createSignal, For } from "solid-js";
+import {
+  Button,
+  ButtonRow,
+  Container,
+  StatRow,
+  colors,
+  radii,
+} from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Async",
@@ -12,27 +20,50 @@ const meta = preview.meta({
 export default meta;
 
 export const Aggregation = meta.story({
-  name: "createAggregated",
+  name: "Infinite scroll page list",
   parameters: {
     docs: {
       description: {
         story:
-          "`createAggregated` aggregates the states of any accessor."
-      }
-    }
+          '`createAggregated` appends each new value from an accessor onto the previous result instead of replacing it — here every "page" gets pushed onto a running list.',
+      },
+    },
   },
   render: () => {
     const [currentPage, setCurrentPage] = createSignal(1);
-    const pages = createAggregated(currentPage, []);
-    const loadNextPage = () => setCurrentPage(page => page + 1);
-    
-    return <main id="pages">
-      <ol>
-        <For each={pages()}>
-          {(page) => <li style="display: flex; height: 80vh; justify-content: center; align-items: center;">{page}</li>}
-        </For>
-      </ol>
-      <button type="button" onClick={loadNextPage}>Load next page</button>
-    </main>
+    const aggregated = createAggregated(currentPage, [] as number[]);
+    const pages = () => aggregated() as number[];
+
+    return (
+      <Container width={280}>
+        <StatRow label="Pages Loaded" value={pages().length} />
+        <div
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.4rem",
+            "max-height": "200px",
+            "overflow-y": "auto",
+          }}
+        >
+          <For each={pages()}>
+            {page => (
+              <div
+                style={{
+                  padding: "0.5rem 0.75rem",
+                  background: colors.surface,
+                  "border-radius": radii.md,
+                }}
+              >
+                Page {page}
+              </div>
+            )}
+          </For>
+        </div>
+        <ButtonRow>
+          <Button onClick={() => setCurrentPage(page => page + 1)}>Load next page</Button>
+        </ButtonRow>
+      </Container>
+    );
   },
 });

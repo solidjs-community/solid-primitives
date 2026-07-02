@@ -1,6 +1,7 @@
 import { makeRetrying } from "@solid-primitives/async";
-import preview from "../../../.storybook/preview.js";;
+import preview from "../../../.storybook/preview.js";
 import { createMemo, isPending, Errored } from "solid-js";
+import { Alert, Badge, Button, Container, Section } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Async",
@@ -12,43 +13,59 @@ const meta = preview.meta({
 export default meta;
 
 export const Retrying = meta.story({
-  name: "makeRetrying",
+  name: "Retrying a flaky request",
   parameters: {
     docs: {
       description: {
         story:
-          "`makeRetrying` wraps a fetcher in order to retry one or more times after a delay."
-      }
-    }
+          "`makeRetrying` wraps a fetcher and retries it after a delay when it rejects. Both services below reject twice before succeeding — only the retrying one recovers.",
+      },
+    },
   },
   render: () => {
-    class FaultyService {
+    class FlakyService {
       #calls = 0;
-      async get(): Promise<string> {
+      get(): Promise<string> {
         return this.#calls++ < 2
-          ? Promise.reject(new Error('rejected'))
-          : Promise.resolve("works")
+          ? Promise.reject(new Error("rejected"))
+          : Promise.resolve("it works!");
       }
-    } 
-    const service1 = new FaultyService();
-    const service2 = new FaultyService();
-    const result1 = createMemo(makeRetrying(() => service1.get()));
-    const result2 = createMemo(() => service2.get());
-    
-    return <>
-      <p>This simulates a service that rejects 2 times before resolving.</p>
-      <h3>With retrying:</h3>
-      <Errored 
-        fallback={(err, reset) => <p>Failed: {err?.()?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
-      >
-        <p>{!isPending(result1) && result1()}</p>
-      </Errored>
-      <h3>Without retrying:</h3>
-      <Errored 
-        fallback={(err, reset) => <p>Failed: {err?.()?.toString() || "unknown error"} <button type="button" onClick={reset}>Reset</button></p>}
-      >
-        <p>{!isPending(result2) && result2()}</p>
-      </Errored>
-    </>
+    }
+    const retryingService = new FlakyService();
+    const plainService = new FlakyService();
+    const retrying = createMemo(makeRetrying(() => retryingService.get(), { delay: 400 }));
+    const plain = createMemo(() => plainService.get());
+
+    const errorFallback = (err: () => unknown, reset: () => void) => (
+      <Alert variant="error">
+        Failed: {err() instanceof Error ? (err() as Error).message : "unknown error"}{" "}
+        <Button variant="ghost" onClick={reset}>
+          Reset
+        </Button>
+      </Alert>
+    );
+
+    return (
+      <Container width={320}>
+        <Section title="With makeRetrying">
+          <Errored fallback={errorFallback}>
+            {isPending(retrying) ? (
+              <Badge variant="warning">retrying…</Badge>
+            ) : (
+              <Badge variant="success">{retrying()}</Badge>
+            )}
+          </Errored>
+        </Section>
+        <Section title="Without retrying">
+          <Errored fallback={errorFallback}>
+            {isPending(plain) ? (
+              <Badge variant="default">loading…</Badge>
+            ) : (
+              <Badge variant="success">{plain()}</Badge>
+            )}
+          </Errored>
+        </Section>
+      </Container>
+    );
   },
 });

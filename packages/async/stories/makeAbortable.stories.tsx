@@ -2,89 +2,76 @@ import { makeAbortable } from "@solid-primitives/async";
 import preview from "../../../.storybook/preview.js";
 import data from "./data.json";
 import { createMemo, createSignal, For, Loading, onCleanup } from "solid-js";
+import readme from "../README.md?raw";
+import { autoSuggest } from "./shared.js";
+import { Card, Container, colors, font, inputStyle } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "Reactivity/Async",
+  tags: ["autodocs"],
   parameters: {
     layout: "centered",
+    docs: {
+      description: {
+        component: readme,
+      },
+    },
   },
 });
 
 export default meta;
 
-declare global {
-  class AbortError extends Error {}
-}
-
 export const Abortable = meta.story({
-  name: "makeAbortable AutoSuggest",
+  name: "Auto-suggest that cancels stale requests",
   parameters: {
     docs: {
       description: {
         story:
-          "`makeAbortable` automatically aborts subsequent requests and automatically aborts on next signal, ideal for patterns like auto-suggest."
-      }
-    }
+          "`makeAbortable` aborts the in-flight request whenever a new one starts, so only the response for the latest keystroke ever resolves — the classic auto-suggest pattern. Call `abort()` yourself on cleanup when not using `createAbortable`.",
+      },
+    },
   },
   render: () => {
-    if (!('AbortError' in globalThis)) {
-      (globalThis as any).AbortError = class AbortError extends Error { 
-        constructor(msg: string) { super(msg); }
-      }
-    }
-    const autoSuggest = async (query: string, signal: AbortSignal) => {
-      await new Promise(r => setTimeout(r, 200));
-      query = query.replace(/\W/, "");
-      if (!query) return [];
-      if (signal.aborted) throw new AbortError("aborted");
-      const fuzzy = (term: string) => {
-        let pos = -1, indices = [];
-        for (const char of query) {
-          pos = term.indexOf(char, pos + 1);
-          indices.push(pos)
-          if (pos === -1) return null;
-        }
-        return indices;
-      }
-      const terms = data.reduce((terms, term) => {
-        if (signal.aborted) throw new AbortError("aborted");
-        const indices = fuzzy(term);
-        if (indices) {
-          let letters: [string, boolean][] = [];
-          [...term].forEach((c, i) => {
-            const mark = indices.includes(i);
-            if (letters.at(-1)?.[1] !== mark) {
-              letters.push([c, mark]);
-            } else {
-              letters.at(-1)![0] += c;
-            }
-          });
-          terms.push(letters);
-        }
-        return terms;
-      }, [] as [string, boolean][][]);
-      console.log(terms);
-      return terms;
-    }
     const [query, setQuery] = createSignal("");
-    const [signal, abort, filterError] = makeAbortable();
+    const [signal, abort, filterAbortError] = makeAbortable();
     onCleanup(abort);
-    const suggest = createMemo(() => autoSuggest(query(), signal()).catch(filterError));
-    
-    return <Loading>
-      <input 
-        placeholder="type for autosuggest"
-        onInput={(ev) => { setQuery(ev.currentTarget.value)}}
-      />
-      <ul>
-        <For each={suggest()} fallback={<li>no suggestions found</li>}>
-          {(suggestion) => <li>
-            <For each={suggestion}>
-              {(letter) => letter[1] ? <strong>{letter[0]}</strong> : letter[0]}
+    const suggestions = createMemo(() =>
+      autoSuggest(query(), signal(), data).catch(filterAbortError),
+    );
+
+    return (
+      <Container width={320}>
+        <input
+          value={query()}
+          onInput={e => setQuery(e.currentTarget.value)}
+          placeholder="Type to search…"
+          style={inputStyle}
+        />
+        <Loading
+          fallback={
+            <span style={{ color: colors.muted, "font-size": font.sizeSm }}>Searching…</span>
+          }
+        >
+          <Card>
+            <For
+              each={suggestions() ?? []}
+              fallback={
+                <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>No matches</span>
+              }
+            >
+              {segments => (
+                <div style={{ "font-family": font.mono, "font-size": font.sizeBase }}>
+                  <For each={segments}>
+                    {([text, matched]) =>
+                      matched ? <strong style={{ color: colors.primary }}>{text}</strong> : text
+                    }
+                  </For>
+                </div>
+              )}
             </For>
-          </li>}
-        </For>
-      </ul>
-    </Loading>
+          </Card>
+        </Loading>
+      </Container>
+    );
   },
 });
