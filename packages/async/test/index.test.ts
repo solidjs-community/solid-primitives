@@ -154,15 +154,17 @@ describe("createAbortable", () => {
 
 describe("makeRetrying", () => {
   test("makes a fetcher retry in case of error", async () => {
-    const responses: Promise<unknown>[] = [Promise.reject(new Error("retry"))];
-    const fetcher = (_prev: unknown) => responses.shift() || Promise.resolve(true);
+    let calls = 0;
+    const fetcher = (_prev: unknown) =>
+      calls++ === 0 ? Promise.reject(new Error("retry")) : Promise.resolve(true);
     const wrapped = makeRetrying(fetcher, { delay: 15 });
     expect(await wrapped()[Symbol.asyncIterator]().next()).toEqual({ done: false, value: true });
   });
-  
+
   test("throws after the retry limit", async () => {
-  const responses: Promise<unknown>[] = Array.from({ length: 4 }, () => Promise.reject(new Error("retry")));
-    const fetcher = (_prev: unknown) => responses.shift() || Promise.resolve(true);
+    let calls = 0;
+    const fetcher = (_prev: unknown) =>
+      calls++ < 4 ? Promise.reject(new Error("retry")) : Promise.resolve(true);
     const wrapped = makeRetrying(fetcher, { delay: 15 });
     const result = wrapped()[Symbol.asyncIterator]().next();
     await expect(result).rejects.toThrow();

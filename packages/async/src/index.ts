@@ -105,7 +105,7 @@ export type AbortableOptions = {
  *
  * Options are optional and include:
  * - `timeout`: time in Milliseconds after which the fetcher aborts automatically
- * - `autoAbort`: can be set to true to make a new source not automatically abort a previous request
+ * - `autoAbort`: defaults to `true`, aborting the previous signal whenever a new one is requested; set to `false` to opt out
  * - `chainTo`: listen to another abort signal to abort this signal
  */
 export function makeAbortable(
@@ -154,7 +154,7 @@ export function makeAbortable(
  *
  * Options are optional and include:
  * - `timeout`: time in Milliseconds after which the fetcher aborts automatically
- * - `noAutoAbort`: can be set to true to make a new source not automatically abort a previous request
+ * - `autoAbort`: defaults to `true`, aborting the previous signal whenever a new one is requested; set to `false` to opt out
  * - `chainTo`: listen to another abort signal to abort this signal
  */
 export function createAbortable(
