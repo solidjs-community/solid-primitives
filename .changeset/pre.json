@@ -104,6 +104,7 @@
   "changesets": [
     "a11y-solid2-initial",
     "active-element-solid2-migration",
+    "async-docs-and-test-fixes",
     "audio-solid2-migration",
     "bounds-solid2-migration",
     "broadcast-channel-solid2-migration",
