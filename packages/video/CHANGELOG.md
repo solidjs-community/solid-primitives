@@ -1,5 +1,11 @@
 # @solid-primitives/video
 
+## 1.0.0-next.1
+
+### Minor Changes
+
+- 7ec7507: Add `makeVideoFrameCallback` and `createVideoFrameCallback` — wrappers around [`HTMLVideoElement.requestVideoFrameCallback`](https://wicg.github.io/video-rvfc/) (resolves #365). The callback fires once per displayed video frame instead of once per display refresh, naturally stops while the video is paused, and receives frame metadata (`mediaTime`, `presentedFrames`, etc.) for syncing work to actual playback. `makeVideoFrameCallback` is non-reactive (no Solid owner required); `createVideoFrameCallback` wraps it in a signal and stops automatically `onCleanup`.
+
 ## 1.0.0-next.0
 
 ### Major Changes
