@@ -109,6 +109,29 @@ const audio = createAudio(src);
 setSrc("track2.mp3");
 ```
 
+#### Seek slider (scrubbing)
+
+`currentTime` updates continuously during playback, so binding a `<input type="range">` directly to it fights the user while they drag the thumb. Track a local "scrubbing" signal to show the dragged position instead, and only call `seek` once the user releases:
+
+```tsx
+const audio = createAudio("example.mp3");
+const [scrubTime, setScrubTime] = createSignal<number | undefined>();
+
+<input
+  type="range"
+  min={0}
+  max={audio.duration()}
+  value={scrubTime() ?? audio.currentTime()}
+  onInput={e => setScrubTime(e.currentTarget.valueAsNumber)}
+  onChange={e => {
+    audio.seek(e.currentTarget.valueAsNumber);
+    setScrubTime(undefined);
+  }}
+/>;
+```
+
+`onInput` fires continuously while dragging (updates the displayed value only); `onChange` fires once on release, when the seek should actually happen.
+
 #### Definition
 
 ```ts
