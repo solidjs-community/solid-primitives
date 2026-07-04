@@ -118,7 +118,7 @@ export const createVideo = (
   const [player, cleanup] = makeVideo(access(src), {}, options);
   onCleanup(cleanup);
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const seek = player.fastSeek
     ? (time: number) => player.fastSeek(time)
     : (time: number) => { player.currentTime = time; };

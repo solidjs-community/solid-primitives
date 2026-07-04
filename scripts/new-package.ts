@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* oxlint-disable no-console */
 import * as fsp from "node:fs/promises";
 import * as path from "node:path";
 import * as url from "node:url";

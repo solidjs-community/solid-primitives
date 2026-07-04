@@ -67,7 +67,7 @@ export const rsync = async (
           `${dest}${dest.endsWith("/") ? "" : "/"}${getItemName(entry)}`,
         ));
     }
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (srcType === "file") {
     const fileData =
       "async" in fs1 ? await fs1.readFile(src) : await toPromise(() => fs1.readFile(src));

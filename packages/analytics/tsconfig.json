@@ -5,7 +5,17 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "references": [],
+  "references": [
+    {
+      "path": "../page-utilities"
+    },
+    {
+      "path": "../queue"
+    },
+    {
+      "path": "../utils"
+    }
+  ],
   "include": [
     "src"
   ]

@@ -76,7 +76,7 @@ export const getPackageBundlesize = async (
       external: ["solid-js", "node-fetch", "chokidar", "fs", ...(peerDependencies ?? [])],
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
+    // oxlint-disable-next-line no-console
     console.error(
       `Error when building ${exportName ? `${packageName}_${exportName}` : packageName}:\n`,
       e,

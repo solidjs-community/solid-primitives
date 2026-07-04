@@ -151,7 +151,7 @@ export function makePersisted<
           const value = deserialize(data);
           (signal[1] as any)(() => value);
         } catch (e) {
-          // eslint-disable-next-line no-console
+          // oxlint-disable-next-line no-console
           if (DEV) console.warn(e);
         }
       }
@@ -160,7 +160,7 @@ export function makePersisted<
           const value = deserialize(data);
           (signal[1] as any)(reconcile(value, () => true));
         } catch (e) {
-          // eslint-disable-next-line no-console
+          // oxlint-disable-next-line no-console
           if (DEV) console.warn(e);
         }
       };
@@ -247,7 +247,7 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): Persistence
           subscriber(data);
         }
       } catch (e) {
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         if (warnOnError) console.warn(e);
       }
     }),

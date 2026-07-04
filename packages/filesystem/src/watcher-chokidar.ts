@@ -13,7 +13,7 @@ export const makeChokidarWatcher = (basePath: string = "/"): Watcher => {
         .on("unlink", path => subscriber?.("rm", path))
         .on("unlinkDir", path => subscriber?.("rm", path)),
     )
-    // eslint-disable-next-line no-console
+    // oxlint-disable-next-line no-console
     .catch(e => console.warn(e));
 
   return fn => {

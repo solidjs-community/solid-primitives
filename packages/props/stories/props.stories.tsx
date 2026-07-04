@@ -3,7 +3,6 @@ import preview from "../../../.storybook/preview.js";
 import {
   combineProps,
   combineHandlers,
-  filterProps,
   partitionProps,
 } from "@solid-primitives/props";
 import readme from "../README.md?raw";

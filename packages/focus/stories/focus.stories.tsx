@@ -13,7 +13,6 @@ import {
   BoolRow,
   Button,
   ButtonRow,
-  Card,
   colors,
   Container,
   EventLog,

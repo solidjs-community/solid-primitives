@@ -19,7 +19,7 @@ export const wrapFetcher = <Result, FetcherArgs extends any[]>(
   if (!originalFetcher) {
     throw new Error("could not read resource fetcher");
   }
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   requestContext.fetcher = wrapper(originalFetcher) || originalFetcher;
 };
 

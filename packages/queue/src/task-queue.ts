@@ -94,7 +94,7 @@ export function createTaskQueue<T>(): ReactiveTaskQueue<T> {
       const entry = tasks.shift()!;
       setSize(tasks.length);
       try {
-        entry.resolve((await entry.fn()) as T);
+        entry.resolve(await entry.fn());
       } catch (err) {
         entry.reject(err);
       }
@@ -166,7 +166,7 @@ export function createConcurrentTaskQueue<T>(concurrency: number): ReactiveConcu
 
       (async () => {
         try {
-          entry.resolve((await entry.fn()) as T);
+          entry.resolve(await entry.fn());
         } catch (err) {
           entry.reject(err);
         } finally {

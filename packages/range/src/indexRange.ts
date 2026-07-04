@@ -113,7 +113,7 @@ export function indexRange<T>(
   return () => {
     let _step = getStep();
     if (_step === 0) {
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       if (!isServer && DEV) console.warn("Range cannot have a step of 0");
       return items;
     }

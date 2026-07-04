@@ -138,7 +138,7 @@ export const createDbStore = <Row extends DbRow>(
     if (typeof opts.onError === "function") {
       opts.onError(error);
     } else if (DEV) {
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       console.error(error);
     }
     return Promise.resolve();

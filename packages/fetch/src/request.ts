@@ -12,7 +12,7 @@ if (isServer && !fetchFallback) {
     fetchFallback = nodeFetch;
   } catch (_e) {
     fetchFallback = () => {
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       console.warn(
         '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"',
       );

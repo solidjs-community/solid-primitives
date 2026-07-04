@@ -56,7 +56,7 @@ export const makeVideoPlayer = (
     player,
     play: () => player.play(),
     pause: () => player.pause(),
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     seek: player.fastSeek
       ? (time: number) => player.fastSeek(time)
       : (time: number) => {
