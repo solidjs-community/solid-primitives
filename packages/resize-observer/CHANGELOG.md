@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 4.0.0-next.1
+
+### Minor Changes
+
+- d0cc459: Add `clientWidth`/`clientHeight` to `getElementSize` and `createElementSize` (resolves #804). These come from the element's `clientWidth`/`clientHeight` properties (padding-box, excludes border/scrollbar, unaffected by CSS transforms) alongside the existing `width`/`height` (from `getBoundingClientRect`, border-box, affected by CSS transforms). Purely additive — non-breaking.
+
 ## 4.0.0-next.0
 
 ### Major Changes
@@ -11,7 +17,6 @@
   **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/resize-observer`
-
   - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
   - `createResizeObserver`: internal `createEffect` converted to the Solid 2.0 split compute/apply pattern
   - `createElementSize`: internal `createEffect` converted to split compute/apply pattern; element cleanup (`unobserve`) is returned from apply phase instead of using `onCleanup`
