@@ -86,6 +86,7 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
           else stopStream(s);
         }).catch((err: unknown) => {
           if (active) setStream(undefined);
+          // oxlint-disable-next-line no-console
           console.error(err);
         });
       } else {
@@ -253,6 +254,7 @@ export const createScreen = (
           else stopStream(s);
         }).catch((err: unknown) => {
           if (active) setStream(undefined);
+          // oxlint-disable-next-line no-console
           console.error(err);
         });
       } else {

@@ -524,7 +524,7 @@ describe("submit", () => {
 
   it("allows re-submit after correcting a validation error", async () => {
     const onSubmit = vi.fn();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     let form: any;
 
     const dispose = createRoot(d => {

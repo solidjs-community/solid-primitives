@@ -69,7 +69,7 @@ export const CreatePaginationStory = meta.story({
   render: () => {
     const [totalPages, setTotalPages] = createSignal(20);
     const [maxVisible, setMaxVisible] = createSignal(7);
-    const [paginationProps, page, setPage] = createPagination(() => ({
+    const [paginationProps, page, _setPage] = createPagination(() => ({
       pages: totalPages(),
       maxPages: maxVisible(),
     }));

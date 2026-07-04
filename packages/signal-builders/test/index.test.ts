@@ -295,7 +295,7 @@ describe("add()", () => {
 
   it("updates when signal changes", () => {
     const [a, setA] = createSignal(1);
-    const [b, setB] = createSignal(2);
+    const [b, _setB] = createSignal(2);
     const { result, dispose } = createRoot(d => ({ result: add(a, b), dispose: d }));
     expect(result()).toBe(3);
     setA(10);

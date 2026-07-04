@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createEffect, createRoot, createSignal, flush } from "solid-js";
-import { createStore, reconcile } from "solid-js";
+import { createStore } from "solid-js";
 import { captureStoreUpdates } from "../src/index.js";
 
 describe("createStoreDelta", () => {

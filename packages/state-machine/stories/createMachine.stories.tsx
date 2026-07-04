@@ -220,7 +220,9 @@ export const InlineEdit = meta.story({
     // Forward references so state callbacks can trigger external transitions.
     // These are assigned after createMachine returns; closures capture the
     // binding, not the value, so they resolve correctly at call time.
+    // oxlint-disable-next-line prefer-const
     let toEdit!: () => void;
+    // oxlint-disable-next-line prefer-const
     let toRead!: () => void;
 
     const state = createMachine<{

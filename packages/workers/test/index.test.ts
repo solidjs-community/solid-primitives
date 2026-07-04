@@ -276,7 +276,7 @@ describe("abort", () => {
   });
 
   it("abort() after the promise already resolved is a no-op", async () => {
-    let mainListeners: ((e: { data: unknown }) => void)[] = [];
+    const mainListeners: ((e: { data: unknown }) => void)[] = [];
     const mock = {
       addEventListener: vi.fn((_: string, h: (e: { data: unknown }) => void) => { mainListeners.push(h); }),
       removeEventListener: vi.fn(),

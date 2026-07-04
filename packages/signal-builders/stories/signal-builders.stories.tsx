@@ -1,7 +1,6 @@
 import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
-  push,
   filter,
   sort,
   capitalize,

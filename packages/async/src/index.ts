@@ -21,7 +21,6 @@ export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args:
     const stream = source instanceof Response ? source.body : source;
     const reader = stream?.getReader();
     if (!reader) {
-      console.warn('No ReadableStream found!')
       return;
     }
     while (true) {
@@ -73,7 +72,7 @@ export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...a
       try {
         const parsed = JSON.parse(closeJSONPart(data));
         yield parsed;
-      } catch (e) { /* ignore erroneous states, recover later */ }
+      } catch (_e) { /* ignore erroneous states, recover later */ }
     }
   }
 }
@@ -217,7 +216,7 @@ export function makeRetrying<T>(
           yield Promise.resolve(result) as PromiseLike<T>;
           return;
         }
-      } catch(error) {
+      } catch(_error) {
         if (retries-- <= 0) {
           retries = options.retries ?? 3;
           throw new Error(`retry failed ${options.retries ?? 3} times`);

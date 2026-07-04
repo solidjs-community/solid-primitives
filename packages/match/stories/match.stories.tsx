@@ -4,7 +4,6 @@ import { MatchTag, MatchValue } from "@solid-primitives/match";
 import readme from "../README.md?raw";
 import {
   Button,
-  ButtonRow,
   Container,
   Card,
   Section,
@@ -207,19 +206,19 @@ export const CustomTagField = meta.story({
             case={{
               info: v => (
                 <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-                  <Badge variant="info">info</Badge>
+                  <Badge variant={BADGE_VARIANT.info}>info</Badge>
                   <span style={{ "font-size": font.sizeSm }}>{v().message}</span>
                 </div>
               ),
               warning: v => (
                 <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-                  <Badge variant="warning">warning #{v().code}</Badge>
+                  <Badge variant={BADGE_VARIANT.warning}>warning #{v().code}</Badge>
                   <span style={{ "font-size": font.sizeSm }}>{v().message}</span>
                 </div>
               ),
               error: v => (
                 <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-                  <Badge variant="error">error #{v().code}</Badge>
+                  <Badge variant={BADGE_VARIANT.error}>error #{v().code}</Badge>
                   <span style={{ "font-size": font.sizeSm }}>{v().message}</span>
                   <BoolRow label="fatal" value={v().fatal} />
                 </div>

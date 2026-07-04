@@ -115,7 +115,7 @@ export function createToken<P extends object, T>(
       : () => {
           !isServer &&
             DEV &&
-            // eslint-disable-next-line no-console
+            // oxlint-disable-next-line no-console
             console.warn(
               `Tokens can only be rendered with resolveTokens. ("${symbol.description}")`,
             );
@@ -149,7 +149,7 @@ function getResolvedTokens(
   // other element
   else if (addElements) resolved.push(value);
   else if (!isServer && DEV && value)
-    // eslint-disable-next-line no-console
+    // oxlint-disable-next-line no-console
     console.warn(`Invalid JSX Element passed to token resolver:`, value);
 
   return resolved;

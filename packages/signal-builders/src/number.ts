@@ -11,6 +11,7 @@ import { type Accessor, createMemo } from "solid-js";
  */
 export function add(...a: MaybeAccessor<number>[]): Accessor<number>;
 export function add(...a: MaybeAccessor<string>[]): Accessor<string>;
+export function add(...a: MaybeAccessor<(number | string)>[]): Accessor<string>;
 export function add(...a: MaybeAccessor<any>[]): Accessor<string | number> {
   return createMemo(() => _.add(...accessArray(a)));
 }

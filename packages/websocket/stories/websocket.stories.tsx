@@ -13,7 +13,6 @@ import {
   Badge,
   Button,
   ButtonRow,
-  Card,
   Container,
   EventLog,
   Section,

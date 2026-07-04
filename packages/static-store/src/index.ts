@@ -1,6 +1,5 @@
 import { accessWith, isObject, type SetterParam } from "@solid-primitives/utils";
 import {
-  type Accessor,
   createMemo,
   createSignal,
   type ComputeFunction,
