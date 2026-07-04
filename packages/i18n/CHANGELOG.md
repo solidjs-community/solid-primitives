@@ -1,5 +1,11 @@
 # @solid-primitives/i18n
 
+## 3.0.0-next.1
+
+### Minor Changes
+
+- 2c46ed3: Add an optional `onMissingKey` third argument to `translator()`, called when the dictionary is loaded but has no value at the requested path — as opposed to when the dictionary itself isn't available yet, which still resolves to `undefined` regardless (resolves #765). Also export `missingKeyAsPath`, a ready-made handler that falls back to the requested path itself (e.g. `"food.meat"`), making missing translations visible in the UI instead of silently rendering blank. The default behavior (no handler passed) is unchanged — missing keys still resolve to `undefined`, matching the existing `NullableTranslator`/`scopedTranslator` documented behavior — so this is purely additive and opt-in.
+
 ## 3.0.0-next.0
 
 ### Major Changes
@@ -11,7 +17,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
 
   ### `@solid-primitives/i18n`
-
   - `createResource` is removed in Solid 2.0 — use `createMemo` with an async function for dynamic dictionary loading, or a synchronous `createMemo` for static dictionaries
   - `Suspense` is replaced by `Loading` from `solid-js` for wrapping async dictionary reads
   - `useTransition` is removed — use `isPending()` from `solid-js` to observe transition state
