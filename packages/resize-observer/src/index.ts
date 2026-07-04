@@ -25,7 +25,10 @@ export type ResizeHandler<T extends Element = Element> = (
 ) => void;
 
 export type Size = { width: number; height: number };
-export type NullableSize = { width: number; height: number } | { width: null; height: null };
+
+export type SizeWithClient = Size & { clientWidth: number; clientHeight: number };
+export type NullableSize =
+  SizeWithClient | { width: null; height: null; clientWidth: null; clientHeight: null };
 
 /**
  * Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
@@ -142,31 +145,39 @@ export function createWindowSize(): Readonly<Size> {
 export const useWindowSize: typeof createWindowSize =
   /*#__PURE__*/ createHydratableSingletonRoot(createWindowSize);
 
-const ELEMENT_SIZE_FALLBACK = { width: null, height: null } as const satisfies NullableSize;
+const ELEMENT_SIZE_FALLBACK = {
+  width: null,
+  height: null,
+  clientWidth: null,
+  clientHeight: null,
+} as const satisfies NullableSize;
 
 /**
  * @param target html element
- * @returns object with width and height dimensions of provided {@link target} element.
+ * @returns object with width/height (from `getBoundingClientRect`, border-box, affected by CSS transforms)
+ * and clientWidth/clientHeight (padding-box, unaffected by CSS transforms) of the provided {@link target} element.
  */
+export function getElementSize(target: Element): SizeWithClient;
+export function getElementSize(target: Element | false | undefined | null): NullableSize;
 export function getElementSize(target: Element | false | undefined | null): NullableSize {
   if (isServer || !target) {
     return { ...ELEMENT_SIZE_FALLBACK };
   }
   const { width, height } = target.getBoundingClientRect();
-  return { width, height };
+  return { width, height, clientWidth: target.clientWidth, clientHeight: target.clientHeight };
 }
 
 /**
- * Creates a reactive store-like object of current width and height dimensions of {@link target} element.
+ * Creates a reactive store-like object of current width/height and clientWidth/clientHeight dimensions of {@link target} element.
  * @param target html element to track the size of. Can be a reactive signal.
- * @returns `{ width: number, height: number }`
+ * @returns `{ width: number, height: number, clientWidth: number, clientHeight: number }`
  * @example
  * const size = createElementSize(document.body);
  * createEffect(() => {
- *   console.log(size.width, size.height)
+ *   console.log(size.width, size.height, size.clientWidth, size.clientHeight)
  * })
  */
-export function createElementSize(target: Element): Readonly<Size>;
+export function createElementSize(target: Element): Readonly<SizeWithClient>;
 export function createElementSize(
   target: Accessor<Element | false | undefined | null>,
 ): Readonly<NullableSize>;

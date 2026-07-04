@@ -16,6 +16,8 @@ describe("server", () => {
     expect(el).not.toBeCalled();
     expect(size.width).toBe(null);
     expect(size.height).toBe(null);
+    expect(size.clientWidth).toBe(null);
+    expect(size.clientHeight).toBe(null);
   });
 
   test("createWindowSize", () => {

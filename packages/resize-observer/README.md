@@ -142,9 +142,9 @@ If you want a reactive interface for media-queries, please checkout [the media p
 
 ## `createElementSize`
 
-Creates a reactive store-like object of current width and height dimensions of html element.
+Creates a reactive store-like object of current width/height and clientWidth/clientHeight dimensions of html element.
 
-It uses `ResizeObserver` under the hood—to observe when the element size changes—and `getBoundingClientRect` to get the current size.
+It uses `ResizeObserver` under the hood—to observe when the element size changes. `width`/`height` come from `getBoundingClientRect` (border-box, affected by CSS transforms); `clientWidth`/`clientHeight` come from the element's `clientWidth`/`clientHeight` properties (padding-box, excludes border/scrollbar, unaffected by CSS transforms).
 
 ### How to use it
 
@@ -157,6 +157,8 @@ const size = createElementSize(document.body);
 createEffect(() => {
   size.width; // => number
   size.height; // => number
+  size.clientWidth; // => number
+  size.clientHeight; // => number
 });
 
 // reactive target
@@ -167,6 +169,8 @@ const size = createElementSize(target);
 createEffect(() => {
   size.width; // => number | null
   size.height; // => number | null
+  size.clientWidth; // => number | null
+  size.clientHeight; // => number | null
 });
 
 <div ref={setTarget} />;
