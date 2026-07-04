@@ -20,7 +20,7 @@ import ThemeBtn from "./ThemeBtn.js";
 import clsx from "clsx";
 import { createTween } from "@solid-primitives/tween";
 import SearchModal from "../Search/SearchModal.js";
-import { A, useLocation } from "@solidjs/router";
+import { Link, useLocation } from "@tanstack/solid-router";
 
 export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
 
@@ -126,7 +126,7 @@ const Header: Component = () => {
 
   createEffect(
     defer(
-      createMemo(() => location.hash),
+      createMemo(() => location().hash),
       () => setIsNavOpen(false),
     ),
   );
@@ -161,7 +161,7 @@ const Header: Component = () => {
                 classList={{ "opacity-100": isNavOpen() }}
               />
             </div>
-            <A href="/">
+            <Link to="/">
               <img
                 class="hidden h-[28px] sm:block sm:h-[40px] dark:hidden"
                 src="/img/solid-primitives-logo.svg"
@@ -182,7 +182,7 @@ const Header: Component = () => {
                 src="/img/solid-primitives-stacked-dark-logo.svg"
                 alt=""
               />
-            </A>
+            </Link>
             <nav>
               <ul class="flex items-center gap-3">
                 <li class="transition" classList={{ "opacity-0": isSearchOpen() }}>

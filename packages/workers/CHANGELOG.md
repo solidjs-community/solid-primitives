@@ -1,5 +1,11 @@
 # @solid-primitives/workers
 
+## 0.4.3
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 0.4.2
 
 ### Patch Changes

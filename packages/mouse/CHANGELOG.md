@@ -1,5 +1,22 @@
 # @solid-primitives/mouse
 
+## 2.1.6
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+  - @solid-primitives/event-listener@2.4.5
+  - @solid-primitives/rootless@1.5.3
+  - @solid-primitives/static-store@0.1.3
+
+## 2.1.5
+
+### Patch Changes
+
+- Updated dependencies [f32f209]
+  - @solid-primitives/event-listener@2.4.4
+
 ## 2.1.4
 
 ### Patch Changes

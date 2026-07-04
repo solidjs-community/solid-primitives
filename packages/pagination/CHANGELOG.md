@@ -1,5 +1,12 @@
 # @solid-primitives/pagination
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+
 ## 0.5.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/analytics
 
+## 0.2.1
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 0.2.0
 
 ### Minor Changes

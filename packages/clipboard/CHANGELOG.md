@@ -1,5 +1,18 @@
 # @solid-primitives/clipboard
 
+## 1.6.4
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+
+## 1.6.3
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 1.6.2
 
 ### Patch Changes

@@ -1,7 +1,7 @@
 import { type RefProps } from "@solid-primitives/refs";
 import { type Component, For } from "solid-js";
 import { scrollIntoView } from "~/utils.js";
-import { A, useLocation } from "@solidjs/router";
+import { useLocation } from "@tanstack/solid-router";
 
 const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = props => {
   const location = useLocation();
@@ -25,11 +25,11 @@ const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = p
 
               return (
                 <li>
-                  <A
+                  <a
                     class="block py-2 font-semibold"
                     href={href}
                     onClick={() => {
-                      if (location.hash === href) {
+                      if (location().hash === hashName) {
                         const anchor = document.querySelector(`a[href="${href}"]`)!;
                         scrollIntoView(anchor, { offset: 70, behavior: "auto" });
                         props.onClose();
@@ -37,7 +37,7 @@ const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = p
                     }}
                   >
                     {item}
-                  </A>
+                  </a>
                 </li>
               );
             }}
