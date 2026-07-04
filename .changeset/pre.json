@@ -171,6 +171,7 @@
     "range-solid2-migration",
     "redesign-intersection-observer-primitives",
     "refs-solid2-migration",
+    "resize-observer-client-size",
     "resize-observer-solid2-migration",
     "restore-make-intersection-observer",
     "scheduled-solid2-migration",
@@ -193,6 +194,7 @@
     "tween-solid2-migration",
     "upload-solid-2-migration",
     "vibrate-initial",
+    "video-frame-callback",
     "video-initial",
     "virtual-solid2-migration",
     "websocket-solid-2-async"
