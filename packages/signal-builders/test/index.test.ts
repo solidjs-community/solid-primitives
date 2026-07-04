@@ -1006,6 +1006,23 @@ describe("merge()", () => {
     expect(result()).toEqual({ color: "blue", size: 24 });
     dispose();
   });
+
+  // https://github.com/solidjs-community/solid-primitives/issues/236
+  // `merge` used to return a plain object instead of an Accessor, so calling
+  // the result as a function threw. Verifies the fix and that it stays reactive.
+  it("returns a callable, reactive Accessor when mixing a derived accessor with a plain object", () => {
+    const [user, setUser] = createSignal({ name: "Carter" });
+    const { profileConfig, dispose } = createRoot(d => ({
+      profileConfig: merge(pick(user, "name"), { uiType: "HEADER" }),
+      dispose: d,
+    }));
+    expect(profileConfig).toBeTypeOf("function");
+    expect(profileConfig()).toEqual({ name: "Carter", uiType: "HEADER" });
+    setUser({ name: "Alice" });
+    flush();
+    expect(profileConfig()).toEqual({ name: "Alice", uiType: "HEADER" });
+    dispose();
+  });
 });
 
 // ─── UPDATE ─────────────────────────────────────────────────────────────────
