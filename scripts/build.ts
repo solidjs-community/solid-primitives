@@ -17,6 +17,9 @@ const tsc = cp.spawn("tsc", ["-b", "packages/*"], {
 tsc.on("close", code => {
   if (code === 0) {
     utils.log_info(`tsc step completed in ${performance.now().toFixed()}ms.`);
+    utils.flattenBarrelExports().then(() => {
+      utils.log_info("Flattened barrel exports for bundler compatibility.");
+    });
   } else {
     utils.log_error("tsc step failed.");
     process.exit(1);
