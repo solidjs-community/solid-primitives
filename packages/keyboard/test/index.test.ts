@@ -15,10 +15,25 @@ const dispatchKeyEvent = (
   type: "keydown" | "keyup",
   extra: Partial<KeyboardEvent> = {},
 ) => {
-  const ev = new Event(type, { cancelable: true }) as any;
+  const ev = new Event(type, { cancelable: true, bubbles: true }) as any;
   ev.key = key;
   Object.assign(ev, extra);
   window.dispatchEvent(ev);
+  return ev as KeyboardEvent;
+};
+
+// Dispatches on a specific element (bubbling to the window listener) instead of
+// window directly, so `event.target` reflects the focused element under test.
+const dispatchKeyEventOn = (
+  target: EventTarget,
+  key: string,
+  type: "keydown" | "keyup",
+  extra: Partial<KeyboardEvent> = {},
+) => {
+  const ev = new Event(type, { cancelable: true, bubbles: true }) as any;
+  ev.key = key;
+  Object.assign(ev, extra);
+  target.dispatchEvent(ev);
   return ev as KeyboardEvent;
 };
 
@@ -344,4 +359,89 @@ describe("createShortcut", () => {
 
       dispose();
     }));
+
+  // https://github.com/solidjs-community/solid-primitives/issues/475
+  describe("ignoreWithinInputs", () => {
+    test("does not fire while focus is on an input", () =>
+      createRoot(dispose => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        let fired = 0;
+        createShortcut(["S"], () => fired++, { ignoreWithinInputs: true });
+
+        const ev = dispatchKeyEventOn(input, "s", "keydown");
+        expect(fired).toBe(0);
+        expect(ev.defaultPrevented).toBe(false);
+
+        dispatchKeyEventOn(input, "s", "keyup");
+        input.remove();
+        dispose();
+      }));
+
+    test("does not fire while focus is on a textarea or select", () =>
+      createRoot(dispose => {
+        const textarea = document.createElement("textarea");
+        const select = document.createElement("select");
+        document.body.append(textarea, select);
+
+        let fired = 0;
+        createShortcut(["S"], () => fired++, { ignoreWithinInputs: true });
+
+        for (const el of [textarea, select]) {
+          dispatchKeyEventOn(el, "s", "keydown");
+          dispatchKeyEventOn(el, "s", "keyup");
+        }
+        expect(fired).toBe(0);
+
+        textarea.remove();
+        select.remove();
+        dispose();
+      }));
+
+    // jsdom doesn't implement `isContentEditable` (always undefined), so it's stubbed here
+    // to exercise the branch as it behaves in a real browser.
+    test("does not fire while focus is inside a contenteditable element", () =>
+      createRoot(dispose => {
+        const editableDiv = document.createElement("div");
+        Object.defineProperty(editableDiv, "isContentEditable", { value: true });
+        document.body.appendChild(editableDiv);
+
+        let fired = 0;
+        createShortcut(["S"], () => fired++, { ignoreWithinInputs: true });
+
+        dispatchKeyEventOn(editableDiv, "s", "keydown");
+        dispatchKeyEventOn(editableDiv, "s", "keyup");
+        expect(fired).toBe(0);
+
+        editableDiv.remove();
+        dispose();
+      }));
+
+    test("still fires when focus is outside any input", () =>
+      createRoot(dispose => {
+        let fired = 0;
+        createShortcut(["S"], () => fired++, { ignoreWithinInputs: true });
+
+        dispatchKeyEventOn(document.body, "s", "keydown");
+        expect(fired).toBe(1);
+
+        dispatchKeyEventOn(document.body, "s", "keyup");
+        dispose();
+      }));
+
+    test("fires normally when the option is not set, even from an input", () =>
+      createRoot(dispose => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        let fired = 0;
+        createShortcut(["S"], () => fired++);
+
+        dispatchKeyEventOn(input, "s", "keydown");
+        expect(fired).toBe(1);
+
+        dispatchKeyEventOn(input, "s", "keyup");
+        input.remove();
+        dispose();
+      }));
+  });
 });

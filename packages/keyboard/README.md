@@ -156,6 +156,7 @@ Creates a keyboard shortcut observer. The provided callback will be called when 
 - `options` — additional configuration:
   - `preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified key is pressed. _(Defaults to `true`)_
   - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
+  - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`, or `contenteditable` element, so it doesn't interrupt typing. Disabled by default.
 
 ```tsx
 import { createShortcut } from "@solid-primitives/keyboard";
@@ -174,6 +175,17 @@ createShortcut(
 When `preventDefault` is `true`, `e.preventDefault()` will be called not only on the keydown event that has triggered the callback, but it will **optimistically** also prevent the default behavior of every previous keydown that will have the possibility to lead to the shortcut being pressed.
 
 E.g. when listening for `Control + Shift + A`, all three keydown events will be prevented.
+
+### Ignoring shortcuts while typing
+
+Single, unmodified-key shortcuts (e.g. `["S"]`) conflict with typing — pressing "s" in a text field would both type the character and trigger the shortcut. Set `ignoreWithinInputs: true` to skip the shortcut entirely while focus is on a form control or `contenteditable` element:
+
+```tsx
+// won't fire while the user is typing in a text field
+createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: true });
+```
+
+Combos that include a modifier (e.g. `Control + S`) don't have this problem, since the modifier itself prevents a character from being typed — `ignoreWithinInputs` is usually unnecessary for those.
 
 ## `createKeyDown`
 

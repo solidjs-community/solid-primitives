@@ -15,6 +15,19 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
   return true;
 }
 
+/** Is the event target an editable form control, or inside a `contenteditable` element? */
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  switch (target.tagName) {
+    case "INPUT":
+    case "TEXTAREA":
+    case "SELECT":
+      return true;
+    default:
+      return target.isContentEditable;
+  }
+}
+
 /**
  * Provides a signal with the last keydown event.
  *
@@ -273,12 +286,19 @@ export function createKeyHold(
  * @param options The options for the shortcut.
  * - `preventDefault` — Controls if the keydown event should have its default action prevented. Enabled by default.
  * - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
+ * - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`,
+ *   or `contenteditable` element, so typing isn't interrupted. Disabled by default — enable it for shortcuts
+ *   made of plain, unmodified keys (e.g. a single letter); combos like `Control+S` are usually fine either way,
+ *   since the modifier prevents a character from being typed.
  *
  * @example
  * ```ts
  * createShortcut(["CONTROL", "SHIFT", "C"], () => {
  *    console.log("Ctrl+Shift+C was pressed");
  * });
+ *
+ * // won't fire while typing in a text field
+ * createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: true });
  * ```
  */
 export function createShortcut(
@@ -287,6 +307,7 @@ export function createShortcut(
   options: {
     preventDefault?: boolean;
     requireReset?: boolean;
+    ignoreWithinInputs?: boolean;
   } = {},
 ): void {
   if (isServer || !keys.length) {
@@ -294,7 +315,7 @@ export function createShortcut(
   }
 
   keys = keys.map(key => key.toUpperCase());
-  const { preventDefault = true, requireReset = false } = options;
+  const { preventDefault = true, requireReset = false, ignoreWithinInputs = false } = options;
 
   // Track pressed keys and sequence locally with plain JS state rather than
   // reactive signals. A signal reads from event listeners return
@@ -312,6 +333,7 @@ export function createShortcut(
 
   makeEventListener(window, "keydown", (e: KeyboardEvent) => {
     if (e.repeat || typeof e.key !== "string") return;
+    if (ignoreWithinInputs && isEditableTarget(e.target)) return;
     const key = e.key.toUpperCase();
 
     if (!pressedKeys.includes(key)) {
