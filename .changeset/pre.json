@@ -127,6 +127,7 @@
     "event-dispatcher-solid2-migration",
     "event-props-solid2-migration",
     "filesystem-solid2-migration",
+    "fix-barrel-exports-rolldown-compat",
     "flux-store-solid2-migration",
     "focus-solid2-migration",
     "form-solid2-initial",
