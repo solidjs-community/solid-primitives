@@ -154,6 +154,58 @@ SSEReadyState.CLOSED; // 2
 
 `EventSource` has native browser-level reconnection built in. For transient network drops the browser automatically retries. The `reconnect` option in `createSSE` is for _application-level_ reconnection — it fires only when `readyState` becomes `SSEReadyState.CLOSED`, meaning the browser has given up entirely. You generally do not need `reconnect: true` for normal usage.
 
+### A note on server disconnection detection
+
+`EventSource` **does not reliably detect when a server silently stops responding**. If the server process crashes or the network path is severed without a proper TCP close handshake, the browser never fires an `error` event and `readyState` stays `OPEN` indefinitely — the connection looks healthy even though no messages will ever arrive.
+
+The only robust workaround is **application-level heartbeats**: the server sends a lightweight event at a fixed interval, and the client starts a timer that triggers a reconnect if no heartbeat is received within the expected window.
+
+```ts
+import { createSSE } from "@solid-primitives/sse";
+import { onCleanup } from "solid-js";
+
+const HEARTBEAT_TIMEOUT_MS = 15_000; // reconnect if silent for 15 s
+
+function createSSEWithHeartbeat(url: string) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  const { reconnect, ...rest } = createSSE(url, {
+    // The server emits `event: heartbeat\ndata: \n\n` every ~10 s.
+    // Any regular message also resets the timer.
+    events: { heartbeat: resetTimer },
+    onMessage: resetTimer,
+    reconnect: true,
+  });
+
+  function resetTimer() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      // No heartbeat received — assume the server is gone.
+      reconnect();
+    }, HEARTBEAT_TIMEOUT_MS);
+  }
+
+  onCleanup(() => {
+    clearTimeout(timer);
+    timer = undefined;
+  });
+  resetTimer(); // arm the first timeout immediately
+
+  return { reconnect, ...rest };
+}
+```
+
+On the server, emit a periodic heartbeat event well within the client timeout:
+
+```js
+// Express / Node.js example
+setInterval(() => {
+  res.write("event: heartbeat\ndata: \n\n");
+}, 10_000); // every 10 s, safely below the 15 s client timeout
+```
+
+> **Why SSE comment lines are not enough** — SSE comment lines (e.g. `: keep-alive`) reset the browser's internal TCP idle timer but are _not_ exposed to JavaScript listeners. Use a named `event: heartbeat` or a plain `data:` event if you need the client to observe the heartbeat.
+
 ## Integration with `@solid-primitives/event-bus`
 
 Because `bus.emit` matches the `(event: MessageEvent) => void` shape of `onMessage`, you can wire them directly:

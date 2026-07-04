@@ -1,4 +1,4 @@
-import { Component, createSignal } from "solid-js";
+import { type Component, createSignal } from "solid-js";
 import { MatchTag, MatchValue } from "../src/index.js";
 
 type AnimalDog = { type: "dog"; breed: string };

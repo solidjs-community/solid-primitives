@@ -83,8 +83,10 @@ export type CreateSSEOptions<T> = SSEOptions & {
    * - `true`: reconnect with defaults (Infinity retries, 3000ms delay)
    * - object: custom `{ retries?, delay? }`
    *
-   * Note: `EventSource` already reconnects natively for transient network
-   * drops. This option handles cases where the browser gives up entirely.
+   * The `retries` budget is shared across both browser-level retries
+   * (readyState stays CONNECTING) and app-level reconnects (readyState →
+   * CLOSED). Once the budget is exhausted the connection is fully torn down,
+   * stopping any further browser-driven retry loops.
    */
   reconnect?: boolean | SSEReconnectOptions;
   /**
@@ -227,6 +229,13 @@ export const createSSE = <T = string>(
   // ── Connection management ─────────────────────────────────────────────────
   let currentCleanup: VoidFunction | undefined;
 
+  /** Tears down the current source without scheduling a reconnect. */
+  const teardown = () => {
+    currentCleanup?.();
+    currentCleanup = undefined;
+    setSource(undefined);
+  };
+
   /** Open a fresh connection, resetting the retry counter. */
   const connect = (resolvedUrl: string) => {
     retriesLeft = reconnectConfig.retries ?? 0;
@@ -255,11 +264,26 @@ export const createSSE = <T = string>(
       setError(() => e);
       options.onError?.(e);
 
-      // Only app-level reconnect when the browser has given up (CLOSED).
-      // When readyState is still CONNECTING the browser is handling retries.
+      // When the browser has given up (CLOSED), perform app-level reconnects
+      // against the configured budget.
+      // When the browser is still retrying (CONNECTING) and a reconnect budget
+      // is configured, count those attempts too so the config is always honoured
+      // and the browser can never loop infinitely beyond the configured limit.
       if (es.readyState === SSEReadyState.CLOSED && retriesLeft > 0) {
         retriesLeft--;
         reconnectTimer = setTimeout(() => _open(resolvedUrl), reconnectConfig.delay ?? 3000);
+      } else if (es.readyState === SSEReadyState.CLOSED) {
+        // Retries exhausted — clean up fully to avoid memory/listener leaks.
+        teardown();
+      } else if (es.readyState === SSEReadyState.CONNECTING && options.reconnect) {
+        // Browser is retrying. Consume the budget; when it's gone, abort so
+        // we don't loop forever against the user's configured retry limit.
+        if (retriesLeft > 0) {
+          retriesLeft--;
+        } else {
+          teardown();
+          setReadyState(SSEReadyState.CLOSED);
+        }
       }
     };
 
@@ -280,9 +304,7 @@ export const createSSE = <T = string>(
   const disconnect = () => {
     clearReconnectTimer();
     retriesLeft = 0;
-    currentCleanup?.();
-    currentCleanup = undefined;
-    setSource(undefined);
+    teardown();
     setReadyState(SSEReadyState.CLOSED);
   };
 
@@ -309,10 +331,7 @@ export const createSSE = <T = string>(
       const resolvedUrl = url();
       if (resolvedUrl !== prevUrl) {
         prevUrl = resolvedUrl;
-        untrack(() => {
-          currentCleanup?.();
-          currentCleanup = undefined;
-        });
+        untrack(() => teardown());
         connect(resolvedUrl);
       }
     });
@@ -321,8 +340,8 @@ export const createSSE = <T = string>(
   // ── Lifecycle cleanup ─────────────────────────────────────────────────────
   onCleanup(() => {
     clearReconnectTimer();
-    currentCleanup?.();
-    currentCleanup = undefined;
+    teardown();
+    setReadyState(SSEReadyState.CLOSED);
   });
 
   return { source, data, error, readyState, close: disconnect, reconnect: manualReconnect };
