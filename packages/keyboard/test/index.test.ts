@@ -10,10 +10,16 @@ import {
   useKeyDownSequence,
 } from "../src/index.js";
 
-const dispatchKeyEvent = (key: string, type: "keydown" | "keyup") => {
-  const ev = new Event(type) as any;
+const dispatchKeyEvent = (
+  key: string,
+  type: "keydown" | "keyup",
+  extra: Partial<KeyboardEvent> = {},
+) => {
+  const ev = new Event(type, { cancelable: true }) as any;
   ev.key = key;
+  Object.assign(ev, extra);
   window.dispatchEvent(ev);
+  return ev as KeyboardEvent;
 };
 
 describe("useKeyDownList", () => {
@@ -39,6 +45,28 @@ describe("useKeyDownList", () => {
       dispatchKeyEvent("Alt", "keyup");
       flush();
       dispatchKeyEvent("q", "keyup");
+      flush();
+      expect(keys()).toEqual([]);
+
+      dispose();
+    }));
+
+  // https://github.com/solidjs-community/solid-primitives/issues/269
+  // macOS never fires `keyup` for other keys held down together with Meta —
+  // only Meta's own keyup arrives — so releasing Meta must clear the whole
+  // list, or the other key's stale state corrupts the next press.
+  test("clears all keys when Meta is released (macOS suppresses keyup for keys held with Meta)", () =>
+    createRoot(dispose => {
+      const keys = useKeyDownList();
+
+      dispatchKeyEvent("Meta", "keydown", { metaKey: true });
+      flush();
+      dispatchKeyEvent("k", "keydown", { metaKey: true });
+      flush();
+      expect(keys()).toEqual(["META", "K"]);
+
+      // macOS quirk: only Meta's keyup fires; "k" never gets its own keyup
+      dispatchKeyEvent("Meta", "keyup");
       flush();
       expect(keys()).toEqual([]);
 
@@ -287,6 +315,32 @@ describe("createShortcut", () => {
 
       dispatchKeyEvent("Control", "keyup");
       dispatchKeyEvent("a", "keyup");
+
+      dispose();
+    }));
+
+  // https://github.com/solidjs-community/solid-primitives/issues/269
+  // macOS never fires `keyup` for other keys held down together with Meta —
+  // only Meta's own keyup arrives — so a naive implementation accumulates
+  // stale key state and fails (silently skipping preventDefault) on the
+  // second press of the same Meta shortcut.
+  test("repeated Meta shortcut presses keep working (macOS suppresses keyup for keys held with Meta)", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createShortcut(["Meta", "P"], () => fired++);
+
+      dispatchKeyEvent("Meta", "keydown", { metaKey: true });
+      const p1 = dispatchKeyEvent("p", "keydown", { metaKey: true });
+      expect(fired).toBe(1);
+      expect(p1.defaultPrevented).toBe(true);
+
+      // macOS quirk: only Meta's keyup fires; "p" never gets its own keyup
+      dispatchKeyEvent("Meta", "keyup");
+
+      dispatchKeyEvent("Meta", "keydown", { metaKey: true });
+      const p2 = dispatchKeyEvent("p", "keydown", { metaKey: true });
+      expect(fired).toBe(2);
+      expect(p2.defaultPrevented).toBe(true);
 
       dispose();
     }));
