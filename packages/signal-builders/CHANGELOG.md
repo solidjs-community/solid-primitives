@@ -1,5 +1,11 @@
 # @solid-primitives/signal-builders
 
+## 1.0.0-next.1
+
+### Minor Changes
+
+- 4eec033: Add `toggle` — wraps a boolean setter with a function that flips the current value, so you don't have to write `setValue(v => !v)` every time. See https://github.com/solidjs-community/solid-primitives/issues/280.
+
 ## 1.0.0-next.0
 
 ### Major Changes
