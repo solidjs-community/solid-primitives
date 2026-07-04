@@ -135,6 +135,7 @@
     "gestures-solid2-migration",
     "graphql-solid2-migration",
     "history-solid2-migration",
+    "i18n-missing-key-handler",
     "i18n-solid2-migration",
     "idle-solid2-migration",
     "immutable-solid2-migration",
