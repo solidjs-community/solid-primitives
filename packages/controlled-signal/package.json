@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/controlled-signal",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Reactive signals that support both controlled (externally managed) and uncontrolled (internally managed) state — a pattern commonly used in headless UI components.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
