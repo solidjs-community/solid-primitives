@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 1.0.0-next.1
+
+### Minor Changes
+
+- 4a511cf: Add `firstAriaLabel`/`prevAriaLabel`/`nextAriaLabel`/`lastAriaLabel` options to `createPagination`, applied as an `aria-label` on the corresponding button props (resolves #750). Previously the first/prev/next/last buttons had no accessible name beyond their visible content, which defaults to bare symbols (`|<`, `<`, `>`, `>|`) — screen reader users got no meaningful announcement. Defaults are `"First page"`, `"Previous page"`, `"Next page"`, `"Last page"`; override any of them independently. These are separate from the existing `firstContent`/`prevContent`/`nextContent`/`lastContent` options, which control visible (possibly JSX/icon) content — `aria-label` must be a plain string, so it can't reuse those.
+
 ## 1.0.0-next.0
 
 ### Major Changes
@@ -11,7 +17,6 @@
   **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/pagination`
-
   - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
   - `createPagination`: page clamping when pages count decreases is now implemented via a derived memo instead of `createComputed` (which was removed in Solid 2.0). The clamping is reactive and automatic.
   - `createInfiniteScroll`: removed `createResource` dependency (removed in Solid 2.0). Fetching is now implemented with `createEffect` and a cancellation pattern. The `pages.loading` and `pages.error` resource properties are no longer available; use `end()` or wrap the fetcher to handle errors externally.
