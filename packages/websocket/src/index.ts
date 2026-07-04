@@ -1,6 +1,13 @@
-import { type Accessor, onCleanup, createSignal, createMemo, createStore, runWithOwner } from "solid-js";
+import {
+  type Accessor,
+  onCleanup,
+  createSignal,
+  createMemo,
+  createStore,
+  runWithOwner,
+} from "solid-js";
 
-export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
+export type WSMessage = string | BufferSource | Blob;
 
 /**
  * Opens a web socket connection with a queued send.
@@ -309,7 +316,7 @@ export const createWSData = <T = string, U = T>(
   const transform = options?.transform;
   return createMemo(async function* () {
     for await (const msg of wsMessageIterable<T>(ws)) {
-      yield (transform ? transform(msg) : (msg as unknown as U));
+      yield transform ? transform(msg) : (msg as unknown as U);
     }
   }) as Accessor<U>;
 };
