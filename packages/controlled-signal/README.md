@@ -111,29 +111,37 @@ setSelected(prev => new Set([...prev, 3]));
 
 ---
 
-## Building a headless component
+### `createToggleState`
 
-```tsx
-import { createControllableBooleanSignal } from "@solid-primitives/controlled-signal";
+Controllable state for toggle components — checkboxes, switches, toggle buttons — built on top of `createControllableBooleanSignal`. Adapted from [Kobalte's `createToggleState`](https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/primitives/create-toggle-state).
 
-function createToggle(props: {
-  pressed?: Accessor<boolean | undefined>;
-  defaultPressed?: Accessor<boolean | undefined>;
-  onChange?: (pressed: boolean) => void;
-}) {
-  const [pressed, setPressed] = createControllableBooleanSignal({
-    value: props.pressed,
-    defaultValue: props.defaultPressed,
-    onChange: props.onChange,
-  });
+```ts
+import { createToggleState } from "@solid-primitives/controlled-signal";
 
-  return { pressed, toggle: () => setPressed(p => !p) };
-}
+const { isSelected, setIsSelected, toggle } = createToggleState({
+  defaultIsSelected: () => false,
+});
+
+toggle(); // isSelected() === true
 ```
+
+**Props:**
+
+| Prop                | Type                       | Description                                             |
+| ------------------- | -------------------------- | --------------------------------------------------------- |
+| `isSelected`        | `Accessor<boolean \| undefined>` | Controlled selected state. When defined, enables controlled mode. |
+| `defaultIsSelected` | `Accessor<boolean \| undefined>` | Initial selected state for uncontrolled mode.        |
+| `isDisabled`        | `Accessor<boolean \| undefined>` | While `true`, `toggle()` and `setIsSelected()` are no-ops. |
+| `isReadOnly`        | `Accessor<boolean \| undefined>` | While `true`, `toggle()` and `setIsSelected()` are no-ops. |
+| `onSelectedChange`  | `(isSelected: boolean) => void`  | Called whenever the selected state would change.     |
+
+**Returns:** `{ isSelected: Accessor<boolean>, setIsSelected: (v: boolean) => void, toggle: () => void }`
+
+Just like `createControllableSignal`, `isSelected` can be omitted for uncontrolled usage, or provided (alongside `onSelectedChange`) to let a parent component drive the state.
 
 ## Credits
 
-This primitive is adapted from the [`create-controllable-signal`](https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/primitives/create-controllable-signal) implementation in [Kobalte](https://github.com/kobaltedev/kobalte) by the Kobalte Contributors, used under the [MIT License](https://github.com/kobaltedev/kobalte/blob/main/LICENSE).
+This primitive is adapted from the [`create-controllable-signal`](https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/primitives/create-controllable-signal) and [`create-toggle-state`](https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/primitives/create-toggle-state) implementations in [Kobalte](https://github.com/kobaltedev/kobalte) by the Kobalte Contributors, used under the [MIT License](https://github.com/kobaltedev/kobalte/blob/main/LICENSE).
 
 ## Changelog
 

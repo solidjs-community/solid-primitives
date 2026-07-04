@@ -38,9 +38,30 @@ import {
   get,
   merge,
   update,
+  toggle,
 } from "../src/index.js";
 import { createRoot, createSignal, flush } from "solid-js";
 import { compare } from "@solid-primitives/utils";
+
+// ─── BOOLEAN ────────────────────────────────────────────────────────────────
+
+describe("toggle()", () => {
+  it("flips the current value", () =>
+    createRoot(dispose => {
+      const [isOpen, setIsOpen] = createSignal(false, { ownedWrite: true });
+      const toggleOpen = toggle(setIsOpen);
+
+      expect(isOpen()).toBe(false);
+      toggleOpen();
+      flush();
+      expect(isOpen()).toBe(true);
+      toggleOpen();
+      flush();
+      expect(isOpen()).toBe(false);
+
+      dispose();
+    }));
+});
 
 // ─── CONVERT ────────────────────────────────────────────────────────────────
 

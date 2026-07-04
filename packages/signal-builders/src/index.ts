@@ -1,3 +1,6 @@
+// BOOLEAN
+export * from "./boolean.js";
+
 // CONVERT
 export * from "./convert.js";
 

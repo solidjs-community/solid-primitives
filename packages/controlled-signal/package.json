@@ -22,7 +22,8 @@
       "createControllableSignal",
       "createControllableBooleanSignal",
       "createControllableArraySignal",
-      "createControllableSetSignal"
+      "createControllableSetSignal",
+      "createToggleState"
     ],
     "category": "Reactivity",
     "gzip": 395

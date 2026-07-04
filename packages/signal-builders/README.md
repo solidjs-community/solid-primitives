@@ -29,6 +29,17 @@ Each builder wraps its computation in `createMemo`, so results only update when 
 
 Because each builder returns an `Accessor<T>`, the output of one can be passed directly as input to another:
 
+### Boolean
+
+```ts
+import { toggle } from "@solid-primitives/signal-builders";
+
+const [isOpen, setIsOpen] = createSignal(false);
+const toggleOpen = toggle(setIsOpen);
+
+toggleOpen(); // isOpen() === true
+```
+
 ### Array
 
 ```ts
@@ -83,6 +94,10 @@ solidMessage(); // => "hello, solid"
 ```
 
 ## Builder Reference
+
+### Boolean
+
+- **`toggle`** — wraps a boolean setter with a function that flips the current value
 
 ### Array
 
