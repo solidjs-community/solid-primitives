@@ -175,6 +175,30 @@ const t2 = i18n.translator(() => dict, i18n.resolveTemplate);
 t2("hello", { name: "John" }); // => 'hello John!'
 ```
 
+### Missing keys
+
+By default, a path that isn't present in the dictionary resolves to `undefined` — same as when the dictionary itself hasn't loaded yet. To make missing translations visible instead of silently rendering blank, pass an `onMissingKey` handler as the third argument to `translator`. It's only called when the dictionary itself is loaded but the requested path isn't in it.
+
+```ts
+const dict = { hello: "hello!" };
+
+// fall back to the path itself, e.g. "goodbye"
+const t = i18n.translator(() => dict, i18n.resolveTemplate, i18n.missingKeyAsPath);
+
+t("hello"); // => 'hello!'
+t("goodbye"); // => 'goodbye'
+
+// or provide a custom handler, e.g. to report missing translations
+const t2 = i18n.translator(
+  () => dict,
+  i18n.resolveTemplate,
+  path => {
+    reportMissingTranslation(path);
+    return "";
+  },
+);
+```
+
 ### Modules
 
 Splitting the dictionary into multiple modules can be useful when you have a large dictionary and want to avoid loading the entire dictionary at once.
