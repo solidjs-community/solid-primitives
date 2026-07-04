@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "4.0.0-next.0",
+  "version": "4.0.0-next.1",
   "description": "Library of primitives focused around component props.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

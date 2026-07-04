@@ -1,5 +1,23 @@
 # @solid-primitives/mouse
 
+## 4.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- Updated dependencies [5fc4efa]
+  - @solid-primitives/event-listener@3.0.0-next.1
+  - @solid-primitives/utils@7.0.0-next.1
+
 ## 4.0.0-next.0
 
 ### Major Changes
@@ -11,7 +29,6 @@
   **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/mouse`
-
   - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
   - `onMount` replaced by `onSettled` for post-render initialization
   - `sharedConfig.context` replaced by `sharedConfig.hydrating` for hydration detection

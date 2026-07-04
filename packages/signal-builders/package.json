@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/signal-builders",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",

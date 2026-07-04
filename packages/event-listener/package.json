@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "SolidJS Primitives to manage creating event listeners.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [

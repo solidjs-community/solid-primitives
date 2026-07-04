@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/range",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Control Flow Primitives for number ranges: createNumericRange, mapRange, indexRange, repeat, and their JSX component counterparts.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [],
