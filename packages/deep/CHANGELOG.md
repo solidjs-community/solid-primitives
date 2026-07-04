@@ -1,5 +1,24 @@
 # @solid-primitives/deep
 
+## 0.3.6
+
+### Patch Changes
+
+- Updated dependencies [0ebdd1a]
+  - @solid-primitives/memo@1.5.0
+
+## 0.3.5
+
+### Patch Changes
+
+- @solid-primitives/memo@1.4.5
+
+## 0.3.4
+
+### Patch Changes
+
+- @solid-primitives/memo@1.4.4
+
 ## 0.3.3
 
 ### Patch Changes

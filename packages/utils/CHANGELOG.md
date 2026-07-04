@@ -1,5 +1,13 @@
 # @solid-primitives/utils
 
+## 6.4.0
+
+### Minor Changes
+
+- 6680ab9: Add string transform utilities: `json`, `ndjson`, `lines`, `number`, `safe`, `pipe`.
+
+  These are `(string) => T` transform functions useful as the `transform` option for SSE, WebSocket, and similar streaming primitives.
+
 ## 6.3.2
 
 ### Patch Changes

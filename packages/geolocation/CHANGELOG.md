@@ -1,5 +1,19 @@
 # @solid-primitives/geolocation
 
+## 1.5.4
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+  - @solid-primitives/static-store@0.1.3
+
+## 1.5.3
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 1.5.2
 
 ### Patch Changes

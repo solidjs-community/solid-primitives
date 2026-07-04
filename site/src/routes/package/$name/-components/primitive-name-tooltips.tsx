@@ -6,9 +6,7 @@ export function createPrimitiveNameTooltips(
   primitives: Accessor<BundlesizeItem[] | undefined>,
 ) {
   const [fn, setFn] =
-    createSignal<
-      typeof import("./primitive-name-tooltip.client.jsx").createPrimitiveNameTooltips
-    >();
+    createSignal<typeof import("./primitive-name-tooltip-impl.jsx").createPrimitiveNameTooltips>();
 
   createEffect(() => {
     const fnValue = fn();
@@ -20,7 +18,7 @@ export function createPrimitiveNameTooltips(
     }
   });
 
-  import("./primitive-name-tooltip.client.jsx").then(({ createPrimitiveNameTooltips }) =>
+  import("./primitive-name-tooltip-impl.jsx").then(({ createPrimitiveNameTooltips }) =>
     setFn(() => createPrimitiveNameTooltips),
   );
 }

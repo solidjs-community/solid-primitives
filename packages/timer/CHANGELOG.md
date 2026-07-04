@@ -1,5 +1,17 @@
 # @solid-primitives/timer
 
+## 1.4.4
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
+## 1.4.3
+
+### Patch Changes
+
+- 3eec5eb: Fix passing signal options to createPolled memo to the inintialValue param.
+
 ## 1.4.2
 
 ### Patch Changes
