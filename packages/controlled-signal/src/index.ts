@@ -90,3 +90,65 @@ export function createControllableSetSignal<T>(props: CreateControllableSignalPr
   const value: Accessor<Set<T>> = () => _value() ?? new Set();
   return [value, setValue] as const;
 }
+
+export interface CreateToggleStateProps {
+  /** The controlled selected state. */
+  isSelected?: Accessor<boolean | undefined>;
+
+  /**
+   * The default selected state when initially rendered.
+   * Useful when you do not need to control the selected state.
+   */
+  defaultIsSelected?: Accessor<boolean | undefined>;
+
+  /** Whether the selected state cannot be changed by the user. */
+  isDisabled?: Accessor<boolean | undefined>;
+
+  /** Whether the selected state cannot be changed by the user. */
+  isReadOnly?: Accessor<boolean | undefined>;
+
+  /** Called when the selected state changes. */
+  onSelectedChange?: (isSelected: boolean) => void;
+}
+
+export interface ToggleState {
+  /** The selected state. */
+  isSelected: Accessor<boolean>;
+
+  /** Updates the selected state. Ignored while `isDisabled` or `isReadOnly`. */
+  setIsSelected: (isSelected: boolean) => void;
+
+  /** Flips the selected state. Ignored while `isDisabled` or `isReadOnly`. */
+  toggle: () => void;
+}
+
+/**
+ * Provides controllable state management for toggle components — checkboxes, switches,
+ * toggle buttons — built on top of {@link createControllableBooleanSignal}.
+ *
+ * Adapted from Kobalte's `createToggleState`:
+ * https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/primitives/create-toggle-state
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/issues/280
+ */
+export function createToggleState(props: CreateToggleStateProps = {}): ToggleState {
+  const [isSelected, _setIsSelected] = createControllableBooleanSignal({
+    value: props.isSelected,
+    defaultValue: props.defaultIsSelected,
+    onChange: props.onSelectedChange,
+  });
+
+  const setIsSelected = (value: boolean) => {
+    if (!props.isReadOnly?.() && !props.isDisabled?.()) {
+      _setIsSelected(value);
+    }
+  };
+
+  const toggle = () => {
+    if (!props.isReadOnly?.() && !props.isDisabled?.()) {
+      _setIsSelected(value => !value);
+    }
+  };
+
+  return { isSelected, setIsSelected, toggle };
+}

@@ -5,6 +5,7 @@ import {
   createControllableBooleanSignal,
   createControllableArraySignal,
   createControllableSetSignal,
+  createToggleState,
 } from "../src/index.js";
 
 describe("createControllableSignal", () => {
@@ -321,5 +322,113 @@ describe("createControllableSetSignal", () => {
       expect(value()).toBeInstanceOf(Set);
       dispose();
     });
+  });
+});
+
+describe("createToggleState", () => {
+  it("defaults to false when no props given", () => {
+    createRoot(dispose => {
+      const { isSelected } = createToggleState();
+      expect(isSelected()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("uses defaultIsSelected when provided", () => {
+    createRoot(dispose => {
+      const { isSelected } = createToggleState({ defaultIsSelected: () => true });
+      expect(isSelected()).toBe(true);
+      dispose();
+    });
+  });
+
+  it("toggle() flips the selected state", () => {
+    createRoot(dispose => {
+      const { isSelected, toggle } = createToggleState({ defaultIsSelected: () => false });
+      toggle();
+      flush();
+      expect(isSelected()).toBe(true);
+      toggle();
+      flush();
+      expect(isSelected()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("setIsSelected() sets the selected state directly", () => {
+    createRoot(dispose => {
+      const { isSelected, setIsSelected } = createToggleState();
+      setIsSelected(true);
+      flush();
+      expect(isSelected()).toBe(true);
+      dispose();
+    });
+  });
+
+  it("calls onSelectedChange when the state changes", () => {
+    createRoot(dispose => {
+      const onSelectedChange = vi.fn();
+      const { toggle } = createToggleState({ defaultIsSelected: () => false, onSelectedChange });
+      toggle();
+      expect(onSelectedChange).toHaveBeenCalledOnce();
+      expect(onSelectedChange).toHaveBeenCalledWith(true);
+      dispose();
+    });
+  });
+
+  it("ignores toggle() and setIsSelected() while isDisabled", () => {
+    createRoot(dispose => {
+      const { isSelected, toggle, setIsSelected } = createToggleState({
+        defaultIsSelected: () => false,
+        isDisabled: () => true,
+      });
+      toggle();
+      flush();
+      expect(isSelected()).toBe(false);
+      setIsSelected(true);
+      flush();
+      expect(isSelected()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("ignores toggle() and setIsSelected() while isReadOnly", () => {
+    createRoot(dispose => {
+      const { isSelected, toggle, setIsSelected } = createToggleState({
+        defaultIsSelected: () => false,
+        isReadOnly: () => true,
+      });
+      toggle();
+      flush();
+      expect(isSelected()).toBe(false);
+      setIsSelected(true);
+      flush();
+      expect(isSelected()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("supports controlled mode", () => {
+    const [external, setExternal] = createSignal(false);
+    const onSelectedChange = vi.fn();
+    let isSelected!: Accessor<boolean>;
+    let toggle!: () => void;
+    const dispose = createRoot(d => {
+      ({ isSelected, toggle } = createToggleState({ isSelected: external, onSelectedChange }));
+      return d;
+    });
+    flush();
+    expect(isSelected()).toBe(false);
+
+    toggle();
+    // controlled mode: internal state doesn't change, only onSelectedChange fires
+    expect(isSelected()).toBe(false);
+    expect(onSelectedChange).toHaveBeenCalledOnce();
+    expect(onSelectedChange).toHaveBeenCalledWith(true);
+
+    setExternal(true);
+    flush();
+    expect(isSelected()).toBe(true);
+    dispose();
   });
 });

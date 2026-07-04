@@ -4,6 +4,7 @@ import {
   createControllableBooleanSignal,
   createControllableArraySignal,
   createControllableSetSignal,
+  createToggleState,
 } from "../src/index.js";
 
 describe("createControllableSignal on server", () => {
@@ -124,5 +125,27 @@ describe("createControllableSetSignal on server", () => {
   test("always returns a Set (never undefined)", () => {
     const [value] = createControllableSetSignal<string>({});
     expect(value()).toBeInstanceOf(Set);
+  });
+});
+
+describe("createToggleState on server", () => {
+  test("returns false with no props", () => {
+    const { isSelected } = createToggleState();
+    expect(isSelected()).toBe(false);
+  });
+
+  test("returns defaultIsSelected when provided", () => {
+    const { isSelected } = createToggleState({ defaultIsSelected: () => true });
+    expect(isSelected()).toBe(true);
+  });
+
+  test("returns controlled isSelected", () => {
+    const { isSelected } = createToggleState({ isSelected: () => true });
+    expect(isSelected()).toBe(true);
+  });
+
+  test("toggle() does not throw", () => {
+    const { toggle } = createToggleState();
+    expect(() => toggle()).not.toThrow();
   });
 });
