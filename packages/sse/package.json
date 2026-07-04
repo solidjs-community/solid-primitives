@@ -1,0 +1,83 @@
+{
+  "name": "@solid-primitives/sse",
+  "version": "0.0.102",
+  "description": "Primitives for Server-Sent Events (SSE) using the browser's EventSource API.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/sse",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "sse",
+    "stage": 2,
+    "list": [
+      "makeSSE",
+      "createSSE",
+      "makeSSEWorker"
+    ],
+    "category": "Network"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "sse",
+    "eventsource",
+    "server-sent-events",
+    "worker",
+    "shared-worker"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    ".": {
+      "import": {
+        "@solid-primitives/source": "./src/index.ts",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./worker": {
+      "import": {
+        "@solid-primitives/source": "./src/worker.ts",
+        "types": "./dist/worker.d.ts",
+        "default": "./dist/worker.js"
+      }
+    },
+    "./worker-handler": {
+      "import": {
+        "@solid-primitives/source": "./src/worker-handler.ts",
+        "default": "./dist/worker-handler.js"
+      }
+    }
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  },
+  "devDependencies": {
+    "solid-js": "^1.9.7"
+  }
+}

@@ -5,7 +5,7 @@ import { createEffect, createSignal, onMount, type ParentComponent } from "solid
 import { pageWidthClass } from "~/constants.js";
 import { doesPathnameMatchBase, reflow } from "~/utils.js";
 import * as Header from "./Header/Header.js";
-import { useLocation } from "@solidjs/router";
+import { useLocation } from "@tanstack/solid-router";
 
 export const TR: ParentComponent = props => {
   return (
@@ -402,10 +402,10 @@ export const Table: ParentComponent = props => {
 
   createEffect(
     defer(
-      () => location.hash,
+      () => location().hash,
       (currentHash, prevHash) => {
         if (prevHash === currentHash) return;
-        if (!doesPathnameMatchBase(location.pathname)) return;
+        if (!doesPathnameMatchBase(location().pathname)) return;
 
         const run = () => {
           const tableElBCR = tableEl.getBoundingClientRect();

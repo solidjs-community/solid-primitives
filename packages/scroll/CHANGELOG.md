@@ -1,5 +1,13 @@
 # @solid-primitives/scroll
 
+## 2.1.5
+
+### Patch Changes
+
+- @solid-primitives/event-listener@2.4.5
+- @solid-primitives/rootless@1.5.3
+- @solid-primitives/static-store@0.1.3
+
 ## 2.1.4
 
 ### Patch Changes

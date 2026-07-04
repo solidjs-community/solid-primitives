@@ -1,5 +1,11 @@
 # @solid-primitives/map
 
+## 0.7.3
+
+### Patch Changes
+
+- @solid-primitives/trigger@1.2.3
+
 ## 0.7.2
 
 ### Patch Changes

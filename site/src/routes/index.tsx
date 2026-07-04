@@ -1,5 +1,6 @@
-import { type Component, createResource, Show, Suspense } from "solid-js";
+import { type Component, Show } from "solid-js";
 import { NoHydration } from "solid-js/web";
+import { createFileRoute } from "@tanstack/solid-router";
 import { fetchHomeContent, fetchPackageList } from "~/api.js";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
 import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn.jsx";
@@ -11,7 +12,17 @@ import { H2 } from "~/components/prose.jsx";
 import { StageContent } from "~/components/Stage/Stage.jsx";
 import * as Table from "~/components/table.jsx";
 import type { PackageListItem } from "~/types.js";
-import { Title } from "@solidjs/meta";
+
+export const Route = createFileRoute("/")({
+  component: Home,
+  loader: async () => {
+    const [content, packages] = await Promise.all([fetchHomeContent(), fetchPackageList()]);
+    return { content, packages };
+  },
+  head: () => ({
+    meta: [{ title: "Solid Primitives" }],
+  }),
+});
 
 const Header: Component = () => {
   return (
@@ -148,13 +159,11 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
   );
 };
 
-export default function Home() {
-  const [content] = createResource(() => fetchHomeContent());
-  const [packages] = createResource(() => fetchPackageList());
+function Home() {
+  const data = Route.useLoaderData();
 
   return (
     <main style={{ "padding-top": `${HEADER_HEIGHT}px` }}>
-      <Title>Solid Primitives</Title>
       <Header />
 
       <div class="relative top-[-100px]">
@@ -162,7 +171,7 @@ export default function Home() {
           Primitives
         </h2>
       </div>
-      <PrimitivesTable packages={packages()} />
+      <PrimitivesTable packages={data().packages} />
 
       <div class="mx-auto mt-[125px] max-w-[864px] p-4 leading-7">
         <NoHydration>
@@ -170,9 +179,7 @@ export default function Home() {
             <H2 text="Contribution Process" />
             <br />
             <StageContent />
-            <Suspense>
-              <div innerHTML={content()} />
-            </Suspense>
+            <div innerHTML={data().content} />
           </div>
         </NoHydration>
       </div>

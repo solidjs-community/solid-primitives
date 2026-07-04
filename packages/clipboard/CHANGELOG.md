@@ -1,5 +1,12 @@
 # @solid-primitives/clipboard
 
+## 1.6.4
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+
 ## 1.6.3
 
 ### Patch Changes
