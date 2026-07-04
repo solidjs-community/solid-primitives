@@ -135,6 +135,46 @@ describe("createScheduled", () => {
     dispose();
   });
 
+  // https://github.com/solidjs-community/solid-primitives/issues/805
+  // Reported crash: navigating away (disposing the owning root) while a
+  // createScheduled(debounce) timer is still pending. Root cause was a
+  // re-entrant `cleanNode` bug in solid-js 1.x's disposal system (see
+  // https://github.com/solidjs/solid/pull/2062), not this package — debounce's
+  // onCleanup(clear) already cancels the pending timeout on dispose. Solid 2's
+  // rewritten disposal system (@solidjs/signals) does not exhibit the
+  // re-entrancy, and this test pins that behavior for this package's usage.
+  it("disposing mid-debounce does not throw and cancels the pending callback", () => {
+    const [track, trigger] = createSignal(undefined, { equals: false });
+    const vals: boolean[] = [];
+
+    const dispose = createRoot(dispose => {
+      const scheduled = createScheduled(fn => debounce(fn, 10_000));
+
+      createEffect(
+        () => {
+          track();
+          return scheduled();
+        },
+        val => {
+          vals.push(val);
+        },
+      );
+
+      return dispose;
+    });
+
+    flush(); // initial run
+    trigger();
+    flush(); // starts the 10s debounce timer
+
+    // navigate away mid-debounce, well before the 10s window elapses
+    expect(() => dispose()).not.toThrow();
+
+    // the pending timeout must be cleared by dispose, so it never fires
+    expect(() => vi.advanceTimersByTime(20_000)).not.toThrow();
+    expect(vals).toEqual([false, false]);
+  });
+
   it("works with multiple computations", () => {
     createRoot(dispose => {
       let invalidate!: VoidFunction;
