@@ -20,7 +20,9 @@
       "makeVideo",
       "makeVideoPlayer",
       "createVideo",
-      "createVideoPlayer"
+      "createVideoPlayer",
+      "makeVideoFrameCallback",
+      "createVideoFrameCallback"
     ],
     "category": "Display & Media",
     "gzip": 1644

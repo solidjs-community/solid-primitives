@@ -128,6 +128,49 @@ function createVideoPlayer(
 ): VideoControlsReturn;
 ```
 
+### `makeVideoFrameCallback`
+
+Wraps [`HTMLVideoElement.requestVideoFrameCallback`](https://wicg.github.io/video-rvfc/), which fires once per displayed video frame instead of once per display refresh — it stops naturally while the video is paused, and the `metadata` argument (`mediaTime`, `presentedFrames`, etc.) lets you sync work to actual playback instead of wall-clock time. No Solid owner required.
+
+```ts
+const [player, cleanup] = makeVideo("clip.mp4");
+const [running, start, stop] = makeVideoFrameCallback(player, (now, metadata) => {
+  draw(metadata.mediaTime);
+});
+start();
+stop();
+cleanup();
+```
+
+```ts
+function makeVideoFrameCallback(
+  video: HTMLVideoElement,
+  callback: VideoFrameRequestCallback,
+): [running: () => boolean, start: VoidFunction, stop: VoidFunction];
+```
+
+### `createVideoFrameCallback`
+
+Reactive version of `makeVideoFrameCallback` — takes an accessor for the video element, so it re-attaches whenever the element changes and stops cleanly when it becomes `undefined`. `running` is a Solid signal, and playback is automatically stopped `onCleanup`.
+
+```ts
+const video = createVideo("clip.mp4");
+const [running, start, stop] = createVideoFrameCallback(
+  () => video.player,
+  (now, metadata) => {
+    console.log(metadata.presentedFrames);
+  },
+);
+start();
+```
+
+```ts
+function createVideoFrameCallback(
+  el: Accessor<HTMLVideoElement | undefined>,
+  callback: VideoFrameRequestCallback,
+): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
+```
+
 ## Types
 
 ```ts

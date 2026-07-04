@@ -10,3 +10,4 @@ export type {
 
 export { makeVideo, setVideoSrc, createVideo } from "./createVideo.js";
 export { makeVideoPlayer, createVideoPlayer } from "./createVideoPlayer.js";
+export { makeVideoFrameCallback, createVideoFrameCallback } from "./createVideoFrameCallback.js";
