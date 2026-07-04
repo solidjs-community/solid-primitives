@@ -1,5 +1,14 @@
 # @solid-primitives/analytics
 
+## 1.1.0
+
+### Minor Changes
+
+- Use `@solid-primitives/page-utilities` for navigation blocking instead of a hand-rolled `beforeunload` listener, removing the `@solid-primitives/event-listener` dependency.
+- `makeAnalyticsGuard` now returns a tuple `[(event: BeforeLeaveEvent) => void, () => void]` instead of `{ onBeforeLeave, cleanup }`, consistent with the `makeAnalytics` tuple convention.
+- `createAnalyticsGuard` now returns `(event: BeforeLeaveEvent) => void` directly instead of `{ onBeforeLeave }`, allowing it to be passed straight to `useBeforeLeave`.
+- Hard navigation (tab close, URL bar) now shows a browser confirmation dialog via `makePageLeave` rather than a fire-and-forget drain.
+
 ## 0.2.1
 
 ### Patch Changes
