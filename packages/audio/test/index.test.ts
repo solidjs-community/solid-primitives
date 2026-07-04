@@ -1,5 +1,5 @@
 import "./setup";
-import { createRoot, createSignal, flush, untrack } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { makeAudio, makeAudioPlayer, createAudio } from "../src/index.js";
 

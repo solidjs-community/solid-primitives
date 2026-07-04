@@ -24,8 +24,8 @@ importers:
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       '@storybook/addon-docs':
-        specifier: ^10.4.1
-        version: 10.4.1(@types/react@19.2.15)(esbuild@0.25.5)(rollup@4.61.0)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        specifier: ^10.4.6
+        version: 10.4.6(@types/react@19.2.16)(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1
@@ -36,11 +36,11 @@ importers:
         specifier: ^22.15.31
         version: 22.15.31
       '@typescript-eslint/eslint-plugin':
-        specifier: ^8.34.0
-        version: 8.34.0(@typescript-eslint/parser@8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3))(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)
+        specifier: ^8.62.0
+        version: 8.62.1(@typescript-eslint/parser@8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
       '@typescript-eslint/parser':
-        specifier: ^8.34.0
-        version: 8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)
+        specifier: ^8.62.0
+        version: 8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
       babel-preset-solid:
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14(@babel/core@7.29.0)(solid-js@2.0.0-beta.14)
@@ -49,10 +49,7 @@ importers:
         version: 0.25.5
       esbuild-plugin-solid:
         specifier: ^0.6.0
-        version: 0.6.0(esbuild@0.25.5)(solid-js@2.0.0-beta.14)
-      eslint:
-        specifier: ^9.28.0
-        version: 9.28.0(jiti@2.7.0)
+        version: 0.6.0(esbuild@0.28.1)(solid-js@2.0.0-beta.15)
       eslint-plugin-eslint-comments:
         specifier: ^3.2.0
         version: 3.2.0(eslint@9.28.0(jiti@2.7.0))
@@ -68,12 +65,15 @@ importers:
       json-to-markdown-table:
         specifier: ^1.0.0
         version: 1.0.0
+      oxlint:
+        specifier: ^1.71.0
+        version: 1.71.0
       prettier:
-        specifier: ^3.5.3
-        version: 3.5.3
+        specifier: ^3.8.4
+        version: 3.9.4
       prettier-plugin-tailwindcss:
-        specifier: ^0.6.12
-        version: 0.6.12(prettier@3.5.3)
+        specifier: ^0.8.0
+        version: 0.8.0(prettier@3.9.4)
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0
@@ -90,11 +90,11 @@ importers:
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14
       storybook:
-        specifier: ^10.4.1
-        version: 10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^10.4.6
+        version: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       storybook-solidjs-vite:
-        specifier: ^10.1.0
-        version: 10.1.1(@solidjs/web@2.0.0-beta.14(solid-js@2.0.0-beta.14))(esbuild@0.25.5)(rollup@4.61.0)(solid-js@2.0.0-beta.14)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(typescript@5.8.3)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.14(solid-js@2.0.0-beta.14))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.14)(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        specifier: ^10.5.2
+        version: 10.5.2(@solidjs/web@2.0.0-beta.15(solid-js@2.0.0-beta.15))(esbuild@0.28.1)(rollup@4.43.0)(solid-js@2.0.0-beta.15)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.8.3)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.15(solid-js@2.0.0-beta.15))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.15)(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0)))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -3295,11 +3295,130 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@parcel/watcher-android-arm64@2.5.6':
-    resolution: {integrity: sha512-YQxSS34tPF/6ZG7r/Ih9xy+kP/WwediEUsqmtf0cuCV5TPPKw/PQHRhueUo6JdeFJaqV3pyjm0GdYjZotbRt/A==}
-    engines: {node: '>= 10.0.0'}
+  '@oxlint/binding-android-arm-eabi@1.71.0':
+    resolution: {integrity: sha512-ImGmd1njEg4FEJH03jhRnveEegtO3czCtfptvaHivKAZQIYATbVFBrrzbaYMYv0oJioTnxZAZVSyV+oL7W8S2g==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [android]
+
+  '@oxlint/binding-android-arm64@1.71.0':
+    resolution: {integrity: sha512-4A5BEexBrwY1YFF8Kiq/lp/wQPRG79G3BWIE1FuWaM5MvmpYSd+7ZySVcKkHdwo0UDzdQGddp6pD9mpctMqLnw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [android]
+
+  '@oxlint/binding-darwin-arm64@1.71.0':
+    resolution: {integrity: sha512-9wJA9GJulLwS2usU3CEisI/ESDO1n1z9eyTCvApMDrAkbJ1ve0mORgTMjcWWsKxkzkeZ2N/Gpra5IQE7x8tYgQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxlint/binding-darwin-x64@1.71.0':
+    resolution: {integrity: sha512-PlLCjS06V0PeJMAJwzjrExw1sYNW9Gch3JtNlcwwZDXGlTYDuwHNN89zYH8LTXFfgkVtsYvs2nv0FqrzyuFDzg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxlint/binding-freebsd-x64@1.71.0':
+    resolution: {integrity: sha512-Lhil7bWre0ncxbUoDoxfS0JzpTz17BRQKW7iwoAUY8GJ66+WwJEfYPCFJ1P0WgVZR5/O/b3Q2pENlHOjeXLOGQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@oxlint/binding-linux-arm-gnueabihf@1.71.0':
+    resolution: {integrity: sha512-Oo9/L58PYD3RC0x05d2upAPLllHytTjHQGsnC06P6Ynn7jKkp5mdImQxXdJ3+FnBaKspNpGogzgVsi6g872LiA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxlint/binding-linux-arm-musleabihf@1.71.0':
+    resolution: {integrity: sha512-mSHfyfgJrEbyIR29ejaeS50BdPk+GoNPlC1dckpDiUZbJAIel68sjSMdOt4WY0/gva+ECC7FNITQkxMJU+vSBw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxlint/binding-linux-arm64-gnu@1.71.0':
+    resolution: {integrity: sha512-n9yY4M2tiy3aij4AqtlnspzpfdpeT5JQfK2/w2d8oyp5W0FRwOb1dIeX99nORNcxGr08iD9bH8N5XFz3I2iy8w==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxlint/binding-linux-arm64-musl@1.71.0':
+    resolution: {integrity: sha512-fJZrs5sDZtTaPIOiemRQQmo82Ezy+vOGXemPc4Ok7iVVsYsFa7SlW6Z5XN819VfsqBHRm3NJ3rTdnR8+bJYJdQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxlint/binding-linux-ppc64-gnu@1.71.0':
+    resolution: {integrity: sha512-cwl7VKGERIy9p+G+AvZdfy/06q0aHXaTt/mMRReC751iuNYJgqKjB7NydXSS30nBT9vtr2tunciOtrR4fD6FUA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxlint/binding-linux-riscv64-gnu@1.71.0':
+    resolution: {integrity: sha512-eZ8ieVXvzGi8jr7+ybQGPK2STw3mldfxZlgA2738iflfB/rzA69sE6m5rDRpQaxC7dpm745Enlh1Tod0QAk9Gg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxlint/binding-linux-riscv64-musl@1.71.0':
+    resolution: {integrity: sha512-puMDbQYe6+NXwfMusojoA7CXGn2b3utukmd23PQqc1E3XhVCwyZ+FueSMzDYeNgDV2dUfIVXAAKZBcFDeCL6sA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxlint/binding-linux-s390x-gnu@1.71.0':
+    resolution: {integrity: sha512-4NJLxBs1ujISCt3L/1FcywLs73PWtJuw+piD6feK2V6h6OS6P7xu9/sWt1DTRLibe6QCzmfZzmM/2HPORoV/Lg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxlint/binding-linux-x64-gnu@1.71.0':
+    resolution: {integrity: sha512-cFDaiR8L3430qp88tfZnvFlt3KotFhR/DlbIL0nHOMMYiG/9Wy4l+6f7t8G8pTa9bd8Lt8+M0y/qjRQ/xcB74g==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxlint/binding-linux-x64-musl@1.71.0':
+    resolution: {integrity: sha512-orfixdt76KlpNly9z0PkWBBNfwjKz+JFVLP/7wnVchlKNU9Dpt9InU/ZggeSej6fC7qwHmHNOGlhLnQXcYoGuA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxlint/binding-openharmony-arm64@1.71.0':
+    resolution: {integrity: sha512-9emQu2lAp6yhPB3XuI+++vR+l/o6JR1X+EpxwcumPdQXBWXEPAsquPGL7l158EqU8SebQMXTUa/S5zN98juyHw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@oxlint/binding-win32-arm64-msvc@1.71.0':
+    resolution: {integrity: sha512-bd5kI8spYwTm3BILDtGhi73zoup5dw8MlPQNT8YB3BD5UIsjNe3K9/4ctrzQMX4SZMoK5HgzVLkLJzacEXB7fA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxlint/binding-win32-ia32-msvc@1.71.0':
+    resolution: {integrity: sha512-W4HvOHGzVLHcrmFu+bMrJlho+/yrlX5ZNdJZqGe8MEldkQG+RHYhxxad9P4jvWAYFmIqUA5i9DQ8QsJqSU9GIw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ia32]
+    os: [win32]
+
+  '@oxlint/binding-win32-x64-msvc@1.71.0':
+    resolution: {integrity: sha512-D2kyEIPHk/G/wiZLnwTVC/sVst+T/lKldVOjAFpgTIBUAOlry72e5OiapDbDBF4LfJLkN5ypJb/8Eu6yJzkveQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [win32]
+
+  '@peculiar/asn1-schema@2.3.13':
+    resolution: {integrity: sha512-3Xq3a01WkHRZL8X04Zsfg//mGaA21xlL4tlVn4v2xGT0JStiztATRkMwa5b+f/HXmY2smsiLXYK46Gwgzvfg3g==}
 
   '@parcel/watcher-darwin-arm64@2.5.6':
     resolution: {integrity: sha512-Z2ZdrnwyXvvvdtRHLmM4knydIdU9adO3D4n/0cVipF3rRiwP+3/sfzpAwA/qKFL6i1ModaabkU7IbpeMBgiVEA==}
@@ -4490,63 +4609,63 @@ packages:
   '@types/ws@8.5.12':
     resolution: {integrity: sha512-3tPRkv1EtkDpzlgyKyI8pGsGZAGPEaXeu0DOj5DI25Ja91bdAYddYHbADRYVrZMRbfW+1l5YwXVDKohDJNQxkQ==}
 
-  '@typescript-eslint/eslint-plugin@8.34.0':
-    resolution: {integrity: sha512-QXwAlHlbcAwNlEEMKQS2RCgJsgXrTJdjXT08xEgbPFa2yYQgVjBymxP5DrfrE7X7iodSzd9qBUHUycdyVJTW1w==}
+  '@typescript-eslint/eslint-plugin@8.62.1':
+    resolution: {integrity: sha512-4EQM77WgVNxj7OkL/5b/D/xZsw00G577+UriYTC7JF5opcF3T2AuoeY7ueLaZgSVjSgCS6yOAJB5bRGLPSJUzA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      '@typescript-eslint/parser': ^8.34.0
-      eslint: ^8.57.0 || ^9.0.0
-      typescript: '>=4.8.4 <5.9.0'
+      '@typescript-eslint/parser': ^8.62.1
+      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
+      typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/parser@8.34.0':
-    resolution: {integrity: sha512-vxXJV1hVFx3IXz/oy2sICsJukaBrtDEQSBiV48/YIV5KWjX1dO+bcIr/kCPrW6weKXvsaGKFNlwH0v2eYdRRbA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      eslint: ^8.57.0 || ^9.0.0
-      typescript: '>=4.8.4 <5.9.0'
-
-  '@typescript-eslint/project-service@8.34.0':
-    resolution: {integrity: sha512-iEgDALRf970/B2YExmtPMPF54NenZUf4xpL3wsCRx/lgjz6ul/l13R81ozP/ZNuXfnLCS+oPmG7JIxfdNYKELw==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <5.9.0'
-
-  '@typescript-eslint/scope-manager@8.34.0':
-    resolution: {integrity: sha512-9Ac0X8WiLykl0aj1oYQNcLZjHgBojT6cW68yAgZ19letYu+Hxd0rE0veI1XznSSst1X5lwnxhPbVdwjDRIomRw==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/tsconfig-utils@8.34.0':
-    resolution: {integrity: sha512-+W9VYHKFIzA5cBeooqQxqNriAP0QeQ7xTiDuIOr71hzgffm3EL2hxwWBIIj4GuofIbKxGNarpKqIq6Q6YrShOA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <5.9.0'
-
-  '@typescript-eslint/type-utils@8.34.0':
-    resolution: {integrity: sha512-n7zSmOcUVhcRYC75W2pnPpbO1iwhJY3NLoHEtbJwJSNlVAZuwqu05zY3f3s2SDWWDSo9FdN5szqc73DCtDObAg==}
+  '@typescript-eslint/parser@8.62.1':
+    resolution: {integrity: sha512-sPhE4iHuJDSvoAiec+Ro8JyXw8f0ql13HFR82P99nCm9GwTEKG0KYLvDe6REk8BCXuit6vJAv/Yxg5ABaNS2rA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.9.0'
 
-  '@typescript-eslint/types@8.34.0':
-    resolution: {integrity: sha512-9V24k/paICYPniajHfJ4cuAWETnt7Ssy+R0Rbcqo5sSFr3QEZ/8TSoUi9XeXVBGXCaLtwTOKSLGcInCAvyZeMA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/typescript-estree@8.34.0':
-    resolution: {integrity: sha512-rOi4KZxI7E0+BMqG7emPSK1bB4RICCpF7QD3KCLXn9ZvWoESsOMlHyZPAHyG04ujVplPaHbmEvs34m+wjgtVtg==}
+  '@typescript-eslint/project-service@8.62.1':
+    resolution: {integrity: sha512-yQ3RgY5RkSBpsNS1Bx/JQEcA24FOSdfGktoyprAr5u18390UQdtVcfnEv4nIrIshNnavlVyZBKxQwT1fIAE6cg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <5.9.0'
 
-  '@typescript-eslint/utils@8.34.0':
-    resolution: {integrity: sha512-8L4tWatGchV9A1cKbjaavS6mwYwp39jql8xUmIIKJdm+qiaeHy5KMKlBrf30akXAWBzn2SqKsNOtSENWUwg7XQ==}
+  '@typescript-eslint/scope-manager@8.62.1':
+    resolution: {integrity: sha512-r4d249KbQ1SFdpeStvob8Ih6aPPIzfqllPVOtvhve6ZcpuVcYo5/7zUWckKpHE7StASX4kTKZTLf0WQm/wPkcg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typescript-eslint/tsconfig-utils@8.62.1':
+    resolution: {integrity: sha512-xadytJqX9vJVQ2fdQjkcIVigwaOJNWkpjdLt6cEQ+xPnrI1fkp+/jZE/I97k9KUjqtpd25i0HeyZf3T6dutv2g==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <5.9.0'
+
+  '@typescript-eslint/type-utils@8.62.1':
+    resolution: {integrity: sha512-aXM5xlqXiTxPibXB93cLAURfT3rlizf7uMXISCXy66Isr/9hISJx3yDsKl0L7lKa51b8JpFuNKby0/O0pEm9jg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.9.0'
 
-  '@typescript-eslint/visitor-keys@8.34.0':
-    resolution: {integrity: sha512-qHV7pW7E85A0x6qyrFn+O+q1k1p3tQCsqIZ1KZ5ESLXY57aTvUd3/a4rdPTeXisvhXn2VQG0VSKUqs8KHF2zcA==}
+  '@typescript-eslint/types@8.62.1':
+    resolution: {integrity: sha512-ooCzJFaf+Hg+uG6fA3NRFGuFjlfNlDhBthbv4ZPU/0elCAFUfnyXUvf/WOpHz/jYwSmvU2GkR2LtyUfy1AxZ1Q==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typescript-eslint/typescript-estree@8.62.1':
+    resolution: {integrity: sha512-xMcW9oP9u7fAMXYs9A65CVmtLQe2r//oXINHfi8HV+oiqhih17sbLdhXr4540YWlgpDKQdY854OL5ZrdCiQsAA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <5.9.0'
+
+  '@typescript-eslint/utils@8.62.1':
+    resolution: {integrity: sha512-sHtbPfuKNZCG+ih8SyjjucqRntSVmp8XgL5u6o9mAhiSn8ds5o/M/XdM0abweme2Tln3szOstOrZ9OXitvPh0g==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: ^8.57.0 || ^9.0.0
+      typescript: '>=4.8.4 <5.9.0'
+
+  '@typescript-eslint/visitor-keys@8.62.1':
+    resolution: {integrity: sha512-4g3BLxfdTMy8iZG0MaBkadnlRrCJ74cQiFbyEVMrkwIoqdyaXXQM22cotDvrl4x28wgIZ9rEJRoM+mmhSJpJ1g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@ungap/structured-clone@1.3.0':
@@ -7049,6 +7168,19 @@ packages:
   oxc-resolver@11.20.0:
     resolution: {integrity: sha512-CblytBiV/a/ZXY34dsVU2NxhIOxMXst8CvDCtyBelVITgd7PLrKzbEbA6oKLdPjvDKDzCiW48qzmzZ+mYaqn+g==}
 
+  oxlint@1.71.0:
+    resolution: {integrity: sha512-U1m1X+C0vDj7DC1e13IoZULzEcPczE7UOMTs8VlZGHUEIUaSTZKo5qkPsQEfzpgnQ29Pea/w3Xntk62UCecxZw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+    peerDependencies:
+      oxlint-tsgolint: '>=0.22.1'
+      vite-plus: '*'
+    peerDependenciesMeta:
+      oxlint-tsgolint:
+        optional: true
+      vite-plus:
+        optional: true
+
   p-filter@2.1.0:
     resolution: {integrity: sha512-ZBxxZ5sL2HghephhpGAQdoskxplTwr7ICaehZwLIlfL6acuVgZPm8yBNuRAFBGEqtD/hmUeq9eqLg2ys9Xr/yw==}
     engines: {node: '>=8'}
@@ -7362,9 +7494,10 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  pretty-bytes@7.1.0:
-    resolution: {integrity: sha512-nODzvTiYVRGRqAOvE84Vk5JDPyyxsVk0/fbA/bq7RqlnhksGpset09XTxbpvLTIjoaF7K8Z8DG8yHtKGTPSYRw==}
-    engines: {node: '>=20'}
+  prettier@3.9.4:
+    resolution: {integrity: sha512-yWG/o/4oJfo036EKAfK6ACAoDOfHeRHx4tuxkfBZiauURiaSmYwlpOr5LQqKtIkRD2z1PLteme2WoxEnj4tHTg==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
@@ -9739,7 +9872,7 @@ snapshots:
       globals: 14.0.0
       ignore: 5.3.2
       import-fresh: 3.3.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       minimatch: 3.1.2
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -10627,75 +10760,62 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@11.20.0':
     optional: true
 
-  '@parcel/watcher-android-arm64@2.5.6':
+  '@oxlint/binding-android-arm-eabi@1.71.0':
     optional: true
 
-  '@parcel/watcher-darwin-arm64@2.5.6':
+  '@oxlint/binding-android-arm64@1.71.0':
     optional: true
 
-  '@parcel/watcher-darwin-x64@2.5.6':
+  '@oxlint/binding-darwin-arm64@1.71.0':
     optional: true
 
-  '@parcel/watcher-freebsd-x64@2.5.6':
+  '@oxlint/binding-darwin-x64@1.71.0':
     optional: true
 
-  '@parcel/watcher-linux-arm-glibc@2.5.6':
+  '@oxlint/binding-freebsd-x64@1.71.0':
     optional: true
 
-  '@parcel/watcher-linux-arm-musl@2.5.6':
+  '@oxlint/binding-linux-arm-gnueabihf@1.71.0':
     optional: true
 
-  '@parcel/watcher-linux-arm64-glibc@2.5.6':
+  '@oxlint/binding-linux-arm-musleabihf@1.71.0':
     optional: true
 
-  '@parcel/watcher-linux-arm64-musl@2.5.6':
+  '@oxlint/binding-linux-arm64-gnu@1.71.0':
     optional: true
 
-  '@parcel/watcher-linux-x64-glibc@2.5.6':
+  '@oxlint/binding-linux-arm64-musl@1.71.0':
     optional: true
 
-  '@parcel/watcher-linux-x64-musl@2.5.6':
+  '@oxlint/binding-linux-ppc64-gnu@1.71.0':
     optional: true
 
-  '@parcel/watcher-wasm@2.3.0':
-    dependencies:
-      is-glob: 4.0.3
-      micromatch: 4.0.8
-
-  '@parcel/watcher-wasm@2.5.6':
-    dependencies:
-      is-glob: 4.0.3
-      picomatch: 4.0.4
-
-  '@parcel/watcher-win32-arm64@2.5.6':
+  '@oxlint/binding-linux-riscv64-gnu@1.71.0':
     optional: true
 
-  '@parcel/watcher-win32-ia32@2.5.6':
+  '@oxlint/binding-linux-riscv64-musl@1.71.0':
     optional: true
 
-  '@parcel/watcher-win32-x64@2.5.6':
+  '@oxlint/binding-linux-s390x-gnu@1.71.0':
     optional: true
 
-  '@parcel/watcher@2.5.6':
-    dependencies:
-      detect-libc: 2.1.2
-      is-glob: 4.0.3
-      node-addon-api: 7.1.1
-      picomatch: 4.0.4
-    optionalDependencies:
-      '@parcel/watcher-android-arm64': 2.5.6
-      '@parcel/watcher-darwin-arm64': 2.5.6
-      '@parcel/watcher-darwin-x64': 2.5.6
-      '@parcel/watcher-freebsd-x64': 2.5.6
-      '@parcel/watcher-linux-arm-glibc': 2.5.6
-      '@parcel/watcher-linux-arm-musl': 2.5.6
-      '@parcel/watcher-linux-arm64-glibc': 2.5.6
-      '@parcel/watcher-linux-arm64-musl': 2.5.6
-      '@parcel/watcher-linux-x64-glibc': 2.5.6
-      '@parcel/watcher-linux-x64-musl': 2.5.6
-      '@parcel/watcher-win32-arm64': 2.5.6
-      '@parcel/watcher-win32-ia32': 2.5.6
-      '@parcel/watcher-win32-x64': 2.5.6
+  '@oxlint/binding-linux-x64-gnu@1.71.0':
+    optional: true
+
+  '@oxlint/binding-linux-x64-musl@1.71.0':
+    optional: true
+
+  '@oxlint/binding-openharmony-arm64@1.71.0':
+    optional: true
+
+  '@oxlint/binding-win32-arm64-msvc@1.71.0':
+    optional: true
+
+  '@oxlint/binding-win32-ia32-msvc@1.71.0':
+    optional: true
+
+  '@oxlint/binding-win32-x64-msvc@1.71.0':
+    optional: true
 
   '@peculiar/asn1-schema@2.3.13':
     dependencies:
@@ -11157,15 +11277,15 @@ snapshots:
 
   '@speed-highlight/core@1.2.15': {}
 
-  '@storybook/addon-docs@10.4.1(@types/react@19.2.15)(esbuild@0.25.5)(rollup@4.61.0)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@storybook/addon-docs@10.4.6(@types/react@19.2.16)(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))':
     dependencies:
-      '@mdx-js/react': 3.1.1(@types/react@19.2.15)(react@19.2.5)
-      '@storybook/csf-plugin': 10.4.1(esbuild@0.25.5)(rollup@4.61.0)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
-      '@storybook/icons': 2.0.2(react-dom@19.2.6(react@19.2.6))(react@19.2.5)
-      '@storybook/react-dom-shim': 10.4.1(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.5)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))
-      react: 19.2.5
-      react-dom: 19.2.6(react@19.2.5)
-      storybook: 10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@mdx-js/react': 3.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@storybook/csf-plugin': 10.4.6(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))
+      '@storybook/icons': 2.0.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@storybook/react-dom-shim': 10.4.6(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+      storybook: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       ts-dedent: 2.2.0
     optionalDependencies:
       '@types/react': 19.2.15
@@ -11176,10 +11296,10 @@ snapshots:
       - vite
       - webpack
 
-  '@storybook/builder-vite@10.4.1(esbuild@0.25.5)(rollup@4.61.0)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@storybook/builder-vite@10.4.4(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))':
     dependencies:
-      '@storybook/csf-plugin': 10.4.1(esbuild@0.25.5)(rollup@4.61.0)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
-      storybook: 10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@storybook/csf-plugin': 10.4.4(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))
+      storybook: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       ts-dedent: 2.2.0
       vite: 6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
     transitivePeerDependencies:
@@ -11187,9 +11307,18 @@ snapshots:
       - rollup
       - webpack
 
-  '@storybook/csf-plugin@10.4.1(esbuild@0.25.5)(rollup@4.61.0)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@storybook/csf-plugin@10.4.4(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))':
     dependencies:
-      storybook: 10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      storybook: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      unplugin: 2.3.5
+    optionalDependencies:
+      esbuild: 0.28.1
+      rollup: 4.43.0
+      vite: 6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0)
+
+  '@storybook/csf-plugin@10.4.6(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))':
+    dependencies:
+      storybook: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       unplugin: 2.3.5
     optionalDependencies:
       esbuild: 0.25.5
@@ -11208,11 +11337,11 @@ snapshots:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
-  '@storybook/react-dom-shim@10.4.1(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.5)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))':
+  '@storybook/react-dom-shim@10.4.6(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))':
     dependencies:
-      react: 19.2.5
-      react-dom: 19.2.6(react@19.2.6)
-      storybook: 10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+      storybook: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
     optionalDependencies:
       '@types/react': 19.2.15
 
@@ -12225,16 +12354,15 @@ snapshots:
     dependencies:
       '@types/node': 22.15.31
 
-  '@typescript-eslint/eslint-plugin@8.34.0(@typescript-eslint/parser@8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3))(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)':
+  '@typescript-eslint/eslint-plugin@8.62.1(@typescript-eslint/parser@8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)':
     dependencies:
-      '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)
-      '@typescript-eslint/scope-manager': 8.34.0
-      '@typescript-eslint/type-utils': 8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)
-      '@typescript-eslint/visitor-keys': 8.34.0
-      eslint: 9.28.0(jiti@2.7.0)
-      graphemer: 1.4.0
+      '@eslint-community/regexpp': 4.12.2
+      '@typescript-eslint/parser': 8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
+      '@typescript-eslint/scope-manager': 8.62.1
+      '@typescript-eslint/type-utils': 8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
+      '@typescript-eslint/utils': 8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
+      '@typescript-eslint/visitor-keys': 8.62.1
+      eslint: 9.28.0(jiti@1.21.7)
       ignore: 7.0.5
       natural-compare: 1.4.0
       ts-api-utils: 2.1.0(typescript@5.8.3)
@@ -12242,80 +12370,80 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)':
+  '@typescript-eslint/parser@8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/scope-manager': 8.34.0
-      '@typescript-eslint/types': 8.34.0
-      '@typescript-eslint/typescript-estree': 8.34.0(typescript@5.8.3)
-      '@typescript-eslint/visitor-keys': 8.34.0
-      debug: 4.4.1
-      eslint: 9.28.0(jiti@2.7.0)
+      '@typescript-eslint/scope-manager': 8.62.1
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/typescript-estree': 8.62.1(typescript@5.8.3)
+      '@typescript-eslint/visitor-keys': 8.62.1
+      debug: 4.4.3
+      eslint: 9.28.0(jiti@1.21.7)
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.34.0(typescript@5.8.3)':
+  '@typescript-eslint/project-service@8.62.1(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.34.0(typescript@5.8.3)
-      '@typescript-eslint/types': 8.34.0
-      debug: 4.4.1
+      '@typescript-eslint/tsconfig-utils': 8.62.1(typescript@5.8.3)
+      '@typescript-eslint/types': 8.62.1
+      debug: 4.4.3
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/scope-manager@8.34.0':
+  '@typescript-eslint/scope-manager@8.62.1':
     dependencies:
-      '@typescript-eslint/types': 8.34.0
-      '@typescript-eslint/visitor-keys': 8.34.0
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/visitor-keys': 8.62.1
 
-  '@typescript-eslint/tsconfig-utils@8.34.0(typescript@5.8.3)':
+  '@typescript-eslint/tsconfig-utils@8.62.1(typescript@5.8.3)':
     dependencies:
       typescript: 5.8.3
 
-  '@typescript-eslint/type-utils@8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)':
+  '@typescript-eslint/type-utils@8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 8.34.0(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)
-      debug: 4.4.1
-      eslint: 9.28.0(jiti@2.7.0)
-      ts-api-utils: 2.1.0(typescript@5.8.3)
-      typescript: 5.8.3
-    transitivePeerDependencies:
-      - supports-color
-
-  '@typescript-eslint/types@8.34.0': {}
-
-  '@typescript-eslint/typescript-estree@8.34.0(typescript@5.8.3)':
-    dependencies:
-      '@typescript-eslint/project-service': 8.34.0(typescript@5.8.3)
-      '@typescript-eslint/tsconfig-utils': 8.34.0(typescript@5.8.3)
-      '@typescript-eslint/types': 8.34.0
-      '@typescript-eslint/visitor-keys': 8.34.0
-      debug: 4.4.1
-      fast-glob: 3.3.3
-      is-glob: 4.0.3
-      minimatch: 9.0.5
-      semver: 7.7.2
-      ts-api-utils: 2.1.0(typescript@5.8.3)
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/typescript-estree': 8.62.1(typescript@5.8.3)
+      '@typescript-eslint/utils': 8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
+      debug: 4.4.3
+      eslint: 9.28.0(jiti@1.21.7)
+      ts-api-utils: 2.5.0(typescript@5.8.3)
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.34.0(eslint@9.28.0(jiti@2.7.0))(typescript@5.8.3)':
+  '@typescript-eslint/types@8.62.1': {}
+
+  '@typescript-eslint/typescript-estree@8.62.1(typescript@5.8.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.7.0(eslint@9.28.0(jiti@2.7.0))
-      '@typescript-eslint/scope-manager': 8.34.0
-      '@typescript-eslint/types': 8.34.0
-      '@typescript-eslint/typescript-estree': 8.34.0(typescript@5.8.3)
-      eslint: 9.28.0(jiti@2.7.0)
+      '@typescript-eslint/project-service': 8.62.1(typescript@5.8.3)
+      '@typescript-eslint/tsconfig-utils': 8.62.1(typescript@5.8.3)
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/visitor-keys': 8.62.1
+      debug: 4.4.3
+      minimatch: 10.2.5
+      semver: 7.8.2
+      tinyglobby: 0.2.16
+      ts-api-utils: 2.5.0(typescript@5.8.3)
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/visitor-keys@8.34.0':
+  '@typescript-eslint/utils@8.62.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/types': 8.34.0
-      eslint-visitor-keys: 4.2.1
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.28.0(jiti@1.21.7))
+      '@typescript-eslint/scope-manager': 8.62.1
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/typescript-estree': 8.62.1(typescript@5.8.3)
+      eslint: 9.28.0(jiti@1.21.7)
+      typescript: 5.8.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/visitor-keys@8.62.1':
+    dependencies:
+      '@typescript-eslint/types': 8.62.1
+      eslint-visitor-keys: 5.0.1
 
   '@ungap/structured-clone@1.3.0': {}
 
@@ -15253,6 +15381,28 @@ snapshots:
       '@oxc-resolver/binding-win32-arm64-msvc': 11.20.0
       '@oxc-resolver/binding-win32-x64-msvc': 11.20.0
 
+  oxlint@1.71.0:
+    optionalDependencies:
+      '@oxlint/binding-android-arm-eabi': 1.71.0
+      '@oxlint/binding-android-arm64': 1.71.0
+      '@oxlint/binding-darwin-arm64': 1.71.0
+      '@oxlint/binding-darwin-x64': 1.71.0
+      '@oxlint/binding-freebsd-x64': 1.71.0
+      '@oxlint/binding-linux-arm-gnueabihf': 1.71.0
+      '@oxlint/binding-linux-arm-musleabihf': 1.71.0
+      '@oxlint/binding-linux-arm64-gnu': 1.71.0
+      '@oxlint/binding-linux-arm64-musl': 1.71.0
+      '@oxlint/binding-linux-ppc64-gnu': 1.71.0
+      '@oxlint/binding-linux-riscv64-gnu': 1.71.0
+      '@oxlint/binding-linux-riscv64-musl': 1.71.0
+      '@oxlint/binding-linux-s390x-gnu': 1.71.0
+      '@oxlint/binding-linux-x64-gnu': 1.71.0
+      '@oxlint/binding-linux-x64-musl': 1.71.0
+      '@oxlint/binding-openharmony-arm64': 1.71.0
+      '@oxlint/binding-win32-arm64-msvc': 1.71.0
+      '@oxlint/binding-win32-ia32-msvc': 1.71.0
+      '@oxlint/binding-win32-x64-msvc': 1.71.0
+
   p-filter@2.1.0:
     dependencies:
       p-map: 2.1.0
@@ -15494,15 +15644,15 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-tailwindcss@0.6.12(prettier@3.5.3):
+  prettier-plugin-tailwindcss@0.8.0(prettier@3.9.4):
     dependencies:
-      prettier: 3.5.3
+      prettier: 3.9.4
 
   prettier@2.8.8: {}
 
   prettier@3.5.3: {}
 
-  pretty-bytes@7.1.0: {}
+  prettier@3.9.4: {}
 
   pretty-format@27.5.1:
     dependencies:
@@ -16153,18 +16303,15 @@ snapshots:
 
   std-env@3.9.0: {}
 
-  std-env@4.1.0: {}
-
-  storybook-solidjs-vite@10.1.1(@solidjs/web@2.0.0-beta.14(solid-js@2.0.0-beta.14))(esbuild@0.25.5)(rollup@4.61.0)(solid-js@2.0.0-beta.14)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(typescript@5.8.3)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.14(solid-js@2.0.0-beta.14))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.14)(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
+  storybook-solidjs-vite@10.5.2(@solidjs/web@2.0.0-beta.15(solid-js@2.0.0-beta.15))(esbuild@0.28.1)(rollup@4.43.0)(solid-js@2.0.0-beta.15)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.8.3)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.15(solid-js@2.0.0-beta.15))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.15)(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0)))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0)):
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.7.0(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
-      '@storybook/builder-vite': 10.4.1(esbuild@0.25.5)(rollup@4.61.0)(storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      '@storybook/builder-vite': 10.4.4(esbuild@0.28.1)(rollup@4.43.0)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))
       '@storybook/global': 5.0.0
       semver: 7.8.1
-      solid-js: 2.0.0-beta.14
-      storybook: 10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      vite: 6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
-      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.14(solid-js@2.0.0-beta.14))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.14)(vite@6.3.5(@types/node@22.15.31)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.8)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      solid-js: 2.0.0-beta.15
+      storybook: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      vite: 6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0)
+      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.15(solid-js@2.0.0-beta.15))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.15)(vite@6.3.5(@types/node@22.15.31)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.77.8)(tsx@4.22.3)(yaml@2.5.0))
     optionalDependencies:
       '@solidjs/web': 2.0.0-beta.14(solid-js@2.0.0-beta.14)
       typescript: 5.8.3
@@ -16173,7 +16320,7 @@ snapshots:
       - rollup
       - webpack
 
-  storybook@10.4.1(@testing-library/dom@10.4.1)(@types/react@19.2.15)(prettier@3.5.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/icons': 2.0.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -16191,8 +16338,8 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.6)
       ws: 8.18.2
     optionalDependencies:
-      '@types/react': 19.2.15
-      prettier: 3.5.3
+      '@types/react': 19.2.16
+      prettier: 3.9.4
     transitivePeerDependencies:
       - '@testing-library/dom'
       - bufferutil
@@ -16496,8 +16643,7 @@ snapshots:
 
   tsx@4.20.2:
     dependencies:
-      esbuild: 0.25.5
-      get-tsconfig: 4.10.1
+      esbuild: 0.28.0
     optionalDependencies:
       fsevents: 2.3.3
 

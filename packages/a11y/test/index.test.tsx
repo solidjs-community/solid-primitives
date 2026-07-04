@@ -426,6 +426,7 @@ describe("createFormControlInput", () => {
   it("deregisters fieldId on dispose", () => {
     const container = document.createElement("div");
     const ctx = createFormControl({ id: "ctrl" });
+    // oxlint-disable-next-line no-unused-vars
     let fp!: ReturnType<typeof createFormControlInput>["fieldProps"];
 
     const dispose = render(() => {

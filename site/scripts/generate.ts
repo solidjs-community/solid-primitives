@@ -176,7 +176,7 @@ async function generatePackageSize(module: ModuleData) {
 
   const packages = [] as PackageListItem[];
 
-  for (let module of await getModulesData()) {
+  for (const module of await getModulesData()) {
     if (module.primitive == null) continue;
 
     const [readme, primitives, packageSize] = await Promise.all([
@@ -199,7 +199,7 @@ async function generatePackageSize(module: ModuleData) {
   // gather all module names into one json file
   await fsp.writeFile(packagesDist, JSON.stringify(packages, null, 2));
 
-  // eslint-disable-next-line no-console
+  // oxlint-disable-next-line no-console
   console.log(`\nGenerated data for ${packages.length} packages.\n`);
 })();
 

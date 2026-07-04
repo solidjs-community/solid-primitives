@@ -208,6 +208,7 @@ function updateKeyedMap<Item, MappedItem>(this: MapData<Item, MappedItem>): any[
   runWithOwner(this._owner, () => {
     let i: number | undefined,
       j: number | undefined,
+      /* oxlint-disable-next-line prefer-const */
       mapper = this._rows
         ? this._unkeyed
           ? () => {
@@ -270,12 +271,19 @@ function updateKeyedMap<Item, MappedItem>(this: MapData<Item, MappedItem>): any[
         newEnd: number,
         item: Item,
         key: any,
+        /* oxlint-disable-next-line prefer-const */
         newIndices: Map<Item, number>,
+        /* oxlint-disable-next-line prefer-const */
         newIndicesNext: number[],
+        /* oxlint-disable-next-line prefer-const */
         temp: MappedItem[] = new Array(newLen),
+        /* oxlint-disable-next-line prefer-const */
         tempNodes: Root[] = new Array(newLen),
+        /* oxlint-disable-next-line prefer-const */
         tempRows: Signal<Item>[] | undefined = this._rows ? new Array(newLen) : undefined,
+        /* oxlint-disable-next-line prefer-const */
         tempIndexes: Signal<number>[] | undefined = this._indexes ? new Array(newLen) : undefined,
+        /* oxlint-disable-next-line prefer-const */
         unusedIndexes: number[] | undefined = this._recycle && !this._unkeyed ? [] : undefined; // unkeyed uses every element, no need to reuse
 
       // skip common prefix

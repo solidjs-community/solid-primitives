@@ -196,11 +196,11 @@ export function createMachine<T extends StatesBase<keyof T>>(
       next[key as any] = (input: any) => next(key, input);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while (true) {
       pendingType = undefined;
       value = untrack(() => (states as any)[type](value, next));
-      if (pendingType === undefined) break; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+      if (pendingType === undefined) break; // oxlint-disable-line @typescript-eslint/no-unnecessary-condition
       type = pendingType;
       value = pendingValue;
     }

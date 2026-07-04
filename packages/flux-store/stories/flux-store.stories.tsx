@@ -9,7 +9,6 @@ import {
 } from "../src/index.js";
 import readme from "../README.md?raw";
 import {
-  Badge,
   BoolRow,
   Button,
   ButtonRow,

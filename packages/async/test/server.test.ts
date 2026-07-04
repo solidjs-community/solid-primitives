@@ -1,5 +1,4 @@
 import { describe, test, expect } from "vitest";
-import { createEffect, createMemo, createRoot } from "solid-js";
 import { fromStream } from "../src/index.js";
 import { createReadStream } from "fs";
 import { Readable } from "stream";

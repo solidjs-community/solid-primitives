@@ -57,7 +57,7 @@ export type CreateViewportObserverReturnValue = [
 
 function observe(el: Element, instance: IntersectionObserver): void {
   if (DEV && el instanceof HTMLElement && el.style.display === "contents") {
-    // eslint-disable-next-line no-console
+    // oxlint-disable-next-line no-console
     console.warn(
       `[@solid-primitives/intersection-observer] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,
       el,

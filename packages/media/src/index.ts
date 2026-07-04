@@ -136,7 +136,7 @@ export function createBreakpoints<T extends Breakpoints>(
     { enumerable: false, get: () => Object.keys(breakpoints).pop() },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (isServer || !window.matchMedia) return fallback;
 
   const { mediaFeature = "min-width", watchChange = true } = options;
