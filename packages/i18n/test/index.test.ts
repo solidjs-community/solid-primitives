@@ -101,6 +101,42 @@ describe("translator", () => {
     expect(t("data.formatList", ["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
     expect(t("jsx", "Tester")).toEqual(plDict.jsx("Tester"));
   });
+
+  test("missing key returns undefined by default", () => {
+    const dict = i18n.flatten(enDict) as any;
+    const missingT = i18n.translator(() => dict, i18n.resolveTemplate);
+    expect(missingT("does.not.exist" as any)).toBeUndefined();
+  });
+
+  test("missing key defers to onMissingKey when the dict is loaded", () => {
+    const dict = i18n.flatten(enDict) as any;
+    const missingT = i18n.translator(() => dict, i18n.resolveTemplate, i18n.missingKeyAsPath);
+    expect(missingT("does.not.exist" as any)).toBe("does.not.exist");
+  });
+
+  test("onMissingKey is not called while the dict itself is unavailable", () => {
+    const onMissingKey = (path: string) => `missing:${path}`;
+    const missingT = i18n.translator(() => undefined, i18n.resolveTemplate, onMissingKey);
+    expect(missingT("hello" as any)).toBeUndefined();
+  });
+
+  test("onMissingKey does not fire for present falsy values", () => {
+    const dict = { zero: 0, empty: "", isFalse: false, isNull: null } as any;
+    const calls: string[] = [];
+    const t2 = i18n.translator(
+      () => dict,
+      i18n.resolveTemplate,
+      path => {
+        calls.push(path);
+        return "missing";
+      },
+    );
+    expect(t2("zero" as any)).toBe(0);
+    expect(t2("empty" as any)).toBe("");
+    expect(t2("isFalse" as any)).toBe(false);
+    expect(t2("isNull" as any)).toBe(null);
+    expect(calls).toEqual([]);
+  });
 });
 
 describe("scopedTranslator", () => {

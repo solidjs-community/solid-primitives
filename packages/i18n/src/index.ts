@@ -212,16 +212,41 @@ export type NullableTranslator<T extends BaseRecordDict, O = string> = <K extend
 ) => Resolved<T[K], O> | undefined;
 
 /**
+ * Called when a lookup finds the dictionary itself but not the requested {@link path} within it —
+ * i.e. a genuinely missing translation, as opposed to the dictionary not being loaded yet.
+ * Its return value is used as the translation result.
+ */
+export type MissingKeyHandler<O = string> = (path: string) => O | undefined;
+
+/**
+ * A {@link MissingKeyHandler} that returns the requested path itself, e.g. `"food.meat"`,
+ * making missing translations visible in the UI instead of silently rendering blank.
+ *
+ * @example
+ * ```ts
+ * const t = i18n.translator(() => flatDict, i18n.resolveTemplate, i18n.missingKeyAsPath);
+ * ```
+ */
+export const missingKeyAsPath: MissingKeyHandler<any> = path => path;
+
+/**
  * Create a translator function that will resolve the path in the dictionary and return the value.
  *
  * If the value is a function it will call it with the provided arguments.
  *
  * If the value is a string it will resolve the template using {@link resolveTemplate} with the provided arguments.
  *
+ * If the dictionary exists but has no value at {@link path}, {@link onMissingKey} is called (if provided)
+ * and its result is returned. By default (no {@link onMissingKey}), a missing key resolves to `undefined`,
+ * same as when the dictionary itself isn't available yet.
+ *
  * Otherwise it will return the value as is.
  *
  * @param dict A function that returns the dictionary to use for translation. Will be called on each translation.
  * @param resolveTemplate A function that will resolve the template. Defaults to {@link identityResolveTemplate}.
+ * @param onMissingKey Called with the requested path when the dictionary exists but has no value there.
+ * Use {@link missingKeyAsPath} to fall back to the path itself, or provide a custom handler,
+ * e.g. to log/report missing translations.
  *
  * @example
  * ```ts
@@ -244,25 +269,31 @@ export type NullableTranslator<T extends BaseRecordDict, O = string> = <K extend
 export function translator<T extends BaseRecordDict, O = string>(
   dict: () => T,
   resolveTemplate?: TemplateResolver<O>,
+  onMissingKey?: MissingKeyHandler<O>,
 ): Translator<T, O>;
 export function translator<T extends BaseRecordDict, O = string>(
   dict: () => T | undefined,
   resolveTemplate?: TemplateResolver<O>,
+  onMissingKey?: MissingKeyHandler<O>,
 ): NullableTranslator<T, O>;
 export function translator<T extends BaseRecordDict>(
   dict: () => T | undefined,
   resolveTemplate: TemplateResolver = identityResolveTemplate,
+  onMissingKey?: MissingKeyHandler,
 ): any {
   return (path: string, ...args: any[]) => {
     if (path[0] === ".") path = path.slice(1);
 
-    const value = dict()?.[path];
+    const currentDict = dict();
+    const value = currentDict?.[path];
 
     switch (typeof value) {
       case "function":
         return value(...args);
       case "string":
         return resolveTemplate(value, args[0]);
+      case "undefined":
+        return currentDict !== undefined && onMissingKey ? onMissingKey(path) : value;
       default:
         return value;
     }
