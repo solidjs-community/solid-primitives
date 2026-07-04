@@ -39,6 +39,17 @@ describe("createPagination", () => {
       dispose();
     }));
 
+  test("createPagination applies default aria-labels on server", () =>
+    createRoot(dispose => {
+      const [paginationProps] = createPagination({ pages: 100 });
+      const [first, prev, , , , , , , , , , , next, last] = paginationProps();
+      expect(first?.["aria-label"]).toBe("First page");
+      expect(prev?.["aria-label"]).toBe("Previous page");
+      expect(next?.["aria-label"]).toBe("Next page");
+      expect(last?.["aria-label"]).toBe("Last page");
+      dispose();
+    }));
+
   test("createPagination clamps start", () =>
     createRoot(dispose => {
       const [paginationProps] = createPagination({ pages: 10, maxPages: 13 });

@@ -48,6 +48,38 @@ describe("createPagination", () => {
     dispose();
   });
 
+  test("createPagination applies default aria-labels", () => {
+    const { paginationProps, dispose } = createRoot(dispose => {
+      const [paginationProps] = createPagination({ pages: 100 });
+      return { paginationProps, dispose };
+    });
+    const [first, prev, , , , , , , , , , , next, last] = paginationProps();
+    expect(first?.["aria-label"]).toBe("First page");
+    expect(prev?.["aria-label"]).toBe("Previous page");
+    expect(next?.["aria-label"]).toBe("Next page");
+    expect(last?.["aria-label"]).toBe("Last page");
+    dispose();
+  });
+
+  test("createPagination applies custom aria-labels", () => {
+    const { paginationProps, dispose } = createRoot(dispose => {
+      const [paginationProps] = createPagination({
+        pages: 100,
+        firstAriaLabel: "Go to first page",
+        prevAriaLabel: "Go to previous page",
+        nextAriaLabel: "Go to next page",
+        lastAriaLabel: "Go to last page",
+      });
+      return { paginationProps, dispose };
+    });
+    const [first, prev, , , , , , , , , , , next, last] = paginationProps();
+    expect(first?.["aria-label"]).toBe("Go to first page");
+    expect(prev?.["aria-label"]).toBe("Go to previous page");
+    expect(next?.["aria-label"]).toBe("Go to next page");
+    expect(last?.["aria-label"]).toBe("Go to last page");
+    dispose();
+  });
+
   test("createPagination clamps start", () =>
     createRoot(dispose => {
       const [paginationProps, _page, _setPage] = createPagination({

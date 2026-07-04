@@ -1,4 +1,10 @@
-import { access, tryOnCleanup, noop, wrapSetter, type MaybeAccessor } from "@solid-primitives/utils";
+import {
+  access,
+  tryOnCleanup,
+  noop,
+  wrapSetter,
+  type MaybeAccessor,
+} from "@solid-primitives/utils";
 import {
   type Accessor,
   type Setter,
@@ -69,12 +75,21 @@ export type PaginationOptions = {
   nextContent?: JSX.Element;
   /** content for the last page element, e.g. an SVG icon, default is ">|" */
   lastContent?: JSX.Element;
+  /** accessible name for the first page element, default is "First page" */
+  firstAriaLabel?: string;
+  /** accessible name for the previous page element, default is "Previous page" */
+  prevAriaLabel?: string;
+  /** accessible name for the next page element, default is "Next page" */
+  nextAriaLabel?: string;
+  /** accessible name for the last page element, default is "Last page" */
+  lastAriaLabel?: string;
   /** number of pages a large jump, if it should exist, should skip */
   jumpPages?: number;
 };
 
 export type PaginationProps = {
   "aria-current"?: boolean;
+  "aria-label"?: string;
   disabled?: boolean;
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
   onKeyUp?: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent>;
@@ -95,6 +110,10 @@ export const PAGINATION_DEFAULTS = {
   prevContent: "<",
   nextContent: ">",
   lastContent: ">|",
+  firstAriaLabel: "First page",
+  prevAriaLabel: "Previous page",
+  nextAriaLabel: "Next page",
+  lastAriaLabel: "Last page",
 } as const;
 
 const normalizeOption = (
@@ -136,13 +155,14 @@ export const createPagination = (
   // ownedWrite allows setPage to be called from event handlers and reactive scopes
   const [rawPage, setPage] = wrapSetter(
     createSignal<number>(opts().initialPage || 1, { ownedWrite: true }),
-    setter => (p: number | ((prev: number) => number)): number => {
-      const n = typeof p === "function" ? p(page()) : p;
-      if (n < 1) return setter(1);
-      const pages = opts().pages;
-      if (n > pages) return setter(pages);
-      return setter(n);
-    },
+    setter =>
+      (p: number | ((prev: number) => number)): number => {
+        const n = typeof p === "function" ? p(page()) : p;
+        if (n < 1) return setter(1);
+        const pages = opts().pages;
+        if (n > pages) return setter(pages);
+        return setter(n);
+      },
   );
 
   // Clamp page to valid range reactively — handles page count decreasing below current page
@@ -204,6 +224,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().firstContent, set: noop, enumerable: true },
+      "aria-label": { get: () => opts().firstAriaLabel, set: noop, enumerable: true },
       page: { value: 1, enumerable: false },
     },
   );
@@ -217,6 +238,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().prevContent, set: noop, enumerable: true },
+      "aria-label": { get: () => opts().prevAriaLabel, set: noop, enumerable: true },
       page: { get: () => Math.max(1, page() - 1), enumerable: false },
     },
   );
@@ -230,6 +252,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().nextContent, set: noop, enumerable: true },
+      "aria-label": { get: () => opts().nextAriaLabel, set: noop, enumerable: true },
       page: { get: () => Math.min(opts().pages, page() + 1), enumerable: false },
     },
   );
@@ -243,6 +266,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().lastContent, set: noop, enumerable: true },
+      "aria-label": { get: () => opts().lastAriaLabel, set: noop, enumerable: true },
       page: { get: () => opts().pages, enumerable: false },
     },
   );

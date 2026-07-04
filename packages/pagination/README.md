@@ -58,6 +58,14 @@ type PaginationOptions = {
   nextContent?: JSX.Element;
   /** content for the last page element, e.g. an SVG icon, default is ">|" */
   lastContent?: JSX.Element;
+  /** accessible name for the first page element, default is "First page" */
+  firstAriaLabel?: string;
+  /** accessible name for the previous page element, default is "Previous page" */
+  prevAriaLabel?: string;
+  /** accessible name for the next page element, default is "Next page" */
+  nextAriaLabel?: string;
+  /** accessible name for the last page element, default is "Last page" */
+  lastAriaLabel?: string;
   /** number of pages a large jump, if it should exist, should skip */
   jumpPages?: number;
 };
