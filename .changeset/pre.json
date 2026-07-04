@@ -142,6 +142,7 @@
     "input-mask-solid2-migration",
     "interaction-solid2-migration",
     "jsx-tokenizer-solid2-migration",
+    "keyboard-ignore-within-inputs",
     "keyboard-meta-shortcut-repeat",
     "keyboard-solid2-migration",
     "keyed-solid2-migration",
