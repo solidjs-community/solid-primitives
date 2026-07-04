@@ -1,5 +1,25 @@
 # @solid-primitives/idle
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- fb86c45: Migrate to Solid.js v2.0 (beta.14)
+
+  - Updated peer dependencies to `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`
+  - Changed `isServer` import from `solid-js/web` to `@solidjs/web`
+  - Replaced `onMount` with `onSettled`
+  - Removed `batch` calls (Solid 2.0 batches automatically via microtasks)
+  - Added `INTERNAL_OPTIONS` (`ownedWrite: true`) to signals to prevent owned-scope write warnings
+  - Used `noop` from `@solid-primitives/utils` for server-side no-op methods
+  - Fixed default events list: removed duplicate `"wheel"` entry (was listed twice as `"wheel"` and `"mousewheel"`)
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 0.2.2
 
 ### Patch Changes

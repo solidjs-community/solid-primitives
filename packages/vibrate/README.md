@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-829_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/vibrate)
 [![version](https://img.shields.io/npm/v/@solid-primitives/vibrate?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/vibrate)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitives for triggering and managing device haptic feedback via the [Vibration API](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API).
 
@@ -94,7 +95,7 @@ setPattern([100, 30, 100, 30, 100]);
 ```ts
 const { vibrating, start, stop } = createVibrate(200, { interval: 1000 });
 start(); // repeats every second
-stop();  // cancels interval + active vibration
+stop(); // cancels interval + active vibration
 ```
 
 ## `frequencyToPattern`
@@ -104,8 +105,8 @@ Converts a frequency in Hz and an optional duty cycle into a single-cycle `[onMs
 ```ts
 import { frequencyToPattern } from "@solid-primitives/vibrate";
 
-frequencyToPattern(2)        // [250, 250] — 2 Hz, equal on/off
-frequencyToPattern(4, 0.25)  // ~[63, 188] — 4 Hz, short tap
+frequencyToPattern(2); // [250, 250] — 2 Hz, equal on/off
+frequencyToPattern(4, 0.25); // ~[63, 188] — 4 Hz, short tap
 ```
 
 ## `makePulse`
@@ -117,7 +118,7 @@ import { makePulse } from "@solid-primitives/vibrate";
 
 const [start, stop] = makePulse(4); // 4 taps per second
 button.addEventListener("pointerdown", start);
-button.addEventListener("pointerup",   stop);
+button.addEventListener("pointerup", stop);
 ```
 
 ## `createPulse`

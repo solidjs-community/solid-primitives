@@ -1,5 +1,20 @@
 # @solid-primitives/filesystem
 
+## 3.0.0-next.0
+
+### Major Changes
+
+- 591095f: Migrate to Solid.js v2.0 (beta.14).
+
+  Breaking changes:
+
+  - `solid-js` peer dependency updated to `^2.0.0-beta.14`
+  - `@solidjs/web` is now a required peer dependency
+  - `isServer` is now imported from `@solidjs/web`
+  - `createSyncFileSystem` and `createAsyncFileSystem` internal signals use `ownedWrite: true` to support writes from reactive scopes
+  - `createAsyncFileSystem` no longer uses `createResource` — reads are backed by plain signals with manual `Promise`-based fetching, eliminating `ResourceActions` from the API
+  - The `toPromise` helper in `tools.ts` uses the Solid 2.0 split `createEffect(compute, apply)` pattern
+
 ## 1.3.3
 
 ### Patch Changes

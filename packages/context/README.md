@@ -8,6 +8,7 @@
 [![size](https://img.shields.io/badge/size-350_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/context)
 [![version](https://img.shields.io/npm/v/@solid-primitives/context?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/context)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitives simplifying the creation and use of SolidJS Context API.
 
@@ -84,11 +85,9 @@ The `useContext` function always returns `Exclude<T, undefined>`. If the factory
 An optional `name` can be passed as part of the third argument. It labels the context's Symbol for Solid DevTools and improves `ContextNotFoundError` stack traces (dev mode only).
 
 ```ts
-const [ThemeProvider, useTheme] = createContextProvider(
-  () => createTheme(),
-  defaultTheme,
-  { name: "Theme" },
-);
+const [ThemeProvider, useTheme] = createContextProvider(() => createTheme(), defaultTheme, {
+  name: "Theme",
+});
 ```
 
 ## `createOptionalContextProvider`
@@ -112,7 +111,7 @@ An optional `name` can be passed as the third argument.
 
 ## `createLayeredContext`
 
-Like `createContextProvider`, but each provider in the tree *extends* the parent context value rather than replacing it entirely. The factory function receives the nearest parent's context value as its second argument.
+Like `createContextProvider`, but each provider in the tree _extends_ the parent context value rather than replacing it entirely. The factory function receives the nearest parent's context value as its second argument.
 
 This is useful for incremental overrides such as themes, permissions layers, or i18n patches where a child provider should inherit what it does not explicitly change.
 

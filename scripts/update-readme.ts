@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from "fs";
+import * as fsp from "node:fs/promises";
 import path from "path";
 // @ts-expect-error ts-missing-module
 import tablemark from "json-to-markdown-table";
@@ -27,21 +28,22 @@ const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process";
 
 const categories: Record<string, PackageData[]> = {};
-const rootDependencies: string[] = [
-  `@solid-primitives/utils`, // utils are not included in the modulesData
-];
+const allPackageNames: string[] = [];
 
 (async () => {
   const modulesData = await utils.getModulesData();
+  let utilsList: string[] = [];
 
   for (const module of modulesData) {
     if (module.primitive == null) continue;
 
-    const packageName = `@solid-primitives/${module.name}`;
-
-    if (module.workspace_deps.length === 0) {
-      rootDependencies.push(packageName);
+    if (module.name === "utils") {
+      utilsList = module.primitive.list;
+      continue;
     }
+
+    const packageName = `@solid-primitives/${module.name}`;
+    allPackageNames.push(packageName);
 
     const data = {} as PackageData;
 
@@ -51,8 +53,25 @@ const rootDependencies: string[] = [
       data.Size = "";
       data.NPM = "";
     } else {
-      if (module.primitive?.gzip != null) {
-        const [value, unit] = utils.formatBytes(module.primitive.gzip);
+      let gzip = module.primitive?.gzip;
+      if (gzip == null) {
+        const bundlesize = await utils.getPackageBundlesize(module.name, {
+          peerDependencies: module.peer_deps,
+        });
+        if (bundlesize != null) {
+          gzip = bundlesize.gzip;
+          const pkgPath = path.join(utils.PACKAGES_DIR, module.name, "package.json");
+          const raw = await fsp.readFile(pkgPath, "utf8");
+          const indent = raw.match(/^(\s+)"/m)?.[1] ?? "  ";
+          const pkg = JSON.parse(raw);
+          if (pkg.primitive) {
+            pkg.primitive.gzip = gzip;
+            await fsp.writeFile(pkgPath, JSON.stringify(pkg, null, indent) + "\n");
+          }
+        }
+      }
+      if (gzip != null) {
+        const [value, unit] = utils.formatBytes(gzip);
         data.Size = `[![SIZE](https://img.shields.io/badge/size-${value}_${unit}-blue?style=for-the-badge)](${bundlephobiaURL}${packageName})`;
       } else {
         data.Size = `[![SIZE](${sizeShield}${packageName}?style=for-the-badge&label=)](${bundlephobiaURL}${packageName})`;
@@ -60,9 +79,13 @@ const rootDependencies: string[] = [
       data.NPM = `[![VERSION](${npmShield}${packageName}?style=for-the-badge&label=)](${npmURL}${packageName})`;
     }
     data.Stage = `[![STAGE](${stageShieldBaseURL}${module.primitive.stage}.json)](${stageShieldLink})`;
-    data.Primitives = module.primitive.list
-      .map(prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`)
-      .join("<br />");
+    const primLinks = module.primitive.list.map(
+      prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`,
+    );
+    data.Primitives =
+      primLinks.length > 15
+        ? `<details><summary>${primLinks.length} primitives</summary>${primLinks.join(", ")}</details>`
+        : primLinks.join("<br />");
     data["Solid 2"] = /^[\^~]?2\./.test(module.solid_peer_version ?? "") ? "✓" : "";
     // Merge the package into the correct category
     const cat = categories[module.primitive.category];
@@ -86,9 +109,22 @@ const rootDependencies: string[] = [
 
   readme = utils.insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 
+  // Update Utils Table
+
+  const COLS = 4;
+  const utilsGithubURL = `${githubURL}utils#`;
+  const utilsRows: string[] = [];
+  for (let i = 0; i < utilsList.length; i += COLS) {
+    const cells = utilsList.slice(i, i + COLS).map(fn => `[${fn}](${utilsGithubURL}${fn.toLowerCase()})`);
+    while (cells.length < COLS) cells.push("");
+    utilsRows.push(`|${cells.join("|")}|`);
+  }
+  const utilsTable = [`|${"  |".repeat(COLS)}`, `|${"---|".repeat(COLS)}`, ...utilsRows].join("\n");
+  readme = utils.insertTextBetweenComments(readme, utilsTable, "INSERT-UTILS-TABLE");
+
   // Update Combined Downloads Badge
 
-  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${rootDependencies.join(
+  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${allPackageNames.join(
     ",",
   )})](https://dash.deno.com/playground/combined-npm-downloads)`;
 

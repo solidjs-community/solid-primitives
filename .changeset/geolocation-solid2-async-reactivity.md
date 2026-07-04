@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/geolocation": minor
+"@solid-primitives/geolocation": major
 ---
 
 Adapt geolocation primitives for Solid 2.0 async reactivity.

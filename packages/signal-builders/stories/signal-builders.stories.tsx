@@ -78,9 +78,7 @@ export const ArrayPipeline = meta.story({
               {n => (
                 <Button
                   variant={list().includes(n) ? "primary" : "outline"}
-                  onClick={() =>
-                    setList(l => (l.includes(n) ? l.filter(x => x !== n) : [...l, n]))
-                  }
+                  onClick={() => setList(l => (l.includes(n) ? l.filter(x => x !== n) : [...l, n]))}
                   style={{
                     "min-width": "34px",
                     padding: "0.3rem",
@@ -111,9 +109,7 @@ export const ArrayPipeline = meta.story({
         </Section>
         <Separator />
         <div style={{ display: "flex", gap: "0.35rem", "flex-wrap": "wrap", "min-height": "26px" }}>
-          <For each={sorted()}>
-            {n => <Badge variant="info">{n}</Badge>}
-          </For>
+          <For each={sorted()}>{n => <Badge variant="info">{n}</Badge>}</For>
           <Show when={sorted().length === 0}>
             <span style={{ color: colors.muted, "font-size": font.sizeSm }}>no items</span>
           </Show>
@@ -269,7 +265,7 @@ export const ObjectPipeline = meta.story({
         <TextField label="Last name" value={lastName()} onChange={setLastName} />
         <Section title="Role override">
           <ButtonRow>
-            {(["viewer", "editor", "admin"]).map(r => (
+            {["viewer", "editor", "admin"].map(r => (
               <Button
                 variant={role() === r ? "primary" : "outline"}
                 onClick={() => setRole(r)}

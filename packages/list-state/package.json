@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/list-state",
-  "version": "0.1.0",
+  "version": "1.0.0-next.0",
   "description": "Keyboard navigable list state management primitives",
   "author": {
     "name": "Jasmin Noetzli",
@@ -24,7 +24,7 @@
   },
   "primitive": {
     "name": "list-state",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "createListState",
       "createMultiSelectListState"
@@ -65,14 +65,14 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

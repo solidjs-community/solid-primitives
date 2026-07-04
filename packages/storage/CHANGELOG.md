@@ -1,5 +1,17 @@
 # @solid-primitives/storage
 
+## 5.0.0-next.0
+
+### Major Changes
+
+- 9404090: **`makePersisted`** - simplify setter, Solid 2.0 adaption, simpler types using function overloads
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 4.3.4
 
 ### Patch Changes

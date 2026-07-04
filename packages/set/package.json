@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/set",
-  "version": "0.7.3",
+  "version": "1.0.0-next.0",
   "description": "Reactive Set and WeakSet primitives with set-algebra operations: union, intersection, difference, and symmetricDifference.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "set",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "ReactiveSet",
       "ReactiveWeakSet",
@@ -60,15 +60,15 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.13",
-    "solid-js": "^2.0.0-beta.13"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "dependencies": {
     "@solid-primitives/trigger": "workspace:^"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.13",
-    "solid-js": "2.0.0-beta.13"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/platform",
-  "version": "0.2.1",
+  "version": "1.0.0-next.0",
   "description": "A set of const boolean variables identifying device and browser type.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "platform",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "List of variables"
     ],
@@ -53,12 +53,12 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

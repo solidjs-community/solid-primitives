@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/share",
-  "version": "3.0.0",
+  "version": "4.0.0-next.0",
   "description": "Primitives to help with sharing content on social media and beyond.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -54,13 +54,13 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.10",
-    "solid-js": "^2.0.0-beta.10"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
     "@solid-primitives/utils": "workspace:^",
-    "@solidjs/web": "2.0.0-beta.10",
-    "solid-js": "2.0.0-beta.10"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

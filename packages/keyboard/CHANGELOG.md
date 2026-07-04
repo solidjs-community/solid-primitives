@@ -1,5 +1,48 @@
 # @solid-primitives/keyboard
 
+## 2.0.0-next.0
+
+### Major Changes
+
+- d2e5c43: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### Removed deprecated tuple API from `useKeyDownList`
+
+  The old destructuring form is no longer supported:
+
+  ```ts
+  // ❌ removed
+  const [keys, { event }] = useKeyDownList();
+
+  // ✅ use the dedicated primitives instead
+  const keys = useKeyDownList();
+  const event = useKeyDownEvent();
+  ```
+
+  ### `isServer` import source
+
+  `isServer` is now sourced from `@solidjs/web` instead of `solid-js/web` (handled internally — no consumer change needed).
+
+  ### `createShortcut` — synchronous `preventDefault`
+
+  `createShortcut` now registers a direct `keydown` event listener instead of using a reactive effect. This fixes `preventDefault` calling correctly within the same event dispatch, which was not guaranteed with Solid 2.0's deferred effect scheduling.
+
+  ### `createKeyHold` — side-effect-free memo
+
+  The `preventDefault` side effect has been moved out of the reactive `createMemo` into a dedicated `keydown` listener, aligning with Solid 2.0's guidance against side effects in memos.
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+  - @solid-primitives/rootless@2.0.0-next.0
+
 ## 1.3.5
 
 ### Patch Changes

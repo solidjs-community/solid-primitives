@@ -1,5 +1,23 @@
 # @solid-primitives/refs
 
+## 3.0.0-next.0
+
+### Major Changes
+
+- 56f5c8a: Migrate to Solid.js 2.0 (beta.14).
+
+  **Breaking changes:**
+
+  - Requires `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`
+  - Removed deprecated re-exports of `ResolvedChildren` and `ResolvedJSXElement` from `solid-js/types`
+  - `Refs` and `Ref` components now use split `createEffect` (compute/apply) instead of the removed `createComputed`; the callback fires asynchronously on the next microtask after children change (consistent with Solid 2.0's deferred reactivity model)
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 1.1.3
 
 ### Patch Changes

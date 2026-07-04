@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-661_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/fullscreen)
 [![size](https://img.shields.io/npm/v/@solid-primitives/fullscreen?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/fullscreen)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive wrapper around the [Fullscreen API](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API).
 
@@ -19,6 +20,8 @@ Reactive wrapper around the [Fullscreen API](https://developer.mozilla.org/en-US
 
 ```bash
 npm install @solid-primitives/fullscreen
+# or
+yarn add @solid-primitives/fullscreen
 # or
 pnpm add @solid-primitives/fullscreen
 ```
@@ -70,17 +73,17 @@ const { enter, exit, isActive } = createFullscreen(ref);
 const [ref, setRef] = createSignal<HTMLDivElement>();
 const { enter, isActive } = createFullscreen(ref);
 
-<div ref={setRef}>...</div>
+<div ref={setRef}>...</div>;
 ```
 
 #### `FullscreenPrimitiveOptions`
 
 Extends the standard [`FullscreenOptions`](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#options) with:
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `exitOnCleanup` | `boolean` | `true` | Exit fullscreen when the reactive scope is disposed. |
-| `navigationUI` | `string` | — | Passed to `requestFullscreen`. |
+| Option          | Type      | Default | Description                                          |
+| --------------- | --------- | ------- | ---------------------------------------------------- |
+| `exitOnCleanup` | `boolean` | `true`  | Exit fullscreen when the reactive scope is disposed. |
+| `navigationUI`  | `string`  | —       | Passed to `requestFullscreen`.                       |
 
 ```ts
 const { enter } = createFullscreen(ref, { exitOnCleanup: false, navigationUI: "hide" });

@@ -9,6 +9,7 @@ import {
   runWithOwner,
   type Setter,
   type ComputeFunction,
+  type EffectOptions,
   type MemoOptions,
   type NoInfer,
   type Owner,
@@ -17,7 +18,7 @@ import {
 } from "solid-js";
 
 import { isServer } from "@solidjs/web";
-import { type EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
+import { EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
 
 const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
   fn.length > 0 ? () => fn(untrack(v)) : (fn as () => T);
@@ -96,7 +97,7 @@ export function createLatest<T extends readonly Accessor<any>[]>(
       DEV ? { name: i + 1 + ". source", equals: false } : EQUALS_FALSE_OPTIONS,
     ),
   );
-  return createMemo(() => memos.map(m => m())[index]!, options);
+  return createMemo(() => memos.map(m => m())[index]!, options as any) as Accessor<ReturnType<T[number]>>;
 }
 
 /**
@@ -299,8 +300,8 @@ export function createMemoCache<Key, Value>(
         const v = calc(key, prevVal);
         prevVal = v;
         return v;
-      }, options),
-    );
+      }, options as any) as Accessor<Value>,
+    )!;
     if (options.size === undefined || cache.size < options.size) cache.set(key, memo);
     return memo();
   };

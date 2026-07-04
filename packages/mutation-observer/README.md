@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-447_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mutation-observer)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mutation-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mutation-observer)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitive providing the ability to watch for changes made to the DOM tree. A wrapper for Browser's [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) API.
 
@@ -56,7 +57,7 @@ Automatically starts observing after the component settles (via `onSettled`) and
 ```tsx
 import { mutationObserver } from "@solid-primitives/mutation-observer";
 
-<div ref={mutationObserver({ childList: true }, records => console.log(records))} />
+<div ref={mutationObserver({ childList: true }, records => console.log(records))} />;
 ```
 
 ### Types

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "2.2.1",
+  "version": "3.0.0-next.0",
   "description": "Library of primitives for providing internationalization support.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "contributors": [
@@ -59,9 +59,9 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.10"
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.10"
+    "solid-js": "2.0.0-beta.15"
   }
 }

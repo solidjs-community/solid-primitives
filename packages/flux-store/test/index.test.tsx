@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { produce } from "solid-js/store";
+import { flush } from "solid-js";
 import { createFluxStoreFactory, createFluxStore } from "../src/index.js";
 
 const id = "test id";
@@ -7,9 +7,12 @@ const initialState = { id, value: true };
 const testState = { id, value: true };
 
 const fluxFactory = createFluxStoreFactory(initialState, {
-  actions: (setState, state) => ({
+  actions: setState => ({
     set: setState,
-    toggle: () => setState("value", !state.value),
+    toggle: () =>
+      setState(s => {
+        s.value = !s.value;
+      }),
   }),
   getters: state => ({
     get: () => state.value,
@@ -31,6 +34,7 @@ describe("createFluxFactory", () => {
     expect(state.value).toBe(testState.value);
     expect(getters.get()).toBe(testState.value);
     actions.toggle();
+    flush();
     expect(state.value).toBe(!testState.value);
     expect(getters.get()).toBe(!testState.value);
   });
@@ -51,11 +55,13 @@ describe("createFluxFactory", () => {
     expect(getters1.get()).toBe(testState.value);
     expect(getters2.get()).toBe(testState.value);
     actions2.toggle();
+    flush();
     expect(state1.value).toBe(testState.value);
     expect(state2.value).toBe(!testState.value);
     expect(getters1.get()).toBe(testState.value);
     expect(getters2.get()).toBe(!testState.value);
     actions1.toggle();
+    flush();
     expect(state1.value).toBe(!testState.value);
     expect(state2.value).toBe(!testState.value);
     expect(getters1.get()).toBe(!testState.value);
@@ -72,11 +78,13 @@ describe("createFluxFactory", () => {
     expect(getters1.get()).toBe(!testState.value);
     expect(getters2.get()).toBe(!testState.value);
     actions2.toggle();
+    flush();
     expect(state1.value).toBe(!testState.value);
     expect(state2.value).toBe(testState.value);
     expect(getters1.get()).toBe(!testState.value);
     expect(getters2.get()).toBe(testState.value);
     actions1.toggle();
+    flush();
     expect(state1.value).toBe(testState.value);
     expect(state2.value).toBe(testState.value);
     expect(getters1.get()).toBe(testState.value);
@@ -100,11 +108,13 @@ describe("createFluxFactory", () => {
     expect(getters1.get()).toBe(!testState.value);
     expect(getters2.get()).toBe(!testState.value);
     actions2.toggle();
+    flush();
     expect(state1.value).toBe(!testState.value);
     expect(state2.value).toBe(testState.value);
     expect(getters1.get()).toBe(!testState.value);
     expect(getters2.get()).toBe(testState.value);
     actions1.toggle();
+    flush();
     expect(state1.value).toBe(testState.value);
     expect(state2.value).toBe(testState.value);
     expect(getters1.get()).toBe(testState.value);
@@ -119,12 +129,18 @@ describe("createFluxFactory", () => {
     expect(state2.value).toBe(testState.value);
     expect(getters1.get()).toBe(testState.value);
     expect(getters2.get()).toBe(testState.value);
-    actions2.set("value", !testState.value);
+    actions2.set(s => {
+      s.value = !testState.value;
+    });
+    flush();
     expect(state1.value).toBe(testState.value);
     expect(state2.value).toBe(!testState.value);
     expect(getters1.get()).toBe(testState.value);
     expect(getters2.get()).toBe(!testState.value);
-    actions1.set("value", !testState.value);
+    actions1.set(s => {
+      s.value = !testState.value;
+    });
+    flush();
     expect(state1.value).toBe(!testState.value);
     expect(state2.value).toBe(!testState.value);
     expect(getters1.get()).toBe(!testState.value);
@@ -139,12 +155,18 @@ describe("createFluxFactory", () => {
     expect(state2.value).toBe(testState.value);
     expect(getters1.get()).toBe(testState.value);
     expect(getters2.get()).toBe(testState.value);
-    actions2.set(produce(s => (s.value = !s.value)));
+    actions2.set(s => {
+      s.value = !s.value;
+    });
+    flush();
     expect(state1.value).toBe(testState.value);
     expect(state2.value).toBe(!testState.value);
     expect(getters1.get()).toBe(testState.value);
     expect(getters2.get()).toBe(!testState.value);
-    actions1.set(produce(s => (s.value = !s.value)));
+    actions1.set(s => {
+      s.value = !s.value;
+    });
+    flush();
     expect(state1.value).toBe(!testState.value);
     expect(state2.value).toBe(!testState.value);
     expect(getters1.get()).toBe(!testState.value);
@@ -156,7 +178,10 @@ describe("createFluxFactory", () => {
 
     expect(state.value).toBe(testState.value);
     expect(getters.get()).toBe(testState.value);
-    actions.set("value", !testState.value);
+    actions.set(s => {
+      s.value = !testState.value;
+    });
+    flush();
     expect(state.value).toBe(!testState.value);
     expect(getters.get()).toBe(!testState.value);
     expect(state.id).toBe(id);
@@ -168,7 +193,10 @@ describe("createFluxFactory", () => {
 
     expect(state.value).toBe(testState.value);
     expect(getters.get()).toBe(testState.value);
-    actions.set(produce(s => (s.value = !s.value)));
+    actions.set(s => {
+      s.value = !s.value;
+    });
+    flush();
     expect(state.value).toBe(!testState.value);
     expect(getters.get()).toBe(!testState.value);
     expect(state.id).toBe(id);
@@ -181,9 +209,12 @@ describe("createFluxStore", () => {
 
   test("get default state value", () => {
     const { state, getters } = createFluxStore(getInitialState(), {
-      actions: (setState, state) => ({
+      actions: setState => ({
         set: setState,
-        toggle: () => setState("value", !state.value),
+        toggle: () =>
+          setState(s => {
+            s.value = !s.value;
+          }),
       }),
       getters: state => ({
         get: () => state.value,
@@ -197,9 +228,12 @@ describe("createFluxStore", () => {
 
   test("toggle state value with actions", () => {
     const { state, getters, actions } = createFluxStore(getInitialState(), {
-      actions: (setState, state) => ({
+      actions: setState => ({
         set: setState,
-        toggle: () => setState("value", !state.value),
+        toggle: () =>
+          setState(s => {
+            s.value = !s.value;
+          }),
       }),
       getters: state => ({
         get: () => state.value,
@@ -212,6 +246,7 @@ describe("createFluxStore", () => {
     expect(state.id).toBe(id);
     expect(getters.getId()).toBe(id);
     actions.toggle();
+    flush();
     expect(state.value).toBe(!testState.value);
     expect(getters.get()).toBe(!testState.value);
     expect(state.id).toBe(id);
@@ -220,9 +255,12 @@ describe("createFluxStore", () => {
 
   test("manually change state value with actions", () => {
     const { state, getters, actions } = createFluxStore(getInitialState(), {
-      actions: (setState, state) => ({
+      actions: setState => ({
         set: setState,
-        toggle: () => setState("value", !state.value),
+        toggle: () =>
+          setState(s => {
+            s.value = !s.value;
+          }),
       }),
       getters: state => ({
         get: () => state.value,
@@ -234,7 +272,10 @@ describe("createFluxStore", () => {
     expect(getters.get()).toBe(testState.value);
     expect(state.id).toBe(id);
     expect(getters.getId()).toBe(id);
-    actions.set("value", !testState.value);
+    actions.set(s => {
+      s.value = !testState.value;
+    });
+    flush();
     expect(state.value).toBe(!testState.value);
     expect(getters.get()).toBe(!testState.value);
     expect(state.id).toBe(id);
@@ -243,9 +284,12 @@ describe("createFluxStore", () => {
 
   test("locally change state value with actions", () => {
     const { state, getters, actions } = createFluxStore(getInitialState(), {
-      actions: (setState, state) => ({
+      actions: setState => ({
         set: setState,
-        toggle: () => setState("value", !state.value),
+        toggle: () =>
+          setState(s => {
+            s.value = !s.value;
+          }),
       }),
       getters: state => ({
         get: () => state.value,
@@ -255,7 +299,10 @@ describe("createFluxStore", () => {
 
     expect(state.value).toBe(testState.value);
     expect(getters.get()).toBe(testState.value);
-    actions.set(produce(s => (s.value = !s.value)));
+    actions.set(s => {
+      s.value = !s.value;
+    });
+    flush();
     expect(state.value).toBe(!testState.value);
     expect(getters.get()).toBe(!testState.value);
     expect(state.id).toBe(id);

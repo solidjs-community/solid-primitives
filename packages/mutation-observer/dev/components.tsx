@@ -2,7 +2,7 @@ import { type Component, createSignal, For, type JSX, Show, splitProps } from "s
 
 export const TestingNode: Component<{ output?: JSX.Element; heading?: string }> = props => {
   return (
-    <div class="border-1 rounded-lg border-gray-800 bg-gray-900">
+    <div class="rounded-lg border-1 border-gray-800 bg-gray-900">
       <Show when={props.heading}>
         <div class="center-child border-0 border-b border-gray-800 px-6 py-3">
           <h5>{props.heading}</h5>
@@ -24,7 +24,7 @@ export const ToggleBtn: Component<
   const [, attrs] = splitProps(props, ["children", "state"]);
   return (
     <button
-      class="center-child border-1 h-6 w-6 cursor-pointer select-none rounded border-gray-600 bg-gray-700 text-gray-100 hover:bg-gray-600"
+      class="center-child h-6 w-6 cursor-pointer rounded border-1 border-gray-600 bg-gray-700 text-gray-100 select-none hover:bg-gray-600"
       classList={{
         "!bg-green-700 border-green-600 !hover:bg-green-600": props.state,
       }}

@@ -3,6 +3,15 @@
   "version": "1.1.0",
   "description": "Solid primitives for analytics tracking with a plugin-compatible queue-based dispatch pipeline.",
   "author": "David Di Biase <dave@solidjs.com>",
+  "primitive": {
+    "name": "analytics",
+    "stage": 2,
+    "list": [
+      "createAnalytics"
+    ],
+    "category": "Utilities",
+    "gzip": 125
+  },
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/analytics#readme",
   "repository": {

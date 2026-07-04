@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-2.25_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
 [![size](https://img.shields.io/npm/v/@solid-primitives/scroll?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scroll)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive primitives to react to element/window scrolling, and to prevent scroll outside of a given element.
 
@@ -20,6 +21,8 @@ Reactive primitives to react to element/window scrolling, and to prevent scroll 
 npm install @solid-primitives/scroll
 # or
 yarn add @solid-primitives/scroll
+# or
+pnpm add @solid-primitives/scroll
 ```
 
 ## `createScrollPosition`
@@ -146,15 +149,15 @@ createPreventScroll({ enabled: open });
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `element` | `MaybeAccessor<HTMLElement \| undefined>` | `undefined` | Allow scroll inside this element. Events outside it are cancelled. |
-| `enabled` | `MaybeAccessor<boolean>` | `true` | Whether scroll prevention is active. |
-| `hideScrollbar` | `MaybeAccessor<boolean>` | `true` | Hide the `<body>` scrollbar while active. |
-| `preventScrollbarShift` | `MaybeAccessor<boolean>` | `true` | Compensate for the hidden scrollbar width to avoid layout shift. |
-| `preventScrollbarShiftMode` | `MaybeAccessor<"padding" \| "margin">` | `"padding"` | Which CSS property to use for the scrollbar shift compensation. |
-| `restoreScrollPosition` | `MaybeAccessor<boolean>` | `true` | Restore `<body>` scroll position via `window.scrollTo` when disabled. |
-| `allowPinchZoom` | `MaybeAccessor<boolean>` | `false` | Allow two-finger pinch-zoom gestures. |
+| Prop                        | Type                                      | Default     | Description                                                           |
+| --------------------------- | ----------------------------------------- | ----------- | --------------------------------------------------------------------- |
+| `element`                   | `MaybeAccessor<HTMLElement \| undefined>` | `undefined` | Allow scroll inside this element. Events outside it are cancelled.    |
+| `enabled`                   | `MaybeAccessor<boolean>`                  | `true`      | Whether scroll prevention is active.                                  |
+| `hideScrollbar`             | `MaybeAccessor<boolean>`                  | `true`      | Hide the `<body>` scrollbar while active.                             |
+| `preventScrollbarShift`     | `MaybeAccessor<boolean>`                  | `true`      | Compensate for the hidden scrollbar width to avoid layout shift.      |
+| `preventScrollbarShiftMode` | `MaybeAccessor<"padding" \| "margin">`    | `"padding"` | Which CSS property to use for the scrollbar shift compensation.       |
+| `restoreScrollPosition`     | `MaybeAccessor<boolean>`                  | `true`      | Restore `<body>` scroll position via `window.scrollTo` when disabled. |
+| `allowPinchZoom`            | `MaybeAccessor<boolean>`                  | `false`     | Allow two-finger pinch-zoom gestures.                                 |
 
 Multiple active instances are stacked; only the topmost one installs event listeners. Body styles are shared and only restored once all instances clean up.
 

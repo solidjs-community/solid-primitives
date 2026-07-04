@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-159_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/match)
 [![version](https://img.shields.io/npm/v/@solid-primitives/match?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/match)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Control-flow components for matching discriminated union (tagged union) members and union literals.
 
@@ -83,6 +84,8 @@ Use the `partial` prop to only handle some of the union members:
 />
 ```
 
+> **Note:** `partial` is a TypeScript-only escape hatch — it switches the `case` mapped type from required to optional keys. It has no runtime effect; unmatched values fall through to `fallback` regardless of whether `partial` is set.
+
 ### Fallback
 
 Provide a fallback element when no match is found or the value is `null`/`undefined`:
@@ -133,6 +136,8 @@ Use the `partial` prop to only handle some of the union members:
 />
 ```
 
+> **Note:** `partial` is a TypeScript-only escape hatch — it has no runtime effect. See [`MatchTag` partial matching](#partial-matching) for details.
+
 ### Fallback
 
 Provide a fallback element when no match is found or the value is `null`/`undefined`:
@@ -148,9 +153,13 @@ Provide a fallback element when no match is found or the value is `null`/`undefi
 />
 ```
 
+## `MatchField` (deprecated)
+
+`MatchField` is an alias for `MatchTag` kept for backwards compatibility. Use `MatchTag` in new code.
+
 ## Demo
 
-[Deployed example](https://primitives.solidjs.community/playground/match) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/match/dev)
+[Storybook](https://primitives.solidjs.community/storybook/?path=/docs/control-flow-match--docs)
 
 ## Changelog
 

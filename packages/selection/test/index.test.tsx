@@ -117,9 +117,9 @@ describe("createSelection", () => {
         window
           .getSelection()
           ?.addRange(
-            (range => (range.setStart(div.firstChild!, 0), range.setEnd(div.firstChild!, 6), range))(
-              document.createRange(),
-            ),
+            (range => (
+              range.setStart(div.firstChild!, 0), range.setEnd(div.firstChild!, 6), range
+            ))(document.createRange()),
           );
         div.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true, cancelable: false }));
         flush();

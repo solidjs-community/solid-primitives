@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-dispatcher",
-  "version": "0.1.1",
+  "version": "1.0.0-next.0",
   "description": "A primitive to dispatch component events.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "event-dispatcher",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createEventDispatcher"
     ],
@@ -53,10 +53,12 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

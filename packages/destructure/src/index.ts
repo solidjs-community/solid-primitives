@@ -102,7 +102,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
       const calc = getter(key);
       if (config.deep && isReactiveObject(obj[key]))
         return runWithOwner(owner, () => destructure(calc, { ...config, memo }));
-      return memo ? runWithOwner(owner, () => createMemo(calc, options)) : calc;
+      return memo ? runWithOwner(owner, () => createMemo(calc, options as any)) : calc;
     });
   }
 
@@ -112,7 +112,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
     const calc = getter(key);
     if (config.deep && isReactiveObject(value))
       result[key] = destructure(calc, { ...config, memo });
-    else result[key] = memo ? createMemo(calc, options) : calc;
+    else result[key] = memo ? createMemo(calc, options as any) : calc;
   }
   return result;
 }

@@ -168,11 +168,25 @@ export const LeadingStory = meta.story({
     const [leadingFires, setLeadingFires] = createSignal<string[]>([]);
     const [leadTrailFires, setLeadTrailFires] = createSignal<string[]>([]);
 
-    const now = () => new Date().toLocaleTimeString([], { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const now = () =>
+      new Date().toLocaleTimeString([], {
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
 
     const trailingFn = throttle(() => setTrailingFires(p => [now(), ...p].slice(0, 5)), 1000);
-    const leadingFn = leading(throttle, () => setLeadingFires(p => [now(), ...p].slice(0, 5)), 1000);
-    const leadTrailFn = leadingAndTrailing(throttle, () => setLeadTrailFires(p => [now(), ...p].slice(0, 5)), 1000);
+    const leadingFn = leading(
+      throttle,
+      () => setLeadingFires(p => [now(), ...p].slice(0, 5)),
+      1000,
+    );
+    const leadTrailFn = leadingAndTrailing(
+      throttle,
+      () => setLeadTrailFires(p => [now(), ...p].slice(0, 5)),
+      1000,
+    );
 
     const logStyle = {
       background: "#0f172a",
@@ -205,7 +219,11 @@ export const LeadingStory = meta.story({
             <Btn onClick={() => trailingFn()}>Trailing</Btn>
             <div style={logStyle}>
               {trailingFires().length === 0 ? (
-                <span style={{ color: "#475569", "font-size": "0.72rem", "font-family": "monospace" }}>—</span>
+                <span
+                  style={{ color: "#475569", "font-size": "0.72rem", "font-family": "monospace" }}
+                >
+                  —
+                </span>
               ) : (
                 trailingFires().map(logEntry)
               )}
@@ -216,7 +234,11 @@ export const LeadingStory = meta.story({
             <Btn onClick={() => leadingFn()}>Leading</Btn>
             <div style={logStyle}>
               {leadingFires().length === 0 ? (
-                <span style={{ color: "#475569", "font-size": "0.72rem", "font-family": "monospace" }}>—</span>
+                <span
+                  style={{ color: "#475569", "font-size": "0.72rem", "font-family": "monospace" }}
+                >
+                  —
+                </span>
               ) : (
                 leadingFires().map(logEntry)
               )}
@@ -227,7 +249,11 @@ export const LeadingStory = meta.story({
             <Btn onClick={() => leadTrailFn()}>Both</Btn>
             <div style={logStyle}>
               {leadTrailFires().length === 0 ? (
-                <span style={{ color: "#475569", "font-size": "0.72rem", "font-family": "monospace" }}>—</span>
+                <span
+                  style={{ color: "#475569", "font-size": "0.72rem", "font-family": "monospace" }}
+                >
+                  —
+                </span>
               ) : (
                 leadTrailFires().map(logEntry)
               )}
@@ -282,7 +308,14 @@ export const CreateScheduledStory = meta.story({
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
           <Btn onClick={() => setCount(n => n + 1)}>Increment count</Btn>
-          <Btn variant="secondary" onClick={() => { setCount(0); setScheduledCount(0); setFlushCount(0); }}>
+          <Btn
+            variant="secondary"
+            onClick={() => {
+              setCount(0);
+              setScheduledCount(0);
+              setFlushCount(0);
+            }}
+          >
             Reset
           </Btn>
         </div>

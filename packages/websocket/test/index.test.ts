@@ -130,6 +130,28 @@ describe("makeReconnectingWS", () => {
     vi.advanceTimersByTime(500);
     expect(ws.readyState).toBe(3);
   });
+  it("does not schedule a duplicate reconnect when reconnecting while open", () => {
+    const OrigWS = (globalThis as any).WebSocket;
+    let socketsCreated = 0;
+    (globalThis as any).WebSocket = class extends OrigWS {
+      constructor(...args: any[]) {
+        super(...args);
+        socketsCreated++;
+      }
+    };
+    try {
+      const ws = makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 });
+      vi.advanceTimersByTime(10); // ws1 opens
+      ws.reconnect(); // closes ws1, immediately creates ws2
+      // 50ms: ws1 fires close event — without the fix the orphaned listener
+      // would schedule getWS() again, creating ws3 after another 100ms
+      vi.advanceTimersByTime(160);
+      ws.close();
+    } finally {
+      (globalThis as any).WebSocket = OrigWS;
+    }
+    expect(socketsCreated).toBe(2);
+  });
 });
 
 describe("createReconnectingWS", () => {

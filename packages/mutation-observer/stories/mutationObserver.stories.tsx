@@ -48,8 +48,14 @@ export const ChildListObserver = meta.story({
         <h3 style={{ margin: 0 }}>createMutationObserver — childList</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <Button onClick={() => setItems(i => [...i, nextId++])} variant="outline">+ Add child</Button>
-          <Button onClick={() => setItems(i => i.slice(0, -1))} disabled={items().length === 0} variant="outline">
+          <Button onClick={() => setItems(i => [...i, nextId++])} variant="outline">
+            + Add child
+          </Button>
+          <Button
+            onClick={() => setItems(i => i.slice(0, -1))}
+            disabled={items().length === 0}
+            variant="outline"
+          >
             − Remove last
           </Button>
         </div>
@@ -94,7 +100,9 @@ export const ChildListObserver = meta.story({
             )}
           </For>
           {log().length === 0 && (
-            <span style={{ color: "#94a3b8" }}>Add or remove children to see mutation records…</span>
+            <span style={{ color: "#94a3b8" }}>
+              Add or remove children to see mutation records…
+            </span>
           )}
         </div>
       </Container>
@@ -134,8 +142,12 @@ export const AttributeObserver = meta.story({
         <h3 style={{ margin: 0 }}>createMutationObserver — attributes</h3>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <Button onClick={() => setHighlighted(h => !h)} variant="outline">Toggle class</Button>
-          <Button onClick={() => setLarge(l => !l)} variant="outline">Toggle font size</Button>
+          <Button onClick={() => setHighlighted(h => !h)} variant="outline">
+            Toggle class
+          </Button>
+          <Button onClick={() => setLarge(l => !l)} variant="outline">
+            Toggle font size
+          </Button>
         </div>
 
         <div
@@ -164,7 +176,9 @@ export const AttributeObserver = meta.story({
             )}
           </For>
           {log().length === 0 && (
-            <span style={{ color: "#94a3b8" }}>Toggle controls above to see attribute records…</span>
+            <span style={{ color: "#94a3b8" }}>
+              Toggle controls above to see attribute records…
+            </span>
           )}
         </div>
       </Container>
@@ -200,7 +214,9 @@ export const PerElementOptions = meta.story({
       records => {
         for (const r of records) {
           if (r.type === "childList")
-            pushLog(`childList on #children: ${r.addedNodes.length} added, ${r.removedNodes.length} removed`);
+            pushLog(
+              `childList on #children: ${r.addedNodes.length} added, ${r.removedNodes.length} removed`,
+            );
           if (r.type === "attributes")
             pushLog(`attr "${r.attributeName}" on #attrs (was: ${r.oldValue ?? "—"})`);
         }
@@ -323,8 +339,14 @@ export const StandaloneRef = meta.story({
         </p>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <Button onClick={() => setItems(i => [...i, nextId++])} variant="outline">+ Add</Button>
-          <Button onClick={() => setItems(i => i.slice(0, -1))} disabled={items().length === 0} variant="outline">
+          <Button onClick={() => setItems(i => [...i, nextId++])} variant="outline">
+            + Add
+          </Button>
+          <Button
+            onClick={() => setItems(i => i.slice(0, -1))}
+            disabled={items().length === 0}
+            variant="outline"
+          >
             − Remove
           </Button>
         </div>

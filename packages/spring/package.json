@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/spring",
-  "version": "0.1.2",
+  "version": "1.0.0-next.0",
   "description": "Primitive that creates spring physics functions.",
   "author": "Carlo Taleon <carloantonioct@gmail.com>",
   "contributors": [
@@ -17,7 +17,7 @@
   },
   "primitive": {
     "name": "spring",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createSpring",
       "createDerivedSpring"
@@ -57,9 +57,13 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solid-primitives/utils": "^7.0.0-next.0",
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solid-primitives/utils": "workspace:*",
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

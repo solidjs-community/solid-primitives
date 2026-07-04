@@ -3,6 +3,7 @@
 [![size](https://img.shields.io/badge/size-395_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/controlled-signal)
 [![version](https://img.shields.io/npm/v/@solid-primitives/controlled-signal?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/controlled-signal)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive signals that support both **controlled** (externally managed) and **uncontrolled** (internally managed) state — a pattern commonly used in headless UI components such as dialogs, dropdowns, and toggles.
 
@@ -10,6 +11,8 @@ Reactive signals that support both **controlled** (externally managed) and **unc
 
 ```bash
 npm install @solid-primitives/controlled-signal
+# or
+yarn add @solid-primitives/controlled-signal
 # or
 pnpm add @solid-primitives/controlled-signal
 ```
@@ -35,11 +38,11 @@ const [value, setValue] = createControllableSignal<T>(props);
 
 **Props:**
 
-| Prop           | Type                       | Description                                      |
-| -------------- | -------------------------- | ------------------------------------------------ |
+| Prop           | Type                       | Description                                              |
+| -------------- | -------------------------- | -------------------------------------------------------- |
 | `value`        | `Accessor<T \| undefined>` | Controlled value. When defined, enables controlled mode. |
-| `defaultValue` | `Accessor<T \| undefined>` | Initial value for uncontrolled mode.             |
-| `onChange`     | `(value: T) => void`       | Called whenever the value would change.          |
+| `defaultValue` | `Accessor<T \| undefined>` | Initial value for uncontrolled mode.                     |
+| `onChange`     | `(value: T) => void`       | Called whenever the value would change.                  |
 
 **Returns:** `[value: Accessor<T | undefined>, setValue: (next) => void]`
 
@@ -48,7 +51,7 @@ const [value, setValue] = createControllableSignal<T>(props);
 ```ts
 const [open, setOpen] = createControllableSignal({ defaultValue: () => false });
 
-setOpen(true);         // updates internal state and calls onChange if provided
+setOpen(true); // updates internal state and calls onChange if provided
 setOpen(prev => !prev); // functional form
 ```
 

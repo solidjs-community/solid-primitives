@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scheduled",
-  "version": "1.5.3",
+  "version": "2.0.0-next.0",
   "description": "Primitives for creating scheduled — throttled or debounced — callbacks.",
   "contributors": [
     "David Di Biase <dave@solidjs.com>",
@@ -63,12 +63,12 @@
   "devDependencies": {
     "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/timer": "workspace:^",
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {}
 }

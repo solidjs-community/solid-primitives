@@ -60,16 +60,13 @@ export const KeyComponent = meta.story({
 
     const reverse = () => setItems(prev => [...prev].reverse());
 
-    const addItem = () =>
-      setItems(prev => [...prev, makeItem(`Item ${_nextId}`)]);
+    const addItem = () => setItems(prev => [...prev, makeItem(`Item ${_nextId}`)]);
 
     const removeFirst = () => setItems(prev => prev.slice(1));
 
     return (
       <Container width={400}>
-        <h3 style={{ margin: 0 }}>
-          {"<Key by=\"id\">"}
-        </h3>
+        <h3 style={{ margin: 0 }}>{'<Key by="id">'}</h3>
 
         <div
           style={{
@@ -103,9 +100,7 @@ export const KeyComponent = meta.story({
                     }}
                   />
                   <span style={{ flex: 1, "font-size": "0.9rem" }}>{item().name}</span>
-                  <span style={{ "font-size": "0.78rem", color: "#94a3b8" }}>
-                    id:{item().id}
-                  </span>
+                  <span style={{ "font-size": "0.78rem", color: "#94a3b8" }}>id:{item().id}</span>
                   {/* Color changes based on item color — not a generic action button */}
                   <button
                     onClick={() => setClicks(c => c + 1)}
@@ -129,8 +124,12 @@ export const KeyComponent = meta.story({
         </div>
 
         <ButtonRow>
-          <Button onClick={shuffle} variant="outline">Shuffle</Button>
-          <Button onClick={reverse} variant="outline">Reverse</Button>
+          <Button onClick={shuffle} variant="outline">
+            Shuffle
+          </Button>
+          <Button onClick={reverse} variant="outline">
+            Reverse
+          </Button>
           <Button onClick={addItem}>Add item</Button>
           <Button onClick={removeFirst} disabled={items().length === 0} variant="outline">
             Remove first
@@ -186,9 +185,7 @@ export const EntriesComponent = meta.story({
 
     return (
       <Container width={400}>
-        <h3 style={{ margin: 0 }}>
-          {"<Entries of={scores}>"}
-        </h3>
+        <h3 style={{ margin: 0 }}>{"<Entries of={scores}>"}</h3>
 
         <div
           style={{
@@ -245,10 +242,18 @@ export const EntriesComponent = meta.story({
 
         <ButtonRow>
           <Button onClick={randomize}>Randomize scores</Button>
-          <Button onClick={addPlayer} disabled={Object.keys(scores()).length >= 5} variant="outline">
+          <Button
+            onClick={addPlayer}
+            disabled={Object.keys(scores()).length >= 5}
+            variant="outline"
+          >
             Add player
           </Button>
-          <Button onClick={removeLast} disabled={Object.keys(scores()).length === 0} variant="outline">
+          <Button
+            onClick={removeLast}
+            disabled={Object.keys(scores()).length === 0}
+            variant="outline"
+          >
             Remove last
           </Button>
         </ButtonRow>
@@ -287,9 +292,7 @@ export const SetValuesComponent = meta.story({
 
     return (
       <Container width={400}>
-        <h3 style={{ margin: 0 }}>
-          {"<SetValues of={selected}>"}
-        </h3>
+        <h3 style={{ margin: 0 }}>{"<SetValues of={selected}>"}</h3>
 
         <div style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap" }}>
           <For each={TAGS}>
@@ -297,7 +300,11 @@ export const SetValuesComponent = meta.story({
               <Button
                 onClick={() => toggle(tag)}
                 variant={selected().has(tag) ? "primary" : "outline"}
-                style={{ "border-radius": "999px", padding: "0.3rem 0.65rem", "font-size": "0.82rem" }}
+                style={{
+                  "border-radius": "999px",
+                  padding: "0.3rem 0.65rem",
+                  "font-size": "0.82rem",
+                }}
               >
                 {tag}
               </Button>
@@ -309,7 +316,9 @@ export const SetValuesComponent = meta.story({
           <div style={{ "font-size": "0.8rem", color: "#64748b", "margin-bottom": "0.35rem" }}>
             Selected tags ({selected().size}):
           </div>
-          <div style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap", "min-height": "28px" }}>
+          <div
+            style={{ display: "flex", gap: "0.4rem", "flex-wrap": "wrap", "min-height": "28px" }}
+          >
             <SetValues
               of={selected()}
               fallback={<span style={{ color: "#94a3b8", "font-size": "0.85rem" }}>none</span>}
@@ -369,9 +378,7 @@ export const RerunComponent = meta.story({
 
     return (
       <Container width={400}>
-        <h3 style={{ margin: 0 }}>
-          {"<Rerun on={tab}>"}
-        </h3>
+        <h3 style={{ margin: 0 }}>{"<Rerun on={tab}>"}</h3>
 
         {/* Tab navigation — custom underline styling, kept as <button> */}
         <div style={{ display: "flex", gap: 0, "border-bottom": "2px solid #e2e8f0" }}>

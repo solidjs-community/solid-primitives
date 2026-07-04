@@ -74,9 +74,7 @@ export const BatteryStatusStory = meta.story({
                 <div style={{ flex: "1" }}>
                   <Progress
                     value={b().level * 100}
-                    color={
-                      b().charging ? "#10b981" : b().level < 0.2 ? "#ef4444" : colors.primary
-                    }
+                    color={b().charging ? "#10b981" : b().level < 0.2 ? "#ef4444" : colors.primary}
                   />
                 </div>
                 <span
@@ -156,9 +154,7 @@ export const MotionAndTiltStory = meta.story({
             <Show
               when={accel() !== undefined}
               fallback={
-                <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>
-                  awaiting…
-                </span>
+                <span style={{ color: colors.mutedFg, "font-size": font.sizeSm }}>awaiting…</span>
               }
             >
               <div style={{ display: "flex", "flex-direction": "column", gap: "0.2rem" }}>
@@ -205,7 +201,7 @@ export const CompassHeadingStory = meta.story({
   },
   render: () => {
     const mag = createCompass();
-    const bearing = () => ((Math.atan2(mag.y, mag.x) * (180 / Math.PI)) + 360) % 360;
+    const bearing = () => (Math.atan2(mag.y, mag.x) * (180 / Math.PI) + 360) % 360;
 
     return (
       <Container width={280}>
@@ -333,8 +329,8 @@ export const NonReactiveListenerStory = meta.story({
         </div>
         <EventLog entries={log()} />
         <p style={{ margin: 0, "font-size": "0.78rem", color: colors.mutedFg }}>
-          Attaches a raw <code>devicemotion</code> listener. No Solid owner required — the
-          returned function removes the listener at any time.
+          Attaches a raw <code>devicemotion</code> listener. No Solid owner required — the returned
+          function removes the listener at any time.
         </p>
       </Container>
     );

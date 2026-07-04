@@ -121,15 +121,9 @@ export const TranslatorStory = meta.story({
         />
 
         <Card>
-          <StatRow
-            label='t("greeting", { name })'
-            value={t("greeting", { name: name() })}
-          />
+          <StatRow label='t("greeting", { name })' value={t("greeting", { name: name() })} />
           <Separator />
-          <StatRow
-            label='t("farewell", { name })'
-            value={t("farewell", { name: name() })}
-          />
+          <StatRow label='t("farewell", { name })' value={t("farewell", { name: name() })} />
           <Separator />
           <StatRow label='t("food.meat")' value={t("food.meat")} />
           <Separator />
@@ -200,15 +194,9 @@ export const DynamicLoadingStory = meta.story({
         >
           <div style={{ opacity: isPending() ? 0.5 : 1, transition: "opacity 0.15s" }}>
             <Card>
-              <StatRow
-                label="greeting"
-                value={String(t("greeting", { name: name() }) ?? "")}
-              />
+              <StatRow label="greeting" value={String(t("greeting", { name: name() }) ?? "")} />
               <Separator />
-              <StatRow
-                label="farewell"
-                value={String(t("farewell", { name: name() }) ?? "")}
-              />
+              <StatRow label="farewell" value={String(t("farewell", { name: name() }) ?? "")} />
               <Separator />
               <StatRow label="food.meat" value={String(t("food.meat") ?? "")} />
             </Card>
@@ -242,7 +230,7 @@ export const ScopedChainedStory = meta.story({
     docs: {
       description: {
         story:
-          "`scopedTranslator(t, scope)` narrows a translator to a key prefix — useful for component-local scopes. `chainedTranslator(dict, t)` maps the dictionary shape to callable methods, enabling IDE \"Go to definition\" on translation keys. `proxyTranslator(t)` achieves the same via `Proxy` without needing the original dictionary object.",
+          '`scopedTranslator(t, scope)` narrows a translator to a key prefix — useful for component-local scopes. `chainedTranslator(dict, t)` maps the dictionary shape to callable methods, enabling IDE "Go to definition" on translation keys. `proxyTranslator(t)` achieves the same via `Proxy` without needing the original dictionary object.',
       },
     },
   },

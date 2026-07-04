@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/sse",
-  "version": "0.0.102",
+  "version": "1.0.0-next.0",
   "description": "Primitives for Server-Sent Events (SSE) using the browser's EventSource API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "sse",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "makeSSE",
       "createSSE",
@@ -68,7 +68,7 @@
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
-    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "vitest": "vitest -c vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
@@ -76,9 +76,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

@@ -33,7 +33,10 @@ export const BasicTrigger = meta.story({
     const [track, dirty] = createTrigger();
     const [noise, setNoise] = createSignal(0);
     let count = 0;
-    const runCount = createMemo(() => { track(); return ++count; });
+    const runCount = createMemo(() => {
+      track();
+      return ++count;
+    });
 
     return (
       <Container>
@@ -92,8 +95,8 @@ export const BasicTrigger = meta.story({
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
           Only <code>dirty()</code> re-runs the tracked memo. Changing the unrelated{" "}
-          <code>noise</code> signal leaves the counter unchanged — the trigger is decoupled
-          from any data model.
+          <code>noise</code> signal leaves the counter unchanged — the trigger is decoupled from any
+          data model.
         </p>
       </Container>
     );
@@ -113,10 +116,21 @@ export const TriggerCacheStory = meta.story({
   render: () => {
     const [track, dirty, dirtyAll] = createTriggerCache<number>();
 
-    let c1 = 0, c2 = 0, c3 = 0;
-    const run1 = createMemo(() => { track(1); return ++c1; });
-    const run2 = createMemo(() => { track(2); return ++c2; });
-    const run3 = createMemo(() => { track(3); return ++c3; });
+    let c1 = 0,
+      c2 = 0,
+      c3 = 0;
+    const run1 = createMemo(() => {
+      track(1);
+      return ++c1;
+    });
+    const run2 = createMemo(() => {
+      track(2);
+      return ++c2;
+    });
+    const run3 = createMemo(() => {
+      track(3);
+      return ++c3;
+    });
 
     const rows = [
       { key: 1, run: run1 },
@@ -165,9 +179,9 @@ export const TriggerCacheStory = meta.story({
         </Button>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Each row has its own trigger. <code>dirty(1)</code> only re-evaluates the memo
-          tracking key 1, leaving keys 2 and 3 untouched. <code>dirtyAll()</code> invalidates
-          all three at once.
+          Each row has its own trigger. <code>dirty(1)</code> only re-evaluates the memo tracking
+          key 1, leaving keys 2 and 3 untouched. <code>dirtyAll()</code> invalidates all three at
+          once.
         </p>
       </Container>
     );

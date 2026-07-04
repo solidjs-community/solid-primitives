@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/state-machine",
-  "version": "0.1.1",
+  "version": "1.0.0-next.0",
   "description": "A primitive for creating reactive state machines.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "state-machine",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createMachine"
     ],
@@ -56,9 +56,9 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.13"
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.13"
+    "solid-js": "2.0.0-beta.15"
   }
 }

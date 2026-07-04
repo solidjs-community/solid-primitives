@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/upload",
-  "version": "0.1.4",
+  "version": "1.0.0-next.0",
   "description": "Primitives for uploading files.",
   "author": "Rustam Ashurmatov <rr.ashurmatov.21@gmail.com>",
   "license": "MIT",
@@ -11,10 +11,14 @@
   },
   "primitive": {
     "name": "upload",
-    "stage": 0,
+    "stage": 3,
     "list": [
+      "createFilePicker",
       "createFileUploader",
-      "createDropzone"
+      "fileSender",
+      "fileUploader",
+      "createDropzone",
+      "dropzone"
     ],
     "category": "Browser APIs",
     "gzip": 1035
@@ -50,13 +54,15 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^"
+    "@solid-primitives/event-listener": "workspace:*"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

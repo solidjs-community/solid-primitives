@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/transition-group",
-  "version": "1.1.2",
+  "version": "2.0.0-next.0",
   "description": "Reactive primitives for implementing transition effects in SolidJS",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "transition-group",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createSwitchTransition",
       "createListTransition"
@@ -47,19 +47,20 @@
     }
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "@solid-primitives/refs": "workspace:^",
-    "@solid-primitives/utils": "workspace:^",
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   },
   "typesVersions": {}
 }

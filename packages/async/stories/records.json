@@ -1,0 +1,536 @@
+[
+  {
+    "package": "a11y",
+    "exports": [
+      "createFormControl",
+      "createFormControlInput",
+      "FormControlContext",
+      "useFormControl",
+      "makeAnnounce",
+      "createAnnounce",
+      "createReducedMotion"
+    ]
+  },
+  { "package": "active-element", "exports": ["createActiveElement"] },
+  { "package": "analytics", "exports": ["createAnalytics"] },
+  {
+    "package": "async",
+    "exports": [
+      "fromStream",
+      "fromJSONStream",
+      "makeAbortable",
+      "createAbortable",
+      "makeRetrying",
+      "createAggregated"
+    ]
+  },
+  { "package": "audio", "exports": ["makeAudio", "makeAudioPlayer", "createAudio"] },
+  { "package": "bounds", "exports": ["createElementBounds"] },
+  { "package": "broadcast-channel", "exports": ["makeBroadcastChannel", "createBroadcastChannel"] },
+  { "package": "clipboard", "exports": ["copyClipboard", "writeClipboard", "createClipboard"] },
+  { "package": "connectivity", "exports": ["createConnectivitySignal"] },
+  {
+    "package": "context",
+    "exports": [
+      "createContextProvider",
+      "createOptionalContextProvider",
+      "createLayeredContext",
+      "MultiProvider"
+    ]
+  },
+  { "package": "controlled props", "exports": ["createControlledProp"] },
+  {
+    "package": "controlled-signal",
+    "exports": [
+      "createControllableSignal",
+      "createControllableBooleanSignal",
+      "createControllableArraySignal",
+      "createControllableSetSignal"
+    ]
+  },
+  {
+    "package": "cookies",
+    "exports": ["createServerCookie", "createUserTheme", "getCookiesString"]
+  },
+  {
+    "package": "cursor",
+    "exports": [
+      "makeBodyCursor",
+      "makeElementCursor",
+      "createBodyCursor",
+      "createElementCursor",
+      "createDragCursor",
+      "cursorRef"
+    ]
+  },
+  {
+    "package": "date",
+    "exports": [
+      "createDate",
+      "createDateNow",
+      "createTimeDifference",
+      "createTimeDifferenceFromNow",
+      "createTimeAgo",
+      "createCountdown",
+      "createCountdownFromNow"
+    ]
+  },
+  { "package": "db-store", "exports": ["createDbStore", "supabaseAdapter"] },
+  { "package": "deep", "exports": ["trackDeep", "trackStore", "captureStoreUpdates"] },
+  { "package": "destructure", "exports": ["destructure"] },
+  {
+    "package": "devices",
+    "exports": ["createDevices", "createMicrophones", "createSpeakers", "createCameras"]
+  },
+  {
+    "package": "event-bus",
+    "exports": ["createEventBus", "createEmitter", "createEventHub", "createEventStack"]
+  },
+  { "package": "event-dispatcher", "exports": ["createEventDispatcher"] },
+  {
+    "package": "event-listener",
+    "exports": [
+      "createEventListener",
+      "createEventSignal",
+      "createEventListenerMap",
+      "WindowEventListener",
+      "DocumentEventListener"
+    ]
+  },
+  { "package": "event-props", "exports": ["createEventProps"] },
+  { "package": "fetch", "exports": ["createFetch"] },
+  {
+    "package": "filesystem",
+    "exports": [
+      "createFileSystem",
+      "createSyncFileSystem",
+      "createAsyncFileSystem",
+      "makeNoFileSystem",
+      "makeNoAsyncFileSystem",
+      "makeVirtualFileSystem",
+      "makeWebAccessFileSystem",
+      "makeNodeFileSystem",
+      "makeTauriFileSystem",
+      "makeChokidarWatcher",
+      "rsync"
+    ]
+  },
+  {
+    "package": "flux-store",
+    "exports": ["createFluxStore", "createFluxStoreFactory", "createActions", "createAction"]
+  },
+  {
+    "package": "focus",
+    "exports": [
+      "autofocus",
+      "createAutofocus",
+      "createFocusTrap",
+      "makeFocusListener",
+      "createFocusSignal"
+    ]
+  },
+  {
+    "package": "form",
+    "exports": [
+      "createForm",
+      "toFormData",
+      "createFormResetListener",
+      "createFormControl",
+      "createFormControlInput",
+      "FormControlContext",
+      "useFormControl"
+    ]
+  },
+  { "package": "fullscreen", "exports": ["makeFullscreen", "createFullscreen", "fullscreen"] },
+  {
+    "package": "geolocation",
+    "exports": [
+      "makeGeolocation",
+      "makeGeolocationWatcher",
+      "createGeolocation",
+      "createGeolocationWatcher",
+      "createDistance",
+      "createWithinRadius"
+    ]
+  },
+  { "package": "graphql", "exports": ["createGraphQLClient"] },
+  { "package": "history", "exports": ["createUndoHistory"] },
+  {
+    "package": "i18n",
+    "exports": ["flatten", "resolveTemplate", "translator", "scopedTranslator", "chainedTranslator"]
+  },
+  { "package": "idle", "exports": ["createIdleTimer"] },
+  { "package": "immutable", "exports": ["createImmutable"] },
+  { "package": "input-mask", "exports": ["createInputMask", "createMaskPattern"] },
+  {
+    "package": "interaction",
+    "exports": [
+      "makeInteractOutside",
+      "interactOutside",
+      "createInteractOutside",
+      "ariaHideOutside",
+      "createHideOutside"
+    ]
+  },
+  {
+    "package": "intersection-observer",
+    "exports": ["createIntersectionObserver", "createViewportObserver", "createVisibilityObserver"]
+  },
+  {
+    "package": "jsx-tokenizer",
+    "exports": ["createTokenizer", "createToken", "resolveTokens", "isToken"]
+  },
+  {
+    "package": "keyboard",
+    "exports": [
+      "useKeyDownEvent",
+      "useKeyDownList",
+      "useCurrentlyHeldKey",
+      "useKeyDownSequence",
+      "createKeyHold",
+      "createShortcut"
+    ]
+  },
+  { "package": "keyed", "exports": ["keyArray", "Key", "Entries", "MapEntries", "SetValues"] },
+  { "package": "lifecycle", "exports": ["createIsMounted", "isHydrated", "onElementConnect"] },
+  { "package": "list", "exports": ["listArray", "List"] },
+  { "package": "list-state", "exports": ["createListState", "createMultiSelectListState"] },
+  { "package": "map", "exports": ["ReactiveMap", "ReactiveWeakMap"] },
+  { "package": "marker", "exports": ["createMarker"] },
+  { "package": "masonry", "exports": ["createMasonry"] },
+  { "package": "match", "exports": ["MatchTag", "MatchValue"] },
+  {
+    "package": "media",
+    "exports": ["makeMediaQueryListener", "createMediaQuery", "createBreakpoints", "usePrefersDark"]
+  },
+  {
+    "package": "mediastream",
+    "exports": [
+      "createStream",
+      "createAmplitudeStream",
+      "createAmplitudeFromStream",
+      "createMediaPermissionRequest",
+      "createScreen"
+    ]
+  },
+  {
+    "package": "memo",
+    "exports": [
+      "createLatest",
+      "createLatestMany",
+      "createWritableMemo",
+      "createLazyMemo",
+      "createPureReaction",
+      "createMemoCache",
+      "createReducer"
+    ]
+  },
+  { "package": "mouse", "exports": ["createMousePosition", "createPositionToElement"] },
+  { "package": "mutable", "exports": ["createMutable", "modifyMutable"] },
+  { "package": "mutation-observer", "exports": ["createMutationObserver"] },
+  {
+    "package": "notification",
+    "exports": [
+      "isNotificationSupported",
+      "makeNotification",
+      "createNotification",
+      "createNotificationPermission"
+    ]
+  },
+  { "package": "orientation", "exports": ["makeOrientation", "createOrientation"] },
+  {
+    "package": "page-utilities",
+    "exports": [
+      "createPageVisibility",
+      "usePageVisibility",
+      "makePageLeave",
+      "createPageLeaveBlocker"
+    ]
+  },
+  {
+    "package": "pagination",
+    "exports": ["createPagination", "createSegment", "createInfiniteScroll"]
+  },
+  { "package": "permission", "exports": ["createPermission"] },
+  { "package": "platform", "exports": ["List of variables"] },
+  {
+    "package": "pointer",
+    "exports": [
+      "createPointerListeners",
+      "createPerPointerListeners",
+      "createPointerPosition",
+      "createPointerList"
+    ]
+  },
+  { "package": "presence", "exports": ["createPresence"] },
+  {
+    "package": "promise",
+    "exports": [
+      "promiseTimeout",
+      "raceTimeout",
+      "until",
+      "untilAll",
+      "untilAny",
+      "retry",
+      "changed"
+    ]
+  },
+  {
+    "package": "props",
+    "exports": ["combineProps", "combineHandlers", "filterProps", "partitionProps"]
+  },
+  {
+    "package": "queue",
+    "exports": [
+      "makeQueue",
+      "createQueue",
+      "makePriorityQueue",
+      "createPriorityQueue",
+      "createTaskQueue",
+      "createConcurrentTaskQueue"
+    ]
+  },
+  { "package": "raf", "exports": ["createRAF", "createMs", "targetFPS"] },
+  {
+    "package": "range",
+    "exports": ["createNumericRange", "repeat", "mapRange", "indexRange", "Repeat", "IndexRange"]
+  },
+  { "package": "refs", "exports": ["mergeRefs", "resolveElements", "resolveFirst", "Ref", "Refs"] },
+  {
+    "package": "resize-observer",
+    "exports": ["createResizeObserver", "createWindowSize", "createElementSize"]
+  },
+  {
+    "package": "resource",
+    "exports": [
+      "createAggregated",
+      "createDeepSignal",
+      "makeAbortable",
+      "createAbortable",
+      "makeCache",
+      "makeRetrying"
+    ]
+  },
+  {
+    "package": "rootless",
+    "exports": [
+      "createSubRoot",
+      "createCallback",
+      "createDisposable",
+      "createSharedRoot",
+      "createRootPool"
+    ]
+  },
+  {
+    "package": "scheduled",
+    "exports": [
+      "debounce",
+      "throttle",
+      "scheduleIdle",
+      "leading",
+      "createScheduled",
+      "leadingAndTrailing"
+    ]
+  },
+  { "package": "script-loader", "exports": ["createScriptLoader"] },
+  {
+    "package": "scroll",
+    "exports": ["createScrollPosition", "useWindowScrollPosition", "createPreventScroll"]
+  },
+  { "package": "selection", "exports": ["createSelection"] },
+  {
+    "package": "sensors",
+    "exports": [
+      "makeAccelerometer",
+      "createAccelerometer",
+      "makeGyroscope",
+      "createGyroscope",
+      "makeSensor",
+      "createSensor",
+      "makeCompass",
+      "createCompass",
+      "makeBattery",
+      "createBattery"
+    ]
+  },
+  {
+    "package": "set",
+    "exports": [
+      "ReactiveSet",
+      "ReactiveWeakSet",
+      "union",
+      "intersection",
+      "difference",
+      "symmetricDifference",
+      "readonlySet"
+    ]
+  },
+  { "package": "share", "exports": ["createSocialShare", "createWebShare", "makeWebShare"] },
+  {
+    "package": "signal-builders",
+    "exports": [
+      "push",
+      "filter",
+      "sort",
+      "map",
+      "get",
+      "merge",
+      "update",
+      "add",
+      "clamp",
+      "template"
+    ]
+  },
+  { "package": "spring", "exports": ["createSpring", "createDerivedSpring"] },
+  { "package": "sse", "exports": ["makeSSE", "createSSE", "makeSSEWorker"] },
+  { "package": "state-machine", "exports": ["createMachine"] },
+  { "package": "static-store", "exports": ["createStaticStore", "createDerivedStaticStore"] },
+  {
+    "package": "storage",
+    "exports": [
+      "makePersisted",
+      "cookieStorage",
+      "tauriStorage",
+      "multiplexStorage",
+      "storageSync",
+      "messageSync",
+      "wsSync",
+      "multiplexSync",
+      "addClearMethod",
+      "addWithOptionsMethod",
+      "makeObjectStorage"
+    ]
+  },
+  { "package": "styles", "exports": ["createRemSize"] },
+  {
+    "package": "timer",
+    "exports": [
+      "makeTimer",
+      "createTimer",
+      "createTimeoutLoop",
+      "createPolled",
+      "createIntervalCounter"
+    ]
+  },
+  { "package": "transition-group", "exports": ["createSwitchTransition", "createListTransition"] },
+  { "package": "trigger", "exports": ["createTrigger", "createTriggerCache"] },
+  { "package": "tween", "exports": ["createTween"] },
+  {
+    "package": "upload",
+    "exports": [
+      "createFilePicker",
+      "createFileUploader",
+      "fileSender",
+      "fileUploader",
+      "createDropzone",
+      "dropzone"
+    ]
+  },
+  {
+    "package": "utils",
+    "exports": [
+      "shallowArrayCopy",
+      "shallowObjectCopy",
+      "shallowCopy",
+      "withArrayCopy",
+      "withObjectCopy",
+      "withCopy",
+      "push",
+      "drop",
+      "dropRight",
+      "filterOut",
+      "filter",
+      "sort",
+      "sortBy",
+      "map",
+      "slice",
+      "splice",
+      "fill",
+      "concat",
+      "remove",
+      "removeItems",
+      "flatten",
+      "filterInstance",
+      "filterOutInstance",
+      "omit",
+      "pick",
+      "split",
+      "merge",
+      "get",
+      "update",
+      "add",
+      "substract",
+      "multiply",
+      "divide",
+      "power",
+      "clamp",
+      "json",
+      "ndjson",
+      "lines",
+      "number",
+      "safe",
+      "pipe",
+      "wrapSetter",
+      "parseColor",
+      "normalizeColor",
+      "tryParseColor",
+      "isValidColor",
+      "detectColorFormat",
+      "getColorChannels",
+      "normalizeHue",
+      "colorToOKLCH",
+      "lighten",
+      "darken",
+      "saturate",
+      "desaturate",
+      "complement",
+      "mix",
+      "contrastRatio",
+      "isReadable",
+      "colorScale",
+      "perceptualColorScale",
+      "COLOR_INTL_TRANSLATIONS"
+    ]
+  },
+  {
+    "package": "vibrate",
+    "exports": [
+      "isVibrationSupported",
+      "makeVibrate",
+      "createVibrate",
+      "frequencyToPattern",
+      "makePulse",
+      "createPulse"
+    ]
+  },
+  {
+    "package": "video",
+    "exports": ["makeVideo", "makeVideoPlayer", "createVideo", "createVideoPlayer"]
+  },
+  { "package": "virtual", "exports": ["createVirutalList", "VirtualList"] },
+  {
+    "package": "websocket",
+    "exports": [
+      "makeWS",
+      "createWS",
+      "createWSState",
+      "createWSMessage",
+      "makeReconnectingWS",
+      "createReconnectingWS",
+      "makeHeartbeatWS",
+      "wsMessageIterable",
+      "createWSData",
+      "createWSStore"
+    ]
+  },
+  {
+    "package": "workers",
+    "exports": [
+      "createWorker",
+      "createWorkerPool",
+      "createWorkerQuery",
+      "createReactiveWorker",
+      "workerScope"
+    ]
+  }
+]

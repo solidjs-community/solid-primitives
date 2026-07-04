@@ -7,18 +7,19 @@
 [![size](https://img.shields.io/badge/size-852_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/set)
 [![version](https://img.shields.io/npm/v/@solid-primitives/set?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/set)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive `Set` and `WeakSet` primitives, plus a suite of derived set-algebra operations.
 
-| Export | Type | Description |
-|---|---|---|
-| [`ReactiveSet`](#reactiveset) | `class` | Drop-in reactive replacement for `Set` |
-| [`ReactiveWeakSet`](#reactiveweakset) | `class` | Drop-in reactive replacement for `WeakSet` |
-| [`union`](#union) | `function` | Elements in `a` or `b` |
-| [`intersection`](#intersection) | `function` | Elements in both `a` and `b` |
-| [`difference`](#difference) | `function` | Elements in `a` not in `b` |
-| [`symmetricDifference`](#symmetricdifference) | `function` | Elements in `a` or `b`, but not both |
-| [`readonlySet`](#readonlyset) | `function` | Cast a `ReactiveSet` to `ReadonlySet` |
+| Export                                        | Type       | Description                                |
+| --------------------------------------------- | ---------- | ------------------------------------------ |
+| [`ReactiveSet`](#reactiveset)                 | `class`    | Drop-in reactive replacement for `Set`     |
+| [`ReactiveWeakSet`](#reactiveweakset)         | `class`    | Drop-in reactive replacement for `WeakSet` |
+| [`union`](#union)                             | `function` | Elements in `a` or `b`                     |
+| [`intersection`](#intersection)               | `function` | Elements in both `a` and `b`               |
+| [`difference`](#difference)                   | `function` | Elements in `a` not in `b`                 |
+| [`symmetricDifference`](#symmetricdifference) | `function` | Elements in `a` or `b`, but not both       |
+| [`readonlySet`](#readonlyset)                 | `function` | Cast a `ReactiveSet` to `ReadonlySet`      |
 
 ## Installation
 
@@ -139,8 +140,12 @@ function createTodoList() {
   const _todos = new ReactiveSet<string>();
   return {
     todos: readonlySet(_todos),
-    add(todo: string) { _todos.add(todo); },
-    remove(todo: string) { _todos.delete(todo); },
+    add(todo: string) {
+      _todos.add(todo);
+    },
+    remove(todo: string) {
+      _todos.delete(todo);
+    },
   };
 }
 

@@ -52,7 +52,7 @@ const App: Component = () => {
         <NumberInput name="width" value={width()} setValue={setWidth} />
         <NumberInput name="height" value={height()} setValue={setHeight} />
       </div>
-      <div class="fixed bottom-4 right-4">
+      <div class="fixed right-4 bottom-4">
         window: {Math.round(ws.width)}px x {Math.round(ws.height)}px
       </div>
     </div>

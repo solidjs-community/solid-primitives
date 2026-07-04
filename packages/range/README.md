@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-1.52_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/range)
 [![version](https://img.shields.io/npm/v/@solid-primitives/range?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/range)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Control Flow Primitives for displaying a number range or given number of elements.
 
@@ -24,6 +25,8 @@ Control Flow Primitives for displaying a number range or given number of element
 npm install @solid-primitives/range
 # or
 yarn add @solid-primitives/range
+# or
+pnpm add @solid-primitives/range
 ```
 
 Requires `solid-js` and `@solidjs/web` v2.0.0-beta.13 or later as peer dependencies.
@@ -66,12 +69,17 @@ function createNumericRange(
 Reactively maps a number range of specified length with a callback function - underlying helper for the `<Repeat>` control flow.
 
 ```ts
-const [length, setLength] = createSignal(10)
+const [length, setLength] = createSignal(10);
 const mapped = repeat(length, index => {
-   const [value, setValue] = createSignal(index);
-   createEffect(() => value(), v => { /* react to value */ })
-   return value
-})
+  const [value, setValue] = createSignal(index);
+  createEffect(
+    () => value(),
+    v => {
+      /* react to value */
+    },
+  );
+  return value;
+});
 ```
 
 #### Definition
@@ -146,14 +154,24 @@ All `start`, `to` and `step` arguments are accessors, and changing them will cau
 `step` will become negative _(the range will be descending)_ if `to` is smaller than `start`. Range stops at `to`, it is not included in the range.
 
 ```ts
-const [to, setTo] = createSignal(5)
-const mapped = mapRange(() => 0, to, () => 0.5, number => {
-   const [value, setValue] = createSignal(number);
-   createEffect(() => value(), v => { /* react to value */ })
-   return value
-})
-mapped() // => [0, 0.5, 1, 1.5, 2...]
-setTo(3) // changes the output array, mapping only added numbers
+const [to, setTo] = createSignal(5);
+const mapped = mapRange(
+  () => 0,
+  to,
+  () => 0.5,
+  number => {
+    const [value, setValue] = createSignal(number);
+    createEffect(
+      () => value(),
+      v => {
+        /* react to value */
+      },
+    );
+    return value;
+  },
+);
+mapped(); // => [0, 0.5, 1, 1.5, 2...]
+setTo(3); // changes the output array, mapping only added numbers
 ```
 
 #### Definition
@@ -239,7 +257,10 @@ const mapped = indexRange(
   () => 0.5,
   number => {
     const [value, setValue] = createSignal(number());
-    createEffect(() => number(), n => handleNewNumber(n));
+    createEffect(
+      () => number(),
+      n => handleNewNumber(n),
+    );
     return value;
   },
 );

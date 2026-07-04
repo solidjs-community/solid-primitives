@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/idle",
-  "version": "0.2.2",
+  "version": "1.0.0-next.0",
   "description": "A primitive to observe the user's idle status and react to its changes.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "idle",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createIdleTimer"
     ],
@@ -55,12 +55,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.10",
-    "solid-js": "^2.0.0-beta.10"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.10",
-    "solid-js": "2.0.0-beta.10"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

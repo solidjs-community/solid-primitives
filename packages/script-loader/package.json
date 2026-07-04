@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/script-loader",
-  "version": "2.3.2",
+  "version": "3.0.0-next.0",
   "description": "Primitive to load scripts dynamically",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -45,8 +45,8 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "keywords": [
     "script",
@@ -56,7 +56,7 @@
   ],
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

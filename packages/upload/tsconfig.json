@@ -7,7 +7,7 @@
   },
   "references": [
     {
-      "path": "../utils"
+      "path": "../event-listener"
     }
   ],
   "include": [

@@ -76,7 +76,7 @@ export const KeyLevelReactivity = meta.story({
           </ButtonRow>
         </Section>
 
-        <Section title='has() per key'>
+        <Section title="has() per key">
           <For each={FRUITS}>
             {fruit => <BoolRow label={`has("${fruit}")`} value={set.has(fruit)} />}
           </For>
@@ -120,7 +120,15 @@ export const SetAlgebra = meta.story({
       accessor: () => ReadonlySet<number>,
       variant: "info" | "success" | "warning" | "error",
     ) => (
-      <div style={{ display: "flex", gap: "0.25rem", "flex-wrap": "wrap", "min-height": "1.4rem", "align-items": "center" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "0.25rem",
+          "flex-wrap": "wrap",
+          "min-height": "1.4rem",
+          "align-items": "center",
+        }}
+      >
         <For each={[...accessor()]}>{n => <Badge variant={variant}>{n}</Badge>}</For>
       </div>
     );
@@ -131,7 +139,14 @@ export const SetAlgebra = meta.story({
       variant: "info" | "success" | "warning" | "error",
     ) => (
       <div style={{ display: "flex", gap: "0.75rem", "align-items": "center" }}>
-        <code style={{ "font-size": "0.78rem", color: "#64748b", "min-width": "200px", "flex-shrink": "0" }}>
+        <code
+          style={{
+            "font-size": "0.78rem",
+            color: "#64748b",
+            "min-width": "200px",
+            "flex-shrink": "0",
+          }}
+        >
           {label}
         </code>
         {chipRow(accessor, variant)}
@@ -142,7 +157,16 @@ export const SetAlgebra = meta.story({
       <Container width={480}>
         <Section title="Inputs">
           <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
-            <span style={{ "font-size": "0.8rem", "font-weight": "600", width: "12px", color: "#64748b" }}>A</span>
+            <span
+              style={{
+                "font-size": "0.8rem",
+                "font-weight": "600",
+                width: "12px",
+                color: "#64748b",
+              }}
+            >
+              A
+            </span>
             <ButtonRow>
               <For each={NUMS}>
                 {n => (
@@ -158,7 +182,16 @@ export const SetAlgebra = meta.story({
             </ButtonRow>
           </div>
           <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
-            <span style={{ "font-size": "0.8rem", "font-weight": "600", width: "12px", color: "#64748b" }}>B</span>
+            <span
+              style={{
+                "font-size": "0.8rem",
+                "font-weight": "600",
+                width: "12px",
+                color: "#64748b",
+              }}
+            >
+              B
+            </span>
             <ButtonRow>
               <For each={NUMS}>
                 {n => (

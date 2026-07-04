@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "6.4.0",
+  "version": "7.0.0-next.0",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [
@@ -38,12 +38,22 @@
         "types": "./dist/immutable/index.d.ts",
         "default": "./dist/immutable/index.js"
       }
+    },
+    "./colors": {
+      "import": {
+        "@solid-primitives/source": "./src/colors/index.ts",
+        "types": "./dist/colors/index.d.ts",
+        "default": "./dist/colors/index.js"
+      }
     }
   },
   "typesVersions": {
     "*": {
       "immutable": [
         "./dist/immutable/index.d.ts"
+      ],
+      "colors": [
+        "./dist/colors/index.d.ts"
       ]
     }
   },
@@ -62,7 +72,7 @@
   ],
   "primitive": {
     "name": "utils",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "shallowArrayCopy",
       "shallowObjectCopy",
@@ -105,17 +115,36 @@
       "number",
       "safe",
       "pipe",
-      "wrapSetter"
+      "wrapSetter",
+      "parseColor",
+      "normalizeColor",
+      "tryParseColor",
+      "isValidColor",
+      "detectColorFormat",
+      "getColorChannels",
+      "normalizeHue",
+      "colorToOKLCH",
+      "lighten",
+      "darken",
+      "saturate",
+      "desaturate",
+      "complement",
+      "mix",
+      "contrastRatio",
+      "isReadable",
+      "colorScale",
+      "perceptualColorScale",
+      "COLOR_INTL_TRANSLATIONS"
     ],
     "category": "Utilities",
     "gzip": 1399
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

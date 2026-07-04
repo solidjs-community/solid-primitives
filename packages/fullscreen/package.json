@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/fullscreen",
-  "version": "2.0.0-beta.0",
+  "version": "2.0.0-next.1",
   "description": "Primitive that wraps the fullscreen API.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -54,12 +54,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

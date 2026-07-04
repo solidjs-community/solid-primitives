@@ -9,13 +9,7 @@ import {
 } from "@solid-primitives/cursor";
 import type { CursorProperty } from "@solid-primitives/cursor";
 import readme from "../README.md?raw";
-import {
-  Container,
-  Button,
-  Card,
-  StatRow,
-  BoolRow,
-} from "../../../.storybook/ui/index.js";
+import { Container, Button, Card, StatRow, BoolRow } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "DOM/Cursor",
@@ -292,8 +286,8 @@ export const DragHandle = meta.story({
         </Card>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          While holding, move the pointer off the element — the <code>grabbing</code> cursor
-          follows everywhere.
+          While holding, move the pointer off the element — the <code>grabbing</code> cursor follows
+          everywhere.
         </p>
       </Container>
     );
@@ -362,7 +356,7 @@ export const CursorShowcase = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Each tile uses <code>{"ref={cursorRef(\"…\")}"}</code>. Hover to see the cursor.
+          Each tile uses <code>{'ref={cursorRef("…")}'}</code>. Hover to see the cursor.
         </p>
       </Container>
     );

@@ -4,7 +4,7 @@
  * Copyright (c) 2022 Kobalte Contributors — MIT License
  */
 
-import { type Accessor, createMemo, createSignal, untrack } from "solid-js";
+import { type Accessor, createSignal, untrack } from "solid-js";
 import { accessWith } from "@solid-primitives/utils";
 
 export interface CreateControllableSignalProps<T> {
@@ -29,27 +29,28 @@ export interface CreateControllableSignalProps<T> {
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/controlled-signal
  */
 export function createControllableSignal<T>(props: CreateControllableSignalProps<T>) {
-  // Read defaultValue once, untracked, so it doesn't create a dependency during init.
-  // Cast: createSignal's overload requires Exclude<T, Function>; the caller is responsible
-  // for not passing function-typed T values as defaultValue (same assumption Kobalte makes).
-  // ownedWrite: true because setValue intentionally writes this from inside reactive scopes.
-  const [_value, _setValue] = createSignal<T | undefined>(
-    untrack(() => props.defaultValue?.()) as Exclude<T, Function> | undefined,
+  // Solid 2.0 function-form createSignal: a writable derived signal that tracks props.value
+  // reactively. When props.value?.() is undefined (uncontrolled), no reactive dependency is
+  // created from that read, so the fn never re-runs and _setValue overrides persist.
+  // When props.value?.() is defined (controlled), the dependency is tracked and the signal
+  // follows the parent. Uses !== undefined rather than ?? so a controlled null is kept.
+  // ownedWrite: true because _setValue is called from inside setValue which may run in a
+  // reactive scope.
+  const [value, _setValue] = createSignal<T | undefined>(
+    () => {
+      const v = props.value?.();
+      return v !== undefined ? v : untrack(() => props.defaultValue?.());
+    },
     { ownedWrite: true },
   );
 
-  const isControlled = createMemo(() => props.value?.() !== undefined);
-  const value = createMemo(() => (isControlled() ? props.value?.() : _value()));
-
   const setValue = (next: Exclude<T, Function> | ((prev: T) => T)) => {
     untrack(() => {
-      // Read raw signals — not the memo — to avoid deferred-memo staleness in Solid 2.0.
-      const controlled = props.value?.() !== undefined;
-      const current = (controlled ? props.value?.() : _value()) as T;
+      const current = value() as T;
       const nextValue = accessWith(next, current) as T;
 
       if (!Object.is(nextValue, current)) {
-        if (!controlled) {
+        if (props.value?.() === undefined) {
           _setValue(nextValue as Exclude<T, Function>);
         }
         props.onChange?.(nextValue);

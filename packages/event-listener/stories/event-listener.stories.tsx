@@ -64,7 +64,9 @@ export const WindowEventListenerStory = meta.story({
           />
         </Show>
 
-        <div style={{ display: "flex", "justify-content": "space-between", "align-items": "center" }}>
+        <div
+          style={{ display: "flex", "justify-content": "space-between", "align-items": "center" }}
+        >
           <span
             style={{
               "font-size": "0.72rem",
@@ -221,7 +223,11 @@ export const EventSignalStory = meta.story({
 
     const pos = () => {
       const e = lastEvent();
-      if (e && "clientX" in e) return { x: Math.round((e as MouseEvent).clientX), y: Math.round((e as MouseEvent).clientY) };
+      if (e && "clientX" in e)
+        return {
+          x: Math.round((e as MouseEvent).clientX),
+          y: Math.round((e as MouseEvent).clientY),
+        };
       return null;
     };
 

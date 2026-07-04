@@ -94,16 +94,24 @@ const App: Component = () => {
   ]);
 
   function addTodo(title: string) {
-    setTodos(t => { t.push({ title, done: false }); });
+    setTodos(t => {
+      t.push({ title, done: false });
+    });
   }
   function removeTodo(index: number) {
-    setTodos(t => { t.splice(index, 1); });
+    setTodos(t => {
+      t.splice(index, 1);
+    });
   }
   function toggleTodo(index: number) {
-    setTodos(t => { t[index]!.done = !t[index]!.done; });
+    setTodos(t => {
+      t[index]!.done = !t[index]!.done;
+    });
   }
   function editTodo(index: number, title: string) {
-    setTodos(t => { t[index]!.title = title; });
+    setTodos(t => {
+      t[index]!.title = title;
+    });
   }
 
   let input!: HTMLInputElement;

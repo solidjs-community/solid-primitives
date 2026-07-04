@@ -78,8 +78,7 @@ export const StateFlowStory = meta.story({
     const status = () => (isIdle() ? "idle" : isPrompted() ? "prompted" : "active");
     const badgeVariant = (): "error" | "warning" | "success" =>
       isIdle() ? "error" : isPrompted() ? "warning" : "success";
-    const barColor = () =>
-      isIdle() ? "#ef4444" : isPrompted() ? colors.warning : colors.primary;
+    const barColor = () => (isIdle() ? "#ef4444" : isPrompted() ? colors.warning : colors.primary);
 
     const handleReset = () => {
       reset();
@@ -111,8 +110,8 @@ export const StateFlowStory = meta.story({
           Reset timer
         </Button>
         <p style={{ margin: 0, "font-size": "0.78rem", color: colors.mutedFg }}>
-          Bar fills as inactivity accumulates — any mouse or keyboard event resets it, as does
-          the Reset button.
+          Bar fills as inactivity accumulates — any mouse or keyboard event resets it, as does the
+          Reset button.
         </p>
       </Container>
     );
@@ -125,7 +124,7 @@ export const SessionWarningStory = meta.story({
     docs: {
       description: {
         story:
-          'A session-lock UX pattern: after `idleTimeout` the user sees a prompt card. If they confirm presence via `reset()`, the timer restarts. If they do not respond within `promptTimeout`, `isIdle` becomes true and the session locks. Note that user activity during the prompt phase does **not** dismiss it — only `reset()`, `stop()`, or `triggerIdle()` can.',
+          "A session-lock UX pattern: after `idleTimeout` the user sees a prompt card. If they confirm presence via `reset()`, the timer restarts. If they do not respond within `promptTimeout`, `isIdle` becomes true and the session locks. Note that user activity during the prompt phase does **not** dismiss it — only `reset()`, `stop()`, or `triggerIdle()` can.",
       },
     },
   },
@@ -250,7 +249,12 @@ export const ManualControlsStory = meta.story({
           <Button onClick={handleStart} disabled={started()} style={{ flex: "1" }}>
             start
           </Button>
-          <Button onClick={handleStop} disabled={!started()} variant="outline" style={{ flex: "1" }}>
+          <Button
+            onClick={handleStop}
+            disabled={!started()}
+            variant="outline"
+            style={{ flex: "1" }}
+          >
             stop
           </Button>
           <Button onClick={reset} variant="outline" style={{ flex: "1" }}>

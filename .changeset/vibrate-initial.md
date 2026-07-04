@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/vibrate": minor
+"@solid-primitives/vibrate": major
 ---
 
 Add `@solid-primitives/vibrate` package (Stage 0)
@@ -13,4 +13,4 @@ New primitives for device haptic feedback via the [Vibration API](https://develo
 - **`makePulse(hz, options?)`** — non-reactive helper that vibrates continuously at `hz` cycles per second using a repeating chunk strategy.
 - **`createPulse(hz, options?)`** — reactive pulse primitive returning `{ pulsing, start, stop, supported }`. Accepts a reactive `hz` accessor: changing frequency while pulsing restarts immediately at the new rhythm.
 
-Peer dependencies: `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`.
+Peer dependencies: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`.

@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-1.2_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/sensors)
 [![size](https://img.shields.io/npm/v/@solid-primitives/sensors?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/sensors)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive primitives for device motion, orientation, and hardware sensors using standard browser APIs.
 
@@ -14,6 +15,8 @@ Reactive primitives for device motion, orientation, and hardware sensors using s
 
 ```bash
 npm install @solid-primitives/sensors
+# or
+yarn add @solid-primitives/sensors
 # or
 pnpm add @solid-primitives/sensors
 ```
@@ -42,10 +45,10 @@ cleanup();
 
 **Options:**
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
+| Option           | Type      | Default | Description                                                                |
+| ---------------- | --------- | ------- | -------------------------------------------------------------------------- |
 | `includeGravity` | `boolean` | `false` | When `true`, uses `accelerationIncludingGravity` instead of `acceleration` |
-| `interval` | `number` | `100` | Minimum milliseconds between `onChange` calls |
+| `interval`       | `number`  | `100`   | Minimum milliseconds between `onChange` calls                              |
 
 **Returns:** `VoidFunction` — call to remove the event listener.
 
@@ -72,8 +75,8 @@ function MyComponent() {
 
 ```ts
 function createAccelerometer(
-  includeGravity?: boolean,  // default: false
-  interval?: number,         // default: 100ms
+  includeGravity?: boolean, // default: false
+  interval?: number, // default: 100ms
 ): Accessor<AccelerometerReading | undefined>;
 
 type AccelerometerReading = DeviceMotionEventAcceleration | null;
@@ -105,9 +108,9 @@ cleanup();
 
 **Options:**
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `interval` | `number` | `100` | Minimum milliseconds between `onChange` calls |
+| Option     | Type     | Default | Description                                   |
+| ---------- | -------- | ------- | --------------------------------------------- |
+| `interval` | `number` | `100`   | Minimum milliseconds between `onChange` calls |
 
 **Returns:** `VoidFunction` — call to remove the event listener.
 
@@ -168,7 +171,7 @@ if (cleanup) {
 
 ```ts
 function makeSensor<T extends GenericSensor>(
-  SensorClass: { new(options?: any): T },
+  SensorClass: { new (options?: any): T },
   onChange: (sensor: T) => void,
   options?: SensorOptions,
 ): VoidFunction | null;
@@ -200,7 +203,7 @@ function MyComponent() {
 
 ```ts
 function createSensor<T extends GenericSensor>(
-  SensorClass: { new(options?: any): T },
+  SensorClass: { new (options?: any): T },
   options?: SensorOptions,
 ): Accessor<T | undefined>;
 ```
@@ -216,19 +219,19 @@ Uses `window.Magnetometer` from the [Generic Sensor API](https://developer.mozil
 ```ts
 import { makeCompass } from "@solid-primitives/sensors";
 
-const cleanup = makeCompass(
-  ({ x, y, z }) => console.log(`Field: ${x}µT, ${y}µT, ${z}µT`),
-  { frequency: 10, referenceFrame: "device" },
-);
+const cleanup = makeCompass(({ x, y, z }) => console.log(`Field: ${x}µT, ${y}µT, ${z}µT`), {
+  frequency: 10,
+  referenceFrame: "device",
+});
 
 if (cleanup) cleanup();
 ```
 
 **Options:**
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `frequency` | `number` | — | Readings per second |
+| Option           | Type                   | Default    | Description                |
+| ---------------- | ---------------------- | ---------- | -------------------------- |
+| `frequency`      | `number`               | —          | Readings per second        |
 | `referenceFrame` | `"device" \| "screen"` | `"device"` | Coordinate reference frame |
 
 **Returns:** `VoidFunction` or `null` if `window.Magnetometer` is unavailable.
@@ -284,9 +287,9 @@ function makeBattery(onChange: (reading: BatteryReading) => void): VoidFunction;
 
 type BatteryReading = {
   charging: boolean;
-  chargingTime: number;    // seconds until full; Infinity if not charging
+  chargingTime: number; // seconds until full; Infinity if not charging
   dischargingTime: number; // seconds until empty; Infinity if charging
-  level: number;           // 0.0–1.0
+  level: number; // 0.0–1.0
 };
 ```
 

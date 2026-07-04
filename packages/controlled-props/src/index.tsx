@@ -1,7 +1,9 @@
 import { createMemo, createSignal, For } from "solid-js";
-import type { Accessor, Component, JSX, Setter } from "solid-js";
+import type { Accessor, Component, Setter } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
-export type TestPropType = "boolean" | "number" | "string" | "object";
+export type TestPropType = "boolean" | "number" | "range" | "string" | "object";
 
 export type TestPropObjectOptions<T> = T[] | Record<string, T> | any;
 
@@ -10,6 +12,7 @@ export type TestPropOptions<T> = (T extends undefined
   : { initialValue: T }) & {
   min?: T extends number ? number : undefined;
   max?: T extends number ? number : undefined;
+  step?: T extends number ? number : undefined;
   options?: TestPropObjectOptions<T>;
   type?: TestPropType;
 };
@@ -22,6 +25,7 @@ export type TestPropProps<T> = {
   setValue: Setter<T>;
   min?: T extends number ? number : undefined;
   max?: T extends number ? number : undefined;
+  step?: T extends number ? number : undefined;
 };
 
 export const BoolProp: Component<TestPropProps<boolean>> = props => (
@@ -44,9 +48,27 @@ export const NumberProp: Component<TestPropProps<number>> = props => (
       name={props.name}
       min={props.min}
       max={props.max}
+      step={props.step}
       value={props.value()}
       onChange={ev => props.setValue(ev.currentTarget.valueAsNumber)}
     />{" "}
+  </label>
+);
+
+export const RangeProp: Component<TestPropProps<number>> = props => (
+  <label>
+    <span>{props.name}</span>{" "}
+    <input
+      type="range"
+      name={props.name}
+      min={props.min ?? 0}
+      max={props.max ?? 100}
+      step={props.step}
+      value={props.value()}
+      onInput={ev => props.setValue(ev.currentTarget.valueAsNumber)}
+      onChange={ev => props.setValue(ev.currentTarget.valueAsNumber)}
+    />{" "}
+    <span>{props.value()}</span>
   </label>
 );
 
@@ -88,16 +110,20 @@ export const SelectProp = <T,>(
       ? props.options.map((option: any) => [option, option])
       : filterEnum(props.options),
   );
-  const initialValue = options().findIndex(([, value]) => value === props.value());
+  const selectedIndex = createMemo(() => options().findIndex(([, v]) => v === props.value()));
   return (
     <label>
       <span>{props.name}</span>{" "}
       <select
         name={props.name}
-        value={initialValue.toString()}
-        onChange={ev => props.setValue(options()[ev.currentTarget.selectedIndex]![1] as any)}
+        value={String(selectedIndex())}
+        onChange={ev => {
+          const item = options()[ev.currentTarget.selectedIndex];
+          if (!item) return;
+          props.setValue(item[1] as any);
+        }}
       >
-        <For each={options()} fallback={<option>"options missing"</option>}>
+        <For each={options()} fallback={<option>options missing</option>}>
           {([key], index) => <option value={index()}>{key}</option>}
         </For>
       </select>{" "}
@@ -108,6 +134,7 @@ export const SelectProp = <T,>(
 const defaultInitialValues: Record<TestPropType & string, boolean | number | string | undefined> = {
   boolean: false,
   number: 0,
+  range: 0,
   string: "",
   object: undefined,
 };
@@ -179,7 +206,16 @@ export function createControlledProp<T>(
     ? "object"
     : ((options as TestPropOptions<T>).type ?? (typeof initialValue as TestPropType));
 
-  const [value, setValue] = createSignal<T>(initialValue, { name });
+  const numOpts =
+    options != null && typeof options === "object" ? (options as TestPropOptions<number>) : null;
+  const min = numOpts?.min;
+  const max = numOpts?.max;
+  const step = numOpts?.step;
+
+  const [value, setValue] = createSignal<T>(initialValue as Exclude<T, Function>, {
+    ...INTERNAL_OPTIONS,
+    name,
+  });
   return [
     value,
     setValue,
@@ -187,19 +223,40 @@ export function createControlledProp<T>(
       ? () => BoolProp({ name, value: value as any, setValue: setValue as any as Setter<boolean> })
       : propType === "number"
         ? () =>
-            NumberProp({ name, value: value as any, setValue: setValue as any as Setter<number> })
-        : propType === "string"
+            NumberProp({
+              name,
+              value: value as any,
+              setValue: setValue as any as Setter<number>,
+              min,
+              max,
+              step,
+            })
+        : propType === "range"
           ? () =>
-              StringProp({ name, value: value as any, setValue: setValue as any as Setter<string> })
-          : () =>
-              SelectProp<T>({
+              RangeProp({
                 name,
-                value: value,
-                setValue: setValue,
-                options:
-                  (options as TestPropOptions<T>).options ??
-                  ([initialValue] as TestPropObjectOptions<T>),
-              }),
+                value: value as any,
+                setValue: setValue as any as Setter<number>,
+                min,
+                max,
+                step,
+              })
+          : propType === "string"
+            ? () =>
+                StringProp({
+                  name,
+                  value: value as any,
+                  setValue: setValue as any as Setter<string>,
+                })
+            : () =>
+                SelectProp<T>({
+                  name,
+                  value: value,
+                  setValue: setValue,
+                  options:
+                    (options as TestPropOptions<T>).options ??
+                    ([initialValue] as TestPropObjectOptions<T>),
+                }),
   ];
 }
 

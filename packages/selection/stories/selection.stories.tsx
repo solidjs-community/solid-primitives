@@ -33,7 +33,7 @@ const getSelectedText = (node: HTMLElement | null, start: number, end: number) =
   const content =
     node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement
       ? node.value
-      : node.textContent ?? "";
+      : (node.textContent ?? "");
   return content.slice(start, end);
 };
 
@@ -72,10 +72,7 @@ export const LiveTracking = meta.story({
           />
           <StatRow label="start" value={fmtPos(sel()[1])} />
           <StatRow label="end" value={fmtPos(sel()[2])} />
-          <StatRow
-            label="selected"
-            value={getSelectedText(sel()[0], sel()[1], sel()[2]) || "—"}
-          />
+          <StatRow label="selected" value={getSelectedText(sel()[0], sel()[1], sel()[2]) || "—"} />
         </Section>
       </Container>
     );
@@ -108,10 +105,7 @@ export const ProgrammaticSet = meta.story({
           <Button variant="outline" onClick={() => setSel([inputRef, 0, 0])}>
             Start
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => setSel([inputRef, text.length, text.length])}
-          >
+          <Button variant="outline" onClick={() => setSel([inputRef, text.length, text.length])}>
             End
           </Button>
           <Button variant="outline" onClick={() => setSel([inputRef, 0, text.length])}>
@@ -172,9 +166,9 @@ export const RichText = meta.story({
         </Section>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          <code>getTextNodes()</code> finds {nodeCount()} text nodes inside this element.
-          Offsets are unified across all of them, so the selection API treats the whole content
-          as one flat string.
+          <code>getTextNodes()</code> finds {nodeCount()} text nodes inside this element. Offsets
+          are unified across all of them, so the selection API treats the whole content as one flat
+          string.
         </p>
       </Container>
     );

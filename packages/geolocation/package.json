@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/geolocation",
-  "version": "2.0.0",
+  "version": "3.0.0-next.0",
   "description": "Primitives to query geolocation and observe changes.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",
@@ -54,17 +54,17 @@
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.8",
-    "@solidjs/web": "2.0.0-beta.14",
+    "@solidjs/web": "2.0.0-beta.15",
     "leaflet": "^1.9.4",
-    "solid-js": "2.0.0-beta.14"
+    "solid-js": "2.0.0-beta.15"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   },
   "typesVersions": {}
 }

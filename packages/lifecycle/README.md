@@ -7,9 +7,11 @@
 [![size](https://img.shields.io/badge/size-289_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/lifecycle)
 [![version](https://img.shields.io/npm/v/@solid-primitives/lifecycle?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/lifecycle)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Package providing extra layer of lifecycle primitives for Solid.
 
+- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/reactivity-lifecycle--docs)
 - [`createIsMounted`](#createismounted) - Returns a boolean signal indicating whether the component is mounted or not.
 - [`isHydrated`](#ishydrated) - A signal with the same behavior as [`isHydrating`](#ishydrating) but this one focused only on client-side updates.
 - [`onElementConnect`](#onelementconnect) - Calls the given callback when the target element is connected to the DOM.
@@ -118,10 +120,6 @@ However, it is not certain that the elements are actually connected to the DOM w
   }}
 />
 ```
-
-## Demo
-
-You can see the primitives in action in the following sandbox: https://primitives.solidjs.community/playground/lifecycle/
 
 ## Changelog
 

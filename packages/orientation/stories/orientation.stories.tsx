@@ -114,10 +114,9 @@ export const CreateOrientationStory = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Rotate your device or use browser DevTools device emulation (toggle device toolbar,
-          then rotate) to trigger an orientation change. Uses{" "}
-          <code>screen.orientation</code> when available, falling back to the{" "}
-          <code>orientationchange</code> event on older browsers.
+          Rotate your device or use browser DevTools device emulation (toggle device toolbar, then
+          rotate) to trigger an orientation change. Uses <code>screen.orientation</code> when
+          available, falling back to the <code>orientationchange</code> event on older browsers.
         </p>
       </Container>
     );

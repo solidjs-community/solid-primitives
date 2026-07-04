@@ -84,7 +84,15 @@ export const BasicMasonry = meta.story({
     });
 
     return (
-      <div style={{ "font-family": "system-ui", display: "flex", "flex-direction": "column", "align-items": "center", gap: "0.75rem" }}>
+      <div
+        style={{
+          "font-family": "system-ui",
+          display: "flex",
+          "flex-direction": "column",
+          "align-items": "center",
+          gap: "0.75rem",
+        }}
+      >
         <p style={{ margin: 0, "font-size": "0.85rem", color: "#64748b" }}>
           15 items · 3 columns · shortest-column-first packing
         </p>
@@ -188,7 +196,15 @@ export const InteractiveMasonry = meta.story({
             "flex-wrap": "wrap",
           }}
         >
-          <label style={{ "font-size": "0.85rem", color: "#64748b", display: "flex", gap: "0.5rem", "align-items": "center" }}>
+          <label
+            style={{
+              "font-size": "0.85rem",
+              color: "#64748b",
+              display: "flex",
+              gap: "0.5rem",
+              "align-items": "center",
+            }}
+          >
             Columns:
             <input
               type="range"
@@ -200,7 +216,9 @@ export const InteractiveMasonry = meta.story({
             <strong>{cols()}</strong>
           </label>
 
-          <Button onClick={shuffle} variant="secondary">Shuffle</Button>
+          <Button onClick={shuffle} variant="secondary">
+            Shuffle
+          </Button>
 
           <span style={{ "font-size": "0.85rem", color: "#64748b" }}>
             Click items to toggle height · colour = column

@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-1.16_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/props)
 [![size](https://img.shields.io/npm/v/@solid-primitives/props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/props)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Library of primitives focused around component props.
 
@@ -91,7 +92,6 @@ combined.onClick(); // "child" "parent"
 ##### For better reference of how exactly `combineProps` works, see the [TESTS](https://github.com/solidjs-community/solid-primitives/blob/main/packages/props/test/combineProps.test.ts)
 
 ### Additional helpers
-
 
 A couple of lower-lever helpers that power `combineProps`:
 
@@ -187,8 +187,8 @@ Splits a props object into two reactive views: one containing only the keys that
 import { partitionProps } from "@solid-primitives/props";
 
 const MyButton = (props: ButtonProps & JSX.HTMLAttributes<HTMLButtonElement>) => {
-  const [ownProps, htmlProps] = partitionProps(props,
-    key => ["label", "variant", "size"].includes(key as string)
+  const [ownProps, htmlProps] = partitionProps(props, key =>
+    ["label", "variant", "size"].includes(key as string),
   );
 
   return <button {...htmlProps}>{ownProps.label}</button>;

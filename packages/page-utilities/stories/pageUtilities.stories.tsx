@@ -102,17 +102,13 @@ export const SingletonRootStory = meta.story({
     return (
       <Container width={300}>
         <Card>
-          <span
-            style={{ "font-size": font.sizeSm, color: colors.muted, "font-family": font.mono }}
-          >
+          <span style={{ "font-size": font.sizeSm, color: colors.muted, "font-family": font.mono }}>
             Component A
           </span>
           <BoolRow label="usePageVisibility()" value={visibleA()} />
         </Card>
         <Card>
-          <span
-            style={{ "font-size": font.sizeSm, color: colors.muted, "font-family": font.mono }}
-          >
+          <span style={{ "font-size": font.sizeSm, color: colors.muted, "font-family": font.mono }}>
             Component B
           </span>
           <BoolRow label="usePageVisibility()" value={visibleB()} />
@@ -198,17 +194,13 @@ export const ImperativeLeaveGuardStory = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>Leave guard</span>
-          <Badge variant={active() ? "error" : "default"}>
-            {active() ? "active" : "inactive"}
-          </Badge>
+          <Badge variant={active() ? "error" : "default"}>{active() ? "active" : "inactive"}</Badge>
         </div>
         <Button onClick={toggle} variant={active() ? "outline" : "primary"}>
           {active() ? "Remove guard" : "Add guard"}
         </Button>
         <Show when={active()}>
-          <Alert variant="warning">
-            Guard is active — try closing or refreshing this tab.
-          </Alert>
+          <Alert variant="warning">Guard is active — try closing or refreshing this tab.</Alert>
         </Show>
       </Container>
     );

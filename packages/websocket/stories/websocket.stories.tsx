@@ -137,7 +137,9 @@ export const WSStateStory = meta.story({
 
     createEffect(
       () => state(),
-      s => { logEntry(`→ ${STATE_LABELS[s]} (${s})`); },
+      s => {
+        logEntry(`→ ${STATE_LABELS[s]} (${s})`);
+      },
     );
 
     return (
@@ -300,8 +302,7 @@ export const CreateWSStory = meta.story({
     createEffect(
       () => message(),
       msg => {
-        if (msg !== undefined)
-          setChatLog(prev => [...prev, { from: "server", text: msg }]);
+        if (msg !== undefined) setChatLog(prev => [...prev, { from: "server", text: msg }]);
       },
     );
 
@@ -386,18 +387,14 @@ export const CreateWSStory = meta.story({
         </div>
 
         <ButtonRow>
-          <Button
-            onClick={() => mock?.simDrop()}
-            disabled={state() !== 1}
-            variant="outline"
-          >
+          <Button onClick={() => mock?.simDrop()} disabled={state() !== 1} variant="outline">
             Drop connection
           </Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.muted }}>
-          The simulated server echoes every message. <code>createWS</code> does not
-          auto-reconnect — use <code>createReconnectingWS</code> for that.
+          The simulated server echoes every message. <code>createWS</code> does not auto-reconnect —
+          use <code>createReconnectingWS</code> for that.
         </p>
       </Container>
     );

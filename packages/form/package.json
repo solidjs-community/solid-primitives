@@ -1,0 +1,73 @@
+{
+  "name": "@solid-primitives/form",
+  "version": "1.0.0-next.0",
+  "description": "Reactive form primitive for Solid.js with per-field signals, sync/async validation, validateOn control, and DOM binding.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/form",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "form",
+    "stage": 2,
+    "list": [
+      "createForm",
+      "toFormData",
+      "createFormResetListener",
+      "createFormControl",
+      "createFormControlInput",
+      "FormControlContext",
+      "useFormControl"
+    ],
+    "category": "Forms",
+    "gzip": 2495
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "form",
+    "validation",
+    "reactive",
+    "async"
+  ],
+  "dependencies": {
+    "@solid-primitives/a11y": "workspace:^",
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
+  },
+  "typesVersions": {},
+  "devDependencies": {
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
+  }
+}

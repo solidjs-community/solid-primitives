@@ -1,6 +1,7 @@
-import { createRoot, flush } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, test, expect } from "vitest";
 import {
+  createKeyDown,
   createKeyHold,
   createShortcut,
   useKeyDownEvent,
@@ -145,6 +146,98 @@ describe("createKeyHold", () => {
       expect(isHeld()).toBe(false);
 
       dispose();
+    }));
+});
+
+describe("createKeyDown", () => {
+  // createKeyDown listens on document; events dispatched on window don't reach document listeners
+  const dispatchDocumentKeyEvent = (key: string) => {
+    const ev = new Event("keydown") as any;
+    ev.key = key;
+    document.dispatchEvent(ev);
+  };
+
+  test("fires callback when the matching key is pressed", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createKeyDown("Escape", () => fired++);
+      flush();
+
+      dispatchDocumentKeyEvent("Escape");
+      expect(fired).toBe(1);
+
+      dispatchDocumentKeyEvent("Escape");
+      expect(fired).toBe(2);
+
+      dispose();
+    }));
+
+  test("does not fire for other keys", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createKeyDown("Escape", () => fired++);
+      flush();
+
+      dispatchDocumentKeyEvent("Enter");
+      dispatchDocumentKeyEvent("a");
+      expect(fired).toBe(0);
+
+      dispose();
+    }));
+
+  test("passes the keyboard event to the callback", () =>
+    createRoot(dispose => {
+      let received: KeyboardEvent | undefined;
+      createKeyDown("Enter", e => (received = e));
+      flush();
+
+      dispatchDocumentKeyEvent("Enter");
+      expect(received).toBeDefined();
+      expect((received as any).key).toBe("Enter");
+
+      dispose();
+    }));
+
+  test("disabled option prevents the callback from firing", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createKeyDown("Escape", () => fired++, { disabled: true });
+      flush();
+
+      dispatchDocumentKeyEvent("Escape");
+      expect(fired).toBe(0);
+
+      dispose();
+    }));
+
+  test("disabled as accessor — reactively enables/disables the listener", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      // ownedWrite: true because the setter is called inside createRoot (an owned scope)
+      const [disabled, setDisabled] = createSignal(true, { ownedWrite: true });
+      createKeyDown("Escape", () => fired++, { disabled });
+      flush();
+
+      dispatchDocumentKeyEvent("Escape");
+      expect(fired).toBe(0);
+
+      setDisabled(false);
+      flush();
+      dispatchDocumentKeyEvent("Escape");
+      expect(fired).toBe(1);
+
+      dispose();
+    }));
+
+  test("removes the listener when disposed", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createKeyDown("Escape", () => fired++);
+      flush();
+
+      dispose();
+      dispatchDocumentKeyEvent("Escape");
+      expect(fired).toBe(0);
     }));
 });
 

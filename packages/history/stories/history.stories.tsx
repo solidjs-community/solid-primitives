@@ -91,7 +91,10 @@ export const StoreRollback = meta.story({
 
     const history = createUndoHistory(() => {
       const copy = JSON.parse(JSON.stringify(form)) as typeof form;
-      return () => setForm(s => { Object.assign(s, copy); });
+      return () =>
+        setForm(s => {
+          Object.assign(s, copy);
+        });
     });
 
     return (
@@ -99,7 +102,11 @@ export const StoreRollback = meta.story({
         <TextField
           label="Name"
           value={form.name}
-          onChange={v => setForm(s => { s.name = v; })}
+          onChange={v =>
+            setForm(s => {
+              s.name = v;
+            })
+          }
           placeholder="e.g. Alice"
         />
         <Section title="Role">
@@ -108,7 +115,11 @@ export const StoreRollback = meta.story({
               {role => (
                 <Button
                   variant={form.role === role ? "primary" : "outline"}
-                  onClick={() => setForm(s => { s.role = role; })}
+                  onClick={() =>
+                    setForm(s => {
+                      s.role = role;
+                    })
+                  }
                 >
                   {role}
                 </Button>

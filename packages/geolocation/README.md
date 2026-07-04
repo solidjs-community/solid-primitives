@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-1.23_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/geolocation)
 [![size](https://img.shields.io/npm/v/@solid-primitives/geolocation?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/geolocation)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitives to query and watch geolocation information from within the browser.
 
@@ -14,6 +15,8 @@ Primitives to query and watch geolocation information from within the browser.
 
 ```bash
 npm install @solid-primitives/geolocation
+# or
+yarn add @solid-primitives/geolocation
 # or
 pnpm add @solid-primitives/geolocation
 ```
@@ -93,7 +96,10 @@ With a server-side seed (e.g. IP geolocation from Cloudflare):
 ```ts
 // On the server, location() resolves immediately with the seed instead of throwing NotReadyError.
 // On the client, the seed is ignored and GPS is queried directly.
-const [location, refetch] = createGeolocation(undefined, { latitude: cf.latitude, longitude: cf.longitude });
+const [location, refetch] = createGeolocation(undefined, {
+  latitude: cf.latitude,
+  longitude: cf.longitude,
+});
 ```
 
 ### Definition
@@ -252,6 +258,7 @@ const { location } = createGeolocationWatcher(true, undefined, data()?.ipCoords)
 ```
 
 When a seed is provided:
+
 - **Server** — `location()` / `distance()` / `within()` return values derived from the seed instead of throwing or returning `null`/`false`.
 - **Client** — the seed is the starting value; the GPS watcher overwrites it as soon as the first fix arrives. No `<Loading>` suspension occurs if the seed is present.
 - Fields beyond `latitude`/`longitude` (`accuracy`, `altitude`, `heading`, `speed`) are `0` or `null` until real GPS data arrives.

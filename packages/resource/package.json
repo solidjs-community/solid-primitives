@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "resource",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createAggregated",
       "createDeepSignal",

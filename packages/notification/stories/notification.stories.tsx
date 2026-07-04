@@ -65,7 +65,7 @@ export const PermissionFlow = meta.story({
     docs: {
       description: {
         story:
-          "`createNotificationPermission()` wraps the browser [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API). `permission()` starts as `\"unknown\"` while the async query resolves, then settles to `\"granted\"`, `\"denied\"`, or `\"prompt\"`. The signal updates live whenever the user changes their browser settings — no polling required. `pending()` is `true` while the native browser dialog is open.",
+          '`createNotificationPermission()` wraps the browser [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API). `permission()` starts as `"unknown"` while the async query resolves, then settles to `"granted"`, `"denied"`, or `"prompt"`. The signal updates live whenever the user changes their browser settings — no polling required. `pending()` is `true` while the native browser dialog is open.',
       },
     },
   },
@@ -124,9 +124,9 @@ export const PermissionFlow = meta.story({
           </ButtonRow>
 
           <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.muted }}>
-            If the browser dialog doesn't appear, click <strong>Open in new tab ↗</strong> —
-            Chrome blocks permission prompts inside embedded iframes. The badge updates live when
-            you change settings without reloading.
+            If the browser dialog doesn't appear, click <strong>Open in new tab ↗</strong> — Chrome
+            blocks permission prompts inside embedded iframes. The badge updates live when you
+            change settings without reloading.
           </p>
         </Show>
       </Container>
@@ -149,8 +149,7 @@ export const ReactiveInstance = meta.story({
   render: () => {
     const [body, setBody] = createSignal("Hello from Storybook!");
     const [log, setLog] = createSignal<{ label: string; time: string }[]>([]);
-    const push = (label: string) =>
-      setLog(prev => [{ label, time: ts() }, ...prev].slice(0, 6));
+    const push = (label: string) => setLog(prev => [{ label, time: ts() }, ...prev].slice(0, 6));
 
     const { permission, requestPermission, pending } = createNotificationPermission();
     const [reqError, setReqError] = createSignal<string | null>(null);
@@ -193,7 +192,11 @@ export const ReactiveInstance = meta.story({
               <Button
                 onClick={openInTab}
                 variant="ghost"
-                style={{ "font-size": font.sizeSm, padding: "0.25rem 0.6rem", "margin-left": "auto" }}
+                style={{
+                  "font-size": font.sizeSm,
+                  padding: "0.25rem 0.6rem",
+                  "margin-left": "auto",
+                }}
               >
                 Open in new tab ↗
               </Button>
@@ -238,8 +241,8 @@ export const ReactiveInstance = meta.story({
           </Section>
 
           <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.muted }}>
-            Change the body text before clicking Show — options are read at call time. Click the
-            OS notification to fire <code>onClick</code>; dismissing it fires <code>onClose</code>.
+            Change the body text before clicking Show — options are read at call time. Click the OS
+            notification to fire <code>onClick</code>; dismissing it fires <code>onClose</code>.
           </p>
         </Show>
       </Container>
@@ -255,7 +258,7 @@ export const ImperativeAPI = meta.story({
     docs: {
       description: {
         story:
-          "`makeNotification(title, options?)` has no Solid lifecycle dependency — it returns a plain `[show, close]` tuple. `show()` creates the native notification and returns the `Notification` instance, or `null` when permission is not `\"granted\"`. Permission must be managed separately; here `createNotificationPermission` provides the reactive permission badge and inline Request button.",
+          '`makeNotification(title, options?)` has no Solid lifecycle dependency — it returns a plain `[show, close]` tuple. `show()` creates the native notification and returns the `Notification` instance, or `null` when permission is not `"granted"`. Permission must be managed separately; here `createNotificationPermission` provides the reactive permission badge and inline Request button.',
       },
     },
   },
@@ -306,7 +309,11 @@ export const ImperativeAPI = meta.story({
               <Button
                 onClick={openInTab}
                 variant="ghost"
-                style={{ "font-size": font.sizeSm, padding: "0.25rem 0.6rem", "margin-left": "auto" }}
+                style={{
+                  "font-size": font.sizeSm,
+                  padding: "0.25rem 0.6rem",
+                  "margin-left": "auto",
+                }}
               >
                 Open in new tab ↗
               </Button>
@@ -340,8 +347,8 @@ export const ImperativeAPI = meta.story({
 
           <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.muted }}>
             <code>show()</code> calls <code>new Notification()</code> directly — a real OS
-            notification, not a mock. If the Request button doesn't trigger a browser dialog,
-            use <strong>Open in new tab ↗</strong> to escape the iframe.
+            notification, not a mock. If the Request button doesn't trigger a browser dialog, use{" "}
+            <strong>Open in new tab ↗</strong> to escape the iframe.
           </p>
         </Show>
       </Container>

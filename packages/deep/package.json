@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/deep",
-  "version": "0.3.5",
+  "version": "1.0.0-next.0",
   "description": "Primitives for tracking and observing nested reactive objects in Solid.",
   "author": "Samuel Burbano <me@iosamuel.dev>",
   "contributors": [
@@ -17,7 +17,7 @@
   },
   "primitive": {
     "name": "deep",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "trackDeep",
       "trackStore",
@@ -52,7 +52,6 @@
   },
   "typesVersions": {},
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -62,9 +61,11 @@
     "@solid-primitives/memo": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

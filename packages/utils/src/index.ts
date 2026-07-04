@@ -20,6 +20,7 @@ import {
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer = typeof window === "undefined";
+
 import type {
   AccessorArray,
   AnyClass,
@@ -36,24 +37,45 @@ export * from "./types.js";
 // GENERAL HELPERS:
 //
 
+/** `true` on the server (SSR), `false` in the browser. */
 export { isServer };
+/** `true` in the browser, `false` on the server. */
 export const isClient = !isServer;
+/** `true` in the browser with Solid's DEV mode active. */
 export const isDev = isClient && !!DEV;
+/** `true` when DEV mode is off (i.e. production browser builds and all SSR). */
 export const isProd = !isDev;
 
-/** no operation */
+/** No-operation function — accepts any arguments and returns `undefined`. */
 export const noop = (() => void 0) as Noop;
+/** A function that always returns `true`. Useful as a default predicate prop. */
 export const trueFn: () => boolean = () => true;
+/** A function that always returns `false`. Useful as a default predicate prop. */
 export const falseFn: () => boolean = () => false;
 
 /** @deprecated use {@link equalFn} from "solid-js" */
 export const defaultEquals = Object.is.bind(Object);
 
+/**
+ * Signal options that disable equality checking, causing the signal to always
+ * notify subscribers even when the value hasn't changed. Useful for signals
+ * holding mutable objects where structural equality cannot be assumed.
+ */
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
+
+/**
+ * Signal options that allow writes from inside an owned reactive scope
+ * (component body, memo, or effect) without throwing `SIGNAL_WRITE_IN_OWNED_SCOPE`
+ * in Solid 2.0 dev mode.
+ *
+ * Use only for implementation-detail signals that genuinely need to be written
+ * from within a scope — not as a general escape hatch.
+ */
 export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
- * Check if the value is an instance of ___
+ * Returns `true` if `v` is an instance of `c`. Checks both `instanceof` and
+ * `constructor` so that values created across different realms (e.g. iframes) match.
  */
 export const ofClass = (v: any, c: AnyClass): boolean =>
   v instanceof c || (v && v.constructor === c);
@@ -63,10 +85,14 @@ export function isObject(value: any): value is AnyObject {
   return value !== null && (typeof value === "object" || typeof value === "function");
 }
 
+/** Type guard: returns `true` when `i` is neither `null` nor `undefined`. */
 export const isNonNullable = <T>(i: T): i is NonNullable<T> => i != null;
+
+/** Returns a new array with all `null` and `undefined` items removed. */
 export const filterNonNullable = <T extends readonly unknown[]>(arr: T): NonNullable<T[number]>[] =>
   arr.filter(isNonNullable);
 
+/** Three-way comparison: returns `-1` if `a < b`, `1` if `a > b`, `0` if equal. */
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
@@ -100,6 +126,7 @@ export function reverseChain<Args extends [] | any[]>(
   };
 }
 
+/** Clamps `n` to the inclusive range `[min, max]`. */
 export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
 /** Creates an ID generator with its own isolated counter and per-generator random segment. Each call to the returned function produces a `timestamp-sequence-random` string that is unique within the generator and with high probability unique across independent generators (e.g. separate processes or SSR requests). */
@@ -120,6 +147,10 @@ export const createIdGenerator = (): (() => string) => {
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" && !v.length ? v() : (v as any);
 
+/**
+ * Wraps `value` in a single-element array. If `value` is already an array it is
+ * returned as-is. Falsy values (except `0` and `false`) produce an empty array.
+ */
 export const asArray = <T>(value: T): (T extends any[] ? T[number] : NonNullable<T>)[] =>
   Array.isArray(value) ? (value as any) : value ? [value as any] : [];
 
@@ -147,6 +178,10 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   typeof _value != null && fn(_value as NonNullable<V>);
 };
 
+/**
+ * Wraps a plain value in a zero-argument accessor `() => value`.
+ * If `v` is already a function it is returned unchanged.
+ */
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
   v: A,
 ): Accessor<MaybeAccessorValue<A>> => (typeof v === "function" ? (v as any) : () => v as any);
@@ -160,11 +195,14 @@ export function accessWith<T>(
 }
 
 /**
- * Solid's `on` helper, but always defers and returns a provided initial value when if does instead of `undefined`.
+ * A deferred effect compute function. Skips the first reactive run and returns
+ * `initialValue` instead, then calls `fn` on subsequent dependency changes.
+ * Useful as the compute phase of `createEffect(defer(...), apply)` when the
+ * initial run should be suppressed.
  *
- * @param deps
- * @param fn
- * @param initialValue
+ * @param deps - a single accessor or an array of accessors to track
+ * @param fn - called with the current input, previous input, and previous return value
+ * @param initialValue - returned on the skipped first run (defaults to `undefined`)
  */
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
@@ -218,6 +256,19 @@ export const tryOnCleanup: typeof onCleanup = isDev
   ? fn => (getOwner() ? onCleanup(fn) : fn)
   : onCleanup;
 
+/**
+ * Creates a stack of callbacks that can be pushed to, executed all at once, or cleared.
+ * All callbacks receive the same arguments when `execute` is called; the stack is
+ * automatically cleared after execution.
+ *
+ * @example
+ * ```ts
+ * const stack = createCallbackStack<string>();
+ * stack.push(s => console.log("a:", s));
+ * stack.push(s => console.log("b:", s));
+ * stack.execute("hello"); // logs "a: hello", "b: hello" — stack is now empty
+ * ```
+ */
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
   execute: (arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void;
@@ -236,9 +287,17 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
 };
 
 /**
- * Group synchronous function calls.
- * @param fn
- * @returns `fn`
+ * Returns a debounced wrapper around `fn` that batches rapid synchronous calls
+ * into a single invocation. Only the most-recently-passed arguments are forwarded.
+ * The counter resets on cleanup so stale microtasks are silently discarded.
+ *
+ * @example
+ * ```ts
+ * const flush = createMicrotask((value: string) => console.log(value));
+ * flush("a");
+ * flush("b");
+ * flush("c"); // only "c" is logged (in the next microtask)
+ * ```
  */
 export function createMicrotask<A extends any[] | []>(fn: (...a: A) => void): (...a: A) => void {
   let calls = 0;
@@ -284,12 +343,13 @@ export function createHydratableSignal<T>(
 export const createHydrateSignal = createHydratableSignal;
 
 /**
- * Handle items removed and added to the array by diffing it by refference.
+ * Diffs two arrays by reference and calls `handleAdded` / `handleRemoved` for
+ * each item that appeared or disappeared. Items are compared with `===`.
  *
- * @param current new array instance
- * @param prev previous array copy
- * @param handleAdded called once for every added item to array
- * @param handleRemoved called once for every removed from array
+ * @param current - the new array
+ * @param prev - the previous array snapshot
+ * @param handleAdded - called once for each item present in `current` but not `prev`
+ * @param handleRemoved - called once for each item present in `prev` but not `current`
  */
 export function handleDiffArray<T>(
   current: readonly T[],
@@ -327,6 +387,16 @@ export function handleDiffArray<T>(
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
 }
+
+/**
+ * Schedules `fn` to run after the browser has painted by nesting two
+ * requestAnimationFrame calls. No-op in non-browser environments.
+ */
+export const afterPaint = (fn: () => void): void => {
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(() => requestAnimationFrame(fn));
+  }
+};
 
 // ─── String transforms ────────────────────────────────────────────────────────
 

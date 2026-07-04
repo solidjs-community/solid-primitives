@@ -26,7 +26,7 @@ const App: Component = () => {
   return (
     <div class="center-child w-full">
       <Loading>
-        <div class={`my-24 transition-opacity${isPending() ? " opacity-50" : ""}`}>
+        <div class={`my-24 transition-opacity${isPending() ? "opacity-50" : ""}`}>
           <p>
             Current locale: <b>{locale()}</b>
           </p>

@@ -50,10 +50,18 @@ export const CreateDate = meta.story({
         />
 
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
-          <Button onClick={() => setDate(new Date())} variant="outline">Now</Button>
-          <Button onClick={() => setDate(Date.now() - 86_400_000)} variant="outline">Yesterday</Button>
-          <Button onClick={() => setDate(Date.now() - 7 * 86_400_000)} variant="outline">Last week</Button>
-          <Button onClick={() => setDate(Date.now() + 86_400_000)} variant="outline">Tomorrow</Button>
+          <Button onClick={() => setDate(new Date())} variant="outline">
+            Now
+          </Button>
+          <Button onClick={() => setDate(Date.now() - 86_400_000)} variant="outline">
+            Yesterday
+          </Button>
+          <Button onClick={() => setDate(Date.now() - 7 * 86_400_000)} variant="outline">
+            Last week
+          </Button>
+          <Button onClick={() => setDate(Date.now() + 86_400_000)} variant="outline">
+            Tomorrow
+          </Button>
         </div>
       </Container>
     );

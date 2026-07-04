@@ -97,8 +97,8 @@ export const SingleSelect = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Click the list to focus it, then press <Kbd>↑</Kbd> / <Kbd>↓</Kbd>,{" "}
-          <Kbd>Home</Kbd>, or <Kbd>End</Kbd> to navigate.
+          Click the list to focus it, then press <Kbd>↑</Kbd> / <Kbd>↓</Kbd>, <Kbd>Home</Kbd>, or{" "}
+          <Kbd>End</Kbd> to navigate.
         </p>
       </Container>
     );
@@ -184,7 +184,11 @@ export const MultiSelect = meta.story({
                 >
                   <span style={{ flex: 1 }}>{item}</span>
                   <Show when={isSelected()}>
-                    <span style={{ opacity: 0.75, "font-size": "0.75rem", "font-family": "system-ui" }}>✓</span>
+                    <span
+                      style={{ opacity: 0.75, "font-size": "0.75rem", "font-family": "system-ui" }}
+                    >
+                      ✓
+                    </span>
                   </Show>
                 </li>
               );
@@ -226,7 +230,7 @@ export const HorizontalList = meta.story({
     docs: {
       description: {
         story:
-          "Pass `orientation: \"horizontal\"` to switch the navigation keys from ↑/↓ to ←/→. Combine with `vimMode: true` to also enable h/l bindings.",
+          'Pass `orientation: "horizontal"` to switch the navigation keys from ↑/↓ to ←/→. Combine with `vimMode: true` to also enable h/l bindings.',
       },
     },
   },

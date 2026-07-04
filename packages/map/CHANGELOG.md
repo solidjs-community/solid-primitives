@@ -1,5 +1,31 @@
 # @solid-primitives/map
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- 56e6762: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `batch` is no longer used internally — Solid 2.0 auto-batches all writes, so multiple `dirty()` calls within a single `set`, `delete`, or `clear` are naturally coalesced
+  - Added `test/server.test.ts` to verify safe SSR behavior
+
+### Patch Changes
+
+- Updated dependencies [254a964]
+  - @solid-primitives/trigger@3.0.0-next.0
+
+## 0.8.0
+
+### Major Changes
+
+- Migrate to Solid.js v2.0 (beta.14). Peer dependencies are now `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`.
+- Removed internal `batch()` usage — Solid 2.0 auto-batches all signal writes.
+- Added `test/server.test.ts` for SSR safety verification.
+
 ## 0.7.3
 
 ### Patch Changes

@@ -7,6 +7,9 @@
 [![size](https://img.shields.io/badge/size-849_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/controlled-props)
 [![size](https://img.shields.io/npm/v/@solid-primitives/controlled-props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/controlled-props)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
+
+[**Docs & demos**](https://primitives.solidjs.community/package/controlled-props)
 
 Library of helpers for creating your own component prototyping tool. _(a Storybook alternative if you will)_ The primitives in this package allow you to create controlls for component props.
 
@@ -20,29 +23,9 @@ yarn add @solid-primitives/controlled-props
 pnpm add @solid-primitives/controlled-props
 ```
 
-## SSR Support
-
-If you are using [solid-start](https://github.com/solidjs/solid-start) with SSR, you may see this error comming form the `@solid-primitives/props` package.
-
-```
-TypeError: web.template is not a function
-```
-
-To prevent this, add `"@solid-primitives/props"` entry to `noExternal` field in your vite config, like so:
-
-```tsx
-export default defineConfig({
-  plugins: [solid()],
-  ssr: {
-    // It allows Vite to preprocess the package
-    noExternal: ["@solid-primitives/props"],
-  },
-});
-```
-
 ## `createControlledProp`
 
-Primitive that provides controllable props signals like knobs/controls for simple component testing
+Primitive that provides controllable props signals like knobs/controls for simple component testing.
 
 ### How to use it
 
@@ -51,27 +34,37 @@ You can either create a single prop:
 ```ts
 // Second argument can be initialValue for boolean, number, string:
 const [string, setString, stringField] = createControlledProp("stringValue", "test");
+
+// Number with min/max/step:
+const [count, setCount, countField] = createControlledProp("count", {
+  initialValue: 5,
+  min: 1,
+  max: 10,
+  step: 2,
+});
+
+// Range slider:
+const [opacity, setOpacity, opacityField] = createControlledProp("opacity", {
+  initialValue: 50,
+  min: 0,
+  max: 100,
+  type: "range",
+});
+
 // Arrays or enums can be provided in an options object:
 const [language, setLanguage, languageField] = createControlledProp(
   "language",
   { initialValue: "en", options: ["de", "en", "fr", "it"] as const }
   // If you want your array to be able to influence the setter/getter types, use `as const`.
 );
-enum Currency {
-  AUD,
-  GBP,
-  EUR,
-  USD,
-  CHF,
-  JPY,
-  CNY
-}
+
+enum Currency { AUD, GBP, EUR, USD, CHF, JPY, CNY }
 const [currency, setCurrency, currencyField] = createControlledProp("currency", {
   initialValue: Currency.USD,
   options: Currency
 });
 
-return { languageField(); };
+return <>{languageField()}</>;
 ```
 
 or multiple props in one call:
@@ -103,9 +96,31 @@ props == {
 fields == JSX.Element[];
 ```
 
-### Demo
+### Control type inference
 
-https://primitives.solidjs.community/playground/controlled-props/
+| Initial value type         | `type` option | Rendered control                |
+| -------------------------- | ------------- | ------------------------------- |
+| `boolean`                  | —             | `<input type="checkbox">`       |
+| `number`                   | —             | `<input type="number">`         |
+| `number`                   | `"range"`     | `<input type="range">` (slider) |
+| `string`                   | —             | `<input type="text">`           |
+| any + `options` array/enum | —             | `<select>`                      |
+
+### Exported field components
+
+The individual field components are exported if you need them standalone:
+
+```ts
+import {
+  BoolProp,
+  NumberProp,
+  RangeProp,
+  StringProp,
+  SelectProp,
+} from "@solid-primitives/controlled-props";
+```
+
+`RangeProp` renders a slider with a live value readout and accepts `min`, `max`, and `step` props.
 
 ## Changelog
 
