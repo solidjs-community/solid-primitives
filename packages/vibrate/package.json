@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/vibrate",
-  "version": "0.0.100",
+  "version": "1.0.0-next.0",
   "description": "Primitives to trigger and manage device vibration via the Vibration API",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
@@ -59,14 +59,14 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

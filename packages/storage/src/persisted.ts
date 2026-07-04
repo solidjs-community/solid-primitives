@@ -201,7 +201,7 @@ export function makePersisted<
       const output = signal[1](value);
       persist();
       unchanged = false;
-      return output instanceof Promise ? output.then((result) => (persist(), result), (err) => { persist(); throw err; }) : output;
+      return output instanceof Promise ? output.then(async (result) => { await Promise.resolve(); persist(); return result; }, (err) => { persist(); throw err; }) : output;
     }),
     init,
   ] as unknown as PersistedState<S>;

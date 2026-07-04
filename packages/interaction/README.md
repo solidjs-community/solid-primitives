@@ -6,7 +6,7 @@
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
-Primitives for detecting and hiding interactions that originate **outside** a given element. Useful for building accessible dismissible UI components such as dropdowns, popovers, dialogs, and tooltips.
+Primitives for detecting and hiding interactions that originate **outside** a given element, and for hiding off-screen content from assistive technologies. Useful for building accessible dismissible UI components such as dropdowns, popovers, dialogs, and tooltips.
 
 ## Installation
 
@@ -242,9 +242,109 @@ const cleanup = makeInteractOutside(el, {
 cleanup();
 ```
 
-> **Tip:** To hide content outside a dialog from screen readers, you don't need a library.
-> Set `ariaModal="true"` on your dialog or popover element and assistive technologies will
-> automatically scope navigation to it. See [`Element.ariaModal`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaModal) on MDN.
+---
+
+## `ariaHideOutside`
+
+```ts
+function ariaHideOutside(
+  targets: Element[],
+  root?: HTMLElement,
+  alwaysVisibleSelector?: string,
+): () => void;
+```
+
+A non-reactive, imperative primitive. Walks the DOM from `root` (defaults to `document.body`) and sets `aria-hidden="true"` on every element that is not an ancestor of, or contained within, one of `targets`. A `MutationObserver` watches for newly added nodes and hides them automatically. Returns a cleanup function that removes all `aria-hidden` attributes added by this call.
+
+Ref-counted — nested calls cooperate correctly so that tearing down an inner layer does not accidentally reveal content that an outer layer is still hiding.
+
+```ts
+import { ariaHideOutside } from "@solid-primitives/interaction";
+
+const cleanup = ariaHideOutside([dialogEl]);
+
+// when the dialog closes:
+cleanup();
+```
+
+Pass `alwaysVisibleSelector` to exempt elements matched by a CSS selector from being hidden regardless of their position in the tree (useful for live-region announcers or top-layer elements):
+
+```ts
+const cleanup = ariaHideOutside([dialogEl], document.body, "[aria-live]");
+```
+
+## `createHideOutside`
+
+```ts
+function createHideOutside(options: CreateHideOutsideOptions): void;
+```
+
+Reactive wrapper around `ariaHideOutside`. Re-runs whenever `targets`, `root`, or `disabled` changes and cleans up the previous hide pass automatically. Integrates with the reactive owner so everything is torn down when the component or scope disposes.
+
+### Options
+
+| Option                  | Type                                      | Description                                                                                                    |
+| ----------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `targets`               | `MaybeAccessor<Element[]>`                | The elements that should remain visible (and their ancestors / descendants). Reactive — can be an accessor.    |
+| `root`                  | `MaybeAccessor<HTMLElement \| undefined>` | Subtree to walk. Defaults to `document.body`. Reactive — can be an accessor.                                   |
+| `disabled`              | `MaybeAccessor<boolean \| undefined>`     | Skips hiding entirely when `true`. Reactive — can be an accessor.                                              |
+| `alwaysVisibleSelector` | `string`                                  | CSS selector for elements that must never be hidden (e.g. `"[aria-live]"` for live-region announcers). Static. |
+
+```tsx
+import { createSignal, Show } from "solid-js";
+import { createHideOutside } from "@solid-primitives/interaction";
+
+function Dialog(props: { open: boolean }) {
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+
+  createHideOutside({
+    targets: () => (ref() ? [ref()!] : []),
+    disabled: () => !props.open,
+  });
+
+  return (
+    <Show when={props.open}>
+      <div ref={setRef} role="dialog" aria-modal="true">
+        Dialog content
+      </div>
+    </Show>
+  );
+}
+```
+
+### Combining with `createInteractOutside`
+
+A fully accessible dismissible dialog uses both primitives together — `createHideOutside` removes the background from the accessibility tree while `createInteractOutside` closes the dialog on outside pointer or focus events:
+
+```tsx
+import { createSignal, Show } from "solid-js";
+import { createHideOutside, createInteractOutside } from "@solid-primitives/interaction";
+
+function Modal(props: { open: boolean; onClose: () => void }) {
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+
+  createHideOutside({
+    targets: () => (ref() ? [ref()!] : []),
+    disabled: () => !props.open,
+  });
+
+  createInteractOutside(
+    {
+      disabled: () => !props.open,
+      onInteractOutside: props.onClose,
+    },
+    ref,
+  );
+
+  return (
+    <Show when={props.open}>
+      <div ref={setRef} role="dialog">
+        Modal content
+      </div>
+    </Show>
+  );
+}
+```
 
 ## Changelog
 
@@ -255,6 +355,7 @@ See [CHANGELOG.md](./CHANGELOG.md)
 Based on primitives from [Kobalte](https://kobalte.dev), adapted for Solid 2.0 and the Solid Primitives ecosystem:
 
 - [`createInteractOutside`](https://github.com/kobaltedev/kobalte/blob/main/packages/core/src/primitives/create-interact-outside/create-interact-outside.ts) — Kobalte, MIT, Copyright (c) 2022 Kobalte contributors
+- [`createHideOutside`](https://github.com/kobaltedev/kobalte/blob/main/packages/core/src/primitives/create-hide-outside/create-hide-outside.ts) — Kobalte, MIT, Copyright (c) 2022 Kobalte contributors
 
 Kobalte's implementation draws from:
 

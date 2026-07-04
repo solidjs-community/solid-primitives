@@ -1,5 +1,27 @@
 # @solid-primitives/raf
 
+## 4.0.0-next.0
+
+### Major Changes
+
+- ec17f08: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/raf`
+
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `createRAF`: `running` signal created with `{ ownedWrite: true }` to allow `start()`/`stop()` to be called from within reactive scopes
+  - Added `test/server.test.ts` verifying SSR no-op behaviour for `createRAF`, `targetFPS`, and `createMs`
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 2.3.4
 
 ### Patch Changes

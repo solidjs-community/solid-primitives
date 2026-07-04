@@ -1,5 +1,27 @@
 # @solid-primitives/pointer
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- 5a96993: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `isServer` is now imported from `@solidjs/web` (was `solid-js/web`)
+  - `JSX` type is now imported from `@solidjs/web` (was `solid-js`) — `JSX.Element` moved to the web renderer package
+  - Added `test/server.test.ts` with SSR safety coverage for all primitives
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+  - @solid-primitives/rootless@2.0.0-next.0
+
 ## 0.3.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/a11y",
-  "version": "0.0.100",
+  "version": "1.0.0-next.0",
   "description": "Accessibility primitives for Solid.js — labeled field groups, ARIA graph helpers, and more.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
@@ -61,11 +61,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

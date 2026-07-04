@@ -1,5 +1,53 @@
 # @solid-primitives/static-store
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- 4a5bf32: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/media`
+
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - Requires Solid.js v2 — `classList` is replaced by `class` with object/array forms in consuming code
+
+  ### `@solid-primitives/utils`
+
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createHydratableSignal`: uses `onSettled` (was `onMount`) and `sharedConfig.hydrating` (was `sharedConfig.context`) for hydration detection
+  - `INTERNAL_OPTIONS`: `{ internal: true }` changed to `{ pureWrite: true }` to match Solid 2.0 `SignalOptions`
+  - `defaultEquals` now aliases `isEqual` (was `equalFn`)
+  - `defer`: `AccessorArray<S>` type replaced with `Accessor<S>[]` (type was removed in Solid 2.0)
+
+  ### `@solid-primitives/static-store`
+
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createStaticStore`: uses `getObserver` (was `getListener`) and `{ pureWrite: true }` (was `{ internal: true }`)
+  - Removed explicit `batch()` calls — updates are automatically batched in Solid 2.0
+  - `createHydratableStaticStore`: uses `onSettled` (was `onMount`) and `sharedConfig.hydrating` (was `sharedConfig.context`)
+
+  ### `@solid-primitives/rootless`
+
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createHydratableSingletonRoot`: uses `sharedConfig.hydrating` (was `sharedConfig.context`)
+  - `createRootPool`: removed `batch()` calls — Solid 2.0 auto-batches on microtasks
+
+  ### `@solid-primitives/event-listener`
+
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web` across all source files
+  - `createEventListener` and `createRenderEffect` converted to split compute/apply effect pattern required by Solid 2.0
+  - `eventListener` directive converted to split effect pattern; cleanup is returned from apply phase instead of using `onCleanup`
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 0.1.3
 
 ### Patch Changes

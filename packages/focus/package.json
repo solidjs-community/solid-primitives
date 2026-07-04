@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/focus",
-  "version": "0.2.0",
+  "version": "1.0.0-next.0",
   "description": "Primitives for autofocusing HTML elements and trapping focus within a container",
   "author": "jer3m01 <jer3m01@jer3m01.com>",
   "contributors": [
@@ -69,8 +69,8 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
@@ -78,7 +78,7 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

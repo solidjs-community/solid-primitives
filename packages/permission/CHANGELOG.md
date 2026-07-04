@@ -1,5 +1,11 @@
 # @solid-primitives/permission
 
+## 2.0.0-next.0
+
+### Major Changes
+
+- 88833b5: updated to Solid-2.0
+
 ## 1.3.2
 
 ### Patch Changes

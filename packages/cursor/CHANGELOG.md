@@ -1,5 +1,31 @@
 # @solid-primitives/cursor
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- 8cfd3f8: Migrate to Solid.js v2.0 and add new primitives
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `createElementCursor` and `createBodyCursor` updated to the split compute/apply effect pattern required by Solid 2.0 — cleanup is returned from the apply phase instead of using `onCleanup`
+
+  ## New Exports
+
+  - `makeBodyCursor(cursor)` — sets cursor on body immediately, returns a cleanup function
+  - `makeElementCursor(target, cursor)` — sets cursor on an element immediately, returns a cleanup function
+  - `createDragCursor(target, options?)` — reactively sets `"grab"` on a target element and switches to `"grabbing"` on the body during pointer drag
+  - `cursorRef(cursor)` — ref factory for inline JSX use: `<div ref={cursorRef("pointer")}>`
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 0.1.3
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/page-utilities",
-  "version": "2.1.5",
+  "version": "3.0.0-next.0",
   "description": "Primitives for page visibility and navigation blocking",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -62,12 +62,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "^2.0.0-beta.15",
+    "solid-js": "^2.0.0-beta.15"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

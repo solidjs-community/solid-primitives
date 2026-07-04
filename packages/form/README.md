@@ -781,6 +781,40 @@ type FormControlContextValue = {
 
 ---
 
+## `createFormResetListener`
+
+Listens for the `reset` event on the closest ancestor `<form>` element and calls the given handler. Useful for form controls that need to restore their default value when the surrounding form is reset.
+
+The element accessor is reactive — when it changes, the old listener is automatically removed and a new one is attached to the form closest to the new element.
+
+```ts
+import { createFormResetListener } from "@solid-primitives/form";
+```
+
+```tsx
+function NumberField(props) {
+  const [ref, setRef] = createSignal<HTMLElement>();
+  const [value, setValue] = createSignal(props.defaultValue ?? 0);
+
+  createFormResetListener(ref, () => setValue(props.defaultValue ?? 0));
+
+  return <input ref={setRef} type="number" value={value()} />;
+}
+```
+
+For native form elements (`input`, `select`, `textarea`, `button`) the handler is attached to `element.form`. For all other elements it walks up the DOM via `element.closest("form")`. If no form ancestor is found, no listener is added.
+
+#### Definition
+
+```ts
+function createFormResetListener(
+  element: Accessor<HTMLElement | null | undefined>,
+  handler: () => void,
+): void;
+```
+
+---
+
 ## Future work
 
 ### Field sanitizers
