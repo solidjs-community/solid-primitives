@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, Show, untrack } from "solid-js";
 import { Errored, Loading } from "@solidjs/web";
 import preview from "../../../.storybook/preview.js";
 import { createInfiniteScroll, createPagination, createSegment } from "../src/index.js";
@@ -70,10 +70,19 @@ export const CreatePaginationStory = meta.story({
   render: () => {
     const [totalPages, setTotalPages] = createSignal(20);
     const [maxVisible, setMaxVisible] = createSignal(7);
-    const [paginationProps, page, _setPage] = createPagination(() => ({
-      pages: totalPages(),
-      maxPages: maxVisible(),
-    }));
+    // untrack: Storybook's Solid renderer wraps every story's render() in its
+    // own createMemo. Without this, createPagination's internal setup memo
+    // reading totalPages()/maxVisible() during its first synchronous compute
+    // leaks as a dependency of that outer memo, causing it to re-invoke this
+    // entire render() function (creating brand-new signals) whenever those
+    // values change — which breaks rendering. See
+    // https://github.com/solidjs-community/solid-primitives/issues/795
+    const [paginationProps, page, _setPage] = untrack(() =>
+      createPagination(() => ({
+        pages: totalPages(),
+        maxPages: maxVisible(),
+      })),
+    );
 
     return (
       <Container minWidth={400}>
@@ -82,26 +91,30 @@ export const CreatePaginationStory = meta.story({
         <Separator />
         <Section title="Max visible">
           <ButtonRow>
-            {([5, 7, 10] as const).map(n => (
-              <Button
-                variant={maxVisible() === n ? "primary" : "outline"}
-                onClick={() => setMaxVisible(n)}
-              >
-                {n}
-              </Button>
-            ))}
+            <For each={[5, 7, 10] as const}>
+              {n => (
+                <Button
+                  variant={maxVisible() === n ? "primary" : "outline"}
+                  onClick={() => setMaxVisible(n)}
+                >
+                  {n}
+                </Button>
+              )}
+            </For>
           </ButtonRow>
         </Section>
         <Section title="Total pages">
           <ButtonRow>
-            {([10, 20, 50] as const).map(n => (
-              <Button
-                variant={totalPages() === n ? "primary" : "outline"}
-                onClick={() => setTotalPages(n)}
-              >
-                {n}
-              </Button>
-            ))}
+            <For each={[10, 20, 50] as const}>
+              {n => (
+                <Button
+                  variant={totalPages() === n ? "primary" : "outline"}
+                  onClick={() => setTotalPages(n)}
+                >
+                  {n}
+                </Button>
+              )}
+            </For>
           </ButtonRow>
         </Section>
       </Container>
@@ -122,12 +135,15 @@ export const CreateSegmentStory = meta.story({
   render: () => {
     const ITEMS = Array.from({ length: 50 }, (_, i) => `Item ${String(i + 1).padStart(2, "0")}`);
     const [limit, setLimit] = createSignal(8);
-    const [paginationProps, page] = createPagination(() => ({
-      pages: Math.ceil(ITEMS.length / limit()),
-      maxPages: 5,
-      showFirst: false,
-      showLast: false,
-    }));
+    // untrack: see the note in CreatePaginationStory above.
+    const [paginationProps, page] = untrack(() =>
+      createPagination(() => ({
+        pages: Math.ceil(ITEMS.length / limit()),
+        maxPages: 5,
+        showFirst: false,
+        showLast: false,
+      })),
+    );
     const segment = createSegment(ITEMS, limit, page);
 
     return (
@@ -163,11 +179,13 @@ export const CreateSegmentStory = meta.story({
         <Separator />
         <Section title="Items per page">
           <ButtonRow>
-            {([5, 8, 10, 25] as const).map(n => (
-              <Button variant={limit() === n ? "primary" : "outline"} onClick={() => setLimit(n)}>
-                {n}
-              </Button>
-            ))}
+            <For each={[5, 8, 10, 25] as const}>
+              {n => (
+                <Button variant={limit() === n ? "primary" : "outline"} onClick={() => setLimit(n)}>
+                  {n}
+                </Button>
+              )}
+            </For>
           </ButtonRow>
         </Section>
       </Container>
@@ -228,10 +246,7 @@ export const CreateInfiniteScrollStory = meta.story({
                     // what actually kicks off a new request. Errored also doesn't
                     // hand control back to <Loading> while that retry is in flight,
                     // so this fallback watches `fetching()` itself for feedback.
-                    <Show
-                      when={!page.fetching()}
-                      fallback={<Badge>Retrying page {i()}…</Badge>}
-                    >
+                    <Show when={!page.fetching()} fallback={<Badge>Retrying page {i()}…</Badge>}>
                       <div style={{ display: "flex", gap: "0.4rem", "align-items": "center" }}>
                         <Badge variant="error">{String(err())}</Badge>
                         <Button variant="outline" onClick={page.retry}>
