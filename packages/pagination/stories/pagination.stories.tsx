@@ -201,9 +201,8 @@ export const CreateInfiniteScrollStory = meta.story({
       );
     };
 
-    // sentinel is intentionally unused — IO-based auto-loading needs a page-level
-    // scroll context that Storybook's iframe doesn't provide.
-    const [pages, , { pageCount, end, setPageCount, getPage }] = createInfiniteScroll(mockFetcher);
+    const [pages, loader, { pageCount, end, setPageCount, getPage }] =
+      createInfiniteScroll(mockFetcher);
 
     return (
       <Container width={320}>
@@ -267,6 +266,13 @@ export const CreateInfiniteScrollStory = meta.story({
               );
             }}
           </For>
+          {/* IntersectionObserver clips the target's visibility against any
+              scrollable ancestor even with the default root (viewport), so
+              this sentinel correctly fires on scroll within this box — no
+              page-level scroll container needed. */}
+          <Show when={!end()}>
+            <div ref={loader} style={{ height: "1px" }} />
+          </Show>
         </div>
         <Show when={!end()}>
           <Button variant="outline" onClick={() => setPageCount(p => p + 1)}>
