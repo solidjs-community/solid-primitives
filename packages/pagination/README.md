@@ -142,15 +142,28 @@ return <For each={segment()}>{item => <Item item={item} />}</For>;
 
 Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. Browser-only: the loader and fetching are skipped on the server.
 
+Each page is its own independent async unit, so it can be rendered with `<Loading>`/`<Errored>` for idiomatic suspense and retry, or read via plain `fetching`/`error` signals if you'd rather not use boundaries.
+
 ### How to use it
 
 ```tsx
 // fetcher: (page: number) => Promise<T[]>
-const [pages, setEl, { end }] = createInfiniteScroll(fetcher);
+const [pages, setEl, { getPage, end }] = createInfiniteScroll(fetcher);
 
 return (
   <div>
-    <For each={pages()}>{item => <h4>{item}</h4>}</For>
+    <For each={pages()}>
+      {i => {
+        const page = getPage(i);
+        return (
+          <Errored fallback={(err, reset) => <button onClick={reset}>Retry: {String(err())}</button>}>
+            <Loading fallback={<h4>Loading…</h4>}>
+              <For each={page.content()}>{item => <h4>{item}</h4>}</For>
+            </Loading>
+          </Errored>
+        );
+      }}
+    </For>
     <Show when={!end()}>
       <h1 ref={setEl}>Loading...</h1>
     </Show>
@@ -158,24 +171,53 @@ return (
 );
 ```
 
+Prefer plain signals over boundaries? Skip `<Loading>`/`<Errored>` and use `fetching()`/`error()`/`retry()` directly:
+
+```tsx
+<For each={pages()}>
+  {i => {
+    const page = getPage(i);
+    return (
+      <Show
+        when={!page.error()}
+        fallback={<button onClick={page.retry}>Retry: {String(page.error())}</button>}
+      >
+        <Show when={!page.fetching()} fallback={<h4>Loading…</h4>}>
+          <For each={page.content()}>{item => <h4>{item}</h4>}</For>
+        </Show>
+      </Show>
+    );
+  }}
+</For>
+```
+
 ### Definition
 
 ```ts
+type InfiniteScrollPage<T> = {
+  content: Accessor<T[]>;
+  fetching: Accessor<boolean>;
+  error: Accessor<unknown>;
+  retry: () => void;
+};
+
 function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
-  pages: Accessor<T[]>,
+  pages: Accessor<number[]>,
   loader: (el: Element) => void,
   options: {
-    page: Accessor<number>;
-    setPage: Setter<number>;
-    setPages: Setter<T[]>;
+    pageCount: Accessor<number>;
+    setPageCount: Setter<number>;
     end: Accessor<boolean>;
-    fetching: Accessor<boolean>;
-    error: Accessor<unknown>;
+    getPage: (index: number) => InfiniteScrollPage<T>;
+    reset: () => void;
   },
 ];
 ```
 
-`end` is `true` when the fetcher returns an empty array or when an error occurs.
+- `pages()` is the list of page indices requested so far — feed it directly to `<For>`.
+- `getPage(i)` returns (and caches) the `{ content, fetching, error, retry }` bundle for page `i`. `retry()` re-runs that page's fetcher and clears its error.
+- `end` is `true` once a page fetch returns zero items. A failed page does **not** set `end` — the sentinel just pauses auto-loading until that page is retried.
+- `reset()` disposes every cached page and starts over from the first page.
 
 ## Changelog
 

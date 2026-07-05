@@ -57,7 +57,7 @@ const PaginationBar = (barProps: {
 );
 
 export const CreatePaginationStory = meta.story({
-  name: "createPagination",
+  name: "Pagination bar",
   parameters: {
     docs: {
       description: {
@@ -109,7 +109,7 @@ export const CreatePaginationStory = meta.story({
 });
 
 export const CreateSegmentStory = meta.story({
-  name: "createSegment",
+  name: "Paged item grid",
   parameters: {
     docs: {
       description: {
@@ -175,21 +175,24 @@ export const CreateSegmentStory = meta.story({
 });
 
 export const CreateInfiniteScrollStory = meta.story({
-  name: "createInfiniteScroll",
+  name: "Infinite scroll with per-page retry",
   parameters: {
     docs: {
       description: {
         story:
-          "`createInfiniteScroll` accumulates fetched pages and exposes `fetching`, `end`, and `error` signals. In production, attach `ref={sentinel}` to a DOM element at the bottom of the list — `IntersectionObserver` calls `setPage` automatically when it scrolls into view. This demo drives `setPage` manually to show the state machine.",
+          "`createInfiniteScroll` treats every page as its own independent async unit via `getPage(i)`, so one page failing doesn't block the rest of the list — it just pauses auto-loading until that page is retried. In production, attach `ref={sentinel}` to a DOM element at the bottom of the list — `IntersectionObserver` calls `setPageCount` automatically when it scrolls into view. This demo drives `setPageCount` manually to show the state machine, and always fails page 1 once to demonstrate per-page retry.",
       },
     },
   },
   render: () => {
-    // 4 pages × 6 items = 24 items, page>=4 signals end.
-    // createInfiniteScroll starts page at 0; the deferred effect fires first
-    // so fetcher(0) is always the initial call regardless of IO timing.
+    // 4 pages × 6 items = 24 items, page>=4 signals end. Page 1 fails once.
+    let page1Failed = false;
     const mockFetcher = async (page: number): Promise<string[]> => {
       await new Promise<void>(resolve => setTimeout(resolve, 600));
+      if (page === 1 && !page1Failed) {
+        page1Failed = true;
+        throw new Error("Network hiccup");
+      }
       if (page >= 4) return [];
       return Array.from(
         { length: 6 },
@@ -199,11 +202,11 @@ export const CreateInfiniteScrollStory = meta.story({
 
     // sentinel is intentionally unused — IO-based auto-loading needs a page-level
     // scroll context that Storybook's iframe doesn't provide.
-    const [pages, , { page, fetching, end, setPage, error }] = createInfiniteScroll(mockFetcher);
+    const [pages, , { pageCount, end, setPageCount, getPage }] = createInfiniteScroll(mockFetcher);
 
     return (
       <Container width={320}>
-        <StatRow label="Page fetched" value={page()} />
+        <StatRow label="Pages requested" value={pageCount()} />
         <div
           style={{
             height: "200px",
@@ -217,35 +220,56 @@ export const CreateInfiniteScrollStory = meta.story({
           }}
         >
           <For each={pages()}>
-            {item => (
-              <div
-                style={{
-                  padding: "0.4rem 0.75rem",
-                  background: colors.secondary,
-                  "border-radius": radii.sm,
-                  "font-size": font.sizeSm,
-                  "font-family": font.mono,
-                  border: `1px solid ${colors.border}`,
-                  "flex-shrink": "0",
-                }}
-              >
-                {item}
-              </div>
-            )}
+            {i => {
+              const page = getPage(i);
+              return (
+                <Show
+                  when={!page.error()}
+                  fallback={
+                    <div style={{ display: "flex", gap: "0.4rem", "align-items": "center" }}>
+                      <Badge variant="error">{String(page.error())}</Badge>
+                      <Button variant="outline" onClick={page.retry}>
+                        Retry
+                      </Button>
+                    </div>
+                  }
+                >
+                  <Show
+                    when={!page.fetching()}
+                    fallback={<Badge>Loading page {i}…</Badge>}
+                  >
+                    <For each={page.content()}>
+                      {item => (
+                        <div
+                          style={{
+                            padding: "0.4rem 0.75rem",
+                            background: colors.secondary,
+                            "border-radius": radii.sm,
+                            "font-size": font.sizeSm,
+                            "font-family": font.mono,
+                            border: `1px solid ${colors.border}`,
+                            "flex-shrink": "0",
+                          }}
+                        >
+                          {item}
+                        </div>
+                      )}
+                    </For>
+                  </Show>
+                </Show>
+              );
+            }}
           </For>
         </div>
         <Show when={!end()}>
-          <Button variant="outline" disabled={fetching()} onClick={() => setPage(p => p + 1)}>
-            {fetching() ? "Loading…" : "Load next page"}
+          <Button variant="outline" onClick={() => setPageCount(p => p + 1)}>
+            Load next page
           </Button>
         </Show>
         <Show when={end()}>
-          <Badge variant={error() ? "error" : "success"}>
-            {error() ? String(error()) : "All pages loaded"}
-          </Badge>
+          <Badge variant="success">All pages loaded</Badge>
         </Show>
         <Separator />
-        <BoolRow label="fetching" value={fetching()} />
         <BoolRow label="end" value={end()} />
       </Container>
     );

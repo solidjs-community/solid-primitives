@@ -255,25 +255,181 @@ describe("createSegment", () => {
   });
 });
 
+class MockIntersectionObserver {
+  static instances: MockIntersectionObserver[] = [];
+  observed = new Set<Element>();
+  constructor(public callback: IntersectionObserverCallback) {
+    MockIntersectionObserver.instances.push(this);
+  }
+  observe(el: Element) {
+    this.observed.add(el);
+  }
+  unobserve(el: Element) {
+    this.observed.delete(el);
+  }
+  disconnect() {
+    this.observed.clear();
+  }
+  trigger(isIntersecting: boolean) {
+    this.callback([{ isIntersecting } as IntersectionObserverEntry], this as never);
+  }
+}
 //@ts-ignore
-global.IntersectionObserver = class {
-  disconnect() {}
+global.IntersectionObserver = MockIntersectionObserver;
+
+const settle = async () => {
+  flush();
+  await Promise.resolve();
+  await Promise.resolve();
+  flush();
 };
 
 describe("createInfiniteScroll", () => {
-  const fetcher = async (page: number) => Array.from({ length: page + 1 }, (_, i) => i);
+  const fetcher = async (page: number) => Array.from({ length: page + 1 }, (_, i) => page * 10 + i);
 
-  test("createInfiniteScroll", () => {
-    const { pages, page, setPage, dispose } = createRoot(dispose => {
-      const [pages, , { page, setPage }] = createInfiniteScroll(fetcher);
-      return { pages, page, setPage, dispose };
+  test("requests page 0 eagerly and resolves its content", async () => {
+    await createRoot(async dispose => {
+      const [pages, , { pageCount, getPage }] = createInfiniteScroll(fetcher);
+      expect(pages()).toEqual([0]);
+      expect(pageCount()).toBe(1);
+
+      const page0 = getPage(0);
+      expect(page0.fetching(), "fetching until the effect's first pass resolves").toBe(true);
+
+      await settle();
+
+      expect(page0.fetching()).toBe(false);
+      expect(page0.error()).toBeUndefined();
+      expect(page0.content()).toEqual([0]);
+
+      dispose();
     });
-    expect(pages(), "initial value should be []").toStrictEqual([]);
+  });
 
-    setPage(1);
-    flush();
-    expect(page(), "value should be 1").toStrictEqual(1);
+  test("setPageCount grows the page list and fetches the new page", async () => {
+    await createRoot(async dispose => {
+      const [pages, , { setPageCount, getPage }] = createInfiniteScroll(fetcher);
+      await settle();
 
-    dispose();
+      setPageCount(p => p + 1);
+      flush();
+      expect(pages()).toEqual([0, 1]);
+
+      await settle();
+      expect(getPage(1).content()).toEqual([10, 11]);
+
+      dispose();
+    });
+  });
+
+  test("a page returning an empty array sets end without touching earlier pages", async () => {
+    const fetchUntilEmpty = async (page: number) => (page >= 1 ? [] : [0]);
+    await createRoot(async dispose => {
+      const [, , { setPageCount, end, getPage }] = createInfiniteScroll(fetchUntilEmpty);
+      await settle();
+      expect(end()).toBe(false);
+
+      setPageCount(p => p + 1);
+      await settle();
+
+      expect(end()).toBe(true);
+      expect(getPage(0).content()).toEqual([0]);
+      dispose();
+    });
+  });
+
+  test("a failed fetch surfaces error() without setting end, and retry() recovers", async () => {
+    let shouldFail = true;
+    const flaky = async (page: number) => {
+      if (shouldFail) throw new Error("network down");
+      return [page];
+    };
+    await createRoot(async dispose => {
+      const [, , { getPage, end }] = createInfiniteScroll(flaky);
+      const page0 = getPage(0);
+      await settle();
+
+      expect(page0.fetching()).toBe(false);
+      expect(page0.error()).toBeInstanceOf(Error);
+      expect(end(), "an error is not the same as running out of content").toBe(false);
+
+      shouldFail = false;
+      page0.retry();
+      await settle();
+
+      expect(page0.error()).toBeUndefined();
+      expect(page0.content()).toEqual([0]);
+
+      dispose();
+    });
+  });
+
+  test("the sentinel auto-advances once settled, but not while fetching or errored", async () => {
+    await createRoot(async dispose => {
+      const [pages, loader, { pageCount }] = createInfiniteScroll(fetcher);
+      const el = document.createElement("div");
+      loader(el);
+      const io = MockIntersectionObserver.instances.at(-1)!;
+
+      // page 0 hasn't resolved yet — must not advance
+      io.trigger(true);
+      flush();
+      expect(pageCount()).toBe(1);
+
+      await settle();
+
+      io.trigger(true);
+      flush();
+      expect(pageCount()).toBe(2);
+      expect(pages()).toEqual([0, 1]);
+
+      dispose();
+    });
+  });
+
+  test("the sentinel does not auto-advance past an errored page", async () => {
+    const failOnPage1 = async (page: number) => {
+      if (page === 1) throw new Error("boom");
+      return [page];
+    };
+    await createRoot(async dispose => {
+      const [, loader, { pageCount }] = createInfiniteScroll(failOnPage1);
+      const el = document.createElement("div");
+      loader(el);
+      const io = MockIntersectionObserver.instances.at(-1)!;
+
+      await settle();
+      io.trigger(true);
+      await settle();
+      expect(pageCount()).toBe(2);
+
+      io.trigger(true);
+      flush();
+      expect(pageCount(), "page 1 errored, so IO should not advance to page 2").toBe(2);
+
+      dispose();
+    });
+  });
+
+  test("reset disposes cached pages and starts over from page 0", async () => {
+    await createRoot(async dispose => {
+      const [pages, , { setPageCount, getPage, reset }] = createInfiniteScroll(fetcher);
+      await settle();
+      setPageCount(p => p + 1);
+      await settle();
+      expect(pages()).toEqual([0, 1]);
+
+      const stalePage0 = getPage(0);
+      reset();
+      flush();
+      expect(pages()).toEqual([0]);
+
+      const fresh = getPage(0);
+      expect(fresh).not.toBe(stalePage0);
+      await settle();
+      expect(fresh.content()).toEqual([0]);
+
+      dispose();
+    });
   });
 });

@@ -10,6 +10,7 @@ import {
   type Setter,
   createEffect,
   createMemo,
+  createRoot,
   createSignal,
   onCleanup,
 } from "solid-js";
@@ -362,49 +363,158 @@ declare module "solid-js" {
 
 export type _E = JSX.Element;
 
+/** A single page's async fetch, gated independently of every other page. */
+export type InfiniteScrollPage<T> = {
+  /** the fetched items for this page — read inside `<Loading>`/`<Errored>` to gate a subtree on it */
+  content: Accessor<T[]>;
+  /** true while this page's fetch is in flight */
+  fetching: Accessor<boolean>;
+  /** the error from this page's last failed fetch, or undefined */
+  error: Accessor<unknown>;
+  /** re-runs this page's fetcher, clearing its error */
+  retry: () => void;
+};
+
 /**
- * Provides an easy way to implement infinite scrolling.
+ * Provides an easy way to implement infinite scrolling. Each page is its own
+ * independent async unit — render it with `<Loading>`/`<Errored>` for
+ * idiomatic suspense/retry, or read `fetching`/`error` directly for a
+ * boundary-free UI.
  *
- * ```ts
- * const [pages, loader, { page, setPage, setPages, end }] = createInfiniteScroll(fetcher);
+ * ```tsx
+ * const [pages, loader, { getPage, end }] = createInfiniteScroll(fetcher);
+ *
+ * <For each={pages()}>
+ *   {i => {
+ *     const page = getPage(i);
+ *     return (
+ *       <Errored fallback={(err, reset) => <button onClick={reset}>Retry: {String(err())}</button>}>
+ *         <Loading fallback={<Skeleton />}>
+ *           <For each={page.content()}>{item => <Row item={item} />}</For>
+ *         </Loading>
+ *       </Errored>
+ *     );
+ *   }}
+ * </For>
+ * <Show when={!end()}><div ref={loader} /></Show>
  * ```
  * @param fetcher `(page: number) => Promise<T[]>`
- * @return `pages()` is an accessor that contains the accumulated array of all fetched items
- * @return `loader` is a ref function to attach to the sentinel element that triggers loading
- * @method `page` is an accessor that contains the current page number
- * @method `setPage` allows to manually change the page number
- * @method `setPages` allows to manually replace the accumulated items
- * @method `end` is true when content is exhausted or an error occurred
- * @method `fetching` is true while a page fetch is in progress
- * @method `error` contains the last fetch error, or undefined if the last fetch succeeded
+ * @return `pages()` is an accessor for the page indices requested so far — feed directly to `<For>`
+ * @return `loader` is a ref function to attach to the sentinel element that triggers loading more
+ * @method `getPage` returns (and caches) the `{ content, fetching, error, retry }` bundle for a page index
+ * @method `pageCount` is an accessor for the number of pages requested
+ * @method `setPageCount` allows manually growing or jumping the requested page count
+ * @method `end` is true once a page fetch returns zero items
+ * @method `reset` disposes every cached page and starts over from the first page
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
-  pages: Accessor<T[]>,
+  pages: Accessor<number[]>,
   loader: (el: Element) => void,
   options: {
-    page: Accessor<number>;
-    setPage: Setter<number>;
-    setPages: Setter<T[]>;
+    pageCount: Accessor<number>;
+    setPageCount: Setter<number>;
     end: Accessor<boolean>;
-    fetching: Accessor<boolean>;
-    error: Accessor<unknown>;
+    getPage: (index: number) => InfiniteScrollPage<T>;
+    reset: () => void;
   },
 ] {
+  const initialPageCount = isServer ? 0 : 1;
   // ownedWrite allows setters to be called from reactive scopes and event handlers
-  const [pages, setPages] = createSignal<T[]>([], { ownedWrite: true });
-  const [page, setPage] = createSignal(0, { ownedWrite: true });
-  const [_end, _setEnd] = createSignal(false, { ownedWrite: true });
-  const [fetching, setFetching] = createSignal(false, { ownedWrite: true });
-  const [error, setError] = createSignal<unknown>(undefined, { ownedWrite: true });
-  const end = createMemo(() => _end() || !!error());
+  const [pageCount, setPageCount] = createSignal(initialPageCount, { ownedWrite: true });
+  const pages = createMemo(() => Array.from({ length: pageCount() }, (_, i) => i));
+  const [end, setEnd] = createSignal(false, { ownedWrite: true });
+
+  const pageCache = new Map<number, InfiniteScrollPage<T>>();
+  const pageDisposers = new Map<number, () => void>();
+
+  // Set by the IO block below (browser only); re-observes the sentinel after
+  // a page resolves so IO fires again if it's still in the viewport — this
+  // auto-fills the viewport before handing off to the user's scroll.
+  let reobserve = noop;
+
+  function getPage(index: number): InfiniteScrollPage<T> {
+    const cached = pageCache.get(index);
+    if (cached) return cached;
+
+    let entry!: InfiniteScrollPage<T>;
+    const dispose = createRoot(disposePage => {
+      const [fetching, setFetching] = createSignal(true, { ownedWrite: true });
+      const [error, setError] = createSignal<unknown>(undefined, { ownedWrite: true });
+      // Bumped on retry so `content` (below) re-reads the latest `request`.
+      const [attempt, setAttempt] = createSignal(0, { ownedWrite: true });
+
+      // The primitive owns the promise directly (rather than calling
+      // `fetcher` from inside an async `createMemo`) because the framework's
+      // `NotReadyError`/boundary plumbing for *rejections* relies on
+      // internal queueing that isn't part of the public API — a plain
+      // `.then`/`.catch` here is the reliable way to get `fetching`/`error`.
+      // `content` still hands back the same promise, so `<Loading>`/
+      // `<Errored>` work normally for JSX consumers that want them.
+      let request!: Promise<T[]>;
+      const startRequest = () => {
+        setFetching(true);
+        setError(undefined);
+        const thisRequest = fetcher(index);
+        request = thisRequest;
+        thisRequest
+          .then(value => {
+            if (thisRequest !== request) return; // superseded by a retry
+            setFetching(false);
+            if (value.length === 0) setEnd(true);
+            else if (index === pageCount() - 1) reobserve();
+          })
+          .catch(err => {
+            if (thisRequest !== request) return;
+            setFetching(false);
+            setError(err);
+          });
+      };
+
+      // Runs before `content` below so its first, eager computation already
+      // sees a populated `request` — otherwise it caches a plain `undefined`
+      // (not yet a thenable) and never revisits it.
+      startRequest();
+
+      const content = createMemo(() => {
+        attempt();
+        return request;
+      });
+
+      entry = {
+        content,
+        fetching,
+        error,
+        retry: () => {
+          startRequest();
+          setAttempt(a => a + 1);
+        },
+      };
+      return disposePage;
+    });
+
+    pageCache.set(index, entry);
+    pageDisposers.set(index, dispose);
+    return entry;
+  }
+
+  function reset() {
+    for (const dispose of pageDisposers.values()) dispose();
+    pageCache.clear();
+    pageDisposers.clear();
+    setEnd(false);
+    setPageCount(initialPageCount);
+  }
 
   let add: (el: Element) => void = noop;
   if (!isServer) {
     let sentinelEl: Element | null = null;
     const io = new IntersectionObserver(e => {
-      if (e.length > 0 && e[0]!.isIntersecting && !end() && !fetching()) {
-        setPage(p => p + 1);
-      }
+      if (e.length === 0 || !e[0]!.isIntersecting || end()) return;
+      // Don't outrun the last requested page: wait for it to settle, and
+      // don't auto-advance past a failed one — call `retry` on it instead.
+      const last = getPage(pageCount() - 1);
+      if (last.fetching() || last.error()) return;
+      setPageCount(p => p + 1);
     });
     onCleanup(() => io.disconnect());
     add = (el: Element) => {
@@ -415,55 +525,23 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
         if (sentinelEl === el) sentinelEl = null;
       });
     };
+    reobserve = () => {
+      const el = sentinelEl;
+      if (el) {
+        io.unobserve(el);
+        io.observe(el);
+      }
+    };
 
+    // Starts each page's fetch the moment it's requested, regardless of
+    // whether the consumer's JSX has rendered that page index yet.
     createEffect(
-      () => page(),
-      currentPage => {
-        let cancelled = false;
-        setFetching(true);
-        fetcher(currentPage)
-          .then(content => {
-            if (cancelled) return;
-            setError(undefined);
-            if (content.length === 0) {
-              _setEnd(true);
-              setFetching(false);
-            } else {
-              setPages(p => [...p, ...content]);
-              setFetching(false);
-              // IO only fires on intersection *changes*. After the DOM updates
-              // with new items, re-observe so IO fires again if the sentinel is
-              // still in the viewport — this auto-fills the viewport before
-              // handing off to the user's scroll.
-              const el = sentinelEl;
-              if (el && !end()) {
-                io.unobserve(el);
-                io.observe(el);
-              }
-            }
-          })
-          .catch(err => {
-            if (cancelled) return;
-            setError(err);
-            setFetching(false);
-          });
-        return () => {
-          cancelled = true;
-        };
+      () => pageCount(),
+      count => {
+        if (count > 0) getPage(count - 1);
       },
     );
   }
 
-  return [
-    pages,
-    add,
-    {
-      page,
-      setPage,
-      setPages,
-      end,
-      fetching,
-      error,
-    },
-  ];
+  return [pages, add, { pageCount, setPageCount, end, getPage, reset }];
 }
