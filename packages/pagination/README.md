@@ -156,7 +156,18 @@ return (
       {i => {
         const page = getPage(i);
         return (
-          <Errored fallback={(err, reset) => <button onClick={reset}>Retry: {String(err())}</button>}>
+          // Note: use `page.retry`, not Errored's own `reset` — `content` only
+          // re-fetches when `retry()` bumps its internal version signal, so a
+          // bare `reset()` would just re-surface the same cached rejection.
+          // Errored also won't hand control back to <Loading> while that retry
+          // is in flight, so the fallback watches `fetching()` itself.
+          <Errored
+            fallback={err => (
+              <Show when={!page.fetching()} fallback={<h4>Retrying…</h4>}>
+                <button onClick={page.retry}>Retry: {String(err())}</button>
+              </Show>
+            )}
+          >
             <Loading fallback={<h4>Loading…</h4>}>
               <For each={page.content()}>{item => <h4>{item}</h4>}</For>
             </Loading>

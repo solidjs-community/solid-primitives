@@ -1,4 +1,5 @@
 import { createSignal, For, Show } from "solid-js";
+import { Errored, Loading } from "@solidjs/web";
 import preview from "../../../.storybook/preview.js";
 import { createInfiniteScroll, createPagination, createSegment } from "../src/index.js";
 import readme from "../README.md?raw";
@@ -180,7 +181,7 @@ export const CreateInfiniteScrollStory = meta.story({
     docs: {
       description: {
         story:
-          "`createInfiniteScroll` treats every page as its own independent async unit via `getPage(i)`, so one page failing doesn't block the rest of the list — it just pauses auto-loading until that page is retried. In production, attach `ref={sentinel}` to a DOM element at the bottom of the list — `IntersectionObserver` calls `setPageCount` automatically when it scrolls into view. This demo drives `setPageCount` manually to show the state machine, and always fails page 1 once to demonstrate per-page retry.",
+          "`createInfiniteScroll` treats every page as its own independent async unit via `getPage(i)` — `page.content()` is a genuine async value, so each page is wrapped in its own `<Loading>`/`<Errored>` boundary rather than manual `fetching`/`error` checks. One page failing doesn't block the rest of the list; `<Errored>`'s `reset` calls straight into `retry()` for that page. In production, attach `ref={sentinel}` to a DOM element at the bottom of the list — `IntersectionObserver` calls `setPageCount` automatically when it scrolls into view. This demo drives `setPageCount` manually to show the state machine, and always fails page 1 once to demonstrate per-page retry.",
       },
     },
   },
@@ -223,21 +224,27 @@ export const CreateInfiniteScrollStory = meta.story({
             {i => {
               const page = getPage(i);
               return (
-                <Show
-                  when={!page.error()}
-                  fallback={
-                    <div style={{ display: "flex", gap: "0.4rem", "align-items": "center" }}>
-                      <Badge variant="error">{String(page.error())}</Badge>
-                      <Button variant="outline" onClick={page.retry}>
-                        Retry
-                      </Button>
-                    </div>
-                  }
+                <Errored
+                  fallback={err => (
+                    // Errored's own `reset` just re-reads content() — since our memo
+                    // only re-fetches when attempt() changes, retry() (not reset) is
+                    // what actually kicks off a new request. Errored also doesn't
+                    // hand control back to <Loading> while that retry is in flight,
+                    // so this fallback watches `fetching()` itself for feedback.
+                    <Show
+                      when={!page.fetching()}
+                      fallback={<Badge>Retrying page {i}…</Badge>}
+                    >
+                      <div style={{ display: "flex", gap: "0.4rem", "align-items": "center" }}>
+                        <Badge variant="error">{String(err())}</Badge>
+                        <Button variant="outline" onClick={page.retry}>
+                          Retry
+                        </Button>
+                      </div>
+                    </Show>
+                  )}
                 >
-                  <Show
-                    when={!page.fetching()}
-                    fallback={<Badge>Loading page {i}…</Badge>}
-                  >
+                  <Loading fallback={<Badge>Loading page {i}…</Badge>}>
                     <For each={page.content()}>
                       {item => (
                         <div
@@ -255,8 +262,8 @@ export const CreateInfiniteScrollStory = meta.story({
                         </div>
                       )}
                     </For>
-                  </Show>
-                </Show>
+                  </Loading>
+                </Errored>
               );
             }}
           </For>
