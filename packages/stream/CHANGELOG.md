@@ -1,5 +1,12 @@
 # @solid-primitives/stream
 
+## 0.7.4
+
+### Patch Changes
+
+- Updated dependencies [62e331d]
+  - @solid-primitives/utils@6.4.1
+
 ## 0.7.3
 
 ### Patch Changes
