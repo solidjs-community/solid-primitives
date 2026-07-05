@@ -238,10 +238,13 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  * </CounterProvider>
  * ```
  *
- * @param use Either one of the following:
- *  - A function that returns the context value. Preferably the `use...()` function returned from `createContextProvider()`.
- *  - The context itself returned from `createContext()`.
- *  - A inline function that returns the context value.
+ * @param provider Either one of the following:
+ *  - A function that returns the context value. Preferably the `use...()` function returned by `createContextProvider()`.
+ *  - The context itself returned by `createContext()`.
+ *  - An inline function that returns the context's value.
+ *
+ * Please note that this prop is not reactive.
+ *
  *
  * @example
  * ```tsx
@@ -250,37 +253,37 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  *
  * // provide and use the context
  * <CounterProvider count={1}>
- *   <ConsumeContext use={useCounter}>
+ *   <ContextConsumer provider={useCounter}>
  *     {({ count }) => (
  *       <div>Count: {count()}</div>
  *     )}
- *   </ConsumeContext>
+ *   </ContextConsumer>
  * </CounterProvider>
  * ```
  *
  * ```tsx
  * // create the context
- * const counterContext = createContext({ count: 0 });
+ * const CounterContext = createContext({ count: 0 });
  *
  * // provide and use the context
- * <counterContext.Provider value={{ count: 1 }}>
- *   <ConsumeContext use={counterContext}>
+ * <CounterContext value={{ count: 1 }}>
+ *   <ContextConsumer provider={CounterContext}>
  *     {({ count }) => (
  *       <div>Count: {count}</div>
  *     )}
- *   </ConsumeContext>
- * </counterContext.Provider>
+ *   </ContextConsumer>
+ * </CounterContext>
  * ```
  */
-export function ConsumeContext<T>(props: {
-  children: (value: T | undefined) => JSX.Element,
-  use: (() => T | undefined) | Context<T>,
-}): JSX.Element {
+export function ContextConsumer<T>(props: {
+  children: (value: T | undefined) => Element,
+  provider: (() => T | undefined) | Context<T>,
+}): Element {
   let context: T | undefined;
-  if (typeof props.use === "function") {
-    context = props.use();
+  if (props.provider.length === 0) {
+    context = props.provider(undefined!) as T | undefined;
   } else {
-    context = useContext(props.use);
+    context = useContext(props.provider as Context<T>);
   }
   return props.children(context);
 }

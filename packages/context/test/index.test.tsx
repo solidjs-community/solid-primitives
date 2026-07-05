@@ -6,6 +6,7 @@ import {
   createOptionalContextProvider,
   createLayeredContext,
   MultiProvider,
+  ContextConsumer,
 } from "../src/index.js";
 
 type TestContextValue = {
@@ -343,36 +344,70 @@ describe("MultiProvider", () => {
 });
 
 describe("ConsumeContext", () => {
-  test("consumes a context", () => {
-    const Ctx = createContext<string>("Hello");
-    const useCtx = () => useContext(Ctx);
+  test("consumes a context directly", () => {
+    const Context = createContext<string>("Default");
 
-    let capture1;
-    let capture2;
-    let capture3;
-    createRoot(() => {
-      <Ctx.Provider value="World">
-        <ConsumeContext use={Ctx}>
-          {value => (
-            capture1 = value
-          )}
-        </ConsumeContext>
-        <ConsumeContext use={useCtx}>
-          {value => (
-            capture2 = value
-          )}
-        </ConsumeContext>
-        <ConsumeContext use={() => useContext(Ctx)}>
-          {value => (
-            capture3 = value
-          )}
-        </ConsumeContext>
-      </Ctx.Provider>;
-    });
+    let capture;
+    const unmount = render(
+      () => (
+        <Context value="Actual">
+          <ContextConsumer provider={Context}>
+            {value => (
+              capture = value
+            )}
+          </ContextConsumer>
+        </Context>
+      ),
+      document.createElement("div")
+    );
 
-    expect(capture1).toBe("World");
-    expect(capture2).toBe("World");
-    expect(capture3).toBe("World");
+    expect(capture).toBe("Actual");
+
+    unmount();
+  });
+
+  test("consumes a context via global use-function", () => {
+    const Context = createContext<string>("Default");
+
+    let capture;
+    const unmount = render(
+      () => (
+        <Context value="Actual">
+          <ContextConsumer provider={() => useContext(Context)}>
+            {value => (
+              capture = value
+            )}
+          </ContextConsumer>
+        </Context>
+      ),
+      document.createElement("div")
+    );
+
+    expect(capture).toBe("Actual");
+
+    unmount();
+  });
+
+  test("consumes a context via its use-function from `createContextProvider`", () => {
+    const [Provider, useContext] = createContextProvider(
+      (props: { value: string }) => props.value,
+      "Default");
+
+    let capture;
+    const unmount = render(
+      () => (
+        <Provider value="Actual">
+          <ContextConsumer provider={useContext}>
+            {value => (
+              capture = value
+            )}
+          </ContextConsumer>
+        </Provider>
+      ),
+      document.createElement("div")
+    );
+
+    expect(capture).toBe("Actual");
 
     unmount();
   });
