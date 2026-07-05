@@ -8,10 +8,9 @@ import {
 import {
   type Accessor,
   type Setter,
-  createEffect,
   createMemo,
-  createRoot,
   createSignal,
+  mapArray,
   onCleanup,
 } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
@@ -382,126 +381,122 @@ export type InfiniteScrollPage<T> = {
  * boundary-free UI.
  *
  * ```tsx
- * const [pages, loader, { getPage, end }] = createInfiniteScroll(fetcher);
+ * const [pages, loader, { end }] = createInfiniteScroll(fetcher);
  *
  * <For each={pages()}>
- *   {i => {
- *     const page = getPage(i);
- *     return (
- *       <Errored fallback={(err, reset) => <button onClick={reset}>Retry: {String(err())}</button>}>
- *         <Loading fallback={<Skeleton />}>
- *           <For each={page.content()}>{item => <Row item={item} />}</For>
- *         </Loading>
- *       </Errored>
- *     );
- *   }}
+ *   {page => (
+ *     <Errored fallback={err => <button onClick={page.retry}>Retry: {String(err())}</button>}>
+ *       <Loading fallback={<Skeleton />}>
+ *         <For each={page.content()}>{item => <Row item={item} />}</For>
+ *       </Loading>
+ *     </Errored>
+ *   )}
  * </For>
  * <Show when={!end()}><div ref={loader} /></Show>
  * ```
  * @param fetcher `(page: number) => Promise<T[]>`
- * @return `pages()` is an accessor for the page indices requested so far — feed directly to `<For>`
+ * @return `pages()` is an accessor for the `{ content, fetching, error, retry }` bundle of every page requested so far, in order — feed directly to `<For>`
  * @return `loader` is a ref function to attach to the sentinel element that triggers loading more
- * @method `getPage` returns (and caches) the `{ content, fetching, error, retry }` bundle for a page index
  * @method `pageCount` is an accessor for the number of pages requested
  * @method `setPageCount` allows manually growing or jumping the requested page count
  * @method `end` is true once a page fetch returns zero items
- * @method `reset` disposes every cached page and starts over from the first page
+ * @method `reset` disposes every page and starts over from the first page
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
-  pages: Accessor<number[]>,
+  pages: Accessor<InfiniteScrollPage<T>[]>,
   loader: (el: Element) => void,
   options: {
     pageCount: Accessor<number>;
     setPageCount: Setter<number>;
     end: Accessor<boolean>;
-    getPage: (index: number) => InfiniteScrollPage<T>;
     reset: () => void;
   },
 ] {
   const initialPageCount = isServer ? 0 : 1;
   // ownedWrite allows setters to be called from reactive scopes and event handlers
   const [pageCount, setPageCount] = createSignal(initialPageCount, { ownedWrite: true });
-  const pages = createMemo(() => Array.from({ length: pageCount() }, (_, i) => i));
   const [end, setEnd] = createSignal(false, { ownedWrite: true });
-
-  const pageCache = new Map<number, InfiniteScrollPage<T>>();
-  const pageDisposers = new Map<number, () => void>();
+  // Bumped by reset() so every page key changes shape — a page index alone
+  // wouldn't work as a mapArray key here, since going from e.g. 5 pages
+  // straight to 1 in a single write never makes index 0 "leave" the list,
+  // so mapArray would keep the stale, already-settled page cached.
+  const [generation, setGeneration] = createSignal(0, { ownedWrite: true });
 
   // Set by the IO block below (browser only); re-observes the sentinel after
   // a page resolves so IO fires again if it's still in the viewport — this
   // auto-fills the viewport before handing off to the user's scroll.
   let reobserve = noop;
 
-  function getPage(index: number): InfiniteScrollPage<T> {
-    const cached = pageCache.get(index);
-    if (cached) return cached;
+  const pageKeys = createMemo(() => {
+    const gen = generation();
+    return Array.from({ length: pageCount() }, (_, i) => `${gen}:${i}`);
+  });
 
-    let entry!: InfiniteScrollPage<T>;
-    const dispose = createRoot(disposePage => {
-      const [fetching, setFetching] = createSignal(true, { ownedWrite: true });
-      const [error, setError] = createSignal<unknown>(undefined, { ownedWrite: true });
-      // Bumped on retry so `content` (below) re-reads the latest `request`.
-      const [attempt, setAttempt] = createSignal(0, { ownedWrite: true });
+  // mapArray (the primitive <For> itself is built on) caches per key and
+  // disposes a key's whole reactive scope — including the effects below —
+  // the moment it drops out of the list, so shrinking pageCount can't leak.
+  // Its mapFn also runs eagerly on a list change rather than waiting for a
+  // read, so a page's fetch starts the instant it's requested regardless of
+  // whether the consumer's JSX has rendered `pages()` yet.
+  const pages = mapArray(pageKeys, key => {
+    const index = Number(key.slice(key.indexOf(":") + 1));
 
-      // The primitive owns the promise directly (rather than calling
-      // `fetcher` from inside an async `createMemo`) because the framework's
-      // `NotReadyError`/boundary plumbing for *rejections* relies on
-      // internal queueing that isn't part of the public API — a plain
-      // `.then`/`.catch` here is the reliable way to get `fetching`/`error`.
-      // `content` still hands back the same promise, so `<Loading>`/
-      // `<Errored>` work normally for JSX consumers that want them.
-      let request!: Promise<T[]>;
-      const startRequest = () => {
-        setFetching(true);
-        setError(undefined);
-        const thisRequest = fetcher(index);
-        request = thisRequest;
-        thisRequest
-          .then(value => {
-            if (thisRequest !== request) return; // superseded by a retry
-            setFetching(false);
-            if (value.length === 0) setEnd(true);
-            else if (index === pageCount() - 1) reobserve();
-          })
-          .catch(err => {
-            if (thisRequest !== request) return;
-            setFetching(false);
-            setError(err);
-          });
-      };
+    const [fetching, setFetching] = createSignal(true, { ownedWrite: true });
+    const [error, setError] = createSignal<unknown>(undefined, { ownedWrite: true });
+    // Bumped on retry so `content` (below) re-reads the latest `request`.
+    const [attempt, setAttempt] = createSignal(0, { ownedWrite: true });
 
-      // Runs before `content` below so its first, eager computation already
-      // sees a populated `request` — otherwise it caches a plain `undefined`
-      // (not yet a thenable) and never revisits it.
-      startRequest();
+    // The primitive owns the promise directly (rather than calling
+    // `fetcher` from inside an async `createMemo`) because the framework's
+    // `NotReadyError`/boundary plumbing for *rejections* relies on internal
+    // queueing that isn't part of the public API — a plain `.then`/`.catch`
+    // here is the reliable way to get `fetching`/`error`. `content` still
+    // hands back the same promise, so `<Loading>`/`<Errored>` work normally
+    // for JSX consumers that want them.
+    let request!: Promise<T[]>;
+    const startRequest = () => {
+      setFetching(true);
+      setError(undefined);
+      const thisRequest = fetcher(index);
+      request = thisRequest;
+      thisRequest
+        .then(value => {
+          if (thisRequest !== request) return; // superseded by a retry
+          setFetching(false);
+          if (value.length === 0) setEnd(true);
+          else if (index === pageCount() - 1) reobserve();
+        })
+        .catch(err => {
+          if (thisRequest !== request) return;
+          setFetching(false);
+          setError(err);
+        });
+    };
 
-      const content = createMemo(() => {
-        attempt();
-        return request;
-      });
+    // Runs before `content` below so its first, eager computation already
+    // sees a populated `request` — otherwise it caches a plain `undefined`
+    // (not yet a thenable) and never revisits it.
+    startRequest();
 
-      entry = {
-        content,
-        fetching,
-        error,
-        retry: () => {
-          startRequest();
-          setAttempt(a => a + 1);
-        },
-      };
-      return disposePage;
+    const content = createMemo(() => {
+      attempt();
+      return request;
     });
 
-    pageCache.set(index, entry);
-    pageDisposers.set(index, dispose);
-    return entry;
-  }
+    return {
+      content,
+      fetching,
+      error,
+      retry: () => {
+        startRequest();
+        setAttempt(a => a + 1);
+      },
+    };
+  });
 
   function reset() {
-    for (const dispose of pageDisposers.values()) dispose();
-    pageCache.clear();
-    pageDisposers.clear();
     setEnd(false);
+    setGeneration(g => g + 1);
     setPageCount(initialPageCount);
   }
 
@@ -512,8 +507,8 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
       if (e.length === 0 || !e[0]!.isIntersecting || end()) return;
       // Don't outrun the last requested page: wait for it to settle, and
       // don't auto-advance past a failed one — call `retry` on it instead.
-      const last = getPage(pageCount() - 1);
-      if (last.fetching() || last.error()) return;
+      const last = pages().at(-1);
+      if (!last || last.fetching() || last.error()) return;
       setPageCount(p => p + 1);
     });
     onCleanup(() => io.disconnect());
@@ -532,16 +527,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
         io.observe(el);
       }
     };
-
-    // Starts each page's fetch the moment it's requested, regardless of
-    // whether the consumer's JSX has rendered that page index yet.
-    createEffect(
-      () => pageCount(),
-      count => {
-        if (count > 0) getPage(count - 1);
-      },
-    );
   }
 
-  return [pages, add, { pageCount, setPageCount, end, getPage, reset }];
+  return [pages, add, { pageCount, setPageCount, end, reset }];
 }

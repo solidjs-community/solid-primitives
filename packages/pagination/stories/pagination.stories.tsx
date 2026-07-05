@@ -181,7 +181,7 @@ export const CreateInfiniteScrollStory = meta.story({
     docs: {
       description: {
         story:
-          "`createInfiniteScroll` treats every page as its own independent async unit via `getPage(i)` — `page.content()` is a genuine async value, so each page is wrapped in its own `<Loading>`/`<Errored>` boundary rather than manual `fetching`/`error` checks. One page failing doesn't block the rest of the list; the retry button calls `page.retry()` directly (Errored's own `reset` only re-reads `content()`, which won't refetch on its own). Scroll to the bottom of the box below and `IntersectionObserver` loads the next page automatically via the sentinel — the manual button underneath does the same thing for convenience. Page 1 always fails once to demonstrate per-page retry.",
+          "`createInfiniteScroll` treats every page as its own independent async unit — `pages()` is an array of `{ content, fetching, error, retry }` bundles, ready to feed straight into `<For>`. `content()` is a genuine async value, so each page is wrapped in its own `<Loading>`/`<Errored>` boundary rather than manual `fetching`/`error` checks. One page failing doesn't block the rest of the list; the retry button calls `page.retry()` directly (Errored's own `reset` only re-reads `content()`, which won't refetch on its own). Scroll to the bottom of the box below and `IntersectionObserver` loads the next page automatically via the sentinel — the manual button underneath does the same thing for convenience. Page 1 always fails once to demonstrate per-page retry.",
       },
     },
   },
@@ -201,8 +201,7 @@ export const CreateInfiniteScrollStory = meta.story({
       );
     };
 
-    const [pages, loader, { pageCount, end, setPageCount, getPage }] =
-      createInfiniteScroll(mockFetcher);
+    const [pages, loader, { pageCount, end, setPageCount }] = createInfiniteScroll(mockFetcher);
 
     return (
       <Container width={320}>
@@ -220,8 +219,7 @@ export const CreateInfiniteScrollStory = meta.story({
           }}
         >
           <For each={pages()}>
-            {i => {
-              const page = getPage(i);
+            {(page, i) => {
               return (
                 <Errored
                   fallback={err => (
@@ -232,7 +230,7 @@ export const CreateInfiniteScrollStory = meta.story({
                     // so this fallback watches `fetching()` itself for feedback.
                     <Show
                       when={!page.fetching()}
-                      fallback={<Badge>Retrying page {i}…</Badge>}
+                      fallback={<Badge>Retrying page {i()}…</Badge>}
                     >
                       <div style={{ display: "flex", gap: "0.4rem", "align-items": "center" }}>
                         <Badge variant="error">{String(err())}</Badge>
@@ -243,7 +241,7 @@ export const CreateInfiniteScrollStory = meta.story({
                     </Show>
                   )}
                 >
-                  <Loading fallback={<Badge>Loading page {i}…</Badge>}>
+                  <Loading fallback={<Badge>Loading page {i()}…</Badge>}>
                     <For each={page.content()}>
                       {item => (
                         <div

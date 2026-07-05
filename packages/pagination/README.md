@@ -148,32 +148,29 @@ Each page is its own independent async unit, so it can be rendered with `<Loadin
 
 ```tsx
 // fetcher: (page: number) => Promise<T[]>
-const [pages, setEl, { getPage, end }] = createInfiniteScroll(fetcher);
+const [pages, setEl, { end }] = createInfiniteScroll(fetcher);
 
 return (
   <div>
     <For each={pages()}>
-      {i => {
-        const page = getPage(i);
-        return (
-          // Note: use `page.retry`, not Errored's own `reset` — `content` only
-          // re-fetches when `retry()` bumps its internal version signal, so a
-          // bare `reset()` would just re-surface the same cached rejection.
-          // Errored also won't hand control back to <Loading> while that retry
-          // is in flight, so the fallback watches `fetching()` itself.
-          <Errored
-            fallback={err => (
-              <Show when={!page.fetching()} fallback={<h4>Retrying…</h4>}>
-                <button onClick={page.retry}>Retry: {String(err())}</button>
-              </Show>
-            )}
-          >
-            <Loading fallback={<h4>Loading…</h4>}>
-              <For each={page.content()}>{item => <h4>{item}</h4>}</For>
-            </Loading>
-          </Errored>
-        );
-      }}
+      {page => (
+        // Note: use `page.retry`, not Errored's own `reset` — `content` only
+        // re-fetches when `retry()` bumps its internal version signal, so a
+        // bare `reset()` would just re-surface the same cached rejection.
+        // Errored also won't hand control back to <Loading> while that retry
+        // is in flight, so the fallback watches `fetching()` itself.
+        <Errored
+          fallback={err => (
+            <Show when={!page.fetching()} fallback={<h4>Retrying…</h4>}>
+              <button onClick={page.retry}>Retry: {String(err())}</button>
+            </Show>
+          )}
+        >
+          <Loading fallback={<h4>Loading…</h4>}>
+            <For each={page.content()}>{item => <h4>{item}</h4>}</For>
+          </Loading>
+        </Errored>
+      )}
     </For>
     <Show when={!end()}>
       <h1 ref={setEl}>Loading...</h1>
@@ -186,19 +183,16 @@ Prefer plain signals over boundaries? Skip `<Loading>`/`<Errored>` and use `fetc
 
 ```tsx
 <For each={pages()}>
-  {i => {
-    const page = getPage(i);
-    return (
-      <Show
-        when={!page.error()}
-        fallback={<button onClick={page.retry}>Retry: {String(page.error())}</button>}
-      >
-        <Show when={!page.fetching()} fallback={<h4>Loading…</h4>}>
-          <For each={page.content()}>{item => <h4>{item}</h4>}</For>
-        </Show>
+  {page => (
+    <Show
+      when={!page.error()}
+      fallback={<button onClick={page.retry}>Retry: {String(page.error())}</button>}
+    >
+      <Show when={!page.fetching()} fallback={<h4>Loading…</h4>}>
+        <For each={page.content()}>{item => <h4>{item}</h4>}</For>
       </Show>
-    );
-  }}
+    </Show>
+  )}
 </For>
 ```
 
@@ -213,22 +207,20 @@ type InfiniteScrollPage<T> = {
 };
 
 function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
-  pages: Accessor<number[]>,
+  pages: Accessor<InfiniteScrollPage<T>[]>,
   loader: (el: Element) => void,
   options: {
     pageCount: Accessor<number>;
     setPageCount: Setter<number>;
     end: Accessor<boolean>;
-    getPage: (index: number) => InfiniteScrollPage<T>;
     reset: () => void;
   },
 ];
 ```
 
-- `pages()` is the list of page indices requested so far — feed it directly to `<For>`.
-- `getPage(i)` returns (and caches) the `{ content, fetching, error, retry }` bundle for page `i`. `retry()` re-runs that page's fetcher and clears its error.
+- `pages()` is the `{ content, fetching, error, retry }` bundle for every page requested so far, in order — feed it directly to `<For>`. `retry()` re-runs that page's fetcher and clears its error.
 - `end` is `true` once a page fetch returns zero items. A failed page does **not** set `end` — the sentinel just pauses auto-loading until that page is retried.
-- `reset()` disposes every cached page and starts over from the first page.
+- `reset()` disposes every page (including its in-flight request, if any) and starts over from the first page.
 
 ## Changelog
 

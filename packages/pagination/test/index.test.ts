@@ -289,11 +289,11 @@ describe("createInfiniteScroll", () => {
 
   test("requests page 0 eagerly and resolves its content", async () => {
     await createRoot(async dispose => {
-      const [pages, , { pageCount, getPage }] = createInfiniteScroll(fetcher);
-      expect(pages()).toEqual([0]);
+      const [pages, , { pageCount }] = createInfiniteScroll(fetcher);
+      expect(pages().length).toBe(1);
       expect(pageCount()).toBe(1);
 
-      const page0 = getPage(0);
+      const page0 = pages()[0]!;
       expect(page0.fetching(), "fetching until the effect's first pass resolves").toBe(true);
 
       await settle();
@@ -308,15 +308,15 @@ describe("createInfiniteScroll", () => {
 
   test("setPageCount grows the page list and fetches the new page", async () => {
     await createRoot(async dispose => {
-      const [pages, , { setPageCount, getPage }] = createInfiniteScroll(fetcher);
+      const [pages, , { setPageCount }] = createInfiniteScroll(fetcher);
       await settle();
 
       setPageCount(p => p + 1);
       flush();
-      expect(pages()).toEqual([0, 1]);
+      expect(pages().length).toBe(2);
 
       await settle();
-      expect(getPage(1).content()).toEqual([10, 11]);
+      expect(pages()[1]!.content()).toEqual([10, 11]);
 
       dispose();
     });
@@ -325,7 +325,7 @@ describe("createInfiniteScroll", () => {
   test("a page returning an empty array sets end without touching earlier pages", async () => {
     const fetchUntilEmpty = async (page: number) => (page >= 1 ? [] : [0]);
     await createRoot(async dispose => {
-      const [, , { setPageCount, end, getPage }] = createInfiniteScroll(fetchUntilEmpty);
+      const [pages, , { setPageCount, end }] = createInfiniteScroll(fetchUntilEmpty);
       await settle();
       expect(end()).toBe(false);
 
@@ -333,7 +333,7 @@ describe("createInfiniteScroll", () => {
       await settle();
 
       expect(end()).toBe(true);
-      expect(getPage(0).content()).toEqual([0]);
+      expect(pages()[0]!.content()).toEqual([0]);
       dispose();
     });
   });
@@ -345,8 +345,8 @@ describe("createInfiniteScroll", () => {
       return [page];
     };
     await createRoot(async dispose => {
-      const [, , { getPage, end }] = createInfiniteScroll(flaky);
-      const page0 = getPage(0);
+      const [pages, , { end }] = createInfiniteScroll(flaky);
+      const page0 = pages()[0]!;
       await settle();
 
       expect(page0.fetching()).toBe(false);
@@ -381,7 +381,7 @@ describe("createInfiniteScroll", () => {
       io.trigger(true);
       flush();
       expect(pageCount()).toBe(2);
-      expect(pages()).toEqual([0, 1]);
+      expect(pages().length).toBe(2);
 
       dispose();
     });
@@ -411,21 +411,39 @@ describe("createInfiniteScroll", () => {
     });
   });
 
-  test("reset disposes cached pages and starts over from page 0", async () => {
+  test("shrinking pageCount disposes the pages that fall out of range", async () => {
     await createRoot(async dispose => {
-      const [pages, , { setPageCount, getPage, reset }] = createInfiniteScroll(fetcher);
+      const [pages, , { setPageCount }] = createInfiniteScroll(fetcher);
+      setPageCount(p => p + 2); // grow to 3 pages
+      await settle();
+      expect(pages().length).toBe(3);
+
+      setPageCount(1);
+      flush();
+      expect(pages().length, "shrinking should drop the disposed pages from the list").toBe(1);
+
+      dispose();
+    });
+  });
+
+  test("reset disposes every page and starts over with fresh instances", async () => {
+    await createRoot(async dispose => {
+      const [pages, , { setPageCount, reset }] = createInfiniteScroll(fetcher);
       await settle();
       setPageCount(p => p + 1);
       await settle();
-      expect(pages()).toEqual([0, 1]);
+      expect(pages().length).toBe(2);
 
-      const stalePage0 = getPage(0);
+      const stalePage0 = pages()[0]!;
       reset();
       flush();
-      expect(pages()).toEqual([0]);
+      expect(pages().length).toBe(1);
 
-      const fresh = getPage(0);
-      expect(fresh).not.toBe(stalePage0);
+      const fresh = pages()[0]!;
+      expect(
+        fresh,
+        "page 0 never structurally left the list across the reset, so without the generation key it would stay cached",
+      ).not.toBe(stalePage0);
       await settle();
       expect(fresh.content()).toEqual([0]);
 
