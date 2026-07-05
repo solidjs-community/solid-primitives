@@ -84,3 +84,37 @@ describe("createLayeredContext (SSR)", () => {
     expect(capturedInner?.base).toBe("ssr");
   });
 });
+
+describe("ConsumeContext", () => {
+  test("consumes a context via use-function", () => {
+    const Ctx = createContext<string>("Hello");
+    const useCtx = () => useContext(Ctx);
+
+    let capture1;
+    let capture2;
+    let capture3;
+    renderToString(() => {
+      <Ctx.Provider value="World">
+        <ConsumeContext use={Ctx}>
+          {value => (
+            capture1 = value
+          )}
+        </ConsumeContext>
+        <ConsumeContext use={useCtx}>
+          {value => (
+            capture2 = value
+          )}
+        </ConsumeContext>
+        <ConsumeContext use={() => useContext(Ctx)}>
+          {value => (
+            capture3 = value
+          )}
+        </ConsumeContext>
+      </Ctx.Provider>;
+    });
+
+    expect(capture1).toBe("World");
+    expect(capture2).toBe("World");
+    expect(capture3).toBe("World");
+  });
+});
