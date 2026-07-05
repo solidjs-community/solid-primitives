@@ -181,7 +181,7 @@ export const CreateInfiniteScrollStory = meta.story({
     docs: {
       description: {
         story:
-          "`createInfiniteScroll` treats every page as its own independent async unit via `getPage(i)` — `page.content()` is a genuine async value, so each page is wrapped in its own `<Loading>`/`<Errored>` boundary rather than manual `fetching`/`error` checks. One page failing doesn't block the rest of the list; `<Errored>`'s `reset` calls straight into `retry()` for that page. In production, attach `ref={sentinel}` to a DOM element at the bottom of the list — `IntersectionObserver` calls `setPageCount` automatically when it scrolls into view. This demo drives `setPageCount` manually to show the state machine, and always fails page 1 once to demonstrate per-page retry.",
+          "`createInfiniteScroll` treats every page as its own independent async unit via `getPage(i)` — `page.content()` is a genuine async value, so each page is wrapped in its own `<Loading>`/`<Errored>` boundary rather than manual `fetching`/`error` checks. One page failing doesn't block the rest of the list; the retry button calls `page.retry()` directly (Errored's own `reset` only re-reads `content()`, which won't refetch on its own). Scroll to the bottom of the box below and `IntersectionObserver` loads the next page automatically via the sentinel — the manual button underneath does the same thing for convenience. Page 1 always fails once to demonstrate per-page retry.",
       },
     },
   },
