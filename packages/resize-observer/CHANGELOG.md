@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 2.2.0
+
+### Minor Changes
+
+- 636b436: Add `clientHeight` and `clientWidth` for element size
+
 ## 2.1.6
 
 ### Patch Changes
