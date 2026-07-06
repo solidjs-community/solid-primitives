@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/event-bus",
+  "version": "3.0.0-next.1",
+  "description": "A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

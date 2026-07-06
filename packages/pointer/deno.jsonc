@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/pointer",
+  "version": "1.0.0-next.0",
+  "description": "A collection of primitives, giving you a nicer API to handle pointer events in a reactive context.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}
