@@ -15,6 +15,8 @@ type VirtualListReturn<T extends readonly any[]> = [
     containerHeight: number;
     viewerTop: number;
     visibleItems: T;
+    firstIndex: number;
+    lastIndex: number | undefined;
   }>,
   onScroll: (e: Event) => void,
 ];
@@ -41,20 +43,23 @@ export function createVirtualList<T extends readonly any[]>({
 
   const [offset, setOffset] = createSignal(0);
 
-  const getFirstIdx = () => Math.max(0, Math.floor(offset() / rowHeight) - overscanCount);
-
-  const getLastIdx = () =>
-    Math.min(
-      items.length,
-      Math.floor(offset() / rowHeight) + Math.ceil(rootHeight / rowHeight) + overscanCount,
-    );
-
   return [
-    () => ({
-      containerHeight: items.length * rowHeight,
-      viewerTop: getFirstIdx() * rowHeight,
-      visibleItems: items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
-    }),
+    () => {
+      const firstIndex = Math.max(0, Math.floor(offset() / rowHeight) - overscanCount);
+      const lastIndex = Math.min(
+        items.length,
+        Math.floor(offset() / rowHeight) + Math.ceil(rootHeight / rowHeight) + overscanCount,
+      );
+
+      return {
+        containerHeight: items.length * rowHeight,
+        viewerTop: firstIndex * rowHeight,
+        visibleItems: items.slice(firstIndex, lastIndex) as unknown as T,
+        firstIndex,
+        lastIndex: lastIndex > 0 ? lastIndex - 1 : undefined,
+        // -1 because slice is an exclusive range
+      };
+    },
     e => {
       // @ts-expect-error
       if (e.target?.scrollTop !== undefined) setOffset(e.target.scrollTop);
