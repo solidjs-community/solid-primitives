@@ -36,7 +36,7 @@ export function makeAbortable(
   filterAbortError: (err: any) => void,
 ] {
   let controller: AbortController | undefined;
-  let timeout: ReturnType<typeof setTimeout> | number | undefined;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   const abort = (reason?: string) => {
     timeout && clearTimeout(timeout);
     controller?.abort(reason);
