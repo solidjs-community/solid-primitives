@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { DirEntries, ItemType, SyncFileSystemAdapter } from "./types.js";
+import type { DirEntries, ItemType, SyncFileSystemAdapter } from "./types.ts";
 
 /** Mocks a synchronous file system adapter */
 export const makeNoFileSystem = () => ({

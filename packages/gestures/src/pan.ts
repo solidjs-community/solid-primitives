@@ -1,6 +1,6 @@
 import { onCleanup } from "solid-js";
-import { registerPointerListener } from "./core.js";
-import type { PointerCallback } from "./core.js";
+import { registerPointerListener } from "./core.ts";
+import type { PointerCallback } from "./core.ts";
 
 export type PanProps = {
   callback: (position: { x: number; y: number }) => void;

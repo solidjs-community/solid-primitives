@@ -1,4 +1,4 @@
-import { type RequestContext } from "./fetch.js";
+import { type RequestContext } from "./fetch.ts";
 import { isServer } from "solid-js/web";
 
 export type Request<FetcherArgs extends any[]> = <Result>(

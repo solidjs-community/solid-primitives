@@ -1,7 +1,7 @@
 import { type ResourceOptions, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
-import { type RequestContext } from "./fetch.js";
-import { type RequestModifier, wrapFetcher } from "./modifiers.js";
+import { type RequestContext } from "./fetch.ts";
+import { type RequestModifier, wrapFetcher } from "./modifiers.ts";
 
 export type CacheEntry<T = any> = {
   ts: number;

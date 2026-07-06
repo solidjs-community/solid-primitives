@@ -1,4 +1,4 @@
-import { type FilePickerOptions, type UploadFile } from "./types.js";
+import { type FilePickerOptions, type UploadFile } from "./types.ts";
 
 export function createInputComponent({ multiple = false, accept = "" }: FilePickerOptions) {
   const element = document.createElement("input");

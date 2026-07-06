@@ -1,3 +1,3 @@
-export * from "./track-deep.js";
-export * from "./track-store.js";
-export * from "./store-updates.js";
+export * from "./track-deep.ts";
+export * from "./track-store.ts";
+export * from "./store-updates.ts";

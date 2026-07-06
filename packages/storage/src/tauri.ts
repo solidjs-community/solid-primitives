@@ -1,4 +1,4 @@
-import { type AsyncStorage } from "./persisted.js";
+import { type AsyncStorage } from "./persisted.ts";
 
 /**
  * tauriStorage: an asynchronous Storage API based on tauri-plugin-store

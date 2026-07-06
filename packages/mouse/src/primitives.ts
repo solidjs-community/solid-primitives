@@ -9,13 +9,13 @@ import {
   getPositionToElement,
   makeMouseInsideListener,
   makeMousePositionListener,
-} from "./common.js";
+} from "./common.ts";
 import type {
   FollowTouchOptions,
   MousePositionInside,
   PositionRelativeToElement,
   UseTouchOptions,
-} from "./types.js";
+} from "./types.ts";
 
 export interface MousePositionOptions extends UseTouchOptions, FollowTouchOptions {
   /**

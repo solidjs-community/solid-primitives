@@ -8,8 +8,8 @@ import {
   type ResourceOptions,
   type ResourceReturn,
 } from "solid-js";
-import { type RequestModifier } from "./modifiers.js";
-import { fetchRequest, type Request } from "./request.js";
+import { type RequestModifier } from "./modifiers.ts";
+import { fetchRequest, type Request } from "./request.ts";
 
 export type FetchArgs = [info: RequestInfo] | [info: RequestInfo, init?: RequestInit];
 

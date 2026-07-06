@@ -1,5 +1,5 @@
-import type { ItemType } from "./types.js";
-import { getParentDir } from "./tools.js";
+import type { ItemType } from "./types.ts";
+import { getParentDir } from "./tools.ts";
 
 export type ObjectFileSystem = { [id: string]: string | ObjectFileSystem };
 export type ObjectFileSystemItem = ObjectFileSystem | string | undefined;

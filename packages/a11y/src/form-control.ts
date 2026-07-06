@@ -26,7 +26,7 @@ import type {
   CreateFormControlProps,
   FormControlContextValue,
   FormControlDataSet,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Solid context that carries the `FormControlContextValue` produced by `createFormControl`.

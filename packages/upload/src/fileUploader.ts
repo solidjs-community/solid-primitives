@@ -1,7 +1,7 @@
 import { onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { transformFiles } from "./helpers.js";
-import { type FileUploaderDirective } from "./types.js";
+import { transformFiles } from "./helpers.ts";
+import { type FileUploaderDirective } from "./types.ts";
 
 /**
  * Ref callback factory for `<input type="file">` elements.

@@ -1,4 +1,4 @@
-import type { AnalyticsPlugin, AnyPayload } from "./types.js";
+import type { AnalyticsPlugin, AnyPayload } from "./types.ts";
 
 /**
  * Creates a client-side plugin that forwards every analytics event to a server

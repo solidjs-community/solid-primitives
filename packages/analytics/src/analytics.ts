@@ -13,7 +13,7 @@ import type {
   PagePayload,
   TrackPayload,
   IdentifyPayload,
-} from "./types.js";
+} from "./types.ts";
 
 
 

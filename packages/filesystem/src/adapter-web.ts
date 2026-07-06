@@ -1,6 +1,6 @@
-///<reference path="../node_modules/@types/wicg-file-system-access/index.d.ts" />
+///<reference types="@types/wicg-file-system-access/index.d.ts" />
 import { isServer } from "@solidjs/web";
-import { type DirEntries } from "./types.js";
+import { type DirEntries } from "./types.ts";
 
 /**
  * Adapter that provides access to the actual filesystem in the browser using a directory picker

@@ -3,7 +3,7 @@ import {
   type AsyncStorage,
   type AsyncStorageWithOptions,
   type SyncStorageWithOptions,
-} from "./index.js";
+} from "./index.ts";
 
 /**
  * adds a `.clear` method to a Storage without one only using `.key`/`.removeItem`

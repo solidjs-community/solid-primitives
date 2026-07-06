@@ -1,8 +1,8 @@
 import { createSignal, flush } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { transformFiles } from "./helpers.js";
-import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
+import { transformFiles } from "./helpers.ts";
+import type { UploadFile, Dropzone, DropzoneOptions } from "./types.ts";
 
 /**
  * Primitive to make working with dropzones easier.

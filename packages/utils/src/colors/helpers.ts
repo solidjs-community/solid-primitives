@@ -12,8 +12,8 @@
  * https://github.com/adobe/react-spectrum/blob/68e305768cb829bab7b9836dded593bd731259f3/packages/%40react-stately/color/src/Color.ts
  */
 
-import { clamp } from "../index.js";
-import type { ColorIntlTranslations } from "./intl.js";
+import { clamp } from "../index.ts";
+import type { ColorIntlTranslations } from "./intl.ts";
 import type {
   ColorAxes,
   ColorChannel,
@@ -21,7 +21,7 @@ import type {
   ColorFormat,
   ColorSpace,
   Color as IColor,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Parses a color string into a {@link Color} object.

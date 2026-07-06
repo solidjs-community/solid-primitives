@@ -10,9 +10,9 @@
  * https://www.w3.org/TR/WCAG21/#contrast-minimum
  */
 
-import { clamp } from "../index.js";
-import { colorToOKLCH, normalizeHue, parseColor } from "./helpers.js";
-import type { Color, ColorFormat } from "./types.js";
+import { clamp } from "../index.ts";
+import { colorToOKLCH, normalizeHue, parseColor } from "./helpers.ts";
+import type { Color, ColorFormat } from "./types.ts";
 
 // ─── Safe parsing ─────────────────────────────────────────────────────────────
 
