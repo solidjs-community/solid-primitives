@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest";
 import * as i18n from "../src/index.js";
 import { createEffect, createMemo, createRoot, createSignal, flush } from "solid-js";
-import { Locale, enDict, plDict } from "./setup.js";
+import { enDict, plDict } from "./setup.js";
+import type { Locale } from "./setup.js";
 
 describe("dict", () => {
   test("flatten", () => {

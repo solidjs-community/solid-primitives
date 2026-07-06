@@ -30,24 +30,28 @@
   "exports": {
     ".": {
       "import": {
+        "@solid-primitives/source": "./src/index.ts",
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
     },
     "./relay": {
       "import": {
+        "@solid-primitives/source": "./src/relay.ts",
         "types": "./dist/relay.d.ts",
         "default": "./dist/relay.js"
       }
     },
     "./relay/solidstart": {
       "import": {
+        "@solid-primitives/source": "./src/relay/solidstart.ts",
         "types": "./dist/relay/solidstart.d.ts",
         "default": "./dist/relay/solidstart.js"
       }
     },
     "./relay/tanstack": {
       "import": {
+        "@solid-primitives/source": "./src/relay/tanstack.ts",
         "types": "./dist/relay/tanstack.d.ts",
         "default": "./dist/relay/tanstack.js"
       }
