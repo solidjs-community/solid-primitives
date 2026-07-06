@@ -61,9 +61,9 @@
   },
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.15",
-    "@tauri-apps/api": "^1.5.3",
+    "@tauri-apps/api": "^1.6.0",
     "@types/wicg-file-system-access": "2023.10.7",
-    "chokidar": "^3.5.3",
+    "chokidar": "^3.6.0",
     "solid-js": "2.0.0-beta.15"
   },
   "peerDependencies": {
