@@ -56,6 +56,47 @@ const staticDicts: Record<Locale, RawDict> = {
   },
 };
 
+function LocaleSwitcher(props: { locale: Locale; onChange: (locale: Locale) => void }) {
+  const localeLabel = () =>
+    props.locale === "en" ? "English" : props.locale === "fr" ? "Français" : "Español";
+
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          "align-items": "center",
+          "justify-content": "space-between",
+        }}
+      >
+        <span style={{ "font-size": font.sizeSm, color: colors.muted }}>Active locale</span>
+        <Badge variant="info">{localeLabel()}</Badge>
+      </div>
+
+      <ButtonRow>
+        <Button
+          variant={props.locale === "en" ? "primary" : "outline"}
+          onClick={() => props.onChange("en")}
+        >
+          English
+        </Button>
+        <Button
+          variant={props.locale === "fr" ? "primary" : "outline"}
+          onClick={() => props.onChange("fr")}
+        >
+          Français
+        </Button>
+        <Button
+          variant={props.locale === "es" ? "primary" : "outline"}
+          onClick={() => props.onChange("es")}
+        >
+          Español
+        </Button>
+      </ButtonRow>
+    </>
+  );
+}
+
 export const TranslatorStory = meta.story({
   name: "Locale Switching with Static Dictionaries",
   parameters: {
@@ -73,42 +114,9 @@ export const TranslatorStory = meta.story({
     const dict = createMemo(() => i18n.flatten(staticDicts[locale()]));
     const t = i18n.translator(dict, i18n.resolveTemplate);
 
-    const localeLabel = () =>
-      locale() === "en" ? "English" : locale() === "fr" ? "Français" : "Español";
-
     return (
       <Container width={400}>
-        <div
-          style={{
-            display: "flex",
-            "align-items": "center",
-            "justify-content": "space-between",
-          }}
-        >
-          <span style={{ "font-size": font.sizeSm, color: colors.muted }}>Active locale</span>
-          <Badge variant="info">{localeLabel()}</Badge>
-        </div>
-
-        <ButtonRow>
-          <Button
-            variant={locale() === "en" ? "primary" : "outline"}
-            onClick={() => setLocale("en")}
-          >
-            English
-          </Button>
-          <Button
-            variant={locale() === "fr" ? "primary" : "outline"}
-            onClick={() => setLocale("fr")}
-          >
-            Français
-          </Button>
-          <Button
-            variant={locale() === "es" ? "primary" : "outline"}
-            onClick={() => setLocale("es")}
-          >
-            Español
-          </Button>
-        </ButtonRow>
+        <LocaleSwitcher locale={locale()} onChange={setLocale} />
 
         <TextField
           label="Name — substituted into template strings"
@@ -142,7 +150,7 @@ export const DynamicLoadingStory = meta.story({
     docs: {
       description: {
         story:
-          "Pass an async `createMemo` to `translator()` to load dictionaries lazily. Wrap translated content in `<Loading>` to suspend until the first dictionary resolves. `isPending()` inside the loaded content returns `true` during subsequent locale transitions — use it to dim the UI while the next dictionary fetches (simulated 400 ms delay).",
+          "Pass an async `createMemo` to `translator()` to load dictionaries lazily. Wrap translated content in `<Loading>` to suspend until the first dictionary resolves. `isPending(dict)` inside the loaded content returns `true` during subsequent locale transitions — use it to dim the UI while the next dictionary fetches (simulated 400 ms delay).",
       },
     },
   },
@@ -333,42 +341,9 @@ export const RichTextStory = meta.story({
     const richT = i18n.translator(dict, i18n.resolveRichTemplate);
     const plainT = i18n.translator(dict, i18n.resolveTemplate);
 
-    const localeLabel = () =>
-      locale() === "en" ? "English" : locale() === "fr" ? "Français" : "Español";
-
     return (
       <Container width={430}>
-        <div
-          style={{
-            display: "flex",
-            "align-items": "center",
-            "justify-content": "space-between",
-          }}
-        >
-          <span style={{ "font-size": font.sizeSm, color: colors.muted }}>Active locale</span>
-          <Badge variant="info">{localeLabel()}</Badge>
-        </div>
-
-        <ButtonRow>
-          <Button
-            variant={locale() === "en" ? "primary" : "outline"}
-            onClick={() => setLocale("en")}
-          >
-            English
-          </Button>
-          <Button
-            variant={locale() === "fr" ? "primary" : "outline"}
-            onClick={() => setLocale("fr")}
-          >
-            Français
-          </Button>
-          <Button
-            variant={locale() === "es" ? "primary" : "outline"}
-            onClick={() => setLocale("es")}
-          >
-            Español
-          </Button>
-        </ButtonRow>
+        <LocaleSwitcher locale={locale()} onChange={setLocale} />
 
         <Section title="resolveRichTemplate — JSX as a template argument">
           <Card>
