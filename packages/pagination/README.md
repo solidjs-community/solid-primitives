@@ -220,7 +220,7 @@ function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
 
 - `pages()` is the `{ content, fetching, error, retry }` bundle for every page requested so far, in order — feed it directly to `<For>`. `retry()` re-runs that page's fetcher and clears its error.
 - `end` is `true` once a page fetch returns zero items. A failed page does **not** set `end` — the sentinel just pauses auto-loading until that page is retried.
-- `reset()` disposes every page (including its in-flight request, if any) and starts over from the first page.
+- `reset()` disposes every page's reactive state and starts over from the first page. It does **not** abort an in-flight fetch — if one resolves or rejects after disposal, its result is ignored by the same stale-request check `retry()` relies on.
 
 ## Changelog
 
