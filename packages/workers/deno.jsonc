@@ -5,7 +5,7 @@
   "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
-    "./worker": "./src/worker.ts"
+    "./worker": "./src/worker-scope.ts"
   },
   "publish": {
     "include": [
