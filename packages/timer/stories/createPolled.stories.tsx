@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createPolled, createIntervalCounter } from "@solid-primitives/timer";
 import { Stat, Container } from "../../../.storybook/ui/index.js";
@@ -44,9 +44,11 @@ export const CreatePolled = meta.story({
             Last 5 ticks
           </div>
           <div style={{ display: "flex", "flex-direction": "column", gap: "0.2rem" }}>
-            {history().map((t, i) => (
-              <code style={{ "font-size": "0.85rem", opacity: `${0.4 + i * 0.15}` }}>{t}</code>
-            ))}
+            <For each={history()} keyed={false}>
+              {(t, i) => (
+                <code style={{ "font-size": "0.85rem", opacity: `${0.4 + i * 0.15}` }}>{t()}</code>
+              )}
+            </For>
           </div>
         </div>
 
