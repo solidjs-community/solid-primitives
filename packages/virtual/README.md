@@ -28,6 +28,8 @@ pnpm add @solid-primitives/virtual
 
 `createVirtualList` is a headless utility for constructing your own virtualized list components with maximum flexibility.
 
+`virtual` is an accessor returning `{ containerHeight, viewerTop, visibleItems }` — call it to read the current values. When rendering `visibleItems` with `<For>`, pass `keyed={false}` so each item is provided as an `Accessor` (`<For>` defaults to `keyed={true}`, which passes raw values instead).
+
 ```tsx
 function MyComp(): JSX.Element {
   const items = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -72,7 +74,8 @@ function MyComp(): JSX.Element {
           }}
         >
           {/* only virtual().visibleItems are ultimately rendered */}
-          <For fallback={"no items"} each={virtual().visibleItems}>
+          {/* keyed={false} is required for item to be passed as an Accessor — <For> defaults to keyed={true}, passing raw values instead */}
+          <For fallback={"no items"} each={virtual().visibleItems} keyed={false}>
             {item => <div>{item()}</div>}
           </For>
         </div>
@@ -92,6 +95,8 @@ function MyComp(): JSX.Element {
   each={[0, 1, 2, 3, 4, 5, 6, 7]}
   // the optional fallback to display if the list of items is empty
   fallback={<div>No items</div>}
+  // an optional class applied to the element wrapping the rendered rows, useful for styling row layout (e.g. flex/grid)
+  class="my-list"
   // the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
   overscanCount={5}
   // the height of the root element of the virtualizedList itself
@@ -109,6 +114,24 @@ function MyComp(): JSX.Element {
 
 The tests describe the exact behavior and how overscanCount handles the start/end of the list in more detail.
 Note that the component only handles vertical lists where the number of items is known and the height of an individual item is fixed.
+
+#### Styling the rows with `class`
+
+The rendered rows are wrapped in an absolutely positioned element that `<VirtualList>` manages internally (for offsetting the visible window as you scroll). Pass `class` to have it applied to that wrapper, which is useful for laying out rows with flexbox or grid instead of relying on each row's own styles:
+
+```tsx
+<VirtualList each={items} rootHeight={400} rowHeight={40} class="row-list">
+  {item => <div>{item()}</div>}
+</VirtualList>
+```
+
+```css
+.row-list {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+}
+```
 
 ## Changelog
 

@@ -338,6 +338,23 @@ describe("VirtualList", () => {
     dispose();
   });
 
+  test("applies class to the element wrapping the rendered rows", () => {
+    const dispose = render(
+      () => (
+        <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class="my-list">
+          {item => <div id={"item-" + item()} style={{ height: "10px" }} />}
+        </VirtualList>
+      ),
+      ROOT,
+    );
+
+    const listEl = ROOT.querySelector(".my-list");
+    expect(listEl).not.toBeNull();
+    expect(listEl?.querySelector("#item-0")).not.toBeNull();
+
+    dispose();
+  });
+
   test("renders when list is empty with optional fallback", () => {
     const dispose = render(
       () => (
