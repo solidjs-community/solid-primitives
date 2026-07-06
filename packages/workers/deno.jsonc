@@ -3,7 +3,10 @@
   "version": "2.0.0",
   "description": "Primitives that support creating Web Workers.",
   "license": "MIT",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./worker": "./src/worker.ts"
+  },
   "publish": {
     "include": [
       "README.md",

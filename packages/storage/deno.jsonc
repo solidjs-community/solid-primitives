@@ -3,7 +3,10 @@
   "version": "5.0.0-next.0",
   "description": "Primitive that provides reactive wrappers for storage access",
   "license": "MIT",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tauri": "./src/tauri.ts"
+  },
   "publish": {
     "include": [
       "README.md",

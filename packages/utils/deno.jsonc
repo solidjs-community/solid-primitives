@@ -3,7 +3,11 @@
   "version": "7.0.0-next.1",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "license": "MIT",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./immutable": "./src/immutable/index.ts",
+    "./colors": "./src/colors/index.ts"
+  },
   "publish": {
     "include": [
       "README.md",

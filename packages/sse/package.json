@@ -60,6 +60,7 @@
     "./worker-handler": {
       "import": {
         "@solid-primitives/source": "./src/worker-handler.ts",
+        "types": "./dist/worker-handler.d.ts",
         "default": "./dist/worker-handler.js"
       }
     }
