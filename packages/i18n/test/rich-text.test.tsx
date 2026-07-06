@@ -11,6 +11,12 @@ describe("resolveRichTemplate", () => {
     expect(i18n.resolveRichTemplate("hello {{name}}!")).toBe("hello {{name}}!");
   });
 
+  test("stays a plain string when a placeholder has no matching arg", () => {
+    expect(i18n.resolveRichTemplate("hello {{name}} and {{extra}}!", { name: "Tester" })).toBe(
+      "hello Tester and {{extra}}!",
+    );
+  });
+
   test("returns JSX when a value isn't a string", () => {
     const link = <a href="/info">click here</a>;
 

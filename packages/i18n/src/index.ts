@@ -225,7 +225,7 @@ export const resolveRichTemplate: TemplateResolver<string | JSX.Element> = (
   while ((match = regex.exec(string))) {
     parts.push(string.slice(lastIndex, match.index));
     const value = args[match[1]!];
-    if (typeof value !== "string") isRich = true;
+    if (value !== undefined && typeof value !== "string") isRich = true;
     parts.push(value === undefined ? match[0] : (value as string | JSX.Element));
     lastIndex = regex.lastIndex;
   }
