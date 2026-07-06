@@ -10,6 +10,8 @@ import {
   type Setter,
   createMemo,
   createSignal,
+  getOwner,
+  isDisposed,
   mapArray,
   onCleanup,
 } from "solid-js";
@@ -453,21 +455,35 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     // here is the reliable way to get `fetching`/`error`. `content` still
     // hands back the same promise, so `<Loading>`/`<Errored>` work normally
     // for JSX consumers that want them.
+    // Captured once per page — mapArray disposes this owner when the page's
+    // key drops out of pageKeys, and a fetch can still be in flight then.
+    const owner = getOwner();
+    const stale = (thisRequest: Promise<T[]>) =>
+      thisRequest !== request || (owner != null && isDisposed(owner)); // superseded by a retry, or page disposed
+
     let request!: Promise<T[]>;
     const startRequest = () => {
       setFetching(true);
       setError(undefined);
-      const thisRequest = fetcher(index);
+      // A fetcher that throws synchronously (instead of returning a rejected
+      // promise) is normalized to a rejection here so it still lands in
+      // `.catch` below rather than escaping through mapArray's mapFn.
+      let thisRequest: Promise<T[]>;
+      try {
+        thisRequest = fetcher(index);
+      } catch (err) {
+        thisRequest = Promise.reject(err);
+      }
       request = thisRequest;
       thisRequest
         .then(value => {
-          if (thisRequest !== request) return; // superseded by a retry
+          if (stale(thisRequest)) return;
           setFetching(false);
           if (value.length === 0) setEnd(true);
           else if (index === pageCount() - 1) reobserve();
         })
         .catch(err => {
-          if (thisRequest !== request) return;
+          if (stale(thisRequest)) return;
           setFetching(false);
           setError(err);
         });
