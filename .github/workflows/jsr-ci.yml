@@ -1,0 +1,39 @@
+name: JSR validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - next
+  workflow_dispatch:
+
+jobs:
+  jsr:
+    name: Validate JSR workspace
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install Deno dependencies
+        run: |
+          if [ -f deno.lock ]; then
+            deno ci
+          else
+            deno install
+          fi
+
+      - name: Format check
+        run: deno task jsr:fmt
+
+      - name: Publish dry run with full type checks
+        run: deno publish --dry-run --check

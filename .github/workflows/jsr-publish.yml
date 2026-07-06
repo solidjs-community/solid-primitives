@@ -1,0 +1,50 @@
+name: Publish JSR
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Run the real JSR publish after the dry run passes
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+jobs:
+  publish:
+    name: Publish JSR workspace
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install Deno dependencies
+        run: |
+          if [ -f deno.lock ]; then
+            deno ci
+          else
+            deno install
+          fi
+
+      - name: Publish dry run
+        run: |
+          deno publish --dry-run --check
+          deno bump-version --base=main --dry-run
+
+
+      - name: Publish to JSR
+        if: ${{ inputs.publish == 'true' }}
+        run: |
+          deno bump-version --base=main
+          deno publish --check
