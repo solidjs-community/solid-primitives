@@ -20,7 +20,7 @@
     "npm:@tailwindcss/container-queries@~0.1.1": "0.1.1_tailwindcss@3.3.3",
     "npm:@tailwindcss/typography@~0.5.20": "0.5.20_tailwindcss@3.3.3",
     "npm:@tanstack/solid-router@2.0.0-beta.23": "2.0.0-beta.23_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15",
-    "npm:@tanstack/solid-start@2.0.0-beta.24": "2.0.0-beta.24_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_esbuild@0.28.1_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0",
+    "npm:@tanstack/solid-start@2.0.0-beta.24": "2.0.0-beta.24_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0",
     "npm:@tauri-apps/api@^1.6.0": "1.6.0",
     "npm:@testing-library/jest-dom@^6.9.1": "6.9.1",
     "npm:@types/jsdom@^21.1.7": "21.1.7",
@@ -74,7 +74,7 @@
     "npm:typescript@^6.0.3": "6.0.3",
     "npm:undici@^5.29.0": "5.29.0",
     "npm:unified@^11.0.5": "11.0.5",
-    "npm:unplugin-solid@1": "1.0.0_solid-js@2.0.0-beta.15",
+    "npm:unplugin-solid@1": "1.0.0_solid-js@2.0.0-beta.15_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0",
     "npm:vite-plugin-solid@3.0.0-next.5": "3.0.0-next.5_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_@testing-library+jest-dom@6.9.1_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
     "npm:vite@^6.4.3": "6.4.3_@types+node@22.20.0_sass@1.101.0",
     "npm:vite@^8.1.3": "8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
@@ -2970,7 +2970,7 @@
         "zod"
       ]
     },
-    "@tanstack/router-plugin@1.168.18_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_esbuild@0.28.1": {
+    "@tanstack/router-plugin@1.168.18_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_solid-js@2.0.0-beta.15": {
       "integrity": "sha512-MofS28/axfnfnhOD2RSgJEaU882aX5RsAzhGz5Vc4XhAmvCjy919u9JrNs4QsTWFbTD1P7IJ8WFlFVsrg0pStg==",
       "dependencies": [
         "@babel/core",
@@ -2980,7 +2980,7 @@
         "@tanstack/router-generator",
         "@tanstack/router-utils",
         "chokidar@5.0.0",
-        "unplugin@3.3.0_esbuild@0.28.1_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0",
+        "unplugin@3.3.0_esbuild@0.28.1_rolldown@1.1.4_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@types+node@22.20.0_sass@1.101.0",
         "vite@8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
         "vite-plugin-solid",
         "zod"
@@ -3036,7 +3036,7 @@
         "solid-js@2.0.0-beta.15"
       ]
     },
-    "@tanstack/solid-start@2.0.0-beta.24_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_esbuild@0.28.1_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
+    "@tanstack/solid-start@2.0.0-beta.24_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
       "integrity": "sha512-mtF9MP/zw/0IZ2qhZCcl5dUPB+bL7Fp7ftjHcrJ9m8zw6TDbnUSiC65W/xiymiLV/J1KssVklEs0sPIxdcvOtw==",
       "dependencies": [
         "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
@@ -3066,7 +3066,7 @@
     "@tanstack/start-fn-stubs@1.162.0": {
       "integrity": "sha512-QWfUZ3Yo923tdQn38LyKMU8rcTw69zc+T4dAvgTWV4O56SqFRsGfS0lSWIMhJRwXIx/bvdi7nTUBDdZtTHtpTQ=="
     },
-    "@tanstack/start-plugin-core@1.171.17_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_esbuild@0.28.1_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
+    "@tanstack/start-plugin-core@1.171.17_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_solid-js@2.0.0-beta.15_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
       "integrity": "sha512-ngKkp3wn/U3nyeqZl7KcMzjbgTbcypC5ES7O92JpA5/tz4PufFOf5l+eX3pY+4Z6jE6Jb6ekQgnryG7XMjpK7Q==",
       "dependencies": [
         "@babel/code-frame@7.27.1",
@@ -3125,7 +3125,7 @@
         "@babel/code-frame@7.29.7",
         "@babel/runtime",
         "@types/aria-query",
-        "aria-query",
+        "aria-query@5.3.0",
         "dom-accessibility-api@0.5.16",
         "lz-string",
         "picocolors@1.1.1",
@@ -3136,7 +3136,7 @@
       "integrity": "sha512-zIcONa+hVtVSSep9UT3jZ5rizo2BsxgyDYU7WFD5eICBE7no3881HGeb/QkGfsJs6JTkY1aQhT7rIPC7e+0nnA==",
       "dependencies": [
         "@adobe/css-tools",
-        "aria-query",
+        "aria-query@5.3.2",
         "css.escape",
         "dom-accessibility-api@0.6.3",
         "picocolors@1.1.1",
@@ -3629,6 +3629,9 @@
       "dependencies": [
         "dequal"
       ]
+    },
+    "aria-query@5.3.2": {
+      "integrity": "sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw=="
     },
     "array-union@2.1.0": {
       "integrity": "sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw=="
@@ -7498,7 +7501,7 @@
         "normalize-path@2.1.1"
       ]
     },
-    "unplugin-solid@1.0.0_solid-js@2.0.0-beta.15": {
+    "unplugin-solid@1.0.0_solid-js@2.0.0-beta.15_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
       "integrity": "sha512-pv1CS3XMtf3WwX8Dq9Bvo4qH6mfjN2xOgbaPcnqW1dLhyP/JQCvueGEsN0dYIZ4JvxaD/G/Ot1JnBzNQGHkfeA==",
       "dependencies": [
         "@babel/core",
@@ -7520,17 +7523,19 @@
         "webpack-virtual-modules"
       ]
     },
-    "unplugin@3.3.0_esbuild@0.28.1_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
+    "unplugin@3.3.0_esbuild@0.28.1_rolldown@1.1.4_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@types+node@22.20.0_sass@1.101.0": {
       "integrity": "sha512-qa66K+crbfyE6JK10GjvbJeRrOsuC/JpbnHctfyp/i4oBTxWOzJfRZyDiOk1PtErMFRu8JhsU/wPvOdBNWe5Rg==",
       "dependencies": [
         "@jridgewell/remapping",
         "esbuild@0.28.1",
         "picomatch@4.0.5",
+        "rolldown",
         "vite@8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
         "webpack-virtual-modules"
       ],
       "optionalPeers": [
         "esbuild@0.28.1",
+        "rolldown",
         "vite@8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0"
       ]
     },
@@ -7906,7 +7911,9 @@
         "npm:solid-js@2.0.0-beta.15",
         "npm:storybook-solidjs-vite@^10.5.2",
         "npm:storybook@^10.4.6",
+        "npm:tsdown@~0.22.3",
         "npm:typescript@^6.0.3",
+        "npm:unplugin-solid@1",
         "npm:vite-plugin-solid@3.0.0-next.5",
         "npm:vite@^6.4.3",
         "npm:vitest@^2.1.9"
