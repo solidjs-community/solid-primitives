@@ -13,4 +13,5 @@ onlyBuiltDependencies:
 
 catalog:
   tsdown: ^0.22.3
+  unplugin-solid: ^1.0.0
   
