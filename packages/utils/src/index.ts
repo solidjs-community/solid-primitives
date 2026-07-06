@@ -54,7 +54,7 @@ export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
 /** @deprecated use {@link equalFn} from "solid-js" */
-export const defaultEquals = Object.is.bind(Object);
+export const defaultEquals: typeof Object.is = Object.is.bind(Object);
 
 /**
  * Signal options that disable equality checking, causing the signal to always
@@ -127,7 +127,7 @@ export function reverseChain<Args extends [] | any[]>(
 }
 
 /** Clamps `n` to the inclusive range `[min, max]`. */
-export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
+export const clamp = (n: number, min: number, max: number): number => Math.min(Math.max(n, min), max);
 
 /** Creates an ID generator with its own isolated counter and per-generator random segment. Each call to the returned function produces a `timestamp-sequence-random` string that is unique within the generator and with high probability unique across independent generators (e.g. separate processes or SSR requests). */
 export const createIdGenerator = (): (() => string) => {
@@ -172,7 +172,7 @@ export const accessArray = <A extends MaybeAccessor<any>>(
 export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue<A>>(
   value: A,
   fn: (value: NonNullable<V>) => void,
-) => {
+): void => {
   const _value = access(value);
   // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   typeof _value != null && fn(_value as NonNullable<V>);

@@ -41,7 +41,7 @@ export function makeMediaQueryListener(
  * console.log(isSmall());
  * ```
  */
-export function createMediaQuery(query: string, serverFallback = false) {
+export function createMediaQuery(query: string, serverFallback = false): Accessor<boolean> {
   if (isServer) {
     return () => serverFallback;
   }
@@ -64,7 +64,7 @@ export function createMediaQuery(query: string, serverFallback = false) {
  *    prefersDark() // => boolean
  * });
  */
-export function createPrefersDark(serverFallback?: boolean) {
+export function createPrefersDark(serverFallback?: boolean): Accessor<boolean> {
   return createMediaQuery("(prefers-color-scheme: dark)", serverFallback);
 }
 

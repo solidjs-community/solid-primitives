@@ -11,7 +11,7 @@ import { type AsyncStorage } from "./persisted.ts";
  * const storage = isFallback ? localStorage : tauriStorage();
  * ````
  */
-export function tauriStorage(name = "solid-storage.dat") {
+export function tauriStorage(name = "solid-storage.dat"): AsyncStorage {
   const api: AsyncStorage = {
     _store: null,
     _getStore: async () =>

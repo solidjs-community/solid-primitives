@@ -111,7 +111,7 @@ export const multiplexStorage: StorageMultiplexer = (...storages) => ({
 /**
  * Provides a minimal Storage API wrapper for an object
  */
-export const makeObjectStorage = (object: { [key: string]: string }) => ({
+export const makeObjectStorage = (object: { [key: string]: string }): SyncStorage => ({
   getItem: (key: string) => (Object.hasOwn(object, key) && object[key]) || null,
   setItem: (key: string, value: string) => {
     object[key] = value;

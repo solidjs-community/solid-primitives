@@ -128,7 +128,7 @@ export const makeReconnectingWS = (
   url: string,
   protocols?: string | string[],
   options: WSReconnectOptions = {},
-) => {
+): ReconnectingWebSocket => {
   // oxlint-disable-next-line no-unused-vars
   let retries = options.retries || Infinity;
   let ws: ReconnectingWebSocket;
@@ -344,7 +344,7 @@ export type WSStoreOptions<S, T = string> = {
 export const createWSStore = <S extends object, T = string>(
   ws: WebSocket,
   options: WSStoreOptions<S, T>,
-) => {
+): ReturnType<typeof createStore<S>> => {
   const [store, setStore] = createStore(options.initial as any);
   const handler = (e: MessageEvent) => {
     runWithOwner(null, () => setStore((draft: S) => void options.patch(draft, e.data as T)));

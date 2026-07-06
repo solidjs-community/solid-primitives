@@ -59,8 +59,8 @@ export function makeEventListener(
   handler: (event: Event) => void,
   options?: EventListenerOptions,
 ): VoidFunction {
-  target.addEventListener(type, handler, options);
-  return tryOnCleanup(target.removeEventListener.bind(target, type, handler, options));
+  target?.addEventListener?.(type, handler, options);
+  return tryOnCleanup(target?.removeEventListener?.bind(target, type, handler, options));
 }
 
 /**

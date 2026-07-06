@@ -11,7 +11,7 @@ import { type FileUploaderDirective } from "./types.ts";
  *
  * Usage: `<input type="file" ref={fileUploader({ userCallback, setFiles, onError })} />`
  */
-export const fileUploader = (options: FileUploaderDirective) => {
+export const fileUploader = (options: FileUploaderDirective): (_el: HTMLInputElement) => void => {
   if (isServer) return (_el: HTMLInputElement) => {};
 
   const { userCallback, setFiles, onError } = options;

@@ -91,7 +91,7 @@ export function createMousePosition(
  *   console.log(pos.x, pos.y)
  * })
  */
-export const useMousePosition = /*#__PURE__*/ createHydratableSingletonRoot(
+export const useMousePosition: ReturnType<typeof createHydratableSingletonRoot> = /*#__PURE__*/ createHydratableSingletonRoot(
   createMousePosition.bind(void 0, void 0, void 0),
 );
 

@@ -14,7 +14,7 @@ export type Fetcher<Result, FetcherArgs> = Exclude<
 export const wrapFetcher = <Result, FetcherArgs extends any[]>(
   requestContext: RequestContext<Result, FetcherArgs>,
   wrapper: (originalFetcher: Fetcher<Result, FetcherArgs>) => Fetcher<Result, FetcherArgs>,
-) => {
+): void => {
   const originalFetcher = requestContext.fetcher;
   if (!originalFetcher) {
     throw new Error("could not read resource fetcher");
@@ -28,7 +28,7 @@ export const wrapResource = <Result, FetcherArgs>(
   wrapper: (
     requestContext: RequestContext<Result, FetcherArgs>,
   ) => [props?: { [key: string]: any }, actions?: { [key: string]: any }],
-) => {
+): void => {
   if (!requestContext.resource) {
     throw new Error("could not read resource");
   }

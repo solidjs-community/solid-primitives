@@ -1,21 +1,21 @@
-import { createSignal, onCleanup } from "solid-js";
+import { createSignal, onCleanup, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
 
-export type OnMessageCB = (e: MessageEvent) => void;
+export type OnMessageCB<T> = (e: MessageEvent<T>) => void;
 
-export type TBroadcastChannelInstance = {
-  onMessageCBList: { id: Symbol; cb: OnMessageCB }[];
+export type TBroadcastChannelInstance<T> = {
+  onMessageCBList: { id: Symbol; cb: OnMessageCB<any> }[];
   instanceCount: number;
   instance: {
-    onMessage: (cb: OnMessageCB, options?: boolean | AddEventListenerOptions) => void;
-    postMessage: (props: any) => void;
+    onMessage: (cb: OnMessageCB<T>, options?: boolean | AddEventListenerOptions) => void;
+    postMessage: (props: T) => void;
     close: () => void;
     channelName: string;
     instance: BroadcastChannel;
   };
 };
 const map: {
-  [key: string]: TBroadcastChannelInstance;
+  [key: string]: TBroadcastChannelInstance<any>;
 } = {};
 
 /**
@@ -33,7 +33,7 @@ const map: {
  * - `channelName` - the name of the channel
  * - `instance` - the underlying [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance
  */
-export function makeBroadcastChannel<T>(name: string) {
+export function makeBroadcastChannel<T>(name: string): TBroadcastChannelInstance<T>["instance"] {
   if (isServer)
     return {
       onMessage: () => void 0,
@@ -109,7 +109,7 @@ export function makeBroadcastChannel<T>(name: string) {
     instanceCount: 1,
     onMessageCBList: [],
     instance: null as any,
-  } as TBroadcastChannelInstance;
+  } as TBroadcastChannelInstance<T>;
 
   const instance = new BroadcastChannel(name);
   const { name: channelName, postMessage } = instance;
@@ -143,7 +143,7 @@ export function makeBroadcastChannel<T>(name: string) {
  * - `channelName` - the name of the channel
  * - `instance` - the underlying [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance
  */
-export function createBroadcastChannel<T>(name: string) {
+export function createBroadcastChannel<T>(name: string): Omit<TBroadcastChannelInstance<T>["instance"], "onMessage"> & { message: Accessor<T | null> } {
   const [message, setMessage] = createSignal<T | null>(null);
   const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel<T>(name);
 

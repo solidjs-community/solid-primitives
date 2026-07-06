@@ -269,7 +269,7 @@ function toArray(item: any) {
  *
  * Objects and Arrays are re-created on each operation, but the values will be left untouched, so `<For>` should work fine.
  */
-export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initialValue?: I) {
+export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initialValue?: I): Accessor<I | R | {} | R[] | I[] | undefined> {
   return createMemo<I | R | {} | R[] | I[] | undefined>(previous => {
     const current = res();
     return current == null && previous == null

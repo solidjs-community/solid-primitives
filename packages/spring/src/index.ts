@@ -351,7 +351,7 @@ export function createSpring<T extends SpringTarget>(
 export function createDerivedSpring<T extends SpringTarget>(
   target: Accessor<T>,
   options?: SpringOptions | Accessor<SpringOptions>,
-) {
+): Accessor<WidenSpringTarget<T>> {
   const [springValue, setSpringValue] = createSpring(target(), options);
 
   if (!isServer) {
