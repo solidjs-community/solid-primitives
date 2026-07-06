@@ -7,18 +7,6 @@
   "preferPackageJson": true,
   "lock": true,
   "lint": {
-    "include": [
-      "packages",
-      "scripts"
-    ],
-    "exclude": [
-      "packages/*/dist",
-      "packages/*/dev",
-      "packages/*/test",
-      "packages/*/tauri_storage",
-      "site",
-      "node_modules"
-    ],
     "rules": {
       "tags": [
         "recommended"
@@ -61,22 +49,25 @@
     }
   },
   "tasks": {
-    "jsr:sync": "deno run --allow-read --allow-write scripts/jsr/sync-package-metadata.ts",
-    "jsr:check-sync": "deno run --allow-read scripts/jsr/sync-package-metadata.ts --check",
-    "jsr:check": "deno task jsr:check-sync && deno check --all",
-    "jsr:fmt": "deno fmt --check deno.jsonc packages/*/deno.jsonc scripts/jsr/*.ts",
-    "jsr:dry-run": "deno task jsr:check-sync && deno publish --dry-run --check",
-    "jsr:prepublish": "deno task jsr:check-sync && deno task jsr:fmt && deno task jsr:dry-run",
+    "jsr:check": "deno check --all",
+    "jsr:fmt": "deno fmt --check deno.jsonc packages/*/deno.jsonc",
     "jsr:list": "deno list -r"
   },
-  "allowScripts": {
-    "allow": [],
-    "deny": [
-      "npm:@parcel/watcher@2.5.6",
-      "npm:esbuild@0.21.5",
-      "npm:esbuild@0.25.12",
-      "npm:esbuild@0.28.1",
-      "npm:fsevents@2.3.3"
-    ]
-  }
+  "include": [
+    "packages",
+    "template"
+  ],
+  "exclude": [
+    "**/stories",
+    "**/dist",
+    "**/dev",
+    "**/test",
+    "**/tauri-storage",
+    "**/vitest.config.ts",
+    "**/node_modules",
+    ".storybook",
+    "configs",
+    "scripts",
+    "site"
+  ]
 }
