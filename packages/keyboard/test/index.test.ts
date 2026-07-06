@@ -444,4 +444,91 @@ describe("createShortcut", () => {
         dispose();
       }));
   });
+
+  // https://github.com/solidjs-community/solid-primitives/issues/663
+  describe("anyOrder", () => {
+    test("fires regardless of which modifier is pressed first", () =>
+      createRoot(dispose => {
+        let fired = 0;
+        createShortcut(["Shift", "Control", "M"], () => fired++, { anyOrder: true });
+
+        dispatchKeyEvent("Control", "keydown");
+        dispatchKeyEvent("Shift", "keydown");
+        dispatchKeyEvent("m", "keydown");
+        expect(fired).toBe(1);
+
+        dispatchKeyEvent("m", "keyup");
+        dispatchKeyEvent("Shift", "keyup");
+        dispatchKeyEvent("Control", "keyup");
+        dispose();
+      }));
+
+    test("does not fire for a partial or unrelated key set", () =>
+      createRoot(dispose => {
+        let fired = 0;
+        createShortcut(["Control", "Shift", "M"], () => fired++, { anyOrder: true });
+
+        dispatchKeyEvent("Shift", "keydown");
+        expect(fired).toBe(0);
+
+        dispatchKeyEvent("q", "keydown");
+        dispatchKeyEvent("Control", "keydown");
+        dispatchKeyEvent("m", "keydown");
+        expect(fired).toBe(0);
+
+        dispatchKeyEvent("q", "keyup");
+        dispatchKeyEvent("Shift", "keyup");
+        dispatchKeyEvent("Control", "keyup");
+        dispatchKeyEvent("m", "keyup");
+        dispose();
+      }));
+
+    test("requireReset — fires only once until keys are released, in any order", () =>
+      createRoot(dispose => {
+        let fired = 0;
+        createShortcut(["Control", "Shift", "M"], () => fired++, {
+          anyOrder: true,
+          requireReset: true,
+        });
+
+        dispatchKeyEvent("Shift", "keydown");
+        dispatchKeyEvent("Control", "keydown");
+        dispatchKeyEvent("m", "keydown");
+        expect(fired).toBe(1);
+
+        // still held — shouldn't refire
+        dispatchKeyEvent("m", "keydown", { repeat: true });
+        expect(fired).toBe(1);
+
+        dispatchKeyEvent("m", "keyup");
+        dispatchKeyEvent("Shift", "keyup");
+        dispatchKeyEvent("Control", "keyup");
+
+        dispatchKeyEvent("Control", "keydown");
+        dispatchKeyEvent("Shift", "keydown");
+        dispatchKeyEvent("m", "keydown");
+        expect(fired).toBe(2);
+
+        dispatchKeyEvent("m", "keyup");
+        dispatchKeyEvent("Shift", "keyup");
+        dispatchKeyEvent("Control", "keyup");
+        dispose();
+      }));
+
+    test("defaults to order-sensitive matching when not set", () =>
+      createRoot(dispose => {
+        let fired = 0;
+        createShortcut(["Control", "Shift", "M"], () => fired++);
+
+        dispatchKeyEvent("Shift", "keydown");
+        dispatchKeyEvent("Control", "keydown");
+        dispatchKeyEvent("m", "keydown");
+        expect(fired).toBe(0);
+
+        dispatchKeyEvent("m", "keyup");
+        dispatchKeyEvent("Shift", "keyup");
+        dispatchKeyEvent("Control", "keyup");
+        dispose();
+      }));
+  });
 });
