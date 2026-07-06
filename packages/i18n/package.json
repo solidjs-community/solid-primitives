@@ -20,6 +20,8 @@
     "list": [
       "flatten",
       "resolveTemplate",
+      "resolveRichTemplate",
+      "richText",
       "translator",
       "scopedTranslator",
       "chainedTranslator"
@@ -45,7 +47,6 @@
   },
   "typesVersions": {},
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -59,9 +60,11 @@
     "primitives"
   ],
   "peerDependencies": {
+    "@solidjs/web": "^2.0.0-beta.15",
     "solid-js": "^2.0.0-beta.15"
   },
   "devDependencies": {
+    "@solidjs/web": "2.0.0-beta.15",
     "solid-js": "2.0.0-beta.15"
   }
 }

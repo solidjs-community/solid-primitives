@@ -1,4 +1,5 @@
 import { createMemo, createSignal, isPending, Loading } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import preview from "../../../.storybook/preview.js";
 import * as i18n from "@solid-primitives/i18n";
 import readme from "../README.md?raw";
@@ -9,6 +10,7 @@ import {
   Card,
   colors,
   Container,
+  EventLog,
   font,
   Section,
   Separator,
@@ -31,8 +33,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── Shared dictionaries ─────────────────────────────────────────────────────
-
 const en_raw = {
   greeting: i18n.template<{ name: string }>("Hello, {{ name }}!"),
   farewell: ({ name }: { name: string }) => `Goodbye, ${name}!`,
@@ -40,8 +40,9 @@ const en_raw = {
 };
 
 type RawDict = typeof en_raw;
+type Locale = "en" | "fr" | "es";
 
-const staticDicts: Record<string, RawDict> = {
+const staticDicts: Record<Locale, RawDict> = {
   en: en_raw,
   fr: {
     greeting: "Bonjour, {{ name }} !" as any,
@@ -55,12 +56,8 @@ const staticDicts: Record<string, RawDict> = {
   },
 };
 
-type Locale = "en" | "fr" | "es";
-
-// ─── Story 1: translator ──────────────────────────────────────────────────────
-
 export const TranslatorStory = meta.story({
-  name: "translator",
+  name: "Locale Switching with Static Dictionaries",
   parameters: {
     docs: {
       description: {
@@ -134,15 +131,13 @@ export const TranslatorStory = meta.story({
   },
 });
 
-// ─── Story 2: Dynamic Loading ─────────────────────────────────────────────────
-
 async function simulateFetch(locale: Locale): Promise<i18n.Flatten<RawDict>> {
   await new Promise(r => setTimeout(r, 400));
   return i18n.flatten(staticDicts[locale]);
 }
 
 export const DynamicLoadingStory = meta.story({
-  name: "Dynamic Loading",
+  name: "Loading Dictionaries Asynchronously",
   parameters: {
     docs: {
       description: {
@@ -192,7 +187,7 @@ export const DynamicLoadingStory = meta.story({
             </Card>
           }
         >
-          <div style={{ opacity: isPending() ? 0.5 : 1, transition: "opacity 0.15s" }}>
+          <div style={{ opacity: isPending(dict) ? 0.5 : 1, transition: "opacity 0.15s" }}>
             <Card>
               <StatRow label="greeting" value={String(t("greeting", { name: name() }) ?? "")} />
               <Separator />
@@ -206,8 +201,6 @@ export const DynamicLoadingStory = meta.story({
     );
   },
 });
-
-// ─── Story 3: Scoped & Chained Translators ────────────────────────────────────
 
 const moduleDict = {
   nav: {
@@ -225,7 +218,7 @@ const moduleDict = {
 const flatModuleDict = i18n.flatten(moduleDict);
 
 export const ScopedChainedStory = meta.story({
-  name: "scopedTranslator · chainedTranslator · proxyTranslator",
+  name: "Module Scoping & Object-Style Key Access",
   parameters: {
     docs: {
       description: {
@@ -283,6 +276,127 @@ export const ScopedChainedStory = meta.story({
               value={proxy.auth.welcome({ user: user() })}
             />
           </Card>
+        </Section>
+      </Container>
+    );
+  },
+});
+
+const Link = (props: { onClick: () => void; children: JSX.Element }) => (
+  <a
+    href="#"
+    onClick={e => {
+      e.preventDefault();
+      props.onClick();
+    }}
+    style={{ color: colors.primary, "text-decoration": "underline", cursor: "pointer" }}
+  >
+    {props.children}
+  </a>
+);
+
+const richDicts = {
+  en: {
+    clickHere: "click here",
+    info: "For more information, {{ clickHere }}.",
+    terms: "By continuing, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>.",
+  },
+  fr: {
+    clickHere: "cliquez ici",
+    info: "Pour plus d'informations, {{ clickHere }}.",
+    terms: "En continuant, vous acceptez nos <terms>Conditions d'utilisation</terms> et notre <privacy>Politique de confidentialité</privacy>.",
+  },
+  es: {
+    clickHere: "haga clic aquí",
+    info: "Para más información, {{ clickHere }}.",
+    terms: "Al continuar, aceptas nuestros <terms>Términos de servicio</terms> y nuestra <privacy>Política de privacidad</privacy>.",
+  },
+} satisfies Record<Locale, Record<string, string>>;
+
+export const RichTextStory = meta.story({
+  name: "Embedding Links & Components in Translations",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`resolveRichTemplate` accepts JSX — not just strings — as `{{ placeholder }}` values, returning JSX instead of a plain string as soon as one is used. `richText(string, tags)` resolves `<tag>content</tag>` markup, resolved separately via `resolveTemplate`, into JSX by calling a renderer for each tag name. Both splice real, interactive Solid components into a translated string, reactively across locales — click a link below to fire its handler.",
+      },
+    },
+  },
+  render: () => {
+    const [locale, setLocale] = createSignal<Locale>("en");
+    const [log, setLog] = createSignal<{ label: string; time: string }[]>([]);
+    const logClick = (label: string) =>
+      setLog(prev => [{ label, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 6));
+
+    const dict = createMemo(() => richDicts[locale()]);
+    const richT = i18n.translator(dict, i18n.resolveRichTemplate);
+    const plainT = i18n.translator(dict, i18n.resolveTemplate);
+
+    const localeLabel = () =>
+      locale() === "en" ? "English" : locale() === "fr" ? "Français" : "Español";
+
+    return (
+      <Container width={430}>
+        <div
+          style={{
+            display: "flex",
+            "align-items": "center",
+            "justify-content": "space-between",
+          }}
+        >
+          <span style={{ "font-size": font.sizeSm, color: colors.muted }}>Active locale</span>
+          <Badge variant="info">{localeLabel()}</Badge>
+        </div>
+
+        <ButtonRow>
+          <Button
+            variant={locale() === "en" ? "primary" : "outline"}
+            onClick={() => setLocale("en")}
+          >
+            English
+          </Button>
+          <Button
+            variant={locale() === "fr" ? "primary" : "outline"}
+            onClick={() => setLocale("fr")}
+          >
+            Français
+          </Button>
+          <Button
+            variant={locale() === "es" ? "primary" : "outline"}
+            onClick={() => setLocale("es")}
+          >
+            Español
+          </Button>
+        </ButtonRow>
+
+        <Section title="resolveRichTemplate — JSX as a template argument">
+          <Card>
+            <p style={{ margin: 0, "font-size": font.sizeBase }}>
+              {richT("info", {
+                clickHere: (
+                  <Link onClick={() => logClick(`clicked: ${plainT("clickHere")}`)}>
+                    {plainT("clickHere")}
+                  </Link>
+                ),
+              })}
+            </p>
+          </Card>
+        </Section>
+
+        <Section title="richText — <tag> markup mapped to components">
+          <Card>
+            <p style={{ margin: 0, "font-size": font.sizeBase }}>
+              {i18n.richText(plainT("terms"), {
+                terms: text => <Link onClick={() => logClick(`clicked: ${text}`)}>{text}</Link>,
+                privacy: text => <Link onClick={() => logClick(`clicked: ${text}`)}>{text}</Link>,
+              })}
+            </p>
+          </Card>
+        </Section>
+
+        <Section title="Event log">
+          <EventLog entries={log()} />
         </Section>
       </Container>
     );
