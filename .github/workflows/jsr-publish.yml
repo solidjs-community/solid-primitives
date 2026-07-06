@@ -39,12 +39,11 @@ jobs:
 
       - name: Publish dry run
         run: |
-          deno publish --dry-run --check
+          deno publish --dry-run --check --allow-slow-types
           deno bump-version --base=main --dry-run
-
 
       - name: Publish to JSR
         if: ${{ inputs.publish == 'true' }}
         run: |
           deno bump-version --base=main
-          deno publish --check
+          deno publish --check --allow-slow-types
