@@ -227,7 +227,7 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  * A component that allows you to consume a context without extracting the children into a separate function.
  * This is particularly useful when the context needs to be used within the same JSX where it is provided.
  *
- * The `ConsumeContext` component is equivalent to the following code and solely exists as syntactic sugar:
+ * The `ContextConsumer` component is equivalent to the following code and solely exists as syntactic sugar:
  *
  * ```tsx
  * <CounterProvider>
