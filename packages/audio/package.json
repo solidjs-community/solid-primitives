@@ -37,8 +37,12 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "build": "tsdown",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"

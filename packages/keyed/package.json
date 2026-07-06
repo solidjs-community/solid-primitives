@@ -44,9 +44,13 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "tsdown",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
