@@ -13,6 +13,8 @@
     "strict": true,
     "esModuleInterop": true,
     "isolatedModules": true,
+    "isolatedDeclarations": true,
+    "declaration": true,
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,

@@ -53,7 +53,9 @@ const pointerStateKeys: (keyof PointerState)[] = [
 ];
 export const toState = (e: PointerEvent): PointerState =>
   pick(e, ...pointerStateKeys) as PointerState;
-export const toStateActive = (e: PointerEvent, isActive: boolean) => ({
+export const toStateActive: (e: PointerEvent, isActive: boolean) => PointerState & {
+  isActive: boolean;
+} = (e: PointerEvent, isActive: boolean) => ({
   ...toState(e),
   isActive,
 });

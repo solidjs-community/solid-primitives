@@ -127,7 +127,7 @@ export function createPerPointerListeners(
         ) => void
       >
   >,
-) {
+): void {
   if (isServer) {
     return;
   }

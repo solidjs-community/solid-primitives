@@ -33,7 +33,7 @@ export class GraphQLError extends Error {
   constructor(
     message: string,
     public locations?: { line: number; column: number }[],
-    public extensions?: Record<string, any>,
+    public extensions?: Record<string, any> | undefined,
   ) {
     super(message);
   }

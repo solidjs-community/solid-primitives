@@ -209,7 +209,7 @@ export const newClipboardItem: NewClipboardItem = (type, data) =>
 /**
  * @deprecated Use `newClipboardItem` instead.
  */
-export const newItem = newClipboardItem;
+export const newItem: NewClipboardItem = newClipboardItem;
 
 /**
  * A modifier that highlights/selects a range on an HTML element.

@@ -52,7 +52,7 @@ export const isSafari: boolean =
 
 /** Browser is Internet Explorer 6-11 */
 // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
-export const isIE = /*@cc_on!@*/ false || !!w.document.documentMode;
+export const isIE: boolean = /*@cc_on!@*/ false || !!w.document.documentMode;
 
 /** is Chromium-based browser */
 export const isChromium: boolean = !!w.chrome;

@@ -19,7 +19,7 @@ import {
 
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
-const isServer = typeof window === "undefined";
+const isServer: boolean = typeof window === "undefined";
 
 import type {
   AccessorArray,
@@ -40,14 +40,14 @@ export * from "./types.ts";
 /** `true` on the server (SSR), `false` in the browser. */
 export { isServer };
 /** `true` in the browser, `false` on the server. */
-export const isClient = !isServer;
+export const isClient: boolean = !isServer;
 /** `true` in the browser with Solid's DEV mode active. */
-export const isDev = isClient && !!DEV;
+export const isDev: boolean = isClient && !!DEV;
 /** `true` when DEV mode is off (i.e. production browser builds and all SSR). */
-export const isProd = !isDev;
+export const isProd: boolean = !isDev;
 
 /** No-operation function — accepts any arguments and returns `undefined`. */
-export const noop = (() => void 0) as Noop;
+export const noop: Noop = (() => void 0) as Noop;
 /** A function that always returns `true`. Useful as a default predicate prop. */
 export const trueFn: () => boolean = () => true;
 /** A function that always returns `false`. Useful as a default predicate prop. */
@@ -61,7 +61,7 @@ export const defaultEquals: typeof Object.is = Object.is.bind(Object);
  * notify subscribers even when the value hasn't changed. Useful for signals
  * holding mutable objects where structural equality cannot be assumed.
  */
-export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
+export const EQUALS_FALSE_OPTIONS: { readonly equals: false } = { equals: false } as const satisfies SignalOptions<unknown>;
 
 /**
  * Signal options that allow writes from inside an owned reactive scope
@@ -71,7 +71,7 @@ export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalO
  * Use only for implementation-detail signals that genuinely need to be written
  * from within a scope — not as a general escape hatch.
  */
-export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS: { readonly ownedWrite: true }  = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Returns `true` if `v` is an instance of `c`. Checks both `instanceof` and
@@ -340,7 +340,7 @@ export function createHydratableSignal<T>(
 }
 
 /** @deprecated use {@link createHydratableSignal} instead */
-export const createHydrateSignal = createHydratableSignal;
+export const createHydrateSignal: typeof createHydratableSignal = createHydratableSignal;
 
 /**
  * Diffs two arrays by reference and calls `handleAdded` / `handleRemoved` for

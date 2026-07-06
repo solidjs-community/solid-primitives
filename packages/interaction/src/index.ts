@@ -79,7 +79,7 @@ const observerStack: Array<{ observe(): void; disconnect(): void }> = [];
  */
 export function ariaHideOutside(
   targets: Element[],
-  root = document.body,
+  root: Element = document.body,
   alwaysVisibleSelector?: string,
 ): () => void {
   const visibleNodes = new Set<Element>(targets);

@@ -23,7 +23,7 @@ export const stringMaskRegExp: Record<string, RegExp> = {
 };
 
 /** Convert a string mask to an array mask */
-export const stringMaskToArray = (mask: string, regexps = stringMaskRegExp): (RegExp | string)[] =>
+export const stringMaskToArray = (mask: string, regexps: typeof stringMaskRegExp = stringMaskRegExp): (RegExp | string)[] =>
   [...mask].map(c => regexps[c] || c);
 
 /** Convert a regex mask to a mask function */
