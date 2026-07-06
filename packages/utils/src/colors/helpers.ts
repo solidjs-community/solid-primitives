@@ -436,7 +436,7 @@ class RGBColor extends Color {
   }
 
   /** Packs red/green/blue into a 24-bit integer via bitwise shifts (alpha is not included). */
-  toHexInt(): number {
+  override toHexInt(): number {
     return (this.red << 16) | (this.green << 8) | this.blue;
   }
 
