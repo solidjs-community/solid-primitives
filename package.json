@@ -25,7 +25,7 @@
     "test:ssr2": "pnpm run test:client2 --mode ssr",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/build.ts",
+    "build": "pnpm -r --filter '@solid-primitives/*' run build",
     "new-package": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/new-package.ts",
     "update-readme": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/update-readme.ts",
     "update-tsconfigs": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/update-tsconfigs.ts",
