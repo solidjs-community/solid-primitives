@@ -7,8 +7,13 @@ import * as utils from "./utils/index.js";
 
 const ROOT_DIST_DIR = path.join(utils.ROOT_DIR, "dist");
 
+// Get all package directories
+const packageDirs = (await fsp.readdir(utils.PACKAGES_DIR))
+  .filter(name => !name.startsWith("."))
+  .map(name => `packages/${name}`);
+
 // Emit d.ts and .js(x) files
-const tsc = cp.spawn("tsc", ["-b", "packages/*"], {
+const tsc = cp.spawn("tsc", ["-b", ...packageDirs], {
   stdio: "inherit",
   cwd: utils.ROOT_DIR,
   shell: true,
@@ -17,6 +22,9 @@ const tsc = cp.spawn("tsc", ["-b", "packages/*"], {
 tsc.on("close", code => {
   if (code === 0) {
     utils.log_info(`tsc step completed in ${performance.now().toFixed()}ms.`);
+    utils.flattenBarrelExports().then(() => {
+      utils.log_info("Flattened barrel exports for bundler compatibility.");
+    });
   } else {
     utils.log_error("tsc step failed.");
     process.exit(1);
