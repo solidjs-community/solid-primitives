@@ -138,12 +138,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/active-element:
     dependencies:
@@ -160,12 +154,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/analytics:
     dependencies:
@@ -188,24 +176,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.14
         version: 2.0.0-beta.14
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.14)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/async:
     devDependencies:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/audio:
     dependencies:
@@ -222,12 +198,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/bounds:
     dependencies:
@@ -247,12 +217,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/broadcast-channel:
     devDependencies:
@@ -262,12 +226,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/clipboard:
     dependencies:
@@ -281,12 +239,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/connectivity:
     dependencies:
@@ -306,12 +258,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/context:
     devDependencies:
@@ -321,12 +267,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/controlled-props:
     dependencies:
@@ -340,12 +280,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/controlled-signal:
     dependencies:
@@ -356,12 +290,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/cookies:
     devDependencies:
@@ -371,12 +299,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/cursor:
     dependencies:
@@ -390,12 +312,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/date:
     dependencies:
@@ -415,12 +331,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/db-store:
     dependencies:
@@ -434,12 +344,6 @@ importers:
       solid-js:
         specifier: ^1.9.7
         version: 1.9.7
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@1.9.7)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/deep:
     dependencies:
@@ -453,12 +357,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/destructure:
     dependencies:
@@ -469,12 +367,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/devices:
     devDependencies:
@@ -484,12 +376,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/event-bus:
     dependencies:
@@ -500,12 +386,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/event-dispatcher:
     devDependencies:
@@ -515,12 +395,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/event-listener:
     dependencies:
@@ -534,24 +408,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/event-props:
     devDependencies:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/fetch:
     dependencies:
@@ -562,12 +424,6 @@ importers:
       solid-js:
         specifier: ^1.9.7
         version: 1.9.7
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@1.9.7)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/filesystem:
     devDependencies:
@@ -586,24 +442,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/flux-store:
     devDependencies:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/focus:
     dependencies:
@@ -620,12 +464,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/form:
     dependencies:
@@ -645,12 +483,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/fullscreen:
     dependencies:
@@ -667,12 +499,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/geolocation:
     dependencies:
@@ -695,24 +521,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/gestures:
     devDependencies:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/graphql:
     dependencies:
@@ -741,12 +555,6 @@ importers:
       solid-js:
         specifier: ^1.9.7
         version: 1.9.7
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@1.9.7)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/history:
     dependencies:
@@ -763,12 +571,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/i18n:
     devDependencies:
@@ -778,12 +580,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/idle:
     dependencies:
@@ -797,12 +593,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/immutable:
     dependencies:
@@ -825,24 +615,12 @@ importers:
       solid-transition-group:
         specifier: ^0.2.3
         version: 0.2.3(solid-js@1.9.7)
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@1.9.7)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/input-mask:
     devDependencies:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/interaction:
     dependencies:
@@ -856,12 +634,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/intersection-observer:
     dependencies:
@@ -878,12 +650,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/jsx-tokenizer:
     dependencies:
@@ -897,12 +663,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/keyboard:
     dependencies:
@@ -922,12 +682,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/keyed:
     devDependencies:
@@ -940,12 +694,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/lifecycle:
     devDependencies:
@@ -955,12 +703,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/list:
     dependencies:
@@ -974,12 +716,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/list-state:
     dependencies:
@@ -993,12 +729,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/map:
     dependencies:
@@ -1012,24 +742,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/marker:
     devDependencies:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/masonry:
     dependencies:
@@ -1043,12 +761,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/match:
     devDependencies:
@@ -1058,12 +770,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/media:
     dependencies:
@@ -1086,12 +792,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/mediastream:
     dependencies:
@@ -1105,12 +805,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/memo:
     dependencies:
@@ -1124,12 +818,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/mouse:
     dependencies:
@@ -1155,12 +843,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/mutable:
     devDependencies:
@@ -1170,12 +852,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/mutation-observer:
     dependencies:
@@ -1189,12 +865,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/notification:
     dependencies:
@@ -1211,12 +881,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/orientation:
     dependencies:
@@ -1230,12 +894,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/page-utilities:
     dependencies:
@@ -1255,12 +913,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/pagination:
     dependencies:
@@ -1274,12 +926,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/permission:
     devDependencies:
@@ -1289,12 +935,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/platform:
     devDependencies:
@@ -1304,12 +944,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/pointer:
     dependencies:
@@ -1329,12 +963,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/presence:
     dependencies:
@@ -1345,12 +973,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/promise:
     dependencies:
@@ -1361,12 +983,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/props:
     dependencies:
@@ -1380,12 +996,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/queue:
     dependencies:
@@ -1396,12 +1006,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/raf:
     dependencies:
@@ -1415,12 +1019,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/range:
     dependencies:
@@ -1434,12 +1032,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/refs:
     dependencies:
@@ -1456,12 +1048,6 @@ importers:
       solid-transition-group:
         specifier: ^0.2.3
         version: 0.2.3(solid-js@2.0.0-beta.15)
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/resize-observer:
     dependencies:
@@ -1484,24 +1070,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/resource:
     devDependencies:
       solid-js:
         specifier: ^1.9.7
         version: 1.9.7
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@1.9.7)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/rootless:
     dependencies:
@@ -1515,12 +1089,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/scheduled:
     devDependencies:
@@ -1536,12 +1104,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/script-loader:
     devDependencies:
@@ -1551,12 +1113,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/scroll:
     dependencies:
@@ -1579,12 +1135,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/selection:
     dependencies:
@@ -1604,12 +1154,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/sensors:
     devDependencies:
@@ -1619,12 +1163,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/set:
     dependencies:
@@ -1638,12 +1176,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/share:
     devDependencies:
@@ -1656,12 +1188,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/signal-builders:
     dependencies:
@@ -1672,12 +1198,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/spring:
     devDependencies:
@@ -1690,12 +1210,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/sse:
     dependencies:
@@ -1709,12 +1223,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/state-machine:
     dependencies:
@@ -1725,12 +1233,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/static-store:
     dependencies:
@@ -1744,12 +1246,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/storage:
     dependencies:
@@ -1766,12 +1262,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/styles:
     dependencies:
@@ -1788,12 +1278,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/timer:
     devDependencies:
@@ -1803,12 +1287,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/transition-group:
     dependencies:
@@ -1822,12 +1300,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/trigger:
     dependencies:
@@ -1841,12 +1313,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/tween:
     devDependencies:
@@ -1856,12 +1322,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/upload:
     dependencies:
@@ -1875,12 +1335,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/url:
     dependencies:
@@ -1915,12 +1369,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/vibrate:
     dependencies:
@@ -1934,12 +1382,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/video:
     dependencies:
@@ -1956,12 +1398,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/virtual:
     dependencies:
@@ -1981,24 +1417,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/websocket:
     devDependencies:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/workers:
     devDependencies:
@@ -2008,12 +1432,6 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
-      unplugin-solid:
-        specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   site:
     dependencies:
@@ -14597,20 +14015,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  babel-preset-solid@1.9.12(@babel/core@7.29.7)(solid-js@1.9.7):
-    dependencies:
-      '@babel/core': 7.29.7
-      babel-plugin-jsx-dom-expressions: 0.40.7(@babel/core@7.29.7)
-    optionalDependencies:
-      solid-js: 1.9.7
-
-  babel-preset-solid@1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.14):
-    dependencies:
-      '@babel/core': 7.29.7
-      babel-plugin-jsx-dom-expressions: 0.40.7(@babel/core@7.29.7)
-    optionalDependencies:
-      solid-js: 2.0.0-beta.14
-
   babel-preset-solid@1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.15):
     dependencies:
       '@babel/core': 7.29.7
@@ -18151,18 +17555,6 @@ snapshots:
       seroval: 1.5.4
       seroval-plugins: 1.5.4(seroval@1.5.4)
 
-  solid-refresh@0.7.8(solid-js@1.9.7):
-    dependencies:
-      '@babel/generator': 7.29.7
-      '@babel/types': 7.29.7
-      solid-js: 1.9.7
-
-  solid-refresh@0.7.8(solid-js@2.0.0-beta.14):
-    dependencies:
-      '@babel/generator': 7.29.7
-      '@babel/types': 7.29.7
-      solid-js: 2.0.0-beta.14
-
   solid-refresh@0.7.8(solid-js@2.0.0-beta.15):
     dependencies:
       '@babel/generator': 7.29.7
@@ -18728,36 +18120,6 @@ snapshots:
     dependencies:
       normalize-path: 2.1.1
 
-  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@1.9.7)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
-    dependencies:
-      '@babel/core': 7.29.7
-      '@rollup/pluginutils': 5.4.0(rollup@4.61.0)
-      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@1.9.7)
-      merge-anything: 6.0.6
-      solid-js: 1.9.7
-      solid-refresh: 0.7.8(solid-js@1.9.7)
-      unplugin: 2.3.11
-      vitefu: 1.1.3(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-      - vite
-
-  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.14)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
-    dependencies:
-      '@babel/core': 7.29.7
-      '@rollup/pluginutils': 5.4.0(rollup@4.61.0)
-      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.14)
-      merge-anything: 6.0.6
-      solid-js: 2.0.0-beta.14
-      solid-refresh: 0.7.8(solid-js@2.0.0-beta.14)
-      unplugin: 2.3.11
-      vitefu: 1.1.3(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-      - vite
-
   unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
     dependencies:
       '@babel/core': 7.29.7
@@ -18768,21 +18130,6 @@ snapshots:
       solid-refresh: 0.7.8(solid-js@2.0.0-beta.15)
       unplugin: 2.3.11
       vitefu: 1.1.3(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-      - vite
-
-  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
-    dependencies:
-      '@babel/core': 7.29.7
-      '@rollup/pluginutils': 5.4.0(rollup@4.61.0)
-      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.15)
-      merge-anything: 6.0.6
-      solid-js: 2.0.0-beta.15
-      solid-refresh: 0.7.8(solid-js@2.0.0-beta.15)
-      unplugin: 2.3.11
-      vitefu: 1.1.3(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
       - rollup
       - supports-color

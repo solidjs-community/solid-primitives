@@ -7924,9 +7924,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -7934,9 +7932,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -7944,18 +7940,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.14",
-            "npm:solid-js@2.0.0-beta.14",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.14"
           ]
         }
       },
       "packages/async": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -7963,9 +7955,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -7973,9 +7963,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -7983,9 +7971,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -7993,9 +7979,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8003,9 +7987,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8013,9 +7995,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8023,18 +8003,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/controlled-signal": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8042,9 +8018,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8052,9 +8026,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8063,9 +8035,7 @@
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
             "npm:date-fns@^2.30.0",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8073,9 +8043,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@supabase/supabase-js@^2.48.1",
-            "npm:solid-js@^1.9.7",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@^1.9.7"
           ]
         }
       },
@@ -8083,18 +8051,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/destructure": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8102,18 +8066,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/event-bus": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8121,9 +8081,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8131,18 +8089,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/event-props": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8150,9 +8104,7 @@
         "packageJson": {
           "dependencies": [
             "npm:node-fetch@^3.3.2",
-            "npm:solid-js@^1.9.7",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@^1.9.7"
           ]
         }
       },
@@ -8163,18 +8115,14 @@
             "npm:@tauri-apps/api@^1.6.0",
             "npm:@types/wicg-file-system-access@2023.10.7",
             "npm:chokidar@^3.6.0",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/flux-store": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8182,9 +8130,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8192,9 +8138,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8202,9 +8146,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8214,18 +8156,14 @@
             "npm:@solidjs/web@2.0.0-beta.15",
             "npm:@types/leaflet@^1.9.21",
             "npm:leaflet@^1.9.4",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/gestures": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8238,9 +8176,7 @@
             "npm:@graphql-codegen/typescript@^4.0.1",
             "npm:@graphql-typed-document-node/core@^3.2.0",
             "npm:graphql@^16.8.1",
-            "npm:solid-js@^1.9.7",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@^1.9.7"
           ]
         }
       },
@@ -8248,18 +8184,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/i18n": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8267,9 +8199,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8279,18 +8209,14 @@
             "npm:@reduxjs/toolkit@^1.9.7",
             "npm:redux@^4.2.1",
             "npm:solid-js@^1.9.7",
-            "npm:solid-transition-group@~0.2.3",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-transition-group@~0.2.3"
           ]
         }
       },
       "packages/input-mask": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8298,9 +8224,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8308,9 +8232,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8318,9 +8240,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8328,9 +8248,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8338,9 +8256,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8348,9 +8264,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8358,9 +8272,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8368,9 +8280,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8378,27 +8288,21 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/marker": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/masonry": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8406,9 +8310,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8416,9 +8318,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8426,9 +8326,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8436,9 +8334,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8446,9 +8342,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8456,9 +8350,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8466,9 +8358,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8476,9 +8366,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8486,9 +8374,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8496,9 +8382,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8506,9 +8390,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8516,9 +8398,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8526,9 +8406,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8536,27 +8414,21 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/presence": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/promise": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8564,18 +8436,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/queue": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8583,9 +8451,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8593,9 +8459,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8604,9 +8468,7 @@
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
             "npm:solid-js@2.0.0-beta.15",
-            "npm:solid-transition-group@~0.2.3",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-transition-group@~0.2.3"
           ]
         }
       },
@@ -8614,18 +8476,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/resource": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@^1.9.7",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@^1.9.7"
           ]
         }
       },
@@ -8633,9 +8491,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8643,9 +8499,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8653,9 +8507,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8663,9 +8515,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8675,9 +8525,7 @@
             "npm:@babel/core@^7.29.7",
             "npm:@solidjs/web@2.0.0-beta.15",
             "npm:babel-preset-solid@2.0.0-beta.14",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8685,9 +8533,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8695,9 +8541,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8705,18 +8549,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/signal-builders": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8724,9 +8564,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8734,18 +8572,14 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/state-machine": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8753,9 +8587,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8763,9 +8595,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8773,9 +8603,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8783,9 +8611,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8793,9 +8619,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8803,9 +8627,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8813,9 +8635,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8823,9 +8643,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8833,9 +8651,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8843,9 +8659,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8853,9 +8667,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8865,18 +8677,14 @@
             "npm:@babel/core@^7.29.7",
             "npm:@solidjs/web@2.0.0-beta.15",
             "npm:babel-preset-solid@2.0.0-beta.14",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
       "packages/websocket": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },
@@ -8884,9 +8692,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
-            "npm:tsdown@~0.22.3",
-            "npm:unplugin-solid@1"
+            "npm:solid-js@2.0.0-beta.15"
           ]
         }
       },

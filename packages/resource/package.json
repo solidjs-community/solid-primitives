@@ -63,8 +63,6 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7",
-    "tsdown": "catalog:",
-    "unplugin-solid": "catalog:"
+    "solid-js": "^1.9.7"
   }
 }

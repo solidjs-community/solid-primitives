@@ -56,10 +56,6 @@
     "entry": "src/**/*.{ts,tsx}",
     "outDir": "dist"
   },
-  "tsdown": {
-    "entry": "src/**/*.{ts,tsx}",
-    "outDir": "dist"
-  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "pnpm -w build",
@@ -77,8 +73,6 @@
   "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15",
-    "tsdown": "catalog:",
-    "unplugin-solid": "catalog:"
+    "solid-js": "2.0.0-beta.15"
   }
 }

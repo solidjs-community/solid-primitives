@@ -66,8 +66,6 @@
   },
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15",
-    "tsdown": "catalog:",
-    "unplugin-solid": "catalog:"
+    "solid-js": "2.0.0-beta.15"
   }
 }

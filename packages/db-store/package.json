@@ -64,8 +64,6 @@
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.48.1",
-    "solid-js": "^1.9.7",
-    "tsdown": "catalog:",
-    "unplugin-solid": "catalog:"
+    "solid-js": "^1.9.7"
   }
 }
