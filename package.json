@@ -32,8 +32,7 @@
     "measure": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/measure.ts",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
     "release": "pnpm build && changeset publish",
-    "release-tagged": "pnpm build && (test -f .changeset/pre.json && changeset publish || changeset publish --tag $BRANCH_NAME)",
-    "postinstall": "pnpm update-tsconfigs"
+    "release-tagged": "pnpm build && (test -f .changeset/pre.json && changeset publish || changeset publish --tag $BRANCH_NAME)"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
