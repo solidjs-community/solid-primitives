@@ -58,7 +58,8 @@
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.15",
     "solid-js": "2.0.0-beta.15",
-    "solid-transition-group": "^0.2.3"
+    "solid-transition-group": "^0.2.3",
+    "tsdown": "catalog:"
   },
   "peerDependencies": {
     "@solidjs/web": "^2.0.0-beta.15",

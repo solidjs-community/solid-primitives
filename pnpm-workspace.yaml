@@ -10,3 +10,7 @@ allowBuilds:
 onlyBuiltDependencies:
   - "@parcel/watcher"
   - esbuild
+
+catalog:
+  tsdown: ^0.22.3
+  

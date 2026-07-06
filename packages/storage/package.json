@@ -80,8 +80,8 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@tauri-apps/plugin-store": "*",
     "@solidjs/web": "^2.0.0-beta.15",
+    "@tauri-apps/plugin-store": "*",
     "solid-js": "^2.0.0-beta.15"
   },
   "peerDependenciesMeta": {
@@ -90,7 +90,8 @@
     }
   },
   "devDependencies": {
+    "@solidjs/web": "2.0.0-beta.15",
     "solid-js": "2.0.0-beta.15",
-    "@solidjs/web": "2.0.0-beta.15"
+    "tsdown": "catalog:"
   }
 }

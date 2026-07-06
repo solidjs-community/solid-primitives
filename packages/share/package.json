@@ -61,6 +61,7 @@
   "devDependencies": {
     "@solid-primitives/utils": "workspace:^",
     "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15"
+    "solid-js": "2.0.0-beta.15",
+    "tsdown": "catalog:"
   }
 }

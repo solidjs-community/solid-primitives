@@ -63,6 +63,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "redux": "^4.2.1",
     "solid-js": "^1.9.7",
-    "solid-transition-group": "^0.2.3"
+    "solid-transition-group": "^0.2.3",
+    "tsdown": "catalog:"
   }
 }

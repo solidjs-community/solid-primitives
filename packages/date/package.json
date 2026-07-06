@@ -57,7 +57,8 @@
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.15",
     "date-fns": "^2.30.0",
-    "solid-js": "2.0.0-beta.15"
+    "solid-js": "2.0.0-beta.15",
+    "tsdown": "catalog:"
   },
   "dependencies": {
     "@solid-primitives/timer": "workspace:^",
