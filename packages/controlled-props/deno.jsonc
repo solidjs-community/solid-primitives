@@ -3,17 +3,21 @@
   "version": "1.0.0-next.0",
   "description": "The primitives in this package allow you to create controlls for component props.",
   "license": "MIT",
-  "exports": "./src/index.tsx",
+  "exports": {
+    ".": "./dist/index.js",
+    "./index.tsx": "./src/index.tsx"
+  },
   "publish": {
     "include": [
       "README.md",
       "LICENSE",
+      "dist/**/*.js",
+      "dist/**/*.ts",
       "src/**/*.ts",
       "src/**/*.tsx",
       "package.json"
     ],
     "exclude": [
-      "dist",
       "dev",
       "test",
       "node_modules",
