@@ -1,0 +1,82 @@
+{
+  "workspace": [
+    "packages/*",
+    "site"
+  ],
+  "nodeModulesDir": "auto",
+  "preferPackageJson": true,
+  "lock": true,
+  "lint": {
+    "include": [
+      "packages",
+      "scripts"
+    ],
+    "exclude": [
+      "packages/*/dist",
+      "packages/*/dev",
+      "packages/*/test",
+      "packages/*/tauri_storage",
+      "site",
+      "node_modules"
+    ],
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "no-slow-types",
+        "no-process-global",
+        "no-node-globals"
+      ]
+    }
+  },
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@solidjs/web",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ]
+  },
+  "catalog": {
+    "solid-js": "2.0.0-beta.15",
+    "@solidjs/web": "2.0.0-beta.15"
+  },
+  "catalogs": {
+    "graphql": {
+      "@graphql-typed-document-node/core": "^3.2.0",
+      "graphql": "^16.8.1"
+    },
+    "supabase": {
+      "@supabase/supabase-js": "^2.48.1"
+    },
+    "tauri": {
+      "@tauri-apps/plugin-store": "*"
+    },
+    "node": {
+      "node-fetch": "^3.3.2",
+      "chokidar": "^3.5.3"
+    }
+  },
+  "tasks": {
+    "jsr:sync": "deno run --allow-read --allow-write scripts/jsr/sync-package-metadata.ts",
+    "jsr:check-sync": "deno run --allow-read scripts/jsr/sync-package-metadata.ts --check",
+    "jsr:check": "deno task jsr:check-sync && deno check --all",
+    "jsr:fmt": "deno fmt --check deno.jsonc packages/*/deno.jsonc scripts/jsr/*.ts",
+    "jsr:dry-run": "deno task jsr:check-sync && deno publish --dry-run --check",
+    "jsr:prepublish": "deno task jsr:check-sync && deno task jsr:fmt && deno task jsr:dry-run",
+    "jsr:list": "deno list -r"
+  },
+  "allowScripts": {
+    "allow": [],
+    "deny": [
+      "npm:@parcel/watcher@2.5.6",
+      "npm:esbuild@0.21.5",
+      "npm:esbuild@0.25.12",
+      "npm:esbuild@0.28.1",
+      "npm:fsevents@2.3.3"
+    ]
+  }
+}
