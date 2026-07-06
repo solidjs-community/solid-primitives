@@ -46,7 +46,7 @@
   "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "tsdown",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -61,6 +61,7 @@
   "devDependencies": {
     "@supabase/supabase-js": "^2.48.1",
     "solid-js": "^1.9.7",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "unplugin-solid": "catalog:"
   }
 }

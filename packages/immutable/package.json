@@ -47,7 +47,7 @@
   "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "tsdown",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -64,6 +64,7 @@
     "redux": "^4.2.1",
     "solid-js": "^1.9.7",
     "solid-transition-group": "^0.2.3",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "unplugin-solid": "catalog:"
   }
 }

@@ -43,7 +43,7 @@
   "scripts": {
     "start": "vite serve dev",
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "tsdown",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -58,7 +58,8 @@
     "@solidjs/web": "2.0.0-beta.15",
     "date-fns": "^2.30.0",
     "solid-js": "2.0.0-beta.15",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "unplugin-solid": "catalog:"
   },
   "dependencies": {
     "@solid-primitives/timer": "workspace:^",

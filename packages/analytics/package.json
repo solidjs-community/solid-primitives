@@ -62,7 +62,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "tsdown",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -93,6 +93,7 @@
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.14",
     "solid-js": "2.0.0-beta.14",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "unplugin-solid": "catalog:"
   }
 }

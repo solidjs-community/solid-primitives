@@ -48,11 +48,14 @@
   "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "tsdown",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest2",
     "test:ssr": "pnpm run vitest2 --mode ssr"
+  },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
@@ -66,6 +69,7 @@
     "@solidjs/web": "2.0.0-beta.15",
     "babel-preset-solid": "2.0.0-beta.14",
     "solid-js": "2.0.0-beta.15",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "unplugin-solid": "catalog:"
   }
 }
