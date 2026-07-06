@@ -343,7 +343,7 @@ describe("MultiProvider", () => {
   });
 });
 
-describe("ConsumeContext", () => {
+describe("ContextConsumer", () => {
   test("consumes a context directly", () => {
     const Context = createContext<string>("Default");
 

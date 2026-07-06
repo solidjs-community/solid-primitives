@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
 import { renderToString } from "@solidjs/web";
-import { createContextProvider, createLayeredContext, MultiProvider } from "../src/index.js";
+import { ContextConsumer, createContextProvider, createLayeredContext, MultiProvider } from "../src/index.js";
 
 type TestContextValue = {
   message: string;
@@ -85,36 +85,58 @@ describe("createLayeredContext (SSR)", () => {
   });
 });
 
-describe("ConsumeContext", () => {
-  test("consumes a context via use-function", () => {
-    const Ctx = createContext<string>("Hello");
-    const useCtx = () => useContext(Ctx);
 
-    let capture1;
-    let capture2;
-    let capture3;
-    renderToString(() => {
-      <Ctx.Provider value="World">
-        <ConsumeContext use={Ctx}>
-          {value => (
-            capture1 = value
-          )}
-        </ConsumeContext>
-        <ConsumeContext use={useCtx}>
-          {value => (
-            capture2 = value
-          )}
-        </ConsumeContext>
-        <ConsumeContext use={() => useContext(Ctx)}>
-          {value => (
-            capture3 = value
-          )}
-        </ConsumeContext>
-      </Ctx.Provider>;
-    });
+describe("ContextConsumer (SSR)", () => {
+  test("consumes a context directly", () => {
+    const Context = createContext<string>("Default");
 
-    expect(capture1).toBe("World");
-    expect(capture2).toBe("World");
-    expect(capture3).toBe("World");
+    let capture;
+    renderToString(() => (
+      <Context value="Actual">
+        <ContextConsumer provider={Context}>
+          {value => (
+            capture = value
+          )}
+        </ContextConsumer>
+      </Context>
+    ));
+
+    expect(capture).toBe("Actual");
+  });
+
+  test("consumes a context via global use-function", () => {
+    const Context = createContext<string>("Default");
+
+    let capture;
+    renderToString(() => (
+      <Context value="Actual">
+        <ContextConsumer provider={() => useContext(Context)}>
+          {value => (
+            capture = value
+          )}
+        </ContextConsumer>
+      </Context>
+    ));
+
+    expect(capture).toBe("Actual");
+  });
+
+  test("consumes a context via its use-function from `createContextProvider`", () => {
+    const [Provider, useContext] = createContextProvider(
+      (props: { value: string }) => props.value,
+      "Default");
+
+    let capture;
+    renderToString(() => (
+      <Provider value="Actual">
+        <ContextConsumer provider={useContext}>
+          {value => (
+            capture = value
+          )}
+        </ContextConsumer>
+      </Provider>
+    ));
+
+    expect(capture).toBe("Actual");
   });
 });

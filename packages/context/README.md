@@ -16,7 +16,7 @@ Primitives simplifying the creation and use of SolidJS Context API.
 - [`createOptionalContextProvider`](#createoptionalcontextprovider) - Like `createContextProvider`, but returns `undefined` instead of throwing if the context is missing.
 - [`createLayeredContext`](#createlayeredcontext) - Like `createContextProvider`, but each provider extends the parent context value rather than replacing it.
 - [`MultiProvider`](#multiprovider) - A component that allows you to provide multiple contexts at once.
-- [`ConsumeContext`](#consumecontext) - A component that allows you to consume contexts directly within JSX.
+- [`ContextConsumer`](#contextconsumer) - A component that allows you to consume contexts directly within JSX.
 
 ## Installation
 
@@ -187,22 +187,22 @@ import { MultiProvider } from "@solid-primitives/context";
 > **Warning**
 > Components and values passed to `MultiProvider` will be evaluated only once, so make sure that the structure is static. If it isn't, please use nested provider components instead.
 
-## `ConsumeContext`
+## `ContextConsumer`
 
-Inspired by React's `Context.Consumer` component, `ConsumeContext` allows using contexts directly within JSX without the needing to extract the content JSX into a separate function.
+Inspired by React's `Context.Consumer` component, `ContextConsumer` allows using contexts directly within JSX without the needing to extract the content JSX into a separate function.
 
 This is particularly useful when you want to use the context in the same JSX block where you're providing it and directly bind the context value to the frontend.
 
-Note that this component solely serves as syntactic sugar and doesn't provide any additional functionality over inlining SolidJS's `useContext` hook within JSX.
+Note that this component solely serves as syntactic sugar and doesn't provide any additional functionality over using `untrack` together with `useContext` in JSX.
 
 ### How to use it
 
-`ConsumeContext` takes a `use` prop that can be either one of the following:
-* A `use...()` function returned by `createContextProvider` or a inline function that returns the context value like `() => useContext(MyContext)`.
-* A `context` prop that takes a raw SolidJS context created by `createContext()`.
+`ContextConsumer` takes a `provider` prop that can be either one of the following:
+* A `use...()` function returned by `createContextProvider` or an inline function that returns the context's value: `() => useContext(MyContext)`.
+* A raw SolidJS context returned by `createContext()`.
 
 ```tsx
-import { createContextProvider, ConsumeContext } from "@solid-primitives/context";
+import { createContextProvider, ContextConsumer } from "@solid-primitives/context";
 
 // Create a context provider
 const [CounterProvider, useCounter] = createContextProvider(() => {
@@ -211,33 +211,32 @@ const [CounterProvider, useCounter] = createContextProvider(() => {
   return { count, increment };
 });
 
-// Provide it, consume it and use it in the same JSX block
+// Provide and consume the context within same JSX block
 <CounterProvider>
-  <ConsumeContext use={useCounter}>
+  <ContextConsumer provider={useCounter}>
     {({ count, increment }) => (
-      <div>
-        <button onClick={increment}>Increment</button>
-        <span>{count()}</span>
-      </div>
+      // ...
     )}
-  </ConsumeContext>
+  </ContextConsumer>
 </CounterProvider>
 ```
 
 With the raw SolidJS context returned by `createContext()`:
 
 ```tsx
-import { ConsumeContext } from "@solid-primitives/context";
+import { ContextConsumer } from "@solid-primitives/context";
 
 // Create a context
-const counterContext = createContext(/*...*/);
+const CounterContext = createContext(/*...*/);
 
 // Consume it using the raw context
-<ConsumeContext use={counterContext}>
-  {({ count, increment }) => {
-    // ...
-  }}
-</ConsumeContext>
+<CounterContext>
+  <ContextConsumer provider={CounterContext}>
+    {({ count, increment }) => {
+      // ...
+    }}
+  </ContextConsumer>
+</CounterContext>
 ```
 
 ## Changelog
