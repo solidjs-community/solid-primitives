@@ -61,7 +61,6 @@
   ],
   "exclude": [
     "**/stories",
-    "**/dist",
     "**/dev",
     "**/test",
     "**/tauri-storage",

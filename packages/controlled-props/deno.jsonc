@@ -11,10 +11,8 @@
     "include": [
       "README.md",
       "LICENSE",
-      "dist/**/*.js",
-      "dist/**/*.ts",
-      "src/**/*.ts",
-      "src/**/*.tsx",
+      "dist",
+      "src",
       "package.json"
     ],
     "exclude": [
