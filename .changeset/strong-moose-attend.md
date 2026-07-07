@@ -2,4 +2,4 @@
 "@solid-primitives/context": minor
 ---
 
-Add `ConsumeContext`
+Add `ContextConsumer`

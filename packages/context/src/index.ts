@@ -194,11 +194,11 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
 export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props: {
   values: {
     [K in keyof T]:
-      | readonly [
-          Context<T[K]> | ContextProviderComponent<T[K]>,
-          [T[K]][T extends unknown ? 0 : never],
-        ]
-      | FlowComponent;
+    | readonly [
+      Context<T[K]> | ContextProviderComponent<T[K]>,
+      [T[K]][T extends unknown ? 0 : never],
+    ]
+    | FlowComponent;
   };
   children: Element;
 }): Element {
@@ -276,7 +276,8 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  * ```
  */
 export function ContextConsumer<T>(props: {
-  children: (value: T | undefined) => Element,
+  children: (value: T) => Element,
+  fallback?: (() => Element) | Element,
   provider: (() => T | undefined) | Context<T>,
 }): Element {
   let context: T | undefined;
@@ -284,6 +285,12 @@ export function ContextConsumer<T>(props: {
     context = props.provider(undefined!) as T | undefined;
   } else {
     context = useContext(props.provider as Context<T>);
+  }
+  if (context === undefined) {
+    if (typeof props.fallback === "function") {
+      return props.fallback?.();
+    }
+    return props.fallback;
   }
   return props.children(context);
 }

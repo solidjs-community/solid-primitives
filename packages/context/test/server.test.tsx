@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
 import { renderToString } from "@solidjs/web";
-import { ContextConsumer, createContextProvider, createLayeredContext, MultiProvider } from "../src/index.js";
+import { ContextConsumer, createContextProvider, createOptionalContextProvider, createLayeredContext, MultiProvider } from "../src/index.js";
 
 type TestContextValue = {
   message: string;
@@ -138,5 +138,65 @@ describe("ContextConsumer (SSR)", () => {
     ));
 
     expect(capture).toBe("Actual");
+  });
+
+  test("consumes a context directly without providing context (default value)", () => {
+    const Context = createContext<string>("Default");
+
+    let capture;
+    renderToString(() => (
+      <ContextConsumer provider={Context}>
+        {value => (
+          capture = value
+        )}
+      </ContextConsumer>
+    ));
+
+    expect(capture).toBe("Default");
+  });
+
+  test("consumes a context via its use-function from `createContextProvider` without provider (default value)", () => {
+    const [, useContext] = createContextProvider(
+      (props: { value: string }) => props.value,
+      "Default");
+
+    let capture;
+    renderToString(() => (
+      <ContextConsumer provider={useContext}>
+        {value => (
+          capture = value
+        )}
+      </ContextConsumer>
+    ));
+
+    expect(capture).toBe("Default");
+  });
+
+  test("renders fallback prop when context is undefined", () => {
+    const [, useOptional] = createOptionalContextProvider((props: { value?: string }) => props.value);
+
+    let capture;
+    renderToString(() => (
+      <ContextConsumer provider={useOptional} fallback={() => (capture = 'Fallback')}>
+        {value => (
+          value as any
+        )}
+      </ContextConsumer>
+    ));
+
+    expect(capture).toBe("Fallback");
+  });
+
+  test("throws when provider absent and no fallback", () => {
+    const [, useRequired] = createContextProvider(() => ({ value: 1 }));
+    expect(() =>
+      renderToString(() => (
+        <ContextConsumer provider={useRequired}>
+          {value => (
+            value as any
+          )}
+        </ContextConsumer>
+      ))
+    ).toThrow();
   });
 });

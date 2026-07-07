@@ -201,6 +201,8 @@ Note that this component solely serves as syntactic sugar and doesn't provide an
 * A `use...()` function returned by `createContextProvider` or an inline function that returns the context's value: `() => useContext(MyContext)`.
 * A raw SolidJS context returned by `createContext()`.
 
+In case the context is not provided, it renders the element specified in the `fallback` prop. If no fallback is provided, this component will throw an error.
+
 ```tsx
 import { createContextProvider, ContextConsumer } from "@solid-primitives/context";
 
@@ -212,13 +214,22 @@ const [CounterProvider, useCounter] = createContextProvider(() => {
 });
 
 // Provide and consume the context within same JSX block
-<CounterProvider>
-  <ContextConsumer provider={useCounter}>
-    {({ count, increment }) => (
-      // ...
-    )}
-  </ContextConsumer>
-</CounterProvider>
+return (
+  <CounterProvider>
+    <ContextConsumer provider={useCounter} fallback={() => (
+      <div>
+        <p>Fallback</p>
+      </div>
+    )}>
+      {({ count, increment }) => (
+        <div>
+          <p>Count: {count()}</p>
+          <button onClick={increment}>Increment</button>
+        </div>
+      )}
+    </ContextConsumer>
+  </CounterProvider>
+);
 ```
 
 With the raw SolidJS context returned by `createContext()`:
@@ -233,7 +244,10 @@ const CounterContext = createContext(/*...*/);
 <CounterContext>
   <ContextConsumer provider={CounterContext}>
     {({ count, increment }) => {
-      // ...
+      <div>
+        <p>Count: {count()}</p>
+        <button onClick={increment}>Increment</button>
+      </div>
     }}
   </ContextConsumer>
 </CounterContext>
