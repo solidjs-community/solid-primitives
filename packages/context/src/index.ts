@@ -245,11 +245,13 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  *
  * Please note that this prop is not reactive.
  *
+ * @param fallback Optional fallback element to render when the context's value is `undefined`. Can be a function or an element. Note that the component still throws an error if the context is not provided, regardless of the fallback.
  *
  * @example
+ * with `createContextProvider`:
  * ```tsx
  * // create the context
- * const [CounterProvider, useCounter] // = createContextProvider(...)
+ * const [CounterProvider, useCounter] = createContextProvider(...)
  *
  * // provide and use the context
  * <CounterProvider count={1}>
@@ -261,9 +263,29 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  * </CounterProvider>
  * ```
  *
+ * @example
+ * with `createOptionalContextProvider` (and `fallback`):
+ * ```tsx
+ * // create the optional context
+ * const [OptionalCounterProvider, useOptionalCounter] = createOptionalContextProvider(...)
+ *
+ * // provide and use the context
+ * <OptionalCounterProvider>
+ *   <ContextConsumer provider={useOptionalCounter} fallback={() => (
+ *       <div>No counter provided</div>
+ *     )}>
+ *     {({ count }) => (
+ *       <div>Count: {count()}</div>
+ *     )}
+ *   </ContextConsumer>
+ * </OptionalCounterProvider>
+ * ```
+ *
+ * @example
+ * with `createContext`:
  * ```tsx
  * // create the context
- * const CounterContext = createContext({ count: 0 });
+ * const CounterContext = createContext(...);
  *
  * // provide and use the context
  * <CounterContext value={{ count: 1 }}>
