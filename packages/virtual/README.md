@@ -28,7 +28,12 @@ pnpm add @solid-primitives/virtual
 
 `createVirtualList` is a headless utility for constructing your own virtualized list components with maximum flexibility.
 
-`virtual` is an accessor returning `{ containerHeight, viewerTop, visibleItems }` — call it to read the current values. When rendering `visibleItems` with `<For>`, pass `keyed={false}` so each item is provided as an `Accessor` (`<For>` defaults to `keyed={true}`, which passes raw values instead).
+`virtual` is an accessor returning `{ containerHeight, viewerTop, visibleItems, firstIndex, lastIndex }` — call it to read the current values. When rendering `visibleItems` with `<For>`, pass `keyed={false}` so each item is provided as an `Accessor` (`<For>` defaults to `keyed={true}`, which passes raw values instead).
+
+- `firstIndex` is the index (into the original `items` list) of the first rendered item.
+- `lastIndex` is the index of the last rendered item, or `undefined` if the list is empty.
+
+Together they're useful for things like "showing items X-Y of Z" counters, since `visibleItems` alone doesn't tell you where those items sit in the original list.
 
 ```tsx
 function MyComp(): JSX.Element {

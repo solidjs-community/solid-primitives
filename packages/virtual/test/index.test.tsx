@@ -57,6 +57,30 @@ describe("createVirtualList", () => {
       dispose();
     }));
 
+  test("returns firstIndex representing the first index of the visibleList", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
+
+      expect(virtual().firstIndex).toEqual(0);
+      dispose();
+    }));
+
+  test("returns lastIndex representing the last item in the visibleList's index", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: TEST_LIST,
+        rootHeight: 20,
+        rowHeight: 10,
+      });
+
+      expect(virtual().lastIndex).toEqual(2);
+      dispose();
+    }));
+
   test("returns onScroll which sets viewerTop and visibleItems based on rootElement's scrolltop", () =>
     createRoot(dispose => {
       const el = document.createElement("div");
@@ -69,18 +93,24 @@ describe("createVirtualList", () => {
 
       expect(virtual().visibleItems).toEqual([0, 1, 2]);
       expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().firstIndex).toEqual(0);
+      expect(virtual().lastIndex).toEqual(2);
 
       el.scrollTop += 10;
 
       // no change until onScroll is called
       expect(virtual().visibleItems).toEqual([0, 1, 2]);
       expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().firstIndex).toEqual(0);
+      expect(virtual().lastIndex).toEqual(2);
 
       onScroll(TARGETED_SCROLL_EVENT(el));
       flush();
 
       expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
       expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().firstIndex).toEqual(0);
+      expect(virtual().lastIndex).toEqual(3);
 
       el.scrollTop += 10;
       onScroll(TARGETED_SCROLL_EVENT(el));
@@ -88,6 +118,8 @@ describe("createVirtualList", () => {
 
       expect(virtual().visibleItems).toEqual([1, 2, 3, 4]);
       expect(virtual().viewerTop).toEqual(10);
+      expect(virtual().firstIndex).toEqual(1);
+      expect(virtual().lastIndex).toEqual(4);
 
       el.scrollTop -= 10;
       onScroll(TARGETED_SCROLL_EVENT(el));
@@ -95,6 +127,8 @@ describe("createVirtualList", () => {
 
       expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
       expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().firstIndex).toEqual(0);
+      expect(virtual().lastIndex).toEqual(3);
 
       el.scrollTop -= 10;
       onScroll(TARGETED_SCROLL_EVENT(el));
@@ -102,6 +136,8 @@ describe("createVirtualList", () => {
 
       expect(virtual().visibleItems).toEqual([0, 1, 2]);
       expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().firstIndex).toEqual(0);
+      expect(virtual().lastIndex).toEqual(2);
 
       dispose();
     }));
@@ -125,6 +161,8 @@ describe("createVirtualList", () => {
 
       expect(virtual().visibleItems).toEqual([997, 998, 999]);
       expect(virtual().viewerTop).toEqual(9_970);
+      expect(virtual().firstIndex).toEqual(997);
+      expect(virtual().lastIndex).toEqual(999);
 
       dispose();
     }));
@@ -145,6 +183,8 @@ describe("createVirtualList", () => {
       flush();
 
       expect(virtual().visibleItems).toEqual([8, 9, 10, 11, 12, 13]);
+      expect(virtual().firstIndex).toEqual(8);
+      expect(virtual().lastIndex).toEqual(13);
 
       dispose();
     }));
@@ -183,6 +223,50 @@ describe("createVirtualList", () => {
       expect(virtual().containerHeight).toEqual(0);
       expect(virtual().viewerTop).toEqual(0);
       expect(virtual().visibleItems).toEqual([]);
+      expect(virtual().firstIndex).toEqual(0);
+      expect(virtual().lastIndex).toEqual(undefined);
+
+      dispose();
+    }));
+
+  test("lastIndex is undefined in an empty list", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: [],
+        rootHeight: 20,
+        rowHeight: 10,
+      });
+
+      expect(virtual().lastIndex).toEqual(undefined);
+      dispose();
+    }));
+
+  test("lastIndex is 0 in a singleton list", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: [10],
+        rootHeight: 20,
+        rowHeight: 10,
+      });
+
+      expect(virtual().lastIndex).toEqual(0);
+      dispose();
+    }));
+
+  test("handles singleton list", () =>
+    createRoot(dispose => {
+      const [virtual] = createVirtualList({
+        items: [10],
+        rootHeight: 20,
+        rowHeight: 10,
+        overscanCount: 0,
+      });
+
+      expect(virtual().containerHeight).toEqual(10);
+      expect(virtual().viewerTop).toEqual(0);
+      expect(virtual().visibleItems).toEqual([10]);
+      expect(virtual().firstIndex).toEqual(0);
+      expect(virtual().lastIndex).toEqual(0);
 
       dispose();
     }));

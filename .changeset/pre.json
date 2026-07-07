@@ -137,12 +137,14 @@
     "graphql-solid2-migration",
     "history-solid2-migration",
     "i18n-missing-key-handler",
+    "i18n-rich-text",
     "i18n-solid2-migration",
     "idle-solid2-migration",
     "immutable-solid2-migration",
     "input-mask-solid2-migration",
     "interaction-solid2-migration",
     "jsx-tokenizer-solid2-migration",
+    "keyboard-any-order-shortcut",
     "keyboard-ignore-within-inputs",
     "keyboard-meta-shortcut-repeat",
     "keyboard-solid2-migration",
@@ -200,6 +202,8 @@
     "vibrate-initial",
     "video-frame-callback",
     "video-initial",
+    "virtual-first-last-index",
+    "virtual-list-class-prop",
     "virtual-solid2-migration",
     "websocket-solid-2-async"
   ]
