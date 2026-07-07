@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "references": [
+    {
+      "path": "../event-listener"
+    },
+    {
+      "path": "../rootless"
+    },
+    {
+      "path": "../static-store"
+    },
+    {
+      "path": "../trigger"
+    },
+    {
+      "path": "../utils"
+    }
+  ],
+  "include": [
+    "src"
+  ]
+}
