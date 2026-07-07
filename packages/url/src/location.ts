@@ -1,5 +1,5 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createSingletonRoot } from "@solid-primitives/rootless";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createStaticStore } from "@solid-primitives/static-store";
 import { accessWith, entries, noop, tryOnCleanup } from "@solid-primitives/utils";
 import { pick } from "@solid-primitives/utils/immutable";
@@ -187,7 +187,7 @@ export function createLocationState(fallback?: LocationFallbackInit): [
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/url#useSharedLocationState
  */
-export const useSharedLocationState = /*#__PURE__*/ createSingletonRoot(() =>
+export const useSharedLocationState = /*#__PURE__*/ createHydratableSingletonRoot(() =>
   createLocationState(),
 );
 
