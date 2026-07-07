@@ -3,17 +3,16 @@
   "version": "3.0.0-next.1",
   "description": "SolidJS Primitives to manage creating event listeners.",
   "license": "MIT",
-  "exports": "./src/index.ts",
+  "exports": "./dist/index.js",
   "publish": {
     "include": [
       "README.md",
       "LICENSE",
-      "src/**/*.ts",
-      "src/**/*.tsx",
+      "dist",
+      "src",
       "package.json"
     ],
     "exclude": [
-      "dist",
       "dev",
       "test",
       "node_modules",

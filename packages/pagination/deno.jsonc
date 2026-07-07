@@ -3,17 +3,16 @@
   "version": "1.0.0-next.1",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "license": "MIT",
-  "exports": "./src/index.ts",
+  "exports": "./dist/index.js",
   "publish": {
     "include": [
       "README.md",
       "LICENSE",
-      "src/**/*.ts",
-      "src/**/*.tsx",
+      "dist",
+      "src",
       "package.json"
     ],
     "exclude": [
-      "dist",
       "dev",
       "test",
       "node_modules",
