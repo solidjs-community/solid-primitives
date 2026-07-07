@@ -3,7 +3,7 @@ import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createStaticStore } from "@solid-primitives/static-store";
 import { accessWith, entries, noop, tryOnCleanup } from "@solid-primitives/utils";
 import { pick } from "@solid-primitives/utils/immutable";
-import { isServer } from "@solidjs/web";
+import { getRequestEvent, isServer } from "@solidjs/web";
 import type { SetterValue } from "./common.js";
 
 export type LocationState = {
@@ -106,7 +106,7 @@ export function setLocationFallback(fallback: LocationFallbackInit): void {
  * setter methods, to push, replace, or navigate to a new href.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/url#createLocationState
- * @param fallback state to use during SSR, when `window.location` isn't available. Falls back to {@link setLocationFallback}'s value if not provided.
+ * @param fallback state to use during SSR, when `window.location` isn't available. Falls back to the current request's URL (via `getRequestEvent`), then to {@link setLocationFallback}'s value, if not provided.
  * @returns
  * ```ts
  * [state, { push, replace, navigate }]
@@ -127,11 +127,20 @@ export function createLocationState(fallback?: LocationFallbackInit): [
   },
 ] {
   if (isServer) {
-    const state = fallback ? getLocationStateFromFallback(fallback) : locationFallback;
+    let state: LocationState | undefined;
+    if (fallback) {
+      state = getLocationStateFromFallback(fallback);
+    } else {
+      const requestEvent = getRequestEvent();
+      state = requestEvent
+        ? getLocationStateFromFallback(requestEvent.request.url)
+        : locationFallback;
+    }
     if (!state) {
       throw new Error(
         "createLocationState requires a location fallback for server execution. " +
-          "Pass one as an argument, or set a global one with setLocationFallback.",
+          "Pass one as an argument, set a global one with setLocationFallback, or " +
+          "run inside a request context that provides one via getRequestEvent.",
       );
     }
     return [state, { push: noop, replace: noop, navigate: noop }];

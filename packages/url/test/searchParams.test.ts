@@ -1,5 +1,5 @@
 import { createEffect, createRoot, flush } from "solid-js";
-import { describe, test, expect, afterEach } from "vitest";
+import { describe, test, expect, afterEach, vi } from "vitest";
 import {
   createLocationSearchParams,
   createSearchParams,
@@ -36,28 +36,17 @@ describe("ReactiveSearchParams", () => {
   test("is granularly reactive per key", () =>
     createRoot(dispose => {
       const params = new ReactiveSearchParams("foo=1&bar=2");
-      let fooUpdates = 0;
-      let barUpdates = 0;
+      const fooUpdates = vi.fn();
+      const barUpdates = vi.fn();
 
-      createEffect(
-        () => params.get("foo"),
-        () => {
-          fooUpdates++;
-        },
-        { defer: true },
-      );
-      createEffect(
-        () => params.get("bar"),
-        () => {
-          barUpdates++;
-        },
-        { defer: true },
-      );
+      createEffect(() => params.get("foo"), fooUpdates, { defer: true });
+      createEffect(() => params.get("bar"), barUpdates, { defer: true });
 
       params.set("foo", "9");
       flush();
-      expect(fooUpdates, "foo changed").toBe(1);
-      expect(barUpdates, "bar did not change").toBe(0);
+      expect(fooUpdates).toHaveBeenCalledTimes(1);
+      expect(fooUpdates).toHaveBeenCalledWith("9", undefined);
+      expect(barUpdates).not.toHaveBeenCalled();
 
       dispose();
     }));
@@ -65,19 +54,13 @@ describe("ReactiveSearchParams", () => {
   test("set() is a no-op when the value doesn't change", () =>
     createRoot(dispose => {
       const params = new ReactiveSearchParams("foo=1");
-      let updates = 0;
+      const updates = vi.fn();
 
-      createEffect(
-        () => params.get("foo"),
-        () => {
-          updates++;
-        },
-        { defer: true },
-      );
+      createEffect(() => params.get("foo"), updates, { defer: true });
 
       params.set("foo", "1");
       flush();
-      expect(updates).toBe(0);
+      expect(updates).not.toHaveBeenCalled();
 
       dispose();
     }));

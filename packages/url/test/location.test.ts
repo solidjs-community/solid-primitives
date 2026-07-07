@@ -3,17 +3,18 @@ import { describe, test, expect, afterEach } from "vitest";
 import { createLocationState, updateLocation } from "../src/index.js";
 
 const origin = location.origin;
+const rootHref = origin + "/";
 
 describe("createLocationState", () => {
   afterEach(() => {
-    history.replaceState(null, "", origin + "/");
+    history.replaceState(null, "", rootHref);
   });
 
   test("reflects the current window.location", () =>
     createRoot(dispose => {
       const [state] = createLocationState();
       expect(state.pathname).toBe("/");
-      expect(state.href).toBe(origin + "/");
+      expect(state.href).toBe(rootHref);
       dispose();
     }));
 
@@ -85,7 +86,7 @@ describe("createLocationState", () => {
 
 describe("updateLocation", () => {
   afterEach(() => {
-    history.replaceState(null, "", origin + "/");
+    history.replaceState(null, "", rootHref);
   });
 
   test("push uses history.pushState", () => {

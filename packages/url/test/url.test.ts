@@ -1,5 +1,5 @@
 import { createEffect, createRoot, flush } from "solid-js";
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { createURL, createURLRecord } from "../src/index.js";
 
 const inithref = "http://example.com/path?foo=bar#hash";
@@ -39,28 +39,17 @@ describe("ReactiveURL", () => {
   test("is reactive — updates trigger effects", () =>
     createRoot(dispose => {
       const url = createURL(inithref);
-      let hrefUpdates = 0;
-      let hashUpdates = 0;
+      const hrefUpdates = vi.fn();
+      const hashUpdates = vi.fn();
 
-      createEffect(
-        () => url.href,
-        () => {
-          hrefUpdates++;
-        },
-        { defer: true },
-      );
-      createEffect(
-        () => url.hash,
-        () => {
-          hashUpdates++;
-        },
-        { defer: true },
-      );
+      createEffect(() => url.href, hrefUpdates, { defer: true });
+      createEffect(() => url.hash, hashUpdates, { defer: true });
 
       url.search = "?a=1";
       flush();
-      expect(hrefUpdates, "href changed").toBe(1);
-      expect(hashUpdates, "hash did not change").toBe(0);
+      expect(hrefUpdates).toHaveBeenCalledTimes(1);
+      expect(hrefUpdates).toHaveBeenCalledWith("http://example.com/path?a=1#hash", undefined);
+      expect(hashUpdates).not.toHaveBeenCalled();
 
       dispose();
     }));
