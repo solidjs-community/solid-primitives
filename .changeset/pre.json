@@ -99,7 +99,8 @@
     "@solid-primitives/sensors": "0.1.0",
     "@solid-primitives/vibrate": "0.0.100",
     "@solid-primitives/video": "0.0.100",
-    "@solid-primitives/async": "0.0.100"
+    "@solid-primitives/async": "0.0.100",
+    "@solid-primitives/url": "0.1.0"
   },
   "changesets": [
     "a11y-solid2-initial",
@@ -199,6 +200,7 @@
     "trigger-solid2-migration",
     "tween-solid2-migration",
     "upload-solid-2-migration",
+    "url-initial",
     "vibrate-initial",
     "video-frame-callback",
     "video-initial",
