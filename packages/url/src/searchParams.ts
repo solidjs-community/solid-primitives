@@ -1,7 +1,7 @@
 import { createSingletonRoot } from "@solid-primitives/rootless";
 import { createTriggerCache } from "@solid-primitives/trigger";
 import { accessWith, entries } from "@solid-primitives/utils";
-import { createStore, type Store } from "solid-js";
+import { createStore, untrack, type Store } from "solid-js";
 import type { SetterValue } from "./common.js";
 import { _useLocationState, type UpdateLocationMethod } from "./location.js";
 
@@ -159,7 +159,7 @@ export class ReactiveSearchParams extends URLSearchParams {
    * @param onChange @internal called after every mutation — used by {@link ReactiveURL} to sync `url.search` from its `.searchParams`.
    */
   constructor(init: ReactiveSearchParamsInit, onChange?: VoidFunction) {
-    super(init instanceof ReactiveSearchParams ? init.toString() : init);
+    super(init instanceof ReactiveSearchParams ? untrack(() => init.toString()) : init);
     // A single lazy TriggerCache — its signals are only created the first time a key is
     // actually `track`ed from within a reactive read, never eagerly at construction. Mutating
     // (or constructing) a `ReactiveSearchParams` that no one has read yet is then a plain,
