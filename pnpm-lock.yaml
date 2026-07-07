@@ -580,6 +580,12 @@ importers:
       solid-js:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
+      unplugin-solid:
+        specifier: 'catalog:'
+        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/idle:
     dependencies:
@@ -18130,6 +18136,21 @@ snapshots:
       solid-refresh: 0.7.8(solid-js@2.0.0-beta.15)
       unplugin: 2.3.11
       vitefu: 1.1.3(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+    transitivePeerDependencies:
+      - rollup
+      - supports-color
+      - vite
+
+  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.15)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
+    dependencies:
+      '@babel/core': 7.29.7
+      '@rollup/pluginutils': 5.4.0(rollup@4.61.0)
+      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.15)
+      merge-anything: 6.0.6
+      solid-js: 2.0.0-beta.15
+      solid-refresh: 0.7.8(solid-js@2.0.0-beta.15)
+      unplugin: 2.3.11
+      vitefu: 1.1.3(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
       - rollup
       - supports-color
