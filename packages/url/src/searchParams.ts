@@ -195,7 +195,7 @@ export class ReactiveSearchParams extends URLSearchParams {
   }
   override sort(): void {
     super.sort();
-    this.#dirty(WHOLE);
+    this.#notify();
   }
 
   // reads

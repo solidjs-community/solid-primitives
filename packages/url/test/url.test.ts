@@ -127,5 +127,17 @@ describe("ReactiveURL", () => {
 
         dispose();
       }));
+
+    test("sorting searchParams updates url.search and href", () =>
+      createRoot(dispose => {
+        const url = createURL("http://example.com/path?b=2&a=1");
+
+        url.searchParams.sort();
+
+        expect(url.search).toBe("?a=1&b=2");
+        expect(url.href).toBe("http://example.com/path?a=1&b=2");
+
+        dispose();
+      }));
   });
 });
