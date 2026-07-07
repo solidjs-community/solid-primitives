@@ -152,14 +152,15 @@ export function createLocationState(fallback?: LocationFallbackInit): [
     b?: SetterValue<string>,
   ) => {
     const url = new URL(location.href);
+    // `origin` is excluded from WritableLocationFields/LocationSetterRecord's types, but a
+    // plain JS caller could still pass it at runtime — assigning to it would throw, since
+    // it's a getter-only property on URL.
     if (typeof a === "string") {
+      if ((a as string) === "origin") return;
       url[a] = accessWith(b as SetterValue<string>, state[a]);
     } else {
       const record = accessWith(a, state);
       for (const [key, value] of entries(record)) {
-        // `origin` is excluded from LocationSetterRecord's type, but a plain JS caller
-        // (or one spreading the full LocationState) could still pass it at runtime —
-        // assigning to it would throw, since it's a getter-only property on URL.
         if ((key as string) === "origin" || value == null) continue;
         url[key] = value;
       }
