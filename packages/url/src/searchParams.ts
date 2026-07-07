@@ -2,8 +2,8 @@ import { createSingletonRoot } from "@solid-primitives/rootless";
 import { createTriggerCache } from "@solid-primitives/trigger";
 import { accessWith, entries } from "@solid-primitives/utils";
 import { createStore, untrack, type Store } from "solid-js";
-import type { SetterValue } from "./common.js";
-import { _useLocationState, type UpdateLocationMethod } from "./location.js";
+import type { SetterValue } from "./common.ts";
+import { _useLocationState, type UpdateLocationMethod } from "./location.ts";
 
 export type SearchParamsRecord = Store<Record<string, string | string[]>>;
 export type SearchParamsSetter = {
@@ -117,7 +117,7 @@ export function createLocationSearchParams(options?: { useSharedState?: boolean 
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/url#useSharedLocationSearchParams
  */
-export const useSharedLocationSearchParams = /*#__PURE__*/ createSingletonRoot(() =>
+export const useSharedLocationSearchParams: ReturnType<typeof createSingletonRoot<ReturnType<typeof createLocationSearchParams>>> = /*#__PURE__*/ createSingletonRoot(() =>
   createLocationSearchParams({ useSharedState: true }),
 );
 

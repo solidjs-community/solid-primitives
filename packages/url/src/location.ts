@@ -4,7 +4,7 @@ import { createStaticStore } from "@solid-primitives/static-store";
 import { accessWith, entries, noop, tryOnCleanup } from "@solid-primitives/utils";
 import { pick } from "@solid-primitives/utils/immutable";
 import { getRequestEvent, isServer } from "@solidjs/web";
-import type { SetterValue } from "./common.js";
+import type { SetterValue } from "./common.ts";
 
 export type LocationState = {
   readonly hash: string;
@@ -196,10 +196,10 @@ export function createLocationState(fallback?: LocationFallbackInit): [
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/url#useSharedLocationState
  */
-export const useSharedLocationState = /*#__PURE__*/ createHydratableSingletonRoot(() =>
+export const useSharedLocationState: ReturnType<typeof createHydratableSingletonRoot<ReturnType<typeof createLocationState>>> = /*#__PURE__*/ createHydratableSingletonRoot(() =>
   createLocationState(),
 );
 
 /** @internal */
-export const _useLocationState = (useShared: boolean) =>
+export const _useLocationState: (useShared: boolean) => ReturnType<typeof createLocationState> = (useShared: boolean): ReturnType<typeof createLocationState> =>
   useShared ? useSharedLocationState() : createLocationState();
