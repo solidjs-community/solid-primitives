@@ -115,7 +115,7 @@ async function generateReadme(module: ModuleData, primitiveData: PrimitiveData) 
           }
           return origin;
         });
-        p2 = `[Live Site](https://primitives.solidjs.community/playground/${module.name}/)\n\n${p2}`;
+        p2 = `[Live Site](/playground/${module.name}/)\n\n${p2}`;
         return `${p1}${p2}`;
       }
       return _;

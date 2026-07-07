@@ -39,7 +39,7 @@ function createTween(
   target: Accessor<number>,
   options: {
     duration?: number = 100; // ms
-    easing?: (t: number) => number = (t) => t;
+    ease?: (t: number) => number = (t) => t;
   }
 ): Accessor<number>;
 ```
@@ -51,7 +51,7 @@ You can provide two options:
 
 - `duration` is the number of milliseconds to perform the transition
   from the previous value to the next value. Defaults to 100.
-- `easing` is a function that maps a number between 0 and 1 to a number
+- `ease` is a function that maps a number between 0 and 1 to a number
   between 0 and 1, to speed up or slow down different parts of the transition.
   The default easing function `(t) => t` is linear (no easing).
   A common choice is `(t) => 0.5 - Math.cos(Math.PI * t) / 2`.

@@ -1,5 +1,32 @@
 # @solid-primitives/share
 
+## 2.2.5
+
+### Patch Changes
+
+- 62e331d: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+## 2.2.4
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
+## 2.2.3
+
+### Patch Changes
+
+- f5abdc3: @solid-primitives/graphql: Fix a build issue occurring during the bundling process.
+  @solid-primitives/share: Fix a typo for Facebook Messenger
+
 ## 2.2.2
 
 ### Patch Changes

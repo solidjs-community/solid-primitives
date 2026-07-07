@@ -169,7 +169,7 @@ createShortcut(
 
 ### Preventing default
 
-When `preventDefault` is `true`, `e.preventDefault()` will be called not only on the keydown event that have triggered the callback, but it will **optimistically** also prevend the default behavior of every previous keydown that will have the possibility to lead to the shotcut being pressed.
+When `preventDefault` is `true`, `e.preventDefault()` will be called not only on the keydown event that has triggered the callback, but it will **optimistically** also prevent the default behavior of every previous keydown that will have the possibility to lead to the shortcut being pressed.
 
 E.g. when listening for `Control + Shift + A`, all three keydown events will be prevented.
 

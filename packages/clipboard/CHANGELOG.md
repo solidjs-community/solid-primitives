@@ -1,5 +1,31 @@
 # @solid-primitives/clipboard
 
+## 1.6.6
+
+### Patch Changes
+
+- Updated dependencies [62e331d]
+  - @solid-primitives/utils@6.4.1
+
+## 1.6.5
+
+### Patch Changes
+
+- 4af6707: Fix `createClipboard`'s `deferInitial` parameter being completely non-functional — `deferInitial || true` always evaluated to `true` regardless of the argument passed, so explicitly passing `deferInitial={false}` had no effect and the clipboard was never written from the initial signal value (resolves #790). Also corrected the JSDoc, which incorrectly claimed the default was `false` when the intended (and actual, once fixed) default is `true` — skip the initial write unless `deferInitial` is explicitly `false`.
+
+## 1.6.4
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+
+## 1.6.3
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 1.6.2
 
 ### Patch Changes

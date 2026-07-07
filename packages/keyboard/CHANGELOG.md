@@ -1,5 +1,36 @@
 # @solid-primitives/keyboard
 
+## 1.3.7
+
+### Patch Changes
+
+- Updated dependencies [62e331d]
+  - @solid-primitives/event-listener@2.4.6
+  - @solid-primitives/utils@6.4.1
+  - @solid-primitives/rootless@1.5.4
+
+## 1.3.6
+
+### Patch Changes
+
+- 8fdc007: Fix `useKeyDownList` (and everything built on it: `useCurrentlyHeldKey`, `useKeyDownSequence`, `createKeyHold`, `createShortcut`) failing to re-trigger on repeated presses of shortcuts involving the `Meta` key, e.g. `["Meta", "P"]` on macOS. macOS never fires `keyup` for other keys held down together with Meta, only for Meta itself, so `useKeyDownList` now treats Meta's `keyup` as a signal to clear all tracked keys, preventing stale key state from corrupting the next press.
+
+## 1.3.5
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+  - @solid-primitives/event-listener@2.4.5
+  - @solid-primitives/rootless@1.5.3
+
+## 1.3.4
+
+### Patch Changes
+
+- Updated dependencies [f32f209]
+  - @solid-primitives/event-listener@2.4.4
+
 ## 1.3.3
 
 ### Patch Changes

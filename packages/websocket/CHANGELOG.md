@@ -1,5 +1,17 @@
 # @solid-primitives/websocket
 
+## 1.4.0
+
+### Minor Changes
+
+- bd7876e: Fix reconnect loop in `makeReconnectingWS`: the `close` event listener is now removed from the old `WebSocket` instance before a new connection is created. Previously, closing the old socket during reconnection would trigger the listener again and schedule an extra reconnect, causing duplicate connections under certain timing conditions.
+
+## 1.3.2
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 1.3.1
 
 ### Patch Changes

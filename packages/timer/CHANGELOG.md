@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.4.4
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 1.4.3
 
 ### Patch Changes

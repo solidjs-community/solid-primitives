@@ -1,5 +1,33 @@
 # @solid-primitives/media
 
+## 2.3.6
+
+### Patch Changes
+
+- Updated dependencies [62e331d]
+  - @solid-primitives/event-listener@2.4.6
+  - @solid-primitives/utils@6.4.1
+  - @solid-primitives/rootless@1.5.4
+  - @solid-primitives/static-store@0.1.4
+
+## 2.3.5
+
+### Patch Changes
+
+- Updated dependencies [6680ab9]
+  - @solid-primitives/utils@6.4.0
+  - @solid-primitives/event-listener@2.4.5
+  - @solid-primitives/rootless@1.5.3
+  - @solid-primitives/static-store@0.1.3
+
+## 2.3.4
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+- Updated dependencies [f32f209]
+  - @solid-primitives/event-listener@2.4.4
+
 ## 2.3.3
 
 ### Patch Changes
