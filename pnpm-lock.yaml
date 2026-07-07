@@ -1321,6 +1321,31 @@ importers:
         specifier: 2.0.0-beta.15
         version: 2.0.0-beta.15
 
+  packages/url:
+    dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
+      '@solid-primitives/rootless':
+        specifier: workspace:^
+        version: link:../rootless
+      '@solid-primitives/static-store':
+        specifier: workspace:^
+        version: link:../static-store
+      '@solid-primitives/trigger':
+        specifier: workspace:^
+        version: link:../trigger
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.15
+        version: 2.0.0-beta.15(solid-js@2.0.0-beta.15)
+      solid-js:
+        specifier: 2.0.0-beta.15
+        version: 2.0.0-beta.15
+
   packages/utils:
     devDependencies:
       '@solidjs/web':
