@@ -157,6 +157,7 @@ Creates a keyboard shortcut observer. The provided callback will be called when 
   - `preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified key is pressed. _(Defaults to `true`)_
   - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
   - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`, or `contenteditable` element, so it doesn't interrupt typing. Disabled by default.
+  - `anyOrder` — If `true`, the keys can be pressed in any order (e.g. `Shift + Control` as well as `Control + Shift`), as long as they all end up held down together. Disabled by default, requiring `keys` to be pressed in order.
 
 ```tsx
 import { createShortcut } from "@solid-primitives/keyboard";
@@ -186,6 +187,15 @@ createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: 
 ```
 
 Combos that include a modifier (e.g. `Control + S`) don't have this problem, since the modifier itself prevents a character from being typed — `ignoreWithinInputs` is usually unnecessary for those.
+
+### Matching keys in any order
+
+By default, `keys` must be pressed in the order given — `["Control", "Shift", "M"]` only matches Control, then Shift, then M. Set `anyOrder: true` to match the combo regardless of press order, similar to how most editors handle shortcuts:
+
+```tsx
+// triggers for both Control+Shift+M and Shift+Control+M
+createShortcut(["Control", "Shift", "M"], () => console.log("M was pressed"), { anyOrder: true });
+```
 
 ## `createKeyDown`
 
