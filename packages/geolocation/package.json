@@ -53,18 +53,18 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.15",
+    "@solidjs/web": "2.0.0-beta.16",
     "@types/leaflet": "^1.9.21",
     "leaflet": "^1.9.4",
-    "solid-js": "2.0.0-beta.15"
+    "solid-js": "2.0.0-beta.16"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15"
+    "@solidjs/web": "2.0.0-beta.16",
+    "solid-js": "2.0.0-beta.16"
   },
   "typesVersions": {}
 }

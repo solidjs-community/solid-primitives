@@ -7,6 +7,11 @@ allowBuilds:
   esbuild: true
   sharp: false
 
+minimumReleaseAgeExclude:
+  - '@solidjs/signals@2.0.0-beta.16'
+  - '@solidjs/web@2.0.0-beta.16'
+  - solid-js@2.0.0-beta.16
+
 onlyBuiltDependencies:
   - "@parcel/watcher"
   - esbuild
