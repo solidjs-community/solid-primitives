@@ -46,11 +46,15 @@ let locationFallback: LocationState | undefined;
 // createLocationState instance needs to know when either was called — not just
 // on back/forward (popstate) or #hash changes — hence the one-time monkey-patch.
 const historyStateListeners = new Set<VoidFunction>();
-let patchedHistory = false;
+// Keyed on the `history` object itself (not a plain boolean) — a module can outlive
+// the realm it was first patched in (e.g. an iframe/popup's own `history`, or a test
+// runner that reuses the module cache across per-file jsdom realms), so a global flag
+// would leave every later realm's `history` unpatched and its listeners un-notified.
+const patchedHistories = new WeakSet<History>();
 
 function patchHistoryState(): void {
-  if (patchedHistory) return;
-  patchedHistory = true;
+  if (patchedHistories.has(history)) return;
+  patchedHistories.add(history);
 
   const pushState = history.pushState.bind(history);
   const replaceState = history.replaceState.bind(history);
