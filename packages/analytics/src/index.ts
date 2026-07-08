@@ -12,13 +12,13 @@ export type {
   AnalyticsOptions,
   AnalyticsControls,
   ReactiveAnalyticsControls,
-} from "./types.js";
+} from "./types.ts";
 
-export { makeAnalytics, createAnalytics } from "./analytics.js";
+export { makeAnalytics, createAnalytics } from "./analytics.ts";
 
-export { createServerPlugin } from "./relay.js";
+export { createServerPlugin } from "./relay.ts";
 
-export { AnalyticsProvider, useAnalytics } from "./context.js";
+export { AnalyticsProvider, useAnalytics } from "./context.ts";
 
-export { makeAnalyticsGuard, createAnalyticsGuard } from "./guard.js";
-export type { BeforeLeaveEvent } from "./guard.js";
+export { makeAnalyticsGuard, createAnalyticsGuard } from "./guard.ts";
+export type { BeforeLeaveEvent } from "./guard.ts";

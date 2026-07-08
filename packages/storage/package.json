@@ -63,8 +63,12 @@
       ]
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -80,8 +84,8 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@tauri-apps/plugin-store": "*",
     "@solidjs/web": "^2.0.0-beta.15",
+    "@tauri-apps/plugin-store": "*",
     "solid-js": "^2.0.0-beta.15"
   },
   "peerDependenciesMeta": {
@@ -90,7 +94,7 @@
     }
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.15",
-    "@solidjs/web": "2.0.0-beta.15"
+    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "2.0.0-beta.15"
   }
 }

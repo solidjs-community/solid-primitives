@@ -4,7 +4,7 @@
  * Copyright (c) 2022 Kobalte Contributors — MIT License
  */
 
-import { type Accessor, createSignal, untrack } from "solid-js";
+import { type Accessor, type Signal, createSignal, untrack } from "solid-js";
 import { accessWith } from "@solid-primitives/utils";
 
 export interface CreateControllableSignalProps<T> {
@@ -28,7 +28,7 @@ export interface CreateControllableSignalProps<T> {
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/controlled-signal
  */
-export function createControllableSignal<T>(props: CreateControllableSignalProps<T>) {
+export function createControllableSignal<T>(props: CreateControllableSignalProps<T>): Signal<T | undefined> {
   // Solid 2.0 function-form createSignal: a writable derived signal that tracks props.value
   // reactively. When props.value?.() is undefined (uncontrolled), no reactive dependency is
   // created from that read, so the fn never re-runs and _setValue overrides persist.
@@ -58,37 +58,37 @@ export function createControllableSignal<T>(props: CreateControllableSignalProps
     });
   };
 
-  return [value, setValue] as const;
+  return [value, setValue] as Signal<T | undefined>;
 }
 
 /**
  * Variant of {@link createControllableSignal} for boolean values.
  * Falls back to `false` when the value is `undefined`.
  */
-export function createControllableBooleanSignal(props: CreateControllableSignalProps<boolean>) {
+export function createControllableBooleanSignal(props: CreateControllableSignalProps<boolean>): Signal<boolean> {
   const [_value, setValue] = createControllableSignal(props);
   const value: Accessor<boolean> = () => _value() ?? false;
-  return [value, setValue] as const;
+  return [value, setValue] as Signal<boolean>;
 }
 
 /**
  * Variant of {@link createControllableSignal} for array values.
  * Falls back to `[]` when the value is `undefined`.
  */
-export function createControllableArraySignal<T>(props: CreateControllableSignalProps<Array<T>>) {
+export function createControllableArraySignal<T>(props: CreateControllableSignalProps<Array<T>>): Signal<Array<T>> {
   const [_value, setValue] = createControllableSignal(props);
   const value: Accessor<Array<T>> = () => _value() ?? [];
-  return [value, setValue] as const;
+  return [value, setValue] as Signal<Array<T>>;
 }
 
 /**
  * Variant of {@link createControllableSignal} for Set values.
  * Falls back to `new Set()` when the value is `undefined`.
  */
-export function createControllableSetSignal<T>(props: CreateControllableSignalProps<Set<T>>) {
+export function createControllableSetSignal<T>(props: CreateControllableSignalProps<Set<T>>): Signal<Set<T>> {
   const [_value, setValue] = createControllableSignal(props);
   const value: Accessor<Set<T>> = () => _value() ?? new Set();
-  return [value, setValue] as const;
+  return [value, setValue] as Signal<Set<T>>;
 }
 
 export interface CreateToggleStateProps {

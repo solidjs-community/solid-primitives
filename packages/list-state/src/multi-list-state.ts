@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { access } from "@solid-primitives/utils";
-import type { MultiSelectListStateOptions, MultiSelectListStateReturn } from "./types.js";
+import type { MultiSelectListStateOptions, MultiSelectListStateReturn } from "./types.ts";
 
 /**
  * Creates a keyboard navigable multi-select list with cursor-based navigation.

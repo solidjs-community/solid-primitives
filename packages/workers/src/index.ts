@@ -7,11 +7,11 @@ import type {
   WorkerMethods,
   CreateWorkerResult,
   CreateWorkerPoolResult,
-} from "./types.js";
-import { RPC, buildWorkerCode, setup } from "./utils.js";
+} from "./types.d.ts";
+import { RPC, buildWorkerCode, setup } from "./utils.ts";
 
-export type * from "./types.js";
-export { createReactiveWorker } from "./reactive-worker.js";
+export type * from "./types.d.ts";
+export { createReactiveWorker } from "./reactive-worker.ts";
 
 /**
  * Spawns a worker from a record of named functions, exposing each as a typed

@@ -1,7 +1,7 @@
-export { createFilePicker } from "./createFilePicker.js";
-export { createFileUploader } from "./createFileUploader.js";
-export { fileSender } from "./fileSender.js";
-export type { FileSenderOptions } from "./fileSender.js";
-export { createDropzone, dropzone } from "./createDropzone.js";
-export { fileUploader } from "./fileUploader.js";
-export * from "./types.js";
+export { createFilePicker } from "./createFilePicker.ts";
+export { createFileUploader } from "./createFileUploader.ts";
+export { fileSender } from "./fileSender.ts";
+export type { FileSenderOptions } from "./fileSender.ts";
+export { createDropzone, dropzone } from "./createDropzone.ts";
+export { fileUploader } from "./fileUploader.ts";
+export * from "./types.ts";

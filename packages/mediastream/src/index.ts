@@ -295,7 +295,7 @@ export const createMediaPermissionRequest = (
     return Promise.resolve();
   }
   return navigator.mediaDevices
-    .getUserMedia(
+    ?.getUserMedia?.(
       source
         ? typeof source === "string"
           ? { [source]: true }

@@ -1,8 +1,8 @@
 import { createSignal, flush } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { transformFiles } from "./helpers.js";
-import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
+import { transformFiles } from "./helpers.ts";
+import type { UploadFile, Dropzone, DropzoneOptions } from "./types.ts";
 
 /**
  * Primitive to make working with dropzones easier.
@@ -140,7 +140,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
  * <div ref={dz} class={dz.isDragging() ? "dragging" : ""} />
  * ```
  */
-function dropzone<T extends HTMLElement = HTMLElement>(options?: DropzoneOptions) {
+function dropzone<T extends HTMLElement = HTMLElement>(options?: DropzoneOptions): Dropzone<T>["ref"] & Omit<Dropzone<T>, "ref"> {
   const { ref, ...state } = createDropzone<T>(options);
   return Object.assign(ref, state);
 }

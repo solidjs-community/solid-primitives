@@ -2,8 +2,8 @@ import { createStaticStore } from "@solid-primitives/static-store";
 import { accessWith, entries } from "@solid-primitives/utils";
 import { pick } from "@solid-primitives/utils/immutable";
 import { untrack } from "solid-js";
-import type { SetterValue } from "./common.js";
-import { ReactiveSearchParams } from "./searchParams.js";
+import type { SetterValue } from "./common.ts";
+import { ReactiveSearchParams } from "./searchParams.ts";
 
 export type URLRecord = {
   readonly hash: string;

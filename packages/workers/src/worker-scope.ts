@@ -1,5 +1,5 @@
 import { createEffect, createRoot, createStore, deep, onCleanup, type StoreSetter } from "solid-js";
-import type { BridgeMessage } from "./types.js";
+import type { BridgeMessage } from "./types.d.ts";
 
 // Minimal interface covering DedicatedWorkerGlobalScope without requiring webworker lib
 type WorkerCtx = {

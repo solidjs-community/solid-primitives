@@ -13,8 +13,8 @@
  *
  * This file has no Solid reactive code — it is safe to run in any Worker context.
  */
-import { makeSSE, type SSEReadyStateValue } from "./sse.js";
-import type { SSEWorkerMessage } from "./worker.js";
+import { makeSSE, type SSEReadyStateValue } from "./sse.ts";
+import type { SSEWorkerMessage } from "./worker.ts";
 
 const connections = new Map<string, VoidFunction>();
 

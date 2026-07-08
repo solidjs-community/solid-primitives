@@ -1,7 +1,7 @@
 import { onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { transformFiles } from "./helpers.js";
-import { type FileUploaderDirective } from "./types.js";
+import { transformFiles } from "./helpers.ts";
+import { type FileUploaderDirective } from "./types.ts";
 
 /**
  * Ref callback factory for `<input type="file">` elements.
@@ -11,7 +11,7 @@ import { type FileUploaderDirective } from "./types.js";
  *
  * Usage: `<input type="file" ref={fileUploader({ userCallback, setFiles, onError })} />`
  */
-export const fileUploader = (options: FileUploaderDirective) => {
+export const fileUploader = (options: FileUploaderDirective): (_el: HTMLInputElement) => void => {
   if (isServer) return (_el: HTMLInputElement) => {};
 
   const { userCallback, setFiles, onError } = options;

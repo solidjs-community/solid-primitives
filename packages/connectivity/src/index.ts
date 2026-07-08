@@ -73,7 +73,7 @@ declare global {
 // --- Helpers ---
 
 function readNetworkState(): NetworkState {
-  const conn = navigator.connection;
+  const conn = navigator?.connection as NetworkInformationConnection | undefined;
   return {
     online: navigator.onLine,
     downlink: conn?.downlink,
@@ -131,7 +131,7 @@ export function makeNetworkInformation(callback: (state: NetworkState) => void):
   const fire = () => callback(readNetworkState());
   const clear1 = makeEventListener(window, "online", fire);
   const clear2 = makeEventListener(window, "offline", fire);
-  const conn = navigator.connection;
+  const conn = navigator.connection as NetworkInformationConnection | undefined;
   const clear3 = conn ? makeEventListener(conn, "change", fire) : noop;
   return () => {
     clear1();

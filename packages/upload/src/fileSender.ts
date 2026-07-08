@@ -1,4 +1,4 @@
-import type { SendFunction } from "./types.js";
+import type { SendFunction } from "./types.ts";
 
 export type FileSenderOptions = {
   fieldName?: string;
