@@ -156,11 +156,11 @@ importers:
         version: 1.120.20(@types/node@26.1.0)(db0@0.3.4)(esbuild@0.28.1)(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(rollup@4.62.2)(sass@1.101.0)(terser@5.48.0)(tsx@4.23.0)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.16(solid-js@2.0.0-beta.16))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.16)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.23.0)(yaml@2.9.0)))(vite@6.4.3(@types/node@26.1.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.23.0)(yaml@2.9.0))(yaml@2.9.0)
     devDependencies:
       '@solidjs/web':
-        specifier: 2.0.0-beta.14
-        version: 2.0.0-beta.14(solid-js@2.0.0-beta.14)
+        specifier: 2.0.0-beta.16
+        version: 2.0.0-beta.16(solid-js@2.0.0-beta.16)
       solid-js:
-        specifier: 2.0.0-beta.14
-        version: 2.0.0-beta.14
+        specifier: 2.0.0-beta.16
+        version: 2.0.0-beta.16
 
   packages/async:
     devDependencies:
@@ -4020,9 +4020,6 @@ packages:
   '@solidjs/signals@2.0.0-beta.14':
     resolution: {integrity: sha512-y72nYtD7ogwX/UR5g2Y+meyeO6Q/xbQGtmvVTQX6USkMwEGOMnytqDnHj5amUzD7Fzqg32svwtCSx/q8hsOXAA==}
 
-  '@solidjs/signals@2.0.0-beta.15':
-    resolution: {integrity: sha512-lw4a4frNajnmVjILbyfrgJ4ksqU+YKhkepZ8glKK9Q68O3zq7W8qDLOtsz5v1mt0o3TB11/rozJFpgMTmnYegg==}
-
   '@solidjs/signals@2.0.0-beta.16':
     resolution: {integrity: sha512-BBOXytK+Tf2jn7Lh9MIdRTHaRiPxgXw6XkwhpuPZWbGaPNjLoSnnFFzRhgKiUCWMcXbm+g5lP6pd21s88pifWQ==}
 
@@ -4030,11 +4027,6 @@ packages:
     resolution: {integrity: sha512-ugSnWcNc18osJZ24+op7mQpm6LlyHSgTnvSaYqEwL9PVmLxXpmAS7/dt5nc7MLLZtwgf1J1rmRfZb7mT8fTL2w==}
     peerDependencies:
       solid-js: ^2.0.0-beta.13
-
-  '@solidjs/web@2.0.0-beta.14':
-    resolution: {integrity: sha512-iYqLqYapbnYBxbX9WspujYBdFHM1HND+Pd0p18vXHHlhYi42oBmIayxH4JsqPA+abe19nnpjXLmv03X2/IpmVQ==}
-    peerDependencies:
-      solid-js: ^2.0.0-beta.14
 
   '@solidjs/web@2.0.0-beta.16':
     resolution: {integrity: sha512-BZaMwDMN8/NLl8LuGQX8TdsNoXU7L02Ay4KhNaUsMocdMcj5G2EDXLssI+iZdzHVV637Cj4N9KWaTeizGrZeDw==}
@@ -7739,9 +7731,6 @@ packages:
   solid-js@1.9.14:
     resolution: {integrity: sha512-sAEXC0Kk0S1EDg+8ysEWJDbYhA3RRoEjwuySUGlKIemeo0I5YZfOyumNjNs9Sv3y2nmhD+0rW66ag2HsMuQiGQ==}
 
-  solid-js@2.0.0-beta.14:
-    resolution: {integrity: sha512-gbbvlxhs1GgL1IsnwHNtkTCRBBQcIDMwznBw3T05iYvP+fuUKMyIPku+ZLjeALyX4RaSLR99JSL6NttyHsYb8Q==}
-
   solid-js@2.0.0-beta.16:
     resolution: {integrity: sha512-8GVhd4QACNK5K8EJI9VB478U8wg7ulRIZY36Vj0LNKmQrRAVcdv8FitNnA/NPFOzmfLVHf8ZAh0wbjxNTtAjvg==}
 
@@ -10950,8 +10939,6 @@ snapshots:
 
   '@solidjs/signals@2.0.0-beta.14': {}
 
-  '@solidjs/signals@2.0.0-beta.15': {}
-
   '@solidjs/signals@2.0.0-beta.16': {}
 
   '@solidjs/web@2.0.0-beta.13(solid-js@2.0.0-beta.16)':
@@ -10959,12 +10946,6 @@ snapshots:
       seroval: 1.5.4
       seroval-plugins: 1.5.4(seroval@1.5.4)
       solid-js: 2.0.0-beta.16
-
-  '@solidjs/web@2.0.0-beta.14(solid-js@2.0.0-beta.14)':
-    dependencies:
-      seroval: 1.5.4
-      seroval-plugins: 1.5.4(seroval@1.5.4)
-      solid-js: 2.0.0-beta.14
 
   '@solidjs/web@2.0.0-beta.16(solid-js@2.0.0-beta.16)':
     dependencies:
@@ -15759,13 +15740,6 @@ snapshots:
 
   solid-js@1.9.14:
     dependencies:
-      csstype: 3.2.3
-      seroval: 1.5.4
-      seroval-plugins: 1.5.4(seroval@1.5.4)
-
-  solid-js@2.0.0-beta.14:
-    dependencies:
-      '@solidjs/signals': 2.0.0-beta.15
       csstype: 3.2.3
       seroval: 1.5.4
       seroval-plugins: 1.5.4(seroval@1.5.4)
