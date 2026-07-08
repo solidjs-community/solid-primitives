@@ -1,5 +1,11 @@
 # @solid-primitives/virtual
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- d59ab60: expose `firstIndex` and `lastIndex` in virtual lists, to support counting
+
 ## 1.0.0-next.1
 
 ### Minor Changes
