@@ -1,5 +1,5 @@
-import type { Countdown, DateInit, RelativeFormatMessages, Unit } from "./types.js";
-import { DAY, DEFAULT_MESSAGES, HOUR, MINUTE, SECOND, UNITS } from "./variables.js";
+import type { Countdown, DateInit, RelativeFormatMessages, Unit } from "./types.ts";
+import { DAY, DEFAULT_MESSAGES, HOUR, MINUTE, SECOND, UNITS } from "./variables.ts";
 
 /**
  * @param init timestamp `number` | date `string` | `Date` instance

@@ -27,7 +27,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   #keyTriggers = new TriggerCache<K | typeof $OBJECT>();
   #valueTriggers = new TriggerCache<K | typeof $OBJECT>();
 
-  [Symbol.iterator](): MapIterator<[K, V]> {
+  override [Symbol.iterator](): MapIterator<[K, V]> {
     return this.entries();
   }
 
@@ -36,41 +36,41 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     if (entries) for (const entry of entries) super.set(...entry);
   }
 
-  get size(): number {
+  override get size(): number {
     this.#keyTriggers.track($OBJECT);
     return super.size;
   }
 
-  *keys(): MapIterator<K> {
+  override *keys(): MapIterator<K> {
     this.#keyTriggers.track($OBJECT);
     for (const key of super.keys()) yield key;
   }
 
-  *values(): MapIterator<V> {
+  override *values(): MapIterator<V> {
     this.#valueTriggers.track($OBJECT);
     for (const value of super.values()) yield value;
   }
 
-  *entries(): MapIterator<[K, V]> {
+  override *entries(): MapIterator<[K, V]> {
     this.#keyTriggers.track($OBJECT);
     this.#valueTriggers.track($OBJECT);
     for (const entry of super.entries()) yield entry;
   }
 
-  forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
+  override forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
     this.#keyTriggers.track($OBJECT);
     this.#valueTriggers.track($OBJECT);
     super.forEach(callbackfn, thisArg);
   }
 
   /** Tracks key presence only — re-runs when this key is added or removed, not when its value changes. */
-  has(key: K): boolean {
+  override has(key: K): boolean {
     this.#keyTriggers.track(key);
     return super.has(key);
   }
 
   /** Tracks the value for this key — re-runs when the value changes, not when unrelated keys change. */
-  get(key: K): V | undefined {
+  override get(key: K): V | undefined {
     this.#valueTriggers.track(key);
     return super.get(key);
   }
@@ -79,7 +79,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
    * Sets a value. Notifies key-presence subscribers only if the key is new; notifies value
    * subscribers only if the value changed by reference. Setting the same value is a no-op.
    */
-  set(key: K, value: V): this {
+  override set(key: K, value: V): this {
     const hadNoKey = !super.has(key);
     const hasChanged = super.get(key) !== value;
     const result = super.set(key, value);
@@ -96,7 +96,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     return result;
   }
 
-  delete(key: K): boolean {
+  override delete(key: K): boolean {
     const isDefined = super.get(key) !== undefined;
     const result = super.delete(key);
 
@@ -112,7 +112,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     return result;
   }
 
-  clear(): void {
+  override clear(): void {
     if (super.size === 0) return;
     this.#keyTriggers.dirty($OBJECT);
     this.#valueTriggers.dirty($OBJECT);
@@ -154,19 +154,19 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
   }
 
   /** Tracks key presence only — re-runs when this key is added or removed, not when its value changes. */
-  has(key: K): boolean {
+  override has(key: K): boolean {
     this.#keyTriggers.track(key);
     return super.has(key);
   }
 
   /** Tracks the value for this key — re-runs when the value changes, not when unrelated keys change. */
-  get(key: K): V | undefined {
+  override get(key: K): V | undefined {
     this.#valueTriggers.track(key);
     return super.get(key);
   }
 
   /** Sets a value. Notifies key-presence subscribers only if the key is new; value subscribers only if the value changed by reference. */
-  set(key: K, value: V): this {
+  override set(key: K, value: V): this {
     const hadNoKey = !super.has(key);
     const hasChanged = super.get(key) !== value;
     const result = super.set(key, value);
@@ -177,7 +177,7 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
     return result;
   }
 
-  delete(key: K): boolean {
+  override delete(key: K): boolean {
     const isDefined = super.get(key) !== undefined;
     const result = super.delete(key);
 

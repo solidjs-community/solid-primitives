@@ -34,9 +34,13 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "typecheck": "tsc --noEmit src/* test/*;",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",

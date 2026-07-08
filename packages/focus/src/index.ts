@@ -1,5 +1,5 @@
-export { autofocus, createAutofocus } from "./autofocus.js";
-export type { E } from "./autofocus.js";
-export { createFocusTrap } from "./focusTrap.js";
-export type { CreateFocusTrapProps } from "./focusTrap.js";
-export { makeFocusListener, createFocusSignal } from "./focusSignal.js";
+export { autofocus, createAutofocus } from "./autofocus.ts";
+export type { E } from "./autofocus.ts";
+export { createFocusTrap } from "./focusTrap.ts";
+export type { CreateFocusTrapProps } from "./focusTrap.ts";
+export { makeFocusListener, createFocusSignal } from "./focusSignal.ts";

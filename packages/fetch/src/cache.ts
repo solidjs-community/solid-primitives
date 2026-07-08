@@ -1,7 +1,7 @@
 import { type ResourceOptions, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
-import { type RequestContext } from "./fetch.js";
-import { type RequestModifier, wrapFetcher } from "./modifiers.js";
+import { type RequestContext } from "./fetch.ts";
+import { type RequestModifier, wrapFetcher } from "./modifiers.ts";
 
 export type CacheEntry<T = any> = {
   ts: number;
@@ -110,7 +110,7 @@ export const withRefetchOnExpiry: RequestModifier =
             setTimeout(() => requestContext.resource?.[1].refetch(), requestContext.expires + 10);
           } else if (typeof requestContext.expires === "function") {
             const delay: typeof setTimeout | ((fn: FrameRequestCallback, _ms: number) => number) =
-              pollDelayMs === 0 ? fn => requestAnimationFrame(fn) : setTimeout;
+              pollDelayMs === 0 ? (fn: FrameRequestCallback) => requestAnimationFrame(fn) : setTimeout;
             const poll = () => {
               if (requestContext.expires(cached)) {
                 requestContext.resource?.[1].refetch();

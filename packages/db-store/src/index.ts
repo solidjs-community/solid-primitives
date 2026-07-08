@@ -101,12 +101,12 @@ export const supabaseAdapter = <Row extends DbRow>(
     insert: data =>
       opts.client
         .from(opts.table)
-        .insert(data.new)
+        .insert(data.new as DbRow)
         .then(supabaseHandleError(data, "insert", true)),
     update: data =>
       opts.client
         .from(opts.table)
-        .update(data.new)
+        .update(data.new as DbRow)
         .eq("id", data.old?.id ?? data.new?.id)
         .then(supabaseHandleError(data, "update", true)),
     delete: data =>

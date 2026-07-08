@@ -12,6 +12,7 @@
  * https://github.com/adobe/react-spectrum/blob/70e7caf1946c423bc9aa9cb0e50dbdbe953d239b/packages/@react-aria/label/src/useField.ts
  */
 
+import type { Context } from "solid-js";
 import {
   createContext,
   createEffect,
@@ -26,13 +27,13 @@ import type {
   CreateFormControlProps,
   FormControlContextValue,
   FormControlDataSet,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Solid context that carries the `FormControlContextValue` produced by `createFormControl`.
  * Provide it with `<FormControlContext value={ctx}>` and consume it with `useFormControl()`.
  */
-export const FormControlContext = createContext<FormControlContextValue | undefined>(undefined);
+export const FormControlContext: Context<FormControlContextValue | undefined> = createContext<FormControlContextValue | undefined>(undefined);
 
 /**
  * Reads `FormControlContext` from the nearest ancestor `<FormControlContext>` provider.
@@ -198,7 +199,14 @@ export function createFormControl(props: CreateFormControlProps): FormControlCon
  * };
  * ```
  */
-export function createFormControlInput(props: CreateFormControlInputProps = {}) {
+export function createFormControlInput(props: CreateFormControlInputProps = {}): {
+  fieldProps: {
+    id: () => string;
+    ariaLabel: () => string | undefined;
+    ariaLabelledBy: () => string | undefined;
+    ariaDescribedBy: () => string | undefined;
+  };
+} {
   const context = useFormControl();
 
   const id = () => access(props.id) ?? context.generateId("field");

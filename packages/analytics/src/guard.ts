@@ -1,6 +1,6 @@
 import { isServer } from "@solidjs/web";
 import { makePageLeave, createPageLeaveBlocker } from "@solid-primitives/page-utilities";
-import type { AnalyticsControls } from "./types.js";
+import type { AnalyticsControls } from "./types.ts";
 
 /** Minimal shape required by the guard — accepts both make and create controls. */
 type Drainable = Pick<AnalyticsControls, "drain">;

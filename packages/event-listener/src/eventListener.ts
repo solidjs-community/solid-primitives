@@ -13,7 +13,7 @@ import type {
   EventMapOf,
   TargetWithEventMap,
   EventListenerOptions,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Creates an event listener, that will be automatically disposed on cleanup.
@@ -59,8 +59,8 @@ export function makeEventListener(
   handler: (event: Event) => void,
   options?: EventListenerOptions,
 ): VoidFunction {
-  target.addEventListener(type, handler, options);
-  return tryOnCleanup(target.removeEventListener.bind(target, type, handler, options));
+  target?.addEventListener?.(type, handler, options);
+  return tryOnCleanup(target?.removeEventListener?.bind(target, type, handler, options));
 }
 
 /**

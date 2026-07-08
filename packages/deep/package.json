@@ -51,8 +51,12 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"

@@ -6,8 +6,8 @@ export type {
   VideoControls,
   VideoReturn,
   VideoControlsReturn,
-} from "./types.js";
+} from "./types.ts";
 
-export { makeVideo, setVideoSrc, createVideo } from "./createVideo.js";
-export { makeVideoPlayer, createVideoPlayer } from "./createVideoPlayer.js";
-export { makeVideoFrameCallback, createVideoFrameCallback } from "./createVideoFrameCallback.js";
+export { makeVideo, setVideoSrc, createVideo } from "./createVideo.ts";
+export { makeVideoPlayer, createVideoPlayer } from "./createVideoPlayer.ts";
+export { makeVideoFrameCallback, createVideoFrameCallback } from "./createVideoFrameCallback.ts";

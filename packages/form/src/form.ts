@@ -1,9 +1,9 @@
 import { createSignal, createMemo, createRoot, onCleanup, untrack, createEffect, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import type { ValidatorFn, FieldsConfig, InferValue, FormField, FormReturn, FormConfig } from "./types.js";
+import type { ValidatorFn, FieldsConfig, InferValue, FormField, FormReturn, FormConfig } from "./types.ts";
 
-export type { ValidatorFn, FieldConfig, FieldsConfig, FormField, FormReturn, FormConfig } from "./types.js";
+export type { ValidatorFn, FieldConfig, FieldsConfig, FormField, FormReturn, FormConfig } from "./types.ts";
 
 
 /**

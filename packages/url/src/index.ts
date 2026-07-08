@@ -9,7 +9,7 @@ export {
   createLocationState,
   useSharedLocationState,
   updateLocation,
-} from "./location.js";
+} from "./location.ts";
 
 export {
   type SearchParamsRecord,
@@ -20,7 +20,7 @@ export {
   useSharedLocationSearchParams,
   createSearchParams,
   ReactiveSearchParams,
-} from "./searchParams.js";
+} from "./searchParams.ts";
 
 export {
   type URLRecord,
@@ -30,4 +30,4 @@ export {
   createURLRecord,
   createURL,
   ReactiveURL,
-} from "./url.js";
+} from "./url.ts";

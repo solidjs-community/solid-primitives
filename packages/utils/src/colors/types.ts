@@ -12,7 +12,7 @@
  * https://github.com/adobe/react-spectrum/blob/68e305768cb829bab7b9836dded593bd731259f3/packages/%40react-types/color/src/index.d.ts
  */
 
-import type { ColorIntlTranslations } from "./intl.js";
+import type { ColorIntlTranslations } from "./intl.ts";
 
 /** Supported color string formats. Formats without an `a` suffix treat alpha as fully opaque. */
 export type ColorFormat =

@@ -1,5 +1,5 @@
 import { onCleanup } from "solid-js";
-import { registerPointerListener, DEFAULT_DELAY, DEFAULT_MIN_SWIPE_DISTANCE } from "./core.js";
+import { registerPointerListener, DEFAULT_DELAY, DEFAULT_MIN_SWIPE_DISTANCE } from "./core.ts";
 
 export type SwipeProps = {
   callback: (direction: "top" | "right" | "bottom" | "left") => void;

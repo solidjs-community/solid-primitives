@@ -1,9 +1,10 @@
-import { limitPath } from "./tools.js";
+import { limitPath } from "./tools.ts";
 import { isServer } from "@solidjs/web";
+import type { AsyncFileSystemAdapter } from "./types.ts";
 
-export const makeNodeFileSystem = isServer
-  ? async (basePath: string = "/") => {
-      const fs = await import("fs/promises");
+export const makeNodeFileSystem: ((basePath?: string) => Promise<AsyncFileSystemAdapter>) | (() => Promise<null>) = isServer
+  ? async (basePath: string = "/"): Promise<AsyncFileSystemAdapter> => {
+      const fs = await import("node:fs/promises");
       const p = limitPath(basePath);
       return {
         async: true as const,
@@ -21,4 +22,4 @@ export const makeNodeFileSystem = isServer
           fs.writeFile(p(path), data, { encoding: "utf8" }),
       };
     }
-  : () => Promise.resolve(null);
+  : (): Promise<null> => Promise.resolve(null);
