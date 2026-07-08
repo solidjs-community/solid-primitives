@@ -11,6 +11,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  flush,
   onCleanup,
 } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
@@ -88,7 +89,7 @@ export type PaginationOptions = {
 };
 
 export type PaginationProps = {
-  "aria-current"?: boolean;
+  "aria-current"?: "page";
   "aria-label"?: string;
   disabled?: boolean;
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
@@ -170,10 +171,13 @@ export const createPagination = (
 
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
     setPage(p);
-    if ("currentTarget" in ev)
-      (ev.currentTarget as HTMLElement).parentNode
-        ?.querySelector<HTMLElement>('[aria-current="true"]')
-        ?.focus();
+    if (ev.currentTarget instanceof HTMLElement) {      
+      let parent: HTMLElement | ParentNode | null = ev.currentTarget, current;
+      while (parent && !(current = parent.querySelector('[aria-current="page"]')))
+        parent = parent.parentNode;
+      
+      current instanceof HTMLElement && current.focus();
+    }
   };
 
   const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
@@ -205,7 +209,7 @@ export const createPagination = (
                 },
             {
               "aria-current": {
-                get: () => (page() === pageNo ? "true" : undefined),
+                get: () => (page() === pageNo ? "page" : undefined),
                 set: noop,
                 enumerable: true,
               },
