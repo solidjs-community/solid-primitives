@@ -32,13 +32,14 @@ export const COLOR_INTL_TRANSLATIONS = {
   alpha: "Alpha",
 
   // Full color name composers
-  colorName: (lightness: string, chroma: string, hue: string) => `${lightness} ${chroma} ${hue}`,
+  colorName: (lightness: string, chroma: string, hue: string): string =>
+    `${lightness} ${chroma} ${hue}`,
   transparentColorName: (
     lightness: string,
     chroma: string,
     hue: string,
     percentTransparent: string,
-  ) => `${lightness} ${chroma} ${hue}, ${percentTransparent} transparent`,
+  ): string => `${lightness} ${chroma} ${hue}, ${percentTransparent} transparent`,
 
   // Lightness descriptors
   "very dark": "very dark",

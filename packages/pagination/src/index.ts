@@ -352,16 +352,6 @@ export const createPagination = (
   return [paginationProps, page, setPage];
 };
 
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      infiniteScrollLoader: boolean;
-    }
-  }
-}
-
-export type _E = JSX.Element;
-
 /**
  * Provides an easy way to implement infinite scrolling.
  *
