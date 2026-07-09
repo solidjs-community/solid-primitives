@@ -168,14 +168,17 @@ export const createPagination = (
 
   // Clamp page to valid range reactively — handles page count decreasing below current page
   const page: Accessor<number> = createMemo(() => Math.max(1, Math.min(rawPage(), opts().pages)));
-
+  
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
+    // select the parent before we might get detached
+    let parent = ev.currentTarget, current;
+    while (parent instanceof HTMLElement && parent.childElementCount < 3) parent = parent.parentNode;
     setPage(p);
-    if (ev.currentTarget instanceof HTMLElement) {      
-      let parent: HTMLElement | ParentNode | null = ev.currentTarget, current;
-      while (parent && !(current = parent.querySelector('[aria-current="page"]')))
+    flush();
+    // select the current page
+    if (parent) {      
+      while (parent instanceof HTMLElement && !(current = parent.querySelector('[aria-current="page"]')))
         parent = parent.parentNode;
-      
       current instanceof HTMLElement && current.focus();
     }
   };

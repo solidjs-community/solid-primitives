@@ -1,6 +1,6 @@
-import { createSignal, Errored, For, Show } from "solid-js";
+import { createMemo, createSignal, Errored, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
-import { createInfiniteScroll, createPagination, createSegment } from "../src/index.js";
+import { createInfiniteScroll, createPagination, createSegment, type PaginationOptions } from "../src/index.js";
 import readme from "../README.md?raw";
 import {
   Badge,
@@ -30,30 +30,34 @@ const meta = preview.meta({
 export default meta;
 
 const PaginationBar = (barProps: {
-  props: ReturnType<typeof createPagination>[0];
+  options: PaginationOptions;
   center?: boolean;
-}) => (
-  <nav
-    style={{
-      display: "flex",
-      gap: "0.25rem",
-      "flex-wrap": "wrap",
-      ...(barProps.center ? { "justify-content": "center" } : {}),
-    }}
-  >
-    <For each={barProps.props()}>
-      {props => (
-        <Button
-          {...props}
-          variant={props["aria-current"] ? "primary" : "outline"}
-          style={{ "min-width": "2rem", "font-size": font.sizeSm, padding: "0.3rem 0.6rem" }}
-        >
-          {props.children as string}
-        </Button>
-      )}
-    </For>
-  </nav>
-);
+}) => {
+  const [props, page] = createPagination(() => barProps.options);
+  return (<>
+    <StatRow label="Current page" value={page()} />
+    <nav
+      style={{
+        display: "flex",
+        gap: "0.25rem",
+        "flex-wrap": "wrap",
+        ...(barProps.center ? { "justify-content": "center" } : {}),
+      }}
+    >
+      <For each={props()}>
+        {props => (
+          <Button
+            {...props}
+            variant={props["aria-current"] ? "primary" : "outline"}
+            style={{ "min-width": "2rem", "font-size": font.sizeSm, padding: "0.3rem 0.6rem" }}
+          >
+            {props.children as string}
+          </Button>
+        )}
+      </For>
+    </nav>
+  </>);
+}
 
 export const CreatePaginationStory = meta.story({
   name: "createPagination",
@@ -68,16 +72,15 @@ export const CreatePaginationStory = meta.story({
   render: () => {
     const [totalPages, setTotalPages] = createSignal(20);
     const [maxVisible, setMaxVisible] = createSignal(7);
-    const [paginationProps, page, _setPage] = createPagination(() => ({
+    const paginationOptions = createMemo(() => ({
       pages: totalPages(),
       maxPages: maxVisible(),
     }));
-
+    
     return (
       <Errored fallback={(err, reset) => <p>Error: {err} <button type="reset" onClick={reset}>Reset</button></p>}>
         <Container minWidth={400}>
-          <StatRow label="Current page" value={page()} />
-          <PaginationBar props={paginationProps} />
+          <PaginationBar options={paginationOptions()} />
           <Separator />
           <Section title="Max visible">
             <ButtonRow>
