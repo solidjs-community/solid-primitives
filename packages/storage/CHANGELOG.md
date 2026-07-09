@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 4.4.0
+
+### Minor Changes
+
+- 348974b: types and resource usage
+
 ## 4.3.5
 
 ### Patch Changes
