@@ -27,6 +27,8 @@
     "build-storybook": "storybook build",
     "build": "tsdown",
     "new-package": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/new-package.ts",
+    "jsr:sync-versions": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/sync-jsr-versions.ts",
+    "jsr:sync-versions:check": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/sync-jsr-versions.ts --check",
     "update-readme": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/update-readme.ts",
     "measure": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/measure.ts",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",

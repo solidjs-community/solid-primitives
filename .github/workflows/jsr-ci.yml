@@ -46,6 +46,9 @@ jobs:
       - name: Format check
         run: deno task jsr:fmt
 
+      - name: Check deno.jsonc/package.json version sync
+        run: pnpm jsr:sync-versions:check
+
       - name: Build packages
         run: pnpm build
 

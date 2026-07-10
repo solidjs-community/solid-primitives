@@ -48,13 +48,15 @@ jobs:
             deno install
           fi
 
+      - name: Sync deno.jsonc versions from package.json
+        run: pnpm jsr:sync-versions
+
+      - name: Build packages
+        run: pnpm build
+
       - name: Publish dry run
-        run: |
-          deno publish --dry-run --check --allow-slow-types
-          deno bump-version --base=main --dry-run
+        run: deno publish --dry-run --check --allow-slow-types
 
       - name: Publish to JSR
         if: ${{ inputs.publish == 'true' }}
-        run: |
-          deno bump-version --base=main
-          deno publish --check --allow-slow-types
+        run: deno publish --check --allow-slow-types

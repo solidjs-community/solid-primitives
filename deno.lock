@@ -12,15 +12,14 @@
     "npm:@nothing-but/node-resolve-ts@^1.0.1": "1.0.1",
     "npm:@reduxjs/toolkit@^1.9.7": "1.9.7_react@19.2.7",
     "npm:@solidjs/signals@2.0.0-beta.14": "2.0.0-beta.14",
-    "npm:@solidjs/web@2.0.0-beta.13": "2.0.0-beta.13_solid-js@2.0.0-beta.15",
-    "npm:@solidjs/web@2.0.0-beta.14": "2.0.0-beta.14_solid-js@2.0.0-beta.15",
-    "npm:@solidjs/web@2.0.0-beta.15": "2.0.0-beta.15_solid-js@2.0.0-beta.15",
+    "npm:@solidjs/web@2.0.0-beta.13": "2.0.0-beta.13_solid-js@2.0.0-beta.16",
+    "npm:@solidjs/web@2.0.0-beta.16": "2.0.0-beta.16_solid-js@2.0.0-beta.16",
     "npm:@storybook/addon-docs@^10.4.6": "10.4.6_@types+react@19.2.17_storybook@10.4.6__@types+react@19.2.17__prettier@3.9.4__@testing-library+dom@10.4.1__react@19.2.7_@testing-library+dom@10.4.1_@types+node@22.20.0_esbuild@0.28.1_prettier@3.9.4_sass@1.101.0_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0",
     "npm:@supabase/supabase-js@^2.48.1": "2.110.0",
     "npm:@tailwindcss/container-queries@~0.1.1": "0.1.1_tailwindcss@3.3.3",
     "npm:@tailwindcss/typography@~0.5.20": "0.5.20_tailwindcss@3.3.3",
-    "npm:@tanstack/solid-router@2.0.0-beta.23": "2.0.0-beta.23_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15",
-    "npm:@tanstack/solid-start@2.0.0-beta.24": "2.0.0-beta.24_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0",
+    "npm:@tanstack/solid-router@2.0.0-beta.23": "2.0.0-beta.23_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.16__seroval@1.5.5_solid-js@2.0.0-beta.16_seroval@1.5.5",
+    "npm:@tanstack/solid-start@2.0.0-beta.24": "2.0.0-beta.24_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_seroval@1.5.5",
     "npm:@tauri-apps/api@^1.6.0": "1.6.0",
     "npm:@testing-library/jest-dom@^6.9.1": "6.9.1",
     "npm:@types/jsdom@^21.1.7": "21.1.7",
@@ -31,7 +30,7 @@
     "npm:@typescript-eslint/eslint-plugin@^8.62.1": "8.62.1_@typescript-eslint+parser@8.62.1__eslint@10.6.0__typescript@6.0.3_eslint@10.6.0_typescript@6.0.3",
     "npm:@typescript-eslint/parser@^8.62.1": "8.62.1_eslint@10.6.0_typescript@6.0.3",
     "npm:autoprefixer@^10.5.2": "10.5.2_postcss@8.5.16",
-    "npm:babel-preset-solid@2.0.0-beta.14": "2.0.0-beta.14_@babel+core@7.29.7_solid-js@2.0.0-beta.15",
+    "npm:babel-preset-solid@2.0.0-beta.14": "2.0.0-beta.14_@babel+core@7.29.7_solid-js@2.0.0-beta.16",
     "npm:chokidar@^3.6.0": "3.6.0",
     "npm:clsx@^2.1.1": "2.1.1",
     "npm:date-fns@^2.30.0": "2.30.0",
@@ -61,11 +60,10 @@
     "npm:remark-parse@11": "11.0.0",
     "npm:remark-rehype@^11.1.2": "11.1.2",
     "npm:sass@^1.101.0": "1.101.0",
-    "npm:solid-js@2.0.0-beta.14": "2.0.0-beta.14",
-    "npm:solid-js@2.0.0-beta.15": "2.0.0-beta.15",
+    "npm:solid-js@2.0.0-beta.16": "2.0.0-beta.16",
     "npm:solid-js@^1.9.7": "1.9.14",
-    "npm:solid-transition-group@~0.2.3": "0.2.3_solid-js@2.0.0-beta.15",
-    "npm:storybook-solidjs-vite@^10.5.2": "10.5.2_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_storybook@10.4.6__@types+react@19.2.17__prettier@3.9.4__@testing-library+dom@10.4.1__react@19.2.7_typescript@6.0.3_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@testing-library+dom@10.4.1_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_@types+react@19.2.17_esbuild@0.28.1_prettier@3.9.4_react@19.2.7_sass@1.101.0",
+    "npm:solid-transition-group@~0.2.3": "0.2.3_solid-js@2.0.0-beta.16",
+    "npm:storybook-solidjs-vite@^10.5.2": "10.5.2_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16_storybook@10.4.6__@types+react@19.2.17__prettier@3.9.4__@testing-library+dom@10.4.1__react@19.2.7_typescript@6.0.3_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.16___solid-js@2.0.0-beta.16__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.16__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0",
     "npm:storybook@^10.4.6": "10.4.6_@types+react@19.2.17_prettier@3.9.4_@testing-library+dom@10.4.1_react@19.2.7",
     "npm:tailwindcss-dir@4": "4.0.0",
     "npm:tailwindcss@3.3.3": "3.3.3",
@@ -73,8 +71,8 @@
     "npm:typescript@^6.0.3": "6.0.3",
     "npm:undici@^5.29.0": "5.29.0",
     "npm:unified@^11.0.5": "11.0.5",
-    "npm:unplugin-solid@1": "1.0.0_solid-js@2.0.0-beta.15",
-    "npm:vite-plugin-solid@3.0.0-next.5": "3.0.0-next.5_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_@testing-library+jest-dom@6.9.1_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
+    "npm:unplugin-solid@1": "1.0.0_solid-js@2.0.0-beta.16",
+    "npm:vite-plugin-solid@3.0.0-next.5": "3.0.0-next.5_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_@testing-library+jest-dom@6.9.1_solid-js@2.0.0-beta.16_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0",
     "npm:vite@^6.4.3": "6.4.3_@types+node@22.20.0_sass@1.101.0",
     "npm:vite@^8.1.3": "8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
     "npm:vitest@^2.1.9": "2.1.9_@types+node@22.20.0_jsdom@25.0.1_sass@1.101.0"
@@ -2553,7 +2551,7 @@
     "@sindresorhus/is@4.6.0": {
       "integrity": "sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw=="
     },
-    "@solid-devtools/debugger@0.28.1_solid-js@2.0.0-beta.15": {
+    "@solid-devtools/debugger@0.28.1_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-6qIUI6VYkXoRnL8oF5bvh2KgH71qlJ18hNw/mwSyY6v48eb80ZR48/5PDXufUa3q+MBSuYa1uqTMwLewpay9eg==",
       "dependencies": [
         "@nothing-but/utils",
@@ -2565,20 +2563,20 @@
         "@solid-primitives/scheduled",
         "@solid-primitives/static-store",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-devtools/logger@0.9.11_solid-js@2.0.0-beta.15": {
+    "@solid-devtools/logger@0.9.11_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-THbiY1iQlieL6vdgJc4FIsLe7V8a57hod/Thm8zdKrTkWL88UPZjkBBfM+mVNGusd4OCnAN20tIFBhNnuT1Dew==",
       "dependencies": [
         "@nothing-but/utils",
         "@solid-devtools/debugger",
         "@solid-devtools/shared",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-devtools/shared@0.20.0_solid-js@2.0.0-beta.15": {
+    "@solid-devtools/shared@0.20.0_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-o5TACmUOQsxpzpOKCjbQqGk8wL8PMi+frXG9WNu4Lh3PQVUB6hs95Kl/S8xc++zwcMguUKZJn8h5URUiMOca6Q==",
       "dependencies": [
         "@nothing-but/utils",
@@ -2590,136 +2588,135 @@
         "@solid-primitives/static-store",
         "@solid-primitives/styles",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/bounds@0.1.6_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/bounds@0.1.6_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-aAjjllsB1hlkyWPYdP+AiavRNhJDUl1jBj08HGgZp2wdX6VsbJBik9+Y1JoNnbtFl/wls+8Z31hAemhsZ1bR6Q==",
       "dependencies": [
         "@solid-primitives/event-listener",
         "@solid-primitives/resize-observer",
         "@solid-primitives/static-store",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/event-listener@2.4.6_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/event-listener@2.4.6_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-5I0YJcTVYIWoMmgBSROBZGcz+ymhew/pGTg2dHW74BUjFKsV8Li4bOZYl0YAGP4mHw5o4UBd9/BEesqBci3wxw==",
       "dependencies": [
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/keyboard@1.3.7_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/keyboard@1.3.7_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-558RPNYnXx4nGh537DSqAn4xMrC8iFipl/5+xzgzWoTNFst4RnUN3BOLmtDjJ0UGGoQXVMALYR3bNOHM0xnt1Q==",
       "dependencies": [
         "@solid-primitives/event-listener",
         "@solid-primitives/rootless",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/media@2.3.6_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/media@2.3.6_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-pk49gPOq/UMRUJ+pTSrOfBiR8xJjRYHXIf1iR/jSnyQ/KroU+ZXhkZzavC7hvfp2vJeOTW5k2/HN0r3Q1VJ7Pw==",
       "dependencies": [
         "@solid-primitives/event-listener",
         "@solid-primitives/rootless",
         "@solid-primitives/static-store",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/refs@1.1.4_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/refs@1.1.4_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-bLjwIs6ZPu8NQnuw04sU3Zc8qKSpbc0umUU/O4SHf6oWOdO4+dHY8vb1T7C4b/Tg103+9WGr6sEE0+NFlbaB/A==",
       "dependencies": [
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/resize-observer@2.1.6_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/resize-observer@2.1.6_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-GFj6b81KIahl5SBf35VlyClHshDhVEREeZz2WYkHHKBvam66mE5H5f1g3EralabAAjmcU1bBd18YYYETPv0Knw==",
       "dependencies": [
         "@solid-primitives/event-listener",
         "@solid-primitives/rootless",
         "@solid-primitives/static-store",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/rootless@1.5.4_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/rootless@1.5.4_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-TOIZa1VUfVJ+9nkCcRajw3U4t9vBOP1HxX1WHNTbXq32mXwlqTvUnC4CRIilohcryBkT9u2ZkhUDSHRTaGp55g==",
       "dependencies": [
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/scheduled@1.5.3_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/scheduled@1.5.3_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-oNwLE6E6lxJAWrc8QXuwM0k2oU1BnANnkChwMw82aK1j3+mWGJkG1IFe5gCwbV+afYmjI76t9JJV3md/8tLw+g==",
       "dependencies": [
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/static-store@0.1.4_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/static-store@0.1.4_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-LgtVaVBtB7EbmS4+M0b8xY5Iq6pUWXBsIC4VgtrFKDGDdyCaDt88sHk0fUlx1Enxm/XZnZyLXJABRoa39RjJqA==",
       "dependencies": [
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/styles@0.1.4_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/styles@0.1.4_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-siDvuK9mBpswjUdJCpr3ZUhBIHghNjHsBhZ9p3mIH1sDgwVr5gQGfFmESIvtb4Ka4Oq6B6hLOqi4QES/i8u4YA==",
       "dependencies": [
         "@solid-primitives/rootless",
         "@solid-primitives/utils",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/transition-group@1.1.2_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/transition-group@1.1.2_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-gnHS0OmcdjeoHN9n7Khu8KNrOlRc8a2weETDt2YT6o1zeW/XtUC6Db3Q9pkMU/9cCKdEmN4b0a/41MKAHRhzWA==",
       "dependencies": [
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solid-primitives/utils@6.4.1_solid-js@2.0.0-beta.15": {
+    "@solid-primitives/utils@6.4.1_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-ISSB5QX1qP2ynrheIpYwc4oKR5Ny4siNuUyf1qZniy+Il+p/PtDB0QK1Dnle8noiHpwRD3gpPdubOC3qI/Zamg==",
       "dependencies": [
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solidjs/meta@0.29.4_solid-js@2.0.0-beta.15": {
+    "@solidjs/meta@0.29.4_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-zdIWBGpR9zGx1p1bzIPqF5Gs+Ks/BH8R6fWhmUa/dcK1L2rUC8BAcZJzNRYBQv74kScf1TSOs0EY//Vd/I0V8g==",
       "dependencies": [
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
     "@solidjs/signals@2.0.0-beta.14": {
       "integrity": "sha512-y72nYtD7ogwX/UR5g2Y+meyeO6Q/xbQGtmvVTQX6USkMwEGOMnytqDnHj5amUzD7Fzqg32svwtCSx/q8hsOXAA=="
     },
-    "@solidjs/signals@2.0.0-beta.15": {
-      "integrity": "sha512-lw4a4frNajnmVjILbyfrgJ4ksqU+YKhkepZ8glKK9Q68O3zq7W8qDLOtsz5v1mt0o3TB11/rozJFpgMTmnYegg=="
+    "@solidjs/signals@2.0.0-beta.16": {
+      "integrity": "sha512-BBOXytK+Tf2jn7Lh9MIdRTHaRiPxgXw6XkwhpuPZWbGaPNjLoSnnFFzRhgKiUCWMcXbm+g5lP6pd21s88pifWQ=="
     },
-    "@solidjs/web@2.0.0-beta.13_solid-js@2.0.0-beta.15": {
+    "@solidjs/web@2.0.0-beta.13_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-ugSnWcNc18osJZ24+op7mQpm6LlyHSgTnvSaYqEwL9PVmLxXpmAS7/dt5nc7MLLZtwgf1J1rmRfZb7mT8fTL2w==",
       "dependencies": [
         "seroval",
         "seroval-plugins",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@solidjs/web@2.0.0-beta.14_solid-js@2.0.0-beta.15": {
-      "integrity": "sha512-iYqLqYapbnYBxbX9WspujYBdFHM1HND+Pd0p18vXHHlhYi42oBmIayxH4JsqPA+abe19nnpjXLmv03X2/IpmVQ==",
-      "dependencies": [
-        "seroval",
-        "seroval-plugins",
-        "solid-js@2.0.0-beta.15"
-      ]
-    },
-    "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15": {
+    "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.16_seroval@1.5.5": {
       "integrity": "sha512-+LvmzzN5CHxQ+TeCGgA8DKuB8S4t0EHVlmDUlAp4hkLnh7My3ZGuKYHKWsFMd8w08nPgF6LdBZkH+c5iNcmcSA==",
       "dependencies": [
+        "seroval-plugins",
+        "solid-js@2.0.0-beta.16"
+      ]
+    },
+    "@solidjs/web@2.0.0-beta.16_solid-js@2.0.0-beta.16": {
+      "integrity": "sha512-BZaMwDMN8/NLl8LuGQX8TdsNoXU7L02Ay4KhNaUsMocdMcj5G2EDXLssI+iZdzHVV637Cj4N9KWaTeizGrZeDw==",
+      "dependencies": [
         "seroval",
         "seroval-plugins",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
     "@storybook/addon-docs@10.4.6_@types+react@19.2.17_storybook@10.4.6__@types+react@19.2.17__prettier@3.9.4__@testing-library+dom@10.4.1__react@19.2.7_@testing-library+dom@10.4.1_@types+node@22.20.0_esbuild@0.28.1_prettier@3.9.4_sass@1.101.0_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
@@ -2884,7 +2881,7 @@
         "zod"
       ]
     },
-    "@tanstack/router-plugin@1.168.18_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_solid-js@2.0.0-beta.15": {
+    "@tanstack/router-plugin@1.168.18_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.16___solid-js@2.0.0-beta.16__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.16__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-MofS28/axfnfnhOD2RSgJEaU882aX5RsAzhGz5Vc4XhAmvCjy919u9JrNs4QsTWFbTD1P7IJ8WFlFVsrg0pStg==",
       "dependencies": [
         "@babel/core",
@@ -2917,43 +2914,43 @@
         "tinyglobby"
       ]
     },
-    "@tanstack/solid-router@2.0.0-beta.23_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15": {
+    "@tanstack/solid-router@2.0.0-beta.23_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.16__seroval@1.5.5_solid-js@2.0.0-beta.16_seroval@1.5.5": {
       "integrity": "sha512-0gwLWmeFuT6Euaqi0qSOq5jtJHAZJsmQhCZs+knwiLIsuhjUV4cRyhgEVI0eAVVTDlFfBSzA0tTBdFe5diPCoA==",
       "dependencies": [
         "@solid-devtools/logger",
         "@solid-primitives/refs",
         "@solidjs/meta",
-        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
+        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.16_seroval@1.5.5",
         "@tanstack/history",
         "@tanstack/router-core",
         "isbot",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@tanstack/solid-start-client@2.0.0-beta.23_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15": {
+    "@tanstack/solid-start-client@2.0.0-beta.23_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16_seroval@1.5.5": {
       "integrity": "sha512-EPYRD+arREV7r4PR0Mx4gnFZUfM+5ALIKltRdomhLBjmjmm6k9CFh5Ctqjj2lEdA6M5yvZlMgR9vNE14r1Knqg==",
       "dependencies": [
-        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
+        "@solidjs/web@2.0.0-beta.16_solid-js@2.0.0-beta.16",
         "@tanstack/router-core",
         "@tanstack/solid-router",
         "@tanstack/start-client-core",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@tanstack/solid-start-server@2.0.0-beta.23_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15": {
+    "@tanstack/solid-start-server@2.0.0-beta.23_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16_seroval@1.5.5": {
       "integrity": "sha512-EOJHHdIcRb9WkDE6PUJbn7Wh/BVvm7OUPGn0JzVZIObnXDU/BLd9yRDYSCIgC7JK1IH43dxlktV4eEb3TC86/Q==",
       "dependencies": [
-        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
+        "@solidjs/web@2.0.0-beta.16_solid-js@2.0.0-beta.16",
         "@tanstack/router-core",
         "@tanstack/solid-router",
         "@tanstack/start-server-core",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "@tanstack/solid-start@2.0.0-beta.24_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
+    "@tanstack/solid-start@2.0.0-beta.24_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_seroval@1.5.5": {
       "integrity": "sha512-mtF9MP/zw/0IZ2qhZCcl5dUPB+bL7Fp7ftjHcrJ9m8zw6TDbnUSiC65W/xiymiLV/J1KssVklEs0sPIxdcvOtw==",
       "dependencies": [
-        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
+        "@solidjs/web@2.0.0-beta.16_solid-js@2.0.0-beta.16",
         "@tanstack/solid-router",
         "@tanstack/solid-start-client",
         "@tanstack/solid-start-server",
@@ -2961,7 +2958,7 @@
         "@tanstack/start-plugin-core",
         "@tanstack/start-server-core",
         "pathe@2.0.3",
-        "solid-js@2.0.0-beta.15",
+        "solid-js@2.0.0-beta.16",
         "vite@8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0"
       ],
       "optionalPeers": [
@@ -2980,7 +2977,7 @@
     "@tanstack/start-fn-stubs@1.162.0": {
       "integrity": "sha512-QWfUZ3Yo923tdQn38LyKMU8rcTw69zc+T4dAvgTWV4O56SqFRsGfS0lSWIMhJRwXIx/bvdi7nTUBDdZtTHtpTQ=="
     },
-    "@tanstack/start-plugin-core@1.171.17_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_esbuild@0.28.1_rolldown@1.1.4_sass@1.101.0_solid-js@2.0.0-beta.15_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
+    "@tanstack/start-plugin-core@1.171.17_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-ngKkp3wn/U3nyeqZl7KcMzjbgTbcypC5ES7O92JpA5/tz4PufFOf5l+eX3pY+4Z6jE6Jb6ekQgnryG7XMjpK7Q==",
       "dependencies": [
         "@babel/code-frame@7.27.1",
@@ -3630,26 +3627,26 @@
         "validate-html-nesting"
       ]
     },
-    "babel-preset-solid@1.9.12_@babel+core@7.29.7_solid-js@2.0.0-beta.15": {
+    "babel-preset-solid@1.9.12_@babel+core@7.29.7_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-LLqnuKVDlKpyBlMPcH6qEvs/wmS9a+NczppxJ3ryS/c0O5IiSFOIBQi9GzyiGDSbcJpx4Gr87jyFTos1MyEuWg==",
       "dependencies": [
         "@babel/core",
         "babel-plugin-jsx-dom-expressions@0.40.7_@babel+core@7.29.7",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ],
       "optionalPeers": [
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "babel-preset-solid@2.0.0-beta.14_@babel+core@7.29.7_solid-js@2.0.0-beta.15": {
+    "babel-preset-solid@2.0.0-beta.14_@babel+core@7.29.7_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-l0eX4t+vYmANQqEbRWz0d7b9zt2SybxX7/PfA5cyWGphSGiMtGahFT6XHXktDd8x16o5t1DyPIl7yfa/HAho3A==",
       "dependencies": [
         "@babel/core",
         "babel-plugin-jsx-dom-expressions@0.50.0-next.13_@babel+core@7.29.7",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ],
       "optionalPeers": [
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
     "bail@2.0.2": {
@@ -6750,14 +6747,14 @@
         "upper-case-first"
       ]
     },
-    "seroval-plugins@1.5.4_seroval@1.5.4": {
+    "seroval-plugins@1.5.4_seroval@1.5.5": {
       "integrity": "sha512-S0xQPhUTefAhNvNWFg0c1J8qJArHt5KdtJ/cFAofo06KD1MVSeFWyl4iiu+ApDIuw0WhjpOfCdgConOfAnLgkw==",
       "dependencies": [
         "seroval"
       ]
     },
-    "seroval@1.5.4": {
-      "integrity": "sha512-46uFvgrXTVxZcUorgSSRZ4y+ieqLLQRMlG4bnCZKW3qI6BZm7Rg4ntMW4p1mILEEBZWrFlcpp0AyIIlM6jD9iw=="
+    "seroval@1.5.5": {
+      "integrity": "sha512-bSjOuPcwPKLSJNhr9+bZxA20nQxVle5J5MNsYRVE6cIg7KpRLXGupymePavu0jrxlPiPsr4xGZSB8yUY2sH2sw=="
     },
     "sharp@0.34.5": {
       "integrity": "sha512-Ou9I5Ft9WNcCbXrU9cMgPBcCK8LiwLqcbywW3t4oDV37n1pzpuNLsYiAV8eODnjbtQlSDwZ2cUEeQz4E54Hltg==",
@@ -6861,46 +6858,37 @@
         "seroval-plugins"
       ]
     },
-    "solid-js@2.0.0-beta.14": {
-      "integrity": "sha512-gbbvlxhs1GgL1IsnwHNtkTCRBBQcIDMwznBw3T05iYvP+fuUKMyIPku+ZLjeALyX4RaSLR99JSL6NttyHsYb8Q==",
+    "solid-js@2.0.0-beta.16": {
+      "integrity": "sha512-8GVhd4QACNK5K8EJI9VB478U8wg7ulRIZY36Vj0LNKmQrRAVcdv8FitNnA/NPFOzmfLVHf8ZAh0wbjxNTtAjvg==",
       "dependencies": [
-        "@solidjs/signals@2.0.0-beta.15",
+        "@solidjs/signals@2.0.0-beta.16",
         "csstype",
         "seroval",
         "seroval-plugins"
       ]
     },
-    "solid-js@2.0.0-beta.15": {
-      "integrity": "sha512-3hvcmEFUgDlahc++/ulrPhnc5IM7aJbW1P4TUaKsMZpDY5qGcOagtL4nbXGdUPnVP0JsJhMuE9bXEcLdLE+2SA==",
-      "dependencies": [
-        "@solidjs/signals@2.0.0-beta.15",
-        "csstype",
-        "seroval",
-        "seroval-plugins"
-      ]
-    },
-    "solid-refresh@0.7.8_solid-js@2.0.0-beta.15": {
+    "solid-refresh@0.7.8_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-iG442T3HXJp5jEebCy8okETrWnmX7CnxNOKrJQVeufh6WXSn+xtLXaptUXXMHTWcRqTJOJwQ8UwzxrRtVFSIzA==",
       "dependencies": [
         "@babel/generator@7.29.7",
         "@babel/types@7.29.7",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "solid-refresh@0.8.0-next.7_solid-js@2.0.0-beta.15": {
+    "solid-refresh@0.8.0-next.7_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-fqkPRAeiE0tqfo2ZljeQBIXwfYssU2w1FmaWFrXmnV33B/CfGfez7BjtOF0Y1/orUNRXI/DZcJlJThHllcCMsA==",
       "dependencies": [
         "@babel/generator@7.29.7",
         "@babel/types@7.29.7",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
-    "solid-transition-group@0.2.3_solid-js@2.0.0-beta.15": {
+    "solid-transition-group@0.2.3_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-iB72c9N5Kz9ykRqIXl0lQohOau4t0dhel9kjwFvx81UZJbVwaChMuBuyhiZmK24b8aKEK0w3uFM96ZxzcyZGdg==",
       "dependencies": [
         "@solid-primitives/refs",
         "@solid-primitives/transition-group",
-        "solid-js@2.0.0-beta.15"
+        "solid-js@2.0.0-beta.16"
       ]
     },
     "source-map-js@1.2.1": {
@@ -6941,23 +6929,23 @@
     "std-env@3.10.0": {
       "integrity": "sha512-5GS12FdOZNliM5mAOxFRg7Ir0pWz8MdpYm6AY6VPkGpbA7ZzmbzNcBJQ0GPvvyWgcY7QAhCgf9Uy89I03faLkg=="
     },
-    "storybook-solidjs-vite@10.5.2_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_solid-js@2.0.0-beta.15_storybook@10.4.6__@types+react@19.2.17__prettier@3.9.4__@testing-library+dom@10.4.1__react@19.2.7_typescript@6.0.3_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.15___solid-js@2.0.0-beta.15__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.15__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@testing-library+dom@10.4.1_@testing-library+jest-dom@6.9.1_@types+node@22.20.0_@types+react@19.2.17_esbuild@0.28.1_prettier@3.9.4_react@19.2.7_sass@1.101.0": {
+    "storybook-solidjs-vite@10.5.2_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_solid-js@2.0.0-beta.16_storybook@10.4.6__@types+react@19.2.17__prettier@3.9.4__@testing-library+dom@10.4.1__react@19.2.7_typescript@6.0.3_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_vite-plugin-solid@3.0.0-next.5__@solidjs+web@2.0.0-beta.16___solid-js@2.0.0-beta.16__@testing-library+jest-dom@6.9.1__solid-js@2.0.0-beta.16__vite@8.1.3___@types+node@22.20.0___esbuild@0.28.1___sass@1.101.0": {
       "integrity": "sha512-u+XSoTxE8JoVZ4IdI+gJRuNMQL00PCLA1BinBPdwHRKSSSVczf+JQhcfBJ2xxODs430RJp+JjAajKZeaSIHj9Q==",
       "dependencies": [
-        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
+        "@solidjs/web@2.0.0-beta.16_solid-js@2.0.0-beta.16",
         "@storybook/builder-vite",
         "@storybook/global",
         "@volar/language-core",
         "@volar/typescript",
         "semver@7.8.1",
-        "solid-js@2.0.0-beta.15",
+        "solid-js@2.0.0-beta.16",
         "storybook",
         "typescript",
         "vite@8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
         "vite-plugin-solid"
       ],
       "optionalPeers": [
-        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
+        "@solidjs/web@2.0.0-beta.16_solid-js@2.0.0-beta.16",
         "typescript"
       ]
     },
@@ -7402,15 +7390,15 @@
         "normalize-path@2.1.1"
       ]
     },
-    "unplugin-solid@1.0.0_solid-js@2.0.0-beta.15": {
+    "unplugin-solid@1.0.0_solid-js@2.0.0-beta.16": {
       "integrity": "sha512-pv1CS3XMtf3WwX8Dq9Bvo4qH6mfjN2xOgbaPcnqW1dLhyP/JQCvueGEsN0dYIZ4JvxaD/G/Ot1JnBzNQGHkfeA==",
       "dependencies": [
         "@babel/core",
         "@rollup/pluginutils",
-        "babel-preset-solid@1.9.12_@babel+core@7.29.7_solid-js@2.0.0-beta.15",
+        "babel-preset-solid@1.9.12_@babel+core@7.29.7_solid-js@2.0.0-beta.16",
         "merge-anything@6.0.6",
-        "solid-js@2.0.0-beta.15",
-        "solid-refresh@0.7.8_solid-js@2.0.0-beta.15",
+        "solid-js@2.0.0-beta.16",
+        "solid-refresh@0.7.8_solid-js@2.0.0-beta.16",
         "unplugin@2.3.11",
         "vitefu"
       ]
@@ -7507,17 +7495,17 @@
       ],
       "bin": true
     },
-    "vite-plugin-solid@3.0.0-next.5_@solidjs+web@2.0.0-beta.15__solid-js@2.0.0-beta.15_@testing-library+jest-dom@6.9.1_solid-js@2.0.0-beta.15_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0": {
+    "vite-plugin-solid@3.0.0-next.5_@solidjs+web@2.0.0-beta.16__solid-js@2.0.0-beta.16_@testing-library+jest-dom@6.9.1_solid-js@2.0.0-beta.16_vite@8.1.3__@types+node@22.20.0__esbuild@0.28.1__sass@1.101.0": {
       "integrity": "sha512-hcn3mzevQDv6Oyo/Zv5LXdOrlWwKGeGVxNhc9fUq3AcN9aO6KABy52yq5cvnPDo3qaxmvOJVbNS1H4V5rx7AQg==",
       "dependencies": [
         "@babel/core",
-        "@solidjs/web@2.0.0-beta.15_solid-js@2.0.0-beta.15",
+        "@solidjs/web@2.0.0-beta.16_solid-js@2.0.0-beta.16",
         "@testing-library/jest-dom",
         "@types/babel__core",
-        "babel-preset-solid@2.0.0-beta.14_@babel+core@7.29.7_solid-js@2.0.0-beta.15",
+        "babel-preset-solid@2.0.0-beta.14_@babel+core@7.29.7_solid-js@2.0.0-beta.16",
         "merge-anything@5.1.7",
-        "solid-js@2.0.0-beta.15",
-        "solid-refresh@0.8.0-next.7_solid-js@2.0.0-beta.15",
+        "solid-js@2.0.0-beta.16",
+        "solid-refresh@0.8.0-next.7_solid-js@2.0.0-beta.16",
         "vite@8.1.3_@types+node@22.20.0_esbuild@0.28.1_sass@1.101.0",
         "vitefu"
       ],
@@ -7787,7 +7775,7 @@
         "npm:@changesets/cli@^2.31.0",
         "npm:@nothing-but/node-resolve-ts@^1.0.1",
         "npm:@solidjs/signals@2.0.0-beta.14",
-        "npm:@solidjs/web@2.0.0-beta.15",
+        "npm:@solidjs/web@2.0.0-beta.16",
         "npm:@storybook/addon-docs@^10.4.6",
         "npm:@testing-library/jest-dom@^6.9.1",
         "npm:@types/jsdom@^21.1.7",
@@ -7808,7 +7796,7 @@
         "npm:rehype-highlight@^7.0.2",
         "npm:rehype-slug@6",
         "npm:remark-gfm@^4.0.1",
-        "npm:solid-js@2.0.0-beta.15",
+        "npm:solid-js@2.0.0-beta.16",
         "npm:storybook-solidjs-vite@^10.5.2",
         "npm:storybook@^10.4.6",
         "npm:tsdown@~0.22.3",
@@ -7823,119 +7811,119 @@
       "packages/a11y": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/active-element": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/analytics": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.14",
-            "npm:solid-js@2.0.0-beta.14"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/async": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/audio": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/bounds": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/broadcast-channel": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/clipboard": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/connectivity": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/context": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/controlled-props": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/controlled-signal": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/cookies": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/cursor": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/date": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
+            "npm:@solidjs/web@2.0.0-beta.16",
             "npm:date-fns@^2.30.0",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
@@ -7950,53 +7938,53 @@
       "packages/deep": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/destructure": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/devices": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/event-bus": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/event-dispatcher": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/event-listener": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/event-props": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
@@ -8011,59 +7999,59 @@
       "packages/filesystem": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
+            "npm:@solidjs/web@2.0.0-beta.16",
             "npm:@tauri-apps/api@^1.6.0",
             "npm:@types/wicg-file-system-access@2023.10.7",
             "npm:chokidar@^3.6.0",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/flux-store": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/focus": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/form": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/fullscreen": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/geolocation": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
+            "npm:@solidjs/web@2.0.0-beta.16",
             "npm:@types/leaflet@^1.9.21",
             "npm:leaflet@^1.9.4",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/gestures": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
@@ -8083,16 +8071,16 @@
       "packages/history": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/i18n": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16",
             "npm:tsdown@~0.22.3",
             "npm:unplugin-solid@1"
           ]
@@ -8101,8 +8089,8 @@
       "packages/idle": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
@@ -8119,258 +8107,258 @@
       "packages/input-mask": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/interaction": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/intersection-observer": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/jsx-tokenizer": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/keyboard": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/keyed": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/lifecycle": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/list": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/list-state": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/map": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/marker": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/masonry": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/match": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/media": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/mediastream": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/memo": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/mouse": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/mutable": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/mutation-observer": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/notification": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/orientation": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/page-utilities": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/pagination": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/permission": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/platform": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/pointer": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/presence": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/promise": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/props": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/queue": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/raf": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/range": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/refs": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15",
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16",
             "npm:solid-transition-group@~0.2.3"
           ]
         }
@@ -8378,8 +8366,8 @@
       "packages/resize-observer": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
@@ -8393,32 +8381,32 @@
       "packages/rootless": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/scheduled": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/script-loader": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/scroll": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
@@ -8426,159 +8414,159 @@
         "packageJson": {
           "dependencies": [
             "npm:@babel/core@^7.29.7",
-            "npm:@solidjs/web@2.0.0-beta.15",
+            "npm:@solidjs/web@2.0.0-beta.16",
             "npm:babel-preset-solid@2.0.0-beta.14",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/sensors": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/set": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/share": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/signal-builders": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/spring": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/sse": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/state-machine": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/static-store": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/storage": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/styles": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/timer": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/transition-group": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/trigger": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/tween": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/upload": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/url": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/utils": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/vibrate": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/video": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
@@ -8586,24 +8574,24 @@
         "packageJson": {
           "dependencies": [
             "npm:@babel/core@^7.29.7",
-            "npm:@solidjs/web@2.0.0-beta.15",
+            "npm:@solidjs/web@2.0.0-beta.16",
             "npm:babel-preset-solid@2.0.0-beta.14",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/websocket": {
         "packageJson": {
           "dependencies": [
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },
       "packages/workers": {
         "packageJson": {
           "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.15",
-            "npm:solid-js@2.0.0-beta.15"
+            "npm:@solidjs/web@2.0.0-beta.16",
+            "npm:solid-js@2.0.0-beta.16"
           ]
         }
       },

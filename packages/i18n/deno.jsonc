@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "3.0.0-next.1",
+  "version": "3.0.0-next.2",
   "description": "Library of primitives for providing internationalization support.",
   "license": "MIT",
   "exports": "./src/index.ts",
