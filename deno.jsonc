@@ -6,6 +6,7 @@
   "nodeModulesDir": "auto",
   "preferPackageJson": true,
   "lock": true,
+  "minimumDependencyAge": "0",
   "lint": {
     "rules": {
       "tags": [
