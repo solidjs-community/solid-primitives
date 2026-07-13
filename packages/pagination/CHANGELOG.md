@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- 71c6bc2: fix keyboard focus loss
+
 ## 1.0.0-next.1
 
 ### Minor Changes
