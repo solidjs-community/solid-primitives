@@ -26,7 +26,7 @@
       "createScreen"
     ],
     "category": "Browser APIs",
-    "gzip": 1049
+    "gzip": 1057
   },
   "files": [
     "dist"

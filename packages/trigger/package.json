@@ -21,7 +21,7 @@
       "createTriggerCache"
     ],
     "category": "Reactivity",
-    "gzip": 497
+    "gzip": 496
   },
   "private": false,
   "sideEffects": false,

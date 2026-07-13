@@ -20,7 +20,7 @@
       "createGraphQLClient"
     ],
     "category": "Network",
-    "gzip": 975
+    "gzip": 978
   },
   "files": [
     "dist"
