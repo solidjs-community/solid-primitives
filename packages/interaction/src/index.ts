@@ -325,6 +325,16 @@ export function makeInteractOutside<T extends Element>(
   let ownerDoc: Document = el.ownerDocument;
 
   const isEventOutside = (e: Event): boolean => {
+    // `el` can be removed from the document by its owner (e.g. a `<Show>`
+    // unmounting a dismissable layer) before this instance's reactive owner
+    // gets around to calling the cleanup this function returns (listener
+    // removal is tied to `onCleanup`, which can lag a tick behind the DOM
+    // change that triggered it). Once `el` is disconnected there's nothing
+    // left to protect, and `el.contains(target)` would incorrectly read as
+    // "not contained" for every target — including ones legitimately inside
+    // a *new* instance that opened in that same window — misreporting them
+    // as outside interactions on this now-orphaned instance.
+    if (!el.isConnected) return false;
     const target = e.target as Element | null;
     if (!(target instanceof Element)) return false;
     if (!ownerDoc.contains(target)) return false;
