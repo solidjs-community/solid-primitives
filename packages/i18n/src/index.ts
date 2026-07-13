@@ -280,6 +280,7 @@ export function richText(string: string, tags: RichTextTags): JSX.Element {
       parts.push(render(inner));
     } else {
       if (DEV)
+        // oxlint-disable-next-line no-console
         console.warn(
           `[@solid-primitives/i18n] richText: no renderer for tag "<${tag}>" was provided, rendering its contents as plain text.`,
         );

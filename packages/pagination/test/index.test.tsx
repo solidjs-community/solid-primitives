@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { createMemo, createRoot, createSignal, flush } from "solid-js";
+import { createMemo, createRoot, createSignal, flush, For } from "solid-js";
+import { render } from "@solidjs/web";
 import {
   createInfiniteScroll,
   createPagination,
@@ -192,6 +193,41 @@ describe("createPagination", () => {
     flush();
     expect(page()).toBe(8);
     dispose();
+  });
+  
+  test("sets the focus after going to a new page", async () => {
+    const originalFocus = HTMLElement.prototype.focus;
+    let current = document.body;
+    HTMLElement.prototype.focus = function() { 
+      current = this; 
+      originalFocus.call(this);
+    };
+    let dispose;
+    try {
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const Pagination = () => {
+        const [pagination] = createPagination({ pages: 10, maxPages: 5, initialPage: 1 });
+        return <nav>
+          <For each={pagination()}>
+            {(props) => <button type="button" {...props} />}
+          </For>
+        </nav>;
+      };
+      dispose = render(() => <Pagination />, container);
+      const activeButton = container?.querySelector('nav button[aria-current="page"]');
+      activeButton instanceof HTMLElement && activeButton.focus();
+      for (var i = 0; i < 5; i++) {
+        await new Promise(r => setTimeout(r, 15));
+        current?.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, charCode: 0, code: "ArrowRight", key: "ArrowRight", keyCode: 39 }));
+        current?.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true, charCode: 0, code: "ArrowRight", key: "ArrowRight", keyCode: 39 }));
+        await new Promise(r => setTimeout(r, 45));
+        expect(current.getAttribute("aria-current")).toBe("page");
+      }
+    } finally {
+      queueMicrotask(dispose);
+      HTMLElement.prototype.focus = originalFocus;
+    }
   });
 });
 

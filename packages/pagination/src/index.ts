@@ -11,6 +11,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  flush,
   onCleanup,
 } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
@@ -88,7 +89,7 @@ export type PaginationOptions = {
 };
 
 export type PaginationProps = {
-  "aria-current"?: boolean;
+  "aria-current"?: "page";
   "aria-label"?: string;
   disabled?: boolean;
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
@@ -167,13 +168,19 @@ export const createPagination = (
 
   // Clamp page to valid range reactively — handles page count decreasing below current page
   const page: Accessor<number> = createMemo(() => Math.max(1, Math.min(rawPage(), opts().pages)));
-
+  
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
+    // select the parent before we might get detached
+    let parent = ev.currentTarget, current;
+    while (parent instanceof HTMLElement && parent.childElementCount < 3) parent = parent.parentNode;
     setPage(p);
-    if ("currentTarget" in ev)
-      (ev.currentTarget as HTMLElement).parentNode
-        ?.querySelector<HTMLElement>('[aria-current="true"]')
-        ?.focus();
+    flush();
+    // select the current page
+    if (parent) {      
+      while (parent instanceof HTMLElement && !(current = parent.querySelector('[aria-current="page"]')))
+        parent = parent.parentNode;
+      current instanceof HTMLElement && current.focus();
+    }
   };
 
   const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
@@ -205,7 +212,7 @@ export const createPagination = (
                 },
             {
               "aria-current": {
-                get: () => (page() === pageNo ? "true" : undefined),
+                get: () => (page() === pageNo ? "page" : undefined),
                 set: noop,
                 enumerable: true,
               },

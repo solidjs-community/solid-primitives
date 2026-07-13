@@ -20,7 +20,7 @@
       "createRootPool"
     ],
     "category": "Reactivity",
-    "gzip": 936
+    "gzip": 935
   },
   "private": false,
   "sideEffects": false,

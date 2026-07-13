@@ -28,7 +28,7 @@
       "createWSStore"
     ],
     "category": "Network",
-    "gzip": 1086
+    "gzip": 1094
   },
   "private": false,
   "type": "module",

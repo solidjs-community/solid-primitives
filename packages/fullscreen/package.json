@@ -18,7 +18,7 @@
       "fullscreen"
     ],
     "category": "Browser APIs",
-    "gzip": 661
+    "gzip": 663
   },
   "files": [
     "dist"

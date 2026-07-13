@@ -25,7 +25,7 @@
       "createConcurrentTaskQueue"
     ],
     "category": "Utilities",
-    "gzip": 937
+    "gzip": 936
   },
   "keywords": [
     "solid",
