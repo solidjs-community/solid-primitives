@@ -144,6 +144,7 @@
     "idle-solid2-migration",
     "immutable-solid2-migration",
     "input-mask-solid2-migration",
+    "interaction-orphaned-listener-fix",
     "interaction-solid2-migration",
     "jsx-tokenizer-solid2-migration",
     "keyboard-any-order-shortcut",
