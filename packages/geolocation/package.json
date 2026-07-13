@@ -21,7 +21,7 @@
       "createWithinRadius"
     ],
     "category": "Browser APIs",
-    "gzip": 1225
+    "gzip": 1223
   },
   "keywords": [
     "geolocation",

@@ -22,7 +22,7 @@
       "onElementConnect"
     ],
     "category": "Reactivity",
-    "gzip": 289
+    "gzip": 297
   },
   "keywords": [
     "solid",

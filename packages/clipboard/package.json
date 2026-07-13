@@ -21,7 +21,7 @@
       "createClipboard"
     ],
     "category": "Browser APIs",
-    "gzip": 920
+    "gzip": 919
   },
   "files": [
     "dist"
