@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/resource",
   "version": "0.4.3",
-  "description": "A template primitive example.",
+  "description": "Utilities for composing createResource fetchers: abortable requests, caching, retrying, and aggregation.",
   "author": "Alex <alex.lohr@goto.com>",
   "contributors": [],
   "license": "MIT",

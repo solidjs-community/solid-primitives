@@ -6,8 +6,14 @@ import {
   type Accessor,
   type SignalOptions,
 } from "solid-js";
+/**
+ * Primitives to manage timeout and interval.
+ *
+ * @module
+ */
 import { isServer } from "@solidjs/web";
 
+/** A delay in milliseconds, or an {@link Accessor} of one, `false` to disable the timer. */
 export type TimeoutSource = number | Accessor<number | false>;
 
 /**
@@ -171,6 +177,7 @@ export function createPolled<T extends P, P = T>(
   value?: undefined,
   options?: SignalOptions<T>,
 ): Accessor<T>;
+/** {@link createPolled} overload with an explicit initial `value` of a distinct type `I`. */
 export function createPolled<T extends P, I = T, P = T>(
   fn: (prev: P | I) => T,
   timeout: TimeoutSource,

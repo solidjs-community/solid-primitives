@@ -21,6 +21,7 @@ export const defaultCacheOptions: CacheOptions = {
   cache: {},
 };
 
+/** Turns fetcher args (a `RequestInfo`/`RequestInit` pair) into a stable string key for cache lookups. */
 export const serializeRequest = <FetcherArgs extends any[]>(requestData: FetcherArgs): string =>
   JSON.stringify({
     ...(typeof requestData[0] === "string" ? { url: requestData[0] } : requestData[0]),
@@ -97,6 +98,14 @@ export const withCache: RequestModifier =
     });
   };
 
+/**
+ * Companion to `withCache`: automatically refetches once the current cache
+ * entry expires, instead of waiting for the next manual read. With a function
+ * `expires`, polls every `pollDelayMs` (or every animation frame if `0`) to
+ * detect expiry.
+ *
+ * @param pollDelayMs Polling interval in ms used when `expires` is a function. Defaults to 100.
+ */
 export const withRefetchOnExpiry: RequestModifier =
   <Result, FetcherArgs extends any[]>(pollDelayMs = 100) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
@@ -127,6 +136,14 @@ export const withRefetchOnExpiry: RequestModifier =
     requestContext.wrapResource();
   };
 
+/**
+ * Persists the `withCache` cache to a `Storage` (e.g. `localStorage`), loading
+ * any previously stored entries on setup and writing back after every cache update.
+ * Must be composed after `withCache` in the modifier chain.
+ *
+ * @param storage Storage to persist the cache to. Defaults to `localStorage`.
+ * @param key Key under which the cache is stored. Defaults to `"fetch-cache"`.
+ */
 export const withCacheStorage: RequestModifier =
   (storage: Storage = localStorage, key = "fetch-cache") =>
   requestContext => {

@@ -1,3 +1,9 @@
+/**
+ * Utilities for composing `createResource` fetchers: abortable requests, response
+ * caching, retrying, aggregating paginated data, and a deep-store-backed signal.
+ *
+ * @module
+ */
 import {
   createMemo,
   createSignal,
@@ -9,8 +15,11 @@ import {
 } from "solid-js";
 import { createStore, reconcile, unwrap } from "solid-js/store";
 
+/** Options for {@link makeAbortable} and {@link createAbortable}. */
 export type AbortableOptions = {
+  /** When true, a new call to `signal()` will not automatically abort a still-pending previous request. */
   noAutoAbort?: boolean;
+  /** Time in milliseconds after which the signal auto-aborts. */
   timeout?: number;
 };
 
@@ -89,6 +98,7 @@ export function createAbortable(
 const mapEntries = (entries: [key: string, value: any][]) =>
   entries.map(entry => entry.map(serializer).join(":"));
 
+/** Default `sourceHash` used by {@link makeCache}: recursively stringifies a fetcher source into a stable cache key. */
 export const serializer = (req: any): string =>
   // non-objects and null allow for string coercion
   !req || typeof req !== "object"
@@ -104,19 +114,28 @@ export const serializer = (req: any): string =>
           typeof req.entries === "function" ? [...req.entries()] : Object.entries(req),
         )}}`;
 
+/** A cached response as stored by {@link makeCache}, keyed by its serialized source. */
 export type CacheEntry<T, S> = {
   source: S;
   data: T;
   ts: number;
 };
+/** Default, module-global cache shared by all {@link makeCache} calls that don't pass their own `cache`. */
 export const cache: Record<string, CacheEntry<any, any>> = {};
 
+/** Options for {@link makeCache}. */
 export type CacheOptions<T, S> = {
+  /** A local cache to use instead of the global {@link cache}. */
   cache?: Record<string, CacheEntry<T, S>>;
+  /** Fixed number of milliseconds, or a function of the cached entry, after which a cache entry expires. */
   expires?: number | ((entry: Omit<CacheEntry<T, S>, "ts">) => number);
+  /** `[serialize, deserialize]` pair used to persist the cache to `storage`. Defaults to `[JSON.stringify, JSON.parse]`. */
   serialize?: [(input: any) => string, (input: string) => any];
+  /** Function computing the cache key from a fetcher source. Defaults to {@link serializer}. */
   sourceHash?: (source: S) => string;
+  /** A storage like `localStorage` used to persist the cache across reloads. */
   storage?: Storage;
+  /** Key under which the cache is persisted in `storage`. */
   storageKey?: string;
 };
 
@@ -213,8 +232,11 @@ export function makeCache<T, S, R>(
   ];
 }
 
+/** Options for {@link makeRetrying}. */
 export type RetryOptions = {
+  /** Milliseconds to wait before retrying. Defaults to 5000. */
   delay?: number;
+  /** Number of times to retry before giving up and throwing the last error. Defaults to 3. */
   retries?: number;
 };
 
@@ -294,6 +316,7 @@ export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initial
  * @see https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage
  */
 export function createDeepSignal<T>(): Signal<T | undefined>;
+/** {@link createDeepSignal} overload with an initial value. */
 export function createDeepSignal<T>(value: T): Signal<T>;
 export function createDeepSignal<T>(v?: T): Signal<T> {
   const [store, setStore] = createStore([v]);
