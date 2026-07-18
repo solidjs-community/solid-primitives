@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pagination",
-  "version": "1.0.0-next.2",
+  "version": "1.0.0-next.4",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "license": "MIT",
   "exports": "./dist/index.js",

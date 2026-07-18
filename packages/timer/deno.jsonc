@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/timer",
-  "version": "1.4.4",
+  "version": "1.4.5-next.0",
   "description": "Primitives to manage timeout and interval",
   "license": "MIT",
   "exports": "./src/index.ts",

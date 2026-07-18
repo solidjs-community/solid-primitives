@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/sse",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives for Server-Sent Events (SSE) using the browser's EventSource API.",
   "license": "MIT",
   "exports": {

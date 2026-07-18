@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/styles",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Collection of reactive primitives focused on styles.",
   "license": "MIT",
   "exports": "./src/index.ts",

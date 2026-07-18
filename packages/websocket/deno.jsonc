@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "2.0.0-next.1",
+  "version": "2.0.0-next.2",
   "description": "Primitive to create a web socket connection",
   "license": "MIT",
   "exports": "./src/index.ts",

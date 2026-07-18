@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/flux-store",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "SolidJS Primitive to simplify the creation of global stores and the ability to access and mutate them.",
   "license": "MIT",
   "exports": "./src/index.ts",

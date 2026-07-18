@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mutable",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "A primitive for creating a mutable store, an alternative to Solid's createStore.",
   "license": "MIT",
   "exports": "./src/index.ts",
