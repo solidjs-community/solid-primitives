@@ -1,5 +1,11 @@
 # @solid-primitives/event-props
 
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
 ## 1.0.0-next.0
 
 ### Major Changes
@@ -11,7 +17,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
 
   ### `@solid-primitives/event-props`
-
   - Requires Solid.js v2 — signal writes from event handlers fire outside any reactive scope (as they always do from DOM events), consistent with Solid 2.0's owned-scope write restrictions
   - Signal writes are microtask-batched in Solid 2.0; reads reflect the committed value after the next microtask or an explicit `flush()`
 

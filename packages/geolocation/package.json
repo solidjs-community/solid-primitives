@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/geolocation",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "Primitives to query geolocation and observe changes.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",

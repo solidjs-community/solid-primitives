@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "5.0.0-next.0",
+  "version": "5.0.0-next.1",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -29,7 +29,7 @@
       "makeObjectStorage"
     ],
     "category": "Browser APIs",
-    "gzip": 2180
+    "gzip": 2210
   },
   "files": [
     "dist"

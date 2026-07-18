@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/a11y",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Accessibility primitives for Solid.js — labeled field groups, ARIA graph helpers, and more.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
