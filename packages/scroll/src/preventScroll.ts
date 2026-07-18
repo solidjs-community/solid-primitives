@@ -10,20 +10,9 @@
  * https://github.com/theKashey/react-remove-scroll
  */
 
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, type Signal } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { access, type MaybeAccessor } from "@solid-primitives/utils";
-
-function contains(wrapper: HTMLElement, target: HTMLElement): boolean {
-  if (wrapper.contains(target)) return true;
-  let current: HTMLElement | null = target;
-  while (current) {
-    if (current === wrapper) return true;
-    // @ts-expect-error: _$host is a SolidJS-internal property set on portal roots
-    current = current._$host ?? current.parentElement;
-  }
-  return false;
-}
+import { access, contains, globalRegistry, type MaybeAccessor } from "@solid-primitives/utils";
 
 type Axis = "x" | "y";
 
@@ -44,21 +33,11 @@ export type CreatePreventScrollProps = {
   allowPinchZoom?: MaybeAccessor<boolean>;
 };
 
-// ─── Module-level stack ───────────────────────────────────────────────────────
-// Tracks active instances; only the topmost one installs wheel/touch handlers.
-
-const [preventScrollStack, setPreventScrollStack] = createSignal<string[]>([], {
-  ownedWrite: true,
-});
-
-const isActive = (id: string): boolean => {
-  const stack = preventScrollStack();
-  return stack.length > 0 && stack[stack.length - 1] === id;
-};
-
-// ─── Body style tracker ───────────────────────────────────────────────────────
-// Multiple nested instances share a key; the original styles are only restored
-// once the last instance cleans up.
+// Uses globalRegistry (Symbol.for(...) on globalThis, not module-scope bindings) so the
+// active-instance stack and body-style ref-counts stay correct even if the app's dependency
+// graph ends up with more than one copy of this package installed — module-scope state would
+// otherwise be split across copies and the ref-counting would break (e.g. the "topmost
+// instance" check disagreeing between copies).
 
 type ActiveStyle = {
   activeCount: number;
@@ -66,7 +45,24 @@ type ActiveStyle = {
   properties: string[];
 };
 
-const activeBodyStyles = new Map<string, ActiveStyle>();
+type PreventScrollRegistry = {
+  stack: Signal<string[]>;
+  activeBodyStyles: Map<string, ActiveStyle>;
+  /** Shared across duplicate package copies so instance ids never collide on the shared stack. */
+  nextId: number;
+};
+
+const getRegistry = (): PreventScrollRegistry =>
+  globalRegistry<PreventScrollRegistry>("@solid-primitives/scroll:prevent-scroll", () => ({
+    stack: createSignal<string[]>([], { ownedWrite: true }),
+    activeBodyStyles: new Map(),
+    nextId: 0,
+  }));
+
+const isActive = (id: string): boolean => {
+  const stack = getRegistry().stack[0]();
+  return stack.length > 0 && stack[stack.length - 1] === id;
+};
 
 function applyBodyStyle(
   key: string,
@@ -74,6 +70,8 @@ function applyBodyStyle(
   style: Partial<CSSStyleDeclaration>,
   properties: { key: string; value: string }[],
 ): () => void {
+  const activeBodyStyles = getRegistry().activeBodyStyles;
+
   const originalStyles: Partial<CSSStyleDeclaration> = {};
   for (const k in style) {
     originalStyles[k] = element.style[k as keyof CSSStyleDeclaration] as string;
@@ -115,8 +113,6 @@ function applyBodyStyle(
     }
   };
 }
-
-// ─── Scroll helpers ───────────────────────────────────────────────────────────
 
 function getScrollDimensions(element: HTMLElement, axis: Axis): [number, number, number] {
   return axis === "x"
@@ -185,10 +181,6 @@ function wouldScroll(
   return true;
 }
 
-// ─── Primitive ────────────────────────────────────────────────────────────────
-
-let _nextId = 0;
-
 /**
  * Prevents scrolling outside of the given element.
  *
@@ -198,7 +190,9 @@ let _nextId = 0;
 export const createPreventScroll = (props: CreatePreventScrollProps = {}): void => {
   if (isServer) return;
 
-  const id = String(_nextId++);
+  const registry = getRegistry();
+  const id = String(registry.nextId++);
+  const [, setPreventScrollStack] = registry.stack;
 
   let currentTouchStart: [number, number] = [0, 0];
   let currentTouchStartAxis: Axis | undefined;

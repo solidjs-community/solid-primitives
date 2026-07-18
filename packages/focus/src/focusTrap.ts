@@ -6,6 +6,7 @@
 
 import { access, afterPaint, INTERNAL_OPTIONS, type MaybeAccessor } from "@solid-primitives/utils";
 import { createEffect, createMemo, createSignal } from "solid-js";
+import { scheduleFocusRestore } from "./restoreFocus.ts";
 
 const FOCUSABLE_SELECTOR =
   'a[href]:not([tabindex="-1"]), button:not([tabindex="-1"]), input:not([tabindex="-1"]), textarea:not([tabindex="-1"]), select:not([tabindex="-1"]), details:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
@@ -107,20 +108,14 @@ export const createFocusTrap = (props: CreateFocusTrapProps): void => {
     });
   };
 
-  const triggerRestoreFocus = (container: HTMLElement) => {
-    afterPaint(() => {
-      if (!access(props.restoreFocus ?? true)) return;
-      const target = access(props.finalFocusElement ?? null) ?? originalFocusedElement;
-      if (!target) return;
-      const { onFinalFocus } = props;
-      if (onFinalFocus) {
-        const event = new CustomEvent(EVENT_FINAL_FOCUS, EVENT_OPTIONS);
-        container.addEventListener(EVENT_FINAL_FOCUS, onFinalFocus);
-        container.dispatchEvent(event);
-        container.removeEventListener(EVENT_FINAL_FOCUS, onFinalFocus);
-        if (event.defaultPrevented) return;
-      }
-      target.focus();
+  const triggerRestoreFocus = (container: HTMLElement, fallbackTarget: HTMLElement | null) => {
+    scheduleFocusRestore({
+      resolveEventTarget: () => container,
+      eventName: EVENT_FINAL_FOCUS,
+      shouldRestore: () => access(props.restoreFocus ?? true),
+      resolveTarget: () => access(props.finalFocusElement) ?? null,
+      fallbackTarget,
+      onFinalFocus: props.onFinalFocus,
     });
   };
 
@@ -177,7 +172,10 @@ export const createFocusTrap = (props: CreateFocusTrapProps): void => {
       return () => {
         if (observeChanges) observer.disconnect();
         setFocusableElements(undefined);
-        triggerRestoreFocus(container);
+        // Snapshot now, synchronously — the restore is scheduled via afterPaint (deferred by a
+        // couple of animation frames), and a later activation before it fires would otherwise
+        // overwrite originalFocusedElement out from under the still-pending restore.
+        triggerRestoreFocus(container, originalFocusedElement);
       };
     },
   );
