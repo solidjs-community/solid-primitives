@@ -1,5 +1,13 @@
 # @solid-primitives/until
 
+## 2.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 2.0.0-next.0
 
 ### Major Changes
@@ -11,7 +19,6 @@
   **Peer dependencies**: `solid-js@^2.0.0-beta.14` is now required.
 
   ### `@solid-primitives/promise`
-
   - `createEffect` now uses the split compute/apply pattern required by Solid 2.0 — the reactive condition is evaluated in the compute phase and the resolve/dispose side-effect runs in the apply phase.
   - Resolution of `until` is now deferred to after the reactive flush rather than being synchronous with the signal write. This matches the standard async nature of the returned `Promise`, so existing `await`-based usage is unaffected.
   - Added `test/server.test.ts` to verify safe SSR behavior.

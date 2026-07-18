@@ -1,5 +1,13 @@
 # @solid-primitives/cursor
 
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 1.0.0-next.0
 
 ### Major Changes
@@ -14,7 +22,6 @@
   - `createElementCursor` and `createBodyCursor` updated to the split compute/apply effect pattern required by Solid 2.0 — cleanup is returned from the apply phase instead of using `onCleanup`
 
   ## New Exports
-
   - `makeBodyCursor(cursor)` — sets cursor on body immediately, returns a cleanup function
   - `makeElementCursor(target, cursor)` — sets cursor on an element immediately, returns a cleanup function
   - `createDragCursor(target, options?)` — reactively sets `"grab"` on a target element and switches to `"grabbing"` on the body during pointer drag

@@ -1,5 +1,13 @@
 # @solid-primitives/set
 
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/trigger@3.0.0-next.1
+
 ## 1.0.0-next.0
 
 ### Major Changes
@@ -11,7 +19,6 @@
   **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ## New Exports
-
   - **`union(a, b)`** — reactive `Accessor<ReadonlySet<T>>` of all elements in either set.
   - **`intersection(a, b)`** — reactive `Accessor<ReadonlySet<T>>` of elements present in both sets.
   - **`difference(a, b)`** — reactive `Accessor<ReadonlySet<T>>` of elements in `a` not in `b`.

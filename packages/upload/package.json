@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/upload",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Primitives for uploading files.",
   "author": "Rustam Ashurmatov <rr.ashurmatov.21@gmail.com>",
   "license": "MIT",

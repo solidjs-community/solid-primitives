@@ -1,5 +1,13 @@
 # @solid-primitives/raf
 
+## 4.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 4.0.0-next.0
 
 ### Major Changes
@@ -11,7 +19,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/raf`
-
   - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
   - `createRAF`: `running` signal created with `{ ownedWrite: true }` to allow `start()`/`stop()` to be called from within reactive scopes
   - Added `test/server.test.ts` verifying SSR no-op behaviour for `createRAF`, `targetFPS`, and `createMs`

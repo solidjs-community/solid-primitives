@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/history",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives for managing undo/redo history in Solid.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
