@@ -1,5 +1,11 @@
 # @solid-primitives/context
 
+## 2.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
 ## 2.0.0-next.0
 
 ### Major Changes
@@ -16,7 +22,6 @@
   - `MultiProvider` no longer falls back to accessing `.Provider` on non-function items — contexts passed in `values` must be functions (which all `Context` objects now are in Solid 2.0).
 
   ## New APIs
-
   - `createContextProvider` now returns `Exclude<T, undefined>` from its `useContext` helper, matching Solid 2's throwing behavior for missing context values.
   - Added `createOptionalContextProvider` — uses an internal Symbol fallback and returns `undefined` when the context is missing or its value is `undefined`. Accepts an optional default value for missing providers.
 

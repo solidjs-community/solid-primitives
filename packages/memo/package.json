@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/memo",
-  "version": "2.0.0-next.0",
+  "version": "2.0.0-next.1",
   "description": "Collection of custom memo primitives. They extend Solid's createMemo functionality while keeping the usage similar.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [],

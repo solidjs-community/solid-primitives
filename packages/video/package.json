@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/video",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Primitives to manage HTML video playback.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],

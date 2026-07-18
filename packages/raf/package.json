@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "4.0.0-next.0",
+  "version": "4.0.0-next.1",
   "description": "Primitive that facilitates RAF functionality",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [

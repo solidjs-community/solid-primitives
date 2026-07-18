@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/trigger",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "A set of primitives based on Solid signals, used to trigger computations.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

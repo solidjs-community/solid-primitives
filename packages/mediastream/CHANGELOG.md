@@ -1,5 +1,13 @@
 # @solid-primitives/mediastream
 
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 1.0.0-next.0
 
 ### Major Changes
@@ -11,7 +19,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/mediastream`
-
   - `createStream` and `createScreen` now return `[Accessor<MediaStream | undefined>, { stop, mute }]` instead of `[Resource<MediaStream>, ResourceActions & { stop, mute }]`. The `mutate` and `refetch` controls are removed — source reactivity drives re-acquisition automatically.
   - `createAmplitudeStream` second element is now `{ stream, stop }` (no `mutate` / `refetch`).
   - `ResourceActions` type export removed; no longer depends on `createResource`.
