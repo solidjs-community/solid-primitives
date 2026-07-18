@@ -1,0 +1,75 @@
+{
+  "workspace": [
+    "packages/*",
+    "site"
+  ],
+  "nodeModulesDir": "auto",
+  "preferPackageJson": true,
+  "lock": true,
+  "minimumDependencyAge": "0",
+  "lint": {
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "no-slow-types",
+        "no-process-global",
+        "no-node-globals"
+      ]
+    }
+  },
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@solidjs/web",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ]
+  },
+  "catalog": {
+    "solid-js": "2.0.0-beta.15",
+    "@solidjs/web": "2.0.0-beta.15",
+    "tsdown": "^0.22.3",
+    "unplugin-solid": "^1.0.0"
+  },
+  "catalogs": {
+    "graphql": {
+      "@graphql-typed-document-node/core": "^3.2.0",
+      "graphql": "^16.8.1"
+    },
+    "supabase": {
+      "@supabase/supabase-js": "^2.48.1"
+    },
+    "tauri": {
+      "@tauri-apps/plugin-store": "*"
+    },
+    "node": {
+      "node-fetch": "^3.3.2",
+      "chokidar": "^3.5.3"
+    }
+  },
+  "tasks": {
+    "jsr:check": "deno check --all",
+    "jsr:fmt": "deno fmt --check deno.jsonc packages/*/deno.jsonc",
+    "jsr:list": "deno list -r"
+  },
+  "include": [
+    "packages",
+    "template"
+  ],
+  "exclude": [
+    "**/stories",
+    "**/dev",
+    "**/test",
+    "**/tauri-storage",
+    "**/vitest.config.ts",
+    "**/node_modules",
+    ".storybook",
+    "configs",
+    "scripts",
+    "site"
+  ]
+}

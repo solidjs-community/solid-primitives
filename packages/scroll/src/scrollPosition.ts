@@ -134,6 +134,6 @@ export function createScrollPosition(
  *   console.log(scroll.x, scroll.y)
  * })
  */
-export const useWindowScrollPosition = /*#__PURE__*/ createHydratableSingletonRoot(() =>
+export const useWindowScrollPosition: ReturnType<typeof createHydratableSingletonRoot> = /*#__PURE__*/ createHydratableSingletonRoot(() =>
   createScrollPosition(isServer ? () => undefined : window),
 );

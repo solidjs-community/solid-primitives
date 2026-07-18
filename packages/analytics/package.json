@@ -15,7 +15,8 @@
       "createAnalyticsGuard",
       "createServerPlugin"
     ],
-    "category": "Utilities"
+    "category": "Utilities",
+    "gzip": 1863
   },
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/analytics#readme",
@@ -60,8 +61,12 @@
   "files": [
     "dist"
   ],
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -75,9 +80,9 @@
     "primitives"
   ],
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
+    "@solidjs/web": "catalog:peer",
     "@tanstack/start": "*",
-    "solid-js": "^2.0.0-beta.14"
+    "solid-js": "catalog:peer"
   },
   "peerDependenciesMeta": {
     "@tanstack/start": {
@@ -90,7 +95,7 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

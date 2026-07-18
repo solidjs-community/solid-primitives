@@ -1,3 +1,13 @@
+/**
+ * Primitives that support creating Web Workers.
+ *
+ * Spawn workers from plain functions ({@link createWorker}, {@link createWorkerPool}),
+ * turn a worker call into a reactive query ({@link createWorkerQuery}), or bridge
+ * a whole reactive scope between the main thread and a worker
+ * ({@link createReactiveWorker}, and its counterpart in the `/worker` entrypoint).
+ *
+ * @module
+ */
 import { type Accessor, createMemo, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
 import type {
@@ -7,11 +17,11 @@ import type {
   WorkerMethods,
   CreateWorkerResult,
   CreateWorkerPoolResult,
-} from "./types.js";
-import { RPC, buildWorkerCode, setup } from "./utils.js";
+} from "./types.d.ts";
+import { RPC, buildWorkerCode, setup } from "./utils.ts";
 
-export type * from "./types.js";
-export { createReactiveWorker } from "./reactive-worker.js";
+export type * from "./types.d.ts";
+export { createReactiveWorker } from "./reactive-worker.ts";
 
 /**
  * Spawns a worker from a record of named functions, exposing each as a typed

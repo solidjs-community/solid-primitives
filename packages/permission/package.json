@@ -34,16 +34,20 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.15",
-    "solid-js": "^2.0.0-beta.15"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "keywords": [
     "permission",
@@ -53,7 +57,7 @@
   ],
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

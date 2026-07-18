@@ -45,8 +45,7 @@ const PaginationBar = (barProps: {
     <For each={barProps.props()}>
       {props => (
         <Button
-          onClick={props.onClick as () => void}
-          disabled={props.disabled}
+          {...props}
           variant={props["aria-current"] ? "primary" : "outline"}
           style={{ "min-width": "2rem", "font-size": font.sizeSm, padding: "0.3rem 0.6rem" }}
         >
@@ -85,39 +84,41 @@ export const CreatePaginationStory = meta.story({
     );
 
     return (
-      <Container minWidth={400}>
-        <StatRow label="Current page" value={page()} />
-        <PaginationBar props={paginationProps} />
-        <Separator />
-        <Section title="Max visible">
-          <ButtonRow>
-            <For each={[5, 7, 10] as const}>
-              {n => (
-                <Button
-                  variant={maxVisible() === n ? "primary" : "outline"}
-                  onClick={() => setMaxVisible(n)}
-                >
-                  {n}
-                </Button>
-              )}
-            </For>
-          </ButtonRow>
-        </Section>
-        <Section title="Total pages">
-          <ButtonRow>
-            <For each={[10, 20, 50] as const}>
-              {n => (
-                <Button
-                  variant={totalPages() === n ? "primary" : "outline"}
-                  onClick={() => setTotalPages(n)}
-                >
-                  {n}
-                </Button>
-              )}
-            </For>
-          </ButtonRow>
-        </Section>
-      </Container>
+      <Errored fallback={(err, reset) => <p>Error: {err} <button type="reset" onClick={reset}>Reset</button></p>}>
+        <Container minWidth={400}>
+          <StatRow label="Current page" value={page()} />
+          <PaginationBar props={paginationProps} />
+          <Separator />
+          <Section title="Max visible">
+            <ButtonRow>
+              <For each={[5, 7, 10] as const}>
+                {n => (
+                  <Button
+                    variant={maxVisible() === n ? "primary" : "outline"}
+                    onClick={() => setMaxVisible(n)}
+                  >
+                    {n}
+                  </Button>
+                )}
+              </For>
+            </ButtonRow>
+          </Section>
+          <Section title="Total pages">
+            <ButtonRow>
+              <For each={[10, 20, 50] as const}>
+                {n => (
+                  <Button
+                    variant={totalPages() === n ? "primary" : "outline"}
+                    onClick={() => setTotalPages(n)}
+                  >
+                    {n}
+                  </Button>
+                )}
+              </For>
+            </ButtonRow>
+          </Section>
+        </Container>
+      </Errored>
     );
   },
 });

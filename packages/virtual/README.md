@@ -4,7 +4,7 @@
 
 # @solid-primitives/virtual
 
-[![size](https://img.shields.io/badge/size-618_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/virtual)
+[![size](https://img.shields.io/badge/size-647_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/virtual)
 [![version](https://img.shields.io/npm/v/@solid-primitives/virtual?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/virtual)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -28,7 +28,12 @@ pnpm add @solid-primitives/virtual
 
 `createVirtualList` is a headless utility for constructing your own virtualized list components with maximum flexibility.
 
-`virtual` is an accessor returning `{ containerHeight, viewerTop, visibleItems }` — call it to read the current values. When rendering `visibleItems` with `<For>`, pass `keyed={false}` so each item is provided as an `Accessor` (`<For>` defaults to `keyed={true}`, which passes raw values instead).
+`virtual` is an accessor returning `{ containerHeight, viewerTop, visibleItems, firstIndex, lastIndex }` — call it to read the current values. When rendering `visibleItems` with `<For>`, pass `keyed={false}` so each item is provided as an `Accessor` (`<For>` defaults to `keyed={true}`, which passes raw values instead).
+
+- `firstIndex` is the index (into the original `items` list) of the first rendered item.
+- `lastIndex` is the index of the last rendered item, or `undefined` if the list is empty.
+
+Together they're useful for things like "showing items X-Y of Z" counters, since `visibleItems` alone doesn't tell you where those items sit in the original list.
 
 ```tsx
 function MyComp(): JSX.Element {
