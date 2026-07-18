@@ -143,6 +143,7 @@
     "i18n-solid2-migration",
     "idle-solid2-migration",
     "immutable-solid2-migration",
+    "infinite-scroll-initial-page-count",
     "input-mask-solid2-migration",
     "interaction-orphaned-listener-fix",
     "interaction-solid2-migration",
