@@ -140,7 +140,7 @@ return <For each={segment()}>{item => <Item item={item} />}</For>;
 
 ## `createInfiniteScroll`
 
-Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. Browser-only: the loader and fetching are skipped on the server.
+Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. The sentinel-based auto-loading is browser-only, but fetching itself isn't: pass `initialPageCount` to request pages during SSR too, so the first page(s) are present in the server-rendered HTML for SEO and perceived speed.
 
 Each page is its own independent async unit, so it can be rendered with `<Loading>`/`<Errored>` for idiomatic suspense and retry, or read via plain `fetching`/`error` signals if you'd rather not use boundaries.
 
@@ -206,7 +206,10 @@ type InfiniteScrollPage<T> = {
   retry: () => void;
 };
 
-function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+function createInfiniteScroll<T>(
+  fetcher: (page: number) => Promise<T[]>,
+  options?: { initialPageCount?: number },
+): [
   pages: Accessor<InfiniteScrollPage<T>[]>,
   loader: (el: Element) => void,
   options: {
@@ -219,8 +222,9 @@ function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
 ```
 
 - `pages()` is the `{ content, fetching, error, retry }` bundle for every page requested so far, in order — feed it directly to `<For>`. `retry()` re-runs that page's fetcher and clears its error.
+- `options.initialPageCount` sets how many pages are requested up front — same fetch/retry/error mechanics as any other page. Defaults to `0` on the server and `1` in the browser; raise it on the server to render initial content into the SSR'd HTML.
 - `end` is `true` once a page fetch returns zero items. A failed page does **not** set `end` — the sentinel just pauses auto-loading until that page is retried.
-- `reset()` disposes every page's reactive state and starts over from the first page. It does **not** abort an in-flight fetch — if one resolves or rejects after disposal, its result is ignored by the same stale-request check `retry()` relies on.
+- `reset()` disposes every page's reactive state and starts over from `initialPageCount` pages. It does **not** abort an in-flight fetch — if one resolves or rejects after disposal, its result is ignored by the same stale-request check `retry()` relies on.
 
 ## Changelog
 

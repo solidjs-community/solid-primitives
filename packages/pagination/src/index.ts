@@ -404,6 +404,7 @@ export type InfiniteScrollPage<T> = {
  * <Show when={!end()}><div ref={loader} /></Show>
  * ```
  * @param fetcher `(page: number) => Promise<T[]>`
+ * @param options.initialPageCount how many pages to request up front, fetched the same way further pages are — defaults to 0 on the server (opt in for SSR content/SEO) and 1 in the browser
  * @return `pages()` is an accessor for the `{ content, fetching, error, retry }` bundle of every page requested so far, in order — feed directly to `<For>`
  * @return `loader` is a ref function to attach to the sentinel element that triggers loading more
  * @method `pageCount` is an accessor for the number of pages requested
@@ -411,7 +412,10 @@ export type InfiniteScrollPage<T> = {
  * @method `end` is true once a page fetch returns zero items
  * @method `reset` disposes every page and starts over from the first page
  */
-export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+export function createInfiniteScroll<T>(
+  fetcher: (page: number) => Promise<T[]>,
+  options?: { initialPageCount?: number },
+): [
   pages: Accessor<InfiniteScrollPage<T>[]>,
   loader: (el: Element) => void,
   options: {
@@ -421,7 +425,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     reset: () => void;
   },
 ] {
-  const initialPageCount = isServer ? 0 : 1;
+  const initialPageCount = options?.initialPageCount ?? (isServer ? 0 : 1);
   // ownedWrite allows setters to be called from reactive scopes and event handlers
   const [pageCount, setPageCount] = createSignal(initialPageCount, { ownedWrite: true });
   const [end, setEnd] = createSignal(false, { ownedWrite: true });

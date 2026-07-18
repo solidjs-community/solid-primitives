@@ -486,4 +486,25 @@ describe("createInfiniteScroll", () => {
       dispose();
     });
   });
+
+  test("initialPageCount overrides the default number of pages requested up front", async () => {
+    await createRoot(async dispose => {
+      const [pages, , { pageCount, reset }] = createInfiniteScroll(fetcher, {
+        initialPageCount: 3,
+      });
+      expect(pageCount()).toBe(3);
+      expect(pages().length).toBe(3);
+
+      await settle();
+      expect(pages()[2]!.content()).toEqual([20, 21, 22]);
+
+      // reset() should return to initialPageCount, not the single-page default
+      reset();
+      flush();
+      expect(pageCount()).toBe(3);
+      expect(pages().length).toBe(3);
+
+      dispose();
+    });
+  });
 });
