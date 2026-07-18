@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/virtual",
-  "version": "1.0.0-next.2",
+  "version": "1.0.0-next.3",
   "description": "A virtualized list component for performantly rendering lists with many elements",
   "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
   "contributors": [],

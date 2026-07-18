@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/cookies",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Reactive, signal-based cookie primitives for isomorphic use on client and server",
   "author": "Thomas Beer (https://github.com/Tommypop2)",
   "contributors": [

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/bounds",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives for tracking HTML element size and position on screen as it changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
