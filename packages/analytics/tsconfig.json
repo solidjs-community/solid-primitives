@@ -1,22 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "dist",
-    "rootDir": "src"
-  },
-  "references": [
-    {
-      "path": "../page-utilities"
-    },
-    {
-      "path": "../queue"
-    },
-    {
-      "path": "../utils"
-    }
-  ],
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

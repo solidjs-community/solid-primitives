@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/db-store",
   "version": "1.1.4",
-  "description": "A template primitive example.",
+  "description": "A reactive Solid store backed by a database, kept in sync via realtime change events.",
   "author": "Your Name <you@youremail.com>",
   "contributors": [],
   "license": "MIT",
@@ -44,9 +44,13 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -55,8 +59,8 @@
     "@solid-primitives/resource": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12",
-    "@supabase/supabase-js": "2.*"
+    "@supabase/supabase-js": "2.*",
+    "solid-js": "^1.6.12"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.48.1",

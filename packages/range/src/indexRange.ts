@@ -10,7 +10,7 @@ import {
 } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
 import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
-import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./common.js";
+import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./common.ts";
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<IndexRange>` control flow.

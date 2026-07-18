@@ -3,7 +3,7 @@ import {
   type SSEReadyStateValue,
   type SSEOptions,
   type SSESourceFn,
-} from "./sse.js";
+} from "./sse.ts";
 
 // ─── Protocol types ───────────────────────────────────────────────────────────
 

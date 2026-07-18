@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { access } from "@solid-primitives/utils";
-import type { ListStateOptions, ListStateReturn } from "./types.js";
+import type { ListStateOptions, ListStateReturn } from "./types.ts";
 
 /**
  * Creates a keyboard navigable single-select list.

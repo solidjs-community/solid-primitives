@@ -25,7 +25,7 @@
       "createConcurrentTaskQueue"
     ],
     "category": "Utilities",
-    "gzip": 937
+    "gzip": 936
   },
   "keywords": [
     "solid",
@@ -52,9 +52,13 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -63,9 +67,9 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.15"
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.15"
+    "solid-js": "catalog:"
   }
 }

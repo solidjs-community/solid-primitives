@@ -1,4 +1,4 @@
-import { createQueue, type ReactiveQueue } from "./queue.js";
+import { createQueue, type ReactiveQueue } from "./queue.ts";
 
 type WithAddPush<T> = {
   add: (...items: T[]) => void;

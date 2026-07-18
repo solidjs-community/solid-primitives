@@ -1,5 +1,12 @@
+/**
+ * Companion module for `createReactiveWorker`. Import from
+ * `@solid-primitives/workers/worker` inside a worker module to receive a
+ * reactive `inputs` store and a `setOutputs` setter bridged to the main thread.
+ *
+ * @module
+ */
 import { createEffect, createRoot, createStore, deep, onCleanup, type StoreSetter } from "solid-js";
-import type { BridgeMessage } from "./types.js";
+import type { BridgeMessage } from "./types.d.ts";
 
 // Minimal interface covering DedicatedWorkerGlobalScope without requiring webworker lib
 type WorkerCtx = {
@@ -8,6 +15,7 @@ type WorkerCtx = {
   removeEventListener(type: "message", handler: (e: MessageEvent) => void): void;
 };
 
+/** Result of {@link workerScope}: the reactive `inputs` bridged from the main thread and the `setOutputs` setter bridged back to it. */
 export type WorkerScopeResult<
   I extends Record<string, unknown>,
   O extends Record<string, unknown>,

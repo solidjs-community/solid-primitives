@@ -66,7 +66,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
  * })
  * ```
  */
-export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
+export const useKeyDownEvent: ReturnType<typeof createSingletonRoot<Accessor<KeyboardEvent | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -104,7 +104,7 @@ export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<Keyboa
  * })
  * ```
  */
-export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
+export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<string[]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
   if (isServer) {
     return () => [];
   }
@@ -184,7 +184,7 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[
  * })
  * ```
  */
-export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
+export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor<string | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -224,7 +224,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<st
  * })
  * ```
  */
-export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
+export const useKeyDownSequence: ReturnType<typeof createSingletonRoot<Accessor<string[][]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
   if (isServer) {
     return () => [];
   }

@@ -213,11 +213,13 @@ export const createAmplitudeStream = (
   return [amplitude, { stream, stop: teardown }];
 };
 
-declare global {
-  interface DisplayMediaStreamConstraints {
-    audio?: boolean | MediaTrackConstraints;
-    video?: boolean | MediaTrackConstraints;
-  }
+// Not a `declare global` augmentation (global augmentations block JSR's public-API
+// type check) — this isn't actually a standard lib.dom.d.ts type either, so a plain
+// exported interface changes nothing for consumers, who only ever see it through
+// `createScreen`'s parameter type below.
+export interface DisplayMediaStreamConstraints {
+  audio?: boolean | MediaTrackConstraints;
+  video?: boolean | MediaTrackConstraints;
 }
 
 /**
@@ -295,7 +297,7 @@ export const createMediaPermissionRequest = (
     return Promise.resolve();
   }
   return navigator.mediaDevices
-    .getUserMedia(
+    ?.getUserMedia?.(
       source
         ? typeof source === "string"
           ? { [source]: true }
