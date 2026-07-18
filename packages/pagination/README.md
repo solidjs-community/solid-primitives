@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=pagination" alt="Solid Primitives pagination">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Pagination" alt="Solid Primitives pagination">
 </p>
 
 # @solid-primitives/pagination
@@ -7,7 +7,7 @@
 [![docs](https://img.shields.io/badge/-docs%20%26%20demos-blue?style=for-the-badge)](https://primitives.solidjs.community/package/pagination)
 [![size](https://img.shields.io/badge/size-1.81_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/pagination)
 [![version](https://img.shields.io/npm/v/@solid-primitives/pagination?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/pagination)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 A primitive that creates all the reactive data to manage your pagination:
@@ -140,7 +140,9 @@ return <For each={segment()}>{item => <Item item={item} />}</For>;
 
 ## `createInfiniteScroll`
 
-Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. Browser-only: the loader and fetching are skipped on the server.
+Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. The sentinel-based auto-loading is browser-only, but fetching itself isn't: pass `initialPageCount` to request pages during SSR too, so the first page(s) are present in the server-rendered HTML for SEO and perceived speed.
+
+Each page is its own independent async unit, so it can be rendered with `<Loading>`/`<Errored>` for idiomatic suspense and retry, or read via plain `fetching`/`error` signals if you'd rather not use boundaries.
 
 ### How to use it
 
@@ -150,7 +152,26 @@ const [pages, setEl, { end }] = createInfiniteScroll(fetcher);
 
 return (
   <div>
-    <For each={pages()}>{item => <h4>{item}</h4>}</For>
+    <For each={pages()}>
+      {page => (
+        // Note: use `page.retry`, not Errored's own `reset` — `content` only
+        // re-fetches when `retry()` bumps its internal version signal, so a
+        // bare `reset()` would just re-surface the same cached rejection.
+        // Errored also won't hand control back to <Loading> while that retry
+        // is in flight, so the fallback watches `fetching()` itself.
+        <Errored
+          fallback={err => (
+            <Show when={!page.fetching()} fallback={<h4>Retrying…</h4>}>
+              <button onClick={page.retry}>Retry: {String(err())}</button>
+            </Show>
+          )}
+        >
+          <Loading fallback={<h4>Loading…</h4>}>
+            <For each={page.content()}>{item => <h4>{item}</h4>}</For>
+          </Loading>
+        </Errored>
+      )}
+    </For>
     <Show when={!end()}>
       <h1 ref={setEl}>Loading...</h1>
     </Show>
@@ -158,24 +179,52 @@ return (
 );
 ```
 
+Prefer plain signals over boundaries? Skip `<Loading>`/`<Errored>` and use `fetching()`/`error()`/`retry()` directly:
+
+```tsx
+<For each={pages()}>
+  {page => (
+    <Show
+      when={!page.error()}
+      fallback={<button onClick={page.retry}>Retry: {String(page.error())}</button>}
+    >
+      <Show when={!page.fetching()} fallback={<h4>Loading…</h4>}>
+        <For each={page.content()}>{item => <h4>{item}</h4>}</For>
+      </Show>
+    </Show>
+  )}
+</For>
+```
+
 ### Definition
 
 ```ts
-function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
-  pages: Accessor<T[]>,
+type InfiniteScrollPage<T> = {
+  content: Accessor<T[]>;
+  fetching: Accessor<boolean>;
+  error: Accessor<unknown>;
+  retry: () => void;
+};
+
+function createInfiniteScroll<T>(
+  fetcher: (page: number) => Promise<T[]>,
+  options?: { initialPageCount?: number },
+): [
+  pages: Accessor<InfiniteScrollPage<T>[]>,
   loader: (el: Element) => void,
   options: {
-    page: Accessor<number>;
-    setPage: Setter<number>;
-    setPages: Setter<T[]>;
+    pageCount: Accessor<number>;
+    setPageCount: Setter<number>;
     end: Accessor<boolean>;
-    fetching: Accessor<boolean>;
-    error: Accessor<unknown>;
+    reset: () => void;
   },
 ];
 ```
 
-`end` is `true` when the fetcher returns an empty array or when an error occurs.
+- `pages()` is the `{ content, fetching, error, retry }` bundle for every page requested so far, in order — feed it directly to `<For>`. `retry()` re-runs that page's fetcher and clears its error.
+- `options.initialPageCount` sets how many pages are requested up front — same fetch/retry/error mechanics as any other page. Defaults to `0` on the server and `1` in the browser; raise it on the server to render initial content into the SSR'd HTML.
+- `end` is `true` once a page fetch returns zero items. A failed page does **not** set `end` — the sentinel just pauses auto-loading until that page is retried.
+- `reset()` disposes every page's reactive state and starts over from `initialPageCount` pages. It does **not** abort an in-flight fetch — if one resolves or rejects after disposal, its result is ignored by the same stale-request check `retry()` relies on.
 
 ## Changelog
 
