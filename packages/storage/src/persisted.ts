@@ -223,14 +223,14 @@ export const storageSync: PersistenceSyncAPI = [
 /**
  * messageSync - synchronize over post message or broadcast channel API
  */
-export const messageSync = (channel: Window | BroadcastChannel = window): PersistenceSyncAPI => [
+export const messageSync = (channel: Window | BroadcastChannel = window, url = globalThis.location?.href): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     channel.addEventListener("message", ev => {
       subscriber((ev as MessageEvent).data);
     }),
   (key, newValue) =>
     channel.postMessage(
-      { key, newValue, timeStamp: Date.now(), url: location.href },
+      { key, newValue, timeStamp: Date.now(), url },
       location.origin,
     ),
 ];
@@ -238,7 +238,7 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
 /**
  * wsSync - syncronize persisted storage via web socket
  */
-export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): PersistenceSyncAPI => [
+export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV, url = globalThis.location?.href): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     ws.addEventListener("message", (ev: MessageEvent) => {
       try {
@@ -257,7 +257,7 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): Persistence
         key,
         newValue,
         timeStamp: +new Date(),
-        ...(globalThis.window ? { url: location.href } : {}),
+        ...(url ? { url } : {}),
       }),
     ),
 ];
