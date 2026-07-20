@@ -9,7 +9,7 @@ import {
   latest,
   refresh,
 } from "solid-js";
-import { makePersisted } from "../src/persisted.js";
+import { makePersisted, messageSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
@@ -207,5 +207,59 @@ describe("makePersisted", () => {
     await new Promise(r => setTimeout(r, 200));
     flush();
     expect(signal()).toBe("init"); 
+  });
+});
+
+describe("storageSync", () => {
+  it("receives messages", () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    storageSync[0](subscriber);
+    const event = new StorageEvent(
+      "storage",
+      { key: "test9", newValue: "received", timeStamp: Date.now(), url: "https://storage.solid-primitives.org" }
+    );
+    window.dispatchEvent(event);
+    flush();
+    expect(message()).toEqual(event);
+  });
+});
+
+describe("messageSync", () => {
+  it("sends and receives messages", async () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = messageSync(window, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test10", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test10",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
+  });
+});
+
+describe("wsSync", () => {
+  it("sends and receives messages", async () => {
+    const mockWs = {
+      addEventListener: (name: string, handler: (ev: unknown) => void) => { 
+        expect(name).toBe("message");
+        mockWs.send = (data) => handler(new MessageEvent("message", { data }));
+      },
+    };
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = wsSync(mockWs, true, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test11", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test11",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
   });
 });
