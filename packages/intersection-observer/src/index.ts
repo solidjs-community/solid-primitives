@@ -6,6 +6,7 @@ import {
   runWithOwner,
   untrack,
   DEV,
+  NotReadyError,
 } from "solid-js";
 import type { Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
@@ -19,13 +20,13 @@ import {
 // Sentinel for the "not yet observed" pending state.
 const NOT_SET: unique symbol = Symbol();
 
-/** Thrown by `isVisible()` and `createVisibilityObserver()` when called before the first IntersectionObserver callback has fired. Integrates with `<Loading>`. */
-export class NotReadyError extends Error {
-  constructor(message = "Not yet observed") {
-    super(message);
-    this.name = "NotReadyError";
-  }
-}
+/**
+ * Re-exported from `solid-js`. `isVisible()`/`createVisibilityObserver()` throw this before the
+ * first IntersectionObserver callback has fired, so `<Loading>` boundaries can catch it (they
+ * check `instanceof` against this exact class — a locally-defined lookalike class would not be
+ * recognized and would crash rendering instead of showing the Loading fallback).
+ */
+export { NotReadyError };
 
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;
@@ -367,8 +368,6 @@ export function createVisibilityObserver(
   return visible;
 }
 
-// ─── Occurrence ───────────────────────────────────────────────────────────────
-
 export const Occurrence = {
   Entering: "Entering",
   Leaving: "Leaving",
@@ -422,8 +421,6 @@ export function withOccurrence<Ctx extends {}>(
     };
   };
 }
-
-// ─── Direction ────────────────────────────────────────────────────────────────
 
 export const DirectionX = {
   Left: "Left",

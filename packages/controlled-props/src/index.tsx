@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For } from "solid-js";
-import type { Accessor, Component, Setter } from "solid-js";
+import type { Accessor, Component, Setter, VoidComponent } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
@@ -28,7 +28,7 @@ export type TestPropProps<T> = {
   step?: T extends number ? number : undefined;
 };
 
-export const BoolProp: Component<TestPropProps<boolean>> = props => (
+export const BoolProp: VoidComponent<TestPropProps<boolean>> = props => (
   <label>
     <input
       type="checkbox"
@@ -40,7 +40,7 @@ export const BoolProp: Component<TestPropProps<boolean>> = props => (
   </label>
 );
 
-export const NumberProp: Component<TestPropProps<number>> = props => (
+export const NumberProp: VoidComponent<TestPropProps<number>> = props => (
   <label>
     <span>{props.name}</span>{" "}
     <input
@@ -55,7 +55,7 @@ export const NumberProp: Component<TestPropProps<number>> = props => (
   </label>
 );
 
-export const RangeProp: Component<TestPropProps<number>> = props => (
+export const RangeProp: VoidComponent<TestPropProps<number>> = props => (
   <label>
     <span>{props.name}</span>{" "}
     <input
@@ -72,7 +72,7 @@ export const RangeProp: Component<TestPropProps<number>> = props => (
   </label>
 );
 
-export const StringProp: Component<TestPropProps<string>> = props => (
+export const StringProp: VoidComponent<TestPropProps<string>> = props => (
   <label>
     <span>{props.name}</span>{" "}
     <input

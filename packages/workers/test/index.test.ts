@@ -27,8 +27,6 @@ async function settle(cycles = 5) {
   }
 }
 
-// ─── createWorker ────────────────────────────────────────────────────────────
-
 describe("createWorker", () => {
   let mockWorker: { addEventListener: ReturnType<typeof vi.fn>; removeEventListener: ReturnType<typeof vi.fn>; postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
@@ -114,8 +112,6 @@ describe("createWorker", () => {
   });
 });
 
-// ─── createWorkerPool ────────────────────────────────────────────────────────
-
 describe("createWorkerPool", () => {
   beforeEach(() => {
     vi.stubGlobal("Worker", vi.fn(() => ({
@@ -181,8 +177,6 @@ describe("createWorkerPool", () => {
   });
 });
 
-// ─── createWorkerQuery ───────────────────────────────────────────────────────
-
 describe("createWorkerQuery", () => {
   it("resolves the initial value", async () => {
     let result!: ReturnType<typeof createWorkerQuery<number>>;
@@ -223,8 +217,6 @@ describe("createWorkerQuery", () => {
   });
 
 });
-
-// ─── abort ───────────────────────────────────────────────────────────────────
 
 describe("abort", () => {
   let mockWorker: { addEventListener: ReturnType<typeof vi.fn>; removeEventListener: ReturnType<typeof vi.fn>; postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
@@ -329,8 +321,6 @@ describe("createWorkerQuery abort", () => {
     expect(aborted).toContain("call-0");
   });
 });
-
-// ─── createReactiveWorker + workerScope ──────────────────────────────────────
 
 describe("createReactiveWorker + workerScope", () => {
   let channel: ReturnType<typeof makeChannel>;

@@ -16,6 +16,7 @@ The native `autofocus` attribute only works on page load, which makes it incompa
 - [`autofocus`](#autofocus) - Ref callback factory to autofocus an element on render.
 - [`createAutofocus`](#createautofocus) - Reactive primitive to autofocus an element on render.
 - [`createFocusTrap`](#createfocustrap) - Traps focus inside a given DOM element.
+- [`createFocusRestore`](#createfocusrestore) - Restores focus to the previously focused element, without trapping.
 
 ## Installation
 
@@ -150,6 +151,35 @@ createFocusTrap({
   },
 });
 ```
+
+## `createFocusRestore`
+
+`createFocusRestore` saves the currently focused element while active and restores focus to it once deactivated — without trapping focus or managing tab order. Use it for non-modal surfaces (Popover, Tooltip, Menu) that should return focus to their trigger on close but must not intercept Tab navigation while open. For modal dialogs that need both behaviors, use [`createFocusTrap`](#createfocustrap)'s `restoreFocus` option instead.
+
+### How to use it
+
+```tsx
+import { createFocusRestore } from "@solid-primitives/focus";
+
+const Popover: Component<{ open: boolean }> = props => {
+  createFocusRestore({ enabled: () => props.open });
+
+  return (
+    <Show when={props.open}>
+      <div role="dialog">...</div>
+    </Show>
+  );
+};
+```
+
+### Props
+
+| Prop                | Type                               | Default                    | Description                                                             |
+| ------------------- | ----------------------------------- | -------------------------- | ------------------------------------------------------------------------ |
+| `enabled`           | `MaybeAccessor<boolean>`           | `true`                     | Whether focus-restore is active.                                       |
+| `element`           | `MaybeAccessor<HTMLElement\|null>` | `document.body`            | Element to dispatch the `onFinalFocus` event on.                       |
+| `finalFocusElement` | `MaybeAccessor<HTMLElement\|null>` | Previously focused element | Element to focus when deactivated.                                     |
+| `onFinalFocus`      | `(event: Event) => void`           | —                          | Callback when focus restores. Call `event.preventDefault()` to cancel. |
 
 ## Credits
 

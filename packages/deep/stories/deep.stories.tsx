@@ -30,8 +30,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── trackDeep ───────────────────────────────────────────────────────────────
-
 export const TrackDeepMultiple = meta.story({
   name: "One effect, two stores",
   parameters: {
@@ -119,8 +117,6 @@ export const TrackDeepMultiple = meta.story({
     );
   },
 });
-
-// ─── trackStore ──────────────────────────────────────────────────────────────
 
 export const TrackStoreWholeTree = meta.story({
   name: "Sync on any nested change",
@@ -236,8 +232,6 @@ export const TrackStoreWholeTree = meta.story({
     );
   },
 });
-
-// ─── captureStoreUpdates ─────────────────────────────────────────────────────
 
 export const StoreDeltaStory = meta.story({
   name: "Which path changed?",

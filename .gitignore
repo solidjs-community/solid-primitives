@@ -129,6 +129,7 @@ pages
 
 # temp
 _temp_*
+.hydration-harness-*
 
 # Local Netlify folder
 .netlify

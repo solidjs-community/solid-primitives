@@ -30,8 +30,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Discriminated union by type field ────────────────────────────────
-
 type Shape =
   | { type: "circle"; radius: number }
   | { type: "rect"; width: number; height: number }
@@ -142,8 +140,6 @@ export const DiscriminatedUnion = meta.story({
   },
 });
 
-// ── Story 2: Custom tag field ─────────────────────────────────────────────────
-
 type Notification =
   | { kind: "info"; message: string }
   | { kind: "warning"; message: string; code: number }
@@ -240,8 +236,6 @@ export const CustomTagField = meta.story({
   },
 });
 
-// ── Story 3: Partial matching with fallback ───────────────────────────────────
-
 type MediaEvent =
   | { type: "play" }
   | { type: "pause" }
@@ -329,8 +323,6 @@ export const PartialMatch = meta.story({
     );
   },
 });
-
-// ── Story 4: MatchValue on union literals ─────────────────────────────────────
 
 type Status = "idle" | "loading" | "success" | "error";
 

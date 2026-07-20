@@ -12,8 +12,6 @@ function makeReadyPlugin(overrides: Partial<AnalyticsPlugin> = {}): AnalyticsPlu
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
-// ─── makeAnalytics ────────────────────────────────────────────────────────────
-
 describe("makeAnalytics", () => {
   it("dispatches page events immediately to a ready plugin", async () => {
     const pageSpy = vi.fn();
@@ -177,8 +175,6 @@ describe("makeAnalytics", () => {
   });
 });
 
-// ─── createAnalytics ──────────────────────────────────────────────────────────
-
 describe("createAnalytics", () => {
   let dispose: () => void;
 
@@ -246,8 +242,6 @@ describe("createAnalytics", () => {
   });
 });
 
-// ─── drain ────────────────────────────────────────────────────────────────────
-
 describe("drain()", () => {
   it("resolves immediately when no dispatches are in flight", async () => {
     const [analytics, cleanup] = makeAnalytics([makeReadyPlugin()]);
@@ -292,8 +286,6 @@ describe("drain()", () => {
     });
   });
 });
-
-// ─── drainInterval / drainSize ────────────────────────────────────────────────
 
 describe("drainInterval / drainSize", () => {
   it("batches events and dispatches on the drain interval", async () => {
@@ -363,8 +355,6 @@ describe("drainInterval / drainSize", () => {
     cleanup();
   });
 });
-
-// ─── makeAnalyticsGuard ───────────────────────────────────────────────────────
 
 describe("makeAnalyticsGuard", () => {
   it("onBeforeLeave prevents default and retries after drain", async () => {
@@ -436,8 +426,6 @@ describe("makeAnalyticsGuard", () => {
     cleanupAnalytics();
   });
 });
-
-// ─── createAnalyticsGuard ─────────────────────────────────────────────────────
 
 describe("createAnalyticsGuard", () => {
   let dispose: () => void;

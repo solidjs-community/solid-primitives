@@ -16,7 +16,6 @@ import {
   DEV,
 } from "solid-js";
 
-
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.
 const isServer: boolean = typeof window === "undefined";
@@ -398,8 +397,6 @@ export const afterPaint = (fn: () => void): void => {
   }
 };
 
-// ─── String transforms ────────────────────────────────────────────────────────
-
 /**
  * Parse a string as a single JSON value.
  *
@@ -484,8 +481,6 @@ export function pipe<A, B>(a: (raw: string) => A, b: (a: A) => B): (raw: string)
   return (raw: string): B => b(a(raw));
 }
 
-// ─── DOM helpers ─────────────────────────────────────────────────────────────
-
 /**
  * Check if a wrapper element contains a target element.
  * Portal-aware: follows SolidJS `_$host` links so elements rendered inside
@@ -501,6 +496,26 @@ export const contains = (wrapper: HTMLElement, target: HTMLElement): boolean => 
   }
   return false;
 };
+/**
+ * Returns a singleton value keyed by `key`, shared across every copy of the calling module that
+ * ends up loaded in the same JS realm (a `Symbol.for(key)` slot on `globalThis`, not a module-scope
+ * binding). Use this instead of a plain module-scope `let`/`const` for state that must stay
+ * consistent (ref-counts, active-instance stacks) even if the app's dependency graph ends up with
+ * more than one installed copy of the package — module-scope state would otherwise be split across
+ * copies and go out of sync (e.g. a "topmost instance" check disagreeing between copies).
+ *
+ * ```ts
+ * const registry = globalRegistry("@solid-primitives/my-package:my-state", () => ({
+ *   stack: createSignal<string[]>([], { ownedWrite: true }),
+ *   nextId: 0,
+ * }));
+ * ```
+ */
+export function globalRegistry<T>(key: string, init: () => T): T {
+  const g = globalThis as Record<symbol, T | undefined>;
+  return (g[Symbol.for(key)] ??= init());
+}
+
 /**
  * Wraps a setter function of any signal or store
  *

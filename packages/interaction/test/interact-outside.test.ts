@@ -5,8 +5,6 @@ import {
   type CreateInteractOutsideProps,
 } from "../src/index.js";
 
-// ─── PointerEvent polyfill (jsdom does not include it) ────────────────────────
-
 beforeAll(() => {
   if (!("PointerEvent" in window)) {
     class MockPointerEvent extends MouseEvent {
@@ -21,8 +19,6 @@ beforeAll(() => {
     (global as unknown as Record<string, unknown>)["PointerEvent"] = MockPointerEvent;
   }
 });
-
-// ─── Test helpers ─────────────────────────────────────────────────────────────
 
 type ElementKind = "div" | "svg";
 
@@ -78,16 +74,12 @@ function setupTest(
   };
 }
 
-// ─── Test configurations ──────────────────────────────────────────────────────
-
 const testConfigurations: { name: string; inside: ElementKind; outside: ElementKind }[] = [
   { name: "HTML ref with HTML outside", inside: "div", outside: "div" },
   { name: "SVG ref with HTML outside", inside: "svg", outside: "div" },
   { name: "HTML ref with SVG outside", inside: "div", outside: "svg" },
   { name: "SVG ref with SVG outside", inside: "svg", outside: "svg" },
 ];
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe("createInteractOutside", () => {
   beforeEach(() => {
