@@ -1,5 +1,5 @@
-import { withObjectCopy, shallowObjectCopy } from "./copy.js";
-import { type Modify } from "../index.js";
+import { withObjectCopy, shallowObjectCopy } from "./copy.ts";
+import { type Modify } from "../index.ts";
 
 /**
  * Create a new subset object without the provided keys

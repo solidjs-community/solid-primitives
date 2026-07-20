@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/controlled-signal",
+  "version": "1.0.0-next.2",
+  "description": "Reactive signals that support both controlled (externally managed) and uncontrolled (internally managed) state — a pattern commonly used in headless UI components.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

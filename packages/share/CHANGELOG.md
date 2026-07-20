@@ -1,5 +1,33 @@
 # @solid-primitives/share
 
+## 4.0.0-next.3
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
+## 4.0.0-next.2
+
+### Patch Changes
+
+- 20afdb7: Fixed test-suite breakage caused by a new Solid 2.0 beta.17 runtime guard; no API or behavior changes.
+
+  `@solidjs/signals@2.0.0-beta.17` added an `ACTION_CALLED_IN_OWNED_SCOPE` guard that throws when an `action()`-created function (like `createWebShare`'s `share`) is invoked while a reactive owner is active — actions are meant to be called from an event handler or other imperative scope, not from inside a component/computation. `createWebShare`'s tests called `share(...)` directly inside a `createRoot` callback, which now trips this guard. Updated the tests to invoke `share` via `runWithOwner(null, () => share(...))`, matching how a real DOM event handler calls it.
+
+## 4.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
 ## 4.0.0-next.0
 
 ### Major Changes
@@ -11,7 +39,6 @@
   **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/share`
-
   - `isServer` is now imported from `@solidjs/web` (was `solid-js/web`)
   - `createWebShare` — internal `createEffect` converted to the split compute/apply pattern required by Solid 2.0; the `on` helper (removed in Solid 2.0) is no longer used
 

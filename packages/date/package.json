@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/date",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.2",
   "description": "Collection of reactive primitives and utility functions, providing easier ways to deal with dates in SolidJS",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -22,7 +22,7 @@
       "createCountdownFromNow"
     ],
     "category": "Utilities",
-    "gzip": 1509
+    "gzip": 1514
   },
   "files": [
     "dist"
@@ -40,10 +40,14 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "start": "vite serve dev",
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -55,17 +59,17 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.15",
+    "@solidjs/web": "catalog:",
     "date-fns": "^2.30.0",
-    "solid-js": "2.0.0-beta.15"
+    "solid-js": "catalog:"
   },
   "dependencies": {
     "@solid-primitives/timer": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.15",
-    "solid-js": "^2.0.0-beta.15"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {}
 }

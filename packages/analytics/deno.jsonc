@@ -1,0 +1,29 @@
+{
+  "name": "@solid-primitives/analytics",
+  "version": "2.0.0-next.1",
+  "description": "Solid primitives for analytics tracking with a plugin-compatible queue-based dispatch pipeline.",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./relay": "./src/relay.ts",
+    "./relay/solidstart": "./src/relay/solidstart.ts",
+    "./relay/tanstack": "./src/relay/tanstack.ts"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

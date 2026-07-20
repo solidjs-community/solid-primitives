@@ -1,5 +1,21 @@
 # @solid-primitives/keyboard
 
+## 2.0.0-next.4
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/event-listener@3.0.0-next.2
+  - @solid-primitives/rootless@2.0.0-next.1
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 2.0.0-next.3
+
+### Minor Changes
+
+- 393a6a6: Add an `anyOrder` option to `createShortcut` (resolves #663). When `true`, the keys can be pressed in any order — e.g. `Shift+Control+M` as well as `Control+Shift+M` — as long as they all end up held down together, matching how most editors (like VS Code) handle shortcuts. Disabled by default, so this is non-breaking; `keys` still has to be pressed in the given order unless the option is set.
+
 ## 2.0.0-next.2
 
 ### Minor Changes

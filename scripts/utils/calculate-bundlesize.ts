@@ -73,7 +73,7 @@ export const getPackageBundlesize = async (
       treeShaking: true,
       platform: "browser",
       conditions: ["production", "browser"],
-      external: ["solid-js", "node-fetch", "chokidar", "fs", ...(peerDependencies ?? [])],
+      external: ["solid-js", "node-fetch", "chokidar", "fs", "node:*", ...(peerDependencies ?? [])],
     });
   } catch (e) {
     // oxlint-disable-next-line no-console

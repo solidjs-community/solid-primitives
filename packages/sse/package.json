@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/sse",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives for Server-Sent Events (SSE) using the browser's EventSource API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
@@ -22,7 +22,7 @@
       "makeSSEWorker"
     ],
     "category": "Network",
-    "gzip": 1081
+    "gzip": 1615
   },
   "keywords": [
     "solid",
@@ -60,14 +60,19 @@
     "./worker-handler": {
       "import": {
         "@solid-primitives/source": "./src/worker-handler.ts",
+        "types": "./dist/worker-handler.d.ts",
         "default": "./dist/worker-handler.js"
       }
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -76,11 +81,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.15",
-    "solid-js": "^2.0.0-beta.15"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

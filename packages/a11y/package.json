@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/a11y",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Accessibility primitives for Solid.js — labeled field groups, ARIA graph helpers, and more.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
@@ -23,7 +23,7 @@
       "createReducedMotion"
     ],
     "category": "Inputs",
-    "gzip": 1367
+    "gzip": 1365
   },
   "keywords": [
     "solid",
@@ -50,9 +50,13 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -61,11 +65,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.15",
-    "solid-js": "^2.0.0-beta.15"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

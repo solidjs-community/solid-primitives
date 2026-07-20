@@ -79,10 +79,18 @@ describe("createInfiniteScroll", () => {
 
   test("createInfiniteScroll returns empty state on server", () =>
     createRoot(dispose => {
-      const [pages, , { page, end }] = createInfiniteScroll(fetcher);
+      const [pages, , { pageCount, end }] = createInfiniteScroll(fetcher);
       expect(pages(), "initial pages should be empty").toEqual([]);
-      expect(page(), "initial page should be 0").toBe(0);
+      expect(pageCount(), "initial pageCount should be 0").toBe(0);
       expect(end(), "initial end should be false").toBe(false);
+      dispose();
+    }));
+
+  test("createInfiniteScroll requests initialPageCount pages on server", () =>
+    createRoot(dispose => {
+      const [pages, , { pageCount }] = createInfiniteScroll(fetcher, { initialPageCount: 2 });
+      expect(pageCount(), "pageCount should honor initialPageCount").toBe(2);
+      expect(pages().length, "pages should be requested up front").toBe(2);
       dispose();
     }));
 });

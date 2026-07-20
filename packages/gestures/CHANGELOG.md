@@ -1,5 +1,25 @@
 # @solid-primitives/gestures
 
+## 3.0.0-next.2
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
+## 3.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
 ## 3.0.0-next.0
 
 ### Major Changes
@@ -36,7 +56,6 @@
   - **`pan` no longer suppresses events outside the element bounds.** With pointer capture now active, coordinates during a drag may be negative or exceed the element's width/height. This is the expected behavior for draggable UIs. Downstream code that previously relied on the implicit bounds gate should add an explicit check.
 
   ## New Features
-
   - **`longPress`** — new primitive that fires once after a pointer is held stationary past a configurable `threshold` (default 500ms). Cancels on movement beyond `moveThreshold` (default 10px), early release, or a second pointer down.
   - **Pointer capture** — all gesture primitives now call `setPointerCapture` on `pointerdown`. This ensures `pointermove` and `pointerup` events continue to fire on the element even when the pointer leaves its bounds during a gesture, eliminating the "stuck gesture" problem.
   - **`touch-action` guidance** — README documents adding `touch-action: none` (or a more specific value) to prevent browser scroll/zoom from interfering with gesture handlers on touch devices.

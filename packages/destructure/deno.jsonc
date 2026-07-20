@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/destructure",
+  "version": "1.0.0-next.1",
+  "description": "Primitives for destructuring reactive objects – like props or stores – or signals of them into a separate accessors updated individually.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

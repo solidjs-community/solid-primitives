@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/keyboard",
+  "version": "2.0.0-next.4",
+  "description": "A library of reactive promitives helping handling user's keyboard input.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

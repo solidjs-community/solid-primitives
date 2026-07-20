@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mouse",
-  "version": "4.0.0-next.0",
+  "version": "4.0.0-next.2",
   "description": "A collection of Solid Primitives, that capture current mouse cursor position, and help to deal with common related usecases.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -17,7 +17,7 @@
       "createPositionToElement"
     ],
     "category": "Inputs",
-    "gzip": 1741
+    "gzip": 1755
   },
   "sideEffects": false,
   "private": false,
@@ -35,9 +35,13 @@
   "files": [
     "dist"
   ],
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr",
@@ -52,8 +56,8 @@
   ],
   "devDependencies": {
     "@solid-primitives/raf": "workspace:^",
-    "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
@@ -62,8 +66,8 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.15",
-    "solid-js": "^2.0.0-beta.15"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {}
 }

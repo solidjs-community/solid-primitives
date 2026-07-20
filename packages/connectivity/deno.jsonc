@@ -1,0 +1,23 @@
+{
+  "name": "@solid-primitives/connectivity",
+  "version": "1.0.0-next.1",
+  "description": "A navigator.onLine signal.",
+  "license": "MIT",
+  "exports": "./dist/index.js",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "dist",
+      "src",
+      "package.json"
+    ],
+    "exclude": [
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

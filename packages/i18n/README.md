@@ -4,7 +4,7 @@
 
 # @solid-primitives/i18n
 
-[![size](https://img.shields.io/badge/size-672_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/i18n)
+[![size](https://img.shields.io/badge/size-1.09_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/i18n)
 [![size](https://img.shields.io/npm/v/@solid-primitives/i18n?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/i18n)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -111,7 +111,7 @@ const App: Component = () => {
 
 ### With transitions
 
-Use `isPending()` to show visual feedback while a locale switch is in progress.
+Use `isPending(dict)` to show visual feedback while a locale switch is in progress.
 
 ```tsx
 import { createMemo, isPending, Loading } from "solid-js";
@@ -119,7 +119,7 @@ import { createMemo, isPending, Loading } from "solid-js";
 const dict = createMemo(async () => fetchDictionary(locale()));
 
 return (
-  <div style={{ opacity: isPending() ? 0.5 : 1 }}>
+  <div style={{ opacity: isPending(dict) ? 0.5 : 1 }}>
     <Loading>
       <App />
     </Loading>
@@ -174,6 +174,54 @@ const t2 = i18n.translator(() => dict, i18n.resolveTemplate);
 
 t2("hello", { name: "John" }); // => 'hello John!'
 ```
+
+### Rich text
+
+Sometimes a translation needs to contain a link, or otherwise wrap part of the text in a component — not just interpolate a value.
+
+For dictionaries you own in TS/TSX, a dictionary entry can simply be a function that returns JSX. Function entries have no restrictions on argument or return types, so this works with full type-checking and no extra API:
+
+```tsx
+const dict = {
+  forMoreInfo: (clickHere: JSX.Element) => <>For more information, {clickHere}</>,
+  seeGuidelines: (guidelines: (text: string) => JSX.Element, name: string) => (
+    <>Please refer to {guidelines(name)}</>
+  ),
+};
+
+const t = i18n.translator(() => dict);
+
+t("forMoreInfo", <a href="/info">click here</a>);
+t("seeGuidelines", text => <a href="/guidelines">{text}</a>, "the guidelines");
+```
+
+For dictionaries loaded from JSON (translated strings, no functions allowed), use `resolveRichTemplate` in place of `resolveTemplate` to allow JSX values in `{{ placeholder }}` substitutions:
+
+```tsx
+const dict = {
+  forMoreInfo: "For more information, {{ clickHere }}",
+};
+
+const t = i18n.translator(() => dict, i18n.resolveRichTemplate);
+
+t("forMoreInfo", { clickHere: <a href="/info">click here</a> }); // => JSX.Element
+```
+
+To wrap part of a translated string in a component, e.g. `<guidelines>the guidelines</guidelines>`, resolve `{{ }}` variables first with `resolveTemplate`, then pass the result through `richText` to map `<tag>` markup to a renderer:
+
+```tsx
+const dict = {
+  message: "Please refer to <guidelines>{{ name }}</guidelines>",
+};
+
+const t = i18n.translator(() => dict, i18n.resolveTemplate);
+
+i18n.richText(t("message", { name: "the guidelines" }), {
+  guidelines: text => <a href="/guidelines">{text}</a>,
+});
+```
+
+Tag names aren't type-checked against the `tags` map — a typo can't be caught at compile time. To catch it at runtime instead, an unmapped tag logs a dev-only warning and renders its contents as plain text; this check is stripped from production builds. Tags don't nest.
 
 ### Missing keys
 

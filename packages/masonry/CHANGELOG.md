@@ -1,5 +1,13 @@
 # @solid-primitives/masonry
 
+## 2.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 2.0.0-next.0
 
 ### Major Changes
@@ -11,7 +19,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
 
   ### `@solid-primitives/masonry`
-
   - `mapArray` callback signature changed: the first argument is now `Accessor<T>` (not `T` directly). The implementation now calls `source()` internally, so the public API is unchanged.
   - `createMemo` no longer accepts a separate initial-value argument. The `getColumns` memo options (`equals`) are now passed as the second argument directly.
   - `createSignal<VoidFunction | undefined>` with `ownedWrite: true` — allows `createMasonry` to be called from within reactive scopes (component bodies, `createRoot`, effects) without throwing `SIGNAL_WRITE_IN_OWNED_SCOPE`.

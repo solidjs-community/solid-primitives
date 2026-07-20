@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mutable",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "A primitive for creating a mutable store, an alternative to Solid's createStore.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -21,7 +21,7 @@
       "modifyMutable"
     ],
     "category": "Reactivity",
-    "gzip": 1173
+    "gzip": 1142
   },
   "keywords": [
     "solid",
@@ -45,18 +45,22 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.15",
-    "@solidjs/web": "^2.0.0-beta.15"
+    "solid-js": "catalog:peer",
+    "@solidjs/web": "catalog:peer"
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.15",
-    "@solidjs/web": "2.0.0-beta.15"
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:"
   }
 }

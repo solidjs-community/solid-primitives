@@ -1,5 +1,11 @@
 # @solid-primitives/tween
 
+## 2.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
 ## 2.0.0-next.0
 
 ### Major Changes
@@ -11,7 +17,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/tween`
-
   - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
   - `createEffect` updated to the two-argument compute/apply form required by Solid 2.0 — the removed `on()` helper is no longer used
   - Cleanup (cancelling the in-flight `requestAnimationFrame`) is now returned from the apply function instead of calling `onCleanup`

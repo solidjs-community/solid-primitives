@@ -1,1 +1,1 @@
-export type { BridgeMessage } from "./types.js";
+export type { BridgeMessage } from "./types.d.ts";

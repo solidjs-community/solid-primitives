@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/geolocation",
+  "version": "3.0.0-next.1",
+  "description": "Primitives to query geolocation and observe changes.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

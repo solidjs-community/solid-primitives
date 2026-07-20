@@ -15,6 +15,16 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
   return true;
 }
 
+/** Does `subset` contain only keys that are also present in `superset`? */
+function isKeySubset(subset: string[], superset: string[]): boolean {
+  return new Set(subset).isSubsetOf(new Set(superset));
+}
+
+/** Do `a` and `b` contain exactly the same keys, regardless of order? */
+function isSameKeySet(a: string[], b: string[]): boolean {
+  return new Set(a).symmetricDifference(new Set(b)).size === 0;
+}
+
 /** Is the event target an editable form control, or inside a `contenteditable` element? */
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -56,7 +66,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
  * })
  * ```
  */
-export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
+export const useKeyDownEvent: ReturnType<typeof createSingletonRoot<Accessor<KeyboardEvent | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -94,7 +104,7 @@ export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<Keyboa
  * })
  * ```
  */
-export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
+export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<string[]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
   if (isServer) {
     return () => [];
   }
@@ -174,7 +184,7 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[
  * })
  * ```
  */
-export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
+export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor<string | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -214,7 +224,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<st
  * })
  * ```
  */
-export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
+export const useKeyDownSequence: ReturnType<typeof createSingletonRoot<Accessor<string[][]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
   if (isServer) {
     return () => [];
   }
@@ -290,6 +300,8 @@ export function createKeyHold(
  *   or `contenteditable` element, so typing isn't interrupted. Disabled by default — enable it for shortcuts
  *   made of plain, unmodified keys (e.g. a single letter); combos like `Control+S` are usually fine either way,
  *   since the modifier prevents a character from being typed.
+ * - `anyOrder` — If `true`, the keys can be pressed in any order (e.g. `Shift+Control` as well as `Control+Shift`),
+ *   as long as they all end up held down together. Disabled by default, requiring `keys` to be pressed in order.
  *
  * @example
  * ```ts
@@ -299,6 +311,9 @@ export function createKeyHold(
  *
  * // won't fire while typing in a text field
  * createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: true });
+ *
+ * // triggers for both Control+Shift+M and Shift+Control+M
+ * createShortcut(["Control", "Shift", "M"], () => console.log("M was pressed"), { anyOrder: true });
  * ```
  */
 export function createShortcut(
@@ -308,6 +323,7 @@ export function createShortcut(
     preventDefault?: boolean;
     requireReset?: boolean;
     ignoreWithinInputs?: boolean;
+    anyOrder?: boolean;
   } = {},
 ): void {
   if (isServer || !keys.length) {
@@ -315,7 +331,12 @@ export function createShortcut(
   }
 
   keys = keys.map(key => key.toUpperCase());
-  const { preventDefault = true, requireReset = false, ignoreWithinInputs = false } = options;
+  const {
+    preventDefault = true,
+    requireReset = false,
+    ignoreWithinInputs = false,
+    anyOrder = false,
+  } = options;
 
   // Track pressed keys and sequence locally with plain JS state rather than
   // reactive signals. A signal reads from event listeners return
@@ -359,14 +380,20 @@ export function createShortcut(
     if (requireReset) {
       if (reset) return;
       if (sequence.length < keys.length) {
-        if (equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length))) {
+        const holding = sequence.at(-1) ?? [];
+        const matches = anyOrder
+          ? isKeySubset(holding, keys)
+          : equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length));
+        if (matches) {
           preventDefault && e.preventDefault();
         } else {
           reset = true;
         }
       } else {
         reset = true;
-        if (equalsKeyHoldSequence(sequence, keys)) {
+        const holding = sequence.at(-1) ?? [];
+        const matches = anyOrder ? isSameKeySet(holding, keys) : equalsKeyHoldSequence(sequence, keys);
+        if (matches) {
           preventDefault && e.preventDefault();
           callback(e);
         }
@@ -376,14 +403,21 @@ export function createShortcut(
       if (!last) return;
 
       if (preventDefault && last.length < keys.length) {
-        if (arrayEquals(last, keys.slice(0, keys.length - 1))) {
+        const isOneKeyAway = anyOrder
+          ? last.length === keys.length - 1 && isKeySubset(last, keys)
+          : arrayEquals(last, keys.slice(0, keys.length - 1));
+        if (isOneKeyAway) {
           e.preventDefault();
         }
         return;
       }
-      if (arrayEquals(last, keys)) {
+      const isComplete = anyOrder ? isSameKeySet(last, keys) : arrayEquals(last, keys);
+      if (isComplete) {
         const prev = sequence.at(-2);
-        if (!prev || arrayEquals(prev, keys.slice(0, keys.length - 1))) {
+        const prevWasOneKeyAway = anyOrder
+          ? !!prev && prev.length === keys.length - 1 && isKeySubset(prev, keys)
+          : !!prev && arrayEquals(prev, keys.slice(0, keys.length - 1));
+        if (!prev || prevWasOneKeyAway) {
           preventDefault && e.preventDefault();
           callback(e);
         }

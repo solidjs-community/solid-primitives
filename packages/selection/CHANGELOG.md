@@ -1,5 +1,13 @@
 # @solid-primitives/selection
 
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 1.0.0-next.0
 
 ### Major Changes
@@ -11,7 +19,6 @@
   **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/selection`
-
   - `isServer` is now imported from `@solidjs/web` (was `solid-js/web`)
   - `createEffect` for applying selection converted to the split compute/apply pattern required by Solid 2.0
   - Event listeners are now registered directly with `onCleanup` rather than inside a `createEffect` with no reactive dependencies

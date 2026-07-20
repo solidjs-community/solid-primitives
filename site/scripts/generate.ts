@@ -74,6 +74,18 @@ const markdownProcessor = unified()
   .use(rehypeStringify);
 
 /**
+ * Escape HTML meta-characters for safe use inside a double-quoted attribute value.
+ * `&` must be escaped first so it doesn't double-escape the other entities.
+ */
+function escapeHtmlAttribute(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
  * Parse README.md of each package and generate HTML
  */
 async function generateReadme(module: ModuleData, primitiveData: PrimitiveData) {
@@ -126,7 +138,7 @@ async function generateReadme(module: ModuleData, primitiveData: PrimitiveData) 
       // update code tag that contains primitives to have attribute
       .replace(primitiveCodeElRegex, (_, p1, p2, p3) => {
         if (!p2) return _;
-        return `<${p1} data-code-primitive-name="${p2.replace(/\<|\>|&#x3C;/g, "")}">${p2}</${p3}>`;
+        return `<${p1} data-code-primitive-name="${escapeHtmlAttribute(p2)}">${p2}</${p3}>`;
       })
   );
 }

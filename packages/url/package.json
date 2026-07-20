@@ -1,0 +1,88 @@
+{
+  "name": "@solid-primitives/url",
+  "version": "0.2.0-next.1",
+  "description": "Reactive primitives covering Browser's location, URL and URLSearchParams interfaces.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "contributors": [
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/url",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "url",
+    "stage": 0,
+    "list": [
+      "createLocationState",
+      "useSharedLocationState",
+      "updateLocation",
+      "setLocationFallback",
+      "createURL",
+      "createURLRecord",
+      "ReactiveURL",
+      "createSearchParams",
+      "createLocationSearchParams",
+      "useSharedLocationSearchParams",
+      "getSearchParamsRecord",
+      "ReactiveSearchParams"
+    ],
+    "category": "Browser APIs",
+    "gzip": 2736
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "url",
+    "location",
+    "search-params"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "pnpm -w build",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/rootless": "workspace:^",
+    "@solid-primitives/static-store": "workspace:^",
+    "@solid-primitives/trigger": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
+  },
+  "devDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  },
+  "typesVersions": {}
+}

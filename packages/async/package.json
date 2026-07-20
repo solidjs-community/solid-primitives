@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/async",
-  "version": "0.0.101-next.1",
+  "version": "0.0.101-next.2",
   "description": "A collection of primitives for asynchronous handling.",
   "author": "Alex Lohr <alexthkloss@web.de>",
   "contributors": [],
@@ -25,7 +25,7 @@
       "createAggregated"
     ],
     "category": "Reactivity",
-    "gzip": 1168
+    "gzip": 1138
   },
   "keywords": [
     "solid",
@@ -48,18 +48,22 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "2.0.0-beta.15"
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.15"
+    "solid-js": "catalog:"
   }
 }

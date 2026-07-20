@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/resource",
+  "version": "0.4.3",
+  "description": "Utilities for composing createResource fetchers: abortable requests, caching, retrying, and aggregation.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

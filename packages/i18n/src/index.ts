@@ -1,3 +1,6 @@
+import { DEV } from "solid-js";
+import type { JSX } from "@solidjs/web";
+
 export type BaseRecordDict = { readonly [K: string | number]: unknown };
 export type BaseArrayDict = readonly unknown[];
 export type BaseDict = BaseRecordDict | BaseArrayDict;
@@ -137,7 +140,7 @@ export const prefix: <T extends BaseRecordDict, P extends string>(
   return result;
 };
 
-export type BaseTemplateArgs = Record<string, string | number | boolean>;
+export type BaseTemplateArgs = Record<string, unknown>;
 
 /**
  * A string branded with arguments needed to resolve the template.
@@ -187,6 +190,109 @@ export const resolveTemplate: TemplateResolver = (string: string, args?: BaseTem
  * Template resolver that does nothing. It's used as a fallback when no template resolver is provided.
  */
 export const identityResolveTemplate = (v => v) as TemplateResolver;
+
+/**
+ * Template resolver that behaves like {@link resolveTemplate}, but also accepts JSX nodes as
+ * argument values, e.g. to splice a link or other component into a translation.
+ *
+ * Returns a plain `string` when every substituted value is a string, exactly matching
+ * {@link resolveTemplate}. Returns a `JSX.Element` as soon as any substituted value isn't a string.
+ *
+ * @example
+ * ```tsx
+ * const dict = {
+ *   forMoreInfo: "For more information, {{ clickHere }}",
+ * };
+ *
+ * const t = i18n.translator(() => dict, i18n.resolveRichTemplate);
+ *
+ * t("forMoreInfo", { clickHere: <a href="/info">click here</a> }); // => JSX.Element
+ * t("forMoreInfo", { clickHere: "click here" }); // => "For more information, click here"
+ * ```
+ */
+export const resolveRichTemplate: TemplateResolver<string | JSX.Element> = (
+  string: string,
+  args?: BaseTemplateArgs,
+) => {
+  if (!args) return string;
+
+  const regex = /\{\{\s*(\w+)\s*\}\}/g;
+  const parts: (string | JSX.Element)[] = [];
+  let lastIndex = 0;
+  let isRich = false;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(string))) {
+    parts.push(string.slice(lastIndex, match.index));
+    const value = args[match[1]!];
+    if (value !== undefined && typeof value !== "string") isRich = true;
+    parts.push(value === undefined ? match[0] : (value as string | JSX.Element));
+    lastIndex = regex.lastIndex;
+  }
+  parts.push(string.slice(lastIndex));
+
+  return isRich ? (parts as JSX.Element) : parts.join("");
+};
+
+export type RichTextTags = Record<string, (children: JSX.Element) => JSX.Element>;
+
+const RICH_TEXT_TAG_RE = /<(\w+)>([\s\S]*?)<\/\1>/;
+
+/**
+ * Resolves `<tag>content</tag>` markup in an already-resolved translation string into JSX, by
+ * calling the matching {@link tags} renderer with the tag's inner content.
+ *
+ * Meant to be composed with {@link translator}/{@link resolveTemplate} for `{{ }}` variable
+ * substitution — resolve variables first, then pass the result through `richText` for tags.
+ * Tags don't nest.
+ *
+ * There's no type-safety tying tag names to {@link tags} — a typo in either the dictionary or
+ * the {@link tags} map can't be caught at compile time. To catch it at runtime instead, an
+ * unmapped tag logs a dev-only warning and renders its contents as plain text; this check is
+ * stripped from production builds.
+ *
+ * @example
+ * ```tsx
+ * const dict = {
+ *   message: "Please refer to <guidelines>the guidelines</guidelines>",
+ * };
+ *
+ * const t = i18n.translator(() => dict, i18n.resolveTemplate);
+ *
+ * i18n.richText(t("message"), {
+ *   guidelines: text => <A href="/guidelines">{text}</A>,
+ * });
+ * ```
+ */
+export function richText(string: string, tags: RichTextTags): JSX.Element {
+  const parts: JSX.Element[] = [];
+  let rest = string;
+  let match: RegExpExecArray | null;
+
+  while ((match = RICH_TEXT_TAG_RE.exec(rest))) {
+    const full = match[0];
+    const tag = match[1]!;
+    const inner = match[2]!;
+    parts.push(rest.slice(0, match.index));
+
+    const render = tags[tag];
+    if (render) {
+      parts.push(render(inner));
+    } else {
+      if (DEV)
+        // oxlint-disable-next-line no-console
+        console.warn(
+          `[@solid-primitives/i18n] richText: no renderer for tag "<${tag}>" was provided, rendering its contents as plain text.`,
+        );
+      parts.push(inner);
+    }
+
+    rest = rest.slice(match.index + full.length);
+  }
+  parts.push(rest);
+
+  return parts;
+}
 
 export type Resolved<T, O> = T extends (...args: any[]) => infer R ? R : T extends O ? O : T;
 

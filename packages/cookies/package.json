@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/cookies",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Reactive, signal-based cookie primitives for isomorphic use on client and server",
   "author": "Thomas Beer (https://github.com/Tommypop2)",
   "contributors": [
@@ -25,7 +25,7 @@
       "getCookiesString"
     ],
     "category": "Network",
-    "gzip": 427
+    "gzip": 456
   },
   "keywords": [
     "solid",
@@ -49,19 +49,23 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.15",
-    "solid-js": "^2.0.0-beta.15"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.15",
-    "solid-js": "2.0.0-beta.15"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

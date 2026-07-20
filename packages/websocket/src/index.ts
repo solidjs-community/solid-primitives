@@ -1,6 +1,13 @@
-import { type Accessor, onCleanup, createSignal, createMemo, createStore, runWithOwner } from "solid-js";
+import {
+  type Accessor,
+  onCleanup,
+  createSignal,
+  createMemo,
+  createStore,
+  runWithOwner,
+} from "solid-js";
 
-export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
+export type WSMessage = string | BufferSource | Blob;
 
 /**
  * Opens a web socket connection with a queued send.
@@ -121,7 +128,7 @@ export const makeReconnectingWS = (
   url: string,
   protocols?: string | string[],
   options: WSReconnectOptions = {},
-) => {
+): ReconnectingWebSocket => {
   // oxlint-disable-next-line no-unused-vars
   let retries = options.retries || Infinity;
   let ws: ReconnectingWebSocket;
@@ -309,7 +316,7 @@ export const createWSData = <T = string, U = T>(
   const transform = options?.transform;
   return createMemo(async function* () {
     for await (const msg of wsMessageIterable<T>(ws)) {
-      yield (transform ? transform(msg) : (msg as unknown as U));
+      yield transform ? transform(msg) : (msg as unknown as U);
     }
   }) as Accessor<U>;
 };
@@ -337,7 +344,7 @@ export type WSStoreOptions<S, T = string> = {
 export const createWSStore = <S extends object, T = string>(
   ws: WebSocket,
   options: WSStoreOptions<S, T>,
-) => {
+): ReturnType<typeof createStore<S>> => {
   const [store, setStore] = createStore(options.initial as any);
   const handler = (e: MessageEvent) => {
     runWithOwner(null, () => setStore((draft: S) => void options.patch(draft, e.data as T)));
