@@ -64,7 +64,7 @@
     "remark-gfm": "^4.0.1",
     "solid-js": "catalog:",
     "storybook": "^10.4.6",
-    "storybook-solidjs-vite": "^10.5.2",
+    "storybook-solidjs-vite": "^10.6.0",
     "tsdown": "catalog:",
     "typescript": "^7.0.2",
     "unplugin-solid": "catalog:",
