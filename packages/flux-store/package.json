@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/flux-store",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "SolidJS Primitive to simplify the creation of global stores and the ability to access and mutate them.",
   "author": "Zalexios <zalexios@outlook.com>",
   "contributors": [],
@@ -23,7 +23,7 @@
       "createAction"
     ],
     "category": "Utilities",
-    "gzip": 276
+    "gzip": 263
   },
   "keywords": [
     "solid",
@@ -62,10 +62,10 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.17"
+    "solid-js": "catalog:"
   }
 }

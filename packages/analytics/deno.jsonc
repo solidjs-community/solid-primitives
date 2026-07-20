@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/analytics",
-  "version": "2.0.0-next.0",
+  "version": "2.0.0-next.1",
   "description": "Solid primitives for analytics tracking with a plugin-compatible queue-based dispatch pipeline.",
   "license": "MIT",
   "exports": {

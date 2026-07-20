@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",
@@ -18,7 +18,7 @@
       "createAudio"
     ],
     "category": "Display & Media",
-    "gzip": 851
+    "gzip": 852
   },
   "files": [
     "dist"
@@ -53,15 +53,15 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   }
 }

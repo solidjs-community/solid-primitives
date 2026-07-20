@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/page-utilities",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "Primitives for page visibility and navigation blocking",
   "license": "MIT",
   "exports": "./src/index.ts",

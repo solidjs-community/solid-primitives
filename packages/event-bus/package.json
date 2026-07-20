@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-bus",
-  "version": "3.0.0-next.1",
+  "version": "3.0.0-next.2",
   "description": "A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -19,7 +19,7 @@
       "createEventStack"
     ],
     "category": "Utilities",
-    "gzip": 1053
+    "gzip": 1052
   },
   "private": false,
   "sideEffects": false,
@@ -61,10 +61,10 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.17"
+    "solid-js": "catalog:"
   }
 }

@@ -16,7 +16,7 @@
       "createFetch"
     ],
     "category": "Network",
-    "gzip": 2374
+    "gzip": 2288
   },
   "files": [
     "dist"

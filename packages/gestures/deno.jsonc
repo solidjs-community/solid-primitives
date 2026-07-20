@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/gestures",
-  "version": "3.0.0-next.1",
+  "version": "3.0.0-next.2",
   "description": "Ref factories to react to gestures",
   "license": "MIT",
   "exports": "./src/index.ts",

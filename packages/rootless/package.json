@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/rootless",
-  "version": "2.0.0-next.0",
+  "version": "2.0.0-next.1",
   "description": "A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, and managing disposal of reactive roots.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -20,7 +20,7 @@
       "createRootPool"
     ],
     "category": "Reactivity",
-    "gzip": 936
+    "gzip": 935
   },
   "private": false,
   "sideEffects": false,
@@ -61,11 +61,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

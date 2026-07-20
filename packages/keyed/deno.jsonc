@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "license": "MIT",
   "exports": "./src/index.ts",

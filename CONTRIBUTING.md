@@ -51,6 +51,19 @@ Solid uses the `create` prefix to define a primitive that provides reactive util
 
 Solid Primitives is mostly about supplying 80-90% of the common-use cases for the end-user. We prefer to be less prescriptive than other hook libraries such as VueUse and supply granular solutions as opposed to monolithic primitives. The remaining 10-20% of complex use cases are likely not to be covered with this library. This is on purpose to limit the potential of bloat and extended complexity. This project strives to provide foundations and not cumulative solutions. We expect the broader ecosystem will fill the remaining need as further composition to this projects effort. This allows for just the right amount of prescription and opinion.
 
+### Hydration Safety
+
+A primitive that creates a **compute-form** `createSignal(fn)` or `createMemo(fn)` in a component's render body participates in Solid's per-owner hydration id allocation, the same as a DOM element the JSX compiler stamps a hydration key onto. Most primitives that return a derived reactive value (`createPagination`, `createHideOutside`'s internals, anything backed by `createMemo`) fall into this category — it's the norm, not the exception, and on its own isn't a defect. Classify each package's primitives as one of:
+
+- **Effect-only** — no render-body `createSignal(fn)`/`createMemo`, only `createEffect`/`createSignal(value)`/plain functions. Always hydration-safe.
+- **Creates a render-body compute signal/memo** — returns state derived via `createSignal(fn)` or `createMemo`. Verify it with a real hydration round trip (see below) rather than assuming it's fine.
+
+Prefer a plain (non-memoized) getter function over `createMemo` when the derived value is cheap to recompute (a handful of object fields, a short string) — it avoids consuming a hydration id for no measurable perf benefit. Reach for `createMemo` when the computation is genuinely non-trivial.
+
+Use [`scripts/test-utils/hydration-harness.ts`](scripts/test-utils/hydration-harness.ts)'s `renderHydrationRoundTrip()` to verify a package end-to-end: it renders a small fixture component through a real `node` subprocess (so `@solid-primitives/*` and `@solidjs/web` resolve to their published `dist` builds, exactly as an installed consumer gets them — not this monorepo's `@solid-primitives/source` workspace alias that regular `test/server.test.ts` files resolve through), then hydrates the result in-process and asserts no console error/warning. See `packages/controlled-signal/test/hydration.test.tsx` and `packages/a11y/test/hydration.test.tsx` for examples. Add one of these for any primitive whose public API returns a `createMemo`/compute-form-`createSignal` value that a consumer is expected to read directly in a render body.
+
+**Rebuild before trusting a result.** The harness's server half resolves the target package's published `dist`, but its client half resolves workspace `src` (through this monorepo's own alias). If you edit a package's `src` without rebuilding `dist`, the two halves are running genuinely different code, which can desync owner-id allocation for real and produce a false-positive "unclaimed server-rendered node" warning that has nothing to do with the hazard under test. Run `pnpm -w build` (or scope it to the packages you touched) before running a hydration test that depends on your changes.
+
 ## NPM Release and Repository Structure
 
 Solid Primitives is a large and growing project and the way we manage and release updates has been setup to suit the projects scope. The approach we've taken with organizing our packages and npm releases is more granular than other projects such as VueUse which ship all updates in a single release.

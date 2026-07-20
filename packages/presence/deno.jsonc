@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/presence",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Utility to animate the presence of an element based on the existence of data or lack thereof.",
   "license": "MIT",
   "exports": "./src/index.ts",

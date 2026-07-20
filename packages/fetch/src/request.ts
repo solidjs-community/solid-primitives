@@ -22,6 +22,12 @@ if (isServer && !fetchFallback) {
   }
 }
 
+/**
+ * The default request handler installed by `createFetch` at the base of the
+ * modifier chain: calls `fetch` (or `node-fetch` on the server) and parses the
+ * response as JSON, text, or a `Blob` based on its `content-type`, unless a
+ * custom `responseHandler` is set on the request context.
+ */
 export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
   fetchFn => requestContext => {
     requestContext.fetcher = <Result>(requestData: [info: RequestInfo, init?: RequestInit]) =>

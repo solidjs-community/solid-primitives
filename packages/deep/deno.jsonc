@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/deep",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Primitives for tracking and observing nested reactive objects in Solid.",
   "license": "MIT",
   "exports": "./src/index.ts",

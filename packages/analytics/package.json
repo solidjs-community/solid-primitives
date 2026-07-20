@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/analytics",
-  "version": "2.0.0-next.0",
+  "version": "2.0.0-next.1",
   "description": "Solid primitives for analytics tracking with a plugin-compatible queue-based dispatch pipeline.",
   "author": "David Di Biase <dave@solidjs.com>",
   "primitive": {
@@ -80,9 +80,9 @@
     "primitives"
   ],
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
+    "@solidjs/web": "catalog:peer",
     "@tanstack/start": "*",
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "peerDependenciesMeta": {
     "@tanstack/start": {
@@ -95,7 +95,7 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

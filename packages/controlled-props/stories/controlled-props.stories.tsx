@@ -28,8 +28,6 @@ const meta = preview.meta({
 
 export default meta;
 
-/* ── 1. Bool · number · string ───────────────────────────────────────────────── */
-
 export const ScalarControls = meta.story({
   name: "Bool · number · string",
   parameters: {
@@ -80,8 +78,6 @@ export const ScalarControls = meta.story({
     );
   },
 });
-
-/* ── 2. Array & enum select ──────────────────────────────────────────────────── */
 
 export const SelectControls = meta.story({
   name: "Array & enum select",
@@ -152,8 +148,6 @@ export const SelectControls = meta.story({
   },
 });
 
-/* ── 3. Range slider with step ──────────────────────────────────────────────── */
-
 export const RangeControls = meta.story({
   name: "Range slider with step",
   parameters: {
@@ -223,8 +217,6 @@ export const RangeControls = meta.story({
     );
   },
 });
-
-/* ── 4. Live component preview ───────────────────────────────────────────────── */
 
 export const ComponentPropPanel = meta.story({
   name: "Live component preview",

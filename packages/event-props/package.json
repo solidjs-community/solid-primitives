@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-props",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitive to manage events in a reactive way.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -54,10 +54,10 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.17"
+    "solid-js": "catalog:"
   }
 }

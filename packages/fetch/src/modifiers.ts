@@ -11,6 +11,14 @@ export type Fetcher<Result, FetcherArgs> = Exclude<
   undefined
 >;
 
+/**
+ * Replaces `requestContext.fetcher` with the result of `wrapper(originalFetcher)`.
+ * Used by modifiers to layer behavior (aborting, retrying, caching, ...) around
+ * whatever fetcher is currently installed on the context.
+ *
+ * @param requestContext The context passed to a `RequestModifier`.
+ * @param wrapper Receives the current fetcher and returns the replacement.
+ */
 export const wrapFetcher = <Result, FetcherArgs extends any[]>(
   requestContext: RequestContext<Result, FetcherArgs>,
   wrapper: (originalFetcher: Fetcher<Result, FetcherArgs>) => Fetcher<Result, FetcherArgs>,
@@ -23,6 +31,14 @@ export const wrapFetcher = <Result, FetcherArgs extends any[]>(
   requestContext.fetcher = wrapper(originalFetcher) || originalFetcher;
 };
 
+/**
+ * Extends the already-created resource returned by `requestContext.resource` with
+ * extra properties (defined via property descriptors) and/or extra actions,
+ * as produced by `wrapper`.
+ *
+ * @param requestContext The context passed to a `RequestModifier`, after `wrapResource()` has run.
+ * @param wrapper Returns `[props, actions]` to merge onto the resource and its actions object.
+ */
 export const wrapResource = <Result, FetcherArgs>(
   requestContext: RequestContext<Result, FetcherArgs>,
   wrapper: (
@@ -37,6 +53,11 @@ export const wrapResource = <Result, FetcherArgs>(
   actions && Object.assign(requestContext.resource[1], actions);
 };
 
+/**
+ * Makes the request abortable and adds `aborted`, `status`, and `response` to
+ * the resource, plus an `abort()` action. Re-fetching automatically aborts the
+ * previous in-flight request.
+ */
 export const withAbort: RequestModifier =
   <Result, FetcherArgs extends any[]>() =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
@@ -79,6 +100,12 @@ export const withAbort: RequestModifier =
     ]);
   };
 
+/**
+ * Rejects the request if it doesn't resolve within `timeout` milliseconds,
+ * aborting the underlying request in the process.
+ *
+ * @param timeout Milliseconds to wait before aborting and rejecting.
+ */
 export const withTimeout: RequestModifier = (timeout: number) => requestContext => {
   wrapFetcher(
     requestContext,
@@ -96,6 +123,11 @@ export const withTimeout: RequestModifier = (timeout: number) => requestContext 
   requestContext.wrapResource();
 };
 
+/**
+ * Catches all fetcher errors and exposes the last one as `error` on the resource,
+ * instead of letting it propagate to a Suspense/ErrorBoundary. The resource's
+ * value falls back to `info.value` (its previous value) when a request fails.
+ */
 export const withCatchAll: RequestModifier = () => requestContext => {
   const [error, setError] = createSignal<Error | undefined>();
   wrapFetcher(
@@ -159,11 +191,18 @@ export const withRetry: RequestModifier =
     requestContext.wrapResource();
   };
 
+/** Options for {@link withRefetchEvent}. */
 export type RefetchEventOptions<Result, FetcherArgs extends any[]> = {
+  /** Window events that trigger a refetch. Defaults to `["visibilitychange"]`. */
   on?: (keyof WindowEventMap)[];
+  /** Called with the last request's args, its data, and the triggering event; return false to skip the refetch. */
   filter?: (requestData: FetcherArgs, data: Result | undefined, ev: Event) => boolean;
 };
 
+/**
+ * Refetches the resource whenever one of `options.on` fires on `window`
+ * (default: `visibilitychange`, refetching whenever the tab becomes visible again).
+ */
 export const withRefetchEvent: RequestModifier = isServer
   ? () => requestContext => {
       requestContext.wrapResource();
@@ -197,6 +236,14 @@ export const withRefetchEvent: RequestModifier = isServer
           onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
       };
 
+/**
+ * Aggregates each new response into the resource's current value instead of
+ * replacing it: arrays are concatenated, objects shallow-merged, strings
+ * concatenated, and everything else collected into an array. Useful for
+ * paginated data sources.
+ *
+ * @param dataFilter Optional transform applied to each response before it's merged in.
+ */
 export const withAggregation: RequestModifier =
   <Result, FetcherArgs extends any[]>(dataFilter?: (result: Result) => Result) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {

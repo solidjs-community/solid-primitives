@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/promise",
-  "version": "2.0.0-next.0",
+  "version": "2.0.0-next.1",
   "description": "Promised one-time watch for changes. Await a reactive condition.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -22,7 +22,7 @@
       "changed"
     ],
     "category": "Utilities",
-    "gzip": 491
+    "gzip": 838
   },
   "private": false,
   "sideEffects": false,
@@ -63,10 +63,10 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.17"
+    "solid-js": "catalog:"
   }
 }

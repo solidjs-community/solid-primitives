@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/refs",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "Library of primitives, components and directives for SolidJS that help managing references to JSX elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -60,12 +60,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17",
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:",
     "solid-transition-group": "^0.2.3"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   }
 }

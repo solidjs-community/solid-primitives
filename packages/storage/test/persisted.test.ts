@@ -194,6 +194,20 @@ describe("makePersisted", () => {
     });
     expect(init).toBe(promise);
   });
+  
+  it("defers the initialization if the hydrated option is set", async () => {
+    const anotherMockStorage = { ...mockStorage };
+    anotherMockStorage.setItem("test18", '"init"');
+    const [signal, _setSignal] = makePersisted(
+      createSignal("default"), 
+      { storage: anotherMockStorage, name: "test18", hydrated: true }
+    );
+    flush();
+    expect(signal()).toBe("default");
+    await new Promise(r => setTimeout(r, 200));
+    flush();
+    expect(signal()).toBe("init"); 
+  });
 });
 
 describe("storageSync", () => {

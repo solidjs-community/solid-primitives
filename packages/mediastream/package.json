@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mediastream",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives to work with media streams from microphones, cameras, and the screen",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -26,7 +26,7 @@
       "createScreen"
     ],
     "category": "Browser APIs",
-    "gzip": 1049
+    "gzip": 1057
   },
   "files": [
     "dist"
@@ -65,12 +65,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

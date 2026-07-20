@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/queue",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Queue primitives — FIFO, priority, and concurrent task queues",
   "license": "MIT",
   "exports": "./src/index.ts",

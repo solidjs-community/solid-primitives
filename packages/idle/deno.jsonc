@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/idle",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "A primitive to observe the user's idle status and react to its changes.",
   "license": "MIT",
   "exports": "./src/index.ts",

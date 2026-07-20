@@ -27,8 +27,6 @@ import {
   radii,
 } from "../../../.storybook/ui/index.js";
 
-// ─── Local helpers ────────────────────────────────────────────────────────────
-
 const MonoValue = (props: { children: Element }) => (
   <span
     style={{
@@ -91,8 +89,6 @@ const AriaDebug = (props: { entries: { attr: string; value: string | undefined }
   </div>
 );
 
-// ─── Meta ─────────────────────────────────────────────────────────────────────
-
 const meta = preview.meta({
   title: "Inputs/a11y",
   tags: ["autodocs"],
@@ -107,8 +103,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ─── createAnnounce ───────────────────────────────────────────────────────────
 
 export const Announce = meta.story({
   name: "Screen reader announcements",
@@ -207,8 +201,6 @@ export const Announce = meta.story({
   },
 });
 
-// ─── createReducedMotion ──────────────────────────────────────────────────────
-
 export const ReducedMotion = meta.story({
   name: "Reduced motion preference",
   parameters: {
@@ -282,8 +274,6 @@ export const ReducedMotion = meta.story({
     );
   },
 });
-
-// ─── Accessible field (raw API) ───────────────────────────────────────────────
 
 export const StandaloneField = meta.story({
   name: "Accessible field",
@@ -373,8 +363,6 @@ export const StandaloneField = meta.story({
   },
 });
 
-// ─── Sub-component pattern ────────────────────────────────────────────────────
-
 export const SubComponentPattern = meta.story({
   name: "Sub-component pattern",
   parameters: {
@@ -416,8 +404,6 @@ export const SubComponentPattern = meta.story({
   },
 });
 
-// ─── Context provider pattern ─────────────────────────────────────────────────
-
 export const ContextProviderPattern = meta.story({
   name: "Context provider pattern",
   parameters: {
@@ -432,8 +418,6 @@ export const ContextProviderPattern = meta.story({
     const [validationState, setValidationState] = createSignal<"valid" | "invalid" | undefined>(
       undefined,
     );
-
-    // ── Sub-components built inline to show the raw wiring ───────────────────
 
     const Label = (props: { children: Element }) => {
       const ctx = useFormControl();
@@ -497,8 +481,6 @@ export const ContextProviderPattern = meta.story({
       );
     };
 
-    // ── Root: creates context, provides it ───────────────────────────────────
-
     const ctx = createFormControl({ id: "ctx-demo", validationState, required: true });
 
     return (
@@ -528,8 +510,6 @@ export const ContextProviderPattern = meta.story({
     );
   },
 });
-
-// ─── Validation states ────────────────────────────────────────────────────────
 
 export const ValidationStates = meta.story({
   name: "Validation states",
@@ -593,8 +573,6 @@ export const ValidationStates = meta.story({
     );
   },
 });
-
-// ─── aria-labelledby chain ────────────────────────────────────────────────────
 
 export const AriaLabelledByChain = meta.story({
   name: "Label chain resolution",

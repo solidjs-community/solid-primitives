@@ -10,8 +10,6 @@ function delay(ms = 0): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ─── makeAnalytics (server) ───────────────────────────────────────────────────
-
 describe("makeAnalytics (server)", () => {
   it("dispatches page events to a synchronous plugin", async () => {
     const spy = vi.fn();
@@ -134,8 +132,6 @@ describe("makeAnalytics (server)", () => {
     cleanup();
   });
 });
-
-// ─── createAnalytics (server) ─────────────────────────────────────────────────
 
 describe("createAnalytics (server)", () => {
   it("dispatches events inside a createRoot scope on the server", async () => {

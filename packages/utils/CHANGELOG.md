@@ -1,5 +1,17 @@
 # @solid-primitives/utils
 
+## 7.0.0-next.3
+
+### Minor Changes
+
+- b7ef2f3: Add `globalRegistry(key, init)` — returns a singleton value keyed by `key` on `globalThis` (via `Symbol.for`), shared across every copy of the calling module loaded in the same JS realm. Use it instead of a plain module-scope `let`/`const` for state (ref-counts, active-instance stacks) that must stay consistent even if the app's dependency graph ends up with more than one installed copy of a package.
+
+## 7.0.0-next.2
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
 ## 7.0.0-next.1
 
 ### Patch Changes

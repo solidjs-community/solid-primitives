@@ -26,8 +26,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── makeBodyCursor ───────────────────────────────────────────────────────────
-
 export const LoadingState = meta.story({
   name: "Loading state",
   parameters: {
@@ -71,8 +69,6 @@ export const LoadingState = meta.story({
     );
   },
 });
-
-// ─── createBodyCursor ─────────────────────────────────────────────────────────
 
 const BODY_CURSORS: CursorProperty[] = [
   "pointer",
@@ -128,8 +124,6 @@ export const BodyCursorReactive = meta.story({
     );
   },
 });
-
-// ─── createElementCursor ──────────────────────────────────────────────────────
 
 const ELEMENT_CURSORS: CursorProperty[] = [
   "pointer",
@@ -213,8 +207,6 @@ export const ElementCursorToggle = meta.story({
   },
 });
 
-// ─── createDragCursor ─────────────────────────────────────────────────────────
-
 export const DragHandle = meta.story({
   name: "Grab/grabbing on drag",
   parameters: {
@@ -293,8 +285,6 @@ export const DragHandle = meta.story({
     );
   },
 });
-
-// ─── cursorRef ────────────────────────────────────────────────────────────────
 
 const SHOWCASE_CURSORS: CursorProperty[] = [
   "pointer",

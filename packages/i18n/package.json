@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "3.0.0-next.2",
+  "version": "3.0.0-next.3",
   "description": "Library of primitives for providing internationalization support.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "contributors": [
@@ -27,7 +27,7 @@
       "chainedTranslator"
     ],
     "category": "Utilities",
-    "gzip": 672
+    "gzip": 1094
   },
   "files": [
     "dist"
@@ -65,12 +65,12 @@
     "primitives"
   ],
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17",
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:",
     "tsdown": "catalog:",
     "unplugin-solid": "catalog:"
   }

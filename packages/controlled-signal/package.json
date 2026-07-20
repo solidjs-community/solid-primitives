@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/controlled-signal",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Reactive signals that support both controlled (externally managed) and uncontrolled (internally managed) state — a pattern commonly used in headless UI components.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -26,7 +26,7 @@
       "createToggleState"
     ],
     "category": "Reactivity",
-    "gzip": 395
+    "gzip": 478
   },
   "keywords": [
     "solid",
@@ -70,9 +70,9 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.17"
+    "solid-js": "catalog:"
   }
 }

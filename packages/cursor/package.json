@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/cursor",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives for setting CSS cursor property reactively.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -25,7 +25,7 @@
       "cursorRef"
     ],
     "category": "Utilities",
-    "gzip": 651
+    "gzip": 649
   },
   "keywords": [
     "solid",
@@ -64,12 +64,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

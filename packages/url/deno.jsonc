@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/url",
-  "version": "0.2.0-next.0",
+  "version": "0.2.0-next.1",
   "description": "Reactive primitives covering Browser's location, URL and URLSearchParams interfaces.",
   "license": "MIT",
   "exports": "./src/index.ts",

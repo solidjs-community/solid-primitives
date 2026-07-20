@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/map",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "The Map & WeakMap data structures as a reactive signals.",
   "license": "MIT",
   "exports": "./src/index.ts",

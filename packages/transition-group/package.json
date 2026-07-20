@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/transition-group",
-  "version": "2.0.0-next.0",
+  "version": "2.0.0-next.1",
   "description": "Reactive primitives for implementing transition effects in SolidJS",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -21,7 +21,7 @@
       "createListTransition"
     ],
     "category": "Animation",
-    "gzip": 852
+    "gzip": 1159
   },
   "keywords": [
     "solid",
@@ -60,11 +60,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   },
   "typesVersions": {}
 }

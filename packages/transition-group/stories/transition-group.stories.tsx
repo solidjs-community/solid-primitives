@@ -19,8 +19,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── createSwitchTransition ───────────────────────────────────────────────────
-
 export const SwitchFade = meta.story({
   name: "Fade between elements",
   parameters: {
@@ -203,8 +201,6 @@ export const SwitchModes = meta.story({
     );
   },
 });
-
-// ─── createListTransition ─────────────────────────────────────────────────────
 
 export const ListAddRemove = meta.story({
   name: "Add & remove items",

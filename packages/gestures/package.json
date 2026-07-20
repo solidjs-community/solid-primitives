@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/gestures",
-  "version": "3.0.0-next.1",
+  "version": "3.0.0-next.2",
   "description": "Ref factories to react to gestures",
   "author": "Moshe Uminer",
   "license": "MIT",
@@ -40,10 +40,10 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.17"
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "2.0.0-beta.17"
+    "solid-js": "catalog:"
   }
 }

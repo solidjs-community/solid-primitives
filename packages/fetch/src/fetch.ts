@@ -23,15 +23,21 @@ export type DistributeFetcherArgs<FetcherArgs extends any[], ExtraArgs extends a
       | [...{ [n in keyof FetcherArgs]: Accessor<FetcherArgs[n] | undefined> }, ...ExtraArgs]
   : never;
 
+/** Options accepted as the second or third argument of {@link createFetch}. */
 export type FetchOptions<Result, InitialValue, FetcherArgs> = ResourceOptions<
   Result | InitialValue
 > & {
+  /** Custom `fetch` implementation to use instead of the global one. */
   fetch?: typeof fetch;
+  /** Custom request handler, replacing the default fetch-based one at the base of the modifier chain. */
   request?: (requestContext: RequestContext<Result, FetcherArgs>) => void;
+  /** Overrides how a `Response` is turned into `Result`, bypassing the default content-type based handling. */
   responseHandler?: (response: Response) => any;
+  /** When true, no request is made and the resource stays empty (e.g. for conditional fetching in SSR). */
   disable?: boolean;
 };
 
+/** Return value of {@link createFetch}: a `Resource` extended with response metadata, and its actions extended by any applied modifiers. */
 export type FetchReturn<Result, InitialValue> = [
   Resource<Result> & {
     /** if you are using withAbort(), this will contain a boolean to check if the request was aborted */
@@ -48,6 +54,11 @@ export type FetchReturn<Result, InitialValue> = [
   },
 ];
 
+/**
+ * State shared across the modifier chain for a single {@link createFetch} call.
+ * Each modifier reads and rewrites fields here (e.g. wrapping `fetcher`) before
+ * calling `wrapResource()` to hand off to the next modifier in the chain.
+ */
 export type RequestContext<Result, FetcherArgs> = {
   urlAccessor: Accessor<FetcherArgs | undefined>;
   wrapResource: () => ResourceReturn<Result, ResourceOptions<Result>>;
@@ -133,24 +144,29 @@ const fetcherArgsFromArgs = <FetcherArgs extends any[]>(
 export function createFetch<Result>(
   ...fetcherArgs: DistributeFetcherArgs<FetchArgs, []>
 ): FetchReturn<Result, undefined>;
+/** {@link createFetch} overload: request info/init followed by a modifiers array. */
 export function createFetch<Result>(
   ...args: DistributeFetcherArgs<FetchArgs, [modifiers: ReturnType<RequestModifier>[]]>
 ): FetchReturn<Result, undefined>;
+/** {@link createFetch} overload: request info/init followed by a {@link FetchOptions} object. */
 export function createFetch<Result>(
   ...args: DistributeFetcherArgs<FetchArgs, [options: FetchOptions<Result, undefined, FetchArgs>]>
 ): FetchReturn<Result, undefined>;
+/** {@link createFetch} overload: request info/init followed by a {@link FetchOptions} object and a modifiers array. */
 export function createFetch<Result>(
   ...args: DistributeFetcherArgs<
     FetchArgs,
     [options: FetchOptions<Result, undefined, FetchArgs>, modifiers: ReturnType<RequestModifier>[]]
   >
 ): FetchReturn<Result, undefined>;
+/** {@link createFetch} overload: request info/init followed by a {@link FetchOptions} object with an explicit `initialValue` type. */
 export function createFetch<Result, InitialValue extends Result | undefined = undefined>(
   ...args: DistributeFetcherArgs<
     FetchArgs,
     [options: FetchOptions<Result, InitialValue, FetchArgs>]
   >
 ): FetchReturn<Result, InitialValue>;
+/** {@link createFetch} overload: request info/init followed by a {@link FetchOptions} object (with explicit `initialValue` type) and a modifiers array. */
 export function createFetch<Result, InitialValue extends Result | undefined = undefined>(
   ...args: DistributeFetcherArgs<
     FetchArgs,
@@ -160,6 +176,7 @@ export function createFetch<Result, InitialValue extends Result | undefined = un
     ]
   >
 ): FetchReturn<Result, InitialValue>;
+/** {@link createFetch} overload: generic over custom `FetcherArgs`, with a {@link FetchOptions} object. */
 export function createFetch<
   Result,
   InitialValue extends Result | undefined = undefined,
@@ -170,6 +187,7 @@ export function createFetch<
     [options: FetchOptions<Result, InitialValue, FetcherArgs>]
   >
 ): FetchReturn<Result, InitialValue>;
+/** {@link createFetch} overload: generic over custom `FetcherArgs`, with a {@link FetchOptions} object and a modifiers array. */
 export function createFetch<
   Result,
   InitialValue extends Result | undefined = undefined,

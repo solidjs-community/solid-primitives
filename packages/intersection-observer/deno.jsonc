@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.2",
   "description": "Primitives to support using the intersection observer API.",
   "license": "MIT",
   "exports": "./src/index.ts",

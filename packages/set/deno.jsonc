@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/set",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Reactive Set and WeakSet primitives with set-algebra operations: union, intersection, difference, and symmetricDifference.",
   "license": "MIT",
   "exports": "./src/index.ts",

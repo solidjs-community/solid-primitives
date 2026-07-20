@@ -65,6 +65,7 @@ export type PersistenceOptions<
   serialize?: (data: T) => string;
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
+  hydrated?: boolean;
   action?: (signal: S) => Parameters<typeof action>[0];
 } & (undefined extends O
   ? { storage?: SyncStorage | AsyncStorage }
@@ -167,7 +168,12 @@ export function makePersisted<
   let unchanged = true;
 
   if (init instanceof Promise) init.then(data => unchanged && data && set(data));
-  else if (init) set(init);
+  else if (init)
+    // in case of hydration mismatches due to the server lacking the same initial value,
+    // we want to defer the initialization by a short amount so the same state can be used
+    // during hydration
+    if (options.hydrated) setTimeout(() => set(init), 45);
+    else set(init);
 
   const getter: () => T = isSignal ? (signal[0] as () => T) : () => snapshot(signal[0] as T);
 

@@ -1,4 +1,5 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, Show, untrack } from "solid-js";
+import { Errored, Loading } from "@solidjs/web";
 import preview from "../../../.storybook/preview.js";
 import { createInfiniteScroll, createPagination, createSegment } from "../src/index.js";
 import readme from "../README.md?raw";
@@ -44,8 +45,7 @@ const PaginationBar = (barProps: {
     <For each={barProps.props()}>
       {props => (
         <Button
-          onClick={props.onClick as () => void}
-          disabled={props.disabled}
+          {...props}
           variant={props["aria-current"] ? "primary" : "outline"}
           style={{ "min-width": "2rem", "font-size": font.sizeSm, padding: "0.3rem 0.6rem" }}
         >
@@ -57,7 +57,7 @@ const PaginationBar = (barProps: {
 );
 
 export const CreatePaginationStory = meta.story({
-  name: "createPagination",
+  name: "Pagination bar",
   parameters: {
     docs: {
       description: {
@@ -69,47 +69,62 @@ export const CreatePaginationStory = meta.story({
   render: () => {
     const [totalPages, setTotalPages] = createSignal(20);
     const [maxVisible, setMaxVisible] = createSignal(7);
-    const [paginationProps, page, _setPage] = createPagination(() => ({
-      pages: totalPages(),
-      maxPages: maxVisible(),
-    }));
+    // untrack: Storybook's Solid renderer wraps every story's render() in its
+    // own createMemo. Without this, createPagination's internal setup memo
+    // reading totalPages()/maxVisible() during its first synchronous compute
+    // leaks as a dependency of that outer memo, causing it to re-invoke this
+    // entire render() function (creating brand-new signals) whenever those
+    // values change — which breaks rendering. See
+    // https://github.com/solidjs-community/solid-primitives/issues/795
+    const [paginationProps, page, _setPage] = untrack(() =>
+      createPagination(() => ({
+        pages: totalPages(),
+        maxPages: maxVisible(),
+      })),
+    );
 
     return (
-      <Container minWidth={400}>
-        <StatRow label="Current page" value={page()} />
-        <PaginationBar props={paginationProps} />
-        <Separator />
-        <Section title="Max visible">
-          <ButtonRow>
-            {([5, 7, 10] as const).map(n => (
-              <Button
-                variant={maxVisible() === n ? "primary" : "outline"}
-                onClick={() => setMaxVisible(n)}
-              >
-                {n}
-              </Button>
-            ))}
-          </ButtonRow>
-        </Section>
-        <Section title="Total pages">
-          <ButtonRow>
-            {([10, 20, 50] as const).map(n => (
-              <Button
-                variant={totalPages() === n ? "primary" : "outline"}
-                onClick={() => setTotalPages(n)}
-              >
-                {n}
-              </Button>
-            ))}
-          </ButtonRow>
-        </Section>
-      </Container>
+      <Errored fallback={(err, reset) => <p>Error: {err} <button type="reset" onClick={reset}>Reset</button></p>}>
+        <Container minWidth={400}>
+          <StatRow label="Current page" value={page()} />
+          <PaginationBar props={paginationProps} />
+          <Separator />
+          <Section title="Max visible">
+            <ButtonRow>
+              <For each={[5, 7, 10] as const}>
+                {n => (
+                  <Button
+                    variant={maxVisible() === n ? "primary" : "outline"}
+                    onClick={() => setMaxVisible(n)}
+                  >
+                    {n}
+                  </Button>
+                )}
+              </For>
+            </ButtonRow>
+          </Section>
+          <Section title="Total pages">
+            <ButtonRow>
+              <For each={[10, 20, 50] as const}>
+                {n => (
+                  <Button
+                    variant={totalPages() === n ? "primary" : "outline"}
+                    onClick={() => setTotalPages(n)}
+                  >
+                    {n}
+                  </Button>
+                )}
+              </For>
+            </ButtonRow>
+          </Section>
+        </Container>
+      </Errored>
     );
   },
 });
 
 export const CreateSegmentStory = meta.story({
-  name: "createSegment",
+  name: "Paged item grid",
   parameters: {
     docs: {
       description: {
@@ -121,12 +136,15 @@ export const CreateSegmentStory = meta.story({
   render: () => {
     const ITEMS = Array.from({ length: 50 }, (_, i) => `Item ${String(i + 1).padStart(2, "0")}`);
     const [limit, setLimit] = createSignal(8);
-    const [paginationProps, page] = createPagination(() => ({
-      pages: Math.ceil(ITEMS.length / limit()),
-      maxPages: 5,
-      showFirst: false,
-      showLast: false,
-    }));
+    // untrack: see the note in CreatePaginationStory above.
+    const [paginationProps, page] = untrack(() =>
+      createPagination(() => ({
+        pages: Math.ceil(ITEMS.length / limit()),
+        maxPages: 5,
+        showFirst: false,
+        showLast: false,
+      })),
+    );
     const segment = createSegment(ITEMS, limit, page);
 
     return (
@@ -162,11 +180,13 @@ export const CreateSegmentStory = meta.story({
         <Separator />
         <Section title="Items per page">
           <ButtonRow>
-            {([5, 8, 10, 25] as const).map(n => (
-              <Button variant={limit() === n ? "primary" : "outline"} onClick={() => setLimit(n)}>
-                {n}
-              </Button>
-            ))}
+            <For each={[5, 8, 10, 25] as const}>
+              {n => (
+                <Button variant={limit() === n ? "primary" : "outline"} onClick={() => setLimit(n)}>
+                  {n}
+                </Button>
+              )}
+            </For>
           </ButtonRow>
         </Section>
       </Container>
@@ -175,21 +195,24 @@ export const CreateSegmentStory = meta.story({
 });
 
 export const CreateInfiniteScrollStory = meta.story({
-  name: "createInfiniteScroll",
+  name: "Infinite scroll with per-page retry",
   parameters: {
     docs: {
       description: {
         story:
-          "`createInfiniteScroll` accumulates fetched pages and exposes `fetching`, `end`, and `error` signals. In production, attach `ref={sentinel}` to a DOM element at the bottom of the list — `IntersectionObserver` calls `setPage` automatically when it scrolls into view. This demo drives `setPage` manually to show the state machine.",
+          "`createInfiniteScroll` treats every page as its own independent async unit — `pages()` is an array of `{ content, fetching, error, retry }` bundles, ready to feed straight into `<For>`. `content()` is a genuine async value, so each page is wrapped in its own `<Loading>`/`<Errored>` boundary rather than manual `fetching`/`error` checks. One page failing doesn't block the rest of the list; the retry button calls `page.retry()` directly (Errored's own `reset` only re-reads `content()`, which won't refetch on its own). Scroll to the bottom of the box below and `IntersectionObserver` loads the next page automatically via the sentinel — the manual button underneath does the same thing for convenience. Page 1 always fails once to demonstrate per-page retry.",
       },
     },
   },
   render: () => {
-    // 4 pages × 6 items = 24 items, page>=4 signals end.
-    // createInfiniteScroll starts page at 0; the deferred effect fires first
-    // so fetcher(0) is always the initial call regardless of IO timing.
+    // 4 pages × 6 items = 24 items, page>=4 signals end. Page 1 fails once.
+    let page1Failed = false;
     const mockFetcher = async (page: number): Promise<string[]> => {
       await new Promise<void>(resolve => setTimeout(resolve, 600));
+      if (page === 1 && !page1Failed) {
+        page1Failed = true;
+        throw new Error("Network hiccup");
+      }
       if (page >= 4) return [];
       return Array.from(
         { length: 6 },
@@ -197,13 +220,11 @@ export const CreateInfiniteScrollStory = meta.story({
       );
     };
 
-    // sentinel is intentionally unused — IO-based auto-loading needs a page-level
-    // scroll context that Storybook's iframe doesn't provide.
-    const [pages, , { page, fetching, end, setPage, error }] = createInfiniteScroll(mockFetcher);
+    const [pages, loader, { pageCount, end, setPageCount }] = createInfiniteScroll(mockFetcher);
 
     return (
       <Container width={320}>
-        <StatRow label="Page fetched" value={page()} />
+        <StatRow label="Pages requested" value={pageCount()} />
         <div
           style={{
             height: "200px",
@@ -217,35 +238,65 @@ export const CreateInfiniteScrollStory = meta.story({
           }}
         >
           <For each={pages()}>
-            {item => (
-              <div
-                style={{
-                  padding: "0.4rem 0.75rem",
-                  background: colors.secondary,
-                  "border-radius": radii.sm,
-                  "font-size": font.sizeSm,
-                  "font-family": font.mono,
-                  border: `1px solid ${colors.border}`,
-                  "flex-shrink": "0",
-                }}
-              >
-                {item}
-              </div>
-            )}
+            {(page, i) => {
+              return (
+                <Errored
+                  fallback={err => (
+                    // Errored's own `reset` just re-reads content() — since our memo
+                    // only re-fetches when attempt() changes, retry() (not reset) is
+                    // what actually kicks off a new request. Errored also doesn't
+                    // hand control back to <Loading> while that retry is in flight,
+                    // so this fallback watches `fetching()` itself for feedback.
+                    <Show when={!page.fetching()} fallback={<Badge>Retrying page {i()}…</Badge>}>
+                      <div style={{ display: "flex", gap: "0.4rem", "align-items": "center" }}>
+                        <Badge variant="error">{String(err())}</Badge>
+                        <Button variant="outline" onClick={page.retry}>
+                          Retry
+                        </Button>
+                      </div>
+                    </Show>
+                  )}
+                >
+                  <Loading fallback={<Badge>Loading page {i()}…</Badge>}>
+                    <For each={page.content()}>
+                      {item => (
+                        <div
+                          style={{
+                            padding: "0.4rem 0.75rem",
+                            background: colors.secondary,
+                            "border-radius": radii.sm,
+                            "font-size": font.sizeSm,
+                            "font-family": font.mono,
+                            border: `1px solid ${colors.border}`,
+                            "flex-shrink": "0",
+                          }}
+                        >
+                          {item}
+                        </div>
+                      )}
+                    </For>
+                  </Loading>
+                </Errored>
+              );
+            }}
           </For>
+          {/* IntersectionObserver clips the target's visibility against any
+              scrollable ancestor even with the default root (viewport), so
+              this sentinel correctly fires on scroll within this box — no
+              page-level scroll container needed. */}
+          <Show when={!end()}>
+            <div ref={loader} style={{ height: "1px" }} />
+          </Show>
         </div>
         <Show when={!end()}>
-          <Button variant="outline" disabled={fetching()} onClick={() => setPage(p => p + 1)}>
-            {fetching() ? "Loading…" : "Load next page"}
+          <Button variant="outline" onClick={() => setPageCount(p => p + 1)}>
+            Load next page
           </Button>
         </Show>
         <Show when={end()}>
-          <Badge variant={error() ? "error" : "success"}>
-            {error() ? String(error()) : "All pages loaded"}
-          </Badge>
+          <Badge variant="success">All pages loaded</Badge>
         </Show>
         <Separator />
-        <BoolRow label="fetching" value={fetching()} />
         <BoolRow label="end" value={end()} />
       </Container>
     );

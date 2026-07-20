@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/sensors",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Primitives for device sensors: accelerometer, gyroscope, compass, battery, and generic Sensor API.",
   "license": "MIT",
   "exports": "./src/index.ts",

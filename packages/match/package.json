@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/match",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "A template primitive example.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -21,7 +21,7 @@
       "MatchValue"
     ],
     "category": "Control Flow",
-    "gzip": 159
+    "gzip": 164
   },
   "keywords": [
     "solid",
@@ -57,11 +57,11 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

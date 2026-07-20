@@ -1,5 +1,11 @@
 # @solid-primitives/mutable
 
+## 3.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
 ## 3.0.0-next.0
 
 ### Major Changes
@@ -45,7 +51,6 @@
   Reading a mutable property outside a reactive context (effects, memos, JSX) always returns the most current value without needing `flush()`.
 
   ## Internal changes
-
   - Imports migrated: `solid-js/web` → `@solidjs/web`, store APIs → `solid-js`
   - `getListener` renamed to `getObserver` (Solid 2.0 API)
   - `batch()` removed throughout — Solid 2.0 auto-batches all writes

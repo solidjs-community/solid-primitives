@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/a11y",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.2",
   "description": "Accessibility primitives for Solid.js — labeled field groups, ARIA graph helpers, and more.",
   "license": "MIT",
   "exports": "./src/index.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/history",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives for managing undo/redo history in Solid.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -20,7 +20,7 @@
       "createUndoHistory"
     ],
     "category": "Utilities",
-    "gzip": 615
+    "gzip": 639
   },
   "keywords": [
     "solid",
@@ -59,15 +59,15 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
     "@solid-primitives/deep": "workspace:^",
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

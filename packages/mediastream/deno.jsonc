@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mediastream",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Primitives to work with media streams from microphones, cameras, and the screen",
   "license": "MIT",
   "exports": "./dist/index.js",

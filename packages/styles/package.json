@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/styles",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Collection of reactive primitives focused on styles.",
   "author": "Damian Tarnawski <gthetaranv@gmail.com>",
   "contributors": [
@@ -22,7 +22,7 @@
       "createRemSize"
     ],
     "category": "Display & Media",
-    "gzip": 700
+    "gzip": 699
   },
   "private": false,
   "sideEffects": false,
@@ -62,12 +62,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

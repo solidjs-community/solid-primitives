@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "3.0.0-next.0",
+  "version": "3.0.0-next.1",
   "description": "Primitives to manage audio and single sounds.",
   "license": "MIT",
   "exports": "./src/index.ts",

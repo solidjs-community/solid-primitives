@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/db-store",
   "version": "1.1.4",
-  "description": "A template primitive example.",
+  "description": "A reactive Solid store backed by a database, kept in sync via realtime change events.",
   "license": "MIT",
   "exports": "./src/index.ts",
   "publish": {

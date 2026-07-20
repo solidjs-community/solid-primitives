@@ -31,8 +31,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Traffic Light ────────────────────────────────────────────────────
-
 const LIGHTS = [
   { key: "red" as const, color: "#ef4444" },
   { key: "yellow" as const, color: "#f59e0b" },
@@ -123,8 +121,6 @@ export const TrafficLight = meta.story({
   },
 });
 
-// ── Story 2: Lifecycle Counter ────────────────────────────────────────────────
-
 export const LifecycleCounter = meta.story({
   name: "Counter lifecycle",
   parameters: {
@@ -201,8 +197,6 @@ export const LifecycleCounter = meta.story({
     );
   },
 });
-
-// ── Story 3: JSX as State Value ───────────────────────────────────────────────
 
 export const InlineEdit = meta.story({
   name: "JSX as state value",

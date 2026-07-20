@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/video",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Primitives to manage HTML video playback.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
@@ -25,7 +25,7 @@
       "createVideoFrameCallback"
     ],
     "category": "Display & Media",
-    "gzip": 1644
+    "gzip": 1876
   },
   "keywords": [
     "solid",
@@ -66,11 +66,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.17",
-    "solid-js": "2.0.0-beta.17"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.17",
-    "solid-js": "^2.0.0-beta.17"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   }
 }
