@@ -194,11 +194,11 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
 export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props: {
   values: {
     [K in keyof T]:
-      | readonly [
-          Context<T[K]> | ContextProviderComponent<T[K]>,
-          [T[K]][T extends unknown ? 0 : never],
-        ]
-      | FlowComponent;
+    | readonly [
+      Context<T[K]> | ContextProviderComponent<T[K]>,
+      [T[K]][T extends unknown ? 0 : never],
+    ]
+    | FlowComponent;
   };
   children: Element;
 }): Element {
@@ -221,4 +221,98 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
     return createComponent(item, ctxProps);
   };
   return fn(0);
+}
+
+/**
+ * A component that allows you to consume a context without extracting the children into a separate function.
+ * This is particularly useful when the context needs to be used within the same JSX where it is provided.
+ *
+ * The `ContextConsumer` component is equivalent to the following code and solely exists as syntactic sugar:
+ *
+ * ```tsx
+ * <CounterProvider>
+ *   {untrack(() => {
+ *     const context = useContext(counterContext); // or useCounter()
+ *     return children(context);
+ *   })}
+ * </CounterProvider>
+ * ```
+ *
+ * @param provider Either one of the following:
+ *  - A function that returns the context value. Preferably the `use...()` function returned by `createContextProvider()`.
+ *  - The context itself returned by `createContext()`.
+ *  - An inline function that returns the context's value.
+ *
+ * Please note that this prop is not reactive.
+ *
+ * @param fallback Optional fallback element to render when the context's value is `undefined`. Can be a function or an element. Note that the component still throws an error if the context is not provided, regardless of the fallback.
+ *
+ * @example
+ * with `createContextProvider`:
+ * ```tsx
+ * // create the context
+ * const [CounterProvider, useCounter] = createContextProvider(...)
+ *
+ * // provide and use the context
+ * <CounterProvider count={1}>
+ *   <ContextConsumer provider={useCounter}>
+ *     {({ count }) => (
+ *       <div>Count: {count()}</div>
+ *     )}
+ *   </ContextConsumer>
+ * </CounterProvider>
+ * ```
+ *
+ * @example
+ * with `createOptionalContextProvider` (and `fallback`):
+ * ```tsx
+ * // create the optional context
+ * const [OptionalCounterProvider, useOptionalCounter] = createOptionalContextProvider(...)
+ *
+ * // provide and use the context
+ * <OptionalCounterProvider>
+ *   <ContextConsumer provider={useOptionalCounter} fallback={() => (
+ *       <div>No counter provided</div>
+ *     )}>
+ *     {({ count }) => (
+ *       <div>Count: {count()}</div>
+ *     )}
+ *   </ContextConsumer>
+ * </OptionalCounterProvider>
+ * ```
+ *
+ * @example
+ * with `createContext`:
+ * ```tsx
+ * // create the context
+ * const CounterContext = createContext(...);
+ *
+ * // provide and use the context
+ * <CounterContext value={{ count: 1 }}>
+ *   <ContextConsumer provider={CounterContext}>
+ *     {({ count }) => (
+ *       <div>Count: {count}</div>
+ *     )}
+ *   </ContextConsumer>
+ * </CounterContext>
+ * ```
+ */
+export function ContextConsumer<T>(props: {
+  children: (value: T) => Element,
+  fallback?: (() => Element) | Element,
+  provider: (() => T | undefined) | Context<T>,
+}): Element {
+  let context: T | undefined;
+  if (props.provider.length === 0) {
+    context = props.provider(undefined!) as T | undefined;
+  } else {
+    context = useContext(props.provider as Context<T>);
+  }
+  if (context === undefined) {
+    if (typeof props.fallback === "function") {
+      return props.fallback?.();
+    }
+    return props.fallback;
+  }
+  return props.children(context);
 }
