@@ -16,7 +16,6 @@ import type { Context } from "solid-js";
 import {
   createContext,
   createEffect,
-  createMemo,
   createSignal,
   createUniqueId,
   useContext,
@@ -140,13 +139,16 @@ export function createFormControl(props: CreateFormControlProps): FormControlCon
     );
   };
 
-  const dataset = createMemo<FormControlDataSet>(() => ({
+  // Plain getter, not createMemo: the object is cheap to rebuild on every read, and a
+  // render-body compute-form memo would consume a hydration id in every consuming app —
+  // see the transform-boundary hydration hazard this pattern is designed to avoid.
+  const dataset = (): FormControlDataSet => ({
     "data-valid": access(props.validationState) === "valid" ? "" : undefined,
     "data-invalid": access(props.validationState) === "invalid" ? "" : undefined,
     "data-required": access(props.required) ? "" : undefined,
     "data-disabled": access(props.disabled) ? "" : undefined,
     "data-readonly": access(props.readOnly) ? "" : undefined,
-  }));
+  });
 
   return {
     name: () => access(props.name) ?? id(),

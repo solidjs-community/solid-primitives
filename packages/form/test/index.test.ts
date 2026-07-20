@@ -2,8 +2,6 @@ import { describe, it, expect, vi } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
 import { createForm, createFormResetListener, toFormData } from "../src/index.js";
 
-// ─── Inline validators used across tests ──────────────────────────────────────
-
 const isEmail = (v: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email";
 
@@ -12,8 +10,6 @@ const minLength = (n: number) => (v: string) =>
 
 const hasUppercase = (v: string) =>
   /[A-Z]/.test(v) ? null : "Must contain an uppercase letter";
-
-// ─── Field signals ────────────────────────────────────────────────────────────
 
 describe("field signals", () => {
   it("initializes field values from config", () => {
@@ -54,8 +50,6 @@ describe("field signals", () => {
     });
   });
 });
-
-// ─── Validation ───────────────────────────────────────────────────────────────
 
 describe("validation", () => {
   it("returns null error for valid field", () => {
@@ -127,8 +121,6 @@ describe("validation", () => {
     });
   });
 });
-
-// ─── Derived form state ───────────────────────────────────────────────────────
 
 describe("dirty", () => {
   it("is false initially", () => {
@@ -253,8 +245,6 @@ describe("values", () => {
     });
   });
 });
-
-// ─── Reset ────────────────────────────────────────────────────────────────────
 
 describe("reset", () => {
   it("restores all fields to initial values and clears touched", () => {
@@ -388,8 +378,6 @@ describe("reset", () => {
     });
   });
 });
-
-// ─── Submit ───────────────────────────────────────────────────────────────────
 
 describe("submit", () => {
   it("calls onSubmit with current values when valid", async () => {
@@ -570,8 +558,6 @@ describe("submit", () => {
   });
 });
 
-// ─── submitted flag ───────────────────────────────────────────────────────────
-
 describe("submitted", () => {
   it("starts false", () => {
     createRoot(dispose => {
@@ -621,8 +607,6 @@ describe("submitted", () => {
     dispose();
   });
 });
-
-// ─── validateOn ───────────────────────────────────────────────────────────────
 
 describe("validateOn", () => {
   it("change (default): error() shows immediately", () => {
@@ -743,8 +727,6 @@ describe("validateOn", () => {
     });
   });
 });
-
-// ─── Async validators ─────────────────────────────────────────────────────────
 
 describe("async validators", () => {
   it("pending becomes true while an async validator is in flight", () => {
@@ -936,8 +918,6 @@ describe("async validators", () => {
   });
 });
 
-// ─── Bind ─────────────────────────────────────────────────────────────────────
-
 describe("bind", () => {
   it("sets initial input value from signal", () => {
     createRoot(dispose => {
@@ -1112,8 +1092,6 @@ describe("bind", () => {
   });
 });
 
-// ─── Form-level validate ──────────────────────────────────────────────────────
-
 describe("validate", () => {
   it("returns null when the cross-field rule passes", () => {
     createRoot(dispose => {
@@ -1247,8 +1225,6 @@ describe("validate", () => {
   });
 });
 
-// ─── toFormData ───────────────────────────────────────────────────────────────
-
 describe("toFormData", () => {
   it("returns a FormData with all current field values", () => {
     createRoot(dispose => {
@@ -1293,8 +1269,6 @@ describe("toFormData", () => {
   });
 });
 
-// ─── formData ─────────────────────────────────────────────────────────────────
-
 describe("formData", () => {
   it("returns FormData with all current field values", () => {
     createRoot(dispose => {
@@ -1324,8 +1298,6 @@ describe("formData", () => {
     });
   });
 });
-
-// ─── setValues ───────────────────────────────────────────────────────────────
 
 describe("setValues", () => {
   it("updates multiple fields at once", () => {
@@ -1397,8 +1369,6 @@ describe("setValues", () => {
     });
   });
 });
-
-// ─── setError ────────────────────────────────────────────────────────────────
 
 describe("setError", () => {
   it("field.setError sets an external error visible via error()", () => {
@@ -1503,8 +1473,6 @@ describe("setError", () => {
   });
 });
 
-// ─── validate() reactive invalidation ────────────────────────────────────────
-
 describe("validate reactive invalidation", () => {
   it("valid() reflects a new cross-field rule added after it was first read", () => {
     createRoot(dispose => {
@@ -1528,8 +1496,6 @@ describe("validate reactive invalidation", () => {
     });
   });
 });
-
-// ─── bind with textarea ───────────────────────────────────────────────────────
 
 describe("bind with textarea", () => {
   it("sets initial value on a textarea", () => {
@@ -1562,8 +1528,6 @@ describe("bind with textarea", () => {
     });
   });
 });
-
-// ─── bind with select ────────────────────────────────────────────────────────
 
 describe("bind with select", () => {
   function makeSelect(...values: string[]): HTMLSelectElement {
@@ -1623,8 +1587,6 @@ describe("bind with select", () => {
   });
 });
 
-// ─── Form ref ─────────────────────────────────────────────────────────────────
-
 describe("form ref", () => {
   it("intercepts submit event and prevents default", async () => {
     let submitPromise: Promise<void>;
@@ -1656,8 +1618,6 @@ describe("form ref", () => {
     dispose();
   });
 });
-
-// ─── createFormResetListener ──────────────────────────────────────────────────
 
 describe("createFormResetListener", () => {
   const makeForm = () => {

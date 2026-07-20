@@ -11,8 +11,6 @@ import {
 import { transformFiles } from "../src/helpers.js";
 import type { UploadFile } from "../src/types.js";
 
-// ── jsdom polyfills ───────────────────────────────────────────────────────────
-
 beforeAll(() => {
   // jsdom does not implement createObjectURL
   vi.stubGlobal("URL", { createObjectURL: (f: File) => `blob:${f.name}` });
@@ -38,8 +36,6 @@ function dispatchChange(input: HTMLInputElement, files: FileList) {
   input.dispatchEvent(event);
 }
 
-// ── transformFiles ────────────────────────────────────────────────────────────
-
 describe("transformFiles", () => {
   it("returns empty array for null input", () => {
     expect(transformFiles(null)).toEqual([]);
@@ -61,8 +57,6 @@ describe("transformFiles", () => {
     expect(result.map(f => f.name)).toEqual(["a.png", "b.jpg"]);
   });
 });
-
-// ── createFilePicker ────────────────────────────────────────────────────────
 
 describe("createFilePicker", () => {
   it("initialises with empty file list, no error, and isLoading=false", () => {
@@ -256,8 +250,6 @@ describe("createFilePicker", () => {
   });
 });
 
-// ── createDropzone ────────────────────────────────────────────────────────────
-
 describe("createDropzone", () => {
   it("initialises with empty files, no error, isLoading=false, and isDragging=false", () => {
     const { files, error, isLoading, isDragging, dispose } = createRoot(dispose => ({
@@ -436,8 +428,6 @@ describe("createDropzone", () => {
   });
 });
 
-// ── dropzone ref callback factory ────────────────────────────────────────────
-
 describe("dropzone", () => {
   it("returns a callable ref with state properties attached", () => {
     const { dz, dispose } = createRoot(dispose => ({
@@ -485,8 +475,6 @@ describe("dropzone", () => {
     dispose();
   });
 });
-
-// ── fileUploader ref callback ─────────────────────────────────────────────────
 
 describe("fileUploader", () => {
   it("returns a function (ref callback)", () => {
@@ -562,8 +550,6 @@ describe("fileUploader", () => {
     dispose();
   });
 });
-
-// ── createFileUploader ──────────────────────────────────────────────────────────
 
 // Builds a minimal UploadFile without needing a real picker
 function makeUploadFile(name = "test.png"): UploadFile {
@@ -872,8 +858,6 @@ describe("createFileUploader", () => {
     dispose();
   });
 });
-
-// ── createFileUploader — XHR path ───────────────────────────────────────────────
 
 function makeMockXhr() {
   const uploadListeners: Record<string, (e: ProgressEvent) => void> = {};

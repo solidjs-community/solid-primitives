@@ -1,8 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
-import { autofocus, createAutofocus, createFocusTrap } from "../src/index.js";
-
-// ─── Shared focus tracking ────────────────────────────────────────────────────
+import { autofocus, createAutofocus, createFocusTrap, createFocusRestore } from "../src/index.js";
 
 let focused: HTMLElement | null = null;
 
@@ -10,8 +8,6 @@ const original_focus = HTMLElement.prototype.focus;
 HTMLElement.prototype.focus = function (this: HTMLElement) {
   focused = this;
 };
-
-// ─── Fake timers + rAF stub ───────────────────────────────────────────────────
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -33,15 +29,11 @@ afterAll(() => {
   HTMLElement.prototype.focus = original_focus;
 });
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
 /** Run all pending effects then drain all timers (including nested rAFs). */
 const settle = () => {
   flush();
   vi.runAllTimers();
 };
-
-// ─── autofocus ────────────────────────────────────────────────────────────────
 
 describe("autofocus", () => {
   test("focuses the element with autofocus attribute", () => {
@@ -73,8 +65,6 @@ describe("autofocus", () => {
     dispose();
   });
 });
-
-// ─── createAutofocus ──────────────────────────────────────────────────────────
 
 describe("createAutofocus", () => {
   const el = document.createElement("button"),
@@ -117,8 +107,6 @@ describe("createAutofocus", () => {
     expect(focused).toBe(el2); // no focus after dispose
   });
 });
-
-// ─── createFocusTrap ──────────────────────────────────────────────────────────
 
 /** Build a container with `n` focusable buttons and return them. */
 function makeContainer(n: number): { container: HTMLElement; buttons: HTMLButtonElement[] } {
@@ -434,5 +422,204 @@ describe("createFocusTrap", () => {
     settle();
     expect(focused).toBe(buttons[0]);
     dispose();
+  });
+});
+
+describe("createFocusRestore", () => {
+  test("does not move focus on activation", () => {
+    const trigger = document.createElement("button");
+    document.body.appendChild(trigger);
+    trigger.focus();
+    focused = null; // reset after the manual .focus() above
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled: true });
+      return dispose;
+    });
+
+    settle();
+    expect(focused).toBe(null); // createFocusRestore never focuses anything itself
+    dispose();
+    trigger.remove();
+  });
+
+  test("restores focus to the previously focused element on deactivation", () => {
+    const trigger = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    setEnabled(false);
+    settle();
+    expect(focused).toBe(trigger);
+    dispose();
+  });
+
+  test("a reactivation before a pending restore fires does not corrupt that restore's target", () => {
+    // Regression test: the restore target used to be read lazily from a shared outer variable
+    // inside the afterPaint-deferred callback. If something reactivated focus-restore (capturing
+    // a *new* "currently focused" element) before the still-pending restore from the *previous*
+    // deactivation had a chance to fire, that pending restore would incorrectly pick up the new
+    // value instead of the one that was current when it was scheduled.
+    const trigger1 = document.createElement("button");
+    const trigger2 = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", { get: () => trigger1, configurable: true });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled });
+      return dispose;
+    });
+
+    settle(); // originalFocusedElement captured as trigger1
+
+    setEnabled(false); // schedules a restore that should target trigger1
+    flush(); // runs the deactivation synchronously — the afterPaint restore is now pending, not yet fired
+
+    // Before that pending restore fires, something reactivates focus-restore against a
+    // different currently-focused element, and stays enabled (no second deactivation, so no
+    // second restore gets queued — isolates exactly the race being tested).
+    Object.defineProperty(document, "activeElement", { get: () => trigger2, configurable: true });
+    setEnabled(true);
+    flush();
+
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    vi.runAllTimers(); // drains the still-pending first restore
+    expect(focused).toBe(trigger1); // not trigger2
+    dispose();
+  });
+
+  test("restores focus on dispose even without enabled changing first", () => {
+    const trigger = document.createElement("button");
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore();
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    dispose();
+    settle();
+    expect(focused).toBe(trigger);
+  });
+
+  test("uses finalFocusElement when provided", () => {
+    const trigger = document.createElement("button");
+    const customFinal = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled, finalFocusElement: customFinal });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    setEnabled(false);
+    settle();
+    expect(focused).toBe(customFinal);
+    dispose();
+  });
+
+  test("onFinalFocus callback is called on deactivation", () => {
+    const trigger = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+    const onFinalFocus = vi.fn();
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled, onFinalFocus });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    setEnabled(false);
+    settle();
+    expect(onFinalFocus).toHaveBeenCalledOnce();
+    dispose();
+  });
+
+  test("onFinalFocus preventDefault suppresses focus restore", () => {
+    const trigger = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled, onFinalFocus: e => e.preventDefault() });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    focused = null;
+    setEnabled(false);
+    settle();
+    expect(focused).toBe(null); // prevented
+    dispose();
+  });
+
+  test("does not restore focus when enabled is false throughout", () => {
+    const trigger = document.createElement("button");
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled: false });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    dispose();
+    settle();
+    expect(focused).toBe(null);
   });
 });

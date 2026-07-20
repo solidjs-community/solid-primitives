@@ -14,14 +14,10 @@ import {
   inputStyle,
 } from "../../../.storybook/ui/index.js";
 
-// ─── Validators ───────────────────────────────────────────────────────────────
-
 const required = (v: string) => (v.trim() === "" ? "Required" : null);
 const isEmail = (v: string) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email");
 const minLength = (n: number) => (v: string) => (v.length < n ? `Min ${n} chars` : null);
 const hasUppercase = (v: string) => (/[A-Z]/.test(v) ? null : "Needs an uppercase letter");
-
-// ─── Local story helpers ──────────────────────────────────────────────────────
 
 const FieldRow = (props: {
   label: string;
@@ -41,8 +37,6 @@ const FieldRow = (props: {
   </div>
 );
 
-// ─── Meta ─────────────────────────────────────────────────────────────────────
-
 const meta = preview.meta({
   title: "Forms/Form",
   tags: ["autodocs"],
@@ -57,8 +51,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ─── Validate on change ───────────────────────────────────────────────────────
 
 export const ValidateOnChange = meta.story({
   name: "Validate on change",
@@ -122,8 +114,6 @@ export const ValidateOnChange = meta.story({
   },
 });
 
-// ─── Validate on blur ─────────────────────────────────────────────────────────
-
 export const ValidateOnBlur = meta.story({
   name: "Validate on blur",
   parameters: {
@@ -176,8 +166,6 @@ export const ValidateOnBlur = meta.story({
     );
   },
 });
-
-// ─── Errors on first submit ───────────────────────────────────────────────────
 
 export const ValidateOnSubmit = meta.story({
   name: "Errors on first submit",
@@ -237,8 +225,6 @@ export const ValidateOnSubmit = meta.story({
   },
 });
 
-// ─── Cross-field rule ─────────────────────────────────────────────────────────
-
 export const CrossFieldRule = meta.story({
   name: "Passwords must match",
   parameters: {
@@ -296,8 +282,6 @@ export const CrossFieldRule = meta.story({
     );
   },
 });
-
-// ─── Async availability check ─────────────────────────────────────────────────
 
 const TAKEN = new Set(["admin", "root", "solid"]);
 const checkAvailable = (username: string): Promise<string | null> =>

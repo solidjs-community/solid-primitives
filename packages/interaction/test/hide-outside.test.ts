@@ -2,8 +2,6 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
 import { ariaHideOutside, createHideOutside } from "../src/index.js";
 
-// ─── ariaHideOutside ──────────────────────────────────────────────────────────
-
 describe("ariaHideOutside", () => {
   let container: HTMLDivElement;
   let target: HTMLDivElement;
@@ -110,9 +108,58 @@ describe("ariaHideOutside", () => {
     expect(sibling.getAttribute("aria-hidden")).toBe("true");
     sibling.removeAttribute("aria-hidden");
   });
-});
 
-// ─── createHideOutside ────────────────────────────────────────────────────────
+  it("does not set inert by default", () => {
+    const cleanup = ariaHideOutside([target]);
+    expect(sibling.inert).toBeFalsy();
+    cleanup();
+  });
+
+  it("sets inert on hidden elements when inert=true", () => {
+    const cleanup = ariaHideOutside([target], document.body, undefined, true);
+    expect(sibling.inert).toBe(true);
+    expect(sibling.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+    expect(sibling.inert).toBeFalsy();
+  });
+
+  it("ref-counts inert across nested calls", () => {
+    const cleanup1 = ariaHideOutside([target], document.body, undefined, true);
+    const cleanup2 = ariaHideOutside([target], document.body, undefined, true);
+
+    expect(sibling.inert).toBe(true);
+    cleanup2();
+    expect(sibling.inert).toBe(true); // outer still holds the ref
+    cleanup1();
+    expect(sibling.inert).toBeFalsy();
+  });
+
+  it("does not manage pre-existing inert elements", () => {
+    sibling.inert = true;
+
+    const cleanup = ariaHideOutside([target], document.body, undefined, true);
+    cleanup();
+
+    expect(sibling.inert).toBe(true);
+    sibling.inert = false;
+  });
+
+  it("does not set inert on a node left alone due to pre-existing aria-hidden", () => {
+    // Regression test: a node with an author-set aria-hidden is left untouched by the
+    // aria-hidden ref-counting (see "does not manage pre-existing aria-hidden elements" above).
+    // inert=true must respect that same "not ours to manage" boundary — it must not be applied
+    // to this node just because inert=true was requested for the call as a whole.
+    sibling.setAttribute("aria-hidden", "true");
+
+    const cleanup = ariaHideOutside([target], document.body, undefined, true);
+    expect(sibling.inert).toBeFalsy();
+    cleanup();
+    expect(sibling.inert).toBeFalsy();
+    expect(sibling.getAttribute("aria-hidden")).toBe("true"); // still untouched
+
+    sibling.removeAttribute("aria-hidden");
+  });
+});
 
 describe("createHideOutside", () => {
   let container: HTMLDivElement;
@@ -252,5 +299,26 @@ describe("createHideOutside", () => {
     expect(sibling.getAttribute("aria-hidden")).toBeNull();
     dispose();
     sibling.removeAttribute("aria-live");
+  });
+
+  it("sets inert alongside aria-hidden when inert=true", () => {
+    const dispose = createRoot(d => {
+      createHideOutside({ targets: [target], inert: true });
+      return d;
+    });
+    flush();
+    expect(sibling.inert).toBe(true);
+    dispose();
+    expect(sibling.inert).toBeFalsy();
+  });
+
+  it("does not set inert when inert is omitted", () => {
+    const dispose = createRoot(d => {
+      createHideOutside({ targets: [target] });
+      return d;
+    });
+    flush();
+    expect(sibling.inert).toBeFalsy();
+    dispose();
   });
 });

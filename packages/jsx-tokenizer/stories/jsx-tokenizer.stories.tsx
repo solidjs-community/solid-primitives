@@ -34,8 +34,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Tab bar from token children ──────────────────────────────────────
-
 type TabData = { id: string; label: string };
 const TabTokenizer = createTokenizer<TabData>({ name: "tabs" });
 const Tab = createToken(
@@ -114,8 +112,6 @@ export const TabBarFromTokens = meta.story({
     );
   },
 });
-
-// ── Story 2: Token as its own tokenizer (standalone token) ────────────────────
 
 type CrumbData = { label: string; href?: string };
 const Crumb = createToken(
@@ -214,8 +210,6 @@ export const StandaloneToken = meta.story({
     );
   },
 });
-
-// ── Story 3: Tokens mixed with plain JSX (includeJSXElements) ─────────────────
 
 type CalloutData = { kind: "info" | "tip" | "warning"; text: string };
 const CalloutTokenizer = createTokenizer<CalloutData>({ name: "callout" });
@@ -316,8 +310,6 @@ export const MixedTokensAndJSX = meta.story({
     );
   },
 });
-
-// ── Story 4: Array of tokenizers ──────────────────────────────────────────────
 
 type ActionData = { label: string; kbd?: string; description?: string; danger?: boolean };
 const ActionTokenizer = createTokenizer<ActionData>({ name: "action" });

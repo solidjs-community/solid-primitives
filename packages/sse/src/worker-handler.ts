@@ -56,7 +56,6 @@ function handleMessage(data: SSEWorkerMessage, postBack: (msg: SSEWorkerMessage)
   }
 }
 
-// ── Dedicated Worker ──────────────────────────────────────────────────────────
 // `DedicatedWorkerGlobalScope.postMessage` takes one argument, but the DOM lib
 // types `self` as `Window` (which requires `targetOrigin`). Cast to the minimal
 // structural interface we actually need — the project's tsconfig does not include
@@ -66,7 +65,6 @@ self.addEventListener("message", (e: MessageEvent<SSEWorkerMessage>) => {
   handleMessage(e.data, msg => (self as unknown as DedicatedPost).postMessage(msg));
 });
 
-// ── SharedWorker — each connecting tab gets its own MessagePort ───────────────
 self.addEventListener("connect", (e: Event) => {
   const port = (e as MessageEvent).ports[0];
   if (!port) return;
