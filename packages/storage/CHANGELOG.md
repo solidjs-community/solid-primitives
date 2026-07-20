@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 5.0.0-next.2
+
+### Patch Changes
+
+- 99b7631: sync API: allow for url specification
+
 ## 5.0.0-next.1
 
 ### Patch Changes
