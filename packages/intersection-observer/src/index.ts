@@ -368,8 +368,6 @@ export function createVisibilityObserver(
   return visible;
 }
 
-// ─── Occurrence ───────────────────────────────────────────────────────────────
-
 export const Occurrence = {
   Entering: "Entering",
   Leaving: "Leaving",
@@ -423,8 +421,6 @@ export function withOccurrence<Ctx extends {}>(
     };
   };
 }
-
-// ─── Direction ────────────────────────────────────────────────────────────────
 
 export const DirectionX = {
   Left: "Left",

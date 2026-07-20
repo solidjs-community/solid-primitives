@@ -14,8 +14,6 @@ import { clamp } from "../index.ts";
 import { colorToOKLCH, normalizeHue, parseColor } from "./helpers.ts";
 import type { Color, ColorFormat } from "./types.ts";
 
-// ─── Safe parsing ─────────────────────────────────────────────────────────────
-
 /**
  * Like {@link parseColor} but returns `undefined` instead of throwing for invalid input.
  *
@@ -73,8 +71,6 @@ export function detectColorFormat(value: string): ColorFormat | undefined {
   if (/^hsba?\(/i.test(s)) return /^hsba\(/i.test(s) ? "hsba" : "hsb";
   return undefined;
 }
-
-// ─── Manipulation ─────────────────────────────────────────────────────────────
 
 /**
  * Returns a new color with lightness increased by `amount` (0–1 ratio = percentage points).
@@ -151,8 +147,6 @@ export function mix(a: Color, b: Color, ratio = 0.5): Color {
     .withChannelValue("alpha", lerp(ra.getChannelValue("alpha"), rb.getChannelValue("alpha")));
 }
 
-// ─── Accessibility ────────────────────────────────────────────────────────────
-
 /** WCAG 2.1 relative luminance. Alpha is ignored (assumes opaque rendering). */
 function relativeLuminance(color: Color): number {
   const rgb = color.toFormat("rgb");
@@ -211,8 +205,6 @@ export function isReadable(
   if (level === "AAA") return ratio >= (size === "large" ? 4.5 : 7);
   return ratio >= (size === "large" ? 3 : 4.5);
 }
-
-// ─── Color scales ─────────────────────────────────────────────────────────────
 
 /**
  * Returns an array of `steps` colors linearly interpolated in RGB space between

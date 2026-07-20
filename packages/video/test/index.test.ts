@@ -16,8 +16,6 @@ const testUrl = "https://example.com/clip.mp4";
 /** Yield to the microtask queue — used alongside flush() to drain Solid 2.0 effects. */
 const tick = () => Promise.resolve();
 
-// ── setVideoSrc ───────────────────────────────────────────────────────────────
-
 describe("setVideoSrc", () => {
   it("sets src and nulls srcObject when given a string", () => {
     const el = document.createElement("video") as HTMLVideoElement;
@@ -36,8 +34,6 @@ describe("setVideoSrc", () => {
     expect(el.src).not.toMatch(/clip\.mp4$/);
   });
 });
-
-// ── makeVideo ─────────────────────────────────────────────────────────────────
 
 describe("makeVideo", () => {
   it("returns a player and cleanup tuple", () => {
@@ -83,8 +79,6 @@ describe("makeVideo", () => {
     cleanup();
   });
 });
-
-// ── makeVideoPlayer ───────────────────────────────────────────────────────────
 
 describe("makeVideoPlayer", () => {
   it("returns controls and cleanup tuple", () => {
@@ -140,8 +134,6 @@ describe("makeVideoPlayer", () => {
     cleanup();
   });
 });
-
-// ── createVideo ───────────────────────────────────────────────────────────────
 
 describe("createVideo", () => {
   it("returns the expected shape", () =>
@@ -277,8 +269,6 @@ describe("createVideo", () => {
       expect(video.player._mock.paused).toBe(true);
     }));
 });
-
-// ── createVideoPlayer ───────────────────────────────────────────────────────
 
 describe("createVideoPlayer", () => {
   it("includes all VideoReturn fields plus controls fields", () =>
@@ -456,8 +446,6 @@ describe("createVideoPlayer", () => {
     }));
 });
 
-// ── makeVideoFrameCallback ──────────────────────────────────────────────────
-
 describe("makeVideoFrameCallback", () => {
   it("is not running until start is called", () => {
     const [player, cleanup] = makeVideo(testUrl);
@@ -533,8 +521,6 @@ describe("makeVideoFrameCallback", () => {
     }).not.toThrow();
   });
 });
-
-// ── createVideoFrameCallback ─────────────────────────────────────────────────
 
 describe("createVideoFrameCallback", () => {
   it("running is a reactive signal", () =>

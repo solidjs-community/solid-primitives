@@ -5,8 +5,6 @@ import {
   type SSESourceFn,
 } from "./sse.ts";
 
-// ─── Protocol types ───────────────────────────────────────────────────────────
-
 /**
  * Discriminated union of all messages exchanged between the main thread
  * and the Worker. Main → Worker: `connect` | `disconnect`.
@@ -25,8 +23,6 @@ export type SSEWorkerTarget = {
   addEventListener(type: "message", listener: (e: MessageEvent<SSEWorkerMessage>) => void): void;
   removeEventListener(type: "message", listener: (e: MessageEvent<SSEWorkerMessage>) => void): void;
 };
-
-// ─── makeSSEWorker ────────────────────────────────────────────────────────────
 
 /**
  * Returns a `SSESourceFn` that tunnels EventSource connections through a Worker.

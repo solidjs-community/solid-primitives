@@ -21,8 +21,6 @@ import {
   StatRow,
 } from "../../../.storybook/ui/index.js";
 
-// ─── Mock SSE source factories (no server required) ───────────────────────────
-
 function buildHandle() {
   let rs: number = SSEReadyState.CONNECTING;
   const source = {
@@ -127,8 +125,6 @@ const makeFailingMock = (failAfterMs = 3000, msgCount = 2): SSESourceFn => {
   };
 };
 
-// ─── Meta ─────────────────────────────────────────────────────────────────────
-
 const meta = preview.meta({
   title: "Network/SSE",
   tags: ["autodocs"],
@@ -144,12 +140,8 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── Shared display helpers ───────────────────────────────────────────────────
-
 const STATE_LABEL = ["connecting", "open", "closed"] as const;
 const STATE_VARIANT = ["info", "success", "error"] as const;
-
-// ─── Stories ─────────────────────────────────────────────────────────────────
 
 export const StreamWithControlsStory = meta.story({
   name: "Reactive stream with state & controls",

@@ -7,8 +7,6 @@ import {
   createNotificationPermission,
 } from "../src/index.js";
 
-// ── Mock Notification API ─────────────────────────────────────────────────────
-
 class MockNotification {
   static permission: NotificationPermission = "granted";
   static requestPermission = vi.fn().mockResolvedValue("granted" as NotificationPermission);
@@ -53,8 +51,6 @@ class MockNotification {
   }
 }
 
-// ── Mock Permissions API ──────────────────────────────────────────────────────
-
 const mockPermStatus = {
   state: "granted" as PermissionState,
   _listeners: [] as (() => void)[],
@@ -70,8 +66,6 @@ const mockPermStatus = {
     this._listeners.forEach(fn => fn());
   },
 };
-
-// ── Global setup ──────────────────────────────────────────────────────────────
 
 beforeAll(() => {
   Object.defineProperty(window, "Notification", {
@@ -99,15 +93,11 @@ beforeEach(() => {
   mockPermStatus._listeners = [];
 });
 
-// ── isNotificationSupported ───────────────────────────────────────────────────
-
 describe("isNotificationSupported", () => {
   test("returns true when Notification is available", () => {
     expect(isNotificationSupported()).toBe(true);
   });
 });
-
-// ── makeNotification ──────────────────────────────────────────────────────────
 
 describe("makeNotification", () => {
   test("show creates a Notification with the given title", () => {
@@ -179,8 +169,6 @@ describe("makeNotification", () => {
     expect(instance.close).toHaveBeenCalled();
   });
 });
-
-// ── createNotification ────────────────────────────────────────────────────────
 
 describe("createNotification", () => {
   test("initial state: notification is null, supported is true", () => {
@@ -331,8 +319,6 @@ describe("createNotification", () => {
     dispose();
   });
 
-  // ── Event callbacks ─────────────────────────────────────────────────────────
-
   test("onClick fires when click event is dispatched", () => {
     const onClick = vi.fn();
 
@@ -428,8 +414,6 @@ describe("createNotification", () => {
     dispose();
   });
 });
-
-// ── createNotificationPermission ──────────────────────────────────────────────
 
 describe("createNotificationPermission", () => {
   test("permission starts as unknown before query resolves", () => {
