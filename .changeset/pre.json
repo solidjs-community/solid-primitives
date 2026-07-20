@@ -152,6 +152,7 @@
     "interaction-orphaned-listener-fix",
     "interaction-solid2-migration",
     "intersection-observer-notreadyerror-fix",
+    "jolly-states-train",
     "jsx-tokenizer-solid2-migration",
     "keyboard-any-order-shortcut",
     "keyboard-ignore-within-inputs",
