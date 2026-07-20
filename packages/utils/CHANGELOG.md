@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 7.0.0-next.3
+
+### Minor Changes
+
+- b7ef2f3: Add `globalRegistry(key, init)` — returns a singleton value keyed by `key` on `globalThis` (via `Symbol.for`), shared across every copy of the calling module loaded in the same JS realm. Use it instead of a plain module-scope `let`/`const` for state (ref-counts, active-instance stacks) that must stay consistent even if the app's dependency graph ends up with more than one installed copy of a package.
+
 ## 7.0.0-next.2
 
 ### Patch Changes

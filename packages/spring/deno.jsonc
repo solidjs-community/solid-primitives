@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/spring",
-  "version": "1.0.0-next.1",
+  "version": "1.0.0-next.2",
   "description": "Primitive that creates spring physics functions.",
   "license": "MIT",
   "exports": "./src/index.ts",
