@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeAll, afterAll, beforeEach } from "vitest";
-import { createRoot, createSignal, flush, onCleanup } from "solid-js";
+import { createEffect, createRoot, createSignal, flush, isPending, onCleanup } from "solid-js";
 import {
   isNotificationSupported,
   makeNotification,
@@ -532,6 +532,42 @@ describe("createNotificationPermission", () => {
     await promise;
     flush();
     expect(pending()).toBe(false);
+
+    dispose();
+  });
+
+  test("isPending(permission) reads true while requestPermission is in flight (affects())", async () => {
+    let resolve!: (v: NotificationPermission) => void;
+    MockNotification.requestPermission.mockImplementation(
+      () => new Promise<NotificationPermission>(r => (resolve = r)),
+    );
+
+    // isPending must be read inside a genuinely tracked scope (an effect/JSX) to give
+    // reliable results — a bare top-level `isPending(fn)` call outside any computation
+    // does not exercise the same code path and can report stale/incorrect values.
+    const log: boolean[] = [];
+    const { requestPermission, dispose } = createRoot(dispose => {
+      const { permission, requestPermission } = createNotificationPermission();
+      createEffect(
+        () => isPending(permission),
+        p => {
+          log.push(p);
+        },
+      );
+      return { requestPermission, dispose };
+    });
+
+    flush();
+    expect(log).toEqual([false]);
+
+    const promise = requestPermission();
+    flush();
+    expect(log).toEqual([false, true]);
+
+    resolve("granted");
+    await promise;
+    flush();
+    expect(log.at(-1)).toBe(false);
 
     dispose();
   });
