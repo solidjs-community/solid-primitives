@@ -1,5 +1,12 @@
 # @solid-primitives/spring
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- Updated dependencies [b7ef2f3]
+  - @solid-primitives/utils@7.0.0-next.3
+
 ## 1.0.0-next.1
 
 ### Patch Changes

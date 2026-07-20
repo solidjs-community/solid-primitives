@@ -1,5 +1,13 @@
 # @solid-primitives/a11y
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- b7ef2f3: `createFormControl`'s `dataset` accessor is now a plain getter instead of a `createMemo` — no behavior or type change, but it removes an unnecessary render-body compute-form memo (memoizing a handful of cheap string/undefined fields buys nothing) that would otherwise consume a hydration id in every consuming app.
+- Updated dependencies [b7ef2f3]
+  - @solid-primitives/utils@7.0.0-next.3
+
 ## 1.0.0-next.1
 
 ### Patch Changes

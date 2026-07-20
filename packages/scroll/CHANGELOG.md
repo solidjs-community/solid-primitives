@@ -1,5 +1,13 @@
 # @solid-primitives/scroll
 
+## 3.0.0-next.2
+
+### Patch Changes
+
+- b7ef2f3: `createPreventScroll`'s active-instance stack and body-style ref-counts now live in a `globalRegistry` (keyed on `globalThis`, not module-scope bindings), so they stay correct even if the app's dependency graph ends up with more than one copy of this package installed — module-scope state would otherwise be split across copies, breaking the "topmost instance" ref-counting. Also replaced a hand-rolled `contains()` helper with the equivalent one already exported from `@solid-primitives/utils`. No API changes.
+- Updated dependencies [b7ef2f3]
+  - @solid-primitives/utils@7.0.0-next.3
+
 ## 3.0.0-next.1
 
 ### Patch Changes
