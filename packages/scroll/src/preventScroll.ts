@@ -21,13 +21,13 @@ export type CreatePreventScrollProps = {
   element?: MaybeAccessor<HTMLElement | undefined>;
   /** Whether scroll prevention is active. *Default = `true`* */
   enabled?: MaybeAccessor<boolean>;
-  /** Hide the `<body>` scrollbar while active. *Default = `true`* */
+  /** Hide the document scrollbar while active. *Default = `true`* */
   hideScrollbar?: MaybeAccessor<boolean>;
-  /** Add padding/margin to `<body>` to compensate for the hidden scrollbar. *Default = `true`* */
+  /** Add padding/margin to document element to compensate for the hidden scrollbar. *Default = `true`* */
   preventScrollbarShift?: MaybeAccessor<boolean>;
   /** Whether to use `padding` or `margin` for the scrollbar shift compensation. *Default = `"padding"`* */
   preventScrollbarShiftMode?: MaybeAccessor<"padding" | "margin">;
-  /** Restore `<body>` scroll position via `window.scrollTo` when disabled to avoid layout shift. *Default = `true`* */
+  /** Restore scroll position via `window.scrollTo` when disabled to avoid layout shift. *Default = `true`* */
   restoreScrollPosition?: MaybeAccessor<boolean>;
   /** Allow two-finger pinch-zoom gestures. *Default = `false`* */
   allowPinchZoom?: MaybeAccessor<boolean>;
@@ -47,7 +47,7 @@ type ActiveStyle = {
 
 type PreventScrollRegistry = {
   stack: Signal<string[]>;
-  activeBodyStyles: Map<string, ActiveStyle>;
+  activeDocumentStyles: Map<string, ActiveStyle>;
   /** Shared across duplicate package copies so instance ids never collide on the shared stack. */
   nextId: number;
 };
@@ -55,7 +55,7 @@ type PreventScrollRegistry = {
 const getRegistry = (): PreventScrollRegistry =>
   globalRegistry<PreventScrollRegistry>("@solid-primitives/scroll:prevent-scroll", () => ({
     stack: createSignal<string[]>([], { ownedWrite: true }),
-    activeBodyStyles: new Map(),
+    activeDocumentStyles: new Map(),
     nextId: 0,
   }));
 
@@ -64,24 +64,24 @@ const isActive = (id: string): boolean => {
   return stack.length > 0 && stack[stack.length - 1] === id;
 };
 
-function applyBodyStyle(
+function applyDocumentStyle(
   key: string,
   element: HTMLElement,
   style: Partial<CSSStyleDeclaration>,
   properties: { key: string; value: string }[],
 ): () => void {
-  const activeBodyStyles = getRegistry().activeBodyStyles;
+  const activeDocumentStyles = getRegistry().activeDocumentStyles;
 
   const originalStyles: Partial<CSSStyleDeclaration> = {};
   for (const k in style) {
     originalStyles[k] = element.style[k as keyof CSSStyleDeclaration] as string;
   }
 
-  const existing = activeBodyStyles.get(key);
+  const existing = activeDocumentStyles.get(key);
   if (existing) {
     existing.activeCount++;
   } else {
-    activeBodyStyles.set(key, {
+    activeDocumentStyles.set(key, {
       activeCount: 1,
       originalStyles,
       properties: properties.map(p => p.key),
@@ -94,13 +94,13 @@ function applyBodyStyle(
   }
 
   return () => {
-    const active = activeBodyStyles.get(key);
+    const active = activeDocumentStyles.get(key);
     if (!active) return;
     if (active.activeCount !== 1) {
       active.activeCount--;
       return;
     }
-    activeBodyStyles.delete(key);
+    activeDocumentStyles.delete(key);
 
     for (const [k, v] of Object.entries(active.originalStyles)) {
       (element.style as any)[k] = v;
@@ -226,8 +226,8 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
     }) => {
       if (!enabled || !hideScrollbar) return;
 
-      const { body } = document;
-      const scrollbarWidth = window.innerWidth - body.offsetWidth;
+      const { documentElement } = document;
+      const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
       const offsetTop = window.scrollY;
       const offsetLeft = window.scrollX;
 
@@ -236,14 +236,14 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
 
       if (preventScrollbarShift && scrollbarWidth > 0) {
         if (preventScrollbarShiftMode === "padding") {
-          style.paddingRight = `calc(${window.getComputedStyle(body).paddingRight} + ${scrollbarWidth}px)`;
+          style.paddingRight = `calc(${window.getComputedStyle(documentElement).paddingRight} + ${scrollbarWidth}px)`;
         } else {
-          style.marginRight = `calc(${window.getComputedStyle(body).marginRight} + ${scrollbarWidth}px)`;
+          style.marginRight = `calc(${window.getComputedStyle(documentElement).marginRight} + ${scrollbarWidth}px)`;
         }
         properties.push({ key: "--scrollbar-width", value: `${scrollbarWidth}px` });
       }
 
-      const restoreStyle = applyBodyStyle("prevent-scroll", body, style, properties);
+      const restoreStyle = applyDocumentStyle("prevent-scroll", documentElement, style, properties);
 
       return () => {
         restoreStyle();
