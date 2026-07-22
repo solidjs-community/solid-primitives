@@ -177,6 +177,7 @@
     "orientation-initial",
     "page-utilities-solid2-migration",
     "pagination-aria-labels",
+    "pagination-remove-dead-directive-augmentation",
     "pagination-solid2-migration",
     "platform-solid2-migration",
     "pointer-solid2-migration",
