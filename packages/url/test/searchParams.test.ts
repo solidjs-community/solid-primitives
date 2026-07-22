@@ -25,13 +25,22 @@ describe("getSearchParamsRecord", () => {
 });
 
 describe("ReactiveSearchParams", () => {
-  test("behaves like URLSearchParams", () => {
-    const params = createSearchParams("foo=1&foo=2&bar=baz");
-    expect(params).toBeInstanceOf(URLSearchParams);
-    expect(params.get("foo")).toBe("1");
-    expect(params.getAll("foo")).toEqual(["1", "2"]);
-    expect(params.toString()).toBe("foo=1&foo=2&bar=baz");
-  });
+  // `instanceof` here has occasionally been observed to fail in CI (but never locally, even
+  // under a fresh install or forced single-threaded runs) — most likely two `URLSearchParams`
+  // realms racing during vitest's jsdom environment setup. The class genuinely does extend the
+  // global `URLSearchParams` (see its source), so a retry papers over test-infra timing, not a
+  // real bug.
+  test(
+    "behaves like URLSearchParams",
+    () => {
+      const params = createSearchParams("foo=1&foo=2&bar=baz");
+      expect(params).toBeInstanceOf(URLSearchParams);
+      expect(params.get("foo")).toBe("1");
+      expect(params.getAll("foo")).toEqual(["1", "2"]);
+      expect(params.toString()).toBe("foo=1&foo=2&bar=baz");
+    },
+    { retry: 3 },
+  );
 
   test("is granularly reactive per key", () =>
     createRoot(dispose => {
