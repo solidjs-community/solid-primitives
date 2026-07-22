@@ -361,16 +361,6 @@ export const createPagination = (
   return [paginationProps, page, setPage];
 };
 
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      infiniteScrollLoader: boolean;
-    }
-  }
-}
-
-export type _E = JSX.Element;
-
 /** A single page's async fetch, gated independently of every other page. */
 export type InfiniteScrollPage<T> = {
   /** the fetched items for this page — read inside `<Loading>`/`<Errored>` to gate a subtree on it */
