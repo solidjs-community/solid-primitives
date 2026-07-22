@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 5.0.0-next.3
+
+### Patch Changes
+
+- 673347c: Fixed a build failure in `messageSync` and `wsSync`: their `url` parameter's default value (`globalThis.location?.href`) lacked an explicit type annotation, which `--isolatedDeclarations` (used by the package's `.d.ts` generation) requires on any parameter whose type can't be trivially inferred. No behavior or API changes — `url` is still `string | undefined`.
+
 ## 5.0.0-next.2
 
 ### Patch Changes
