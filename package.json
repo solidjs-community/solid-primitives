@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@babel/core": "catalog:",
+    "@babel/preset-typescript": "^7.27.1",
     "@changesets/cli": "^2.31.0",
     "@nothing-but/node-resolve-ts": "^1.0.1",
     "@solid-primitives/a11y": "workspace:*",

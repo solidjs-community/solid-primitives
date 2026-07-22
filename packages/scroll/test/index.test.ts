@@ -70,34 +70,34 @@ describe("createScrollPosition", () => {
 
 describe("createPreventScroll", () => {
   beforeEach(() => {
-    document.body.removeAttribute("style");
+    document.documentElement.removeAttribute("style");
     vi.stubGlobal("scrollTo", vi.fn());
   });
 
   afterEach(() => {
-    document.body.removeAttribute("style");
+    document.documentElement.removeAttribute("style");
     vi.unstubAllGlobals();
   });
 
-  it("sets overflow:hidden on body when enabled", () =>
+  it("sets overflow:hidden on documentElement when enabled", () =>
     createRoot(dispose => {
       createPreventScroll();
       flush();
 
-      expect(document.body.style.overflow).toBe("hidden");
+      expect(document.documentElement.style.overflow).toBe("hidden");
 
       dispose();
     }));
 
-  it("restores body style on cleanup", () =>
+  it("restores documentElement style on cleanup", () =>
     createRoot(dispose => {
       createPreventScroll();
       flush();
 
-      expect(document.body.style.overflow).toBe("hidden");
+      expect(document.documentElement.style.overflow).toBe("hidden");
 
       dispose();
-      expect(document.body.style.overflow).toBe("");
+      expect(document.documentElement.style.overflow).toBe("");
     }));
 
   it("does not set overflow when hideScrollbar is false", () =>
@@ -105,7 +105,7 @@ describe("createPreventScroll", () => {
       createPreventScroll({ hideScrollbar: false });
       flush();
 
-      expect(document.body.style.overflow).not.toBe("hidden");
+      expect(document.documentElement.style.overflow).not.toBe("hidden");
 
       dispose();
     }));
@@ -115,7 +115,7 @@ describe("createPreventScroll", () => {
       createPreventScroll({ enabled: false });
       flush();
 
-      expect(document.body.style.overflow).not.toBe("hidden");
+      expect(document.documentElement.style.overflow).not.toBe("hidden");
 
       dispose();
     }));
@@ -126,15 +126,15 @@ describe("createPreventScroll", () => {
       createPreventScroll({ enabled });
       flush();
 
-      expect(document.body.style.overflow).not.toBe("hidden");
+      expect(document.documentElement.style.overflow).not.toBe("hidden");
 
       setEnabled(true);
       flush();
-      expect(document.body.style.overflow).toBe("hidden");
+      expect(document.documentElement.style.overflow).toBe("hidden");
 
       setEnabled(false);
       flush();
-      expect(document.body.style.overflow).not.toBe("hidden");
+      expect(document.documentElement.style.overflow).not.toBe("hidden");
 
       dispose();
     }));
@@ -232,20 +232,20 @@ describe("createPreventScroll", () => {
         flush();
 
         // Both instances active; second is on top
-        expect(document.body.style.overflow).toBe("hidden");
+        expect(document.documentElement.style.overflow).toBe("hidden");
 
         dispose2();
       });
 
       flush();
-      // First instance should still keep body locked
-      expect(document.body.style.overflow).toBe("hidden");
+      // First instance should still keep documentElement locked
+      expect(document.documentElement.style.overflow).toBe("hidden");
 
       addSpy.mockRestore();
       dispose1();
     }));
 
-  it("restores body style only after all stacked instances clean up", () =>
+  it("restores documentElement style only after all stacked instances clean up", () =>
     createRoot(dispose1 => {
       createPreventScroll();
       flush();
@@ -256,14 +256,14 @@ describe("createPreventScroll", () => {
         return dispose2;
       });
 
-      expect(document.body.style.overflow).toBe("hidden");
+      expect(document.documentElement.style.overflow).toBe("hidden");
 
       cleanup2();
       flush();
       // First instance still active
-      expect(document.body.style.overflow).toBe("hidden");
+      expect(document.documentElement.style.overflow).toBe("hidden");
 
       dispose1();
-      expect(document.body.style.overflow).toBe("");
+      expect(document.documentElement.style.overflow).toBe("");
     }));
 });

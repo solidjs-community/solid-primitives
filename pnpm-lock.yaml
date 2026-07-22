@@ -39,6 +39,9 @@ importers:
       '@babel/core':
         specifier: 'catalog:'
         version: 7.29.7
+      '@babel/preset-typescript':
+        specifier: ^7.27.1
+        version: 7.27.1(@babel/core@7.29.7)
       '@changesets/cli':
         specifier: ^2.31.0
         version: 2.31.0(@types/node@22.20.0)
