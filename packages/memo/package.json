@@ -26,7 +26,7 @@
       "createReducer"
     ],
     "category": "Reactivity",
-    "gzip": 844
+    "gzip": 845
   },
   "private": false,
   "sideEffects": false,

@@ -16,7 +16,7 @@
       "createServerPlugin"
     ],
     "category": "Utilities",
-    "gzip": 1863
+    "gzip": 1862
   },
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/analytics#readme",
