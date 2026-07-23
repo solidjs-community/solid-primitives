@@ -10,17 +10,17 @@ catalogs:
       specifier: ^7.29.7
       version: 7.29.7
     '@solidjs/signals':
-      specifier: 2.0.0-beta.20
-      version: 2.0.0-beta.20
+      specifier: 2.0.0-beta.24
+      version: 2.0.0-beta.24
     '@solidjs/web':
-      specifier: 2.0.0-beta.20
-      version: 2.0.0-beta.20
+      specifier: 2.0.0-beta.24
+      version: 2.0.0-beta.24
     babel-preset-solid:
-      specifier: 2.0.0-beta.20
-      version: 2.0.0-beta.20
+      specifier: 2.0.0-beta.24
+      version: 2.0.0-beta.24
     solid-js:
-      specifier: 2.0.0-beta.20
-      version: 2.0.0-beta.20
+      specifier: 2.0.0-beta.24
+      version: 2.0.0-beta.24
     tsdown:
       specifier: ^0.22.3
       version: 0.22.3
@@ -53,10 +53,10 @@ importers:
         version: link:packages/a11y
       '@solidjs/signals':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@storybook/addon-docs':
         specifier: ^10.4.6
         version: 10.5.2(@types/react@19.2.15)(esbuild@0.28.1)(rollup@4.61.0)(storybook@10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
@@ -77,7 +77,7 @@ importers:
         version: 8.62.1(eslint@9.28.0(jiti@2.7.0))(typescript@7.0.2)
       babel-preset-solid:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(@babel/core@7.29.7)(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(@babel/core@7.29.7)(solid-js@2.0.0-beta.24)
       esbuild:
         specifier: ^0.28.1
         version: 0.28.1
@@ -119,13 +119,13 @@ importers:
         version: 4.0.1
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
       storybook:
         specifier: ^10.4.6
         version: 10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       storybook-solidjs-vite:
         specifier: ^10.5.2
-        version: 10.5.2(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(esbuild@0.28.1)(rollup@4.61.0)(solid-js@2.0.0-beta.20)(storybook@10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@7.0.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 10.5.2(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(esbuild@0.28.1)(rollup@4.61.0)(solid-js@2.0.0-beta.24)(storybook@10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@7.0.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       tsdown:
         specifier: 'catalog:'
         version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@7.0.2)
@@ -134,13 +134,13 @@ importers:
         version: 7.0.2
       unplugin-solid:
         specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       vite:
         specifier: ^6.4.3
         version: 6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
       vite-plugin-solid:
         specifier: 3.0.0-next.5
-        version: 3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.20.0)(jsdom@25.0.1)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)
@@ -153,10 +153,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/active-element:
     dependencies:
@@ -169,10 +169,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/analytics:
     dependencies:
@@ -187,20 +187,20 @@ importers:
         version: link:../utils
       '@tanstack/start':
         specifier: '*'
-        version: 1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)
+        version: 1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/async:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/audio:
     dependencies:
@@ -213,10 +213,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/bounds:
     dependencies:
@@ -232,19 +232,19 @@ importers:
         version: link:../scheduled
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/broadcast-channel:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/clipboard:
     dependencies:
@@ -254,10 +254,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/connectivity:
     dependencies:
@@ -273,19 +273,19 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/context:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/controlled-props:
     dependencies:
@@ -295,10 +295,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/controlled-signal:
     dependencies:
@@ -308,16 +308,16 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/cookies:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/cursor:
     dependencies:
@@ -327,10 +327,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/date:
     dependencies:
@@ -343,13 +343,13 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/db-store:
     dependencies:
@@ -372,10 +372,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/destructure:
     dependencies:
@@ -385,16 +385,16 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/devices:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/event-bus:
     dependencies:
@@ -404,16 +404,16 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/event-dispatcher:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/event-listener:
     dependencies:
@@ -423,16 +423,16 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/event-props:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/fetch:
     dependencies:
@@ -448,7 +448,7 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@tauri-apps/api':
         specifier: ^1.6.0
         version: 1.6.0
@@ -460,13 +460,13 @@ importers:
         version: 3.6.0
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/flux-store:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/focus:
     dependencies:
@@ -479,10 +479,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/form:
     dependencies:
@@ -498,10 +498,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/fullscreen:
     dependencies:
@@ -514,10 +514,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/geolocation:
     dependencies:
@@ -530,7 +530,7 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@types/leaflet':
         specifier: ^1.9.21
         version: 1.9.21
@@ -539,13 +539,13 @@ importers:
         version: 1.9.4
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/gestures:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/graphql:
     dependencies:
@@ -586,25 +586,25 @@ importers:
         version: link:../deep
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/i18n:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
       tsdown:
         specifier: 'catalog:'
         version: 0.22.3(oxc-resolver@11.20.0)(tsx@4.20.2)(typescript@6.0.3)
       unplugin-solid:
         specifier: 'catalog:'
-        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
   packages/idle:
     dependencies:
@@ -614,10 +614,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/immutable:
     dependencies:
@@ -645,7 +645,7 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/interaction:
     dependencies:
@@ -655,10 +655,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/intersection-observer:
     dependencies:
@@ -671,10 +671,10 @@ importers:
         version: link:../range
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/jsx-tokenizer:
     dependencies:
@@ -684,10 +684,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/keyboard:
     dependencies:
@@ -703,10 +703,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/keyed:
     devDependencies:
@@ -715,19 +715,19 @@ importers:
         version: link:../utils
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/lifecycle:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/list:
     dependencies:
@@ -737,10 +737,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/list-state:
     dependencies:
@@ -750,10 +750,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/map:
     dependencies:
@@ -763,16 +763,16 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/marker:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/masonry:
     dependencies:
@@ -785,16 +785,16 @@ importers:
         version: link:../media
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/match:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/media:
     dependencies:
@@ -813,10 +813,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/mediastream:
     dependencies:
@@ -826,10 +826,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/memo:
     dependencies:
@@ -839,10 +839,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/mouse:
     dependencies:
@@ -864,19 +864,19 @@ importers:
         version: link:../raf
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/mutable:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/mutation-observer:
     dependencies:
@@ -886,10 +886,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/notification:
     dependencies:
@@ -902,10 +902,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/orientation:
     dependencies:
@@ -915,10 +915,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/page-utilities:
     dependencies:
@@ -934,10 +934,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/pagination:
     dependencies:
@@ -947,28 +947,28 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/permission:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/platform:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/pointer:
     dependencies:
@@ -984,10 +984,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/presence:
     dependencies:
@@ -997,7 +997,7 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/promise:
     dependencies:
@@ -1007,7 +1007,7 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/props:
     dependencies:
@@ -1017,10 +1017,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/queue:
     dependencies:
@@ -1030,7 +1030,7 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/raf:
     dependencies:
@@ -1040,10 +1040,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/range:
     dependencies:
@@ -1053,10 +1053,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/refs:
     dependencies:
@@ -1066,13 +1066,13 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
       solid-transition-group:
         specifier: ^0.2.3
-        version: 0.2.3(solid-js@2.0.0-beta.20)
+        version: 0.2.3(solid-js@2.0.0-beta.24)
 
   packages/resize-observer:
     dependencies:
@@ -1091,10 +1091,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/resource:
     devDependencies:
@@ -1110,10 +1110,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/scheduled:
     devDependencies:
@@ -1125,19 +1125,19 @@ importers:
         version: link:../timer
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/script-loader:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/scroll:
     dependencies:
@@ -1156,10 +1156,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/selection:
     dependencies:
@@ -1172,22 +1172,22 @@ importers:
         version: 7.29.7
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       babel-preset-solid:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(@babel/core@7.29.7)(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(@babel/core@7.29.7)(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/sensors:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/set:
     dependencies:
@@ -1197,10 +1197,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/share:
     devDependencies:
@@ -1209,10 +1209,10 @@ importers:
         version: link:../utils
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/signal-builders:
     dependencies:
@@ -1222,7 +1222,7 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/spring:
     devDependencies:
@@ -1231,10 +1231,10 @@ importers:
         version: link:../utils
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/sse:
     dependencies:
@@ -1244,10 +1244,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/state-machine:
     dependencies:
@@ -1257,7 +1257,7 @@ importers:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/static-store:
     dependencies:
@@ -1267,10 +1267,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/storage:
     dependencies:
@@ -1283,10 +1283,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/styles:
     dependencies:
@@ -1299,19 +1299,19 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/timer:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/transition-group:
     dependencies:
@@ -1321,10 +1321,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/trigger:
     dependencies:
@@ -1334,19 +1334,19 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/tween:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/upload:
     dependencies:
@@ -1356,10 +1356,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/url:
     dependencies:
@@ -1381,19 +1381,19 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/utils:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/vibrate:
     dependencies:
@@ -1403,10 +1403,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/video:
     dependencies:
@@ -1419,10 +1419,10 @@ importers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/virtual:
     dependencies:
@@ -1435,28 +1435,28 @@ importers:
         version: 7.29.7
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       babel-preset-solid:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(@babel/core@7.29.7)(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(@babel/core@7.29.7)(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/websocket:
     devDependencies:
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   packages/workers:
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-beta.20
+        version: 2.0.0-beta.24
 
   site:
     dependencies:
@@ -1513,13 +1513,13 @@ importers:
         version: link:../packages/utils
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@tanstack/solid-router':
         specifier: 2.0.0-beta.23
-        version: 2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)
+        version: 2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)
       '@tanstack/solid-start':
         specifier: 2.0.0-beta.24
-        version: 2.0.0-beta.24(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 2.0.0-beta.24(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -1580,7 +1580,7 @@ importers:
         version: 8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
       vite-plugin-solid:
         specifier: 3.0.0-next.5
-        version: 3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
 
 packages:
 
@@ -2049,8 +2049,8 @@ packages:
   '@deno/shim-deno@0.19.2':
     resolution: {integrity: sha512-q3VTHl44ad8T2Tw2SpeAvghdGOjlnLPDNO2cpOxwMrBE/PVas6geWpbpIgrM+czOCH0yejp0yi8OaTuB+NU40Q==}
 
-  '@dom-expressions/babel-plugin-jsx@0.50.0-next.23':
-    resolution: {integrity: sha512-IZm2XgupVdIqsV0iZi1U9RYucEF54c//8L20UbPOBvQehy5zysrHKiZWKffj1BgxuFbNDgrnCBeZDkSdYyWR2Q==}
+  '@dom-expressions/babel-plugin-jsx@0.50.0-next.25':
+    resolution: {integrity: sha512-ofFtSBj+cTHahndMNZrIXrNPxrrKk95U/2pY8zllAtPdHZRwOTYf86KCMcQ/i+muIpAIKsCcvI4p8A0B6ENzzw==}
     peerDependencies:
       '@babel/core': ^7.20.12
 
@@ -4589,13 +4589,13 @@ packages:
     peerDependencies:
       solid-js: '>=1.8.4'
 
-  '@solidjs/signals@2.0.0-beta.20':
-    resolution: {integrity: sha512-9fs7Bf9rkOeWQqHBPmt2wyEPo3TloRRJQ2yrqH7HOyYAHsUXicdL8334P0aUFwEK0teOIFeyEqBVAX8BHkKhDw==}
+  '@solidjs/signals@2.0.0-beta.24':
+    resolution: {integrity: sha512-0rFHBM8JuEUT7qM3sQ9NWBLIZAutxCm5zA9ZfrdiAuoiXVkq1JQi/lGQg2KSk7fwinprbolDYXMim5uEN1uF2Q==}
 
-  '@solidjs/web@2.0.0-beta.20':
-    resolution: {integrity: sha512-2vnMYjuBpxjblYreC6KtgJbt6/Ssp1ZQKXUVBpRnH0Q6U705tBbkvcqf3ZThY2ycZWNUHkFC86Ab6Mu2eu5t7Q==}
+  '@solidjs/web@2.0.0-beta.24':
+    resolution: {integrity: sha512-fzvAma4iUaMuEk6SEXiQW2LcXzqdcJoI6WyjxsPuxFO6P2Y5fqby5eGbjVwXfbns9x7ElAnt+7LN9z7UayW3Fg==}
     peerDependencies:
-      solid-js: ^2.0.0-beta.20
+      solid-js: ^2.0.0-beta.24
 
   '@speed-highlight/core@1.2.15':
     resolution: {integrity: sha512-BMq1K3DsElxDWawkX6eLg9+CKJrTVGCBAWVuHXVUV2u0s2711qiChLSId6ikYPfxhdYocLNt3wWwSvDiTvFabw==}
@@ -5634,11 +5634,11 @@ packages:
       solid-js:
         optional: true
 
-  babel-preset-solid@2.0.0-beta.20:
-    resolution: {integrity: sha512-VkTmqPjFeWJgTJ8Uk3ZgLgpMJrGEqVLFXL7y2hLD1MwpQptpqhQMk8JlU9EshM6O1+9rZVL0fKrLE+MRiMELPA==}
+  babel-preset-solid@2.0.0-beta.24:
+    resolution: {integrity: sha512-zwSTDaZaonM7sdkOIUU6V2WUWDD4+vmLrDM1Mv7C7LD+IhGKOmGQru7Ec8X52af7aT1zk514SCktvCh3OAdiDQ==}
     peerDependencies:
       '@babel/core': ^7.0.0
-      solid-js: ^2.0.0-beta.20
+      solid-js: ^2.0.0-beta.24
     peerDependenciesMeta:
       solid-js:
         optional: true
@@ -8679,8 +8679,8 @@ packages:
   solid-js@1.9.7:
     resolution: {integrity: sha512-/saTKi8iWEM233n5OSi1YHCCuh66ZIQ7aK2hsToPe4tqGm7qAejU1SwNuTPivbWAYq7SjuHVVYxxuZQNRbICiw==}
 
-  solid-js@2.0.0-beta.20:
-    resolution: {integrity: sha512-QmlzwzPJ27sSruYBKgv8EBwvqezTum1Z8aEUOcqAQF80UJYRJLQmzu44zuwVNBrcf/0FYGuh5w9ASv9YXPZxFw==}
+  solid-js@2.0.0-beta.24:
+    resolution: {integrity: sha512-J+NrvXiTKMxm3GMtH/k6NWPB4CMyY/t0KwQVwTXD2SjBAAf1RWA8kKjDIUp4Be1IOGW+2q8bUrRxDMrxu9iyTA==}
 
   solid-refresh@0.7.8:
     resolution: {integrity: sha512-iG442T3HXJp5jEebCy8okETrWnmX7CnxNOKrJQVeufh6WXSn+xtLXaptUXXMHTWcRqTJOJwQ8UwzxrRtVFSIzA==}
@@ -10353,7 +10353,7 @@ snapshots:
       '@deno/shim-deno-test': 0.5.0
       which: 4.0.0
 
-  '@dom-expressions/babel-plugin-jsx@0.50.0-next.23(@babel/core@7.29.7)':
+  '@dom-expressions/babel-plugin-jsx@0.50.0-next.25(@babel/core@7.29.7)':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/helper-module-imports': 7.18.6
@@ -12341,142 +12341,142 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-  '@solid-devtools/debugger@0.28.1(solid-js@2.0.0-beta.20)':
+  '@solid-devtools/debugger@0.28.1(solid-js@2.0.0-beta.24)':
     dependencies:
       '@nothing-but/utils': 0.17.0
-      '@solid-devtools/shared': 0.20.0(solid-js@2.0.0-beta.20)
-      '@solid-primitives/bounds': 0.1.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/keyboard': 1.3.7(solid-js@2.0.0-beta.20)
-      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/scheduled': 1.5.3(solid-js@2.0.0-beta.20)
-      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-devtools/shared': 0.20.0(solid-js@2.0.0-beta.24)
+      '@solid-primitives/bounds': 0.1.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/keyboard': 1.3.7(solid-js@2.0.0-beta.24)
+      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/scheduled': 1.5.3(solid-js@2.0.0-beta.24)
+      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-devtools/logger@0.9.11(solid-js@2.0.0-beta.20)':
+  '@solid-devtools/logger@0.9.11(solid-js@2.0.0-beta.24)':
     dependencies:
       '@nothing-but/utils': 0.17.0
-      '@solid-devtools/debugger': 0.28.1(solid-js@2.0.0-beta.20)
-      '@solid-devtools/shared': 0.20.0(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-devtools/debugger': 0.28.1(solid-js@2.0.0-beta.24)
+      '@solid-devtools/shared': 0.20.0(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-devtools/shared@0.20.0(solid-js@2.0.0-beta.20)':
+  '@solid-devtools/shared@0.20.0(solid-js@2.0.0-beta.24)':
     dependencies:
       '@nothing-but/utils': 0.17.0
-      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/media': 2.3.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/refs': 1.1.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/scheduled': 1.5.3(solid-js@2.0.0-beta.20)
-      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/styles': 0.1.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/media': 2.3.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/refs': 1.1.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/scheduled': 1.5.3(solid-js@2.0.0-beta.24)
+      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/styles': 0.1.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/bounds@0.1.6(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/bounds@0.1.6(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/resize-observer': 2.1.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/resize-observer': 2.1.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/event-listener@2.4.6(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/event-listener@2.4.6(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/keyboard@1.3.7(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/keyboard@1.3.7(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/media@2.3.6(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/media@2.3.6(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
   '@solid-primitives/refs@1.0.8(solid-js@1.9.7)':
     dependencies:
       '@solid-primitives/utils': 6.2.3(solid-js@1.9.7)
       solid-js: 1.9.7
 
-  '@solid-primitives/refs@1.0.8(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/refs@1.0.8(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/utils': 6.2.3(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/refs@1.1.4(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/refs@1.1.4(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/resize-observer@2.1.6(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/resize-observer@2.1.6(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.20)
-      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/event-listener': 2.4.6(solid-js@2.0.0-beta.24)
+      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/static-store': 0.1.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/rootless@1.5.4(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/rootless@1.5.4(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/scheduled@1.5.3(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/scheduled@1.5.3(solid-js@2.0.0-beta.24)':
     dependencies:
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/static-store@0.1.4(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/static-store@0.1.4(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/styles@0.1.4(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/styles@0.1.4(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.20)
-      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/rootless': 1.5.4(solid-js@2.0.0-beta.24)
+      '@solid-primitives/utils': 6.4.1(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
   '@solid-primitives/transition-group@1.0.5(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
 
-  '@solid-primitives/transition-group@1.0.5(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/transition-group@1.0.5(solid-js@2.0.0-beta.24)':
     dependencies:
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
   '@solid-primitives/utils@6.2.3(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
 
-  '@solid-primitives/utils@6.2.3(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/utils@6.2.3(solid-js@2.0.0-beta.24)':
     dependencies:
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  '@solid-primitives/utils@6.4.1(solid-js@2.0.0-beta.20)':
+  '@solid-primitives/utils@6.4.1(solid-js@2.0.0-beta.24)':
     dependencies:
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  '@solidjs/meta@0.29.4(solid-js@2.0.0-beta.20)':
+  '@solidjs/meta@0.29.4(solid-js@2.0.0-beta.24)':
     dependencies:
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  '@solidjs/signals@2.0.0-beta.20': {}
+  '@solidjs/signals@2.0.0-beta.24': {}
 
-  '@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20)':
+  '@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24)':
     dependencies:
       seroval: 1.5.4
       seroval-plugins: 1.5.4(seroval@1.5.4)
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
   '@speed-highlight/core@1.2.15': {}
 
@@ -12646,9 +12646,9 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@tanstack/react-start-plugin@1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@tanstack/react-start-plugin@1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
-      '@tanstack/start-plugin-core': 1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      '@tanstack/start-plugin-core': 1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@vitejs/plugin-react': 4.7.0(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       pathe: 2.0.3
       vite: 6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
@@ -12831,7 +12831,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/router-plugin@1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@tanstack/router-plugin@1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-syntax-jsx': 7.27.1(@babel/core@7.29.7)
@@ -12850,11 +12850,11 @@ snapshots:
     optionalDependencies:
       '@tanstack/react-router': 1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       vite: 6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
-      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/router-plugin@1.168.18(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@tanstack/router-plugin@1.168.18(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/template': 7.29.7
@@ -12867,11 +12867,11 @@ snapshots:
       zod: 4.4.3
     optionalDependencies:
       vite: 8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
-      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/router-plugin@1.168.19(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@tanstack/router-plugin@1.168.19(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/template': 7.29.7
@@ -12885,7 +12885,7 @@ snapshots:
     optionalDependencies:
       '@tanstack/react-router': 1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       vite: 6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
-      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -12958,46 +12958,46 @@ snapshots:
       - supports-color
       - vite
 
-  '@tanstack/solid-router@2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)':
+  '@tanstack/solid-router@2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solid-devtools/logger': 0.9.11(solid-js@2.0.0-beta.20)
-      '@solid-primitives/refs': 1.1.4(solid-js@2.0.0-beta.20)
-      '@solidjs/meta': 0.29.4(solid-js@2.0.0-beta.20)
-      '@solidjs/web': 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+      '@solid-devtools/logger': 0.9.11(solid-js@2.0.0-beta.24)
+      '@solid-primitives/refs': 1.1.4(solid-js@2.0.0-beta.24)
+      '@solidjs/meta': 0.29.4(solid-js@2.0.0-beta.24)
+      '@solidjs/web': 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@tanstack/history': 1.162.0
       '@tanstack/router-core': 1.171.13
       isbot: 5.1.44
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  '@tanstack/solid-start-client@2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)':
+  '@tanstack/solid-start-client@2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solidjs/web': 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+      '@solidjs/web': 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@tanstack/router-core': 1.171.13
-      '@tanstack/solid-router': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)
+      '@tanstack/solid-router': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)
       '@tanstack/start-client-core': 1.170.12
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  '@tanstack/solid-start-server@2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)':
+  '@tanstack/solid-start-server@2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)':
     dependencies:
-      '@solidjs/web': 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+      '@solidjs/web': 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@tanstack/router-core': 1.171.13
-      '@tanstack/solid-router': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)
+      '@tanstack/solid-router': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)
       '@tanstack/start-server-core': 1.169.14
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
     transitivePeerDependencies:
       - crossws
 
-  '@tanstack/solid-start@2.0.0-beta.24(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@tanstack/solid-start@2.0.0-beta.24(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
-      '@solidjs/web': 2.0.0-beta.20(solid-js@2.0.0-beta.20)
-      '@tanstack/solid-router': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)
-      '@tanstack/solid-start-client': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)
-      '@tanstack/solid-start-server': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(solid-js@2.0.0-beta.20)
+      '@solidjs/web': 2.0.0-beta.24(solid-js@2.0.0-beta.24)
+      '@tanstack/solid-router': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)
+      '@tanstack/solid-start-client': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)
+      '@tanstack/solid-start-server': 2.0.0-beta.23(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(solid-js@2.0.0-beta.24)
       '@tanstack/start-client-core': 1.170.12
-      '@tanstack/start-plugin-core': 1.171.17(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      '@tanstack/start-plugin-core': 1.171.17(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/start-server-core': 1.169.14
       pathe: 2.0.3
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
     optionalDependencies:
       vite: 8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
     transitivePeerDependencies:
@@ -13082,12 +13082,12 @@ snapshots:
       '@tanstack/start-storage-context': 1.167.10
       seroval: 1.5.4
 
-  '@tanstack/start-config@1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)':
+  '@tanstack/start-config@1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)':
     dependencies:
       '@tanstack/react-router': 1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-start-plugin': 1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      '@tanstack/react-start-plugin': 1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/router-generator': 1.167.17
-      '@tanstack/router-plugin': 1.168.19(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      '@tanstack/router-plugin': 1.168.19(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/server-functions-plugin': 1.142.1(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/start-server-functions-handler': 1.120.19
       '@vitejs/plugin-react': 4.7.0(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
@@ -13152,14 +13152,14 @@ snapshots:
 
   '@tanstack/start-fn-stubs@1.162.0': {}
 
-  '@tanstack/start-plugin-core@1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@tanstack/start-plugin-core@1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(oxc-parser@0.127.0)(rolldown@1.1.4)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
       '@babel/code-frame': 7.26.2
       '@babel/core': 7.29.7
       '@babel/types': 7.29.7
       '@tanstack/router-core': 1.131.50
       '@tanstack/router-generator': 1.131.50
-      '@tanstack/router-plugin': 1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      '@tanstack/router-plugin': 1.131.50(@tanstack/react-router@1.170.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/router-utils': 1.131.2
       '@tanstack/server-functions-plugin': 1.131.2(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/start-server-core': 1.131.50
@@ -13212,14 +13212,14 @@ snapshots:
       - webpack
       - xml2js
 
-  '@tanstack/start-plugin-core@1.171.17(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@tanstack/start-plugin-core@1.171.17(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/core': 7.29.7
       '@babel/types': 7.29.7
       '@tanstack/router-core': 1.171.13
       '@tanstack/router-generator': 1.167.17
-      '@tanstack/router-plugin': 1.168.18(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      '@tanstack/router-plugin': 1.168.18(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/router-utils': 1.162.2
       '@tanstack/start-server-core': 1.169.14
       exsolve: 1.0.8
@@ -13333,13 +13333,13 @@ snapshots:
     dependencies:
       '@tanstack/router-core': 1.171.13
 
-  '@tanstack/start@1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)':
+  '@tanstack/start@1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)':
     dependencies:
       '@tanstack/react-start-client': 1.168.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-start-router-manifest': 1.120.19(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
       '@tanstack/react-start-server': 1.167.13(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/start-api-routes': 1.120.19(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
-      '@tanstack/start-config': 1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)
+      '@tanstack/start-config': 1.120.20(@types/node@22.20.0)(db0@0.3.4)(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(oxc-parser@0.127.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.4)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))(yaml@2.5.0)
       '@tanstack/start-server-functions-client': 1.131.50(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@tanstack/start-server-functions-handler': 1.120.19
       '@tanstack/start-server-functions-server': 1.131.2(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
@@ -14087,19 +14087,19 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  babel-preset-solid@1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.20):
+  babel-preset-solid@1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.24):
     dependencies:
       '@babel/core': 7.29.7
       babel-plugin-jsx-dom-expressions: 0.40.7(@babel/core@7.29.7)
     optionalDependencies:
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  babel-preset-solid@2.0.0-beta.20(@babel/core@7.29.7)(solid-js@2.0.0-beta.20):
+  babel-preset-solid@2.0.0-beta.24(@babel/core@7.29.7)(solid-js@2.0.0-beta.24):
     dependencies:
       '@babel/core': 7.29.7
-      '@dom-expressions/babel-plugin-jsx': 0.50.0-next.23(@babel/core@7.29.7)
+      '@dom-expressions/babel-plugin-jsx': 0.50.0-next.25(@babel/core@7.29.7)
     optionalDependencies:
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
   bail@2.0.2: {}
 
@@ -17581,24 +17581,24 @@ snapshots:
       seroval: 1.3.2
       seroval-plugins: 1.3.2(seroval@1.3.2)
 
-  solid-js@2.0.0-beta.20:
+  solid-js@2.0.0-beta.24:
     dependencies:
-      '@solidjs/signals': 2.0.0-beta.20
+      '@solidjs/signals': 2.0.0-beta.24
       csstype: 3.2.3
       seroval: 1.5.4
       seroval-plugins: 1.5.4(seroval@1.5.4)
 
-  solid-refresh@0.7.8(solid-js@2.0.0-beta.20):
+  solid-refresh@0.7.8(solid-js@2.0.0-beta.24):
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/types': 7.29.7
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
-  solid-refresh@0.8.0-next.7(solid-js@2.0.0-beta.20):
+  solid-refresh@0.8.0-next.7(solid-js@2.0.0-beta.24):
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/types': 7.29.7
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
 
   solid-transition-group@0.2.3(solid-js@1.9.7):
     dependencies:
@@ -17606,11 +17606,11 @@ snapshots:
       '@solid-primitives/transition-group': 1.0.5(solid-js@1.9.7)
       solid-js: 1.9.7
 
-  solid-transition-group@0.2.3(solid-js@2.0.0-beta.20):
+  solid-transition-group@0.2.3(solid-js@2.0.0-beta.24):
     dependencies:
-      '@solid-primitives/refs': 1.0.8(solid-js@2.0.0-beta.20)
-      '@solid-primitives/transition-group': 1.0.5(solid-js@2.0.0-beta.20)
-      solid-js: 2.0.0-beta.20
+      '@solid-primitives/refs': 1.0.8(solid-js@2.0.0-beta.24)
+      '@solid-primitives/transition-group': 1.0.5(solid-js@2.0.0-beta.24)
+      solid-js: 2.0.0-beta.24
 
   source-map-js@1.2.1: {}
 
@@ -17648,19 +17648,19 @@ snapshots:
 
   std-env@4.1.0: {}
 
-  storybook-solidjs-vite@10.5.2(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(esbuild@0.28.1)(rollup@4.61.0)(solid-js@2.0.0-beta.20)(storybook@10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@7.0.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
+  storybook-solidjs-vite@10.5.2(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(esbuild@0.28.1)(rollup@4.61.0)(solid-js@2.0.0-beta.24)(storybook@10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@7.0.2)(vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
     dependencies:
       '@storybook/builder-vite': 10.4.4(esbuild@0.28.1)(rollup@4.61.0)(storybook@10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
       '@storybook/global': 5.0.0
       '@volar/language-core': 2.4.28
       '@volar/typescript': 2.4.28
       semver: 7.8.1
-      solid-js: 2.0.0-beta.20
+      solid-js: 2.0.0-beta.24
       storybook: 10.5.2(@types/react@19.2.15)(prettier@3.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       vite: 6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
-      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
+      vite-plugin-solid: 3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     optionalDependencies:
-      '@solidjs/web': 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+      '@solidjs/web': 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       typescript: 7.0.2
     transitivePeerDependencies:
       - esbuild
@@ -18212,14 +18212,14 @@ snapshots:
     dependencies:
       normalize-path: 2.1.1
 
-  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
+  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
     dependencies:
       '@babel/core': 7.29.7
       '@rollup/pluginutils': 5.4.0(rollup@4.61.0)
-      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.20)
+      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.24)
       merge-anything: 6.0.6
-      solid-js: 2.0.0-beta.20
-      solid-refresh: 0.7.8(solid-js@2.0.0-beta.20)
+      solid-js: 2.0.0-beta.24
+      solid-refresh: 0.7.8(solid-js@2.0.0-beta.24)
       unplugin: 2.3.11
       vitefu: 1.1.3(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
@@ -18227,14 +18227,14 @@ snapshots:
       - supports-color
       - vite
 
-  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
+  unplugin-solid@1.0.0(rollup@4.61.0)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
     dependencies:
       '@babel/core': 7.29.7
       '@rollup/pluginutils': 5.4.0(rollup@4.61.0)
-      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.20)
+      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@2.0.0-beta.24)
       merge-anything: 6.0.6
-      solid-js: 2.0.0-beta.20
-      solid-refresh: 0.7.8(solid-js@2.0.0-beta.20)
+      solid-js: 2.0.0-beta.24
+      solid-refresh: 0.7.8(solid-js@2.0.0-beta.24)
       unplugin: 2.3.11
       vitefu: 1.1.3(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
@@ -18446,15 +18446,15 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
+  vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
     dependencies:
       '@babel/core': 7.29.7
-      '@solidjs/web': 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+      '@solidjs/web': 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@types/babel__core': 7.20.5
-      babel-preset-solid: 2.0.0-beta.20(@babel/core@7.29.7)(solid-js@2.0.0-beta.20)
+      babel-preset-solid: 2.0.0-beta.24(@babel/core@7.29.7)(solid-js@2.0.0-beta.24)
       merge-anything: 5.1.7
-      solid-js: 2.0.0-beta.20
-      solid-refresh: 0.8.0-next.7(solid-js@2.0.0-beta.20)
+      solid-js: 2.0.0-beta.24
+      solid-refresh: 0.8.0-next.7(solid-js@2.0.0-beta.24)
       vite: 6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
       vitefu: 1.1.3(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     optionalDependencies:
@@ -18462,15 +18462,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.20(solid-js@2.0.0-beta.20))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.20)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
+  vite-plugin-solid@3.0.0-next.5(@solidjs/web@2.0.0-beta.24(solid-js@2.0.0-beta.24))(@testing-library/jest-dom@6.9.1)(solid-js@2.0.0-beta.24)(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)):
     dependencies:
       '@babel/core': 7.29.7
-      '@solidjs/web': 2.0.0-beta.20(solid-js@2.0.0-beta.20)
+      '@solidjs/web': 2.0.0-beta.24(solid-js@2.0.0-beta.24)
       '@types/babel__core': 7.20.5
-      babel-preset-solid: 2.0.0-beta.20(@babel/core@7.29.7)(solid-js@2.0.0-beta.20)
+      babel-preset-solid: 2.0.0-beta.24(@babel/core@7.29.7)(solid-js@2.0.0-beta.24)
       merge-anything: 5.1.7
-      solid-js: 2.0.0-beta.20
-      solid-refresh: 0.8.0-next.7(solid-js@2.0.0-beta.20)
+      solid-js: 2.0.0-beta.24
+      solid-refresh: 0.8.0-next.7(solid-js@2.0.0-beta.24)
       vite: 8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0)
       vitefu: 1.1.3(vite@8.1.3(@types/node@22.20.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(tsx@4.20.2)(yaml@2.5.0))
     optionalDependencies:
