@@ -25,7 +25,10 @@ export type ResizeHandler<T extends Element = Element> = (
 ) => void;
 
 export type Size = { width: number; height: number };
-export type NullableSize = { width: number; height: number } | { width: null; height: null };
+type SizeWithClient = Size & { clientWidth: number; clientHeight: number };
+export type NullableSize =
+  | SizeWithClient
+  | { width: null; height: null; clientWidth: null; clientHeight: null };
 
 /**
  * Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
@@ -139,7 +142,12 @@ export function createWindowSize(): Readonly<Size> {
 export const useWindowSize: typeof createWindowSize =
   /*#__PURE__*/ createHydratableSingletonRoot(createWindowSize);
 
-const ELEMENT_SIZE_FALLBACK = { width: null, height: null } as const satisfies NullableSize;
+const ELEMENT_SIZE_FALLBACK = {
+  width: null,
+  height: null,
+  clientWidth: null,
+  clientHeight: null,
+} as const satisfies NullableSize;
 
 /**
  * @param target html element
@@ -150,7 +158,8 @@ export function getElementSize(target: Element | false | undefined | null): Null
     return { ...ELEMENT_SIZE_FALLBACK };
   }
   const { width, height } = target.getBoundingClientRect();
-  return { width, height };
+  const { clientWidth, clientHeight } = target;
+  return { width, height, clientWidth, clientHeight };
 }
 
 /**
@@ -163,7 +172,7 @@ export function getElementSize(target: Element | false | undefined | null): Null
  *   console.log(size.width, size.height)
  * })
  */
-export function createElementSize(target: Element): Readonly<Size>;
+export function createElementSize(target: Element): SizeWithClient;
 export function createElementSize(
   target: Accessor<Element | false | undefined | null>,
 ): Readonly<NullableSize>;
