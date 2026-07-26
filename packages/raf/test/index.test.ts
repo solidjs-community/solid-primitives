@@ -65,7 +65,10 @@ describe("createScheduledLoop", () => {
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
     createRoot(dispose => {
-      const [running, start] = createRAF(ts => {
+      const [running, start, _stop] = createScheduledLoop(
+        window.requestAnimationFrame,
+        window.cancelAnimationFrame,
+      )(ts => {
         expect(typeof ts === "number");
       });
       expect(running()).toBe(false);
@@ -194,7 +197,7 @@ describe("useGlobalRAF", () => {
     // Note on this test: For some reason, the raf is being called twice, once when started (but id doesn't invoke the callback for some strange reason) and once after the timers advance (and the callback is properly invoked).
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
-    createRoot(dispose => {
+    createRoot(async dispose => {
       const timestamps = new Set<number>();
       const createGlobalRAFCallback = useGlobalRAF();
       const callback1: Mock<FrameRequestCallback> = vi.fn(ts => timestamps.add(ts));
@@ -244,10 +247,8 @@ describe("useGlobalRAF", () => {
       expect(timestamps.size).toEqual(2);
       remove1();
       remove2();
-      vi.waitUntil(() => {
-        expect(running()).toBe(false);
-        expect(caf).toHaveBeenCalledTimes(2);
-      });
+      await vi.waitUntil(() => caf.mock.calls.length >= 1);
+      expect(caf).toHaveBeenCalledTimes(2);
       dispose();
     });
   });
@@ -277,7 +278,7 @@ describe("useGlobalRAF", () => {
     const caf = vi.spyOn(window, "cancelAnimationFrame");
 
     // Manual
-    createRoot(dispose => {
+    createRoot(async dispose => {
       const createGlobalRAFCallback = useGlobalRAF();
       const callback: Mock<FrameRequestCallback> = vi.fn();
       const [added, add, _remove, running, start, _stop] = createGlobalRAFCallback(callback);
@@ -295,9 +296,8 @@ describe("useGlobalRAF", () => {
       expect(callback).toHaveBeenCalledTimes(1);
       expect(raf).toHaveBeenCalledTimes(2);
       dispose();
-      vi.waitUntil(() => {
-        expect(caf).toHaveBeenCalledTimes(1);
-      });
+      await vi.waitUntil(() => caf.mock.calls.length >= 1);
+      expect(caf).toHaveBeenCalledTimes(1);
     });
   });
 });

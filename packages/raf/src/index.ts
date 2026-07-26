@@ -38,7 +38,10 @@ function createRAF(
   };
   const stop = () => {
     setRunning(false);
-    if (requestID !== null) cancelAnimationFrame(requestID);
+    if (requestID !== null) {
+      cancelAnimationFrame(requestID);
+      requestID = null;
+    }
   };
 
   onCleanup(stop);
@@ -168,7 +171,10 @@ function createScheduledLoop<
     };
     const stop = () => {
       setRunning(false);
-      if (requestID !== null) cancel(requestID);
+      if (requestID !== null) {
+        cancel(requestID);
+        requestID = null;
+      }
     };
 
     onCleanup(stop);
