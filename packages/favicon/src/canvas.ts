@@ -1,8 +1,8 @@
 import { type Accessor, createEffect, createSignal, onCleanup, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { access, INTERNAL_OPTIONS, type MaybeAccessor } from "@solid-primitives/utils";
+import { access, INTERNAL_OPTIONS, type MaybeAccessor, noop } from "@solid-primitives/utils";
 import { makeFavicon } from "./favicon.ts";
-import type { FaviconOptions } from "./link.ts";
+import type { FaviconController, FaviconOptions } from "./link.ts";
 
 /** Loads `src` into an `Image`, resolving once it's decoded (or rejecting on error). */
 export function loadImage(src: string): Promise<HTMLImageElement> {
@@ -40,6 +40,35 @@ export async function drawBaseIcon(
   ctx.drawImage(img, 0, 0, size, size);
 
   return { canvas, ctx, size };
+}
+
+/**
+ * Wraps a `make*` canvas-overlay primitive's fire-and-forget render: applies `render`'s result
+ * via `favicon.setHref` once it settles, unless `dispose()` has already run by then — otherwise a
+ * badge/progress draw that resolves after disposal would re-add a removed favicon `<link>`, or
+ * overwrite the previous href `dispose()` just restored, with a stale composite. `render` itself
+ * already falls back to the plain `href` on any internal failure (see `drawBaseIcon`), so a
+ * rejection here is unexpected; treated the same as "leave the current href alone" rather than
+ * risk an unhandled rejection.
+ */
+export function guardAsyncRender(
+  favicon: FaviconController,
+  render: Promise<string>,
+): FaviconController {
+  let disposed = false;
+  render.then(dataUrl => {
+    if (!disposed) favicon.setHref(dataUrl);
+  }, noop);
+  return {
+    get href() {
+      return favicon.href;
+    },
+    setHref: favicon.setHref,
+    dispose() {
+      disposed = true;
+      favicon.dispose();
+    },
+  };
 }
 
 /**

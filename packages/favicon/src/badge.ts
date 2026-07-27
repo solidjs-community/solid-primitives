@@ -2,7 +2,7 @@ import type { Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { type MaybeAccessor, noop } from "@solid-primitives/utils";
 import { makeFavicon } from "./favicon.ts";
-import { createCanvasFavicon, drawBaseIcon } from "./canvas.ts";
+import { createCanvasFavicon, drawBaseIcon, guardAsyncRender } from "./canvas.ts";
 import type { FaviconController, FaviconOptions } from "./link.ts";
 
 export type FaviconBadgeValue = number | string | boolean | undefined;
@@ -104,8 +104,7 @@ export function makeFaviconBadge(
   }
 
   const favicon = makeFavicon(href, options);
-  void renderBadgeIcon(href, value, options).then(dataUrl => favicon.setHref(dataUrl));
-  return favicon;
+  return guardAsyncRender(favicon, renderBadgeIcon(href, value, options));
 }
 
 /**

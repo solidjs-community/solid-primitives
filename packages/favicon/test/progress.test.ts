@@ -87,6 +87,21 @@ describe("makeFaviconProgress", () => {
     expect(document.head.querySelector('link[rel="icon"]')).toBeNull();
   });
 
+  test("a draw that resolves after dispose does not clobber the restored favicon", async () => {
+    const existing = document.createElement("link");
+    existing.rel = "icon";
+    existing.href = "/previous.png";
+    document.head.appendChild(existing);
+
+    const favicon = makeFaviconProgress(baseHref, 40);
+    favicon.dispose(); // dispose before the async draw (still in flight) has settled
+    await flushMicrotasks();
+
+    expect(document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href).toBe(
+      new URL("/previous.png", location.href).href,
+    );
+  });
+
   test("respects custom trackColor and color", async () => {
     const favicon = makeFaviconProgress(baseHref, 40, {
       trackColor: "#222222",
