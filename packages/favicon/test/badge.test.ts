@@ -140,12 +140,16 @@ describe("createFaviconBadge", () => {
 
   test("applies the initial badge and restores on cleanup", async () => {
     let href!: () => string;
-    createRoot(dispose => {
+    let dispose!: () => void;
+    createRoot(d => {
+      dispose = d;
       href = createFaviconBadge(baseHref, 5);
-      return dispose;
     });
     await flushMicrotasks();
     expect(href()).toContain("text=5");
+
+    dispose();
+    expect(document.head.querySelector('link[rel="icon"]')).toBeNull();
   });
 
   test("redraws when the value accessor changes", async () => {
