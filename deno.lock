@@ -3757,7 +3757,7 @@
       "integrity": "sha512-rD5t5DwOjJdmSORcTq64j8MawTC+tbQ+HHqjR4NDumamy/ambn1UJrlKL+KdwujWxMkFjPM3pPHOEA9tl4767Q==",
       "dependencies": [
         "browserslist",
-        "caniuse-lite@1.0.30001800",
+        "caniuse-lite",
         "fraction.js",
         "picocolors@1.1.1",
         "postcss@8.5.16",
@@ -3769,7 +3769,7 @@
       "integrity": "sha512-eM9d/swFopRt5gdJ7jrpCwgvEMIayITpojhkkSMRsFHYuH5bkSQ4p/9qTEHtmNudUZh22Tehu7I6CxAW0IXTKA==",
       "dependencies": [
         "browserslist",
-        "caniuse-lite@1.0.30001800",
+        "caniuse-lite",
         "normalize-range",
         "num2fraction",
         "picocolors@0.2.1",
@@ -3879,7 +3879,7 @@
       "integrity": "sha512-FQBYNK15VMslhLHpA7+n+n1GOlF1kId2xcCg7/j95f24AOF6VDYMNH4mFxF7KuaTdv627faazpOAjFzMrfJOUw==",
       "dependencies": [
         "baseline-browser-mapping",
-        "caniuse-lite@1.0.30001806",
+        "caniuse-lite",
         "electron-to-chromium",
         "node-releases",
         "update-browserslist-db"
@@ -3927,9 +3927,6 @@
     },
     "camelcase-css@2.0.1": {
       "integrity": "sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA=="
-    },
-    "caniuse-lite@1.0.30001800": {
-      "integrity": "sha512-MMHtuAz9Ys840zAY5F4k6fV5GaivZ9sPk+nz0mY+GYVzRBnYkN0mpqkSR92oWRQ19yQWo4HvBV/FnC16AJX8MA=="
     },
     "caniuse-lite@1.0.30001806": {
       "integrity": "sha512-72Cuvd95zbSYPKq6Fhg8eDJRlzgWDf7/mtoZv6Qe/DYNCEBdNxoA3+rZAU2ZhGCpZlns3EssFavaZomckT5Uuw=="
@@ -5992,7 +5989,6 @@
         "@next/env",
         "@swc/helpers",
         "baseline-browser-mapping",
-        "caniuse-lite@1.0.30001800",
         "postcss@8.4.31",
         "react",
         "react-dom",
@@ -8182,6 +8178,14 @@
       "packages/event-props": {
         "packageJson": {
           "dependencies": [
+            "npm:solid-js@2.0.0-beta.20"
+          ]
+        }
+      },
+      "packages/favicon": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@solidjs/web@2.0.0-beta.20",
             "npm:solid-js@2.0.0-beta.20"
           ]
         }
