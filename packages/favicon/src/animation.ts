@@ -185,7 +185,11 @@ export function createFaviconAnimation(
         list = newList;
         setFrame(0);
         favicon.setHref(list[0] ?? "");
-        if (untrack(playing) && list.length <= 1) pause();
+        if (list.length <= 1) {
+          if (untrack(playing)) pause();
+        } else if (autoplay && !untrack(playing)) {
+          play();
+        }
       },
       { defer: true },
     );

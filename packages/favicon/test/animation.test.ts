@@ -152,6 +152,50 @@ describe("createFaviconAnimation", () => {
     dispose();
   });
 
+  test("shrinking to one frame pauses; growing back past one resumes when autoplay is set", () => {
+    const [list, setList] = createSignal<readonly string[]>(frames);
+    const { spinner, dispose } = createRoot(dispose => ({
+      spinner: createFaviconAnimation(list, { interval: 100 }),
+      dispose,
+    }));
+    flush();
+    expect(spinner.playing()).toBe(true);
+
+    setList(["/solo.png"]);
+    flush();
+    expect(spinner.playing()).toBe(false);
+
+    vi.advanceTimersByTime(300);
+    flush();
+    expect(spinner.frame()).toBe(0); // no interval running while at one frame
+
+    setList(["/x.png", "/y.png"]);
+    flush();
+    expect(spinner.playing()).toBe(true);
+
+    vi.advanceTimersByTime(100);
+    flush();
+    expect(spinner.frame()).toBe(1);
+
+    dispose();
+  });
+
+  test("growing past one frame does not autoplay when autoplay is false", () => {
+    const [list, setList] = createSignal<readonly string[]>(["/solo.png"]);
+    const { spinner, dispose } = createRoot(dispose => ({
+      spinner: createFaviconAnimation(list, { interval: 100, autoplay: false }),
+      dispose,
+    }));
+    flush();
+    expect(spinner.playing()).toBe(false);
+
+    setList(["/x.png", "/y.png"]);
+    flush();
+    expect(spinner.playing()).toBe(false);
+
+    dispose();
+  });
+
   test("auto-pauses on visibilitychange when hidden, resumes when visible", () => {
     const { spinner, dispose } = createRoot(dispose => ({
       spinner: createFaviconAnimation(frames, { interval: 100 }),

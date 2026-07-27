@@ -1,19 +1,22 @@
 import "./setup.js";
 import { createRoot, createSignal, flush } from "solid-js";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { makeFaviconBadge, createFaviconBadge } from "../src/index.js";
+import { installCanvasMock, installImageMock } from "./setup.js";
 
 const baseHref = "/base.png";
 
-/**
- * Lets the load-image microtask, the async draw chain, and its `.then` settle. Waits for a real
- * macrotask boundary rather than a fixed count of microtask ticks — the render pipeline is
- * entirely microtask-driven, and every microtask queued anywhere (including by unrelated
- * concurrently-running test files when this suite runs as part of the full monorepo test run) is
- * guaranteed to drain before a `setTimeout` callback fires, so this can't under-flush under
- * contention the way a fixed tick count can.
- */
-const flushMicrotasks = (): Promise<void> => new Promise(resolve => setTimeout(resolve, 0));
+/** Lets the load-image microtask, the async draw chain, and its `.then` settle. */
+const flushMicrotasks = async (times = 10): Promise<void> => {
+  for (let i = 0; i < times; i++) await Promise.resolve();
+};
+
+// Re-installed per test: see the module doc in `setup.ts` for why this file can't rely on that
+// module's own import-time side effects alone.
+beforeEach(() => {
+  installCanvasMock();
+  installImageMock();
+});
 
 afterEach(() => {
   document.head.querySelectorAll('link[rel="icon"]').forEach(el => el.remove());

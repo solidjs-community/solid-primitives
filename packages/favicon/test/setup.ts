@@ -4,6 +4,17 @@
  * returns a fake context that records every draw call onto the canvas instance, `toDataURL()`
  * derives a stable string from that call log, and `HTMLImageElement`'s `src` setter schedules a
  * microtask that fires `load` (or `error` for a `"error:"`-prefixed src) instead of doing nothing.
+ *
+ * All of these are installed both once at import time (below) *and* exported as idempotent
+ * `install*` functions that `badge.test.ts`/`progress.test.ts`/`scheme.test.ts` re-run in their
+ * own `beforeEach`. That's not redundant: under the monorepo's shared, non-isolated
+ * (`isolate: false`) test run, this module's top-level side effects don't reliably re-run for
+ * every file that imports it — some files get a cached module instance whose one-time patching
+ * never touched *their* live globals, silently leaving `HTMLImageElement`/`HTMLCanvasElement`
+ * unmocked (confirmed by instrumentation: `img.src` sets never dispatched `load`/`error` at all,
+ * so the render promise chain hung forever instead of resolving or rejecting). Calling the
+ * exported functions explicitly re-applies the patch to whatever globals are live *right now*,
+ * regardless of whether this module's own top-level code happened to run for this file.
  */
 
 export type CanvasOp = { type: string; args: unknown[] };
@@ -54,65 +65,78 @@ class MockContext2D {
   }
 }
 
-HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, id: string) {
-  if (id !== "2d") return null;
-  this._ops ??= [];
-  return new MockContext2D(this) as unknown as CanvasRenderingContext2D;
-} as typeof HTMLCanvasElement.prototype.getContext;
+/** Installs the `HTMLCanvasElement.prototype.getContext`/`toDataURL` mocks. Idempotent. */
+export function installCanvasMock(): void {
+  HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, id: string) {
+    if (id !== "2d") return null;
+    this._ops ??= [];
+    return new MockContext2D(this) as unknown as CanvasRenderingContext2D;
+  } as typeof HTMLCanvasElement.prototype.getContext;
 
-HTMLCanvasElement.prototype.toDataURL = function (this: HTMLCanvasElement) {
-  const ops = this._ops ?? [];
-  const hasBadge = ops.some(op => op.type === "arc") && ops.some(op => op.type === "fill");
-  const fillTextOp = ops.find(op => op.type === "fillText");
-  const text = fillTextOp ? String(fillTextOp.args[0]) : "";
-  const fillOp = ops.find(op => op.type === "fill");
-  const color = fillOp ? String(fillOp.args[0]) : "";
+  HTMLCanvasElement.prototype.toDataURL = function (this: HTMLCanvasElement) {
+    const ops = this._ops ?? [];
+    const hasBadge = ops.some(op => op.type === "arc") && ops.some(op => op.type === "fill");
+    const fillTextOp = ops.find(op => op.type === "fillText");
+    const text = fillTextOp ? String(fillTextOp.args[0]) : "";
+    const fillOp = ops.find(op => op.type === "fill");
+    const color = fillOp ? String(fillOp.args[0]) : "";
 
-  const strokeOps = ops.filter(op => op.type === "stroke");
-  const hasRing = strokeOps.length > 0;
-  // First stroke is always the track; a second (only drawn when progress > 0) is the arc.
-  const trackColor = strokeOps.length > 0 ? String(strokeOps[0]!.args[0]) : "";
-  const ringColor = strokeOps.length > 0 ? String(strokeOps[strokeOps.length - 1]!.args[0]) : "";
-  const arcOps = ops.filter(op => op.type === "arc");
-  const lastEndAngle = arcOps.length > 0 ? String(arcOps[arcOps.length - 1]!.args[4]) : "";
-  // The badge circle's center — lets tests distinguish `position` corners (progress always
-  // centers its ring, so this is only meaningful for badge's output).
-  const firstArc = arcOps[0];
-  const arcX = firstArc ? String(firstArc.args[0]) : "";
-  const arcY = firstArc ? String(firstArc.args[1]) : "";
-  // Which base image this draw actually used — otherwise two draws of the same value/progress
-  // onto different base hrefs produce byte-identical mock output, masking a redraw that never
-  // happened.
-  const drawImageOp = ops.find(op => op.type === "drawImage");
-  const src = drawImageOp ? String(drawImageOp.args[0]) : "";
+    const strokeOps = ops.filter(op => op.type === "stroke");
+    const hasRing = strokeOps.length > 0;
+    // First stroke is always the track; a second (only drawn when progress > 0) is the arc.
+    const trackColor = strokeOps.length > 0 ? String(strokeOps[0]!.args[0]) : "";
+    const ringColor = strokeOps.length > 0 ? String(strokeOps[strokeOps.length - 1]!.args[0]) : "";
+    const arcOps = ops.filter(op => op.type === "arc");
+    const lastEndAngle = arcOps.length > 0 ? String(arcOps[arcOps.length - 1]!.args[4]) : "";
+    // The badge circle's center — lets tests distinguish `position` corners (progress always
+    // centers its ring, so this is only meaningful for badge's output).
+    const firstArc = arcOps[0];
+    const arcX = firstArc ? String(firstArc.args[0]) : "";
+    const arcY = firstArc ? String(firstArc.args[1]) : "";
+    // Which base image this draw actually used — otherwise two draws of the same value/progress
+    // onto different base hrefs produce byte-identical mock output, masking a redraw that never
+    // happened.
+    const drawImageOp = ops.find(op => op.type === "drawImage");
+    const src = drawImageOp ? String(drawImageOp.args[0]) : "";
 
-  return (
-    `data:mock;w=${this.width};h=${this.height};badge=${hasBadge};text=${text};color=${color};` +
-    `ring=${hasRing};trackColor=${trackColor};ringColor=${ringColor};arcs=${arcOps.length};` +
-    `endAngle=${lastEndAngle};arcX=${arcX};arcY=${arcY};src=${src}`
-  );
-};
+    return (
+      `data:mock;w=${this.width};h=${this.height};badge=${hasBadge};text=${text};color=${color};` +
+      `ring=${hasRing};trackColor=${trackColor};ringColor=${ringColor};arcs=${arcOps.length};` +
+      `endAngle=${lastEndAngle};arcX=${arcX};arcY=${arcY};src=${src}`
+    );
+  };
+}
+
+installCanvasMock();
 
 const nativeSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src")!;
 
-Object.defineProperty(HTMLImageElement.prototype, "src", {
-  configurable: true,
-  get(this: HTMLImageElement) {
-    return nativeSrcDescriptor.get!.call(this);
-  },
-  set(this: HTMLImageElement, value: string) {
-    nativeSrcDescriptor.set!.call(this, value);
-    queueMicrotask(() => {
-      if (value.startsWith("error:")) {
-        this.dispatchEvent(new Event("error"));
-        return;
-      }
-      Object.defineProperty(this, "naturalWidth", { value: 32, configurable: true });
-      Object.defineProperty(this, "naturalHeight", { value: 32, configurable: true });
-      this.dispatchEvent(new Event("load"));
-    });
-  },
-});
+/** Installs the `HTMLImageElement.prototype.src` load/error simulation mock. Idempotent. */
+export function installImageMock(): void {
+  Object.defineProperty(HTMLImageElement.prototype, "src", {
+    configurable: true,
+    get(this: HTMLImageElement) {
+      return nativeSrcDescriptor.get!.call(this);
+    },
+    set(this: HTMLImageElement, value: string) {
+      nativeSrcDescriptor.set!.call(this, value);
+      // `Promise.resolve().then(...)` rather than `queueMicrotask` — `animation.test.ts`
+      // (elsewhere in this suite) runs under `vi.useFakeTimers()`, which by default also fakes
+      // `queueMicrotask`; native promise scheduling isn't one of the globals fake timers replace.
+      Promise.resolve().then(() => {
+        if (value.startsWith("error:")) {
+          this.dispatchEvent(new Event("error"));
+          return;
+        }
+        Object.defineProperty(this, "naturalWidth", { value: 32, configurable: true });
+        Object.defineProperty(this, "naturalHeight", { value: 32, configurable: true });
+        this.dispatchEvent(new Event("load"));
+      });
+    },
+  });
+}
+
+installImageMock();
 
 /**
  * jsdom doesn't implement `matchMedia` at all. This mock tracks a `matches` flag per query string
