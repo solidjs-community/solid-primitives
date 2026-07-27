@@ -23,7 +23,9 @@ export type FaviconController = {
 export function bindFaviconLink(rel: FaviconRel, href: string): FaviconController {
   let link = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
   const created = link == null;
-  const previousHref = link?.href;
+  // The raw attribute, not the `.href` IDL property — the property resolves a missing attribute
+  // to `""` (a real, if empty, value), which would lose the "no href at all" case on restore.
+  const previousHref = link?.getAttribute("href") ?? undefined;
 
   if (!link) {
     link = document.createElement("link");
@@ -46,6 +48,8 @@ export function bindFaviconLink(rel: FaviconRel, href: string): FaviconControlle
         el.remove();
       } else if (previousHref !== undefined) {
         el.href = previousHref;
+      } else {
+        el.removeAttribute("href");
       }
     },
   };

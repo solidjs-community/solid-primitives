@@ -35,6 +35,20 @@ describe("makeFavicon", () => {
     existing.remove();
   });
 
+  test("reusing an attribute-less existing link restores it without an href on dispose", () => {
+    const existing = document.createElement("link");
+    existing.rel = "icon";
+    document.head.appendChild(existing);
+    expect(existing.hasAttribute("href")).toBe(false);
+
+    const favicon = makeFavicon("/new.png");
+    expect(existing.getAttribute("href")).toBe("/new.png");
+
+    favicon.dispose();
+    expect(existing.hasAttribute("href")).toBe(false);
+    existing.remove();
+  });
+
   test("setHref updates the link", () => {
     const favicon = makeFavicon("/a.png");
     favicon.setHref("/b.png");
