@@ -134,11 +134,22 @@ class MockMediaQueryList extends EventTarget implements MediaQueryList {
 const mediaQueryState = new Map<string, boolean>();
 const liveMediaQueries: MockMediaQueryList[] = [];
 
-window.matchMedia = ((query: string) => {
-  const mql = new MockMediaQueryList(query);
-  liveMediaQueries.push(mql);
-  return mql;
-}) as typeof window.matchMedia;
+/**
+ * Installs the `window.matchMedia` mock. Exported so `scheme.test.ts` can re-run it in a
+ * `beforeEach` — this file's other mocks are simple prototype overrides that no other package
+ * touches, but `window.matchMedia` is also assigned by other packages' test suites (`media`,
+ * `a11y`) sharing this same global in the monorepo's non-isolated (`isolate: false`) test run;
+ * re-installing per-test guards against whichever of them runs last in the shared worker.
+ */
+export function installMatchMediaMock(): void {
+  window.matchMedia = ((query: string) => {
+    const mql = new MockMediaQueryList(query);
+    liveMediaQueries.push(mql);
+    return mql;
+  }) as typeof window.matchMedia;
+}
+
+installMatchMediaMock();
 
 /** Test helper: simulate an OS/browser `prefers-color-scheme` change. */
 export function setPrefersColorScheme(scheme: "light" | "dark"): void {

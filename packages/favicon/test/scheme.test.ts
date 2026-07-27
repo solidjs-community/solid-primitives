@@ -2,11 +2,12 @@ import "./setup.js";
 import { createRoot, createSignal, flush } from "solid-js";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { makeFaviconScheme, createFaviconScheme } from "../src/index.js";
-import { setPrefersColorScheme } from "./setup.js";
+import { installMatchMediaMock, setPrefersColorScheme } from "./setup.js";
 
 const ICONS = { light: "/light.png", dark: "/dark.png" };
 
 beforeEach(() => {
+  installMatchMediaMock();
   setPrefersColorScheme("light");
 });
 

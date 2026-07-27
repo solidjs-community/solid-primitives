@@ -5,10 +5,15 @@ import { makeFaviconProgress, createFaviconProgress } from "../src/index.js";
 
 const baseHref = "/base.png";
 
-/** Lets the load-image microtask, the async draw chain, and its `.then` settle. */
-const flushMicrotasks = async (times = 6): Promise<void> => {
-  for (let i = 0; i < times; i++) await Promise.resolve();
-};
+/**
+ * Lets the load-image microtask, the async draw chain, and its `.then` settle. Waits for a real
+ * macrotask boundary rather than a fixed count of microtask ticks — the render pipeline is
+ * entirely microtask-driven, and every microtask queued anywhere (including by unrelated
+ * concurrently-running test files when this suite runs as part of the full monorepo test run) is
+ * guaranteed to drain before a `setTimeout` callback fires, so this can't under-flush under
+ * contention the way a fixed tick count can.
+ */
+const flushMicrotasks = (): Promise<void> => new Promise(resolve => setTimeout(resolve, 0));
 
 afterEach(() => {
   document.head.querySelectorAll('link[rel="icon"]').forEach(el => el.remove());
