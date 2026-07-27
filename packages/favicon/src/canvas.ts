@@ -101,14 +101,15 @@ export function createCanvasFavicon<Value, Options extends FaviconOptions>(
   let requestId = 0;
   const redraw = (h: string, v: Value): void => {
     const id = ++requestId;
-    void render(h, v, options).then(dataUrl => {
-      if (id !== requestId) return; // superseded by a more recent href/value change
+    render(h, v, options).then(dataUrl => {
+      if (id !== requestId) return; // superseded by a more recent href/value change, or disposed
       favicon.setHref(dataUrl);
       // Read back the DOM-resolved href (browsers resolve relative `href`s to absolute URLs)
       // rather than trusting `dataUrl` verbatim, so this always matches the non-reactive `make*`
       // variant's `.href` getter.
       setCurrent(favicon.href);
-    });
+    }, noop); // `render` already falls back to the plain href internally, so a rejection here is
+    // unexpected — nothing to apply beyond avoiding an unhandled rejection.
   };
 
   if (typeof href === "function" || typeof value === "function") {
@@ -120,7 +121,13 @@ export function createCanvasFavicon<Value, Options extends FaviconOptions>(
     redraw(href, value);
   }
 
-  onCleanup(favicon.dispose);
+  onCleanup(() => {
+    // Invalidate any redraw still in flight first, reusing the same `requestId` guard `redraw`
+    // checks above — otherwise a draw that settles after disposal could still call
+    // `favicon.setHref`/`setCurrent` on an already-disposed favicon/signal.
+    requestId++;
+    favicon.dispose();
+  });
 
   return current;
 }

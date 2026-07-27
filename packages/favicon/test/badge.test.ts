@@ -121,6 +121,23 @@ describe("makeFaviconBadge", () => {
 });
 
 describe("createFaviconBadge", () => {
+  test("a draw that resolves after dispose does not clobber the restored favicon", async () => {
+    const existing = document.createElement("link");
+    existing.rel = "icon";
+    existing.href = "/previous.png";
+    document.head.appendChild(existing);
+
+    createRoot(dispose => {
+      createFaviconBadge(baseHref, 5);
+      dispose(); // dispose before the async draw (still in flight) has settled
+    });
+    await flushMicrotasks();
+
+    expect(document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href).toBe(
+      new URL("/previous.png", location.href).href,
+    );
+  });
+
   test("applies the initial badge and restores on cleanup", async () => {
     let href!: () => string;
     createRoot(dispose => {

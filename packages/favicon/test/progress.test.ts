@@ -115,6 +115,23 @@ describe("makeFaviconProgress", () => {
 });
 
 describe("createFaviconProgress", () => {
+  test("a draw that resolves after dispose does not clobber the restored favicon", async () => {
+    const existing = document.createElement("link");
+    existing.rel = "icon";
+    existing.href = "/previous.png";
+    document.head.appendChild(existing);
+
+    createRoot(dispose => {
+      createFaviconProgress(baseHref, 40);
+      dispose(); // dispose before the async draw (still in flight) has settled
+    });
+    await flushMicrotasks();
+
+    expect(document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href).toBe(
+      new URL("/previous.png", location.href).href,
+    );
+  });
+
   test("applies the initial progress and restores on cleanup", async () => {
     let href!: () => string;
     createRoot(dispose => {
