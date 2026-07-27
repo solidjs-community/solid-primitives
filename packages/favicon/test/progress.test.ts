@@ -134,12 +134,16 @@ describe("createFaviconProgress", () => {
 
   test("applies the initial progress and restores on cleanup", async () => {
     let href!: () => string;
-    createRoot(dispose => {
+    let dispose!: () => void;
+    createRoot(d => {
+      dispose = d;
       href = createFaviconProgress(baseHref, 25);
-      return dispose;
     });
     await flushMicrotasks();
     expect(href()).toContain("ring=true");
+
+    dispose();
+    expect(document.head.querySelector('link[rel="icon"]')).toBeNull();
   });
 
   test("redraws when the progress accessor changes", async () => {
