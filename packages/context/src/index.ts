@@ -194,11 +194,11 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
 export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props: {
   values: {
     [K in keyof T]:
-    | readonly [
-      Context<T[K]> | ContextProviderComponent<T[K]>,
-      [T[K]][T extends unknown ? 0 : never],
-    ]
-    | FlowComponent;
+      | readonly [
+          Context<T[K]> | ContextProviderComponent<T[K]>,
+          [T[K]][T extends unknown ? 0 : never],
+        ]
+      | FlowComponent;
   };
   children: Element;
 }): Element {
