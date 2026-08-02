@@ -53,5 +53,14 @@ export const combine = <T>(...comparators: Comparator<T>[]): Comparator<T> => (a
   return 0;
 };
 
-/** Flips the order of any comparator (composes with {@link by} and {@link combine}). */
+/**
+ * Flips the order of any comparator (composes with {@link by} and {@link combine}).
+ *
+ * Swapping the arguments also flips where a missing-aware comparator like {@link ascending} puts
+ * `null`/`NaN` — its "always sort missing values last" logic is tied to argument order, not
+ * direction, so `reverse(ascending)` sorts them *first* instead (`undefined` is unaffected: the
+ * JS engine always places it last, never passing it to the comparator at all). Use
+ * {@link descending}, or a comparator that handles missing values explicitly, instead of
+ * `reverse(ascending)` when missing values must stay last.
+ */
 export const reverse = <T>(comparator: Comparator<T>): Comparator<T> => (a, b) => comparator(b, a);
