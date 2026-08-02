@@ -29,7 +29,8 @@
       "createFaviconProgress",
       "FaviconLink"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 2500
   },
   "keywords": [
     "solid",
