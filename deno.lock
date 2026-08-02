@@ -8651,14 +8651,6 @@
           ]
         }
       },
-      "packages/sortable": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@solidjs/web@2.0.0-beta.29",
-            "npm:solid-js@2.0.0-beta.29"
-          ]
-        }
-      },
       "packages/spring": {
         "packageJson": {
           "dependencies": [
