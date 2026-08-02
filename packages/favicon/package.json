@@ -1,0 +1,79 @@
+{
+  "name": "@solid-primitives/favicon",
+  "version": "0.0.100",
+  "description": "Reactive primitives for controlling the document favicon, including animated frame cycling and notification badges.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/favicon",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "favicon",
+    "stage": 2,
+    "list": [
+      "makeFavicon",
+      "createFavicon",
+      "makeFaviconAnimation",
+      "createFaviconAnimation",
+      "makeFaviconBadge",
+      "createFaviconBadge",
+      "makeFaviconScheme",
+      "createFaviconScheme",
+      "makeFaviconProgress",
+      "createFaviconProgress",
+      "FaviconLink"
+    ],
+    "category": "Browser APIs"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "favicon",
+    "icon"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
+  "scripts": {
+    "build": "pnpm -w build",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "devDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
+  }
+}

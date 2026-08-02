@@ -8182,6 +8182,14 @@
           ]
         }
       },
+      "packages/favicon": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@solidjs/web@2.0.0-beta.20",
+            "npm:solid-js@2.0.0-beta.20"
+          ]
+        }
+      },
       "packages/fetch": {
         "packageJson": {
           "dependencies": [

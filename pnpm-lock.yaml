@@ -32,6 +32,9 @@ overrides:
   react: 19.2.7
   react-dom: 19.2.7
 
+patchedDependencies:
+  storybook-solidjs-vite@10.5.2: 5f26b4cdff9127b151770f5c4d3163ddc74e7e57f4506f48627d52541fd64c9e
+
 importers:
 
   .:
@@ -433,6 +436,22 @@ importers:
       solid-js:
         specifier: 'catalog:'
         version: 2.0.0-beta.26
+
+  packages/favicon:
+    dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.24(solid-js@2.0.0-beta.24)
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-beta.24
 
   packages/fetch:
     dependencies:
