@@ -6,6 +6,7 @@ import {
   createFocusSignal,
   makeFocusListener,
   createFocusTrap,
+  createFocusGroup,
 } from "@solid-primitives/focus";
 import readme from "../README.md?raw";
 import {
@@ -308,3 +309,86 @@ export const CustomInitialFocus = meta.story({
     );
   },
 });
+
+export const ArrowKeyNavigation = meta.story({
+  name: "Arrow-key focus navigation",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createFocusGroup(ref)` returns an imperative manager whose `focusNext` / `focusPrevious` / `focusFirst` / `focusLast` methods move focus between the focusable children of the container. This is the building block for arrow-key navigation in menus, listboxes and toolbars. Here ArrowDown/ArrowUp wrap around the group, Home/End jump to the ends.",
+      },
+    },
+  },
+  render: () => {
+    const [ref, setRef] = createSignal<HTMLElement>();
+    const [focusedLabel, setFocusedLabel] = createSignal("One");
+
+    const manager = createFocusGroup(ref, () => ({ wrap: true }));
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      let next: HTMLElement | undefined;
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        next = manager.focusNext();
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        next = manager.focusPrevious();
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        next = manager.focusFirst();
+      } else if (event.key === "End") {
+        event.preventDefault();
+        next = manager.focusLast();
+      }
+      if (next) {
+        setFocusedLabel(next.getAttribute("aria-label") ?? "Unknown");
+      }
+    };
+
+    return (
+      <Container width={320}>
+        <div
+          ref={setRef}
+          onKeyDown={onKeyDown}
+          role="listbox"
+          aria-label="Focus group"
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.5rem",
+            background: "white",
+            border: `1px solid ${colors.border}`,
+            "border-radius": radii.lg,
+            padding: "1rem",
+          }}
+        >
+          <MenuItem label="One" />
+          <MenuItem label="Two" />
+          <MenuItem label="Three" />
+        </div>
+        <BoolRow label="Focused item" value={focusedLabel()} />
+        <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
+          Focus an item, then use <Kbd>ArrowDown</Kbd> / <Kbd>ArrowUp</Kbd> to cycle with wrap,{" "}
+          <Kbd>Home</Kbd> / <Kbd>End</Kbd> to jump.
+        </p>
+      </Container>
+    );
+  },
+});
+
+function MenuItem(props: { label: string }) {
+  return (
+    <button
+      role="option"
+      aria-label={props.label}
+      style={{
+        ...inputStyle,
+        "text-align": "left",
+        cursor: "pointer",
+      }}
+    >
+      {props.label}
+    </button>
+  );
+}

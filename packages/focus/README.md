@@ -17,6 +17,7 @@ The native `autofocus` attribute only works on page load, which makes it incompa
 - [`createAutofocus`](#createautofocus) - Reactive primitive to autofocus an element on render.
 - [`createFocusTrap`](#createfocustrap) - Traps focus inside a given DOM element.
 - [`createFocusRestore`](#createfocusrestore) - Restores focus to the previously focused element, without trapping.
+- [`createFocusGroup`](#createfocusgroup) - Imperatively moves focus between the focusable elements of a container.
 
 ## Installation
 
@@ -174,16 +175,85 @@ const Popover: Component<{ open: boolean }> = props => {
 
 ### Props
 
-| Prop                | Type                               | Default                    | Description                                                             |
-| ------------------- | ----------------------------------- | -------------------------- | ------------------------------------------------------------------------ |
+| Prop                | Type                               | Default                    | Description                                                            |
+| ------------------- | ---------------------------------- | -------------------------- | ---------------------------------------------------------------------- |
 | `enabled`           | `MaybeAccessor<boolean>`           | `true`                     | Whether focus-restore is active.                                       |
 | `element`           | `MaybeAccessor<HTMLElement\|null>` | `document.body`            | Element to dispatch the `onFinalFocus` event on.                       |
 | `finalFocusElement` | `MaybeAccessor<HTMLElement\|null>` | Previously focused element | Element to focus when deactivated.                                     |
 | `onFinalFocus`      | `(event: Event) => void`           | —                          | Callback when focus restores. Call `event.preventDefault()` to cancel. |
 
+## `createFocusGroup`
+
+`createFocusGroup` creates a [FocusGroup](#focusgroup) that imperatively moves focus between the focusable elements of a container — e.g. arrow-key navigation in a menu, listbox or toolbar. It walks the DOM with a `TreeWalker`, either restricting itself to tabbable elements or considering everything focusable.
+
+> Ported from [kobalte](https://kobalte.dev)'s `createFocusManager`, which is based on [react-spectrum](https://react-spectrum.adobe.com)'s `FocusManager`.
+
+### How to use it
+
+```tsx
+import { createFocusGroup } from "@solid-primitives/focus";
+
+const [ref, setRef] = createSignal<HTMLElement>();
+
+const group = createFocusGroup(ref);
+
+// Arrow keys move focus within the group.
+const onKeyDown = (event: KeyboardEvent) => {
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    group.focusNext({ wrap: true });
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    group.focusPrevious({ wrap: true });
+  } else if (event.key === "Home") {
+    event.preventDefault();
+    group.focusFirst();
+  } else if (event.key === "End") {
+    event.preventDefault();
+    group.focusLast();
+  }
+};
+
+return (
+  <div ref={setRef} onKeyDown={onKeyDown} role="menu">
+    <button role="menuitem">One</button>
+    <button role="menuitem">Two</button>
+    <button role="menuitem">Three</button>
+  </div>
+);
+```
+
+### `FocusGroup`
+
+The object returned by `createFocusGroup`. Each method focuses its target and returns it (or `undefined` when there is nothing to move to). Methods accept an options object:
+
+| Method            | Description                                             |
+| ----------------- | ------------------------------------------------------- |
+| `focusNext()`     | Moves focus to the next focusable/tabbable element.     |
+| `focusPrevious()` | Moves focus to the previous focusable/tabbable element. |
+| `focusFirst()`    | Moves focus to the first focusable/tabbable element.    |
+| `focusLast()`     | Moves focus to the last focusable/tabbable element.     |
+
+### Options
+
+| Option     | Type                | Default                   | Description                                                    |
+| ---------- | ------------------- | ------------------------- | -------------------------------------------------------------- |
+| `from`     | `Element`           | Currently focused element | Element to start searching from.                               |
+| `tabbable` | `boolean`           | `false`                   | Only include tabbable elements (`tabindex="-1"` excluded).     |
+| `wrap`     | `boolean`           | `false`                   | Wrap around when reaching the end of the container.            |
+| `accept`   | `(node) => boolean` | —                         | Callback determining whether an element is eligible for focus. |
+
+Default options can be passed as a second argument to `createFocusGroup`, applied to every method call:
+
+```tsx
+const group = createFocusGroup(ref, () => ({ wrap: true, tabbable: true }));
+```
+
 ## Credits
 
 `createFocusTrap` is ported from [solid-focus-trap](https://github.com/corvudev/corvu/tree/main/packages/solid-focus-trap), part of the [corvu](https://corvu.dev) UI toolkit by [Jasmin Noetzli (GiyoMoon)](https://github.com/GiyoMoon). Licensed under the MIT License.
+
+`createFocusGroup` is ported from [kobalte](https://kobalte.dev)'s [`createFocusManager`](https://github.com/kobaltedev/kobalte/blob/main/packages/utils/src/focus-manager.ts), which in turn is based on [react-spectrum](https://react-spectrum.adobe.com)'s `FocusManager` (Apache License 2.0, Copyright 2020 Adobe).
 
 ## Changelog
 
