@@ -316,7 +316,7 @@ export const ArrowKeyNavigation = meta.story({
     docs: {
       description: {
         story:
-          "`createFocusGroup(ref)` returns an imperative manager whose `focusNext` / `focusPrevious` / `focusFirst` / `focusLast` methods move focus between the focusable children of the container. This is the building block for arrow-key navigation in menus, listboxes and toolbars. Here ArrowDown/ArrowUp wrap around the group, Home/End jump to the ends.",
+          "`createFocusGroup(ref)` creates a focus group that moves focus between the focusable children of the container — the building block for arrow-key navigation in menus, listboxes and toolbars. Keyboard navigation is enabled by default: the `keydown` listener is attached to the ref automatically, so no manual wiring is needed. Here ArrowDown/ArrowUp cycle with wrap, Home/End jump to the ends.",
       },
     },
   },
@@ -324,33 +324,15 @@ export const ArrowKeyNavigation = meta.story({
     const [ref, setRef] = createSignal<HTMLElement>();
     const [focusedLabel, setFocusedLabel] = createSignal("One");
 
-    const manager = createFocusGroup(ref, () => ({ wrap: true }));
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      let next: HTMLElement | undefined;
-      if (event.key === "ArrowDown") {
-        event.preventDefault();
-        next = manager.focusNext();
-      } else if (event.key === "ArrowUp") {
-        event.preventDefault();
-        next = manager.focusPrevious();
-      } else if (event.key === "Home") {
-        event.preventDefault();
-        next = manager.focusFirst();
-      } else if (event.key === "End") {
-        event.preventDefault();
-        next = manager.focusLast();
-      }
-      if (next) {
-        setFocusedLabel(next.getAttribute("aria-label") ?? "Unknown");
-      }
-    };
+    createFocusGroup(ref, () => ({ wrap: true }));
 
     return (
       <Container width={320}>
         <div
           ref={setRef}
-          onKeyDown={onKeyDown}
+          onFocusIn={event =>
+            setFocusedLabel((event.target as HTMLElement).getAttribute("aria-label") ?? "Unknown")
+          }
           role="listbox"
           aria-label="Focus group"
           style={{

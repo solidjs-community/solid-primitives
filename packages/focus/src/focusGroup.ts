@@ -10,12 +10,16 @@
  * https://github.com/adobe/react-spectrum/blob/7638f4d671e32b7aa2db110a875fe48f24b68fd0/packages/react-aria/src/focus/FocusScope.tsx
  */
 
-import type { Accessor } from "solid-js";
+import { access, type MaybeAccessor } from "@solid-primitives/utils";
+import { createEffect, type Accessor } from "solid-js";
 import {
   FOCUSABLE_ELEMENT_SELECTOR,
   isElementVisible,
   TABBABLE_ELEMENT_SELECTOR,
 } from "./tabbable.ts";
+
+export type Orientation = "vertical" | "horizontal";
+export type TextDirection = "ltr" | "rtl";
 
 export interface FocusGroup {
   /** Moves focus to the next focusable or tabbable element in the focus scope. */
@@ -43,10 +47,28 @@ export interface FocusGroupOptions {
 
   /** A callback that determines whether the given element is focused. */
   accept?: (node: Element) => boolean;
+
+  /** The orientation of the focus group. @default "vertical" */
+  orientation?: MaybeAccessor<Orientation>;
+
+  /** The text direction of the focus group. @default "ltr" */
+  textDirection?: MaybeAccessor<TextDirection>;
+
+  /** Whether tab key presses should be handled. @default true */
+  handleTab?: MaybeAccessor<boolean>;
+
+  /**
+   * Whether keyboard navigation (arrow keys, Home/End, Tab) should be enabled.
+   * The `keydown` listener is attached to the focus group ref automatically. @default true
+   */
+  keyboardNavigation?: MaybeAccessor<boolean>;
 }
 
 /**
  * Creates a FocusGroup object that can be used to move focus within an element.
+ *
+ * By default keyboard navigation is enabled: a `keydown` listener is attached to the
+ * focus group ref automatically (and removed when the ref changes or the group is disposed).
  *
  * @example
  * ```tsx
@@ -180,6 +202,77 @@ export const createFocusGroup = (
 
     return next;
   };
+
+  const keyboardOptions = () => {
+    const opts = defaultOptions();
+    return {
+      orientation: access(opts.orientation) ?? ("vertical" as const),
+      textDirection: access(opts.textDirection) ?? ("ltr" as const),
+      handleTab: access(opts.handleTab) ?? true,
+    };
+  };
+
+  const getNextKey = (): string => {
+    const { orientation, textDirection } = keyboardOptions();
+    return orientation === "vertical"
+      ? "arrowdown"
+      : textDirection === "ltr"
+        ? "arrowright"
+        : "arrowleft";
+  };
+
+  const getPreviousKey = (): string => {
+    const { orientation, textDirection } = keyboardOptions();
+    return orientation === "vertical"
+      ? "arrowup"
+      : textDirection === "ltr"
+        ? "arrowleft"
+        : "arrowright";
+  };
+
+  const isFocusInsideGroup = (): boolean => {
+    const root = ref();
+    return root != null && root.contains(document.activeElement);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent): void => {
+    const eventKey = event.key.toLowerCase();
+    const from = event.target instanceof Element ? event.target : undefined;
+
+    if (eventKey === getNextKey()) {
+      event.preventDefault();
+      focusNext({ from });
+    } else if (eventKey === getPreviousKey()) {
+      event.preventDefault();
+      focusPrevious({ from });
+    } else if (eventKey === "home") {
+      event.preventDefault();
+      focusFirst();
+    } else if (eventKey === "end") {
+      event.preventDefault();
+      focusLast();
+    } else if (eventKey === "tab" && keyboardOptions().handleTab && isFocusInsideGroup()) {
+      if (event.shiftKey) {
+        if (focusPrevious({ from, wrap: false })) event.preventDefault();
+      } else if (focusNext({ from, wrap: false })) {
+        event.preventDefault();
+      }
+    }
+  };
+
+  createEffect(
+    () => ({
+      root: ref(),
+      keyboardNavigation: access(defaultOptions().keyboardNavigation) ?? true,
+    }),
+    ({ root, keyboardNavigation }) => {
+      if (!root || !keyboardNavigation) {
+        return;
+      }
+      root.addEventListener("keydown", handleKeyDown);
+      return () => root.removeEventListener("keydown", handleKeyDown);
+    },
+  );
 
   return { focusNext, focusPrevious, focusFirst, focusLast };
 };

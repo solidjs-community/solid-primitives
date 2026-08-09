@@ -184,9 +184,7 @@ const Popover: Component<{ open: boolean }> = props => {
 
 ## `createFocusGroup`
 
-`createFocusGroup` creates a [FocusGroup](#focusgroup) that imperatively moves focus between the focusable elements of a container — e.g. arrow-key navigation in a menu, listbox or toolbar. It walks the DOM with a `TreeWalker`, either restricting itself to tabbable elements or considering everything focusable.
-
-> Ported from [kobalte](https://kobalte.dev)'s `createFocusManager`, which is based on [react-spectrum](https://react-spectrum.adobe.com)'s `FocusManager`.
+`createFocusGroup` creates a [FocusGroup](#focusgroup) that moves focus between the focusable elements of a container — e.g. arrow-key navigation in a menu, listbox or toolbar. It walks the DOM with a `TreeWalker`, either restricting itself to tabbable elements or considering everything focusable. Keyboard navigation (arrow keys, Home/End, Tab) is enabled by default: the `keydown` listener is attached to the focus group ref automatically.
 
 ### How to use it
 
@@ -195,32 +193,24 @@ import { createFocusGroup } from "@solid-primitives/focus";
 
 const [ref, setRef] = createSignal<HTMLElement>();
 
-const group = createFocusGroup(ref);
-
-// Arrow keys move focus within the group.
-const onKeyDown = (event: KeyboardEvent) => {
-  if (event.key === "ArrowDown") {
-    event.preventDefault();
-    group.focusNext({ wrap: true });
-  } else if (event.key === "ArrowUp") {
-    event.preventDefault();
-    group.focusPrevious({ wrap: true });
-  } else if (event.key === "Home") {
-    event.preventDefault();
-    group.focusFirst();
-  } else if (event.key === "End") {
-    event.preventDefault();
-    group.focusLast();
-  }
-};
+// Keyboard navigation is attached to the ref automatically.
+createFocusGroup(ref);
 
 return (
-  <div ref={setRef} onKeyDown={onKeyDown} role="menu">
+  <div ref={setRef} role="menu">
     <button role="menuitem">One</button>
     <button role="menuitem">Two</button>
     <button role="menuitem">Three</button>
   </div>
 );
+```
+
+The returned group also exposes imperative methods for moving focus, e.g. inside a click handler:
+
+```tsx
+const group = createFocusGroup(ref);
+
+return <button onClick={() => group.focusNext()}>Next</button>;
 ```
 
 ### `FocusGroup`
@@ -234,20 +224,39 @@ The object returned by `createFocusGroup`. Each method focuses its target and re
 | `focusFirst()`    | Moves focus to the first focusable/tabbable element.    |
 | `focusLast()`     | Moves focus to the last focusable/tabbable element.     |
 
+### Keyboard navigation
+
+Keyboard navigation is enabled by default and can be disabled with the `keyboardNavigation` option. The `keydown` listener is attached to the focus group ref (removed when the ref changes or the group is disposed):
+
+- **Arrow keys** move focus between items, following `orientation` and `textDirection`. Home/End jump to the first/last item.
+- **Tab/Shift+Tab** move within the group when `handleTab` is enabled and focus is already inside it; at a boundary the browser takes over.
+- **`wrap: true`** loops around at the ends.
+
+```tsx
+createFocusGroup(ref, () => ({
+  orientation: "horizontal",
+  wrap: true,
+}));
+```
+
 ### Options
 
-| Option     | Type                | Default                   | Description                                                    |
-| ---------- | ------------------- | ------------------------- | -------------------------------------------------------------- |
-| `from`     | `Element`           | Currently focused element | Element to start searching from.                               |
-| `tabbable` | `boolean`           | `false`                   | Only include tabbable elements (`tabindex="-1"` excluded).     |
-| `wrap`     | `boolean`           | `false`                   | Wrap around when reaching the end of the container.            |
-| `accept`   | `(node) => boolean` | —                         | Callback determining whether an element is eligible for focus. |
-
-Default options can be passed as a second argument to `createFocusGroup`, applied to every method call:
+Options can be passed per-method-call or as default options (second argument to `createFocusGroup`, applied to every method call):
 
 ```tsx
 const group = createFocusGroup(ref, () => ({ wrap: true, tabbable: true }));
 ```
+
+| Option               | Type                           | Default           | Description                                                          |
+| -------------------- | ------------------------------ | ----------------- | -------------------------------------------------------------------- |
+| `from`               | `Element`                      | Currently focused | Element to start searching from.                                     |
+| `tabbable`           | `boolean`                      | `false`           | Only include tabbable elements (`tabindex="-1"` excluded).           |
+| `wrap`               | `boolean`                      | `false`           | Wrap around when reaching the end of the container.                  |
+| `accept`             | `(node) => boolean`            | —                 | Callback determining whether an element is eligible for focus.       |
+| `orientation`        | `MaybeAccessor<Orientation>`   | `"vertical"`      | The orientation of the focus group (`"vertical"` or `"horizontal"`). |
+| `textDirection`      | `MaybeAccessor<TextDirection>` | `"ltr"`           | The text direction of the focus group (`"ltr"` or `"rtl"`).          |
+| `handleTab`          | `MaybeAccessor<boolean>`       | `true`            | Whether tab key presses should be handled.                           |
+| `keyboardNavigation` | `MaybeAccessor<boolean>`       | `true`            | Whether the `keydown` listener is attached to the ref.               |
 
 ## Credits
 
