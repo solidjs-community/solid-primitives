@@ -84,6 +84,7 @@ function isStyleVisible(element: Element) {
 function isAttributeVisible(element: Element, childElement?: Element) {
   return (
     !element.hasAttribute("hidden") &&
+    !element.hasAttribute("inert") &&
     (element.nodeName === "DETAILS" && childElement && childElement.nodeName !== "SUMMARY"
       ? element.hasAttribute("open")
       : true)
