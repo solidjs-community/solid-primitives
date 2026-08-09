@@ -175,7 +175,7 @@ export const createFocusGroup = (
     const { tabbable = defaultOptions().tabbable, accept = defaultOptions().accept } = opts;
 
     const walker = getFocusableTreeWalker(root, { tabbable, accept });
-    const nextNode = walker.nextNode() as HTMLElement | undefined;
+    const nextNode = (walker.nextNode() as HTMLElement | null) ?? undefined;
 
     if (nextNode) {
       focusElement(nextNode, true);
