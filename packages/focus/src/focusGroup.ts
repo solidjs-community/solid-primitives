@@ -325,7 +325,7 @@ export function getFocusableTreeWalker(
       if (
         opts?.tabbable &&
         (node as Element).tagName === "INPUT" &&
-        (node as HTMLInputElement).getAttribute("type") === "radio"
+        (node as HTMLInputElement).type === "radio"
       ) {
         // If the radio is in a form, we can get all the other radios by name.
         if (!isTabbableRadio(node as HTMLInputElement)) {
