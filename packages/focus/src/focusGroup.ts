@@ -363,6 +363,11 @@ export function getFocusableTreeWalker(
 }
 
 function getRadiosInGroup(element: HTMLInputElement): HTMLInputElement[] {
+  if (!element.name) {
+    // A radio without a name isn't part of any group — treat it as its own group of one.
+    return [element];
+  }
+
   if (!element.form) {
     // Radio buttons outside a form - query the document.
     return Array.from(
