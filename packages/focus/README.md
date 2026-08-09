@@ -241,22 +241,29 @@ createFocusGroup(ref, () => ({
 
 ### Options
 
-Options can be passed per-method-call or as default options (second argument to `createFocusGroup`, applied to every method call):
+`from`, `tabbable`, `wrap`, and `accept` are traversal options: pass them per-method-call, or as defaults (second argument to `createFocusGroup`) that every call falls back to unless overridden.
 
 ```tsx
 const group = createFocusGroup(ref, () => ({ wrap: true, tabbable: true }));
+
+group.focusNext({ tabbable: false }); // overrides the default for this call only
 ```
 
-| Option               | Type                           | Default           | Description                                                          |
-| -------------------- | ------------------------------ | ----------------- | -------------------------------------------------------------------- |
-| `from`               | `Element`                      | Currently focused | Element to start searching from.                                     |
-| `tabbable`           | `boolean`                      | `false`           | Only include tabbable elements (`tabindex="-1"` excluded).           |
-| `wrap`               | `boolean`                      | `false`           | Wrap around when reaching the end of the container.                  |
-| `accept`             | `(node) => boolean`            | —                 | Callback determining whether an element is eligible for focus.       |
-| `orientation`        | `MaybeAccessor<Orientation>`   | `"vertical"`      | The orientation of the focus group (`"vertical"` or `"horizontal"`). |
-| `textDirection`      | `MaybeAccessor<TextDirection>` | `"ltr"`           | The text direction of the focus group (`"ltr"` or `"rtl"`).          |
-| `handleTab`          | `MaybeAccessor<boolean>`       | `true`            | Whether tab key presses should be handled.                           |
-| `keyboardNavigation` | `MaybeAccessor<boolean>`       | `true`            | Whether the `keydown` listener is attached to the ref.               |
+| Option     | Type                | Default           | Description                                                    |
+| ---------- | ------------------- | ----------------- | -------------------------------------------------------------- |
+| `from`     | `Element`           | Currently focused | Element to start searching from.                               |
+| `tabbable` | `boolean`           | `false`           | Only include tabbable elements (`tabindex="-1"` excluded).     |
+| `wrap`     | `boolean`           | `false`           | Wrap around when reaching the end of the container.            |
+| `accept`   | `(node) => boolean` | —                 | Callback determining whether an element is eligible for focus. |
+
+`orientation`, `textDirection`, `handleTab`, and `keyboardNavigation` are group-level keyboard options. They only take effect via `createFocusGroup`'s default options (second argument) — passing them to an individual `focusNext()`/`focusPrevious()`/`focusFirst()`/`focusLast()` call has no effect, since those methods only read the traversal options above from their own `opts` argument.
+
+| Option               | Type                           | Default      | Description                                                          |
+| -------------------- | ------------------------------ | ------------ | -------------------------------------------------------------------- |
+| `orientation`        | `MaybeAccessor<Orientation>`   | `"vertical"` | The orientation of the focus group (`"vertical"` or `"horizontal"`). |
+| `textDirection`      | `MaybeAccessor<TextDirection>` | `"ltr"`      | The text direction of the focus group (`"ltr"` or `"rtl"`).          |
+| `handleTab`          | `MaybeAccessor<boolean>`       | `true`       | Whether tab key presses should be handled.                           |
+| `keyboardNavigation` | `MaybeAccessor<boolean>`       | `true`       | Whether the `keydown` listener is attached to the ref.               |
 
 ## Credits
 
