@@ -29,6 +29,8 @@
       "autofocus",
       "createAutofocus",
       "createFocusTrap",
+      "createFocusRestore",
+      "createFocusGroup",
       "makeFocusListener",
       "createFocusSignal"
     ],
