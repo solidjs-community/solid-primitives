@@ -21,6 +21,7 @@ import {
   inputStyle,
   Kbd,
   radii,
+  StatRow,
 } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
@@ -349,7 +350,7 @@ export const ArrowKeyNavigation = meta.story({
           <MenuItem label="Two" />
           <MenuItem label="Three" />
         </div>
-        <BoolRow label="Focused item" value={focusedLabel()} />
+        <StatRow label="Focused item" value={focusedLabel()} />
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
           Focus an item, then use <Kbd>ArrowDown</Kbd> / <Kbd>ArrowUp</Kbd> to cycle with wrap,{" "}
           <Kbd>Home</Kbd> / <Kbd>End</Kbd> to jump.
