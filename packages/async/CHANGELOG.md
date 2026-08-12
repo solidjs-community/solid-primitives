@@ -1,5 +1,11 @@
 # @solid-primitives/async
 
+## 0.0.101-next.3
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+
 ## 0.0.101-next.2
 
 ### Patch Changes

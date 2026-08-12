@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/sortable",
-  "version": "0.0.100",
+  "version": "1.0.0-next.0",
   "description": "Reactive sorting primitives — comparators, reactive sort, sorted search/insert, and granular per-item rank tracking.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
