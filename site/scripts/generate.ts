@@ -1,248 +1,208 @@
+import { execFileSync } from "child_process";
 import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeHighlight from "rehype-highlight";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
-import rehypeSlug from "rehype-slug";
-import rehypeStringify from "rehype-stringify";
-import remarkEmoji from "remark-emoji";
-import remarkGfm from "remark-gfm";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
 import { fileURLToPath } from "url";
-import {
-  type ModuleData,
-  type PrimitiveData,
-  formatBytes,
-  getModulesData,
-  getPackageBundlesize,
-  isNonNullable,
-} from "../../scripts/utils/index.js";
-import { GITHUB_REPO } from "../src/constants.js";
-import type { PackageData, PackageListItem } from "../src/types.js";
+import { getModulesData, type ModuleData } from "../../scripts/utils/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const rootPath = path.join(__dirname, "..", "..");
-const packagesPath = path.join(rootPath, "packages");
-const generatedDirPath = path.join(__dirname, "..", "src", "_generated");
+const siteDir = path.join(__dirname, "..");
+const rootDir = path.join(siteDir, "..");
+const packagesDir = path.join(rootDir, "packages");
+const routesDir = path.join(siteDir, "src", "routes");
+const generatedDir = path.join(siteDir, "src", "generated");
 
-if (!fs.existsSync(generatedDirPath)) {
-  fs.mkdirSync(generatedDirPath);
-}
+const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
 
-const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES: ReadonlySet<string> = new Set([
-  "signal-builders",
-  "platform",
-]);
-
-const markdownProcessor = unified()
-  .use(remarkEmoji)
-  .use(remarkParse)
-  .use(remarkRehype)
-  // support GitHub Flavored Markdown
-  .use(remarkGfm)
-  .use(rehypeSanitize, {
-    ...defaultSchema,
-    attributes: {
-      ...defaultSchema.attributes,
-      // https://github.com/rehypejs/rehype-highlight#example-sanitation
-      code: [
-        ...(defaultSchema.attributes?.code || []),
-        [
-          "className",
-          // List of all allowed languages:
-          ...["js", "jsx", "ts", "tsx", "css", "md", "html", "json", "diff", "bash"].map(
-            lang => `language-${lang}`,
-          ),
-        ],
-      ],
-    },
-  })
-  // highlight code blocks
-  .use(rehypeHighlight)
-  // add id to headings
-  .use(rehypeSlug)
-  // add # to headings
-  .use(rehypeAutolinkHeadings, {
-    properties: { class: "header-anchor" },
-    content: { type: "text", value: "#" },
-  })
-  .use(rehypeStringify);
+// Order categories the way the docs read best; anything unrecognized sorts alphabetically after.
+const CATEGORY_ORDER = [
+  "Animation",
+  "Browser APIs",
+  "Control Flow",
+  "Display & Media",
+  "Forms",
+  "Inputs",
+  "Network",
+  "Reactivity",
+  "Sensors",
+  "UI Patterns",
+  "Utilities",
+];
 
 /**
- * Escape HTML meta-characters for safe use inside a double-quoted attribute value.
- * `&` must be escaped first so it doesn't double-escape the other entities.
+ * Escape unclosed void elements (`<br>`, `<hr>`) into self-closing form so MDX's
+ * JSX parser doesn't choke on them. Only touches lines outside fenced code blocks
+ * (fences nested inside blockquotes are tracked too, since GFM allows that).
  */
-function escapeHtmlAttribute(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function fixUnclosedVoidTags(markdown: string): string {
+  const lines = markdown.split("\n");
+  let inFence = false;
+  const voidTagRe = /<(br|hr)([^<>]*)>/gi;
+
+  return lines
+    .map(line => {
+      const unquoted = line.replace(/^(\s*>\s?)+/, "");
+      if (unquoted.trimStart().startsWith("```")) {
+        inFence = !inFence;
+        return line;
+      }
+      if (inFence) return line;
+      return line.replace(voidTagRe, (m, tag, attrs) => {
+        if (attrs.trimEnd().endsWith("/")) return m; // already self-closed
+        return `<${tag}${attrs} />`;
+      });
+    })
+    .join("\n");
 }
 
-/**
- * Parse README.md of each package and generate HTML
- */
-async function generateReadme(module: ModuleData, primitiveData: PrimitiveData) {
-  const primitiveCodeElRegex = new RegExp(
-    `<(code)>((?:&#x3C;|<)?(?:${primitiveData.list.join("|")})>?)<\/(code)>`,
-    "g",
-  );
-  const readmePath = path.join(packagesPath, module.name, "README.md");
-  let readme = await fsp.readFile(readmePath, "utf8");
-
-  readme = readme
+function cleanReadme(readme: string, name: string): string {
+  return readme
     // remove heading-1
-    .replace(/#\s+.+\n*/, "")
-    // remove solid img banner
+    .replace(/^#\s+.+\n*/m, "")
+    // remove the solid banner image block
     .replace(
-      /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/,
+      /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>\n*/,
       "",
     )
-    // remove size, version, stage ect... img banners
-    .replace(/^\[!\[(?:size|version|stage|lerna)\].+$/gm, "")
-    // replace changelog relative url to github repo changelog
-    .replace(/(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i, (_, p1, p2) => {
-      if (!p2) return _;
-      return `${p1}(${GITHUB_REPO}/blob/main/packages/${module.name}/CHANGELOG.md)`;
-    })
-    // remove Installation section
-    .replace(/##\s+installation[\r\n]+```[^`]+```/gi, "")
-    // replace Demo links with Live Site, Codesandbox/Stackblitz, Dev Source Code
-    .replace(/(?<!#)(##\s+demo\n)((.|\n)+?)(?=(\n##\s))/i, (_, p1, p2) => {
-      if (p2) {
-        p2 = p2.replace(/https?:\/\/[^\s]+/, (match: string) => {
-          const url = new URL(match);
-          const origin = url.origin;
-          if (origin.match(/codesandbox/i)) {
-            return `[CodeSandbox](${match})`;
-          }
-          if (origin.match(/stackblitz/i)) {
-            return `[StackBlitz](${match})`;
-          }
-          return origin;
-        });
-        p2 = `[Live Site](/playground/${module.name}/)\n\n${p2}`;
-        return `${p1}${p2}`;
-      }
-      return _;
-    });
-
-  return (
-    String(await markdownProcessor.process(readme))
-      // update code tag that contains primitives to have attribute
-      .replace(primitiveCodeElRegex, (_, p1, p2, p3) => {
-        if (!p2) return _;
-        return `<${p1} data-code-primitive-name="${escapeHtmlAttribute(p2)}">${p2}</${p3}>`;
-      })
-  );
+    // remove badge lines (size/version/stage/lerna/tested-with-vitest etc.)
+    .replace(/^\[!\[.+\]\(.+\)\]\(.+\)\n*/gm, "")
+    // point relative CHANGELOG links at GitHub
+    .replace(
+      /(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i,
+      (_, p1) => `${p1}(${GITHUB_REPO}/blob/main/packages/${name}/CHANGELOG.md)`,
+    )
+    // drop the Installation section — we render a consistent one ourselves
+    .replace(/##\s+installation[\r\n]+```[^`]*```\n*/gi, "")
+    .trim();
 }
 
-async function generatePrimitiveSizes(module: ModuleData, primitiveData: PrimitiveData) {
-  if (PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES.has(module.name)) {
-    return [];
+const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
+
+/** The package's own last commit date in the monorepo — not the generated file's (nonexistent) git history. */
+function getPackageLastUpdated(name: string): string | null {
+  try {
+    const iso = execFileSync(
+      "git",
+      ["log", "-1", "--format=%aI", "--", `packages/${name}`],
+      { cwd: rootDir, encoding: "utf8" },
+    ).trim();
+    return iso ? dateFormatter.format(new Date(iso)) : null;
+  } catch {
+    return null;
   }
-
-  const sizes = primitiveData.list.map(async primitive => {
-    const result = await getPackageBundlesize(module.name, {
-      exportName: primitive,
-      peerDependencies: module.peer_deps,
-    });
-    if (!result) return null;
-    return {
-      name: primitive,
-      min: formatBytes(result.min),
-      gzip: formatBytes(result.gzip),
-    };
-  });
-
-  return (await Promise.all(sizes)).filter(isNonNullable);
 }
 
-async function generatePackageSize(module: ModuleData) {
-  const result = await getPackageBundlesize(module.name, {
-    peerDependencies: module.peer_deps,
-  });
-  if (!result) return null;
-  return {
-    min: formatBytes(result.min),
-    gzip: formatBytes(result.gzip),
-  };
-}
-
-/**
- * Generate data for all packages
- */
-(async () => {
-  const packagesDirDist = path.join(generatedDirPath, "packages");
-  const packagesDist = path.join(generatedDirPath, "packages.json");
-
-  if (!fs.existsSync(packagesDirDist)) {
-    await fsp.mkdir(packagesDirDist);
-  }
-
-  const packages = [] as PackageListItem[];
-
-  for (const module of await getModulesData()) {
-    if (module.primitive == null) continue;
-
-    const [readme, primitives, packageSize] = await Promise.all([
-      generateReadme(module, module.primitive),
-      generatePrimitiveSizes(module, module.primitive),
-      generatePackageSize(module),
-    ] as const);
-
-    const itemData: PackageListItem = { ...module, primitives, packageSize };
-
-    const data: PackageData = { ...itemData, readme };
-
-    // write data to individual json file
-    const outputFilename = path.join(packagesDirDist, `${module.name}.json`);
-    await fsp.writeFile(outputFilename, JSON.stringify(data, null, 2));
-
-    packages.push(itemData);
-  }
-
-  // gather all module names into one json file
-  await fsp.writeFile(packagesDist, JSON.stringify(packages, null, 2));
-
-  // oxlint-disable-next-line no-console
-  console.log(`\nGenerated data for ${packages.length} packages.\n`);
-})();
-
-/**
- * Parse root README.md and CONTRIBUTING.md to generate HTML content for the home page (home-content.html)
- */
-(async () => {
-  const readmeMD = await fsp.readFile(path.join(rootPath, "README.md"), "utf8");
-  const contributingMD = await fsp.readFile(path.join(rootPath, "CONTRIBUTING.md"), "utf8");
-  const distPath = path.join(generatedDirPath, "home-content.html");
-
-  const headings: [string, string[]][] = [
-    [readmeMD, ["Philosophy"]],
-    [
-      contributingMD,
-      ["Design Maxims", "Basic and Compound Primitives", "Managing Primitive Complexity"],
-    ],
+function buildMetaTable(module: ModuleData, lastUpdated: string | null): string {
+  const stage = module.primitive!.stage;
+  const cells = [
+    `<span class="stage-badge stage-${stage}">${stage}</span>`,
+    module.primitive!.category,
+    lastUpdated ?? "Unknown",
   ];
 
-  const sections = headings.reduce((acc, [file, headings]) => {
-    for (const heading of headings) {
-      const regex = new RegExp(
-        `(?<!#)(##\\s+${heading}[\\r\\n])((.|[\\r\\n])+?)(?=([\\r\\n]##\\s))`,
-      );
-      const match = file.match(regex);
-      if (match) acc += `${match[0]}\n`;
-    }
-    return acc;
-  }, "");
+  // Real GFM table syntax (not a raw HTML <table>) so it picks up the theme's
+  // actual table component — bordered card, header background, cell padding.
+  return [
+    "| Stage | Category | Last Updated |",
+    "| --- | --- | --- |",
+    `| ${cells.join(" | ")} |`,
+  ].join("\n");
+}
 
-  const html = String(await markdownProcessor.process(sections));
+function buildPageBody(module: ModuleData, readme: string, lastUpdated: string | null): string {
+  const install = `npm i @solid-primitives/${module.name}`;
 
-  await fsp.writeFile(distPath, html);
-})();
+  return `# ${module.name}
+
+${module.description}
+
+${buildMetaTable(module, lastUpdated)}
+
+\`\`\`bash
+${install}
+\`\`\`
+
+${readme}
+`;
+}
+
+function frontmatter(title: string): string {
+  // The built-in "last updated" is based on git history of this generated file, which is
+  // gitignored and regenerated — so it's meaningless. We render our own in the meta table instead.
+  return `---\ntitle: ${title}\nlastUpdated: false\n---\n\n`;
+}
+
+type SidebarItem = { title: string; link: string };
+type SidebarGroup = { title: string; collapsed: boolean; items: SidebarItem[] };
+
+function categorySort(a: string, b: string): number {
+  const ai = CATEGORY_ORDER.indexOf(a);
+  const bi = CATEGORY_ORDER.indexOf(b);
+  if (ai === -1 && bi === -1) return a.localeCompare(b);
+  if (ai === -1) return 1;
+  if (bi === -1) return -1;
+  return ai - bi;
+}
+
+async function main() {
+  await fsp.mkdir(routesDir, { recursive: true });
+  await fsp.mkdir(generatedDir, { recursive: true });
+
+  const modules = (await getModulesData())
+    .filter(m => m.primitive != null)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const byCategory = new Map<string, ModuleData[]>();
+
+  for (const module of modules) {
+    const readmePath = path.join(packagesDir, module.name, "README.md");
+    const rawReadme = await fsp.readFile(readmePath, "utf8");
+    const cleaned = fixUnclosedVoidTags(cleanReadme(rawReadme, module.name));
+    const lastUpdated = getPackageLastUpdated(module.name);
+    const page = frontmatter(module.name) + buildPageBody(module, cleaned, lastUpdated);
+
+    await fsp.writeFile(path.join(routesDir, `${module.name}.mdx`), page);
+
+    const category = module.primitive!.category;
+    const list = byCategory.get(category) ?? [];
+    list.push(module);
+    byCategory.set(category, list);
+  }
+
+  const categories = [...byCategory.keys()].sort(categorySort);
+
+  const sidebar: SidebarGroup[] = categories.map(category => ({
+    title: category,
+    collapsed: false,
+    items: byCategory
+      .get(category)!
+      .map(module => ({ title: module.name, link: `/${module.name}` })),
+  }));
+
+  await fsp.writeFile(
+    path.join(generatedDir, "sidebar.ts"),
+    `// Generated by site/scripts/generate.ts — do not edit by hand.\nexport const sidebar = ${JSON.stringify(sidebar, null, 2)} as const;\n`,
+  );
+
+  const primitivesOverviewBody = categories
+    .map(category => {
+      const items = byCategory
+        .get(category)!
+        .map(module => `- [\`${module.name}\`](/${module.name}) — ${module.description}`)
+        .join("\n");
+      return `## ${category}\n\n${items}\n`;
+    })
+    .join("\n");
+
+  await fsp.writeFile(
+    path.join(routesDir, "primitives.mdx"),
+    `---\ntitle: All Primitives\n---\n\n# All Primitives\n\n${modules.length} primitives across ${categories.length} categories.\n\n${primitivesOverviewBody}`,
+  );
+
+  // oxlint-disable-next-line no-console
+  console.log(`\nGenerated ${modules.length} package pages across ${categories.length} categories.\n`);
+}
+
+main();

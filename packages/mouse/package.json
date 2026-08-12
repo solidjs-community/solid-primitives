@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/mouse",
   "version": "4.0.0-next.2",
-  "description": "A collection of Solid Primitives, that capture current mouse cursor position, and help to deal with common related usecases.",
+  "description": "A collection of primitives that capture current mouse cursor position, and help to deal with common related usecases.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/mouse",
