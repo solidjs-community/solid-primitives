@@ -1,7 +1,7 @@
 {
-  "name": "@solid-primitives/focus",
-  "version": "1.0.0-next.3",
-  "description": "Primitives for autofocusing HTML elements and trapping focus within a container",
+  "name": "@solid-primitives/sortable",
+  "version": "0.0.100",
+  "description": "Reactive sorting primitives — comparators, reactive sort, sorted search/insert, and granular per-item rank tracking.",
   "license": "MIT",
   "exports": "./src/index.ts",
   "publish": {

@@ -1,20 +1,11 @@
 {
-  "name": "@solid-primitives/focus",
-  "version": "1.0.0-next.3",
-  "description": "Primitives for autofocusing HTML elements and trapping focus within a container",
-  "author": "jer3m01 <jer3m01@jer3m01.com>",
-  "contributors": [
-    {
-      "name": "Jasmin Noetzli",
-      "url": "https://github.com/GiyoMoon"
-    },
-    {
-      "name": "David Di Biase",
-      "url": "https://github.com/davedbase"
-    }
-  ],
+  "name": "@solid-primitives/sortable",
+  "version": "0.0.100",
+  "description": "Reactive sorting primitives — comparators, reactive sort, sorted search/insert, and granular per-item rank tracking.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/focus",
+  "homepage": "https://primitives.solidjs.community/package/sortable",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -23,29 +14,31 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "focus",
-    "stage": 3,
+    "name": "sortable",
+    "stage": 0,
     "list": [
-      "autofocus",
-      "createAutofocus",
-      "createFocusTrap",
-      "createFocusRestore",
-      "createFocusGroup",
-      "makeFocusListener",
-      "createFocusSignal"
+      "ascending",
+      "descending",
+      "by",
+      "combine",
+      "reverse",
+      "makeSorted",
+      "createSorted",
+      "sortedIndex",
+      "sortedIndexBy",
+      "insertSorted",
+      "createSortedIndex",
+      "createSortedProjection"
     ],
-    "category": "Inputs",
-    "gzip": 3187
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",
     "primitives",
-    "focus",
-    "autofocus",
-    "focus-trap",
-    "trap",
-    "accessibility",
-    "a11y"
+    "sort",
+    "sortable",
+    "comparator",
+    "reactive"
   ],
   "private": false,
   "sideEffects": false,
@@ -54,8 +47,8 @@
   ],
   "type": "module",
   "module": "./dist/index.js",
-  "browser": {},
   "types": "./dist/index.d.ts",
+  "browser": {},
   "exports": {
     "import": {
       "@solid-primitives/source": "./src/index.ts",
@@ -63,6 +56,7 @@
       "default": "./dist/index.js"
     }
   },
+  "typesVersions": {},
   "tsdown": {
     "entry": "src/**/*.{ts,tsx}",
     "outDir": "dist"
@@ -70,19 +64,18 @@
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "pnpm -w build",
-    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/signal-builders": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",
     "solid-js": "catalog:peer"
   },
-  "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^",
-    "@solid-primitives/utils": "workspace:^"
-  },
-  "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"

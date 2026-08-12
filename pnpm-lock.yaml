@@ -1243,6 +1243,22 @@ importers:
         specifier: 'catalog:'
         version: 2.0.0-beta.34
 
+  packages/sortable:
+    dependencies:
+      '@solid-primitives/signal-builders':
+        specifier: workspace:^
+        version: link:../signal-builders
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.29(solid-js@2.0.0-beta.29)
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-beta.29
+
   packages/spring:
     devDependencies:
       '@solid-primitives/utils':
