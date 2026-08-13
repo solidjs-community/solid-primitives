@@ -37,9 +37,6 @@ html[data-theme*="light"] {
   background-color: var(--sb-background-color);
   background-image: var(--pl-bg-image);
   background-repeat: var(--pl-bg-repeat);
-  /* Pin to the viewport instead of the document, so it reads as a fixed
-     backdrop content scrolls over, rather than scrolling away with the page. */
-  background-attachment: fixed;
 }
 html[data-theme*="dark"] {
   --pl-grid-line: color-mix(in hsl, var(--pl-primary) 16%, transparent);
@@ -52,7 +49,6 @@ html[data-theme*="dark"] {
   background-color: var(--sb-background-color);
   background-image: var(--pl-bg-image);
   background-repeat: var(--pl-bg-repeat);
-  background-attachment: fixed;
 }
 
 /* Tighten the vertical rhythm between sidebar primitive links.
@@ -88,7 +84,7 @@ html[data-theme*="dark"] {
   height: 1.5rem;
   margin-right: 0.6rem;
   vertical-align: -0.4em;
-  border-radius: 50%;
+  border-radius: var(--sb-border-radius);
   background-color: var(--pl-primary);
   background-repeat: no-repeat;
   background-position: center;
@@ -216,6 +212,23 @@ html[data-theme*="dark"] {
   content: url("/logo-dark.png");
 }
 
+/* "v2.0" badge next to the logo. The theme already reserves a flex slot right
+   after the logo for its own (unused, since we don't configure multi-version
+   docs) version-selector — repurpose it via generated content instead of
+   wiring up that whole feature for a single static label. */
+[class*="version-selector_"]::after {
+  content: "v2.0";
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15em 0.55em;
+  border-radius: var(--sb-border-radius);
+  background: var(--pl-primary);
+  color: white;
+  font-family: var(--sb-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 /* Footer logo (separate component/class from the header logo) — 75% larger
    than the theme's default 1rem. Width is "max-content" from the theme,
    which keeps the image's aspect ratio as height changes. */
@@ -236,9 +249,10 @@ html[data-theme*="dark"] {
   font-weight: 700 !important;
 }
 
-/* Bold the sidebar category group headers (Animation, Browser APIs, etc). */
+/* Bold and enlarge the sidebar category group headers (Animation, Browser APIs, etc). */
 [class*="section-trigger_"] h2 {
   font-weight: 700;
+  font-size: 1.1rem;
 }
 
 /* Light divider under each sidebar category header, separating it from its
@@ -457,4 +471,14 @@ article:has(.pl-hero) > [class*="content_"] {
     aspect-ratio: auto;
     min-height: 8rem;
   }
+}
+
+/* Links wrapping nothing but an inline code pill (e.g. `filesystem` in the
+   primitives overview list) get an underline from the theme's link style,
+   but it's an inset box-shadow on the plain (non-rounded) <a> box — a
+   flat-bottomed rectangle that clips straight across the code pill's rounded
+   bottom corners. The pill's own color/background already reads as a
+   distinct, clickable element, so drop the underline here instead. */
+[class*="_a_"]:has(> [class*="_code_"]) {
+  box-shadow: none !important;
 }

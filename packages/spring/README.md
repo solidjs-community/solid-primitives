@@ -37,8 +37,6 @@ yarn add @solid-primitives/spring
 pnpm add @solid-primitives/spring
 ```
 
-**Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`.
-
 ## How to use it
 
 ### `createSpring`

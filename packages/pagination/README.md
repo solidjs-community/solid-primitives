@@ -26,8 +26,6 @@ yarn add @solid-primitives/pagination
 pnpm add @solid-primitives/pagination
 ```
 
-> **Peer dependencies:** `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`
-
 ## `createPagination`
 
 Provides an array with the properties to fill your pagination with and a page setter/getter.
