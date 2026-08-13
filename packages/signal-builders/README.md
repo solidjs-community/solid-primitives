@@ -21,8 +21,6 @@ yarn add @solid-primitives/signal-builders
 pnpm add @solid-primitives/signal-builders
 ```
 
-Requires `solid-js@^2.0.0-beta.13` as a peer dependency.
-
 ## Usage
 
 Each builder wraps its computation in `createMemo`, so results only update when the computed value actually changes. Builders must be called inside a reactive owner (a component body or `createRoot`), and computations should be kept pure — avoid side effects inside them.

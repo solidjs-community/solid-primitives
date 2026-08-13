@@ -29,8 +29,6 @@ yarn add @solid-primitives/cookies
 pnpm add @solid-primitives/cookies
 ```
 
-Requires `solid-js@^2.0.0-beta.13` and `@solidjs/web@^2.0.0-beta.13` as peer dependencies.
-
 ## How to use it
 
 ## `createServerCookie`

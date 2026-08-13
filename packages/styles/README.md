@@ -23,8 +23,6 @@ yarn add @solid-primitives/styles
 pnpm add @solid-primitives/styles
 ```
 
-**Peer dependencies**: `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`
-
 ## `createRemSize`
 
 Creates a reactive signal with value of the current rem size in pixels, and tracks it's changes.

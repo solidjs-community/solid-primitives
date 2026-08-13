@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/lifecycle",
   "version": "1.0.0-next.2",
-  "description": "Package providing extra layer of lifecycle primitives for Solid.",
+  "description": "Package providing extra layer of lifecycle primitives.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",

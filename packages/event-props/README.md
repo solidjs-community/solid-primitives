@@ -21,8 +21,6 @@ yarn add @solid-primitives/event-props
 pnpm add @solid-primitives/event-props
 ```
 
-**Peer dependency**: `solid-js@^2.0.0-beta.10`
-
 ## How to use it
 
 ### createEventProps

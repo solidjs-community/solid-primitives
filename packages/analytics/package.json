@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/analytics",
   "version": "2.0.0-next.2",
-  "description": "Solid primitives for analytics tracking with a plugin-compatible queue-based dispatch pipeline.",
+  "description": "Primitives for analytics tracking with a plugin-compatible queue-based dispatch pipeline.",
   "author": "David Di Biase <dave@solidjs.com>",
   "primitive": {
     "name": "analytics",
