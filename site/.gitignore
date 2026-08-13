@@ -3,6 +3,8 @@
 .vinxi
 .output
 .nitro
+.wrangler
+dist
 
 # Generated docs content — produced by `pnpm generate`
 src/routes/*.mdx
