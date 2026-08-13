@@ -58,6 +58,7 @@ export default defineConfig({
           deployConfig: true,
         },
         prerender: {
+          routes: ["/"],
           crawlLinks: true,
         },
       },
