@@ -47,8 +47,19 @@ export default defineConfig({
     }),
     solidStart(solidbase.startConfig()),
     nitro({
-      prerender: {
-        crawlLinks: true,
+      // `preset`/`prerender` are NitroConfig fields, which the vite plugin only reads from
+      // `config` (not top-level) — see nitro/dist/vite.d.mts's NitroPluginConfig type.
+      config: {
+        // Cloudflare Workers (with static assets) — the current recommended deploy target;
+        // Cloudflare is consolidating Pages into Workers, and this preset covers both.
+        preset: "cloudflare-module",
+        // Auto-generate .output/wrangler.json on build instead of requiring a hand-written one.
+        cloudflare: {
+          deployConfig: true,
+        },
+        prerender: {
+          crawlLinks: true,
+        },
       },
     }),
   ],
