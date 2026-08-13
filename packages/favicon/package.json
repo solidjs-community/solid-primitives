@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/favicon",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "Reactive primitives for controlling the document favicon, including animated frame cycling and notification badges.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],

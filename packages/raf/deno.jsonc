@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "4.0.0-next.1",
+  "version": "4.0.0-next.2",
   "description": "Primitive that facilitates RAF functionality",
   "license": "MIT",
   "exports": "./src/index.ts",

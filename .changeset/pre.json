@@ -101,7 +101,8 @@
     "@solid-primitives/video": "0.0.100",
     "@solid-primitives/async": "0.0.100",
     "@solid-primitives/url": "0.1.0",
-    "@solid-primitives/favicon": "0.0.100"
+    "@solid-primitives/favicon": "0.0.100",
+    "@solid-primitives/sortable": "0.0.100"
   },
   "changesets": [
     "a11y-dataset-hydration-safety",
@@ -208,6 +209,8 @@
     "signal-builders-solid2-migration",
     "signal-builders-toggle",
     "solid-2-beta-20-upgrade",
+    "solid-2-rc-0-upgrade",
+    "sortable-initial",
     "spring-solid2-migration",
     "sse-solid2-async-reactivity",
     "state-machine-solid2-migration",

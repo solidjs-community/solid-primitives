@@ -26,11 +26,11 @@ packageExtensions:
       esbuild: ^0.25.0
 
 minimumReleaseAgeExclude:
-  - '@solidjs/signals@2.0.0-beta.34'
-  - '@solidjs/web@2.0.0-beta.34'
-  - solid-js@2.0.0-beta.34
+  - '@solidjs/signals@2.0.0-rc.0'
+  - '@solidjs/web@2.0.0-rc.0'
+  - solid-js@2.0.0-rc.0
   - '@dom-expressions/babel-plugin-jsx@0.50.0-next.42'
-  - babel-preset-solid@2.0.0-beta.34
+  - babel-preset-solid@2.0.0-rc.0
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
@@ -39,16 +39,16 @@ onlyBuiltDependencies:
 catalog:
   tsdown: ^0.22.3
   unplugin-solid: ^1.0.0
-  solid-js: 2.0.0-beta.34
-  '@solidjs/web': 2.0.0-beta.34
-  '@solidjs/signals': 2.0.0-beta.34
-  babel-preset-solid: 2.0.0-beta.34
+  solid-js: 2.0.0-rc.0
+  '@solidjs/web': 2.0.0-rc.0
+  '@solidjs/signals': 2.0.0-rc.0
+  babel-preset-solid: 2.0.0-rc.0
   '@babel/core': ^7.29.7
 
 catalogs:
   peer:
-    solid-js: ^2.0.0-beta.34
-    '@solidjs/web': ^2.0.0-beta.34
+    solid-js: ^2.0.0-rc.0
+    '@solidjs/web': ^2.0.0-rc.0
 
 patchedDependencies:
   storybook-solidjs-vite@10.5.2: patches/storybook-solidjs-vite@10.5.2.patch
