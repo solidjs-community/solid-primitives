@@ -1,13 +1,6 @@
 {
-  // Read by Nitro's cloudflare-module preset at build time (see vite.config.ts) and merged
-  // into the generated .output/server/wrangler.json. Rename to match your Cloudflare project.
+  // Read by Nitro's cloudflare-pages preset at build time (see vite.config.ts) and merged
+  // into the generated .output/_worker.js/wrangler.json. Rename to match your Cloudflare project.
   "name": "solid-primitives-site",
   "compatibility_date": "2026-08-09",
-  // Nitro's Vite build (unlike its standalone CLI) never actually prerenders any routes —
-  // every page depends on request-time SSR. Force every request straight to the Worker so
-  // Cloudflare's default "check static assets first" routing can't intercept unmatched paths
-  // (like "/") before our own SSR fallback gets a chance to run.
-  "assets": {
-    "run_worker_first": true,
-  },
 }
