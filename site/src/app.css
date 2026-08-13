@@ -177,6 +177,26 @@ html[data-theme*="dark"] {
   background: #2962ff;
 }
 
+/* "Demo" button in the per-primitive meta table (see site/scripts/generate.ts) —
+   links out to the package's first Storybook story. */
+.demo-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.3em 0.75em;
+  border-radius: var(--sb-border-radius);
+  background: var(--pl-primary);
+  color: white !important;
+  font-weight: 600;
+  font-size: 0.85em;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+.demo-button:hover {
+  background: var(--pl-secondary);
+}
+
 /* Primitive-name headings (e.g. `readClipboard`) render as a single inline code
    span — style them as plain bold headings with an underline instead of the
    default inline-code "pill" look. */

@@ -124,6 +124,53 @@ function cleanReadme(readme: string, name: string): string {
     .trim();
 }
 
+const STORYBOOK_URL = "https://primitives2-storybook.solidjs.community";
+
+/** Storybook's own `toId()` sanitizer (see storybook/dist/csf) — lowercases and turns
+ *  whitespace/punctuation into single hyphens, trimming the ends. */
+function sanitizeStorybookSegment(segment: string): string {
+  return segment
+    .toLowerCase()
+    .replace(/[ ’–—―′¿'`~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+}
+
+/** Storybook derives a story's display name from its export by splitting camelCase/PascalCase
+ *  into words (e.g. "PanStory" -> "Pan Story") before sanitizing it into the URL id. */
+function splitCamelCase(exportName: string): string {
+  return exportName
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2");
+}
+
+/** Finds the package's first story (alphabetically-first `stories/*.stories.tsx` file, first
+ *  named export in it) and returns its Storybook `?path=/story/<id>` id, or null if the
+ *  package has no stories at all. */
+function getFirstStoryId(name: string): string | null {
+  const storiesDir = path.join(packagesDir, name, "stories");
+  let files: string[];
+  try {
+    files = fs
+      .readdirSync(storiesDir)
+      .filter(f => /\.stories\.tsx?$/.test(f))
+      .sort();
+  } catch {
+    return null;
+  }
+  if (files.length === 0) return null;
+
+  const source = fs.readFileSync(path.join(storiesDir, files[0]!), "utf8");
+  const titleMatch = source.match(/title:\s*["'`]([^"'`]+)["'`]/);
+  const exportMatch = source.match(/export const (\w+)\s*=/);
+  if (!titleMatch || !exportMatch) return null;
+
+  const titleId = sanitizeStorybookSegment(titleMatch[1]!);
+  const storyId = sanitizeStorybookSegment(splitCamelCase(exportMatch[1]!));
+  return `${titleId}--${storyId}`;
+}
+
 const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
 
 /** The package's own last commit date in the monorepo — not the generated file's (nonexistent) git history. */
@@ -140,9 +187,10 @@ function getPackageLastUpdated(name: string): string | null {
   }
 }
 
-function buildMetaTable(module: ModuleData, lastUpdated: string | null): string {
+function buildMetaTable(module: ModuleData, lastUpdated: string | null, storyId: string | null): string {
   const stage = module.primitive!.stage;
   const version = PRERELEASE_TAG ? `${module.version} (${PRERELEASE_TAG})` : module.version;
+  const headers = ["Stage", "Category", "Version", "Last Updated"];
   const cells = [
     `<span class="stage-badge stage-${stage}">${stage}</span>`,
     module.primitive!.category,
@@ -150,11 +198,18 @@ function buildMetaTable(module: ModuleData, lastUpdated: string | null): string 
     lastUpdated ?? "Unknown",
   ];
 
+  if (storyId) {
+    headers.push("Demo");
+    cells.push(
+      `<a class="demo-button" href="${STORYBOOK_URL}/?path=/story/${storyId}" target="_blank" rel="noopener noreferrer">Demo →</a>`,
+    );
+  }
+
   // Real GFM table syntax (not a raw HTML <table>) so it picks up the theme's
   // actual table component — bordered card, header background, cell padding.
   return [
-    "| Stage | Category | Version | Last Updated |",
-    "| --- | --- | --- | --- |",
+    `| ${headers.join(" | ")} |`,
+    `| ${headers.map(() => "---").join(" | ")} |`,
     `| ${cells.join(" | ")} |`,
   ].join("\n");
 }
@@ -166,11 +221,13 @@ function buildPageBody(module: ModuleData, readme: string, lastUpdated: string |
     ? `npm i @solid-primitives/${module.name}@${PRERELEASE_TAG}`
     : `npm i @solid-primitives/${module.name}`;
 
+  const storyId = getFirstStoryId(module.name);
+
   return `# ${getDisplayName(module.name)}
 
 ${module.description}
 
-${buildMetaTable(module, lastUpdated)}
+${buildMetaTable(module, lastUpdated, storyId)}
 
 \`\`\`bash
 ${install}
