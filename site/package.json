@@ -1,7 +1,7 @@
 {
   "name": "site",
-  "private": true,
   "type": "module",
+  "private": true,
   "scripts": {
     "generate": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/generate.ts",
     "dev": "vite dev",
