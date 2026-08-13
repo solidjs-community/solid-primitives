@@ -9,8 +9,6 @@
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
-[**Docs & demos**](https://primitives.solidjs.community/package/controlled-props)
-
 Library of helpers for creating your own component prototyping tool. _(a Storybook alternative if you will)_ The primitives in this package allow you to create controlls for component props.
 
 ## Installation

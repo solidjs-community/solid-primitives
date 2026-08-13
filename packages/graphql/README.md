@@ -167,12 +167,6 @@ const newQuery = createGraphQLClient("https://foobar.com/v1/api", { fetcher: nod
 
 Remember, just like with [`createResource`](https://www.solidjs.com/docs/latest/api#createresource), you will need an [`<ErrorBoundary>`](https://www.solidjs.com/docs/latest/api#%3Cerrorboundary%3E) to catch the errors, even if they are accessible inside the resource. Otherwise, uncaught errors might disrupt your application.
 
-## Demo
-
-You may view a working example here:
-
-https://codesandbox.io/s/solid-primitives-graphql-demo-g6fv6?file=/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

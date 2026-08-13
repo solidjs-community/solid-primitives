@@ -101,10 +101,6 @@ serializeRequest([info: RequestInfo, init?: RequestInit]): string
 
 in case you want to debug or manipulate the cache.
 
-## Demo
-
-TODO
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

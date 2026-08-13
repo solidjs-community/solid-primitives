@@ -149,10 +149,6 @@ const [active, setActive] = createSignal(false)
 Directive<(isActive: boolean) => void>;
 ```
 
-## Demo
-
-https://codesandbox.io/s/solid-primitives-active-element-q4kul?file=/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

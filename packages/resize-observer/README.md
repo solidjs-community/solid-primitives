@@ -176,10 +176,6 @@ createEffect(() => {
 <div ref={setTarget} />;
 ```
 
-## Demo
-
-https://codesandbox.io/s/solid-primitives-resize-observer-yg41gd?file=/index.tsx
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

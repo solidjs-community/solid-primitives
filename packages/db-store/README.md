@@ -72,10 +72,6 @@ export type DbAdapter<Row> = {
 };
 ```
 
-## Demo
-
-[Working demonstration](https://primitives.solidjs.community/playground/db-store/) (requires Supabase account)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

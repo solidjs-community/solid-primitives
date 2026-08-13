@@ -44,10 +44,6 @@ createEffect(
 <div {...eventProps}>Click and drag on me</div>
 ```
 
-## Demo
-
-TODO
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

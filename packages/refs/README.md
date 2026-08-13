@@ -165,12 +165,6 @@ const [refs, setRefs] = createSignal<Element[]>([]);
 </Refs>;
 ```
 
-#### Demo
-
-https://stackblitz.com/edit/solid-vite-unocss-bkbgap?file=index.tsx
-
-(run `npm start` in the terminal)
-
 ## Types
 
 ### `Ref`

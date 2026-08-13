@@ -64,8 +64,6 @@ const isSmall = createMediaQuery("(max-width: 767px)", true);
 console.log(isSmall());
 ```
 
-[Working Demo](https://codesandbox.io/s/solid-media-query-5bf16?file=/src/index.tsx)
-
 ## `createBreakpoints`
 
 Creates a multi-breakpoint monitor to make responsive components easily.
@@ -162,10 +160,6 @@ const moduleSize = () =>
     xl: 6,
   })[matches.key];
 ```
-
-### Demo
-
-[Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
 ## `createPrefersDark`
 

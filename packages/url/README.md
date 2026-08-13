@@ -223,10 +223,6 @@ const record = getSearchParamsRecord("?foo=bar");
 record; // => { foo: "bar" }
 ```
 
-## Demo
-
-You can play with a live demo [here](https://primitives.solidjs.community/playground/url).
-
 ## Changelog
 
 <details>

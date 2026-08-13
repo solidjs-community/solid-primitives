@@ -281,10 +281,6 @@ const customStorage = addWithOptionsMethod(storage_supporting_options);
 const boundCustomStorage = customStorage.withOptions(myOptions);
 ```
 
-## Demo
-
-[Live Demo](https://primitives.solidjs.community/playground/storage) - [Sources](https://github.com/solidjs-community/solid-primitives/tree/main/packages/storage/dev)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

@@ -157,10 +157,6 @@ Provide a fallback element when no match is found or the value is `null`/`undefi
 
 `MatchField` is an alias for `MatchTag` kept for backwards compatibility. Use `MatchTag` in new code.
 
-## Demo
-
-[Storybook](https://primitives.solidjs.community/storybook/?path=/docs/control-flow-match--docs)
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

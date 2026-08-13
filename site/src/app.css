@@ -236,6 +236,13 @@ html[data-theme*="dark"] {
   height: 1.75rem !important;
 }
 
+[data-theme*="light"] [class*="_logo_"] {
+  content: url("/logo-light.png");
+}
+[data-theme*="dark"] [class*="_logo_"] {
+  content: url("/logo-dark.png");
+}
+
 /* The theme's article headings default to font-weight: 400 for all levels;
    make section titles like "How to use it" stand out more. */
 [class*="_h2_"],

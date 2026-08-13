@@ -60,10 +60,6 @@ type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
 };
 ```
 
-## Demo
-
-TODO
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

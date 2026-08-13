@@ -423,10 +423,6 @@ See [DESIGN.md](./DESIGN.md) for the reasoning behind splitting this into small,
 pairs (rather than one `createAdvancedFavicon`), the async-reactivity considerations, and the
 canvas/`Image`/`matchMedia` mocking strategy used in tests.
 
-## Demo
-
-See the [Storybook stories](./stories) for interactive examples of all five primitives.
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

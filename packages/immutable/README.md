@@ -163,10 +163,6 @@ createEffect(() => console.log(state.title, state.completed));
 refetch();
 ```
 
-## Demo
-
-You can see the live demo [here](https://primitives.solidjs.community/playground/immutable).
-
 [Source code](./dev/index.tsx)
 
 ## Changelog

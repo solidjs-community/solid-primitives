@@ -260,11 +260,6 @@ This is already covered in [@solidjs/router](https://github.com/solidjs/solid-ro
 
 Just use an interval with refetch; ideally, also use [`makeAbortable`](#makeabortable).
 
-## Demo
-
-You may view a working example of our resource primitives here:
-https://primitives.solidjs.community/playground/resource/
-
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

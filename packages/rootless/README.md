@@ -164,10 +164,6 @@ And during hydration, if you were to update the shared state before the hydratio
 
 The API is experimental, and likely to change or be merged into `createSingletonRoot` in the future.
 
-### Demo
-
-Usage of combining `createSingletonRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
-
 ## `createRootPool`
 
 Creates a pool of roots, that can be reused. Useful for creating components that are mounted and unmounted frequently.

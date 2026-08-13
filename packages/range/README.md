@@ -333,10 +333,6 @@ function IndexRange<T>(
 ): Accessor<T[]>;
 ```
 
-## Demo
-
-Codesandbox: https://codesandbox.io/s/solid-primitives-range-demo-y3sc5c?file=/index.tsx
-
 ## Possible improvements
 
 ###### (PRs Welcome)
