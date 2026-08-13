@@ -50,8 +50,8 @@ export default defineConfig({
       // `preset` is a NitroConfig field, which the vite plugin only reads from `config`
       // (not top-level) — see nitro/dist/vite.d.mts's NitroPluginConfig type.
       config: {
-        // Cloudflare Pages — static assets + a bundled `_worker.js` SSR fallback.
-        preset: "cloudflare-pages",
+        // Cloudflare Workers (with static assets) — direct `wrangler deploy` / Workers Builds.
+        preset: "cloudflare-module",
         // Auto-generate the wrangler config on build instead of requiring a hand-written one.
         cloudflare: {
           deployConfig: true,

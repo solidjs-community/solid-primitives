@@ -1,6 +1,12 @@
 {
-  // Read by Nitro's cloudflare-pages preset at build time (see vite.config.ts) and merged
-  // into the generated .output/_worker.js/wrangler.json. Rename to match your Cloudflare project.
+  // Read by Nitro's cloudflare-module preset at build time (see vite.config.ts) and merged
+  // into the generated .output/server/wrangler.json. Rename to match your Cloudflare project.
   "name": "solid-primitives-site",
   "compatibility_date": "2026-08-09",
+  // Force every request straight to the Worker instead of Cloudflare's default
+  // "check static assets first" routing — none of our routes are static, so that default
+  // routing left unmatched paths (like "/") getting Cloudflare's own asset-not-found page.
+  "assets": {
+    "run_worker_first": true,
+  },
 }
