@@ -327,7 +327,7 @@ async function main() {
 
   await fsp.writeFile(
     path.join(routesDir, "primitives.mdx"),
-    `---\ntitle: All Primitives\n---\n\n# All Primitives\n\n${modules.length} primitives across ${categories.length} categories.\n\n${primitivesOverviewBody}`,
+    `---\ntitle: All Primitives\nlastUpdated: false\n---\n\n# All Primitives\n\n${modules.length} primitives across ${categories.length} categories.\n\n${primitivesOverviewBody}`,
   );
 
   // oxlint-disable-next-line no-console

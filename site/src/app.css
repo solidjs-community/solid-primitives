@@ -77,13 +77,19 @@ html[data-theme*="dark"] {
    a background-color circle, not `mask-image` — a masked element's
    box-shadow doesn't render in this browser, so a mask+box-shadow "padded
    circle" trick silently produces no visible circle at all. */
+/* Flex row instead of inline content — with `::before` as plain inline content,
+   a wrapped second line of text (e.g. "Display & Media") starts back at the left
+   edge under the icon instead of staying aligned next to it. */
+[class*="sidenav-links_"] > ul > li h2 {
+  display: flex;
+  align-items: center;
+}
 [class*="sidenav-links_"] > ul > li h2::before {
   content: "";
-  display: inline-block;
+  flex-shrink: 0;
   width: 1.5rem;
   height: 1.5rem;
   margin-right: 0.6rem;
-  vertical-align: -0.4em;
   border-radius: var(--sb-border-radius);
   background-color: var(--pl-primary);
   background-repeat: no-repeat;
@@ -508,4 +514,52 @@ article:has(.pl-hero) > [class*="content_"] {
    distinct, clickable element, so drop the underline here instead. */
 [class*="_a_"]:has(> [class*="_code_"]) {
   box-shadow: none !important;
+}
+
+/* Stack the per-primitive meta table (Stage/Category/Version/Last Updated/Demo —
+   see site/scripts/generate.ts) into label/value rows on narrow viewports, since
+   five columns don't fit a phone width. Column order is fixed, so nth-child works
+   whether or not a given page has the (optional) Demo column. */
+@media (max-width: 640px) {
+  [class*="_table_"] table,
+  [class*="_table_"] thead,
+  [class*="_table_"] tbody,
+  [class*="_table_"] th,
+  [class*="_table_"] td,
+  [class*="_table_"] tr {
+    display: block;
+    width: 100%;
+  }
+  [class*="_table_"] thead {
+    display: none;
+  }
+  [class*="_table_"] tr + tr {
+    border-top: 1px solid color-mix(in hsl, var(--sb-decoration-color) 15%, transparent);
+  }
+  [class*="_table_"] td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem !important;
+    border: none !important;
+  }
+  [class*="_table_"] td::before {
+    font-weight: 600;
+  }
+  [class*="_table_"] td:nth-child(1)::before {
+    content: "Stage";
+  }
+  [class*="_table_"] td:nth-child(2)::before {
+    content: "Category";
+  }
+  [class*="_table_"] td:nth-child(3)::before {
+    content: "Version";
+  }
+  [class*="_table_"] td:nth-child(4)::before {
+    content: "Last Updated";
+  }
+  [class*="_table_"] td:nth-child(5)::before {
+    content: "Demo";
+  }
 }
