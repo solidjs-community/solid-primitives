@@ -4,6 +4,7 @@
 
 # Solid Primitives 2.0
 
+[![website](https://img.shields.io/badge/website-primitives2.solidjs.community-blue?style=for-the-badge)](https://primitives2.solidjs.community)
 [![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc00ff.svg?style=for-the-badge&logo=pnpm)](https://pnpm.io/)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
