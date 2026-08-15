@@ -39,6 +39,11 @@ export default defineConfig({
         nav: [
           { text: "Guide", link: "/" },
           { text: "Primitives", link: "/primitives" },
+          { text: "Philosophy", link: "/philosophy" },
+          { text: "JSR & NPM", link: "/jsr-npm" },
+          { text: "Contributors", link: "/contributors" },
+          { text: "Security", link: "/security" },
+          { text: "Migration", link: "/migration" },
         ],
         sidebar: {
           "/": sidebar,

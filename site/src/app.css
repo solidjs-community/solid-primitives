@@ -394,6 +394,63 @@ article:has(.pl-hero) > [class*="content_"] {
   background: color-mix(in hsl, var(--sb-text-color) 6%, transparent);
 }
 
+/* Live project stats (npm downloads, open issues/PRs — see site/scripts/generate.ts's
+   getProjectStats) between the hero actions and the category grid. */
+.pl-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 0 0 3rem;
+}
+.pl-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in hsl, var(--sb-decoration-color) 15%, transparent);
+  border-radius: calc(var(--sb-border-radius) * 1.5);
+  background: color-mix(in hsl, var(--sb-background-color) 97%, var(--sb-tint-color-opposite));
+  text-decoration: none;
+  color: inherit;
+  transition-property: border-color, transform, box-shadow, background-color;
+  transition-timing-function: var(--sb-transition-timing);
+  transition-duration: 0.15s;
+}
+.pl-stat:hover,
+.pl-stat:focus-visible {
+  border-color: color-mix(in hsl, var(--pl-primary) 45%, transparent);
+  background: var(--sb-background-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -12px color-mix(in hsl, var(--pl-primary) 35%, transparent);
+}
+.pl-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--pl-primary);
+  line-height: 1.1;
+}
+.pl-stat-label {
+  font-family: var(--sb-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in hsl, var(--sb-text-color) 65%, transparent);
+}
+.pl-stats-updated {
+  grid-column: 1 / -1;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  text-align: right;
+  color: color-mix(in hsl, var(--sb-text-color) 50%, transparent);
+}
+
+@media screen and (max-width: 40rem) {
+  .pl-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* No more single big enclosing box — the header sits directly on the page
    background, and each category gets its own square card below. */
 .pl-strip {
@@ -561,5 +618,21 @@ article:has(.pl-hero) > [class*="content_"] {
   }
   [class*="_table_"] td:nth-child(5)::before {
     content: "Demo";
+  }
+}
+
+/* The theme only collapses the top nav into its hamburger menu below 500px (it was designed
+   for a short 2-item nav). With 6 items (Guide/Primitives/Philosophy/JSR & NPM/Contributors/
+   Security) that leaves a wide "tablet" range where every link is forced onto one flat row
+   with no room to breathe. Widen the collapse threshold so it switches to the hamburger well
+   before that gets cramped. Matches the theme's own selector/specificity approach (`!important`
+   attribute selectors against the hashed CSS-module class names) since Header.module.css's
+   500px query already uses `!important` on the same properties. */
+@media screen and (max-width: 900px) {
+  [class*="_top-nav_"] > *:not([class*="_mobile-nav-menu_"]) {
+    display: none !important;
+  }
+  [class*="_mobile-nav-menu_"] {
+    display: block !important;
   }
 }

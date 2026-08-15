@@ -1,0 +1,65 @@
+---
+title: JSR & NPM
+lastUpdated: false
+---
+
+# JSR & NPM
+
+Every package in this repository is published to both [npm](https://www.npmjs.com/org/solid-primitives)
+and [JSR](https://jsr.io/@solid-primitives), the Deno-created registry built for TypeScript-first
+packages. Publishing to both isn't a formality — each registry serves a different part of the
+Solid ecosystem, and supporting both means Solid Primitives works the same way regardless of
+which runtime or package manager you're on.
+
+## Why not just npm?
+
+npm is still where the overwhelming majority of installs come from, and it isn't going anywhere.
+But JSR brings a few things npm can't:
+
+- **Native TypeScript** — JSR serves `.ts` source directly; consumers on Deno (and increasingly
+  Node/Bun via JSR's npm compatibility layer) don't need a separate build step or `.d.ts`
+  publishing pipeline to get types.
+- **No dependency confusion** — JSR packages are scoped and immutable by design, with no
+  post-publish tampering.
+- **A real quality signal** — JSR scores packages on things like documentation coverage,
+  runtime compatibility, and having no "slow types" (see below), which pushes us toward keeping
+  each package's public API clean and fully annotated.
+- **First-class Deno support** — Deno users don't need an npm compatibility shim to consume
+  these packages the way they would for anything npm-only.
+
+Since neither registry fully replaces the other yet, publishing to both is how the project stays
+accessible everywhere at once, instead of asking part of the community to route through a
+compatibility layer.
+
+## How it actually works
+
+Each package's version lives in two places: `package.json` (the source of truth, bumped by
+[Changesets](https://github.com/changesets/changesets) on every release) and a per-package
+`deno.jsonc` (what JSR actually publishes from). Changesets has no idea `deno.jsonc` exists, so
+a sync script keeps the two from drifting:
+
+```bash
+pnpm jsr:sync-versions          # write the fix
+pnpm jsr:sync-versions --check  # exit 1 if anything's out of sync, without writing
+```
+
+JSR publishing itself runs as its own GitHub Actions workflow, separate from the npm release
+pipeline, so a JSR publish is a deliberate, manually-triggered step rather than something that
+happens silently on every merge:
+
+1. Sync `deno.jsonc` versions from `package.json`
+2. Build every package
+3. `deno publish --dry-run --check --allow-slow-types` — a dry run has to pass first
+4. Only then, `deno publish --check --allow-slow-types` for the real publish
+
+The workflow authenticates via GitHub's OIDC token exchange (`id-token: write`), so there's no
+long-lived JSR credential sitting in repo secrets waiting to leak.
+
+## "Slow types"
+
+JSR's own linter enforces `no-slow-types` for every package in this repo's `deno.jsonc`. A
+"slow type" is a public export whose type can't be resolved without JSR doing real type
+inference across your whole dependency graph — which is exactly what JSR's fast, `.d.ts`-free
+type-checking is trying to avoid. Concretely, that means fully annotating public function
+return types and exported values instead of leaning on inference, which is also just... better
+TypeScript hygiene for anyone reading the API surface.

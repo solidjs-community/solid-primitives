@@ -1,0 +1,133 @@
+---
+title: Contributors
+lastUpdated: false
+---
+
+# Contributing to Solid Primitives
+
+Thank you for checking out the project and wanting to contribute!
+
+For the reasoning behind *why* this project is organized the way it is — the design maxims,
+the `make`/`create` naming split, the stage process, why there isn't one big
+`solid-primitives` package — see the [Philosophy](/philosophy) page. This page is about the
+practical mechanics of contributing.
+
+## Contribution process
+
+New primitives move through a ratification process loosely modeled on the
+[TC39 proposal stage process](https://tc39.es/process-document/), summarized on the
+[Philosophy page](/philosophy#the-stage-process). Any primitive at Stage 0–1 should be treated
+with caution — the design or implementation may still change. From Stage 2 onward we actively
+work to avoid breaking changes.
+
+## AI-assisted code and review
+
+AI-assisted code is welcome here — write it with whatever tools help you. What isn't optional
+is review: every submission goes through **both** an automated pass with
+[CodeRabbit](https://www.coderabbit.ai/) and a human reviewer, no exceptions. Both levels have
+to pass.
+
+Passing CodeRabbit doesn't mean a PR is in. However thorough the automated pass is, acceptance
+is always at the discretion of the human reviewer — they can ask for changes, push back, or
+decline a submission CodeRabbit had no complaints about. AI-assisted code is judged by the same
+bar as everything else in this repository: does it hold up, is it tested, does it fit the
+project's design maxims — not by who or what wrote the first draft.
+
+## Getting set up
+
+This repository is a monorepo managed by [pnpm workspaces](https://pnpm.io/workspaces), so
+you'll need [pnpm](https://pnpm.io/installation) installed (`npm install -g pnpm` if you don't
+have it already).
+
+If this is your first time pulling the repo, run `pnpm install` to install all dependencies and
+link the workspace packages together — this matters because every package in the monorepo
+depends on others through workspace links, not published versions. Run `pnpm install` again
+any time you pull from `main`/`next`. If something looks broken afterward, try removing
+`node_modules` (`rm -rf node_modules/`) and reinstalling.
+
+This repo should work on any OS. If you hit environment issues, [Gitpod](https://gitpod.io) is
+a quick way to get a clean remote dev environment.
+
+## Formatting and linting
+
+We use [ESLint](https://eslint.org/)/[oxlint](https://oxc.rs/) and
+[Prettier](https://prettier.io/) to lint and format the code:
+
+- `pnpm run lint` — check for linting errors
+- `pnpm run format` — format the code
+
+Having them enabled in your editor isn't required, but it helps.
+
+## CLI helpers
+
+From the repo root:
+
+- `pnpm run new-package name-of-your-package` — scaffold a new package from the template
+- `pnpm run build` — build all packages
+- `pnpm run test` — test all packages
+- `pnpm run lint` — lint all packages
+- `pnpm run format` — format all packages
+- `pnpm run measure name-of-the-package` — measure a package's bundle size
+
+From inside an individual package:
+
+- `pnpm run dev` — start a development playground for the package
+- `pnpm run build` — build the package
+- `pnpm run test` — test the package
+- `pnpm run test:ssr` — test the package in SSR mode
+
+## Hydration safety
+
+A primitive that creates a **compute-form** `createSignal(fn)` or `createMemo(fn)` in a
+component's render body participates in Solid's per-owner hydration id allocation, the same as
+a DOM element the JSX compiler stamps a hydration key onto. Most primitives that return a
+derived reactive value fall into this category — it's the norm, not automatically a defect —
+but it needs to be verified, not assumed. Classify each primitive as one of:
+
+- **Effect-only** — no render-body `createSignal(fn)`/`createMemo`, only
+  `createEffect`/`createSignal(value)`/plain functions. Always hydration-safe.
+- **Creates a render-body compute signal/memo** — returns state derived via `createSignal(fn)`
+  or `createMemo`. Verify it with a real hydration round trip rather than assuming it's fine.
+
+Prefer a plain (non-memoized) getter function over `createMemo` when the derived value is cheap
+to recompute — it avoids consuming a hydration id for no measurable perf benefit. Reach for
+`createMemo` when the computation is genuinely non-trivial.
+
+Use
+[`scripts/test-utils/hydration-harness.ts`](https://github.com/solidjs-community/solid-primitives/blob/next/scripts/test-utils/hydration-harness.ts)'s
+`renderHydrationRoundTrip()` to verify a package end-to-end: it renders a small fixture
+component through a real `node` subprocess (so `@solid-primitives/*` and `@solidjs/web`
+resolve to their published `dist` builds, exactly as an installed consumer gets them), then
+hydrates the result in-process and asserts no console error/warning. See
+[`packages/controlled-signal/test/hydration.test.tsx`](https://github.com/solidjs-community/solid-primitives/blob/next/packages/controlled-signal/test/hydration.test.tsx)
+and
+[`packages/a11y/test/hydration.test.tsx`](https://github.com/solidjs-community/solid-primitives/blob/next/packages/a11y/test/hydration.test.tsx)
+for examples. Add one of these for any primitive whose public API returns a
+`createMemo`/compute-form-`createSignal` value that a consumer is expected to read directly in
+a render body.
+
+**Rebuild before trusting a result.** The harness's server half resolves the target package's
+published `dist`, but its client half resolves workspace `src` through this monorepo's own
+alias. If you edit a package's `src` without rebuilding `dist`, the two halves run genuinely
+different code, which can desync owner-id allocation and produce a false-positive "unclaimed
+server-rendered node" warning that has nothing to do with the hazard under test. Run
+`pnpm -w build` (or scope it to the packages you touched) before running a hydration test that
+depends on your changes.
+
+## Looking for ideas?
+
+Primitives the project would like to see contributed:
+
+- **Display & Media** — `createDragAndDrop`
+- **Device** — `createBattery`
+- **Browser** — `createHistory`, `createWebShare`, `createLocale`
+- **Network** — `createNotification`, `createPush`, `createConnectionObserver`
+- **Inputs** — `createCompositionObserver`, `createForm`, `createInput`, `createTouch`
+- **Utilities** — `createQueue`, `createEffectWhen`
+
+Not sure where to start, or have something else in mind? Open a discussion on
+[GitHub](https://github.com/solidjs-community/solid-primitives) before writing a full
+implementation — it's much easier to align on design early than after the fact.
+
+Found a security issue instead of a missing feature? See the [Security](/security) page —
+please don't report it via GitHub or Discord.

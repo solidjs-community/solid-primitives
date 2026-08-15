@@ -15,6 +15,7 @@ import IconPhPuzzlePiece from "~icons/ph/puzzle-piece";
 import IconPhCompass from "~icons/ph/compass";
 import IconPhNotePencil from "~icons/ph/note-pencil";
 import { totalPackages, categoryPrimitiveCounts } from "../generated/counts";
+import { projectStats } from "../generated/stats";
 
 <div class="pl-hero">
   <p class="pl-eyebrow">A reactive primitives library for Solid 2.0</p>
@@ -31,6 +32,39 @@ import { totalPackages, categoryPrimitiveCounts } from "../generated/counts";
     <a class="pl-btn pl-btn-alt" href="https://github.com/solidjs-community/solid-primitives/tree/next">See the Source</a>
   </div>
 </div>
+
+{projectStats && (
+  <div class="pl-stats">
+    <a
+      class="pl-stat"
+      href="https://www.npmjs.com/org/solid-primitives"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div class="pl-stat-value">{projectStats.npmDownloadsLastMonthFormatted}</div>
+      <div class="pl-stat-label">npm downloads / month</div>
+    </a>
+    <a
+      class="pl-stat"
+      href="https://github.com/solidjs-community/solid-primitives/issues"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div class="pl-stat-value">{projectStats.openIssues}</div>
+      <div class="pl-stat-label">open issues</div>
+    </a>
+    <a
+      class="pl-stat"
+      href="https://github.com/solidjs-community/solid-primitives/pulls"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div class="pl-stat-value">{projectStats.openPullRequests}</div>
+      <div class="pl-stat-label">open pull requests</div>
+    </a>
+    <div class="pl-stats-updated">Last updated {projectStats.generatedAt}</div>
+  </div>
+)}
 
 <div class="pl-strip">
   <div class="pl-strip-header">
