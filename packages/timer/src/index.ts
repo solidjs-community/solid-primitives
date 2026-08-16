@@ -184,7 +184,10 @@ export function createPolled<T extends P, I = T, P = T>(
   value: I,
   options?: SignalOptions<T>,
 ): Accessor<T>;
-/** @internal implementation signature for the overloads above */
+/**
+ * Implementation signature for the {@link createPolled} overloads above.
+ * @internal
+ */
 export function createPolled<T>(
   fn: (prev: T | undefined) => T,
   timeout: TimeoutSource,
