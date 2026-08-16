@@ -319,7 +319,36 @@ article:has(.pl-hero) > [class*="content_"] {
 }
 
 .pl-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
   padding: 2.5rem 0 0.5rem;
+}
+
+.pl-hero-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pl-hero-cube {
+  flex: none;
+  width: clamp(9rem, 18vw, 16rem);
+  height: auto;
+  filter: drop-shadow(0 1.5rem 3rem color-mix(in hsl, var(--pl-primary) 35%, transparent));
+}
+
+@media screen and (max-width: 56rem) {
+  .pl-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .pl-hero-cube {
+    align-self: center;
+    width: clamp(7rem, 40vw, 11rem);
+  }
 }
 
 .pl-eyebrow {
