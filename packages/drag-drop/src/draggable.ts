@@ -1,8 +1,8 @@
 import { createEffect, createMemo, createSignal, flush } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
-import { useDragContext } from "./context.tsx";
-import { applyClass, applyStyle, removeClass, removeStyle } from "./dom.ts";
+import { DEFAULT_KEYBOARD_STEP, useDragContext } from "./context.tsx";
+import { applyClass, applyStyle, markAsDraggable, removeClass, removeStyle, scrollCompensatedDelta } from "./dom.ts";
 import type { CreateDraggableOptions, DraggableReturn, MakeDraggableOptions, Transform } from "./types.ts";
 
 /**
@@ -31,16 +31,18 @@ export function makeDraggable<T = unknown>(
 
   let startX = 0;
   let startY = 0;
+  let startScrollX = 0;
+  let startScrollY = 0;
 
   const onPointerMove = (event: PointerEvent) => {
-    const delta: Transform = { x: event.clientX - startX, y: event.clientY - startY };
+    const delta = scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY);
     options.onMove?.(delta, event);
   };
 
   const onPointerUp = (event: PointerEvent) => {
     document.removeEventListener("pointermove", onPointerMove);
     document.removeEventListener("pointerup", onPointerUp);
-    const delta: Transform = { x: event.clientX - startX, y: event.clientY - startY };
+    const delta = scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY);
     options.onEnd?.(delta, event);
   };
 
@@ -50,6 +52,8 @@ export function makeDraggable<T = unknown>(
     event.preventDefault();
     startX = event.clientX;
     startY = event.clientY;
+    startScrollX = window.scrollX;
+    startScrollY = window.scrollY;
     document.addEventListener("pointermove", onPointerMove);
     document.addEventListener("pointerup", onPointerUp);
     options.onStart?.(event);
@@ -71,6 +75,11 @@ export function makeDraggable<T = unknown>(
  * with registered droppables. Without a Provider, `isDragging` and `transform`
  * still work in standalone mode.
  *
+ * Keyboard-accessible: the element receives `tabindex`/`role`/`aria-roledescription`
+ * automatically (unless already set). `Space`/`Enter` picks up the drag, arrow keys
+ * nudge it by `keyboardStep` pixels (default 25), `Space`/`Enter` drops it, and
+ * `Escape` cancels — mirroring the pointer sensor's lifecycle.
+ *
  * @example
  * ```tsx
  * const drag = createDraggable("card-1", { title: "My card" }, {
@@ -91,6 +100,7 @@ export function createDraggable<T = unknown>(
 
   const ctx = useDragContext();
   const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(undefined, INTERNAL_OPTIONS);
+  const step = () => options.keyboardStep ?? DEFAULT_KEYBOARD_STEP;
 
   let isDragging: () => boolean;
   let currentTransform: () => Transform | null;
@@ -106,9 +116,11 @@ export function createDraggable<T = unknown>(
 
     let startX = 0;
     let startY = 0;
+    let startScrollX = 0;
+    let startScrollY = 0;
 
     const onPointerMove = (event: PointerEvent) => {
-      setTransform({ x: event.clientX - startX, y: event.clientY - startY });
+      setTransform(scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY));
     };
 
     const onPointerUp = () => {
@@ -116,6 +128,37 @@ export function createDraggable<T = unknown>(
       document.removeEventListener("pointerup", onPointerUp);
       setIsDragging(false);
       setTransform(null);
+    };
+
+    const nudge = (dx: number, dy: number) => {
+      setTransform(t => ({ x: (t?.x ?? 0) + dx, y: (t?.y ?? 0) + dy }));
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (access(options.disabled)) return;
+
+      if (!_isDragging()) {
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          setIsDragging(true);
+          setTransform({ x: 0, y: 0 });
+        }
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowUp": event.preventDefault(); nudge(0, -step()); break;
+        case "ArrowDown": event.preventDefault(); nudge(0, step()); break;
+        case "ArrowLeft": event.preventDefault(); nudge(-step(), 0); break;
+        case "ArrowRight": event.preventDefault(); nudge(step(), 0); break;
+        case " ":
+        case "Enter":
+        case "Escape":
+          event.preventDefault();
+          setIsDragging(false);
+          setTransform(null);
+          break;
+      }
     };
 
     createEffect(
@@ -129,14 +172,18 @@ export function createDraggable<T = unknown>(
           el.setPointerCapture(event.pointerId);
           startX = event.clientX;
           startY = event.clientY;
+          startScrollX = window.scrollX;
+          startScrollY = window.scrollY;
           setIsDragging(true);
           setTransform({ x: 0, y: 0 });
           document.addEventListener("pointermove", onPointerMove);
           document.addEventListener("pointerup", onPointerUp);
         };
         el.addEventListener("pointerdown", onPointerDown);
+        el.addEventListener("keydown", onKeyDown);
         return () => {
           el.removeEventListener("pointerdown", onPointerDown);
+          el.removeEventListener("keydown", onKeyDown);
           document.removeEventListener("pointermove", onPointerMove);
           document.removeEventListener("pointerup", onPointerUp);
         };
@@ -144,7 +191,7 @@ export function createDraggable<T = unknown>(
     );
   }
 
-  // Context mode: attach pointerdown listener only (registration handled by droppables).
+  // Context mode: attach pointerdown/keydown listeners only (registration handled by droppables).
   if (ctx) {
     createEffect(
       () => elSignal(),
@@ -157,8 +204,36 @@ export function createDraggable<T = unknown>(
           el.setPointerCapture(event.pointerId);
           ctx._startDrag(id, el, data, event);
         };
+        const onKeyDown = (event: KeyboardEvent) => {
+          if (access(options.disabled)) return;
+
+          if (!isDragging()) {
+            if (event.key === " " || event.key === "Enter") {
+              event.preventDefault();
+              ctx._startKeyboardDrag(id, el, data);
+            }
+            return;
+          }
+
+          switch (event.key) {
+            case "ArrowUp": event.preventDefault(); ctx._moveBy(0, -step()); break;
+            case "ArrowDown": event.preventDefault(); ctx._moveBy(0, step()); break;
+            case "ArrowLeft": event.preventDefault(); ctx._moveBy(-step(), 0); break;
+            case "ArrowRight": event.preventDefault(); ctx._moveBy(step(), 0); break;
+            case " ":
+            case "Enter":
+              event.preventDefault();
+              ctx._endDrag();
+              break;
+            // Escape is handled by the context's own document-level listener.
+          }
+        };
         el.addEventListener("pointerdown", onPointerDown);
-        return () => el.removeEventListener("pointerdown", onPointerDown);
+        el.addEventListener("keydown", onKeyDown);
+        return () => {
+          el.removeEventListener("pointerdown", onPointerDown);
+          el.removeEventListener("keydown", onKeyDown);
+        };
       },
     );
   }
@@ -182,6 +257,7 @@ export function createDraggable<T = unknown>(
     setElSignal(() => el);
     applyStyle(el, options.style);
     applyClass(el, options.class);
+    markAsDraggable(el);
     flush();
   };
 

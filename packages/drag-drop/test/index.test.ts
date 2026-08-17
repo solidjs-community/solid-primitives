@@ -1,7 +1,7 @@
 import "./setup.js";
 import { createRoot, flush } from "solid-js";
 import { render } from "@solidjs/web";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   makeDraggable,
   makeDroppable,
@@ -11,6 +11,7 @@ import {
   createNativeDroppable,
   createDragContext,
   createSortable,
+  arrayMove,
   closestCenter,
   closestCorners,
   rectIntersection,
@@ -43,6 +44,19 @@ function mockRect(element: HTMLElement, rect: Partial<DOMRect>) {
     configurable: true,
   });
 }
+
+function mockScroll(x: number, y: number) {
+  Object.defineProperty(window, "scrollX", { value: x, configurable: true });
+  Object.defineProperty(window, "scrollY", { value: y, configurable: true });
+}
+
+function key(target: EventTarget, keyName: string) {
+  target.dispatchEvent(new KeyboardEvent("keydown", { key: keyName, bubbles: true, cancelable: true }));
+}
+
+afterEach(() => {
+  mockScroll(0, 0);
+});
 
 // ── makeDraggable ─────────────────────────────────────────────────────────────
 
@@ -109,6 +123,30 @@ describe("makeDraggable", () => {
       const cleanup = makeDraggable(el());
       cleanup();
     }).not.toThrow();
+  });
+
+  it("compensates onMove delta for scroll that happens mid-drag", () => {
+    const div = el();
+    let delta: Transform | null = null;
+    const cleanup = makeDraggable(div, { onMove: d => { delta = d; } });
+    ptr(div, "pointerdown", { button: 0, clientX: 10, clientY: 10 });
+    mockScroll(0, 50);
+    // Pointer hasn't moved, but the page scrolled — reported delta should include it.
+    ptr(document, "pointermove", { clientX: 10, clientY: 10 });
+    expect(delta).toEqual({ x: 0, y: 50 });
+    ptr(document, "pointerup", { clientX: 10, clientY: 10 });
+    cleanup();
+  });
+
+  it("compensates onEnd delta for scroll that happens mid-drag", () => {
+    const div = el();
+    let endDelta: Transform | null = null;
+    const cleanup = makeDraggable(div, { onEnd: d => { endDelta = d; } });
+    ptr(div, "pointerdown", { button: 0, clientX: 10, clientY: 10 });
+    mockScroll(20, 0);
+    ptr(document, "pointerup", { clientX: 15, clientY: 10 });
+    expect(endDelta).toEqual({ x: 25, y: 0 });
+    cleanup();
   });
 });
 
@@ -323,6 +361,131 @@ describe("createDraggable (standalone — no context)", () => {
       dispose();
     });
   });
+
+  it("compensates transform for scroll that happens mid-drag", () => {
+    createRoot(dispose => {
+      const div = el();
+      const d = createDraggable("x");
+      d.ref(div);
+      flush();
+      ptr(div, "pointerdown", { button: 0, clientX: 10, clientY: 10 });
+      flush();
+      mockScroll(0, 40);
+      ptr(document, "pointermove", { clientX: 10, clientY: 10 });
+      flush();
+      expect(d.transform()).toEqual({ x: 0, y: 40 });
+      ptr(document, "pointerup", {});
+      flush();
+      dispose();
+    });
+  });
+
+  it("sets tabindex/role/aria-roledescription via ref unless already present", () => {
+    createRoot(dispose => {
+      const div = el();
+      const d = createDraggable("x");
+      d.ref(div);
+      expect(div.tabIndex).toBe(0);
+      expect(div.getAttribute("role")).toBe("button");
+      expect(div.getAttribute("aria-roledescription")).toBe("draggable");
+      dispose();
+    });
+  });
+
+  it("does not override an explicitly set tabindex or role", () => {
+    createRoot(dispose => {
+      const div = el();
+      div.setAttribute("tabindex", "-1");
+      div.setAttribute("role", "listitem");
+      const d = createDraggable("x");
+      d.ref(div);
+      expect(div.getAttribute("tabindex")).toBe("-1");
+      expect(div.getAttribute("role")).toBe("listitem");
+      dispose();
+    });
+  });
+
+  it("keyboard: Space picks up, arrow keys nudge, Space drops", () => {
+    createRoot(dispose => {
+      const div = el();
+      const d = createDraggable("x");
+      d.ref(div);
+      flush();
+
+      key(div, " ");
+      flush();
+      expect(d.isDragging()).toBe(true);
+      expect(d.transform()).toEqual({ x: 0, y: 0 });
+
+      key(div, "ArrowRight");
+      flush();
+      expect(d.transform()).toEqual({ x: 25, y: 0 });
+
+      key(div, "ArrowDown");
+      flush();
+      expect(d.transform()).toEqual({ x: 25, y: 25 });
+
+      key(div, " ");
+      flush();
+      expect(d.isDragging()).toBe(false);
+      expect(d.transform()).toBeNull();
+
+      dispose();
+    });
+  });
+
+  it("keyboard: Escape cancels an active keyboard drag", () => {
+    createRoot(dispose => {
+      const div = el();
+      const d = createDraggable("x");
+      d.ref(div);
+      flush();
+
+      key(div, "Enter");
+      flush();
+      expect(d.isDragging()).toBe(true);
+
+      key(div, "Escape");
+      flush();
+      expect(d.isDragging()).toBe(false);
+      expect(d.transform()).toBeNull();
+
+      dispose();
+    });
+  });
+
+  it("keyboard: respects a custom keyboardStep", () => {
+    createRoot(dispose => {
+      const div = el();
+      const d = createDraggable("x", undefined, { keyboardStep: 5 });
+      d.ref(div);
+      flush();
+
+      key(div, " ");
+      flush();
+      key(div, "ArrowRight");
+      flush();
+      expect(d.transform()).toEqual({ x: 5, y: 0 });
+
+      key(div, " ");
+      dispose();
+    });
+  });
+
+  it("keyboard: ignores key events while disabled", () => {
+    createRoot(dispose => {
+      const div = el();
+      const d = createDraggable("x", undefined, { disabled: true });
+      d.ref(div);
+      flush();
+
+      key(div, " ");
+      flush();
+      expect(d.isDragging()).toBe(false);
+
+      dispose();
+    });
+  });
 });
 
 // ── createDroppable ───────────────────────────────────────────────────────────
@@ -350,6 +513,16 @@ describe("createDroppable (standalone — no context)", () => {
       expect(div.classList.contains("dropzone")).toBe(true);
       dispose();
     });
+  });
+
+  it("warns in dev mode when used without a createDragContext ancestor", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    createRoot(dispose => {
+      createDroppable("zone");
+      dispose();
+    });
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("createDragContext"));
+    warnSpy.mockRestore();
   });
 });
 
@@ -504,6 +677,220 @@ describe("createDragContext", () => {
     ptr(document, "pointerup", {});
     dispose();
   });
+
+  it("does not warn when the droppable has a createDragContext ancestor", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const div = el();
+    const container = el();
+    const dispose = render(
+      () => {
+        const ctx = createDragContext();
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            const drop = createDroppable("zone");
+            drop.ref(div);
+            return null;
+          },
+        });
+      },
+      container,
+    );
+    flush();
+    expect(warnSpy).not.toHaveBeenCalled();
+    dispose();
+    warnSpy.mockRestore();
+  });
+
+  it("compensates transform for scroll that happens mid-drag", () => {
+    const dragEl = el();
+    mockRect(dragEl, { left: 0, top: 0, right: 50, bottom: 50 });
+
+    let ctx!: ReturnType<typeof createDragContext>;
+    const container = el();
+    const dispose = render(
+      () => {
+        ctx = createDragContext();
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            const drag = createDraggable("a");
+            drag.ref(dragEl);
+            return null;
+          },
+        });
+      },
+      container,
+    );
+    flush();
+
+    ptr(dragEl, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
+    flush();
+    mockScroll(0, 30);
+    ptr(document, "pointermove", { clientX: 25, clientY: 25 });
+    flush();
+    // Pointer hasn't moved relative to the page, but the page scrolled by 30 —
+    // the reported transform should track it so the element stays under the pointer.
+    expect(ctx.transform()).toEqual({ x: 0, y: 30 });
+
+    ptr(document, "pointerup", {});
+    dispose();
+  });
+
+  describe("keyboard sensor", () => {
+    it("Space picks up, arrow keys move + trigger collision, Space drops", () => {
+      const dragEl = el();
+      const dropEl = el();
+      mockRect(dragEl, { left: 0, top: 0, right: 50, bottom: 50 });
+      mockRect(dropEl, { left: 200, top: 0, right: 300, bottom: 100 });
+
+      let ctx!: ReturnType<typeof createDragContext>;
+      let drag!: DraggableReturn;
+      let drop!: DroppableReturn;
+
+      const container = el();
+      const dispose = render(
+        () => {
+          ctx = createDragContext();
+          return (ctx.Provider as (p: { children: unknown }) => unknown)({
+            get children() {
+              // dragEl's center is (25, 25); a single 200px step lands well inside dropEl.
+              drag = createDraggable("a", "data-a", { keyboardStep: 200 });
+              drop = createDroppable("b", "data-b");
+              drag.ref(dragEl);
+              drop.ref(dropEl);
+              return null;
+            },
+          });
+        },
+        container,
+      );
+      flush();
+
+      key(dragEl, "Enter");
+      flush();
+      expect(ctx.active()?.id).toBe("a");
+      expect(drag.isDragging()).toBe(true);
+
+      key(dragEl, "ArrowRight");
+      flush();
+      expect(ctx.over()?.id).toBe("b");
+      expect(drop.isOver()).toBe(true);
+
+      key(dragEl, "Enter");
+      flush();
+      expect(ctx.active()).toBeNull();
+      expect(drag.isDragging()).toBe(false);
+
+      dispose();
+    });
+
+    it("Escape cancels a keyboard-initiated drag", () => {
+      let cancelled = false;
+      let drag!: DraggableReturn;
+      const dragEl = el();
+      mockRect(dragEl, { left: 0, top: 0, right: 50, bottom: 50 });
+
+      const container = el();
+      const dispose = render(
+        () => {
+          const ctx = createDragContext({ onDragCancel: () => { cancelled = true; } });
+          return (ctx.Provider as (p: { children: unknown }) => unknown)({
+            get children() {
+              drag = createDraggable("x");
+              drag.ref(dragEl);
+              return null;
+            },
+          });
+        },
+        container,
+      );
+      flush();
+
+      key(dragEl, " ");
+      flush();
+      expect(drag.isDragging()).toBe(true);
+
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      flush();
+      expect(cancelled).toBe(true);
+      expect(drag.isDragging()).toBe(false);
+
+      dispose();
+    });
+  });
+
+  describe("autoScroll", () => {
+    it("scrolls the window when the pointer nears a viewport edge", () => {
+      const dragEl = el();
+      mockRect(dragEl, { left: 0, top: 0, right: 50, bottom: 50 });
+      Object.defineProperty(window, "innerWidth", { value: 1000, configurable: true });
+      Object.defineProperty(window, "innerHeight", { value: 800, configurable: true });
+      const scrollBySpy = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+
+      const container = el();
+      const dispose = render(
+        () => {
+          const ctx = createDragContext({ autoScroll: true });
+          return (ctx.Provider as (p: { children: unknown }) => unknown)({
+            get children() {
+              const drag = createDraggable("a");
+              drag.ref(dragEl);
+              return null;
+            },
+          });
+        },
+        container,
+      );
+      flush();
+
+      ptr(dragEl, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
+      flush();
+      // Near the top-left corner, inside the default 60px threshold.
+      ptr(document, "pointermove", { clientX: 10, clientY: 10 });
+      flush();
+
+      expect(scrollBySpy).toHaveBeenCalled();
+      const [dx, dy] = scrollBySpy.mock.calls[0] as [number, number];
+      expect(dx).toBeLessThan(0);
+      expect(dy).toBeLessThan(0);
+
+      ptr(document, "pointerup", {});
+      scrollBySpy.mockRestore();
+      dispose();
+    });
+
+    it("does not scroll when autoScroll is not set", () => {
+      const dragEl = el();
+      mockRect(dragEl, { left: 0, top: 0, right: 50, bottom: 50 });
+      const scrollBySpy = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+
+      const container = el();
+      const dispose = render(
+        () => {
+          const ctx = createDragContext();
+          return (ctx.Provider as (p: { children: unknown }) => unknown)({
+            get children() {
+              const drag = createDraggable("a");
+              drag.ref(dragEl);
+              return null;
+            },
+          });
+        },
+        container,
+      );
+      flush();
+
+      ptr(dragEl, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
+      flush();
+      ptr(document, "pointermove", { clientX: 1, clientY: 1 });
+      flush();
+
+      expect(scrollBySpy).not.toHaveBeenCalled();
+
+      ptr(document, "pointerup", {});
+      scrollBySpy.mockRestore();
+      dispose();
+    });
+  });
 });
 
 // ── createNativeDroppable ─────────────────────────────────────────────────────
@@ -611,6 +998,37 @@ describe("createSortable", () => {
       expect(s.isActiveDropzone()).toBe(false);
       dispose();
     });
+  });
+});
+
+// ── arrayMove ─────────────────────────────────────────────────────────────────
+
+describe("arrayMove", () => {
+  it("moves an item forward", () => {
+    expect(arrayMove(["a", "b", "c", "d"], 0, 2)).toEqual(["b", "c", "a", "d"]);
+  });
+
+  it("moves an item backward", () => {
+    expect(arrayMove(["a", "b", "c", "d"], 3, 0)).toEqual(["d", "a", "b", "c"]);
+  });
+
+  it("returns an unmodified copy when indices are equal", () => {
+    const items = ["a", "b", "c"];
+    const result = arrayMove(items, 1, 1);
+    expect(result).toEqual(items);
+    expect(result).not.toBe(items);
+  });
+
+  it("returns an unmodified copy when an index is out of range", () => {
+    const items = ["a", "b", "c"];
+    expect(arrayMove(items, -1, 1)).toEqual(items);
+    expect(arrayMove(items, 1, 5)).toEqual(items);
+  });
+
+  it("does not mutate the input array", () => {
+    const items = ["a", "b", "c"];
+    arrayMove(items, 0, 2);
+    expect(items).toEqual(["a", "b", "c"]);
   });
 });
 

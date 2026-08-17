@@ -5,6 +5,36 @@ import { createDroppable } from "./droppable.ts";
 import type { SortableReturn } from "./types.ts";
 
 /**
+ * Reorders an array by moving the item at `from` to `to`, returning a new array —
+ * the array itself and the item order at both indices are left untouched if either
+ * index is out of range or they're equal. Pairs naturally with `createDragContext`'s
+ * `onDragEnd` for reordering a `createSortable` list.
+ *
+ * @example
+ * ```ts
+ * const ctx = createDragContext({
+ *   onDragEnd: (dragged, over) => {
+ *     if (!over) return;
+ *     setItems(items => arrayMove(
+ *       items,
+ *       items.findIndex(i => i.id === dragged.id),
+ *       items.findIndex(i => i.id === over.id),
+ *     ));
+ *   },
+ * });
+ * ```
+ */
+export function arrayMove<T>(array: readonly T[], from: number, to: number): T[] {
+  const next = array.slice();
+  if (from < 0 || from >= array.length || to < 0 || to >= array.length || from === to) {
+    return next;
+  }
+  const [moved] = next.splice(from, 1);
+  next.splice(to, 0, moved as T);
+  return next;
+}
+
+/**
  * Combines `createDraggable` and `createDroppable` on the same element.
  * The element can both be dragged and serve as a drop target for other items.
  *

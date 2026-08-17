@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=drag-drop" alt="Solid Primitives drag">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Drag%20%26%20Drop" alt="Solid Primitives Drag & Drop">
 </p>
 
 # @solid-primitives/drag-drop
@@ -9,6 +9,8 @@
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Composable, tree-shakeable drag-and-drop primitives.
+
+`createDraggable` is keyboard-accessible out of the box — `Space`/`Enter` picks up the drag, arrow keys nudge it, `Space`/`Enter` drops it, and `Escape` cancels, mirroring the pointer sensor's lifecycle.
 
 Two separate drag systems are provided:
 
@@ -77,7 +79,9 @@ const cleanup = makeNativeDroppable(el, {
 
 Reactive draggable. Attach via `ref`. Works standalone or inside a `createDragContext` provider.
 
-Uses `setPointerCapture` internally so the drag is never stuck if the pointer leaves the viewport.
+Uses `setPointerCapture` internally so the drag is never stuck if the pointer leaves the viewport. If the page scrolls mid-drag, `transform` is corrected for the scroll delta so the element stays glued to the pointer instead of drifting.
+
+**Keyboard support:** `ref` sets `tabindex="0"`, `role="button"`, and `aria-roledescription="draggable"` on the element unless you've already set them yourself. With the element focused: `Space`/`Enter` picks up the drag, arrow keys nudge it by `keyboardStep` pixels (default 25), `Space`/`Enter` drops it, and `Escape` cancels.
 
 ```tsx
 const drag = createDraggable("card-1", myData, {
@@ -98,6 +102,7 @@ const drag = createDraggable("card-1", myData, {
 | `draggingStyle` | `Partial<CSSStyleDeclaration>` | Applied while dragging, removed on drop |
 | `draggingClass` | `string` | Added while dragging, removed on drop |
 | `disabled` | `boolean \| Accessor<boolean>` | Prevents drag when true |
+| `keyboardStep` | `number` | Pixels moved per arrow-key press while picked up via keyboard. Defaults to 25 |
 
 | Return | Description |
 |---|---|
@@ -108,7 +113,7 @@ const drag = createDraggable("card-1", myData, {
 
 ### `createDroppable`
 
-Reactive drop target. Requires a `createDragContext` ancestor to coordinate collision detection.
+Reactive drop target. Requires a `createDragContext` ancestor to coordinate collision detection — using it without one leaves `isOver`/`active` permanently `false`/`null` and logs a dev-mode warning, since it usually means a missing `<Provider>`.
 
 ```tsx
 const drop = createDroppable("zone-1", zoneData, {
@@ -119,6 +124,15 @@ const drop = createDroppable("zone-1", zoneData, {
 <div ref={drop.ref}>
   {drop.isOver() ? `release to drop ${drop.active()?.id}` : "drop here"}
 </div>
+```
+
+`accept` is called fresh on every collision check (not memoized), so reading a signal inside it gives you reactive accept logic for free:
+
+```tsx
+const [locked, setLocked] = createSignal(false);
+const drop = createDroppable("zone-1", zoneData, {
+  accept: draggable => !locked() && draggable.data.type === "file",
+});
 ```
 
 ### `createNativeDroppable`
@@ -148,6 +162,8 @@ const ctx = createDragContext({
   onDragStart: item => console.log("started", item.id),
   onDragEnd: (item, over) => console.log("dropped", item.id, "on", over?.id),
   onDragCancel: item => console.log("cancelled", item.id),
+  autoScroll: true, // or { threshold: 80, speed: 20 }
+  keyboardStep: 25,
 });
 
 <ctx.Provider>
@@ -156,12 +172,21 @@ const ctx = createDragContext({
 </ctx.Provider>
 ```
 
+| Option | Type | Description |
+|---|---|---|
+| `collisionDetection` | `CollisionDetector` | Defaults to `pointerWithin` |
+| `onDragStart` / `onDragMove` / `onDragEnd` / `onDragCancel` | callbacks | Drag lifecycle hooks |
+| `keyboardStep` | `number` | Pixels moved per arrow-key press while picked up via keyboard. Defaults to 25 |
+| `autoScroll` | `boolean \| { threshold?, speed? }` | Scrolls the window when the pointer nears a viewport edge during a drag. Off by default; ignored for keyboard-driven drags |
+
 | Return | Description |
 |---|---|
 | `Provider` | Wrap your drag-and-drop tree in this component |
 | `active` | Accessor — the currently dragged `DragItem`, or `null` |
 | `over` | Accessor — the current `DroppableItem` under the draggable, or `null` |
 | `transform` | Accessor — `{ x, y }` delta from drag start, or `null` |
+
+> **Note:** `autoScroll` only scrolls the window — it doesn't track scrolling of an arbitrary nested overflow container.
 
 ### `createSortable`
 
@@ -179,6 +204,8 @@ Combines `createDraggable` and `createDroppable` on the same element. When anoth
   }}
 </For>
 ```
+
+Pair it with `arrayMove` in `onDragEnd` to reorder the backing array — see [`arrayMove`](#arraymove) below.
 
 ## Collision detection strategies
 
@@ -207,6 +234,27 @@ const myDetector: CollisionDetector = (draggable, droppables, pointer) => {
   return droppables[0]?.id ?? null;
 };
 ```
+
+## `arrayMove`
+
+Reorders an array by moving the item at `from` to `to`, returning a new array. Pairs naturally with `createDragContext`'s `onDragEnd` for reordering a `createSortable` list — see the [`createSortable`](#createsortable) example above for the full picture.
+
+```ts
+import { arrayMove } from "@solid-primitives/drag-drop";
+
+const ctx = createDragContext({
+  onDragEnd: (dragged, over) => {
+    if (!over) return;
+    setItems(items => arrayMove(
+      items,
+      items.findIndex(i => i.id === dragged.id),
+      items.findIndex(i => i.id === over.id),
+    ));
+  },
+});
+```
+
+Out-of-range or equal indices return an unmodified copy of the array.
 
 ## Integration with `@solid-primitives/upload`
 

@@ -23,7 +23,7 @@ import {
 import type { CollisionDetector } from "@solid-primitives/drag-drop";
 
 const meta = preview.meta({
-  title: "Interaction/Drag",
+  title: "Interaction/Drag & Drop",
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
@@ -40,7 +40,7 @@ export default meta;
 // ── Story 1: createDraggable standalone ───────────────────────────────────────
 
 export const StandaloneDrag = meta.story({
-  name: "createDraggable — floating card",
+  name: "Floating card",
   parameters: {
     layout: "centered",
     docs: {
@@ -129,7 +129,7 @@ const ZONES = [
 ];
 
 export const DragAndDrop = meta.story({
-  name: "createDragContext — drag and drop",
+  name: "Drop zones with collision strategies",
   parameters: {
     layout: "centered",
     docs: {
@@ -270,7 +270,7 @@ const INITIAL_ITEMS: SortItem[] = [
 const SORTABLE_STRIDE = 50;
 
 export const SortableList = meta.story({
-  name: "createSortable — reorderable list",
+  name: "Reorderable list",
   parameters: {
     docs: {
       description: {
@@ -378,7 +378,7 @@ export const SortableList = meta.story({
 // ── Story 4: createNativeDroppable ────────────────────────────────────────────
 
 export const NativeFileDrop = meta.story({
-  name: "createNativeDroppable — file drop",
+  name: "File drop zone",
   parameters: {
     docs: {
       description: {

@@ -65,11 +65,16 @@ export type CreateDraggableOptions = {
   draggingStyle?: Partial<CSSStyleDeclaration>;
   class?: string;
   draggingClass?: string;
+  /** Pixels moved per arrow-key press while picked up via keyboard. Defaults to 25. */
+  keyboardStep?: number;
 };
+
+export type AcceptPredicate = (draggable: DragItem) => boolean;
 
 export type CreateDroppableOptions = {
   disabled?: boolean | Accessor<boolean>;
-  accept?: (draggable: DragItem) => boolean;
+  /** Called fresh on every collision check — read a signal inside it for reactive accept logic. */
+  accept?: AcceptPredicate;
   style?: Partial<CSSStyleDeclaration>;
   overStyle?: Partial<CSSStyleDeclaration>;
   class?: string;
@@ -115,6 +120,14 @@ export type DragContextOptions = {
   onDragMove?: (item: DragItem, transform: Transform) => void;
   onDragEnd?: (item: DragItem, over: DroppableItem | null) => void;
   onDragCancel?: (item: DragItem) => void;
+  /** Pixels moved per arrow-key press while picked up via keyboard. Defaults to 25. */
+  keyboardStep?: number;
+  /**
+   * Auto-scroll the window when the pointer nears the viewport edge during a drag.
+   * `true` uses the default threshold/speed; pass an object to tune them, or omit /
+   * `false` to disable. Ignored for keyboard-driven drags.
+   */
+  autoScroll?: boolean | { threshold?: number; speed?: number };
 };
 
 export type DragContextReturn = {

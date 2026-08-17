@@ -3,6 +3,7 @@ import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 import { pointerWithin } from "./collision.ts";
 import type {
+  AcceptPredicate,
   DragContextOptions,
   DragContextReturn,
   DragItem,
@@ -12,10 +13,14 @@ import type {
   Transform,
 } from "./types.ts";
 
+const DEFAULT_KEYBOARD_STEP = 25;
+const DEFAULT_AUTO_SCROLL_THRESHOLD = 60;
+const DEFAULT_AUTO_SCROLL_SPEED = 15;
+
 type DroppableEntry = {
   element: HTMLElement;
   data: unknown;
-  accept?: (draggable: DragItem) => boolean;
+  accept?: AcceptPredicate;
 };
 
 export type DragContextValue = {
@@ -26,10 +31,16 @@ export type DragContextValue = {
     id: string | number,
     element: HTMLElement,
     data: unknown,
-    accept?: (draggable: DragItem) => boolean,
+    accept?: AcceptPredicate,
   ) => void;
   _unregisterDroppable: (id: string | number) => void;
   _startDrag: (id: string | number, element: HTMLElement, data: unknown, event: PointerEvent) => void;
+  /** Starts a drag from a keyboard activation — anchors the synthetic pointer to the element's center. */
+  _startKeyboardDrag: (id: string | number, element: HTMLElement, data: unknown) => void;
+  /** Nudges the active keyboard-driven drag by a delta in viewport pixels. No-op if nothing is dragging. */
+  _moveBy: (dx: number, dy: number) => void;
+  /** Drops the active drag (equivalent to releasing the pointer). No-op if nothing is dragging. */
+  _endDrag: () => void;
 };
 
 const DragCtx = createContext<DragContextValue>();
@@ -57,6 +68,8 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
   let currentDrag: DragItem | null = null;
   let startX = 0;
   let startY = 0;
+  let dragStartScrollX = 0;
+  let dragStartScrollY = 0;
 
   // Droppable rects snapshotted at drag start — avoids getBoundingClientRect on every pointermove.
   // Re-snapshotted on scroll or when droppables are added/removed during a drag.
@@ -81,13 +94,41 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
   let pendingX = 0;
   let pendingY = 0;
 
-  const processMove = () => {
-    rafPending = false;
+  // Auto-scrolls the window when the pointer sits near a viewport edge. Only called from the
+  // pointer-driven path — keyboard nudges move a synthetic point that isn't meant to trigger it.
+  const maybeAutoScroll = () => {
+    const cfg = options.autoScroll;
+    if (!cfg) return;
+    const threshold = (typeof cfg === "object" ? cfg.threshold : undefined) ?? DEFAULT_AUTO_SCROLL_THRESHOLD;
+    const speed = (typeof cfg === "object" ? cfg.speed : undefined) ?? DEFAULT_AUTO_SCROLL_SPEED;
+
+    let dx = 0;
+    let dy = 0;
+    if (pendingX < threshold) dx = -speed;
+    else if (pendingX > window.innerWidth - threshold) dx = speed;
+    if (pendingY < threshold) dy = -speed;
+    else if (pendingY > window.innerHeight - threshold) dy = speed;
+
+    if (dx !== 0 || dy !== 0) window.scrollBy(dx, dy);
+  };
+
+  // Recomputes transform + collision state from the current pending pointer position.
+  // Shared by the rAF-throttled pointer path and the immediate keyboard-nudge path.
+  const applyMove = () => {
     if (!currentDrag) return;
 
     const tx = pendingX - startX;
     const ty = pendingY - startY;
-    setTransform({ x: tx, y: ty });
+
+    // The reported transform is what the consumer applies as a CSS translate. It needs the
+    // scroll delta added on top of the raw pointer delta — otherwise the element (which scrolls
+    // with the page like any other in-flow content) visually drifts away from the pointer if the
+    // page scrolls mid-drag. The collision rect below intentionally uses the raw (uncompensated)
+    // tx/ty: once the transform above is scroll-corrected, `dragStartLeft + tx` is exactly where
+    // the element will end up on screen.
+    const scrollDX = window.scrollX - dragStartScrollX;
+    const scrollDY = window.scrollY - dragStartScrollY;
+    setTransform({ x: tx + scrollDX, y: ty + scrollDY });
 
     // Compute draggable rect from initial snapshot + current delta — zero layout reflows during move.
     const draggableRect: DragRect = {
@@ -120,6 +161,12 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
     options.onDragMove?.(currentDrag, { x: tx, y: ty });
   };
 
+  const processMove = () => {
+    rafPending = false;
+    applyMove();
+    maybeAutoScroll();
+  };
+
   const onPointerMove = (event: PointerEvent) => {
     if (!currentDrag) return;
     pendingX = event.clientX;
@@ -137,7 +184,7 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
     if (rafPending) { cancelAnimationFrame(rafId); rafPending = false; }
   };
 
-  const onPointerUp = (_event: PointerEvent) => {
+  const finishDrag = () => {
     if (!currentDrag) return;
     cancelPendingMove();
 
@@ -151,6 +198,8 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
     setOver(null);
     setTransform(null);
   };
+
+  const onPointerUp = (_event: PointerEvent) => finishDrag();
 
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key !== "Escape" || !currentDrag) return;
@@ -177,16 +226,19 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
     document.removeEventListener("scroll", onScroll, { capture: true });
   }
 
-  const _startDrag = (
+  const beginDrag = (
     id: string | number,
     element: HTMLElement,
     data: unknown,
-    event: PointerEvent,
+    clientX: number,
+    clientY: number,
   ) => {
-    startX = event.clientX;
-    startY = event.clientY;
-    pendingX = startX;
-    pendingY = startY;
+    startX = clientX;
+    startY = clientY;
+    pendingX = clientX;
+    pendingY = clientY;
+    dragStartScrollX = window.scrollX;
+    dragStartScrollY = window.scrollY;
 
     // Snapshot layout once — all pointermove collision checks use this cache.
     const r = element.getBoundingClientRect();
@@ -209,6 +261,22 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
     options.onDragStart?.(item);
   };
 
+  const _startDrag = (id: string | number, element: HTMLElement, data: unknown, event: PointerEvent) => {
+    beginDrag(id, element, data, event.clientX, event.clientY);
+  };
+
+  const _startKeyboardDrag = (id: string | number, element: HTMLElement, data: unknown) => {
+    const r = element.getBoundingClientRect();
+    beginDrag(id, element, data, r.left + r.width / 2, r.top + r.height / 2);
+  };
+
+  const _moveBy = (dx: number, dy: number) => {
+    if (!currentDrag) return;
+    pendingX += dx;
+    pendingY += dy;
+    applyMove();
+  };
+
   onCleanup(cleanupDrag);
 
   const contextValue: DragContextValue = {
@@ -224,6 +292,9 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
       if (currentDrag) snapshotRects(currentDrag.id);
     },
     _startDrag,
+    _startKeyboardDrag,
+    _moveBy,
+    _endDrag: finishDrag,
   };
 
   const Provider = (props: { children: Element }): Element => (
@@ -232,3 +303,5 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
 
   return { Provider, active, over, transform };
 }
+
+export { DEFAULT_KEYBOARD_STEP };

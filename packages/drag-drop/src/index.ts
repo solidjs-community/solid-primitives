@@ -7,6 +7,7 @@ export type {
   DragRect,
   DroppableRect,
   CollisionDetector,
+  AcceptPredicate,
   MakeDraggableOptions,
   MakeDroppableOptions,
   MakeNativeDroppableOptions,
@@ -34,4 +35,4 @@ export {
   createNativeDroppable,
 } from "./droppable.ts";
 
-export { createSortable } from "./sortable.ts";
+export { createSortable, arrayMove } from "./sortable.ts";

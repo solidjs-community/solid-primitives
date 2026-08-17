@@ -165,13 +165,32 @@ Returns a `{ Provider, useDragContext }` pair. `Provider` is a Solid component;
 The context store tracks:
 - `active: DragItem | null` — the currently dragged item
 - `over: DroppableItem | null` — the droppable currently under the pointer
-- `transform: Transform | null` — running delta `{x, y}`
+- `transform: Transform | null` — running delta `{x, y}`, scroll-compensated (see below)
 
 Events surfaced on the context:
 - `onDragStart(item)` — fired when drag begins
 - `onDragMove(item, transform)` — fired on every pointer move
 - `onDragEnd(item, over)` — fired on pointer up
 - `onDragCancel(item)` — fired on Escape or pointer cancel
+
+**Keyboard sensor.** `_startKeyboardDrag`/`_moveBy`/`_endDrag` are internal context
+methods (not part of the public `DragContextReturn`) that `createDraggable` wires up
+to `Space`/`Enter`/arrow-key/`Escape` handling. A keyboard-initiated drag anchors its
+synthetic pointer position to the draggable element's center (`getBoundingClientRect`),
+then reuses the exact same collision/transform pipeline as a pointer drag — there is no
+separate keyboard code path for collision detection.
+
+**Scroll compensation.** The collision rect (`dragStartLeft + tx`, etc.) is intentionally
+left uncompensated — it represents where the element *should* end up once the reported
+`transform` is applied. The reported `transform` itself gets `window.scrollX/Y` delta
+(since drag start) added on top of the raw pointer delta, because the dragged element is
+normal-flow content that scrolls with the page like anything else; without this, it would
+visually drift away from the pointer if the page scrolls mid-drag (e.g. via `autoScroll`).
+
+**Auto-scroll.** `DragContextOptions.autoScroll` scrolls `window` (not an arbitrary nested
+overflow container) when the pointer nears a viewport edge, checked once per `processMove`
+tick (already rAF-throttled). It composes for free with scroll compensation above and with
+the existing `scroll` listener that re-snapshots droppable rects.
 
 ### Level 4 — Sortable (composition)
 
@@ -187,6 +206,10 @@ the same element. Used for building sortable lists.
 
 Returns all fields of both + `isActiveDropzone: Accessor<boolean>` (true when
 this element is the active drop target in a sort operation).
+
+`arrayMove(array, from, to)` (exported alongside it, in `sortable.ts`) is a pure,
+immutable reorder helper with no Solid dependency — pairs with `onDragEnd` to
+reorder the backing array without every consumer hand-rolling the same splice logic.
 
 ---
 
@@ -258,6 +281,7 @@ type CreateDraggableOptions = {
   draggingStyle?: Partial<CSSStyleDeclaration>
   class?: string
   draggingClass?: string
+  keyboardStep?: number // pixels per arrow-key press; default 25
 }
 
 type CreateDroppableOptions = {
@@ -275,6 +299,8 @@ type DragContextOptions = {
   onDragMove?: (item: DragItem, transform: Transform) => void
   onDragEnd?: (item: DragItem, over: DroppableItem | null) => void
   onDragCancel?: (item: DragItem) => void
+  keyboardStep?: number // pixels per arrow-key press; default 25
+  autoScroll?: boolean | { threshold?: number; speed?: number }
 }
 ```
 

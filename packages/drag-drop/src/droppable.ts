@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, flush } from "solid-js";
+import { createEffect, createMemo, createSignal, DEV, flush } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { useDragContext } from "./context.tsx";
@@ -63,7 +63,8 @@ export function makeDroppable(el: HTMLElement, options: MakeDroppableOptions = {
  * Reactive droppable primitive. Attach to a JSX element via `ref={drop.ref}`.
  *
  * Requires a `createDragContext` Provider ancestor to coordinate with draggables.
- * Without a Provider, `isOver` and `active` remain at their initial values.
+ * Without a Provider, `isOver` and `active` remain at their initial values (a dev-mode
+ * warning is logged in that case, since it usually means a missing `<ctx.Provider>`).
  *
  * @example
  * ```tsx
@@ -84,6 +85,16 @@ export function createDroppable<T = unknown>(
   }
 
   const ctx = useDragContext();
+
+  if (DEV && !ctx) {
+    // oxlint-disable-next-line no-console
+    console.warn(
+      "[@solid-primitives/drag-drop] createDroppable/createSortable was used without a " +
+        "createDragContext ancestor — isOver/active will stay false/null. Wrap it in the " +
+        "<Provider> returned by createDragContext().",
+    );
+  }
+
   const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(undefined, INTERNAL_OPTIONS);
 
   const isOver: () => boolean = ctx
