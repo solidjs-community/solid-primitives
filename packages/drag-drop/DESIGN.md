@@ -471,7 +471,7 @@ pointerup anywhere on document
 ```json
 {
   "primitive": {
-    "name": "drag",
+    "name": "drag-drop",
     "stage": 0,
     "list": [
       "makeDraggable",
@@ -487,7 +487,7 @@ pointerup anywhere on document
       "rectIntersection",
       "pointerWithin"
     ],
-    "category": "Interaction"
+    "category": "UI Patterns"
   }
 }
 ```
@@ -705,7 +705,7 @@ type NativeDroppableReturn = {
 ```json
 {
   "primitive": {
-    "name": "drag",
+    "name": "drag-drop",
     "stage": 0,
     "list": [
       "makeDraggable",
@@ -721,7 +721,7 @@ type NativeDroppableReturn = {
       "rectIntersection",
       "pointerWithin"
     ],
-    "category": "Interaction"
+    "category": "UI Patterns"
   }
 }
 ```

@@ -23,7 +23,7 @@ import {
 import type { CollisionDetector } from "@solid-primitives/drag-drop";
 
 const meta = preview.meta({
-  title: "Interaction/Drag & Drop",
+  title: "UI Patterns/Drag & Drop",
   tags: ["autodocs"],
   parameters: {
     layout: "centered",

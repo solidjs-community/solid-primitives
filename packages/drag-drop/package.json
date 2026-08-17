@@ -30,7 +30,7 @@
       "rectIntersection",
       "pointerWithin"
     ],
-    "category": "Interaction"
+    "category": "UI Patterns"
   },
   "keywords": [
     "solid",
