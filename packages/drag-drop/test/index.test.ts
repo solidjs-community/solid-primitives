@@ -647,6 +647,68 @@ describe("createDragContext", () => {
     dispose();
   });
 
+  it("isDragging/isOver only flip for the specific ids involved, not siblings", () => {
+    const dragEls = [el(), el(), el()];
+    const dropEls = [el(), el(), el()];
+    mockRect(dragEls[0]!, { left: 0, top: 0, right: 50, bottom: 50 });
+    mockRect(dropEls[0]!, { left: 200, top: 0, right: 300, bottom: 100 });
+    mockRect(dropEls[1]!, { left: 400, top: 0, right: 500, bottom: 100 });
+    mockRect(dropEls[2]!, { left: 600, top: 0, right: 700, bottom: 100 });
+
+    const drags: DraggableReturn[] = [];
+    const drops: DroppableReturn[] = [];
+
+    const container = el();
+    const dispose = render(
+      () => {
+        const ctx = createDragContext();
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            for (let i = 0; i < 3; i++) {
+              const d = createDraggable(`d${i}`);
+              d.ref(dragEls[i]!);
+              drags.push(d);
+              const drop = createDroppable(`z${i}`);
+              drop.ref(dropEls[i]!);
+              drops.push(drop);
+            }
+            return null;
+          },
+        });
+      },
+      container,
+    );
+    flush();
+
+    // Start dragging only the first draggable.
+    ptr(dragEls[0]!, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
+    flush();
+    expect(drags[0]!.isDragging()).toBe(true);
+    expect(drags[1]!.isDragging()).toBe(false);
+    expect(drags[2]!.isDragging()).toBe(false);
+
+    // Hover over only the second drop zone.
+    ptr(document, "pointermove", { clientX: 450, clientY: 50 });
+    flush();
+    expect(drops[0]!.isOver()).toBe(false);
+    expect(drops[1]!.isOver()).toBe(true);
+    expect(drops[2]!.isOver()).toBe(false);
+
+    // Move to the third drop zone — the second should flip back off.
+    ptr(document, "pointermove", { clientX: 650, clientY: 50 });
+    flush();
+    expect(drops[0]!.isOver()).toBe(false);
+    expect(drops[1]!.isOver()).toBe(false);
+    expect(drops[2]!.isOver()).toBe(true);
+
+    ptr(document, "pointerup", { clientX: 650, clientY: 50 });
+    flush();
+    expect(drags[0]!.isDragging()).toBe(false);
+    expect(drops[2]!.isOver()).toBe(false);
+
+    dispose();
+  });
+
   it("excludes self from collision when using createSortable", () => {
     const div = el();
     mockRect(div, { left: 0, top: 0, right: 100, bottom: 100 });

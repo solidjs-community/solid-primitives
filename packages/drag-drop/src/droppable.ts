@@ -97,9 +97,9 @@ export function createDroppable<T = unknown>(
 
   const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(undefined, INTERNAL_OPTIONS);
 
-  const isOver: () => boolean = ctx
-    ? createMemo(() => ctx.over()?.id === id)
-    : () => false;
+  // `ctx._isOver` is a createProjection lookup — checking it doesn't mark every other
+  // droppable's `isOver` stale on each hover change, unlike `ctx.over()?.id === id`.
+  const isOver: () => boolean = ctx ? () => ctx._isOver(id) : () => false;
 
   const active: () => DragItem | null = ctx
     ? createMemo((): DragItem | null => (isOver() ? ctx.active() : null))

@@ -154,7 +154,7 @@ const drop = createNativeDroppable({
 
 Coordinates draggables and droppables. Provide it as a context via `ctx.Provider`.
 
-Droppable rects are snapshotted once at drag start — `getBoundingClientRect` is never called during `pointermove`. Collision checks run at display rate (rAF-throttled) and only write reactive state when the hovered zone actually changes.
+Droppable rects are snapshotted once at drag start — `getBoundingClientRect` is never called during `pointermove`. Collision checks run at display rate (rAF-throttled) and only write reactive state when the hovered zone actually changes. `createDraggable`'s `isDragging` and `createDroppable`'s `isOver` are backed by `createProjection`, so in a list of many draggables/droppables, a drag start/end or hover change only notifies the specific items whose state actually flipped — not every item in the list.
 
 ```tsx
 const ctx = createDragContext({

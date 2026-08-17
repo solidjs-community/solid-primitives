@@ -26,3 +26,4 @@ New package: `@solid-primitives/drag-drop` — composable drag-and-drop primitiv
 
 - The reported `transform` is corrected for page scroll during a drag, so the dragged element doesn't visually drift from the pointer if the page scrolls mid-drag (needed for `autoScroll` to look right, and for any scrollable page in general).
 - `createDroppable`/`createSortable` log a dev-mode warning when used without a `createDragContext` ancestor, since `isOver`/`active` silently stay `false`/`null` in that case.
+- `isDragging`/`isOver` are backed by `createProjection` instead of a per-instance `active()?.id === id` memo, so a drag start/end or hover change in a large list only notifies the specific items involved.

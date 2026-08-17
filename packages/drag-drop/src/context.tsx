@@ -1,4 +1,4 @@
-import { createContext, createSignal, onCleanup, useContext, untrack, type Element } from "solid-js";
+import { createContext, createProjection, createSignal, onCleanup, useContext, untrack, type Element } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
 import { pointerWithin } from "./collision.ts";
@@ -41,6 +41,14 @@ export type DragContextValue = {
   _moveBy: (dx: number, dy: number) => void;
   /** Drops the active drag (equivalent to releasing the pointer). No-op if nothing is dragging. */
   _endDrag: () => void;
+  /**
+   * `true` iff `id` is the currently active draggable. Backed by `createProjection`, so checking
+   * this for every draggable in a large list only invalidates the (at most two) ids that actually
+   * changed, instead of every instance re-comparing against `active()?.id` on each drag start/end.
+   */
+  _isActive: (id: string | number) => boolean;
+  /** Same fine-grained lookup as `_isActive`, for the currently hovered droppable. */
+  _isOver: (id: string | number) => boolean;
 };
 
 const DragCtx = createContext<DragContextValue>();
@@ -64,6 +72,25 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
   const [active, setActive] = createSignal<DragItem | null>(null, INTERNAL_OPTIONS);
   const [over, setOver] = createSignal<DroppableItem | null>(null, INTERNAL_OPTIONS);
   const [transform, setTransform] = createSignal<Transform | null>(null, INTERNAL_OPTIONS);
+
+  // Fine-grained "is this id the one" lookups. A plain `active()?.id === id` memo per draggable
+  // would mark every instance in a list as stale on each drag start/end; these projections only
+  // notify the (at most two) ids whose membership actually flipped.
+  let prevActiveId: string | number | undefined;
+  const isActiveId = createProjection<Record<string | number, boolean>>(s => {
+    const id = active()?.id;
+    if (id != null) s[id] = true;
+    if (prevActiveId != null && prevActiveId !== id) delete s[prevActiveId];
+    prevActiveId = id;
+  }, {});
+
+  let prevOverId: string | number | undefined;
+  const isOverId = createProjection<Record<string | number, boolean>>(s => {
+    const id = over()?.id;
+    if (id != null) s[id] = true;
+    if (prevOverId != null && prevOverId !== id) delete s[prevOverId];
+    prevOverId = id;
+  }, {});
 
   let currentDrag: DragItem | null = null;
   let startX = 0;
@@ -295,6 +322,8 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
     _startKeyboardDrag,
     _moveBy,
     _endDrag: finishDrag,
+    _isActive: id => !!isActiveId[id],
+    _isOver: id => !!isOverId[id],
   };
 
   const Provider = (props: { children: Element }): Element => (

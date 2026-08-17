@@ -106,7 +106,9 @@ export function createDraggable<T = unknown>(
   let currentTransform: () => Transform | null;
 
   if (ctx) {
-    isDragging = createMemo(() => ctx.active()?.id === id);
+    // `ctx._isActive` is a createProjection lookup — checking it doesn't mark every other
+    // draggable's `isDragging` stale on each drag start/end, unlike `ctx.active()?.id === id`.
+    isDragging = () => ctx._isActive(id);
     currentTransform = createMemo(() => (isDragging() ? ctx.transform() : null));
   } else {
     const [_isDragging, setIsDragging] = createSignal(false, INTERNAL_OPTIONS);

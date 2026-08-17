@@ -173,6 +173,14 @@ Events surfaced on the context:
 - `onDragEnd(item, over)` — fired on pointer up
 - `onDragCancel(item)` — fired on Escape or pointer cancel
 
+**Fine-grained membership lookups.** `_isActive(id)`/`_isOver(id)` (internal, not part of
+the public `DragContextReturn`) back `createDraggable`'s `isDragging` and `createDroppable`'s
+`isOver`. They're implemented with `createProjection` rather than a plain `active()?.id === id`
+/ `over()?.id === id` memo per instance: with N draggables/droppables in a list (e.g. a
+`createSortable` list), a plain-memo approach marks all N as stale on every drag start/end/hover
+change, even though at most two ever actually flip value. `createProjection` only notifies the
+specific ids whose membership changed.
+
 **Keyboard sensor.** `_startKeyboardDrag`/`_moveBy`/`_endDrag` are internal context
 methods (not part of the public `DragContextReturn`) that `createDraggable` wires up
 to `Space`/`Enter`/arrow-key/`Escape` handling. A keyboard-initiated drag anchors its
