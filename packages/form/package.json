@@ -22,7 +22,7 @@
       "FormControlContext",
       "useFormControl"
     ],
-    "category": "Forms",
+    "category": "UI Patterns",
     "gzip": 2609
   },
   "keywords": [
