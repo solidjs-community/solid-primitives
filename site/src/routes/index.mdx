@@ -13,7 +13,6 @@ import IconPhBroadcast from "~icons/ph/broadcast";
 import IconPhFilmStrip from "~icons/ph/film-strip";
 import IconPhPuzzlePiece from "~icons/ph/puzzle-piece";
 import IconPhCompass from "~icons/ph/compass";
-import IconPhNotePencil from "~icons/ph/note-pencil";
 import { totalPackages, categoryPrimitiveCounts } from "../generated/counts";
 import { projectStats } from "../generated/stats";
 
@@ -72,7 +71,7 @@ import { projectStats } from "../generated/stats";
 <div class="pl-strip">
   <div class="pl-strip-header">
     <span>Primitive Categories</span>
-    <span class="pl-strip-note">{totalPackages} primitive packages, 11 categories</span>
+    <span class="pl-strip-note">{totalPackages} primitive packages, 10 categories</span>
   </div>
   <div class="pl-strip-steps">
     <a href="/primitives#reactivity" class="pl-step">
@@ -143,13 +142,6 @@ import { projectStats } from "../generated/stats";
       <div class="pl-step-text">
         <div class="pl-step-label">Sensors</div>
         <div class="pl-step-title">{categoryPrimitiveCounts["Sensors"]} primitives</div>
-      </div>
-    </a>
-    <a href="/primitives#forms" class="pl-step">
-      <div class="pl-step-icon"><IconPhNotePencil /></div>
-      <div class="pl-step-text">
-        <div class="pl-step-label">Forms</div>
-        <div class="pl-step-title">{categoryPrimitiveCounts["Forms"]} primitives</div>
       </div>
     </a>
   </div>

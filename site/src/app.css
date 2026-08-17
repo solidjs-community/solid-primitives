@@ -243,7 +243,7 @@ html[data-theme*="dark"] {
    docs) version-selector — repurpose it via generated content instead of
    wiring up that whole feature for a single static label. */
 [class*="version-selector_"]::after {
-  content: "v2.0";
+  content: "v2.0-RC0";
   display: inline-flex;
   align-items: center;
   padding: 0.15em 0.55em;
@@ -284,8 +284,8 @@ html[data-theme*="dark"] {
 
 /* Bold and enlarge the sidebar category group headers (Animation, Browser APIs, etc). */
 [class*="section-trigger_"] h2 {
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
 }
 
 /* Light divider under each sidebar category header, separating it from its
@@ -516,7 +516,7 @@ article:has(.pl-hero) > [class*="content_"] {
 
 .pl-strip-steps {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
 }
 
