@@ -90,7 +90,9 @@ It will work exactly like nesting multiple providers as separate components, but
 
 ### How to use it
 
-`MultiProvider` takes only a single `values` with a key-value pair of the context and the value to provide.
+`MultiProvider` takes a single `values` array. Contexts are paired with the value to provide.
+Providers returned by `createContextProvider` are paired with their props instead, so providers with
+arbitrary prop shapes can be composed without an extra wrapper component.
 
 > **Note**
 > Values list is evaluated in order, so the context values will be provided in the same way as if you were nesting the providers.
@@ -102,11 +104,13 @@ import { MultiProvider } from "@solid-primitives/context";
 <FooContext.Provider value={"foo"}>
   <BarContext.Provider value={"bar"}>
     <BazContext.Provider value={"baz"}>
-      <MyCustomProviderComponent value={"hello-world"}>
-        <BoundContextProvider>
-          <App />
-        </BoundContextProvider>
-      </MyCustomProviderComponent>
+      <CounterProvider initial={1} label="primary">
+        <MyCustomProviderComponent value={"hello-world"}>
+          <BoundContextProvider>
+            <App />
+          </BoundContextProvider>
+        </MyCustomProviderComponent>
+      </CounterProvider>
     </BazContext.Provider>
   </BarContext.Provider>
 </FooContext.Provider>;
@@ -117,6 +121,8 @@ import { MultiProvider } from "@solid-primitives/context";
     [FooContext, "foo"],
     [BarContext, "bar"],
     [BazContext, "baz"],
+    // providers from createContextProvider receive the same props as when nested directly
+    [CounterProvider, { initial: 1, label: "primary" }],
     // you can also provide a component, the value will be passed to a `value` prop
     [MyCustomProviderComponent, "hello-world"],
     // if you have a provider that doesn't accept a `value` prop, you can just pass a function
