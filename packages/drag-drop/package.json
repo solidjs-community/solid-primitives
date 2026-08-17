@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/drag-drop",
-  "version": "0.0.100",
+  "version": "0.1.0-next.0",
   "description": "Composable drag-and-drop primitives.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],

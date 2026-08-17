@@ -102,7 +102,8 @@
     "@solid-primitives/async": "0.0.100",
     "@solid-primitives/url": "0.1.0",
     "@solid-primitives/favicon": "0.0.100",
-    "@solid-primitives/sortable": "0.0.100"
+    "@solid-primitives/sortable": "0.0.100",
+    "@solid-primitives/drag-drop": "0.0.100"
   },
   "changesets": [
     "a11y-dataset-hydration-safety",
@@ -127,6 +128,7 @@
     "deep-solid2-migration",
     "destructure-solid2-migration",
     "devices-solid2-migration",
+    "drag-new-package",
     "eleven-baths-build",
     "eleven-buttons-jump",
     "event-bus-solid2-migration",
