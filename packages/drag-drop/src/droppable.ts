@@ -259,8 +259,10 @@ export function createNativeDroppable(
           return;
         }
         depth++;
-        if (depth === 1) setIsOver(true);
-        options.onEnter?.(event);
+        if (depth === 1) {
+          setIsOver(true);
+          options.onEnter?.(event);
+        }
       };
 
       const onDragLeave = (event: DragEvent) => {

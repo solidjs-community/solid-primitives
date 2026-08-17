@@ -1097,6 +1097,22 @@ describe("createNativeDroppable", () => {
     });
   });
 
+  it("calls onEnter only once per zone entry, not once per child dragenter", () => {
+    createRoot(dispose => {
+      const div = el();
+      let enterCount = 0;
+      const drop = createNativeDroppable({ onEnter: () => enterCount++ });
+      drop.ref(div);
+
+      drag(div, "dragenter"); // depth = 1 — fires
+      drag(div, "dragenter"); // depth = 2 (bubbled from a child) — must not fire again
+      flush();
+      expect(enterCount).toBe(1);
+
+      dispose();
+    });
+  });
+
   it("a rejected dragenter+dragleave does not corrupt depth for a later accepted enter", () => {
     createRoot(dispose => {
       const div = el();
