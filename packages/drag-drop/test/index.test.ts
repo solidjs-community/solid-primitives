@@ -264,6 +264,24 @@ describe("makeNativeDroppable", () => {
     expect(entered).toBe(false);
     cleanup();
   });
+
+  it("a rejected dragenter+dragleave does not corrupt depth for a later accepted enter", () => {
+    const div = el();
+    let rejectNext = true;
+    let entered = false;
+    const cleanup = makeNativeDroppable(div, {
+      accept: () => !rejectNext,
+      onEnter: () => { entered = true; },
+    });
+    drag(div, "dragenter"); // rejected — depth must stay at 0, not go negative
+    drag(div, "dragleave");
+    expect(entered).toBe(false);
+
+    rejectNext = false;
+    drag(div, "dragenter"); // now accepted — must still fire onEnter
+    expect(entered).toBe(true);
+    cleanup();
+  });
 });
 
 // ── createDraggable ───────────────────────────────────────────────────────────
@@ -1002,6 +1020,27 @@ describe("createNativeDroppable", () => {
       drag(div, "dragleave"); // depth = 0
       flush();
       expect(drop.isOver()).toBe(false);
+
+      dispose();
+    });
+  });
+
+  it("a rejected dragenter+dragleave does not corrupt depth for a later accepted enter", () => {
+    createRoot(dispose => {
+      const div = el();
+      let rejectNext = true;
+      const drop = createNativeDroppable({ accept: () => !rejectNext });
+      drop.ref(div);
+
+      drag(div, "dragenter"); // rejected — depth must stay at 0, not go negative
+      drag(div, "dragleave");
+      flush();
+      expect(drop.isOver()).toBe(false);
+
+      rejectNext = false;
+      drag(div, "dragenter"); // now accepted — must still set isOver
+      flush();
+      expect(drop.isOver()).toBe(true);
 
       dispose();
     });

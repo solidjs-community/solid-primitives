@@ -184,7 +184,8 @@ export function makeNativeDroppable(
 
   const onDragLeave = (event: DragEvent) => {
     if (options.disabled) return;
-    depth--;
+    if (options.accept && !options.accept(event)) return;
+    if (depth > 0) depth--;
     if (depth === 0) options.onLeave?.(event);
   };
 
@@ -264,7 +265,8 @@ export function createNativeDroppable(
 
       const onDragLeave = (event: DragEvent) => {
         if (access(options.disabled)) return;
-        depth--;
+        if (options.accept && !options.accept(event)) return;
+        if (depth > 0) depth--;
         if (depth === 0) {
           setIsOver(false);
           options.onLeave?.(event);
