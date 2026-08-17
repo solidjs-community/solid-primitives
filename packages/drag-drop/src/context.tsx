@@ -228,8 +228,11 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
 
   const onPointerUp = (_event: PointerEvent) => finishDrag();
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== "Escape" || !currentDrag) return;
+  // Shared by Escape (explicit user cancel) and pointercancel (OS/browser-interrupted
+  // drag, e.g. a touch gesture cancelled by the system) — both end the drag without a
+  // drop, so both go through onDragCancel rather than onDragEnd.
+  const cancelDrag = () => {
+    if (!currentDrag) return;
     cancelPendingMove();
 
     const item = currentDrag;
@@ -242,6 +245,12 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
     setTransform(null);
   };
 
+  const onPointerCancel = (_event: PointerEvent) => cancelDrag();
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") cancelDrag();
+  };
+
   const onScroll = () => {
     if (currentDrag) snapshotRects(currentDrag.id);
   };
@@ -249,6 +258,7 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
   function cleanupDrag() {
     document.removeEventListener("pointermove", onPointerMove);
     document.removeEventListener("pointerup", onPointerUp);
+    document.removeEventListener("pointercancel", onPointerCancel);
     document.removeEventListener("keydown", onKeyDown);
     document.removeEventListener("scroll", onScroll, { capture: true });
   }
@@ -282,6 +292,7 @@ export function createDragContext(options: DragContextOptions = {}): DragContext
 
     document.addEventListener("pointermove", onPointerMove);
     document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerCancel);
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("scroll", onScroll, { passive: true, capture: true });
 

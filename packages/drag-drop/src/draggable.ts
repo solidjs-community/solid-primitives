@@ -39,9 +39,24 @@ export function makeDraggable<T = unknown>(
     options.onMove?.(delta, event);
   };
 
-  const onPointerUp = (event: PointerEvent) => {
+  // Shared by pointerup (normal end) and pointercancel (OS/browser-interrupted drag,
+  // e.g. a touch gesture cancelled by the system) — both must stop tracking and
+  // report an end, or the document-level listeners leak and the caller never learns
+  // the drag stopped.
+  const stopTracking = () => {
     document.removeEventListener("pointermove", onPointerMove);
     document.removeEventListener("pointerup", onPointerUp);
+    document.removeEventListener("pointercancel", onPointerCancel);
+  };
+
+  const onPointerUp = (event: PointerEvent) => {
+    stopTracking();
+    const delta = scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY);
+    options.onEnd?.(delta, event);
+  };
+
+  const onPointerCancel = (event: PointerEvent) => {
+    stopTracking();
     const delta = scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY);
     options.onEnd?.(delta, event);
   };
@@ -56,6 +71,7 @@ export function makeDraggable<T = unknown>(
     startScrollY = window.scrollY;
     document.addEventListener("pointermove", onPointerMove);
     document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerCancel);
     options.onStart?.(event);
   };
 
@@ -63,8 +79,7 @@ export function makeDraggable<T = unknown>(
 
   return () => {
     el.removeEventListener("pointerdown", onPointerDown);
-    document.removeEventListener("pointermove", onPointerMove);
-    document.removeEventListener("pointerup", onPointerUp);
+    stopTracking();
   };
 }
 
@@ -125,12 +140,18 @@ export function createDraggable<T = unknown>(
       setTransform(scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY));
     };
 
-    const onPointerUp = () => {
+    // Shared by pointerup (normal end) and pointercancel (OS/browser-interrupted drag) —
+    // both must stop tracking and reset state, or isDragging/transform get stuck.
+    const stopTracking = () => {
       document.removeEventListener("pointermove", onPointerMove);
       document.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("pointercancel", onPointerCancel);
       setIsDragging(false);
       setTransform(null);
     };
+
+    const onPointerUp = () => stopTracking();
+    const onPointerCancel = () => stopTracking();
 
     const nudge = (dx: number, dy: number) => {
       setTransform(t => ({ x: (t?.x ?? 0) + dx, y: (t?.y ?? 0) + dy }));
@@ -180,14 +201,14 @@ export function createDraggable<T = unknown>(
           setTransform({ x: 0, y: 0 });
           document.addEventListener("pointermove", onPointerMove);
           document.addEventListener("pointerup", onPointerUp);
+          document.addEventListener("pointercancel", onPointerCancel);
         };
         el.addEventListener("pointerdown", onPointerDown);
         el.addEventListener("keydown", onKeyDown);
         return () => {
           el.removeEventListener("pointerdown", onPointerDown);
           el.removeEventListener("keydown", onKeyDown);
-          document.removeEventListener("pointermove", onPointerMove);
-          document.removeEventListener("pointerup", onPointerUp);
+          stopTracking();
         };
       },
     );

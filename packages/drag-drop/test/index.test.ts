@@ -100,6 +100,23 @@ describe("makeDraggable", () => {
     cleanup();
   });
 
+  it("calls onEnd on pointercancel and stops tracking", () => {
+    const div = el();
+    let endCalls = 0;
+    let moveCalls = 0;
+    const cleanup = makeDraggable(div, {
+      onMove: () => moveCalls++,
+      onEnd: () => endCalls++,
+    });
+    ptr(div, "pointerdown", { button: 0, clientX: 0, clientY: 0 });
+    ptr(document, "pointercancel", { clientX: 5, clientY: 10 });
+    expect(endCalls).toBe(1);
+    // tracking must have stopped — a move after cancel should not fire onMove
+    ptr(document, "pointermove", { clientX: 50, clientY: 50 });
+    expect(moveCalls).toBe(0);
+    cleanup();
+  });
+
   it("no-ops when disabled", () => {
     const div = el();
     let started = false;
@@ -324,6 +341,27 @@ describe("createDraggable (standalone — no context)", () => {
       ptr(document, "pointerup", {});
       flush();
       expect(d.isDragging()).toBe(false);
+      dispose();
+    });
+  });
+
+  it("becomes isDragging true on pointerdown and resets on pointercancel", () => {
+    createRoot(dispose => {
+      const div = el();
+      const d = createDraggable("x");
+      d.ref(div);
+      flush();
+      ptr(div, "pointerdown", { button: 0, clientX: 0, clientY: 0 });
+      flush();
+      expect(d.isDragging()).toBe(true);
+      ptr(document, "pointercancel", {});
+      flush();
+      expect(d.isDragging()).toBe(false);
+      expect(d.transform()).toBeNull();
+      // tracking must have stopped — a move after cancel should not resurrect transform
+      ptr(document, "pointermove", { clientX: 50, clientY: 50 });
+      flush();
+      expect(d.transform()).toBeNull();
       dispose();
     });
   });
@@ -662,6 +700,40 @@ describe("createDragContext", () => {
     ptr(dragEl, "pointerdown", { button: 0 });
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     expect(cancelled).toBe(true);
+    dispose();
+  });
+
+  it("fires onDragCancel (not onDragEnd) on pointercancel, and stops tracking", () => {
+    let cancelled = false;
+    let ended = false;
+    let drag!: DraggableReturn;
+    const dragEl = el();
+
+    const container = el();
+    const dispose = render(
+      () => {
+        const ctx = createDragContext({
+          onDragCancel: () => { cancelled = true; },
+          onDragEnd: () => { ended = true; },
+        });
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            drag = createDraggable("x");
+            drag.ref(dragEl);
+            return null;
+          },
+        });
+      },
+      container,
+    );
+    flush();
+
+    ptr(dragEl, "pointerdown", { button: 0 });
+    ptr(document, "pointercancel", {});
+    expect(cancelled).toBe(true);
+    expect(ended).toBe(false);
+    expect(drag.isDragging()).toBe(false);
+
     dispose();
   });
 
