@@ -331,7 +331,7 @@ export const SortableList = meta.story({
                     style={{
                       position: "relative",
                       "z-index": s.isDragging() ? 10 : 1,
-                      transform: s.isDragging()
+                      transform: s.transform()
                         ? `translate(${s.transform()!.x}px, ${s.transform()!.y}px)`
                         : `translateY(${shift()}px)`,
                       transition: s.isDragging() ? "none" : "transform 0.2s ease",
