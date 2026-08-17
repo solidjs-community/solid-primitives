@@ -26,7 +26,15 @@ import type { SortableReturn } from "./types.ts";
  */
 export function arrayMove<T>(array: readonly T[], from: number, to: number): T[] {
   const next = array.slice();
-  if (from < 0 || from >= array.length || to < 0 || to >= array.length || from === to) {
+  if (
+    !Number.isInteger(from) ||
+    !Number.isInteger(to) ||
+    from < 0 ||
+    from >= array.length ||
+    to < 0 ||
+    to >= array.length ||
+    from === to
+  ) {
     return next;
   }
   const [moved] = next.splice(from, 1);

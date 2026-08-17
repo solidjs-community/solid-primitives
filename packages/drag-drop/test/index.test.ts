@@ -1214,6 +1214,23 @@ describe("arrayMove", () => {
     expect(arrayMove(items, 1, 5)).toEqual(items);
   });
 
+  it("returns an unmodified copy when an index is NaN", () => {
+    // NaN fails every `<`/`>=`/`===` comparison, so without an explicit integer
+    // check it silently bypasses the range guard — Array#splice then coerces
+    // NaN to 0 internally, corrupting the array from index 0.
+    const items = ["a", "b", "c"];
+    const result = arrayMove(items, NaN, 1);
+    expect(result).toEqual(items);
+    expect(result).not.toBe(items);
+    expect(arrayMove(items, 0, NaN)).toEqual(items);
+  });
+
+  it("returns an unmodified copy when an index is fractional", () => {
+    const items = ["a", "b", "c"];
+    expect(arrayMove(items, 1.5, 2)).toEqual(items);
+    expect(arrayMove(items, 0, 1.5)).toEqual(items);
+  });
+
   it("does not mutate the input array", () => {
     const items = ["a", "b", "c"];
     arrayMove(items, 0, 2);
