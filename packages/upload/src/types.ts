@@ -21,6 +21,14 @@ export type FilePickerOptions = {
 
 export type UserCallback = (files: UploadFile[]) => void | Promise<void>;
 
+/**
+ * Fired for drag-movement events (enter/leave/over). The browser only exposes real
+ * `File` objects on `dataTransfer.files` at `drop` time — during movement events it's
+ * always an empty `FileList` — so these receive the raw `DragEvent` instead. Inspect
+ * `event.dataTransfer.items` / `.types` for metadata about what's being dragged.
+ */
+export type DragEventCallback = (event: DragEvent) => void | Promise<void>;
+
 export interface FilePicker {
   files: Accessor<UploadFile[]>;
   error: Accessor<unknown>;
@@ -48,9 +56,9 @@ export interface Dropzone<T extends HTMLElement = HTMLElement> {
 
 export interface DropzoneOptions {
   onDrop?: UserCallback;
-  onDragEnter?: UserCallback;
-  onDragLeave?: UserCallback;
-  onDragOver?: UserCallback;
+  onDragEnter?: DragEventCallback;
+  onDragLeave?: DragEventCallback;
+  onDragOver?: DragEventCallback;
 }
 
 export type UploadStatus = "idle" | "uploading" | "success" | "error" | "aborted";

@@ -46,12 +46,9 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   const [isLoading, setIsLoading] = createSignal(false);
 
   const drop = createNativeDroppable({
-    onEnter: e =>
-      options?.onDragEnter?.(transformFiles(e.dataTransfer?.files ?? null)),
-    onLeave: e =>
-      options?.onDragLeave?.(transformFiles(e.dataTransfer?.files ?? null)),
-    onOver: e =>
-      options?.onDragOver?.(transformFiles(e.dataTransfer?.files ?? null)),
+    onEnter: e => options?.onDragEnter?.(e),
+    onLeave: e => options?.onDragLeave?.(e),
+    onOver: e => options?.onDragOver?.(e),
     onDrop: e => {
       const parsedFiles = transformFiles(e.dataTransfer?.files ?? null);
       setFiles(parsedFiles);

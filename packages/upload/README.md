@@ -272,14 +272,14 @@ const { ref, files, isDragging, error } = createDropzone({
 
 **Options (all optional):**
 
-| Callback      | Fires when…                                              |
-| ------------- | -------------------------------------------------------- |
-| `onDrop`      | Files are dropped; `isLoading` is `true` while it awaits |
-| `onDragEnter` | A dragged item enters the element                        |
-| `onDragLeave` | A dragged item leaves the element                        |
-| `onDragOver`  | An item is dragged continuously over the element         |
+| Callback      | Signature                                            | Fires when…                                               |
+| ------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| `onDrop`      | `(files: UploadFile[]) => void \| Promise<void>`      | Files are dropped; `isLoading` is `true` while it awaits    |
+| `onDragEnter` | `(event: DragEvent) => void \| Promise<void>`         | A dragged item enters the element                           |
+| `onDragLeave` | `(event: DragEvent) => void \| Promise<void>`         | A dragged item leaves the element                           |
+| `onDragOver`  | `(event: DragEvent) => void \| Promise<void>`         | An item is dragged continuously over the element             |
 
-All callbacks have signature `(files: UploadFile[]) => void | Promise<void>`. `isLoading` tracks only the `onDrop` callback — drag-movement callbacks are fire-and-forget.
+Only `onDrop` receives `UploadFile[]` — the browser only exposes real `File` objects on `dataTransfer.files` at drop time, so `onDragEnter`/`onDragLeave`/`onDragOver` receive the raw `DragEvent` instead (inspect `event.dataTransfer.items` / `.types` for metadata about what's being dragged). `isLoading` tracks only the `onDrop` callback — drag-movement callbacks are fire-and-forget.
 
 ## `dropzone`
 
@@ -341,6 +341,10 @@ type FileUploadEntry = {
 };
 
 type UserCallback = (files: UploadFile[]) => void | Promise<void>;
+
+// Drag-movement callbacks (onDragEnter/onDragLeave/onDragOver) receive the raw
+// DragEvent instead of UploadFile[] — dataTransfer.files is only populated at drop.
+type DragEventCallback = (event: DragEvent) => void | Promise<void>;
 
 type FilePickerOptions = {
   accept?: string;

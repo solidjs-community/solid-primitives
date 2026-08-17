@@ -299,6 +299,43 @@ describe("createDropzone", () => {
     }).not.toThrow();
   });
 
+  it("onDragEnter/onDragLeave/onDragOver receive the raw DragEvent, not UploadFile[]", () => {
+    // dataTransfer.files is always empty during movement events in real browsers —
+    // these callbacks get the event itself so consumers can read dataTransfer.items/.types.
+    let enterArg: unknown, leaveArg: unknown, overArg: unknown;
+    const { ref, dispose } = createRoot(dispose => ({
+      ...createDropzone({
+        onDragEnter: e => { enterArg = e; },
+        onDragLeave: e => { leaveArg = e; },
+        onDragOver: e => { overArg = e; },
+      }),
+      dispose,
+    }));
+
+    const div = document.createElement("div");
+    ref(div);
+
+    const withDataTransfer = (type: string) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { files: makeFileList() }, configurable: true });
+      return event;
+    };
+
+    const enterEvent = withDataTransfer("dragenter");
+    div.dispatchEvent(enterEvent);
+    const overEvent = withDataTransfer("dragover");
+    div.dispatchEvent(overEvent);
+    const leaveEvent = withDataTransfer("dragleave");
+    div.dispatchEvent(leaveEvent);
+
+    expect(enterArg).toBe(enterEvent);
+    expect(overArg).toBe(overEvent);
+    expect(leaveArg).toBe(leaveEvent);
+    expect(Array.isArray(enterArg)).toBe(false);
+
+    dispose();
+  });
+
   it("isLoading is true while onDrop callback is pending, false after it resolves", async () => {
     let resolve!: () => void;
     const blocker = new Promise<void>(r => { resolve = r; });
