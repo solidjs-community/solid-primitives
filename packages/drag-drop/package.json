@@ -30,7 +30,8 @@
       "rectIntersection",
       "pointerWithin"
     ],
-    "category": "UI Patterns"
+    "category": "UI Patterns",
+    "gzip": 3987
   },
   "keywords": [
     "solid",
