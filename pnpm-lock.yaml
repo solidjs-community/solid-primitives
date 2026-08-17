@@ -402,6 +402,19 @@ importers:
         specifier: 'catalog:'
         version: 2.0.0-rc.0
 
+  packages/drag-drop:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-rc.0(solid-js@2.0.0-rc.0)
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-rc.0
+
   packages/event-bus:
     dependencies:
       '@solid-primitives/utils':
@@ -1388,9 +1401,9 @@ importers:
 
   packages/upload:
     dependencies:
-      '@solid-primitives/event-listener':
+      '@solid-primitives/drag-drop':
         specifier: workspace:*
-        version: link:../event-listener
+        version: link:../drag-drop
     devDependencies:
       '@solidjs/web':
         specifier: 'catalog:'

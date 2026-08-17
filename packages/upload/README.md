@@ -228,7 +228,7 @@ If `onError` is omitted, a rejection from `userCallback` propagates as an unhand
 
 ## `createDropzone`
 
-A reactive drag-and-drop zone. Attach it to any element via the `ref` callback and respond to the full set of drag lifecycle events.
+A reactive drag-and-drop zone. Attach it to any element via the `ref` callback and respond to drag lifecycle events. Implemented on top of `createNativeDroppable` from `@solid-primitives/drag-drop` — the depth-counter logic, `isOver` tracking, and element cleanup are all handled by the underlying primitive.
 
 ```tsx
 import { createDropzone, createFileUploader, fileSender } from "@solid-primitives/upload";
@@ -272,17 +272,14 @@ const { ref, files, isDragging, error } = createDropzone({
 
 **Options (all optional):**
 
-| Callback      | Fires when…                                              |
-| ------------- | -------------------------------------------------------- |
-| `onDrop`      | Files are dropped; `isLoading` is `true` while it awaits |
-| `onDragStart` | A drag operation begins                                  |
-| `onDragEnter` | A dragged item enters the element                        |
-| `onDragEnd`   | A drag operation ends                                    |
-| `onDragLeave` | A dragged item leaves the element                        |
-| `onDragOver`  | An item is dragged continuously over the element         |
-| `onDrag`      | Any drag event fires on the element                      |
+| Callback      | Signature                                            | Fires when…                                               |
+| ------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| `onDrop`      | `(files: UploadFile[]) => void \| Promise<void>`      | Files are dropped; `isLoading` is `true` while it awaits    |
+| `onDragEnter` | `(event: DragEvent) => void \| Promise<void>`         | A dragged item enters the element                           |
+| `onDragLeave` | `(event: DragEvent) => void \| Promise<void>`         | A dragged item leaves the element                           |
+| `onDragOver`  | `(event: DragEvent) => void \| Promise<void>`         | An item is dragged continuously over the element             |
 
-All callbacks have signature `(files: UploadFile[]) => void | Promise<void>`. `isLoading` tracks only the `onDrop` callback — drag-movement events are fire-and-forget.
+Only `onDrop` receives `UploadFile[]` — the browser only exposes real `File` objects on `dataTransfer.files` at drop time, so `onDragEnter`/`onDragLeave`/`onDragOver` receive the raw `DragEvent` instead (inspect `event.dataTransfer.items` / `.types` for metadata about what's being dragged). `isLoading` tracks only the `onDrop` callback — drag-movement callbacks are fire-and-forget.
 
 ## `dropzone`
 
@@ -292,11 +289,10 @@ A ref callback factory variant of `createDropzone`. Returns a single value that 
 import { dropzone, createFileUploader, fileSender } from "@solid-primitives/upload";
 
 const { upload, progress, status } = createFileUploader(fileSender("/api/upload"));
+const dz = dropzone({ onDrop: files => upload(files) });
 
 <div
-  ref={dropzone({
-    onDrop: files => upload(files),
-  })}
+  ref={dz}
   style={{
     background: dz.isDragging() ? "lightblue" : "lightgray",
     padding: "2rem",
@@ -345,6 +341,10 @@ type FileUploadEntry = {
 };
 
 type UserCallback = (files: UploadFile[]) => void | Promise<void>;
+
+// Drag-movement callbacks (onDragEnter/onDragLeave/onDragOver) receive the raw
+// DragEvent instead of UploadFile[] — dataTransfer.files is only populated at drop.
+type DragEventCallback = (event: DragEvent) => void | Promise<void>;
 
 type FilePickerOptions = {
   accept?: string;

@@ -289,12 +289,9 @@ describe("createDropzone", () => {
       const dispose = createRoot(dispose => {
         createDropzone({
           onDrop: vi.fn(),
-          onDragStart: vi.fn(),
           onDragEnter: vi.fn(),
-          onDragEnd: vi.fn(),
           onDragLeave: vi.fn(),
           onDragOver: vi.fn(),
-          onDrag: vi.fn(),
         });
         return dispose;
       });
@@ -302,13 +299,47 @@ describe("createDropzone", () => {
     }).not.toThrow();
   });
 
+  it("onDragEnter/onDragLeave/onDragOver receive the raw DragEvent, not UploadFile[]", () => {
+    // dataTransfer.files is always empty during movement events in real browsers —
+    // these callbacks get the event itself so consumers can read dataTransfer.items/.types.
+    let enterArg: unknown, leaveArg: unknown, overArg: unknown;
+    const { ref, dispose } = createRoot(dispose => ({
+      ...createDropzone({
+        onDragEnter: e => { enterArg = e; },
+        onDragLeave: e => { leaveArg = e; },
+        onDragOver: e => { overArg = e; },
+      }),
+      dispose,
+    }));
+
+    const div = document.createElement("div");
+    ref(div);
+
+    const withDataTransfer = (type: string) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { files: makeFileList() }, configurable: true });
+      return event;
+    };
+
+    const enterEvent = withDataTransfer("dragenter");
+    div.dispatchEvent(enterEvent);
+    const overEvent = withDataTransfer("dragover");
+    div.dispatchEvent(overEvent);
+    const leaveEvent = withDataTransfer("dragleave");
+    div.dispatchEvent(leaveEvent);
+
+    expect(enterArg).toBe(enterEvent);
+    expect(overArg).toBe(overEvent);
+    expect(leaveArg).toBe(leaveEvent);
+    expect(Array.isArray(enterArg)).toBe(false);
+
+    dispose();
+  });
+
   it("isLoading is true while onDrop callback is pending, false after it resolves", async () => {
     let resolve!: () => void;
-    const blocker = new Promise<void>(r => {
-      resolve = r;
-    });
+    const blocker = new Promise<void>(r => { resolve = r; });
 
-    // Capture isLoading via closure — onDrop is passed before the primitive returns
     let getIsLoading!: () => boolean;
     const { ref, dispose } = createRoot(dispose => {
       const dz = createDropzone({ onDrop: () => blocker });
@@ -325,13 +356,13 @@ describe("createDropzone", () => {
       configurable: true,
     });
     div.dispatchEvent(dropEvent);
-    await Promise.resolve(); // flush setIsLoading(true)
+    await Promise.resolve();
 
     expect(getIsLoading()).toBe(true);
 
     resolve();
     await blocker;
-    await Promise.resolve(); // flush setIsLoading(false) from finally
+    await Promise.resolve();
 
     expect(getIsLoading()).toBe(false);
     dispose();
@@ -381,16 +412,13 @@ describe("createDropzone", () => {
     flush();
     expect(isDragging()).toBe(false);
 
-    // Re-assign — el1 listeners should be removed, el2 should become active
     ref(el2);
     expect(removeSpy).toHaveBeenCalled();
 
-    // el1 events no longer affect state
     el1.dispatchEvent(new Event("dragenter"));
     flush();
     expect(isDragging()).toBe(false);
 
-    // el2 events now drive state
     el2.dispatchEvent(new Event("dragenter"));
     flush();
     expect(isDragging()).toBe(true);
@@ -401,18 +429,13 @@ describe("createDropzone", () => {
   it("error() captures a thrown onDrop callback", async () => {
     const boom = new Error("drop failed");
     const { error, ref, dispose } = createRoot(dispose => ({
-      ...createDropzone({
-        onDrop: async () => {
-          throw boom;
-        },
-      }),
+      ...createDropzone({ onDrop: async () => { throw boom; } }),
       dispose,
     }));
 
     const div = document.createElement("div");
     ref(div);
 
-    // jsdom does not implement DragEvent — dispatch a plain Event with stubbed dataTransfer
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
       value: { files: makeFileList(makeFile()) },
