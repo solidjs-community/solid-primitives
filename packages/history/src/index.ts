@@ -1,12 +1,5 @@
-import { type Many, createMicrotask, falseFn, noop } from "@solid-primitives/utils";
-import {
-  type Accessor,
-  type Signal,
-  type SignalOptions,
-  createMemo,
-  createSignal,
-  untrack,
-} from "solid-js";
+import { type Many, falseFn, noop } from "@solid-primitives/utils";
+import { type Accessor, createMemo, createOptimistic, createStore, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 /**
@@ -50,7 +43,13 @@ export type UndoHistoryReturn = {
   redo: VoidFunction;
 };
 
-type HistoryState = { count: Signal<number>; list: VoidFunction[][] };
+// One slot per source, always the same length as `sources` — even when a
+// source is paused (returns falsy) it keeps its `undefined` slot instead of
+// being dropped, so entries never end up with mismatched lengths and index i
+// always refers to the same source across every recorded entry.
+type Setters = (VoidFunction | undefined)[];
+
+type HistoryState = { offset: number; items: Setters[] };
 
 /**
  * Creates an undo history from a reactive source for going back and forth between state snapshots.
@@ -92,68 +91,63 @@ export function createUndoHistory(
     };
   }
 
-  let ignoreNext = false;
-
   const limit = options?.limit ?? 100,
-    sources = Array.isArray(source) ? source.map(s => createMemo(s)) : [source],
-    clearIgnore = createMicrotask(() => (ignoreNext = false)),
-    // Initial state lives outside the memo so Solid undefined-prev first-call is handled
-    initialCount = createSignal<number>(0, { ownedWrite: true } as SignalOptions<number>),
-    initialState: HistoryState = { list: [], count: initialCount },
-    history = createMemo<HistoryState>(p => {
-      const prev = p ?? initialState;
+    // Each source gets its own memo so an unrelated source's recompute
+    // doesn't produce a fresh (reference-unequal) closure for this one —
+    // that reference stability is what lets `jump` skip no-op restores.
+    sources = (Array.isArray(source) ? source : [source]).map(s => createMemo(s)),
+    [disableTracking, setDisableTracking] = createOptimistic(false),
+    [store, setStore] = createStore<HistoryState>(
+      draft => {
+        const setters: Setters = sources.map(s => s() || undefined);
+        if (untrack(disableTracking) || setters.every(s => s === undefined)) return;
 
-      // always track the sources
-      const setters: VoidFunction[] = [];
-      for (const s of sources) {
-        const setter = s();
-        if (setter) setters.push(setter);
-      }
-
-      if (ignoreNext || !setters.length) {
-        ignoreNext = false;
-        return prev;
-      }
-
-      const count = untrack(prev.count[0]),
-        newLength = prev.list.length - count,
-        newHistory = prev.list.slice(Math.max(0, newLength - limit), newLength);
-      newHistory.push(setters);
-
-      return {
-        count: count
-          ? createSignal<number>(0, { ownedWrite: true } as SignalOptions<number>)
-          : prev.count,
-        list: newHistory,
-      };
-    }),
-    canUndo = createMemo(() => {
-      const h = history();
-      return h.list.length - h.count[0]() > 1;
-    }),
-    canRedo = createMemo(() => history().count[0]() > 0),
-    move = (n: -1 | 1) => {
-      ignoreNext = true;
-      clearIgnore();
-      const h = history(),
-        newCount = h.count[1](p => p + n),
-        newIndex = h.list.length - newCount - 1,
-        prevSetters = h.list[newIndex + n]!,
-        setters = h.list[newIndex]!;
-      for (let i = 0; i < setters.length; i++) {
-        // only call the setter if the current value is different
-        if (setters[i] !== prevSetters[i]) setters[i]!();
-      }
+        // drop any redo-only tail (entries beyond the current position),
+        // insert the new entry, then trim to at most `limit` past entries.
+        draft.items.splice(draft.items.length - draft.offset, draft.offset, setters);
+        draft.items.splice(0, draft.items.length - (limit + 1));
+        draft.offset = 0;
+      },
+      { offset: 0, items: [] },
+    ),
+    getTargetIndex = (state: HistoryState, amount: number) => {
+      const target = state.items.length - 1 - (state.offset - amount);
+      return target >= 0 && target < state.items.length ? target : null;
+    },
+    jump = (amount: -1 | 1) => {
+      setDisableTracking(true);
+      let toEntry: Setters | undefined, fromEntry: Setters | undefined;
+      setStore(draft => {
+        const targetIndex = getTargetIndex(draft, amount);
+        if (targetIndex === null) return;
+        toEntry = draft.items[targetIndex];
+        fromEntry = draft.items[targetIndex - amount];
+        draft.offset -= amount;
+      });
+      if (!toEntry || !fromEntry) return;
+      const setters = toEntry,
+        prevSetters = fromEntry;
+      untrack(() => {
+        for (let i = 0; i < setters.length; i++) {
+          // only call the setter if it was active on both sides of the move
+          // and the value actually differs — if a source was paused on
+          // either side we have no tracked value to compare against, so
+          // skip it rather than firing a spurious restore
+          const setter = setters[i],
+            prevSetter = prevSetters[i];
+          if (setter !== undefined && prevSetter !== undefined && setter !== prevSetter) setter();
+        }
+      });
     };
 
   return {
-    canUndo,
-    canRedo,
+    canUndo: () => getTargetIndex(store, -1) !== null,
+    canRedo: () => getTargetIndex(store, 1) !== null,
     undo() {
-      untrack(() => canUndo() && move(1));
+      jump(-1);
     },
     redo() {
-      untrack(() => canRedo() && move(-1));
+      jump(1);
     },
   };
 }

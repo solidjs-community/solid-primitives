@@ -144,6 +144,7 @@
     "gestures-solid2-migration",
     "graphql-solid2-migration",
     "history-solid2-migration",
+    "history-undo-multi-source-fix",
     "i18n-missing-key-handler",
     "i18n-rich-text",
     "i18n-solid2-migration",
