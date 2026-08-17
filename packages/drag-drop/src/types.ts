@@ -54,7 +54,7 @@ export type MakeNativeDroppableOptions = {
   onLeave?: (event: DragEvent) => void;
   onOver?: (event: DragEvent) => void;
   onDrop?: (event: DragEvent) => void;
-  /** Return false to reject; checked on dragenter and dragover. */
+  /** Return false to reject; checked on dragenter, dragover, and drop. */
   accept?: (event: DragEvent) => boolean;
   disabled?: boolean;
 };

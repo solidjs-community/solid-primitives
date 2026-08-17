@@ -251,6 +251,18 @@ describe("makeNativeDroppable", () => {
     cleanup();
   });
 
+  it("suppresses onDrop when accept returns false", () => {
+    const div = el();
+    let dropped = false;
+    const cleanup = makeNativeDroppable(div, {
+      accept: () => false,
+      onDrop: () => { dropped = true; },
+    });
+    drag(div, "drop");
+    expect(dropped).toBe(false);
+    cleanup();
+  });
+
   it("calls preventDefault on dragover", () => {
     const div = el();
     const cleanup = makeNativeDroppable(div);
@@ -1159,6 +1171,18 @@ describe("createNativeDroppable", () => {
       drop.ref(div);
       drag(div, "drop");
       expect(dropped).toBe(true);
+      dispose();
+    });
+  });
+
+  it("suppresses onDrop when accept returns false", () => {
+    createRoot(dispose => {
+      const div = el();
+      let dropped = false;
+      const drop = createNativeDroppable({ accept: () => false, onDrop: () => { dropped = true; } });
+      drop.ref(div);
+      drag(div, "drop");
+      expect(dropped).toBe(false);
       dispose();
     });
   });

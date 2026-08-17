@@ -203,6 +203,7 @@ export function makeNativeDroppable(
     event.preventDefault();
     depth = 0;
     if (options.disabled) return;
+    if (options.accept && !options.accept(event)) return;
     options.onDrop?.(event);
   };
 
@@ -290,6 +291,7 @@ export function createNativeDroppable(
         depth = 0;
         setIsOver(false);
         if (access(options.disabled)) return;
+        if (options.accept && !options.accept(event)) return;
         options.onDrop?.(event);
       };
 
