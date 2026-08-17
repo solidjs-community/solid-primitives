@@ -1,7 +1,6 @@
 import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
-  push,
   filter,
   sort,
   capitalize,
@@ -49,8 +48,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Array pipeline ───────────────────────────────────────────────────
-
 export const ArrayPipeline = meta.story({
   name: "Sort & filter pipeline",
   parameters: {
@@ -78,9 +75,7 @@ export const ArrayPipeline = meta.story({
               {n => (
                 <Button
                   variant={list().includes(n) ? "primary" : "outline"}
-                  onClick={() =>
-                    setList(l => (l.includes(n) ? l.filter(x => x !== n) : [...l, n]))
-                  }
+                  onClick={() => setList(l => (l.includes(n) ? l.filter(x => x !== n) : [...l, n]))}
                   style={{
                     "min-width": "34px",
                     padding: "0.3rem",
@@ -111,9 +106,7 @@ export const ArrayPipeline = meta.story({
         </Section>
         <Separator />
         <div style={{ display: "flex", gap: "0.35rem", "flex-wrap": "wrap", "min-height": "26px" }}>
-          <For each={sorted()}>
-            {n => <Badge variant="info">{n}</Badge>}
-          </For>
+          <For each={sorted()}>{n => <Badge variant="info">{n}</Badge>}</For>
           <Show when={sorted().length === 0}>
             <span style={{ color: colors.muted, "font-size": font.sizeSm }}>no items</span>
           </Show>
@@ -124,8 +117,6 @@ export const ArrayPipeline = meta.story({
     );
   },
 });
-
-// ── Story 2: String pipeline ──────────────────────────────────────────────────
 
 export const StringPipeline = meta.story({
   name: "Name badge formatter",
@@ -157,8 +148,6 @@ export const StringPipeline = meta.story({
     );
   },
 });
-
-// ── Story 3: Number pipeline ──────────────────────────────────────────────────
 
 export const NumberPipeline = meta.story({
   name: "Price calculator",
@@ -241,8 +230,6 @@ export const NumberPipeline = meta.story({
   },
 });
 
-// ── Story 4: Object pipeline ──────────────────────────────────────────────────
-
 export const ObjectPipeline = meta.story({
   name: "Profile update chain",
   parameters: {
@@ -269,7 +256,7 @@ export const ObjectPipeline = meta.story({
         <TextField label="Last name" value={lastName()} onChange={setLastName} />
         <Section title="Role override">
           <ButtonRow>
-            {(["viewer", "editor", "admin"]).map(r => (
+            {["viewer", "editor", "admin"].map(r => (
               <Button
                 variant={role() === r ? "primary" : "outline"}
                 onClick={() => setRole(r)}
@@ -287,8 +274,6 @@ export const ObjectPipeline = meta.story({
     );
   },
 });
-
-// ── Story 5: Cross-category chain ─────────────────────────────────────────────
 
 export const ConvertAndCompute = meta.story({
   name: "Text input → clamped score",

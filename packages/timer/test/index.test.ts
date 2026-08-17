@@ -20,10 +20,7 @@ afterAll(() => {
   vi.useRealTimers();
 });
 
-// ---------------------------------------------------------------------------
 // makeTimer
-// ---------------------------------------------------------------------------
-
 describe("makeTimer", () => {
   test("setTimeout fires once after delay", () => {
     let count = 0;
@@ -68,10 +65,7 @@ describe("makeTimer", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // createTimer
-// ---------------------------------------------------------------------------
-
 describe("createTimer", () => {
   test("disposing of root clears timers", () => {
     let timeout_count = 0;
@@ -190,10 +184,7 @@ describe("createTimer", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // createTimeoutLoop
-// ---------------------------------------------------------------------------
-
 describe("createTimeoutLoop", () => {
   test("number delay: fires repeatedly and stops on dispose", () => {
     let count = 0;
@@ -294,10 +285,7 @@ describe("createTimeoutLoop", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // createPolled
-// ---------------------------------------------------------------------------
-
 describe("createPolled", () => {
   test("fn called immediately and after each interval", () => {
     let n = 0;
@@ -394,10 +382,7 @@ describe("createPolled", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // createIntervalCounter
-// ---------------------------------------------------------------------------
-
 describe("createIntervalCounter", () => {
   test("starts at 0 and increments each interval", () => {
     const { count, dispose } = createRoot(dispose => ({

@@ -1,11 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
 import { renderToString } from "@solidjs/web";
-import {
-  createContextProvider,
-  createLayeredContext,
-  MultiProvider,
-} from "../src/index.js";
+import { createContextProvider, createLayeredContext, MultiProvider } from "../src/index.js";
 
 type TestContextValue = {
   message: string;
@@ -44,9 +40,7 @@ describe("MultiProvider", () => {
     };
 
     renderToString(() => (
-      <MultiProvider
-        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2, "World"], BoundProvider]}
-      >
+      <MultiProvider values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2, "World"], BoundProvider]}>
         {untrack(() => {
           runs++;
           capture1 = useContext(Ctx1);

@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/queue": minor
+"@solid-primitives/queue": major
 ---
 
 Initial release of `@solid-primitives/queue`

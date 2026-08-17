@@ -1,5 +1,75 @@
 # @solid-primitives/analytics
 
+## 2.0.0-next.2
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/page-utilities@3.0.0-next.2
+  - @solid-primitives/queue@1.0.0-next.3
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 2.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/page-utilities@3.0.0-next.1
+  - @solid-primitives/queue@1.0.0-next.2
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 2.0.0-next.0
+
+### Major Changes
+
+- 5b99671: Redesign for Solid.js v2.0 (beta.14) with a queue-based plugin pipeline
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  The previous `createAnalytics(handlers)` default export and `EventType` / `TrackHandler` types have been replaced with a richer API:
+
+  - **`makeAnalytics(plugins, options?)`** — non-reactive base primitive returning `[controls, cleanup]`
+  - **`createAnalytics(plugins, options?)`** — reactive primitive returning controls plus `initialized` and `pendingCount` signals
+
+  ### Plugin format
+
+  Plugins follow the [`analytics`](https://www.npmjs.com/package/analytics) npm package interface (`name`, `initialize`, `loaded`, `page`, `track`, `identify`), so any plugin from the [analytics plugin catalogue](https://www.npmjs.com/package/analytics#analytic-plugins) works directly — install it separately and pass it in.
+
+  No first-party plugins are bundled in this package.
+
+  ### Event queue
+
+  Events fired before plugins finish initializing are buffered in a bounded FIFO queue and replayed automatically once all plugins report ready. The queue limit and poll interval are configurable via `AnalyticsOptions`.
+
+  ### Migration
+
+  ```ts
+  // Before (v0.x)
+  import createAnalytics, { EventType } from "@solid-primitives/analytics";
+  const track = createAnalytics([myHandler]);
+  track(EventType.Event, { category: "ui", action: "click" });
+
+  // After (v1.x) — use any plugin from https://www.npmjs.com/package/analytics#analytic-plugins
+  import { createAnalytics } from "@solid-primitives/analytics";
+  import googleAnalytics from "@analytics/google-analytics";
+
+  const analytics = createAnalytics([googleAnalytics({ measurementId: "G-xxx" })]);
+  analytics.track("click", { category: "ui" });
+  ```
+
+## 1.1.0
+
+### Minor Changes
+
+- Use `@solid-primitives/page-utilities` for navigation blocking instead of a hand-rolled `beforeunload` listener, removing the `@solid-primitives/event-listener` dependency.
+- `makeAnalyticsGuard` now returns a tuple `[(event: BeforeLeaveEvent) => void, () => void]` instead of `{ onBeforeLeave, cleanup }`, consistent with the `makeAnalytics` tuple convention.
+- `createAnalyticsGuard` now returns `(event: BeforeLeaveEvent) => void` directly instead of `{ onBeforeLeave }`, allowing it to be passed straight to `useBeforeLeave`.
+- Hard navigation (tab close, URL bar) now shows a browser confirmation dialog via `makePageLeave` rather than a fire-and-forget drain.
+
 ## 0.2.1
 
 ### Patch Changes

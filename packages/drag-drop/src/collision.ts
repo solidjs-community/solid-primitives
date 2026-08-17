@@ -1,4 +1,4 @@
-import type { CollisionDetector } from "./types.js";
+import type { CollisionDetector } from "./types.ts";
 
 /** Returns the droppable whose center is nearest to the pointer. Uses squared distance — no sqrt needed. */
 export const closestCenter: CollisionDetector = (_draggable, droppables, pointer) => {

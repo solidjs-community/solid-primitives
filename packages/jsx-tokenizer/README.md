@@ -6,6 +6,7 @@
 
 [![version](https://img.shields.io/npm/v/@solid-primitives/jsx-tokenizer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/jsx-tokenizer)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 A set of primitives that help safely pass data through JSX to the parent component using [token components](#createtoken).
 
@@ -169,7 +170,7 @@ createEffect(
     // token is a function that returns the JSX Element fallback
     // token.data is the data returned by the tokenData function
     tokens.forEach(token => console.log(token.data));
-  }
+  },
 );
 
 // the return value of resolveTokens can be used in JSX (will render the fallback JSX Elements)
@@ -201,7 +202,7 @@ createEffect(
       // token.data is the data returned by the tokenData function
       console.log(el.data);
     });
-  }
+  },
 );
 
 // the return value of resolveTokens can be used in JSX

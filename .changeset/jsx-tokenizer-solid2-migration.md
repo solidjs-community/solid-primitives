@@ -2,11 +2,11 @@
 "@solid-primitives/jsx-tokenizer": major
 ---
 
-Migrate to Solid.js v2.0 (beta.10)
+Migrate to Solid.js v2.0 (beta.14)
 
 ## Breaking Changes
 
-**Peer dependencies**: `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10` are now required.
+**Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
 ### API changes
 

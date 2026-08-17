@@ -4,9 +4,10 @@
 
 # @solid-primitives/mediastream
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mediastream?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mediastream)
+[![size](https://img.shields.io/badge/size-1.06_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mediastream)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mediastream?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mediastream)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive primitives for working with [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream) — microphones, cameras, and screen capture.
 
@@ -14,6 +15,8 @@ Reactive primitives for working with [MediaStream](https://developer.mozilla.org
 
 ```bash
 npm install @solid-primitives/mediastream
+# or
+yarn add @solid-primitives/mediastream
 # or
 pnpm add @solid-primitives/mediastream
 ```
@@ -46,8 +49,15 @@ import { Loading } from "@solidjs/web";
 const [stream] = createStream({ video: true });
 
 <Loading fallback={<p>Requesting camera...</p>}>
-  <video ref={el => createEffect(stream, s => { el.srcObject = s ?? null; })} autoplay />
-</Loading>
+  <video
+    ref={el =>
+      createEffect(stream, s => {
+        el.srcObject = s ?? null;
+      })
+    }
+    autoplay
+  />
+</Loading>;
 ```
 
 ### `createScreen`
@@ -68,8 +78,15 @@ Same controls as `createStream` but uses `getDisplayMedia` instead of `getUserMe
 const [stream] = createScreen({ video: true });
 
 <Loading fallback={<p>Requesting screen capture...</p>}>
-  <video ref={el => createEffect(stream, s => { el.srcObject = s ?? null; })} autoplay />
-</Loading>
+  <video
+    ref={el =>
+      createEffect(stream, s => {
+        el.srcObject = s ?? null;
+      })
+    }
+    autoplay
+  />
+</Loading>;
 ```
 
 ### `createAmplitudeStream`
@@ -99,7 +116,7 @@ const [level] = createAmplitudeStream(audioConstraints);
   fallback={<button onClick={() => setAudioConstraints({ audio: true })}>Start</button>}
 >
   <meter min="0" max="100" value={level()} />
-</Show>
+</Show>;
 ```
 
 ### `createAmplitudeFromStream`
@@ -140,7 +157,7 @@ Returns a `Promise<void>` that resolves when permission is granted, and rejects 
 await createMediaPermissionRequest();
 
 // Request only microphone permission
-await createMediaPermissionRequest('audio');
+await createMediaPermissionRequest("audio");
 ```
 
 Use `createPermission` from `@solid-primitives/permission` to reactively observe the resulting permission state.

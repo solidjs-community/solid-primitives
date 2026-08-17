@@ -1,0 +1,27 @@
+diff --git a/dist/chunk-TKOWB3JL.js b/dist/chunk-TKOWB3JL.js
+index 532f0e8b2821bfe58827699672a5a82dffd9943c..5fb43fc0f74aeb5dbfe59798d32f62892fa6edaa 100644
+--- a/dist/chunk-TKOWB3JL.js
++++ b/dist/chunk-TKOWB3JL.js
+@@ -1,7 +1,12 @@
+ import { watch } from 'fs';
+ import * as path2 from 'path';
+ import { logger } from 'storybook/internal/node-logger';
+-import ts from 'typescript';
++// Patched: the workspace's own `typescript` devDependency is pinned to 7.x (a deliberate
++// upgrade), whose `typescript` package export is just `{ version }` — none of the classic
++// compiler API (ts.JsxEmit, ts.sys, ts.LanguageService, ...) this file needs. Import a
++// known-good classic TypeScript directly by its stable pnpm store path instead of relying on
++// module resolution, which would otherwise pick up the incompatible hoisted 7.x.
++import ts from '../../../../typescript@6.0.3/node_modules/typescript/lib/typescript.js';
+ import { createLanguage, FileMap } from '@volar/language-core';
+ import { resolveFileLanguageId, createLanguageServiceHost } from '@volar/typescript';
+ 
+@@ -798,7 +803,7 @@ async function getOrCreateSolidComponentMetaManager(watchMode = false) {
+     return watchManager;
+   }
+   try {
+-    const ts2 = await import('typescript');
++    const ts2 = await import('../../../../typescript@6.0.3/node_modules/typescript/lib/typescript.js');
+     const instance = new SolidComponentMetaManager(ts2);
+     if (watchMode) {
+       watchManager = instance;

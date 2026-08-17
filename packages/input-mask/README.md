@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-694_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/input-mask)
 [![version](https://img.shields.io/npm/v/@solid-primitives/input-mask?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/input-mask)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitive that returns an event handler to mask the inputs of a text input element (`<input>`, `<textarea>`) when applied in `oninput` or `onchange` and set attributes to handle pattern display.
 
@@ -16,6 +17,8 @@ Primitive that returns an event handler to mask the inputs of a text input eleme
 npm install @solid-primitives/input-mask
 # or
 yarn add @solid-primitives/input-mask
+# or
+pnpm add @solid-primitives/input-mask
 ```
 
 ## Usage
@@ -51,14 +54,13 @@ const meetingId = [/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_the_replacement
 const meetingName = [
   /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(www\.|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
-  () => ""
+  () => "",
 ];
 // function mask: (value, [start, end]) => [value, [start, end]]
 const meetingIdOrName = (value, selection) =>
   (/^\d{1,3}$|^\d{2,4}-?\d{0,3}$|^\d{2,4}-?\d{2,4}-?\d{0,3}$/.test(value)
     ? anyMaskToFn(meetingId)
-    : anyMaskToFn(meetingName)
-  )(value, selection);
+    : anyMaskToFn(meetingName))(value, selection);
 
 // converting string mask to array:
 const maskArrayFromString = stringMaskToArray(maskString);
@@ -75,7 +77,7 @@ const inputMask = {
   ref,
   get value() {
     return inputMask.ref?.value;
-  }
+  },
 };
 
 const dateMask = createInputMask("99/99/9999");

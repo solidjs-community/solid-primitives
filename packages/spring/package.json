@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/spring",
-  "version": "0.1.2",
+  "version": "1.0.0-next.3",
   "description": "Primitive that creates spring physics functions.",
   "author": "Carlo Taleon <carloantonioct@gmail.com>",
   "contributors": [
@@ -17,13 +17,13 @@
   },
   "primitive": {
     "name": "spring",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createSpring",
       "createDerivedSpring"
     ],
     "category": "Animation",
-    "gzip": 753
+    "gzip": 974
   },
   "keywords": [
     "animate",
@@ -49,17 +49,25 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solid-primitives/utils": "^7.0.0-next.4",
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solid-primitives/utils": "workspace:*",
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

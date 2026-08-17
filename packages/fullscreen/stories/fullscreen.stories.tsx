@@ -44,7 +44,9 @@ export const ImperativeControl = meta.story({
 
     return (
       <Container width={360}>
-        <Alert variant="info">Fullscreen requires a user gesture. Press Esc or click Exit to leave.</Alert>
+        <Alert variant="info">
+          Fullscreen requires a user gesture. Press Esc or click Exit to leave.
+        </Alert>
         <Card>
           <div
             ref={el => {

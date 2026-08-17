@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/static-store",
-  "version": "0.1.3",
+  "version": "1.0.0-next.2",
   "description": "Primitives for creating small reactive objects that doesn't change their shape over time - don't need a proxy wrapper.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,13 +15,13 @@
   },
   "primitive": {
     "name": "static-store",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createStaticStore",
       "createDerivedStaticStore"
     ],
     "category": "Reactivity",
-    "gzip": 589
+    "gzip": 587
   },
   "keywords": [
     "solid",
@@ -44,22 +44,26 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

@@ -150,8 +150,6 @@ export function createVibrate(
   return { vibrating, start, stop, supported };
 }
 
-// ─── Pulse / frequency primitives ────────────────────────────────────────────
-
 // Duration of a single repeating chunk sent to navigator.vibrate.
 // The setInterval fires at the same cadence so patterns join seamlessly.
 const PULSE_CHUNK_MS = 1000;

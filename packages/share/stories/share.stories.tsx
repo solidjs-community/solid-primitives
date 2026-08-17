@@ -166,9 +166,7 @@ export const CustomNetworkStory = meta.story({
     },
   },
   render: () => {
-    const [template, setTemplate] = createSignal(
-      "https://www.x.com/intent/tweet?text=@t&url=@u",
-    );
+    const [template, setTemplate] = createSignal("https://www.x.com/intent/tweet?text=@t&url=@u");
 
     const previewUrl = () =>
       template()
@@ -199,9 +197,9 @@ export const CustomNetworkStory = meta.story({
 
         <Section title="Markers">
           <p style={{ margin: 0, "font-size": "0.82rem", color: "#64748b", "line-height": "1.7" }}>
-            <code>@u</code> url &nbsp;·&nbsp; <code>@t</code> title &nbsp;·&nbsp;{" "}
-            <code>@d</code> description &nbsp;·&nbsp; <code>@q</code> quote &nbsp;·&nbsp;{" "}
-            <code>@h</code> hashtags &nbsp;·&nbsp; <code>@m</code> media
+            <code>@u</code> url &nbsp;·&nbsp; <code>@t</code> title &nbsp;·&nbsp; <code>@d</code>{" "}
+            description &nbsp;·&nbsp; <code>@q</code> quote &nbsp;·&nbsp; <code>@h</code> hashtags
+            &nbsp;·&nbsp; <code>@m</code> media
           </p>
         </Section>
 

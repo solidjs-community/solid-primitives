@@ -1,4 +1,4 @@
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 export type Handlers<T> = {
   [Property in keyof T as Property extends `on${infer EventName}`
@@ -32,7 +32,7 @@ export function createEventDispatcher<Props>(props: Props): <
         [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
 ) => boolean {
   if (isServer) {
-    return () => false;
+    return () => true;
   }
   return function <N extends keyof Handlers<Props> & string>(
     ...args: Handlers<Props>[N] extends

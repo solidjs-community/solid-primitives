@@ -23,8 +23,7 @@ export default meta;
 
 const VIDEO = "/video/big_buck_bunny_sall.mp4";
 
-const fmt = (s: number) =>
-  `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 export const ImperativeControls = meta.story({
   name: "Imperative controls",

@@ -4,6 +4,8 @@
 
 # @solid-primitives/event-props
 
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
+
 [![size](https://img.shields.io/badge/size-172_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-props)
 [![size](https://img.shields.io/npm/v/@solid-primitives/event-props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-props)
 
@@ -18,8 +20,6 @@ yarn add @solid-primitives/event-props
 # or
 pnpm add @solid-primitives/event-props
 ```
-
-**Peer dependency**: `solid-js@^2.0.0-beta.10`
 
 ## How to use it
 
@@ -43,10 +43,6 @@ createEffect(
 
 <div {...eventProps}>Click and drag on me</div>
 ```
-
-## Demo
-
-TODO
 
 ## Changelog
 

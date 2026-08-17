@@ -4,9 +4,10 @@
 
 # @solid-primitives/rootless
 
-[![size](https://img.shields.io/badge/size-936_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/rootless)
+[![size](https://img.shields.io/badge/size-935_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/rootless)
 [![version](https://img.shields.io/npm/v/@solid-primitives/rootless?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/rootless)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, and managing disposal of reactive roots.
 
@@ -162,10 +163,6 @@ The reason for this is that `createSingletonRoot` will create a root that will b
 And during hydration, if you were to update the shared state before the hydration is finished, it could cause a mismatch between the server and client.
 
 The API is experimental, and likely to change or be merged into `createSingletonRoot` in the future.
-
-### Demo
-
-Usage of combining `createSingletonRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
 
 ## `createRootPool`
 

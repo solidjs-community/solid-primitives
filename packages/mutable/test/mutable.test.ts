@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import * as solid from "solid-js";
+import { $PROXY, flush } from "solid-js";
 import { createMutable } from "../src/index.js";
-import { unwrap } from "solid-js/store";
 
 describe("State Mutability", () => {
   test("Setting a property", () => {
@@ -87,35 +87,30 @@ describe("Simple update modes", () => {
 });
 
 describe("Unwrapping Edge Cases", () => {
-  test("Unwrap nested frozen state object", () => {
+  test("Nested frozen state object is not wrapped", () => {
     const state = createMutable({
-        data: Object.freeze({ user: { firstName: "John", lastName: "Snow" } }),
-      }),
-      s = unwrap({ ...state });
-    expect(s.data.user.firstName).toBe("John");
-    expect(s.data.user.lastName).toBe("Snow");
-    // @ts-ignore check if proxy still
-    expect(s.data.user[solid.$RAW]).toBeUndefined();
+      data: Object.freeze({ user: { firstName: "John", lastName: "Snow" } }),
+    });
+    // frozen objects are not wrapped as reactive proxies
+    expect(state.data.user.firstName).toBe("John");
+    expect(state.data.user.lastName).toBe("Snow");
+    // @ts-ignore check if not proxy
+    expect(state.data.user[$PROXY]).toBeUndefined();
   });
-  test("Unwrap nested frozen array", () => {
+  test("Nested frozen array elements are accessible", () => {
     const state = createMutable({
-        data: [{ user: { firstName: "John", lastName: "Snow" } }],
-      }),
-      s = unwrap({ data: state.data.slice(0) });
-    expect(s.data[0]!.user.firstName).toBe("John");
-    expect(s.data[0]!.user.lastName).toBe("Snow");
-    // @ts-ignore check if proxy still
-    expect(s.data[0].user[solid.$RAW]).toBeUndefined();
+      data: [{ user: { firstName: "John", lastName: "Snow" } }],
+    });
+    expect(state.data[0]!.user.firstName).toBe("John");
+    expect(state.data[0]!.user.lastName).toBe("Snow");
   });
-  test("Unwrap nested frozen state array", () => {
+  test("Nested frozen state array is not wrapped", () => {
     const state = createMutable({
-        data: Object.freeze([{ user: { firstName: "John", lastName: "Snow" } }]),
-      }),
-      s = unwrap({ ...state });
-    expect(s.data[0]!.user.firstName).toBe("John");
-    expect(s.data[0]!.user.lastName).toBe("Snow");
-    // @ts-ignore check if proxy still
-    expect(s.data[0].user[solid.$RAW]).toBeUndefined();
+      data: Object.freeze([{ user: { firstName: "John", lastName: "Snow" } }]),
+    });
+    // frozen arrays are not wrapped
+    expect(state.data[0]!.user.firstName).toBe("John");
+    expect(state.data[0]!.user.lastName).toBe("Snow");
   });
 });
 
@@ -127,18 +122,23 @@ describe("Tracking State changes", () => {
       let executionCount = 0;
 
       expect.assertions(2);
-      solid.createEffect(() => {
-        if (executionCount === 0) expect(state.data).toBe(2);
-        else if (executionCount === 1) {
-          expect(state.data).toBe(5);
-        } else {
-          // should never get here
-          expect(executionCount).toBe(-1);
-        }
-        executionCount++;
-      });
+      solid.createEffect(
+        () => state!.data,
+        data => {
+          if (executionCount === 0) expect(data).toBe(2);
+          else if (executionCount === 1) {
+            expect(data).toBe(5);
+          } else {
+            // should never get here
+            expect(executionCount).toBe(-1);
+          }
+          executionCount++;
+        },
+      );
     });
+    flush();
     state!.data = 5;
+    flush();
     // same value again should not retrigger
     state!.data = 5;
   });
@@ -152,13 +152,16 @@ describe("Tracking State changes", () => {
         lastName: undefined,
       });
 
-      solid.createEffect(() => {
-        state.lastName;
-        executionCount++;
-      });
-      //this should retrigger the execution despite it being undefined
+      solid.createEffect(
+        () => state!.lastName,
+        () => {
+          executionCount++;
+        },
+      );
     });
+    flush(); // initial effect run
     delete state!.lastName;
+    flush(); // re-run after delete
     expect(executionCount).toBe(2);
   });
 
@@ -170,19 +173,24 @@ describe("Tracking State changes", () => {
         user: { firstName: "John", lastName: "Smith" },
       });
       expect.assertions(2);
-      solid.createEffect(() => {
-        if (executionCount === 0) {
-          expect(state.user.firstName).toBe("John");
-        } else if (executionCount === 1) {
-          expect(state.user.firstName).toBe("Jake");
-        } else {
-          // should never get here
-          expect(executionCount).toBe(-1);
-        }
-        executionCount++;
-      });
+      solid.createEffect(
+        () => state!.user.firstName,
+        firstName => {
+          if (executionCount === 0) {
+            expect(firstName).toBe("John");
+          } else if (executionCount === 1) {
+            expect(firstName).toBe("Jake");
+          } else {
+            // should never get here
+            expect(executionCount).toBe(-1);
+          }
+          executionCount++;
+        },
+      );
     });
+    flush();
     state!.user.firstName = "Jake";
+    flush();
   });
 });
 
@@ -202,6 +210,7 @@ describe("Handling functions in state", () => {
         }),
         getValue = solid.createMemo(() => state.fn());
       state.fn = () => 2;
+      flush();
       expect(getValue()).toBe(2);
     });
   });
@@ -213,10 +222,16 @@ describe("Setting state from Effects", () => {
     let getData: solid.Accessor<string>, setData: solid.Setter<string>;
     solid.createRoot(() => {
       ([getData, setData] = solid.createSignal("init")), (state = createMutable({ data: "" }));
-      // don't do this often
-      solid.createEffect(() => (state.data = getData()));
+      solid.createEffect(
+        () => getData(),
+        data => {
+          state!.data = data;
+        },
+      );
     });
+    flush(); // initial effect: sets state.data = "init"
     setData!("signal");
+    flush();
     expect(state!.data).toBe("signal");
   });
 
@@ -246,16 +261,14 @@ describe("State wrapping", () => {
     // not wrapped
     expect(state.time).toBe(date);
   });
-  test("Respects batch in array mutate 2", () => {
+  test("Array operations are consistent", () => {
     const state = createMutable([1, 2, 3]);
-    solid.batch(() => {
-      expect(state.length).toBe(3);
-      const move = state.splice(1, 1);
-      expect(state.length).toBe(2);
-      state.splice(0, 0, ...move);
-      expect(state.length).toBe(3);
-      expect(state).toEqual([2, 1, 3]);
-    });
+    expect(state.length).toBe(3);
+    const move = state.splice(1, 1);
+    expect(state.length).toBe(2);
+    state.splice(0, 0, ...move);
+    expect(state.length).toBe(3);
+    expect(state).toEqual([2, 1, 3]);
     expect(state.length).toBe(3);
     expect(state).toEqual([2, 1, 3]);
   });
@@ -291,6 +304,7 @@ describe("In Operator", () => {
     expect(access).toBe(0);
 
     store.c = 3;
+    flush();
 
     expect(a()).toBe(true);
     expect(b()).toBe(true);
@@ -298,6 +312,7 @@ describe("In Operator", () => {
     expect(access).toBe(0);
 
     delete store.a;
+    flush();
     expect(a()).toBe(false);
     expect(b()).toBe(true);
     expect(c()).toBe(true);

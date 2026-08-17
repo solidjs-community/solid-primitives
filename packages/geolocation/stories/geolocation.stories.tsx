@@ -79,8 +79,8 @@ export const OneShot = meta.story({
         </Show>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
-          Non-reactive — no Solid owner required. Call <code>cleanup()</code> to cancel a
-          pending request.
+          Non-reactive — no Solid owner required. Call <code>cleanup()</code> to cancel a pending
+          request.
         </p>
       </Container>
     );
@@ -113,19 +113,14 @@ export const WatcherStory = meta.story({
       <Container>
         <h3 style={{ margin: 0 }}>createGeolocationWatcher</h3>
 
-        <Button
-          onClick={() => setEnabled(e => !e)}
-          variant={enabled() ? "outline" : "primary"}
-        >
+        <Button onClick={() => setEnabled(e => !e)} variant={enabled() ? "outline" : "primary"}>
           {enabled() ? "Stop watching" : "Start watching"}
         </Button>
 
         <Show when={enabled()}>
           <Switch>
             <Match when={error()}>
-              <span style={{ color: "#ef4444", "font-size": "0.9rem" }}>
-                ✗ {error()!.message}
-              </span>
+              <span style={{ color: "#ef4444", "font-size": "0.9rem" }}>✗ {error()!.message}</span>
             </Match>
             <Match when={coords()}>
               {c => (
@@ -140,9 +135,7 @@ export const WatcherStory = meta.story({
               )}
             </Match>
             <Match when={true}>
-              <em style={{ color: "#94a3b8", "font-size": "0.9rem" }}>
-                Acquiring GPS fix…
-              </em>
+              <em style={{ color: "#94a3b8", "font-size": "0.9rem" }}>Acquiring GPS fix…</em>
             </Match>
           </Switch>
         </Show>
@@ -213,10 +206,7 @@ export const DistanceTracking = meta.story({
           </select>
         </div>
 
-        <Button
-          onClick={() => setEnabled(e => !e)}
-          variant={enabled() ? "outline" : "primary"}
-        >
+        <Button onClick={() => setEnabled(e => !e)} variant={enabled() ? "outline" : "primary"}>
           {enabled() ? "Stop tracking" : "Start tracking"}
         </Button>
 
@@ -234,8 +224,8 @@ export const DistanceTracking = meta.story({
         </Show>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
-          Swap the landmark while tracking — distance recalculates immediately using the
-          Haversine formula without restarting the GPS watcher.
+          Swap the landmark while tracking — distance recalculates immediately using the Haversine
+          formula without restarting the GPS watcher.
         </p>
       </Container>
     );

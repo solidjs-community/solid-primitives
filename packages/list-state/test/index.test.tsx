@@ -166,7 +166,9 @@ describe("createListState", () => {
       loop: true,
       initialActive: "c",
     });
-    expect(() => onKeyDownWithLoop(new KeyboardEvent("keydown", { key: "ArrowDown" }))).not.toThrow();
+    expect(() =>
+      onKeyDownWithLoop(new KeyboardEvent("keydown", { key: "ArrowDown" })),
+    ).not.toThrow();
 
     const { onKeyDown: onKeyDownNoLoop } = createListState({
       items: ["a", "b", "c"],
@@ -381,7 +383,9 @@ describe("createMultiSelectListState", () => {
       loop: true,
       initialCursor: "c",
     });
-    expect(() => onKeyDownWithLoop(new KeyboardEvent("keydown", { key: "ArrowDown" }))).not.toThrow();
+    expect(() =>
+      onKeyDownWithLoop(new KeyboardEvent("keydown", { key: "ArrowDown" })),
+    ).not.toThrow();
 
     const { onKeyDown: onKeyDownNoLoop } = createMultiSelectListState({
       items: ["a", "b", "c"],
@@ -396,7 +400,11 @@ describe("createMultiSelectListState", () => {
       items: ["a", "b", "c"],
       initialCursor: "b",
     });
-    expect(() => onKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown", shiftKey: true }))).not.toThrow();
-    expect(() => onKeyDown(new KeyboardEvent("keydown", { key: "Home", shiftKey: true }))).not.toThrow();
+    expect(() =>
+      onKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown", shiftKey: true })),
+    ).not.toThrow();
+    expect(() =>
+      onKeyDown(new KeyboardEvent("keydown", { key: "Home", shiftKey: true })),
+    ).not.toThrow();
   });
 });

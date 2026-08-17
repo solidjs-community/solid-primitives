@@ -1,12 +1,6 @@
 import { createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
-import {
-  makeActiveElementListener,
-  createActiveElement,
-  makeFocusListener,
-  createFocusSignal,
-  focus,
-} from "../src/index.js";
+import { makeActiveElementListener, createActiveElement, focus } from "../src/index.js";
 
 const dispatchFocusEvent = (
   target: Element | Window = window,
@@ -40,29 +34,6 @@ describe("makeActiveElementListener", () => {
     }));
 });
 
-describe("makeFocusListener", () => {
-  test("works properly", () =>
-    createRoot(dispose => {
-      const el = document.createElement("div");
-      const captured: any[] = [];
-      const clear = makeFocusListener(el, e => captured.push(e));
-      expect(captured).toEqual([]);
-      dispatchFocusEvent(el, "focus");
-      expect(captured).toEqual([true]);
-      dispatchFocusEvent(el, "blur");
-      expect(captured).toEqual([true, false]);
-      clear();
-      dispatchFocusEvent(el, "focus");
-      expect(captured).toEqual([true, false]);
-      makeFocusListener(el, e => captured.push(e));
-      dispatchFocusEvent(el, "blur");
-      expect(captured).toEqual([true, false, false]);
-      dispose();
-      dispatchFocusEvent(el, "focus");
-      expect(captured).toEqual([true, false, false]);
-    }));
-});
-
 describe("createActiveElement", () => {
   test("works properly", () =>
     createRoot(dispose => {
@@ -72,28 +43,13 @@ describe("createActiveElement", () => {
     }));
 });
 
-describe("createFocusSignal", () => {
-  test("works properly", () =>
-    createRoot(dispose => {
-      const el = document.createElement("div");
-      const activeEl = createFocusSignal(el);
-      expect(activeEl()).toBe(false);
-      dispatchFocusEvent(el, "focus");
-      expect(activeEl()).toBe(true);
-      dispatchFocusEvent(el, "blur");
-      expect(activeEl()).toBe(false);
-      dispose();
-      dispatchFocusEvent(el, "focus");
-      expect(activeEl()).toBe(false);
-    }));
-});
-
-describe("use:focus", () => {
+describe("focus", () => {
   test("works properly", () =>
     createRoot(dispose => {
       const el = document.createElement("div");
       let captured!: boolean;
-      focus(el, () => e => (captured = e));
+      const ref = focus(e => (captured = e));
+      ref(el);
       expect(captured).toBe(false);
       dispatchFocusEvent(el, "focus");
       expect(captured).toBe(true);

@@ -1,6 +1,13 @@
 import { NotReadyError } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { makeVideo, makeVideoPlayer, createVideo, createVideoPlayer } from "../src/index.js";
+import {
+  makeVideo,
+  makeVideoPlayer,
+  createVideo,
+  createVideoPlayer,
+  makeVideoFrameCallback,
+  createVideoFrameCallback,
+} from "../src/index.js";
 
 describe("API works in SSR", () => {
   it("makeVideo() returns stub player and noop cleanup", () => {
@@ -63,5 +70,22 @@ describe("API works in SSR", () => {
   it("createVideoPlayer() duration throws NotReadyError on server", () => {
     const video = createVideoPlayer("https://example.com/clip.mp4");
     expect(() => video.duration()).toThrow(NotReadyError);
+  });
+
+  it("makeVideoFrameCallback() returns a stopped state and noop start/stop", () => {
+    const [running, start, stop] = makeVideoFrameCallback({} as HTMLVideoElement, () => {});
+    expect(running()).toBe(false);
+    expect(() => start()).not.toThrow();
+    expect(() => stop()).not.toThrow();
+  });
+
+  it("createVideoFrameCallback() returns a stopped state and noop start/stop", () => {
+    const [running, start, stop] = createVideoFrameCallback(
+      () => ({}) as HTMLVideoElement,
+      () => {},
+    );
+    expect(running()).toBe(false);
+    expect(() => start()).not.toThrow();
+    expect(() => stop()).not.toThrow();
   });
 });

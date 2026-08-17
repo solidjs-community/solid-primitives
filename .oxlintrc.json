@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [],
+  "categories": {
+    "correctness": "off"
+  },
+  "env": {
+    "builtin": true
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.{js,mjs,jsx,ts,tsx}"
+      ],
+      "rules": {
+        "no-console": "warn",
+        "no-debugger": "warn",
+        "prefer-const": "warn",
+        "eslint-comments/no-unused-disable": "warn",
+        "no-only-tests/no-only-tests": "warn",
+        "no-unused-vars": [
+          "warn",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_"
+          }
+        ],
+        "typescript/no-unnecessary-type-constraint": "warn",
+        "typescript/no-useless-empty-export": "warn"
+      },
+      "jsPlugins": [
+        "eslint-plugin-eslint-comments",
+        "eslint-plugin-no-only-tests"
+      ],
+      "plugins": [
+        "typescript"
+      ]
+    }
+  ]
+}

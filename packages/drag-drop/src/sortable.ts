@@ -1,8 +1,8 @@
 import { isServer } from "@solidjs/web";
 import { noop } from "@solid-primitives/utils";
-import { createDraggable } from "./draggable.js";
-import { createDroppable } from "./droppable.js";
-import type { SortableReturn } from "./types.js";
+import { createDraggable } from "./draggable.ts";
+import { createDroppable } from "./droppable.ts";
+import type { SortableReturn } from "./types.ts";
 
 /**
  * Combines `createDraggable` and `createDroppable` on the same element.

@@ -1,11 +1,12 @@
 {
   "name": "@solid-primitives/connectivity",
-  "version": "0.4.5",
+  "version": "1.0.0-next.2",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>",
-    "Tom Pichaud <dev.tompichaud@icloud.com>"
+    "Tom Pichaud <dev.tompichaud@icloud.com>",
+    "David Di Biase <dave@solidjs.com>"
   ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/connectivity",
@@ -15,12 +16,12 @@
   },
   "primitive": {
     "name": "connectivity",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createConnectivitySignal"
     ],
     "category": "Network",
-    "gzip": 785
+    "gzip": 976
   },
   "files": [
     "dist"
@@ -38,9 +39,13 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -48,8 +53,7 @@
   "keywords": [
     "network",
     "online",
-    "solid",
-    "primitives"
+    "connectivity"
   ],
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",
@@ -57,10 +61,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   },
   "typesVersions": {}
 }

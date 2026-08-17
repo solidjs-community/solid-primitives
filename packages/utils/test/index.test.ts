@@ -1,6 +1,12 @@
 import { describe, test, expect, assert, vi } from "vitest";
 import { createSignal, createStore, flush } from "solid-js";
-import { handleDiffArray, arrayEquals, createHydratableSignal, wrapSetter } from "../src/index.js";
+import {
+  handleDiffArray,
+  arrayEquals,
+  createHydratableSignal,
+  wrapSetter,
+  globalRegistry,
+} from "../src/index.js";
 
 describe("handleDiffArray", () => {
   test("handleAdded called for new array", () => {
@@ -101,6 +107,34 @@ describe("createHydratableSignal", () => {
     const [state, setState] = createHydratableSignal("server", () => "client");
     expect(state()).toEqual("client");
     expect(setState).toBeInstanceOf(Function);
+  });
+});
+
+describe("globalRegistry", () => {
+  test("calls init exactly once and returns the same instance on subsequent calls", () => {
+    const init = vi.fn(() => ({ count: 0 }));
+    const key = `test:globalRegistry:${Math.random()}`;
+    const first = globalRegistry(key, init);
+    const second = globalRegistry(key, init);
+    expect(first).toBe(second);
+    expect(init).toHaveBeenCalledOnce();
+  });
+
+  test("survives a fresh call site sharing the same key — simulates duplicate installed copies", () => {
+    const key = `test:globalRegistry:duplicate-copy:${Math.random()}`;
+    // Simulates two separate module instances of the same package (e.g. a version-skewed
+    // duplicate dependency) each calling globalRegistry with the same key: both must observe
+    // the same mutations, matching real singleton semantics across copies.
+    const registryA = globalRegistry(key, () => ({ stack: [] as string[] }));
+    const registryB = globalRegistry(key, () => ({ stack: ["should never be used"] }));
+    registryA.stack.push("from-a");
+    expect(registryB.stack).toEqual(["from-a"]);
+  });
+
+  test("different keys get independent instances", () => {
+    const a = globalRegistry(`test:globalRegistry:a:${Math.random()}`, () => ({ value: 1 }));
+    const b = globalRegistry(`test:globalRegistry:b:${Math.random()}`, () => ({ value: 2 }));
+    expect(a).not.toBe(b);
   });
 });
 

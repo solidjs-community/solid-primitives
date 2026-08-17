@@ -3,7 +3,6 @@ import preview from "../../../.storybook/preview.js";
 import {
   combineProps,
   combineHandlers,
-  filterProps,
   partitionProps,
 } from "@solid-primitives/props";
 import readme from "../README.md?raw";
@@ -18,8 +17,6 @@ import {
   Section,
 } from "../../../.storybook/ui/index.js";
 import { colors, font, radii } from "../../../.storybook/ui/tokens.js";
-
-/* ── Module-level helpers ────────────────────────────────────────────────────── */
 
 const statusColors = {
   ok: { bg: "#dcfce7", fg: "#16a34a" },
@@ -62,8 +59,6 @@ const FILTER_DEMO_KEYS = [
   "onClick",
 ] as const;
 
-/* ── Meta ────────────────────────────────────────────────────────────────────── */
-
 const meta = preview.meta({
   title: "Utilities/Props",
   tags: ["autodocs"],
@@ -74,8 +69,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-/* ── 1. combineProps: handler chaining ───────────────────────────────────────── */
 
 export const HandlerChaining = meta.story({
   name: "Handler chaining",
@@ -124,8 +117,6 @@ export const HandlerChaining = meta.story({
     );
   },
 });
-
-/* ── 2. combineProps: class & style merging ──────────────────────────────────── */
 
 export const StyleAndClassMerge = meta.story({
   name: "Class & style merging",
@@ -186,8 +177,6 @@ export const StyleAndClassMerge = meta.story({
   },
 });
 
-/* ── 3. combineHandlers: null skipping ───────────────────────────────────────── */
-
 export const NullHandlerSkip = meta.story({
   name: "Null handler skipping",
   parameters: {
@@ -215,10 +204,7 @@ export const NullHandlerSkip = meta.story({
     return (
       <Container minWidth={300}>
         <ButtonRow>
-          <Button
-            variant={extraOn() ? "primary" : "outline"}
-            onClick={() => setExtraOn(v => !v)}
-          >
+          <Button variant={extraOn() ? "primary" : "outline"} onClick={() => setExtraOn(v => !v)}>
             Extra handler: {extraOn() ? "enabled" : "null"}
           </Button>
         </ButtonRow>
@@ -242,8 +228,6 @@ export const NullHandlerSkip = meta.story({
     );
   },
 });
-
-/* ── 4. filterProps: dynamic predicate ───────────────────────────────────────── */
 
 export const DynamicFilter = meta.story({
   name: "Dynamic prefix filter",
@@ -277,8 +261,6 @@ export const DynamicFilter = meta.story({
   },
 });
 
-/* ── 5. partitionProps: own vs DOM split ─────────────────────────────────────── */
-
 export const OwnVsDomSplit = meta.story({
   name: "Own vs DOM split",
   parameters: {
@@ -301,7 +283,9 @@ export const OwnVsDomSplit = meta.story({
             </Button>
           ))}
         </ButtonRow>
-        <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}>
+        <div
+          style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}
+        >
           <StatusBadge
             status={status()}
             label="Deploy"

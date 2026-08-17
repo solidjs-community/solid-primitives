@@ -2,11 +2,11 @@
 "@solid-primitives/websocket": major
 ---
 
-Upgrade to Solid.js 2.0 (`^2.0.0-beta.7`) and add async-reactive message primitives.
+Upgrade to Solid.js 2.0 (`^2.0.0-beta.14`) and add async-reactive message primitives.
 
 **Breaking changes**
 
-- Peer dependency is now `solid-js@^2.0.0-beta.7`. All `createEffect` examples in docs now use the Solid 2.0 split form: `createEffect(compute, effect)`.
+- Peer dependency is now `solid-js@^2.0.0-beta.14`. All `createEffect` examples in docs now use the Solid 2.0 split form: `createEffect(compute, effect)`.
 
 **New: `createWSMessage<T>`**
 

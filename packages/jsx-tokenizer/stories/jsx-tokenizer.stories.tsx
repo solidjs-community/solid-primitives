@@ -1,6 +1,11 @@
 import { createSignal, For, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
-import { createTokenizer, createToken, resolveTokens, isToken } from "@solid-primitives/jsx-tokenizer";
+import {
+  createTokenizer,
+  createToken,
+  resolveTokens,
+  isToken,
+} from "@solid-primitives/jsx-tokenizer";
 import readme from "../README.md?raw";
 import {
   Container,
@@ -28,8 +33,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ── Story 1: Tab bar from token children ──────────────────────────────────────
 
 type TabData = { id: string; label: string };
 const TabTokenizer = createTokenizer<TabData>({ name: "tabs" });
@@ -110,8 +113,6 @@ export const TabBarFromTokens = meta.story({
   },
 });
 
-// ── Story 2: Token as its own tokenizer (standalone token) ────────────────────
-
 type CrumbData = { label: string; href?: string };
 const Crumb = createToken(
   (props: CrumbData) => props,
@@ -140,7 +141,9 @@ export const StandaloneToken = meta.story({
     const crumbs = () => PATHS[depth()] ?? [];
 
     const tokens = resolveTokens(Crumb, () => (
-      <For each={crumbs()}>{(label, i) => <Crumb label={label} href={i() === crumbs().length - 1 ? undefined : "#"} />}</For>
+      <For each={crumbs()}>
+        {(label, i) => <Crumb label={label} href={i() === crumbs().length - 1 ? undefined : "#"} />}
+      </For>
     ));
 
     return (
@@ -150,7 +153,14 @@ export const StandaloneToken = meta.story({
         </h4>
 
         <Card>
-          <div style={{ display: "flex", "align-items": "center", gap: "0.35rem", "flex-wrap": "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              "align-items": "center",
+              gap: "0.35rem",
+              "flex-wrap": "wrap",
+            }}
+          >
             <For each={tokens()}>
               {(token, i) => (
                 <>
@@ -201,8 +211,6 @@ export const StandaloneToken = meta.story({
   },
 });
 
-// ── Story 3: Tokens mixed with plain JSX (includeJSXElements) ─────────────────
-
 type CalloutData = { kind: "info" | "tip" | "warning"; text: string };
 const CalloutTokenizer = createTokenizer<CalloutData>({ name: "callout" });
 const Callout = createToken(
@@ -235,11 +243,16 @@ export const MixedTokensAndJSX = meta.story({
       CalloutTokenizer,
       () => (
         <>
-          <p>This component resolves children with <code>includeJSXElements: true</code>.</p>
+          <p>
+            This component resolves children with <code>includeJSXElements: true</code>.
+          </p>
           <Callout kind="info" text="Token children are intercepted before rendering." />
           <p>Plain JSX passes through and renders as-is.</p>
           <Callout kind="tip" text="Use isToken() to tell tokens apart from regular elements." />
-          <Callout kind="warning" text="Context injected above resolveTokens won't reach token data functions." />
+          <Callout
+            kind="warning"
+            text="Context injected above resolveTokens won't reach token data functions."
+          />
         </>
       ),
       { includeJSXElements: true },
@@ -265,11 +278,19 @@ export const MixedTokensAndJSX = meta.story({
                     }}
                   >
                     <Badge
-                      variant={item.data.kind === "warning" ? "warning" : item.data.kind === "tip" ? "success" : "info"}
+                      variant={
+                        item.data.kind === "warning"
+                          ? "warning"
+                          : item.data.kind === "tip"
+                            ? "success"
+                            : "info"
+                      }
                     >
                       {s.label}
                     </Badge>
-                    <span style={{ "font-size": font.sizeBase, color: s.color }}>{item.data.text}</span>
+                    <span style={{ "font-size": font.sizeBase, color: s.color }}>
+                      {item.data.text}
+                    </span>
                   </div>
                 );
               }
@@ -289,8 +310,6 @@ export const MixedTokensAndJSX = meta.story({
     );
   },
 });
-
-// ── Story 4: Array of tokenizers ──────────────────────────────────────────────
 
 type ActionData = { label: string; kbd?: string; description?: string; danger?: boolean };
 const ActionTokenizer = createTokenizer<ActionData>({ name: "action" });
@@ -385,9 +404,7 @@ export const MultipleTokenizers = meta.story({
                     >
                       {d.label}
                     </span>
-                    <Show when={d.kbd}>
-                      {kbd => <Kbd>{kbd()}</Kbd>}
-                    </Show>
+                    <Show when={d.kbd}>{kbd => <Kbd>{kbd()}</Kbd>}</Show>
                   </button>
                 );
               }
@@ -404,7 +421,13 @@ export const MultipleTokenizers = meta.story({
               padding: "0.45rem 0.65rem",
             }}
           >
-            <div style={{ "font-size": font.sizeSm, color: colors.mutedFg, "margin-bottom": "0.25rem" }}>
+            <div
+              style={{
+                "font-size": font.sizeSm,
+                color: colors.mutedFg,
+                "margin-bottom": "0.25rem",
+              }}
+            >
               Last triggered:
             </div>
             <For each={log()}>
@@ -424,7 +447,8 @@ export const MultipleTokenizers = meta.story({
         </Show>
 
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.muted }}>
-          <code>Action</code> and <code>Div</code> tokens are distinct families, resolved in one pass.
+          <code>Action</code> and <code>Div</code> tokens are distinct families, resolved in one
+          pass.
         </p>
       </Container>
     );

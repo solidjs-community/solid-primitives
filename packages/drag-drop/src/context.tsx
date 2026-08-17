@@ -1,7 +1,7 @@
 import { createContext, createSignal, onCleanup, useContext, untrack, type Element } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
-import { pointerWithin } from "./collision.js";
+import { pointerWithin } from "./collision.ts";
 import type {
   DragContextOptions,
   DragContextReturn,
@@ -10,7 +10,7 @@ import type {
   DroppableItem,
   DroppableRect,
   Transform,
-} from "./types.js";
+} from "./types.ts";
 
 type DroppableEntry = {
   element: HTMLElement;

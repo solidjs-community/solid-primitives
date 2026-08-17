@@ -4,9 +4,10 @@
 
 # @solid-primitives/signal-builders
 
-[![size](https://img.shields.io/badge/size-1.51_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/signal-builders)
+[![size](https://img.shields.io/badge/size-1.53_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/signal-builders)
 [![version](https://img.shields.io/npm/v/@solid-primitives/signal-builders?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/signal-builders)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 A collection of chainable, composable reactive computations — **Signal Builders** — for common array, object, number, string, and type-conversion operations.
 
@@ -15,16 +16,27 @@ A collection of chainable, composable reactive computations — **Signal Builder
 ```bash
 npm install @solid-primitives/signal-builders
 # or
+yarn add @solid-primitives/signal-builders
+# or
 pnpm add @solid-primitives/signal-builders
 ```
-
-Requires `solid-js@^2.0.0-beta.13` as a peer dependency.
 
 ## Usage
 
 Each builder wraps its computation in `createMemo`, so results only update when the computed value actually changes. Builders must be called inside a reactive owner (a component body or `createRoot`), and computations should be kept pure — avoid side effects inside them.
 
 Because each builder returns an `Accessor<T>`, the output of one can be passed directly as input to another:
+
+### Boolean
+
+```ts
+import { toggle } from "@solid-primitives/signal-builders";
+
+const [isOpen, setIsOpen] = createSignal(false);
+const toggleOpen = toggle(setIsOpen);
+
+toggleOpen(); // isOpen() === true
+```
 
 ### Array
 
@@ -80,6 +92,10 @@ solidMessage(); // => "hello, solid"
 ```
 
 ## Builder Reference
+
+### Boolean
+
+- **`toggle`** — wraps a boolean setter with a function that flips the current value
 
 ### Array
 

@@ -19,19 +19,19 @@ export type {
   SortableReturn,
   DragContextOptions,
   DragContextReturn,
-} from "./types.js";
+} from "./types.ts";
 
-export { closestCenter, closestCorners, rectIntersection, pointerWithin } from "./collision.js";
+export { closestCenter, closestCorners, rectIntersection, pointerWithin } from "./collision.ts";
 
-export { createDragContext } from "./context.js";
+export { createDragContext } from "./context.tsx";
 
-export { makeDraggable, createDraggable } from "./draggable.js";
+export { makeDraggable, createDraggable } from "./draggable.ts";
 
 export {
   makeDroppable,
   createDroppable,
   makeNativeDroppable,
   createNativeDroppable,
-} from "./droppable.js";
+} from "./droppable.ts";
 
-export { createSortable } from "./sortable.js";
+export { createSortable } from "./sortable.ts";

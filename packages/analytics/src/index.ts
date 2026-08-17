@@ -1,44 +1,24 @@
-export enum EventType {
-  Pageview = "page",
-  Event = "event",
-  Social = "social",
-}
-export type TrackEventData = {
-  category?: string;
-  action?: string;
-  label?: string;
-  value?: string;
-  location?: string;
-  other?: object;
-};
-export type TrackSocialData = {
-  network: string;
-  action: string;
-  socialtarget: string;
-};
-export type TrackPageview = {
-  location?: string;
-  other?: object;
-};
-export type TrackHandler = (
-  type: EventType,
-  data: TrackEventData | TrackSocialData | TrackPageview,
-) => void;
+export type {
+  PageProperties,
+  TrackProperties,
+  IdentifyTraits,
+  EventMeta,
+  PagePayload,
+  TrackPayload,
+  IdentifyPayload,
+  AnyPayload,
+  PluginArgs,
+  AnalyticsPlugin,
+  AnalyticsOptions,
+  AnalyticsControls,
+  ReactiveAnalyticsControls,
+} from "./types.ts";
 
-/**
- * Creates a method that support with analytics reporting.
- *
- * @param handlers A list of reporting handlers
- * @returns Returns a tracking a single tracking handler
- *
- */
-const createAnalytics = (handlers: Array<TrackHandler>): TrackHandler => {
-  const track: TrackHandler = (type, data) => {
-    for (const i in handlers) {
-      handlers[i]!(type, data);
-    }
-  };
-  return track;
-};
+export { makeAnalytics, createAnalytics } from "./analytics.ts";
 
-export default createAnalytics;
+export { createServerPlugin } from "./relay.ts";
+
+export { AnalyticsProvider, useAnalytics } from "./context.ts";
+
+export { makeAnalyticsGuard, createAnalyticsGuard } from "./guard.ts";
+export type { BeforeLeaveEvent } from "./guard.ts";

@@ -31,8 +31,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Traffic Light ────────────────────────────────────────────────────
-
 const LIGHTS = [
   { key: "red" as const, color: "#ef4444" },
   { key: "yellow" as const, color: "#f59e0b" },
@@ -45,7 +43,7 @@ export const TrafficLight = meta.story({
     docs: {
       description: {
         story:
-          "Typed `to` constraints enforce valid transitions at compile time. TypeScript rejects `state.to.green()` from `red` because `to: \"yellow\"` is the only allowed transition.",
+          'Typed `to` constraints enforce valid transitions at compile time. TypeScript rejects `state.to.green()` from `red` because `to: "yellow"` is the only allowed transition.',
       },
     },
   },
@@ -86,8 +84,7 @@ export const TrafficLight = meta.story({
                   height: "48px",
                   "border-radius": "50%",
                   background: state.type === l.key ? l.color : "#1e293b",
-                  "box-shadow":
-                    state.type === l.key ? `0 0 16px ${l.color}99` : "none",
+                  "box-shadow": state.type === l.key ? `0 0 16px ${l.color}99` : "none",
                   transition: "background 0.2s, box-shadow 0.2s",
                 }}
               />
@@ -113,8 +110,7 @@ export const TrafficLight = meta.story({
             variant="outline"
             disabled={state.type === "red"}
             onClick={() => {
-              if (state.type === "yellow" || state.type === "green")
-                state.to.red();
+              if (state.type === "yellow" || state.type === "green") state.to.red();
             }}
           >
             Reset
@@ -124,8 +120,6 @@ export const TrafficLight = meta.story({
     );
   },
 });
-
-// ── Story 2: Lifecycle Counter ────────────────────────────────────────────────
 
 export const LifecycleCounter = meta.story({
   name: "Counter lifecycle",
@@ -204,8 +198,6 @@ export const LifecycleCounter = meta.story({
   },
 });
 
-// ── Story 3: JSX as State Value ───────────────────────────────────────────────
-
 export const InlineEdit = meta.story({
   name: "JSX as state value",
   parameters: {
@@ -222,7 +214,9 @@ export const InlineEdit = meta.story({
     // Forward references so state callbacks can trigger external transitions.
     // These are assigned after createMachine returns; closures capture the
     // binding, not the value, so they resolve correctly at call time.
+    // oxlint-disable-next-line prefer-const
     let toEdit!: () => void;
+    // oxlint-disable-next-line prefer-const
     let toRead!: () => void;
 
     const state = createMachine<{
@@ -241,9 +235,7 @@ export const InlineEdit = meta.story({
                 flex: "1",
               }}
             >
-              <span style={{ flex: "1", "font-size": font.sizeBase }}>
-                {label()}
-              </span>
+              <span style={{ flex: "1", "font-size": font.sizeBase }}>{label()}</span>
               <Button
                 onClick={() => toEdit()}
                 style={{ padding: "0.25rem 0.75rem", "font-size": font.sizeSm }}

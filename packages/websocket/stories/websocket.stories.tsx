@@ -13,7 +13,6 @@ import {
   Badge,
   Button,
   ButtonRow,
-  Card,
   Container,
   EventLog,
   Section,
@@ -23,8 +22,6 @@ import {
   radii,
   inputStyle,
 } from "../../../.storybook/ui/index.js";
-
-// ─── Simulated WebSocket ──────────────────────────────────────────────────────
 
 class SimulatedWS extends EventTarget {
   readyState: 0 | 1 | 2 | 3 = 0;
@@ -92,8 +89,6 @@ function ts() {
 const STATE_LABELS = ["Connecting", "Open", "Closing", "Closed"] as const;
 const STATE_VARIANTS = ["warning", "success", "warning", "default"] as const;
 
-// ─── Meta ─────────────────────────────────────────────────────────────────────
-
 const meta = preview.meta({
   title: "Network/Websocket",
   tags: ["autodocs"],
@@ -108,8 +103,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ─── createWSState ────────────────────────────────────────────────────────────
 
 export const WSStateStory = meta.story({
   name: "Reactive connection state",
@@ -137,7 +130,9 @@ export const WSStateStory = meta.story({
 
     createEffect(
       () => state(),
-      s => { logEntry(`→ ${STATE_LABELS[s]} (${s})`); },
+      s => {
+        logEntry(`→ ${STATE_LABELS[s]} (${s})`);
+      },
     );
 
     return (
@@ -182,8 +177,6 @@ export const WSStateStory = meta.story({
     );
   },
 });
-
-// ─── createWSMessage ──────────────────────────────────────────────────────────
 
 const DEMO_MESSAGES = [
   '{"type":"update","value":42}',
@@ -263,8 +256,6 @@ export const WSMessageStory = meta.story({
   },
 });
 
-// ─── createWS ────────────────────────────────────────────────────────────────
-
 export const CreateWSStory = meta.story({
   name: "Buffered send queue",
   parameters: {
@@ -300,8 +291,7 @@ export const CreateWSStory = meta.story({
     createEffect(
       () => message(),
       msg => {
-        if (msg !== undefined)
-          setChatLog(prev => [...prev, { from: "server", text: msg }]);
+        if (msg !== undefined) setChatLog(prev => [...prev, { from: "server", text: msg }]);
       },
     );
 
@@ -386,25 +376,19 @@ export const CreateWSStory = meta.story({
         </div>
 
         <ButtonRow>
-          <Button
-            onClick={() => mock?.simDrop()}
-            disabled={state() !== 1}
-            variant="outline"
-          >
+          <Button onClick={() => mock?.simDrop()} disabled={state() !== 1} variant="outline">
             Drop connection
           </Button>
         </ButtonRow>
 
         <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.muted }}>
-          The simulated server echoes every message. <code>createWS</code> does not
-          auto-reconnect — use <code>createReconnectingWS</code> for that.
+          The simulated server echoes every message. <code>createWS</code> does not auto-reconnect —
+          use <code>createReconnectingWS</code> for that.
         </p>
       </Container>
     );
   },
 });
-
-// ─── createReconnectingWS ─────────────────────────────────────────────────────
 
 export const ReconnectingWSStory = meta.story({
   name: "Auto-reconnect on drop",
@@ -487,8 +471,6 @@ export const ReconnectingWSStory = meta.story({
     );
   },
 });
-
-// ─── makeHeartbeatWS ──────────────────────────────────────────────────────────
 
 export const HeartbeatWSStory = meta.story({
   name: "Heartbeat watchdog",

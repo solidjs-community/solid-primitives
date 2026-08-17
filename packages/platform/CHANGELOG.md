@@ -1,5 +1,30 @@
 # @solid-primitives/platform
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
+## 1.0.0-next.0
+
+### Major Changes
+
+- 0eb977c: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/platform`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+
 ## 0.2.1
 
 ### Patch Changes

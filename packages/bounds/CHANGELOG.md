@@ -1,5 +1,47 @@
 # @solid-primitives/bounds
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/event-listener@3.0.0-next.3
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/event-listener@3.0.0-next.2
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 1.0.0-next.0
+
+### Major Changes
+
+- fa549e1: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/bounds`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `onMount` replaced by `onSettled` for post-render initialization
+  - `sharedConfig.context` replaced by `sharedConfig.hydrating` for hydration detection
+  - Inline `ResizeObserver` usage with split `createEffect` (compute/apply) replaces the `@solid-primitives/resize-observer` dependency — the `@solid-primitives/resize-observer` package is no longer a dependency
+  - `@solid-primitives/static-store` dependency removed — bounds reactive object now built with `createMemo` directly for full Solid 2.0 type compatibility
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+
 ## 0.1.5
 
 ### Patch Changes

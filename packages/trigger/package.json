@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/trigger",
-  "version": "2.0.0",
-  "description": "A set of primitives based on Solid signals, used to trigger computations.",
+  "version": "3.0.0-next.2",
+  "description": "A set of primitives based on signals, used to trigger computations.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -15,13 +15,13 @@
   },
   "primitive": {
     "name": "trigger",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "createTrigger",
       "createTriggerCache"
     ],
     "category": "Reactivity",
-    "gzip": 497
+    "gzip": 496
   },
   "private": false,
   "sideEffects": false,
@@ -39,9 +39,13 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -53,15 +57,15 @@
     "trigger"
   ],
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

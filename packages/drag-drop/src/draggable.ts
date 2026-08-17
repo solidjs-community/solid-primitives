@@ -1,9 +1,9 @@
 import { createEffect, createMemo, createSignal, flush } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
-import { useDragContext } from "./context.js";
-import { applyClass, applyStyle, removeClass, removeStyle } from "./dom.js";
-import type { CreateDraggableOptions, DraggableReturn, MakeDraggableOptions, Transform } from "./types.js";
+import { useDragContext } from "./context.tsx";
+import { applyClass, applyStyle, removeClass, removeStyle } from "./dom.ts";
+import type { CreateDraggableOptions, DraggableReturn, MakeDraggableOptions, Transform } from "./types.ts";
 
 /**
  * Attaches pointer-based drag behaviour to an existing element.

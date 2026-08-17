@@ -1,14 +1,20 @@
-import "./setup";
+import { fireVideoFrame } from "./setup.js";
 import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { makeVideo, makeVideoPlayer, createVideo, createVideoPlayer, setVideoSrc } from "../src/index.js";
+import {
+  makeVideo,
+  makeVideoPlayer,
+  createVideo,
+  createVideoPlayer,
+  setVideoSrc,
+  makeVideoFrameCallback,
+  createVideoFrameCallback,
+} from "../src/index.js";
 
 const testUrl = "https://example.com/clip.mp4";
 
 /** Yield to the microtask queue — used alongside flush() to drain Solid 2.0 effects. */
 const tick = () => Promise.resolve();
-
-// ── setVideoSrc ───────────────────────────────────────────────────────────────
 
 describe("setVideoSrc", () => {
   it("sets src and nulls srcObject when given a string", () => {
@@ -28,8 +34,6 @@ describe("setVideoSrc", () => {
     expect(el.src).not.toMatch(/clip\.mp4$/);
   });
 });
-
-// ── makeVideo ─────────────────────────────────────────────────────────────────
 
 describe("makeVideo", () => {
   it("returns a player and cleanup tuple", () => {
@@ -75,8 +79,6 @@ describe("makeVideo", () => {
     cleanup();
   });
 });
-
-// ── makeVideoPlayer ───────────────────────────────────────────────────────────
 
 describe("makeVideoPlayer", () => {
   it("returns controls and cleanup tuple", () => {
@@ -132,8 +134,6 @@ describe("makeVideoPlayer", () => {
     cleanup();
   });
 });
-
-// ── createVideo ───────────────────────────────────────────────────────────────
 
 describe("createVideo", () => {
   it("returns the expected shape", () =>
@@ -270,8 +270,6 @@ describe("createVideo", () => {
     }));
 });
 
-// ── createVideoPlayer ───────────────────────────────────────────────────────
-
 describe("createVideoPlayer", () => {
   it("includes all VideoReturn fields plus controls fields", () =>
     createRoot(dispose => {
@@ -364,9 +362,9 @@ describe("createVideoPlayer", () => {
     createRoot(dispose => {
       const video = createVideoPlayer(testUrl);
       video.setLoop(true);
-      expect(video.player.loop).toBe(true);  // DOM update is synchronous
+      expect(video.player.loop).toBe(true); // DOM update is synchronous
       flush();
-      expect(video.loop()).toBe(true);        // signal update needs flush
+      expect(video.loop()).toBe(true); // signal update needs flush
       dispose();
     }));
 
@@ -445,5 +443,211 @@ describe("createVideoPlayer", () => {
       const video = createVideoPlayer(testUrl);
       dispose();
       expect(video.player._mock.paused).toBe(true);
+    }));
+});
+
+describe("makeVideoFrameCallback", () => {
+  it("is not running until start is called", () => {
+    const [player, cleanup] = makeVideo(testUrl);
+    const [running, start, stop] = makeVideoFrameCallback(player, () => {});
+    expect(running()).toBe(false);
+    start();
+    expect(running()).toBe(true);
+    stop();
+    cleanup();
+  });
+
+  it("invokes the callback with timestamp and metadata on frame presentation", () => {
+    const [player, cleanup] = makeVideo(testUrl);
+    const frames: Array<[number, VideoFrameCallbackMetadata]> = [];
+    const [, start, stop] = makeVideoFrameCallback(player, (now, metadata) => {
+      frames.push([now, metadata]);
+    });
+    start();
+    fireVideoFrame(player, 16.6);
+    expect(frames).toHaveLength(1);
+    expect(frames[0]![0]).toBe(16.6);
+    expect(typeof frames[0]![1].mediaTime).toBe("number");
+    stop();
+    cleanup();
+  });
+
+  it("re-registers itself for the next frame", () => {
+    const [player, cleanup] = makeVideo(testUrl);
+    let calls = 0;
+    const [, start, stop] = makeVideoFrameCallback(player, () => {
+      calls++;
+    });
+    start();
+    fireVideoFrame(player);
+    fireVideoFrame(player);
+    expect(calls).toBe(2);
+    stop();
+    cleanup();
+  });
+
+  it("stop cancels the pending callback", () => {
+    const [player, cleanup] = makeVideo(testUrl);
+    let calls = 0;
+    const [running, start, stop] = makeVideoFrameCallback(player, () => {
+      calls++;
+    });
+    start();
+    stop();
+    expect(running()).toBe(false);
+    fireVideoFrame(player);
+    expect(calls).toBe(0);
+    cleanup();
+  });
+
+  it("start is idempotent while already running", () => {
+    const [player, cleanup] = makeVideo(testUrl);
+    const [, start, stop] = makeVideoFrameCallback(player, () => {});
+    start();
+    const handleAfterFirstStart = player._mock._frameHandle;
+    start();
+    expect(player._mock._frameHandle).toBe(handleAfterFirstStart);
+    stop();
+    cleanup();
+  });
+
+  it("can be called outside a Solid owner", () => {
+    expect(() => {
+      const [player, cleanup] = makeVideo(testUrl);
+      const [, start, stop] = makeVideoFrameCallback(player, () => {});
+      start();
+      stop();
+      cleanup();
+    }).not.toThrow();
+  });
+});
+
+describe("createVideoFrameCallback", () => {
+  it("running is a reactive signal", () =>
+    createRoot(dispose => {
+      const [player, playerCleanup] = makeVideo(testUrl);
+      const [running, start, stop] = createVideoFrameCallback(
+        () => player,
+        () => {},
+      );
+      expect(running()).toBe(false);
+      start();
+      flush();
+      expect(running()).toBe(true);
+      stop();
+      flush();
+      expect(running()).toBe(false);
+      playerCleanup();
+      dispose();
+    }));
+
+  it("stops automatically on dispose", () => {
+    const [player, playerCleanup] = makeVideo(testUrl);
+    let running!: () => boolean;
+    const dispose = createRoot(d => {
+      const [r, start] = createVideoFrameCallback(
+        () => player,
+        () => {},
+      );
+      running = r;
+      start();
+      return d;
+    });
+    flush();
+    expect(running()).toBe(true);
+    dispose();
+    flush();
+    expect(running()).toBe(false);
+    expect(player._mock._frameCallbacks.size).toBe(0);
+    playerCleanup();
+  });
+
+  it("invokes the callback on frame presentation", () =>
+    createRoot(dispose => {
+      const [player, playerCleanup] = makeVideo(testUrl);
+      let calls = 0;
+      const [, start, stop] = createVideoFrameCallback(
+        () => player,
+        () => {
+          calls++;
+        },
+      );
+      start();
+      fireVideoFrame(player);
+      expect(calls).toBe(1);
+      stop();
+      playerCleanup();
+      dispose();
+    }));
+
+  it("does nothing while the accessor returns undefined", () =>
+    createRoot(dispose => {
+      const [el, setEl] = createSignal<HTMLVideoElement | undefined>(undefined, {
+        ownedWrite: true,
+      });
+      let calls = 0;
+      const [running, start] = createVideoFrameCallback(el, () => {
+        calls++;
+      });
+      start();
+      flush();
+      expect(running()).toBe(true);
+      expect(calls).toBe(0);
+      const [player, playerCleanup] = makeVideo(testUrl);
+      setEl(player);
+      flush();
+      fireVideoFrame(player);
+      expect(calls).toBe(1);
+      playerCleanup();
+      dispose();
+    }));
+
+  it("re-attaches to the new element when the accessor changes", () =>
+    createRoot(dispose => {
+      const [playerA, cleanupA] = makeVideo(testUrl);
+      const [playerB, cleanupB] = makeVideo(testUrl);
+      const [el, setEl] = createSignal(playerA, { ownedWrite: true });
+      let calls = 0;
+      const [, start, stop] = createVideoFrameCallback(el, () => {
+        calls++;
+      });
+      start();
+      flush();
+      fireVideoFrame(playerA);
+      expect(calls).toBe(1);
+
+      setEl(playerB);
+      flush();
+      expect(playerA._mock._frameCallbacks.size).toBe(0);
+      fireVideoFrame(playerB);
+      expect(calls).toBe(2);
+
+      stop();
+      cleanupA();
+      cleanupB();
+      dispose();
+    }));
+
+  it("stops and clears pending callbacks when the accessor becomes undefined", () =>
+    createRoot(dispose => {
+      const [player, playerCleanup] = makeVideo(testUrl);
+      const [el, setEl] = createSignal<HTMLVideoElement | undefined>(player, {
+        ownedWrite: true,
+      });
+      let calls = 0;
+      const [, start] = createVideoFrameCallback(el, () => {
+        calls++;
+      });
+      start();
+      flush();
+
+      setEl(undefined);
+      flush();
+      expect(player._mock._frameCallbacks.size).toBe(0);
+      fireVideoFrame(player);
+      expect(calls).toBe(0);
+
+      playerCleanup();
+      dispose();
     }));
 });

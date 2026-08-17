@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/sensors": minor
+"@solid-primitives/sensors": major
 ---
 
 New package. Provides sensor primitives following the Solid Primitives `make*`/`create*` convention (`make*` = raw listener, returns cleanup, no Solid lifecycle; `create*` = reactive accessor or store, integrates with `onCleanup`).

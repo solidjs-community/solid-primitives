@@ -2,10 +2,10 @@
 "@solid-primitives/devices": major
 ---
 
-Migrate to Solid.js v2.0 (beta.13). `createAccelerometer` and `createGyroscope` have been moved to the new `@solid-primitives/sensors` package.
+Migrate to Solid.js v2.0 (beta.14). `createAccelerometer` and `createGyroscope` have been moved to the new `@solid-primitives/sensors` package.
 
 Breaking changes:
-- `solid-js` peer dependency updated to `^2.0.0-beta.13`
+- `solid-js` peer dependency updated to `^2.0.0-beta.14`
 - `@solidjs/web` is now a required peer dependency
 - `createAccelerometer` removed — use `@solid-primitives/sensors` instead
 - `createGyroscope` removed — use `@solid-primitives/sensors` instead

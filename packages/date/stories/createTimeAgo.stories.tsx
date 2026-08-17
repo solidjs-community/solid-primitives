@@ -27,7 +27,7 @@ export const TimeAgo = meta.story({
     docs: {
       description: {
         story:
-          "`createTimeAgo` formats a date as a human-readable relative string (\"5 minutes ago\", \"last year\") and keeps it current via auto-updates. Works for future dates too (\"in 1 hour\").",
+          '`createTimeAgo` formats a date as a human-readable relative string ("5 minutes ago", "last year") and keeps it current via auto-updates. Works for future dates too ("in 1 hour").',
       },
     },
   },
@@ -53,7 +53,14 @@ export const TimeAgo = meta.story({
           </For>
         </div>
 
-        <label style={{ display: "flex", "flex-direction": "column", gap: "0.25rem", "font-size": "0.85rem" }}>
+        <label
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.25rem",
+            "font-size": "0.85rem",
+          }}
+        >
           Custom date
           <input
             type="datetime-local"

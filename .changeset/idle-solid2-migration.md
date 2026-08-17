@@ -2,9 +2,9 @@
 "@solid-primitives/idle": major
 ---
 
-Migrate to Solid.js v2.0 (beta.10)
+Migrate to Solid.js v2.0 (beta.14)
 
-- Updated peer dependencies to `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`
+- Updated peer dependencies to `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`
 - Changed `isServer` import from `solid-js/web` to `@solidjs/web`
 - Replaced `onMount` with `onSettled`
 - Removed `batch` calls (Solid 2.0 batches automatically via microtasks)

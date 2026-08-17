@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/transition-group",
-  "version": "1.1.2",
-  "description": "Reactive primitives for implementing transition effects in SolidJS",
+  "version": "2.0.0-next.2",
+  "description": "Reactive primitives for implementing transition effects",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -15,13 +15,13 @@
   },
   "primitive": {
     "name": "transition-group",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createSwitchTransition",
       "createListTransition"
     ],
     "category": "Animation",
-    "gzip": 852
+    "gzip": 1136
   },
   "keywords": [
     "solid",
@@ -46,20 +46,25 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solid-primitives/refs": "workspace:^",
-    "@solid-primitives/utils": "workspace:^",
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   },
   "typesVersions": {}
 }

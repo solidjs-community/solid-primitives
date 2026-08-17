@@ -4,9 +4,10 @@
 
 # @solid-primitives/video
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/video?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/video)
+[![size](https://img.shields.io/badge/size-1.88_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/video)
 [![version](https://img.shields.io/npm/v/@solid-primitives/video?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/video)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Layered primitives for managing HTML video playback. The `make*` variants are non-reactive and require no Solid owner. The `create*` variants integrate with Solid's reactive system — `createVideo` covers essential playback state, and `createVideoPlayer` extends it with the full control surface.
 
@@ -14,6 +15,8 @@ Layered primitives for managing HTML video playback. The `make*` variants are no
 
 ```bash
 npm install @solid-primitives/video
+# or
+yarn add @solid-primitives/video
 # or
 pnpm add @solid-primitives/video
 ```
@@ -25,7 +28,7 @@ pnpm add @solid-primitives/video
 Creates a raw `HTMLVideoElement` with optional event handlers and initial configuration. No Solid owner required.
 
 ```ts
-const [player, cleanup] = makeVideo('clip.mp4', {}, { muted: true, loop: true });
+const [player, cleanup] = makeVideo("clip.mp4", {}, { muted: true, loop: true });
 cleanup();
 ```
 
@@ -43,7 +46,7 @@ Wraps `makeVideo` with imperative playback controls. No Solid owner required.
 
 ```ts
 const [{ play, pause, seek, setVolume, setMuted, setPlaybackRate, setLoop }, cleanup] =
-  makeVideoPlayer('clip.mp4');
+  makeVideoPlayer("clip.mp4");
 
 await play();
 seek(30);
@@ -65,17 +68,17 @@ function makeVideoPlayer(
 Essential reactive playback state: `playing`, `currentTime`, `ended`, `seeking`, `error`, and an async `duration` that suspends until metadata is loaded.
 
 ```ts
-const video = createVideo('clip.mp4');
+const video = createVideo("clip.mp4");
 // or with a reactive source:
 const video = createVideo(() => selectedUrl());
 
-video.playing()         // boolean — true while actively playing
-video.setPlaying(true)  // plays
-video.currentTime()     // seconds
-video.seek(30)
-video.ended()           // boolean
-video.seeking()         // boolean — true while scrubbing
-video.error()           // MediaError | null
+video.playing(); // boolean — true while actively playing
+video.setPlaying(true); // plays
+video.currentTime(); // seconds
+video.seek(30);
+video.ended(); // boolean
+video.seeking(); // boolean — true while scrubbing
+video.error(); // MediaError | null
 ```
 
 The `duration` accessor throws `NotReadyError` until video metadata has loaded, integrating with Solid 2.0's `<Loading>` boundary:
@@ -87,10 +90,7 @@ The `duration` accessor throws `NotReadyError` until video metadata has loaded, 
 ```
 
 ```ts
-function createVideo(
-  src: VideoSource | Accessor<VideoSource>,
-  options?: VideoOptions,
-): VideoReturn;
+function createVideo(src: VideoSource | Accessor<VideoSource>, options?: VideoOptions): VideoReturn;
 ```
 
 ### `createVideoPlayer`
@@ -98,25 +98,25 @@ function createVideo(
 Extends `createVideo` with the full control surface: volume, muted, playback rate, loop, buffering state, and dimensions. Accepts all `VideoOptions` plus `volume` and `playbackRate` initial values.
 
 ```ts
-const video = createVideoPlayer('clip.mp4', {
+const video = createVideoPlayer("clip.mp4", {
   muted: true,
   volume: 0.8,
   playbackRate: 1,
 });
 
 // All fields from createVideo, plus:
-video.volume()              // 0–1
-video.setVolume(0.5)
-video.muted()               // boolean
-video.setMuted(true)
-video.playbackRate()        // number
-video.setPlaybackRate(1.5)
-video.loop()                // boolean
-video.setLoop(true)
-video.buffered()            // TimeRanges | undefined
-video.readyState()          // 0–4
-video.videoWidth()          // intrinsic pixel width
-video.videoHeight()         // intrinsic pixel height
+video.volume(); // 0–1
+video.setVolume(0.5);
+video.muted(); // boolean
+video.setMuted(true);
+video.playbackRate(); // number
+video.setPlaybackRate(1.5);
+video.loop(); // boolean
+video.setLoop(true);
+video.buffered(); // TimeRanges | undefined
+video.readyState(); // 0–4
+video.videoWidth(); // intrinsic pixel width
+video.videoHeight(); // intrinsic pixel height
 ```
 
 > **Fullscreen** is intentionally omitted — use the dedicated `@solid-primitives/fullscreen` primitive to manage fullscreen state and attach it to `video.player`.
@@ -126,6 +126,49 @@ function createVideoPlayer(
   src: VideoSource | Accessor<VideoSource>,
   options?: VideoControlsOptions,
 ): VideoControlsReturn;
+```
+
+### `makeVideoFrameCallback`
+
+Wraps [`HTMLVideoElement.requestVideoFrameCallback`](https://wicg.github.io/video-rvfc/), which fires once per displayed video frame instead of once per display refresh — it stops naturally while the video is paused, and the `metadata` argument (`mediaTime`, `presentedFrames`, etc.) lets you sync work to actual playback instead of wall-clock time. No Solid owner required.
+
+```ts
+const [player, cleanup] = makeVideo("clip.mp4");
+const [running, start, stop] = makeVideoFrameCallback(player, (now, metadata) => {
+  draw(metadata.mediaTime);
+});
+start();
+stop();
+cleanup();
+```
+
+```ts
+function makeVideoFrameCallback(
+  video: HTMLVideoElement,
+  callback: VideoFrameRequestCallback,
+): [running: () => boolean, start: VoidFunction, stop: VoidFunction];
+```
+
+### `createVideoFrameCallback`
+
+Reactive version of `makeVideoFrameCallback` — takes an accessor for the video element, so it re-attaches whenever the element changes and stops cleanly when it becomes `undefined`. `running` is a Solid signal, and playback is automatically stopped `onCleanup`.
+
+```ts
+const video = createVideo("clip.mp4");
+const [running, start, stop] = createVideoFrameCallback(
+  () => video.player,
+  (now, metadata) => {
+    console.log(metadata.presentedFrames);
+  },
+);
+start();
+```
+
+```ts
+function createVideoFrameCallback(
+  el: Accessor<HTMLVideoElement | undefined>,
+  callback: VideoFrameRequestCallback,
+): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
 ```
 
 ## Types

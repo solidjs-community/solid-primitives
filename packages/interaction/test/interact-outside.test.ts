@@ -5,8 +5,6 @@ import {
   type CreateInteractOutsideProps,
 } from "../src/index.js";
 
-// ─── PointerEvent polyfill (jsdom does not include it) ────────────────────────
-
 beforeAll(() => {
   if (!("PointerEvent" in window)) {
     class MockPointerEvent extends MouseEvent {
@@ -21,8 +19,6 @@ beforeAll(() => {
     (global as unknown as Record<string, unknown>)["PointerEvent"] = MockPointerEvent;
   }
 });
-
-// ─── Test helpers ─────────────────────────────────────────────────────────────
 
 type ElementKind = "div" | "svg";
 
@@ -78,16 +74,12 @@ function setupTest(
   };
 }
 
-// ─── Test configurations ──────────────────────────────────────────────────────
-
 const testConfigurations: { name: string; inside: ElementKind; outside: ElementKind }[] = [
   { name: "HTML ref with HTML outside", inside: "div", outside: "div" },
   { name: "SVG ref with HTML outside", inside: "svg", outside: "div" },
   { name: "HTML ref with SVG outside", inside: "div", outside: "svg" },
   { name: "SVG ref with SVG outside", inside: "svg", outside: "svg" },
 ];
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe("createInteractOutside", () => {
   beforeEach(() => {
@@ -282,6 +274,37 @@ describe("createInteractOutside", () => {
       cleanup();
       outside.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
       expect(mocks.onFocusOutside).not.toHaveBeenCalled();
+    });
+
+    it("does not fire for a still-mounted instance whose watched element was removed from the document before its reactive root disposed", () => {
+      // Reproduces a real-world race: a dismissable layer's DOM subtree is
+      // removed synchronously (e.g. by a Solid `<Show>`) when it closes, but
+      // the reactive owner that will call `onCleanup` (removing this
+      // instance's document-level listeners) can be scheduled to run a tick
+      // later. A second layer opening in that window must not have its
+      // legitimate "inside" interactions misread as "outside" by the first,
+      // now-orphaned instance.
+      const first = setupTest("div", "div");
+
+      // Simulate the DOM removal that happens immediately on close, while
+      // deliberately *not* calling `first.cleanup()` yet — this is the gap
+      // between DOM removal and reactive disposal that the real bug lives in.
+      first.inside.remove();
+
+      const second = setupTest("div", "div");
+
+      // An interaction with the second (live) instance's own content.
+      second.inside.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+
+      // The second instance's own element is "inside" itself, so it must not
+      // fire. The first (orphaned) instance's callbacks must not fire either
+      // — its watched element is disconnected, so it has nothing left to
+      // protect.
+      expect(second.mocks.onFocusOutside).not.toHaveBeenCalled();
+      expect(first.mocks.onFocusOutside).not.toHaveBeenCalled();
+
+      first.cleanup();
+      second.cleanup();
     });
   });
 });

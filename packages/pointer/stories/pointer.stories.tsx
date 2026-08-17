@@ -81,8 +81,8 @@ export const PointerPositionStory = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Tracks mouse, touch, and pen. <code>isActive</code> is <code>false</code> when the
-          pointer leaves the element.
+          Tracks mouse, touch, and pen. <code>isActive</code> is <code>false</code> when the pointer
+          leaves the element.
         </p>
       </Container>
     );
@@ -153,11 +153,16 @@ export const PointerListStory = meta.story({
             "min-height": "2rem",
           }}
         >
-          <For each={pointers()} fallback={
-            <span style={{ "font-size": "0.78rem", color: "#94a3b8", "font-family": "monospace" }}>
-              no active pointers
-            </span>
-          }>
+          <For
+            each={pointers()}
+            fallback={
+              <span
+                style={{ "font-size": "0.78rem", color: "#94a3b8", "font-family": "monospace" }}
+              >
+                no active pointers
+              </span>
+            }
+          >
             {(ptr, i) => {
               const colors = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#0ea5e9"];
               const color = () => colors[i() % colors.length]!;
@@ -276,9 +281,7 @@ export const PointerListenersStory = meta.story({
             )}
           </For>
           {events().length === 0 && (
-            <span
-              style={{ color: "#475569", "font-size": "0.78rem", "font-family": "monospace" }}
-            >
+            <span style={{ color: "#475569", "font-size": "0.78rem", "font-family": "monospace" }}>
               waiting for events…
             </span>
           )}

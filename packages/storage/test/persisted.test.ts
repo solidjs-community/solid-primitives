@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { createSignal } from "solid-js";
-import { createStore } from "solid-js/store";
-import { makePersisted } from "../src/persisted.js";
+import {
+  createEffect,
+  createRoot,
+  createSignal,
+  createStore,
+  createOptimistic,
+  flush,
+  latest,
+  refresh,
+} from "solid-js";
+import { makePersisted, messageSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
@@ -60,23 +68,47 @@ describe("makePersisted", () => {
     });
     setSignal("persisted");
     expect(mockStorage.getItem("test1")).toBe('"persisted"');
-    expect(signal()).toBe("persisted");
+    expect(latest(signal)).toBe("persisted");
   });
+
+  it("persists an optimistic signal", async () => {
+    const DataServer = {
+      data: "server",
+      get: () => Promise.resolve(DataServer.data),
+      set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
+    };
+    const [signal, setSignal] = makePersisted(
+      createOptimistic(() => DataServer.get()),
+      {
+        storage: mockStorage,
+        name: "test1",
+        action: ([getter, setter]) => function*(next) {
+          setter(next);
+          yield DataServer.set(next);
+          refresh(getter);
+        }
+      }
+    );
+    await setSignal("persisted");
+    flush();
+    expect(mockStorage.getItem("test1")).toBe('"persisted"');
+    expect(latest(signal)).toBe("persisted")
+  })
 
   it("reads the persisted value from a synchronous storage into the signal", () => {
     mockStorage.setItem("test2", '"persistence"');
     const [signal] = makePersisted(createSignal(), { storage: mockStorage, name: "test2" });
-    expect(signal()).toBe("persistence");
+    expect(latest(signal)).toBe("persistence");
   });
 
   it("removes a nulled signal's storage item", () => {
-    const [signal, setSignal] = makePersisted(createSignal(), {
+    const [signal, setSignal] = makePersisted(createSignal<string>(), {
       storage: mockStorage,
       name: "test3",
     });
     setSignal("test");
     expect(mockStorage.getItem("test3")).toBe('"test"');
-    expect(signal()).toBe("test");
+    expect(latest(signal)).toBe("test");
     setSignal(undefined);
     expect(mockStorage.getItem("test3")).toBeNull();
   });
@@ -86,9 +118,30 @@ describe("makePersisted", () => {
       storage: mockStorage,
       name: "test4",
     });
-    setStore("test", "persisted");
+    setStore((s) => { s.test = "persisted" });
+    flush();
     expect(store.test).toBe("persisted");
     expect(mockStorage.getItem("test4")).toBe(JSON.stringify({ test: "persisted" }));
+  });
+  
+  it("only updates the leaves in initialization", async () => {
+    mockAsyncStorage.setItem("test4a", JSON.stringify({ a: { b: { c: 1 } } }));
+    const triggered = { a: 0, b: 0, c: 0 };
+    await createRoot(async (dispose) => {
+      const [state, setState] = createStore({ a: { b: { c: 0 } } });
+      createEffect(() => state.a, (_) => { triggered.a++; });
+      createEffect(() => state.a.b, (_) => { triggered.b++; });
+      createEffect(() => state.a.b.c, (_) => { triggered.c++; });
+      const [store, _setStore] = makePersisted(
+        [state, setState],
+        { storage: mockAsyncStorage, name: "test4a" }
+      );
+      await new Promise(r => setTimeout(r, 50));
+      flush();
+      expect(store).toEqual({ a: { b: { c: 1 } } });
+      expect(triggered).toEqual({ a: 1, b: 1, c: 2 });
+      queueMicrotask(dispose);;
+    });
   });
 
   it("persists a signal in an async storage", async () => {
@@ -97,7 +150,7 @@ describe("makePersisted", () => {
       name: "test5",
     });
     setSignal("async");
-    expect(signal()).toBe("async");
+    expect(latest(signal)).toBe("async");
     expect(await mockAsyncStorage.getItem("test5")).toBe('"async"');
   });
 
@@ -108,7 +161,7 @@ describe("makePersisted", () => {
       name: "test6",
     });
     await Promise.resolve();
-    expect(signal()).toBe("predefined");
+    expect(latest(signal)).toBe("predefined");
     setSignal("overwritten");
     await Promise.resolve();
     expect(await mockAsyncStorage.getItem("test6")).toBe('"overwritten"');
@@ -125,20 +178,88 @@ describe("makePersisted", () => {
       storage: slowMockAsyncStorage,
       name: "test7",
     });
-    expect(signal()).toBe("init");
+    expect(latest(signal)).toBe("init");
     setSignal("overwritten");
     resolve("persisted");
-    expect(signal()).toBe("overwritten");
+    expect(latest(signal)).toBe("overwritten");
   });
 
   it("exposes the initial value as third part of the return tuple", () => {
     const anotherMockAsyncStorage = { ...mockAsyncStorage };
-    const promise = Promise.resolve("init");
+    const promise = Promise.resolve('"init"');
     anotherMockAsyncStorage.getItem = () => promise;
     const [_signal, _setSignal, init] = makePersisted(createSignal("default"), {
       storage: anotherMockAsyncStorage,
       name: "test8",
     });
     expect(init).toBe(promise);
+  });
+  
+  it("defers the initialization if the hydrated option is set", async () => {
+    const anotherMockStorage = { ...mockStorage };
+    anotherMockStorage.setItem("test18", '"init"');
+    const [signal, _setSignal] = makePersisted(
+      createSignal("default"), 
+      { storage: anotherMockStorage, name: "test18", hydrated: true }
+    );
+    flush();
+    expect(signal()).toBe("default");
+    await new Promise(r => setTimeout(r, 200));
+    flush();
+    expect(signal()).toBe("init"); 
+  });
+});
+
+describe("storageSync", () => {
+  it("receives messages", () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    storageSync[0](subscriber);
+    const event = new StorageEvent(
+      "storage",
+      { key: "test9", newValue: "received", timeStamp: Date.now(), url: "https://storage.solid-primitives.org" }
+    );
+    window.dispatchEvent(event);
+    flush();
+    expect(message()).toEqual(event);
+  });
+});
+
+describe("messageSync", () => {
+  it("sends and receives messages", async () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = messageSync(window, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test10", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test10",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
+  });
+});
+
+describe("wsSync", () => {
+  it("sends and receives messages", async () => {
+    const mockWs = {
+      addEventListener: (name: string, handler: (ev: unknown) => void) => { 
+        expect(name).toBe("message");
+        mockWs.send = (data) => handler(new MessageEvent("message", { data }));
+      },
+    };
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = wsSync(mockWs, true, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test11", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test11",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
   });
 });

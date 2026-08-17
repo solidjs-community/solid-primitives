@@ -7,6 +7,7 @@
 [![size](https://img.shields.io/badge/size-1.3_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/list-state)
 [![version](https://img.shields.io/npm/v/@solid-primitives/list-state?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/list-state)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitives for managing keyboard-navigable list state. Provides accessible, fully-featured list state management with support for single-select and multi-select patterns.
 
@@ -74,28 +75,28 @@ export function MyList() {
 interface ListStateOptions<T> {
   /** The items in the list. Should be in the same order as they appear in the DOM. */
   items: MaybeAccessor<T[]>;
-  
+
   /** The initially active item. @default undefined */
   initialActive?: T | undefined;
-  
+
   /** The orientation of the list. @default "vertical" */
   orientation?: MaybeAccessor<"vertical" | "horizontal">;
-  
+
   /** Whether the list should loop. @default true */
   loop?: MaybeAccessor<boolean>;
-  
+
   /** The text direction of the list. @default "ltr" */
   textDirection?: MaybeAccessor<"ltr" | "rtl">;
-  
+
   /** Whether tab key presses should be handled. @default true */
   handleTab?: MaybeAccessor<boolean>;
-  
+
   /** Whether vim movement key bindings should be used. @default false */
   vimMode?: MaybeAccessor<boolean>;
-  
+
   /** The vim movement key bindings. @default { up: 'k', down: 'j', right: 'l', left: 'h' } */
   vimKeys?: MaybeAccessor<{ up: string; down: string; right: string; left: string }>;
-  
+
   /** Callback fired when the active item changes. */
   onActiveChange?: (active: T | undefined) => void;
 }
@@ -113,14 +114,14 @@ interface ListStateReturn<T> {
 
 ### Keyboard Shortcuts
 
-| Key | Action |
-|-----|--------|
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Navigate vertically (or ← / → for horizontal) |
-| <kbd>Home</kbd> | Jump to first item |
-| <kbd>End</kbd> | Jump to last item |
-| <kbd>Tab</kbd> | Navigate forward (if `handleTab` is true) |
-| <kbd>Shift</kbd>+<kbd>Tab</kbd> | Navigate backward (if `handleTab` is true) |
-| <kbd>k</kbd> / <kbd>j</kbd> | Vim navigation (if `vimMode` is true) |
+| Key                             | Action                                        |
+| ------------------------------- | --------------------------------------------- |
+| <kbd>↑</kbd> / <kbd>↓</kbd>     | Navigate vertically (or ← / → for horizontal) |
+| <kbd>Home</kbd>                 | Jump to first item                            |
+| <kbd>End</kbd>                  | Jump to last item                             |
+| <kbd>Tab</kbd>                  | Navigate forward (if `handleTab` is true)     |
+| <kbd>Shift</kbd>+<kbd>Tab</kbd> | Navigate backward (if `handleTab` is true)    |
+| <kbd>k</kbd> / <kbd>j</kbd>     | Vim navigation (if `vimMode` is true)         |
 
 ## `createMultiSelectListState`
 
@@ -164,22 +165,22 @@ export function MyMultiSelectList() {
 ```ts
 interface MultiSelectListStateOptions<T> {
   // Same as ListStateOptions<T>, plus:
-  
+
   /** The initially focused item (cursor). @default undefined */
   initialCursor?: T | undefined;
-  
+
   /** The initially active items (range). @default [] */
   initialActive?: T[];
-  
+
   /** The initially selected items. @default [] */
   initialSelected?: T[];
-  
+
   /** Callback fired when the cursor changes. */
   onCursorChange?: (cursor: T | undefined) => void;
-  
+
   /** Callback fired when the active items change. */
   onActiveChange?: (active: T[]) => void;
-  
+
   /** Callback fired when the selected items change. */
   onSelectedChange?: (selected: T[]) => void;
 }
@@ -205,8 +206,8 @@ interface MultiSelectListStateReturn<T> {
 
 All shortcuts from `createListState` plus:
 
-| Key | Action |
-|-----|--------|
+| Key                                          | Action                          |
+| -------------------------------------------- | ------------------------------- |
 | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> | Expand/contract selection range |
 
 ## Types

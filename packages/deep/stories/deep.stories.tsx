@@ -30,8 +30,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── trackDeep ───────────────────────────────────────────────────────────────
-
 export const TrackDeepMultiple = meta.story({
   name: "One effect, two stores",
   parameters: {
@@ -68,26 +66,42 @@ export const TrackDeepMultiple = meta.story({
           <TextField
             label="Name"
             value={user.name}
-            onChange={v => setUser(s => { s.name = v; })}
+            onChange={v =>
+              setUser(s => {
+                s.name = v;
+              })
+            }
           />
           <TextField
             label="Email"
             value={user.email}
-            onChange={v => setUser(s => { s.email = v; })}
+            onChange={v =>
+              setUser(s => {
+                s.email = v;
+              })
+            }
           />
         </Section>
         <Section title="Preferences">
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <Button
               variant={prefs.theme === "dark" ? "primary" : "outline"}
-              onClick={() => setPrefs(s => { s.theme = s.theme === "light" ? "dark" : "light"; })}
+              onClick={() =>
+                setPrefs(s => {
+                  s.theme = s.theme === "light" ? "dark" : "light";
+                })
+              }
               style={{ flex: "1" }}
             >
               {prefs.theme === "dark" ? "Dark" : "Light"} theme
             </Button>
             <Button
               variant={prefs.notify ? "primary" : "outline"}
-              onClick={() => setPrefs(s => { s.notify = !s.notify; })}
+              onClick={() =>
+                setPrefs(s => {
+                  s.notify = !s.notify;
+                })
+              }
               style={{ flex: "1" }}
             >
               Notify {prefs.notify ? "on" : "off"}
@@ -103,8 +117,6 @@ export const TrackDeepMultiple = meta.story({
     );
   },
 });
-
-// ─── trackStore ──────────────────────────────────────────────────────────────
 
 export const TrackStoreWholeTree = meta.story({
   name: "Sync on any nested change",
@@ -167,12 +179,23 @@ export const TrackStoreWholeTree = meta.story({
                 >
                   {item.qty}
                 </span>
-                <Button variant="outline" onClick={() => setCart(s => { s.items[i()].qty++; })}>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setCart(s => {
+                      s.items[i()].qty++;
+                    })
+                  }
+                >
                   +
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => setCart(s => { s.items.splice(i(), 1); })}
+                  onClick={() =>
+                    setCart(s => {
+                      s.items.splice(i(), 1);
+                    })
+                  }
                 >
                   ×
                 </Button>
@@ -183,14 +206,20 @@ export const TrackStoreWholeTree = meta.story({
         <TextField
           label="Order note"
           value={cart.note}
-          onChange={v => setCart(s => { s.note = v; })}
+          onChange={v =>
+            setCart(s => {
+              s.note = v;
+            })
+          }
           placeholder="Special instructions…"
         />
         <Button
           variant="secondary"
           onClick={() => {
             nextId++;
-            setCart(s => { s.items.push({ name: `Item ${nextId}`, qty: 1 }); });
+            setCart(s => {
+              s.items.push({ name: `Item ${nextId}`, qty: 1 });
+            });
           }}
         >
           Add item
@@ -203,8 +232,6 @@ export const TrackStoreWholeTree = meta.story({
     );
   },
 });
-
-// ─── captureStoreUpdates ─────────────────────────────────────────────────────
 
 export const StoreDeltaStory = meta.story({
   name: "Which path changed?",
@@ -260,12 +287,20 @@ export const StoreDeltaStory = meta.story({
                 <input
                   type="checkbox"
                   checked={task.done}
-                  onChange={() => setBoard(s => { s.tasks[i()].done = !s.tasks[i()].done; })}
+                  onChange={() =>
+                    setBoard(s => {
+                      s.tasks[i()].done = !s.tasks[i()].done;
+                    })
+                  }
                 />
                 <input
                   type="text"
                   value={task.title}
-                  onInput={e => setBoard(s => { s.tasks[i()].title = e.currentTarget.value; })}
+                  onInput={e =>
+                    setBoard(s => {
+                      s.tasks[i()].title = e.currentTarget.value;
+                    })
+                  }
                   style={{
                     flex: 1,
                     border: `1px solid ${colors.border}`,

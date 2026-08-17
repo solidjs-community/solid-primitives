@@ -1,4 +1,4 @@
-import { createComputed, createEffect, createRoot } from "solid-js";
+import { createEffect, createRoot, flush } from "solid-js";
 import { expect, describe, it, test, vi } from "vitest";
 import { ReactiveMap, ReactiveWeakMap } from "../src/index.js";
 
@@ -45,24 +45,33 @@ describe("ReactiveMap", () => {
       ]);
 
       const captured: any[] = [];
-      createComputed(() => {
-        captured.push(map.has(2));
-      });
+      createEffect(
+        () => map.has(2),
+        v => {
+          captured.push(v);
+        },
+      );
+      flush();
       expect(captured, "1").toEqual([true]);
 
       map.set(4, {});
+      flush();
       expect(captured, "2").toEqual([true]);
 
       map.delete(4);
+      flush();
       expect(captured, "3").toEqual([true]);
 
       map.delete(2);
+      flush();
       expect(captured, "4").toEqual([true, false]);
 
       map.set(2, {});
+      flush();
       expect(captured, "5").toEqual([true, false, true]);
 
       map.clear();
+      flush();
       expect(captured, "6").toEqual([true, false, true, false]);
 
       dispose();
@@ -83,25 +92,37 @@ describe("ReactiveMap", () => {
       ]);
 
       const fn = vi.fn();
-      createComputed(() => fn(map.get(2)));
+      createEffect(
+        () => map.get(2),
+        value => {
+          fn(value);
+        },
+      );
+      flush();
       expect(fn).toHaveBeenLastCalledWith({});
 
       map.set(4, {});
+      flush();
       expect(fn).toBeCalledTimes(1);
 
       map.delete(4);
+      flush();
       expect(fn).toBeCalledTimes(1);
 
       map.delete(2);
+      flush();
       expect(fn).toHaveBeenLastCalledWith(undefined);
 
       map.set(2, obj4);
+      flush();
       expect(fn).toHaveBeenLastCalledWith(obj4);
 
       map.set(2, obj4);
+      flush();
       expect(fn).toBeCalledTimes(3);
 
       map.clear();
+      flush();
       expect(fn).toHaveBeenLastCalledWith(undefined);
 
       dispose();
@@ -119,40 +140,54 @@ describe("ReactiveMap", () => {
     const captured: any[] = [];
 
     const dispose = createRoot(dispose => {
-      createEffect(() => captured.push([...map.values()]));
+      createEffect(
+        () => [...map.values()],
+        values => {
+          captured.push(values);
+        },
+      );
       return dispose;
     });
+    flush();
 
     expect(captured, "1").toHaveLength(1);
     expect(captured[0], "1").toEqual(["b", "c", "d"]);
 
     map.set(4, "e");
+    flush();
     expect(captured, "2").toHaveLength(2);
     expect(captured[1], "2").toEqual(["b", "c", "d", "e"]);
 
     map.set(4, "e");
+    flush();
     expect(captured, "3").toHaveLength(2);
 
     map.delete(4);
+    flush();
     expect(captured, "4").toHaveLength(3);
     expect(captured[2], "4").toEqual(["b", "c", "d"]);
 
     map.delete(2);
+    flush();
     expect(captured, "5").toHaveLength(4);
     expect(captured[3], "5").toEqual(["b", "d"]);
 
     map.delete(2);
+    flush();
     expect(captured, "6").toHaveLength(4);
 
     map.set(2, "a");
+    flush();
     expect(captured, "7").toHaveLength(5);
     expect(captured[4], "7").toEqual(["b", "d", "a"]);
 
     map.set(2, "b");
+    flush();
     expect(captured, "8").toHaveLength(6);
     expect(captured[5], "8").toEqual(["b", "d", "b"]);
 
     map.clear();
+    flush();
     expect(captured, "9").toHaveLength(7);
     expect(captured[6], "9").toEqual([]);
 
@@ -169,35 +204,46 @@ describe("ReactiveMap", () => {
       ]);
 
       const captured: any[] = [];
-      createComputed(() => {
-        captured.push(map.size);
-      });
+      createEffect(
+        () => map.size,
+        size => {
+          captured.push(size);
+        },
+      );
+      flush();
       expect(captured, "1").toHaveLength(1);
       expect(captured[0], "1").toEqual(3);
 
       map.set(4, {});
+      flush();
       expect(captured, "2").toHaveLength(2);
       expect(captured[1], "2").toEqual(4);
 
       map.delete(4);
+      flush();
       expect(captured, "3").toHaveLength(3);
       expect(captured[2], "3").toEqual(3);
 
       map.delete(2);
+      flush();
       expect(captured, "4").toHaveLength(4);
       expect(captured[3], "4").toEqual(2);
 
       map.delete(2);
+      flush();
       expect(captured, "5").toHaveLength(4);
 
       map.set(2, {});
+      flush();
       expect(captured, "6").toHaveLength(5);
       expect(captured[4], "6").toEqual(3);
 
       map.set(2, {});
+      flush();
       expect(captured, "7").toHaveLength(5);
 
       map.clear();
+      flush();
       expect(captured, "8").toHaveLength(6);
       expect(captured[5], "8").toEqual(0);
 
@@ -215,26 +261,29 @@ describe("ReactiveMap", () => {
     const captured: unknown[][] = [];
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        const run: unknown[] = [];
-        for (const key of map.keys()) {
-          run.push(key);
-        }
-        captured.push(run);
-      });
+      createEffect(
+        () => [...map.keys()],
+        keys => {
+          captured.push(keys);
+        },
+      );
       return dispose;
     });
+    flush();
 
     expect(captured).toHaveLength(1);
     expect(captured[0]).toEqual([1, 2, 3]);
 
     map.set(1, "e");
+    flush();
     expect(captured, "value change").toHaveLength(1);
 
     map.set(4, "f");
+    flush();
     expect(captured, "new key added").toHaveLength(2);
 
     map.delete(1);
+    flush();
     expect(captured, "seen key change").toHaveLength(3);
     expect(captured[2]).toEqual([2, 3, 4]);
 
@@ -251,28 +300,31 @@ describe("ReactiveMap", () => {
     const captured: unknown[][] = [];
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        const run: unknown[] = [];
-        for (const v of map.values()) {
-          run.push(v);
-        }
-        captured.push(run);
-      });
+      createEffect(
+        () => [...map.values()],
+        values => {
+          captured.push(values);
+        },
+      );
       return dispose;
     });
+    flush();
 
     expect(captured).toHaveLength(1);
     expect(captured[0]).toEqual(["a", "b", "c"]);
 
     map.set(1, "e");
+    flush();
     expect(captured, "value change").toHaveLength(2);
     expect(captured[1]).toEqual(["e", "b", "c"]);
 
     map.set(4, "f");
+    flush();
     expect(captured, "new key added").toHaveLength(3);
     expect(captured[2]).toEqual(["e", "b", "c", "f"]);
 
     map.delete(4);
+    flush();
     expect(captured, "key removed").toHaveLength(4);
     expect(captured[3]).toEqual(["e", "b", "c"]);
 
@@ -289,15 +341,15 @@ describe("ReactiveMap", () => {
     const captured: unknown[][] = [];
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        const run: unknown[] = [];
-        for (const e of map.entries()) {
-          run.push(e);
-        }
-        captured.push(run);
-      });
+      createEffect(
+        () => [...map.entries()],
+        entries => {
+          captured.push(entries);
+        },
+      );
       return dispose;
     });
+    flush();
 
     expect(captured).toHaveLength(1);
     expect(captured[0]).toEqual([
@@ -307,6 +359,7 @@ describe("ReactiveMap", () => {
     ]);
 
     map.set(1, "e");
+    flush();
     expect(captured, "value change").toHaveLength(2);
     expect(captured[1]).toEqual([
       [1, "e"],
@@ -315,6 +368,7 @@ describe("ReactiveMap", () => {
     ]);
 
     map.set(4, "f");
+    flush();
     expect(captured, "new key added").toHaveLength(3);
     expect(captured[2]).toEqual([
       [1, "e"],
@@ -324,6 +378,7 @@ describe("ReactiveMap", () => {
     ]);
 
     map.delete(4);
+    flush();
     expect(captured, "key removed").toHaveLength(4);
     expect(captured[3]).toEqual([
       [1, "e"],
@@ -344,15 +399,21 @@ describe("ReactiveMap", () => {
     const captured: unknown[][] = [];
 
     const dispose = createRoot(dispose => {
-      createEffect(() => {
-        const run: unknown[] = [];
-        map.forEach((v, k) => {
-          run.push([k, v]);
-        });
-        captured.push(run);
-      });
+      createEffect(
+        () => {
+          const run: unknown[] = [];
+          map.forEach((v, k) => {
+            run.push([k, v]);
+          });
+          return run;
+        },
+        run => {
+          captured.push(run);
+        },
+      );
       return dispose;
     });
+    flush();
 
     expect(captured).toHaveLength(1);
     expect(captured[0]).toEqual([
@@ -362,6 +423,7 @@ describe("ReactiveMap", () => {
     ]);
 
     map.set(1, "e");
+    flush();
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
       [1, "e"],
@@ -370,6 +432,7 @@ describe("ReactiveMap", () => {
     ]);
 
     map.delete(3);
+    flush();
     expect(captured).toHaveLength(3);
     expect(captured[2]).toEqual([
       [1, "e"],
@@ -378,6 +441,7 @@ describe("ReactiveMap", () => {
 
     dispose();
   });
+
   test(".clear() notifies only listeners of existing members", () =>
     createRoot(dispose => {
       const map = new ReactiveMap([
@@ -387,16 +451,30 @@ describe("ReactiveMap", () => {
       ]);
 
       const existingKey = vi.fn();
-      createComputed(() => existingKey(map.has(2)));
+      createEffect(
+        () => map.has(2),
+        v => existingKey(v),
+      );
 
       const existingValue = vi.fn();
-      createComputed(() => existingValue(map.get(2)));
+      createEffect(
+        () => map.get(2),
+        v => existingValue(v),
+      );
 
       const nonexistingKey = vi.fn();
-      createComputed(() => nonexistingKey(map.has(4)));
+      createEffect(
+        () => map.has(4),
+        v => nonexistingKey(v),
+      );
 
       const nonexistingValue = vi.fn();
-      createComputed(() => nonexistingValue(map.get(4)));
+      createEffect(
+        () => map.get(4),
+        v => nonexistingValue(v),
+      );
+
+      flush();
 
       expect(existingKey).toHaveBeenNthCalledWith(1, true);
       expect(existingValue).toHaveBeenNthCalledWith(1, "b");
@@ -405,6 +483,7 @@ describe("ReactiveMap", () => {
       expect(nonexistingValue).toHaveBeenNthCalledWith(1, undefined);
 
       map.clear();
+      flush();
 
       expect(existingKey).toHaveBeenCalledTimes(2);
       expect(existingKey).toHaveBeenNthCalledWith(2, false);
@@ -456,27 +535,37 @@ describe("ReactiveWeakMap", () => {
       ]);
 
       const captured: any[] = [];
-      createComputed(() => {
-        captured.push(map.has(obj1));
-      });
+      createEffect(
+        () => map.has(obj1),
+        v => {
+          captured.push(v);
+        },
+      );
+      flush();
       expect(captured, "1").toEqual([true]);
 
       map.set(obj3, {});
+      flush();
       expect(captured, "2").toEqual([true]);
 
       map.delete(obj3);
+      flush();
       expect(captured, "3").toEqual([true]);
 
       map.delete(obj1);
+      flush();
       expect(captured, "4").toEqual([true, false]);
 
       map.set(obj1, {});
+      flush();
       expect(captured, "5").toEqual([true, false, true]);
 
       map.set(obj4, {});
+      flush();
       expect(captured, "7").toEqual([true, false, true]);
 
       map.set(obj1, {});
+      flush();
       expect(captured, "8").toEqual([true, false, true]);
 
       dispose();

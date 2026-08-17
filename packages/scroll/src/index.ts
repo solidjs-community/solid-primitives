@@ -4,8 +4,8 @@ export {
   getScrollPosition,
   createScrollPosition,
   useWindowScrollPosition,
-} from "./scrollPosition.js";
-export type { Position } from "./scrollPosition.js";
+} from "./scrollPosition.ts";
+export type { Position } from "./scrollPosition.ts";
 
-export { createPreventScroll } from "./preventScroll.js";
-export type { CreatePreventScrollProps } from "./preventScroll.js";
+export { createPreventScroll } from "./preventScroll.ts";
+export type { CreatePreventScrollProps } from "./preventScroll.ts";

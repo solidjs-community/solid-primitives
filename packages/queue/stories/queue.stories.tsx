@@ -115,11 +115,7 @@ export const SortOnInsert = meta.story({
           <ButtonRow>
             <For each={NUMS}>
               {n => (
-                <Button
-                  variant="outline"
-                  onClick={() => add(n)}
-                  style={{ "min-width": "2.5rem" }}
-                >
+                <Button variant="outline" onClick={() => add(n)} style={{ "min-width": "2.5rem" }}>
                   {n}
                 </Button>
               )}
@@ -219,7 +215,7 @@ export const ConcurrentSlots = meta.story({
     const addBatch = (count: number) => {
       for (let i = 0; i < count; i++) {
         const id = ++counter;
-        const ms = 600 + (id * 300) % 900;
+        const ms = 600 + ((id * 300) % 900);
         enqueue(async () => {
           await new Promise<void>(r => setTimeout(r, ms));
           return `task-${id}`;

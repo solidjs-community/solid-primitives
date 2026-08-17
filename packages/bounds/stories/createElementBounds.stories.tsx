@@ -165,7 +165,14 @@ export const ScrollTracking = meta.story({
             padding: "0.5rem",
           }}
         >
-          <div style={{ height: "480px", display: "flex", "align-items": "center", "justify-content": "center" }}>
+          <div
+            style={{
+              height: "480px",
+              display: "flex",
+              "align-items": "center",
+              "justify-content": "center",
+            }}
+          >
             <div
               ref={ref}
               style={{

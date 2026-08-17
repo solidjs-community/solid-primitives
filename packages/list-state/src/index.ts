@@ -1,5 +1,5 @@
-export { createListState } from "./list-state.js";
-export { createMultiSelectListState } from "./multi-list-state.js";
+export { createListState } from "./list-state.ts";
+export { createMultiSelectListState } from "./multi-list-state.ts";
 export type {
   ListStateOptions,
   ListStateReturn,
@@ -8,4 +8,4 @@ export type {
   Orientation,
   TextDirection,
   VimKeys,
-} from "./types.js";
+} from "./types.ts";

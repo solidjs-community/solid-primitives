@@ -266,7 +266,7 @@ export const EventHubStory = meta.story({
               "font-size": "0.8rem",
             }}
           >
-            {((((angle() % 360) + 540) % 360) - 180)}°
+            {(((angle() % 360) + 540) % 360) - 180}°
           </div>
         </div>
 
@@ -327,7 +327,14 @@ export const EventStackStory = meta.story({
           </Button>
         </form>
 
-        <div style={{ display: "flex", "flex-direction": "column", gap: "0.4rem", "min-height": "80px" }}>
+        <div
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.4rem",
+            "min-height": "80px",
+          }}
+        >
           <Show
             when={stack.value().length > 0}
             fallback={

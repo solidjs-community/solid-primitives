@@ -45,6 +45,7 @@ stories/
 ```
 
 `stories/tsconfig.json`:
+
 ```json
 {
   "extends": "../../../.storybook/tsconfig.json",

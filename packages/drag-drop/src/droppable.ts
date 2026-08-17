@@ -1,8 +1,8 @@
 import { createEffect, createMemo, createSignal, flush } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
-import { useDragContext } from "./context.js";
-import { applyClass, applyStyle, removeClass, removeStyle } from "./dom.js";
+import { useDragContext } from "./context.tsx";
+import { applyClass, applyStyle, removeClass, removeStyle } from "./dom.ts";
 import type {
   CreateDroppableOptions,
   CreateNativeDroppableOptions,
@@ -11,7 +11,7 @@ import type {
   MakeDroppableOptions,
   MakeNativeDroppableOptions,
   NativeDroppableReturn,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Attaches pointer-based drop-zone behaviour to an existing element.

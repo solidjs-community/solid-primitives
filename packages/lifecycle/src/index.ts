@@ -1,12 +1,12 @@
 import {
   type Accessor,
   createSignal,
-  getListener,
+  getObserver,
   onCleanup,
-  onMount,
+  onSettled,
   sharedConfig,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 /**
  * @returns a signal accessor that will return a `false` initially,
@@ -23,7 +23,7 @@ import { isServer } from "solid-js/web";
 export function createIsMounted(): Accessor<boolean> {
   if (isServer) return () => false;
   const [isMounted, setIsMounted] = createSignal(false);
-  onMount(() => setIsMounted(true));
+  onSettled(() => { setIsMounted(true); });
   return isMounted;
 }
 
@@ -39,7 +39,7 @@ export function createIsMounted(): Accessor<boolean> {
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#isHydrated
  */
 export const isHydrated = (): boolean =>
-  !isServer && (!sharedConfig.context || (!!getListener() && createIsMounted()()));
+  !isServer && (!sharedConfig.hydrating || (!!getObserver() && createIsMounted()()));
 
 /**
  * Calls the {@link fn} callback when the {@link el} is connected to the DOM.

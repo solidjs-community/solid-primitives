@@ -9,13 +9,7 @@ import {
 } from "@solid-primitives/cursor";
 import type { CursorProperty } from "@solid-primitives/cursor";
 import readme from "../README.md?raw";
-import {
-  Container,
-  Button,
-  Card,
-  StatRow,
-  BoolRow,
-} from "../../../.storybook/ui/index.js";
+import { Container, Button, Card, StatRow, BoolRow } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
   title: "DOM/Cursor",
@@ -31,8 +25,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ─── makeBodyCursor ───────────────────────────────────────────────────────────
 
 export const LoadingState = meta.story({
   name: "Loading state",
@@ -77,8 +69,6 @@ export const LoadingState = meta.story({
     );
   },
 });
-
-// ─── createBodyCursor ─────────────────────────────────────────────────────────
 
 const BODY_CURSORS: CursorProperty[] = [
   "pointer",
@@ -134,8 +124,6 @@ export const BodyCursorReactive = meta.story({
     );
   },
 });
-
-// ─── createElementCursor ──────────────────────────────────────────────────────
 
 const ELEMENT_CURSORS: CursorProperty[] = [
   "pointer",
@@ -219,8 +207,6 @@ export const ElementCursorToggle = meta.story({
   },
 });
 
-// ─── createDragCursor ─────────────────────────────────────────────────────────
-
 export const DragHandle = meta.story({
   name: "Grab/grabbing on drag",
   parameters: {
@@ -292,15 +278,13 @@ export const DragHandle = meta.story({
         </Card>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          While holding, move the pointer off the element — the <code>grabbing</code> cursor
-          follows everywhere.
+          While holding, move the pointer off the element — the <code>grabbing</code> cursor follows
+          everywhere.
         </p>
       </Container>
     );
   },
 });
-
-// ─── cursorRef ────────────────────────────────────────────────────────────────
 
 const SHOWCASE_CURSORS: CursorProperty[] = [
   "pointer",
@@ -362,7 +346,7 @@ export const CursorShowcase = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          Each tile uses <code>{"ref={cursorRef(\"…\")}"}</code>. Hover to see the cursor.
+          Each tile uses <code>{'ref={cursorRef("…")}'}</code>. Hover to see the cursor.
         </p>
       </Container>
     );

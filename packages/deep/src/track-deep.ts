@@ -44,6 +44,6 @@ function traverse(value: unknown, seen: Set<unknown>): void {
 /**
  * @deprecated Renamed to {@link trackDeep}
  */
-const deepTrack = trackDeep;
+const deepTrack: typeof trackDeep = trackDeep;
 
 export { trackDeep, deepTrack };

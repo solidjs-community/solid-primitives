@@ -2,10 +2,10 @@
 "@solid-primitives/filesystem": major
 ---
 
-Migrate to Solid.js v2.0 (beta.13).
+Migrate to Solid.js v2.0 (beta.14).
 
 Breaking changes:
-- `solid-js` peer dependency updated to `^2.0.0-beta.13`
+- `solid-js` peer dependency updated to `^2.0.0-beta.14`
 - `@solidjs/web` is now a required peer dependency
 - `isServer` is now imported from `@solidjs/web`
 - `createSyncFileSystem` and `createAsyncFileSystem` internal signals use `ownedWrite: true` to support writes from reactive scopes

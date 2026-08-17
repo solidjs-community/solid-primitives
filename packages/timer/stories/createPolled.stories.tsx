@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import { createPolled, createIntervalCounter } from "@solid-primitives/timer";
 import { Stat, Container } from "../../../.storybook/ui/index.js";
@@ -44,13 +44,17 @@ export const CreatePolled = meta.story({
             Last 5 ticks
           </div>
           <div style={{ display: "flex", "flex-direction": "column", gap: "0.2rem" }}>
-            {history().map((t, i) => (
-              <code style={{ "font-size": "0.85rem", opacity: `${0.4 + i * 0.15}` }}>{t}</code>
-            ))}
+            <For each={history()} keyed={false}>
+              {(t, i) => (
+                <code style={{ "font-size": "0.85rem", opacity: `${0.4 + i * 0.15}` }}>{t()}</code>
+              )}
+            </For>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}>
+        <div
+          style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}
+        >
           <span style={{ "font-size": "0.85rem", color: "#64748b" }}>Interval:</span>
           {([250, 500, 1000, 2000] as const).map(ms => (
             <button
@@ -90,11 +94,20 @@ export const CreateIntervalCounter = meta.story({
       <Container minWidth={320}>
         <h3 style={{ margin: 0 }}>createIntervalCounter</h3>
 
-        <div style={{ "font-size": "3rem", "font-weight": "bold", "font-variant-numeric": "tabular-nums", "text-align": "center" }}>
+        <div
+          style={{
+            "font-size": "3rem",
+            "font-weight": "bold",
+            "font-variant-numeric": "tabular-nums",
+            "text-align": "center",
+          }}
+        >
           {count()}
         </div>
 
-        <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}>
+        <div
+          style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}
+        >
           <span style={{ "font-size": "0.85rem", color: "#64748b" }}>Interval:</span>
           {([100, 250, 500, 1000] as const).map(ms => (
             <button

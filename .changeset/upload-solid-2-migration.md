@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/upload": minor
+"@solid-primitives/upload": major
 ---
 
 Migrate to Solid.js 2.0 (beta.14)

@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { createRoot, flush } from "solid-js";
+import { createRoot, flush, runWithOwner } from "solid-js";
 import { createWebShare, createSocialShare } from "../src/index.js";
 
 describe("createWebShare", () => {
@@ -23,7 +23,7 @@ describe("createWebShare", () => {
 
       const { share, pending, status, message } = createWebShare();
 
-      const promise = share({ url: "https://solidjs.com" });
+      const promise = runWithOwner(null, () => share({ url: "https://solidjs.com" }));
       flush();
       expect(pending()).toBe(true);
 
@@ -46,7 +46,7 @@ describe("createWebShare", () => {
 
       const { share, pending, status, message } = createWebShare();
 
-      await share({ url: "https://solidjs.com" });
+      await runWithOwner(null, () => share({ url: "https://solidjs.com" }));
       flush();
       expect(pending()).toBe(false);
       expect(status()).toBe(false);

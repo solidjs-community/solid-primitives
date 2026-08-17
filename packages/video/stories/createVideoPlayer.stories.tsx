@@ -25,8 +25,8 @@ export default meta;
 
 const VIDEO = "/video/big_buck_bunny_sall.mp4";
 
-const fmt = (s: number) =>
-  `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+// oxlint-disable-next-line no-unused-vars
+const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 const SPEEDS = [0.5, 1, 1.5, 2] as const;
 
@@ -66,9 +66,7 @@ export const VolumeAndMuted = meta.story({
         </ButtonRow>
 
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
-          <span
-            style={{ "font-size": font.sizeSm, color: colors.muted, "white-space": "nowrap" }}
-          >
+          <span style={{ "font-size": font.sizeSm, color: colors.muted, "white-space": "nowrap" }}>
             Volume
           </span>
           <input

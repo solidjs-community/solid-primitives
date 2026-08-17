@@ -2,11 +2,11 @@
 "@solid-primitives/fullscreen": major
 ---
 
-Migrate `@solid-primitives/fullscreen` to Solid.js 2.0 (beta.7).
+Migrate `@solid-primitives/fullscreen` to Solid.js 2.0 (beta.14).
 
 **Breaking changes:**
 
-- Peer dependency updated from `solid-js ^1.6.12` to `solid-js ^2.0.0-beta.7` and `@solidjs/web ^2.0.0-beta.7`.
+- Peer dependency updated from `solid-js ^1.6.12` to `solid-js ^2.0.0-beta.14` and `@solidjs/web ^2.0.0-beta.14`.
 - The `use:createFullscreen` JSX directive (Solid 1.x `use:` namespace) is removed. Use the new `fullscreen()` ref directive factory instead:
 
   ```tsx

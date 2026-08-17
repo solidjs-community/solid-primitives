@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/deep",
-  "version": "0.3.5",
-  "description": "Primitives for tracking and observing nested reactive objects in Solid.",
+  "version": "1.0.0-next.3",
+  "description": "Primitives for tracking and observing nested reactive objects.",
   "author": "Samuel Burbano <me@iosamuel.dev>",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>"
@@ -17,14 +17,14 @@
   },
   "primitive": {
     "name": "deep",
-    "stage": 1,
+    "stage": 3,
     "list": [
       "trackDeep",
       "trackStore",
       "captureStoreUpdates"
     ],
     "category": "Reactivity",
-    "gzip": 1298
+    "gzip": 952
   },
   "keywords": [
     "solid",
@@ -51,8 +51,12 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -61,11 +65,11 @@
     "@solid-primitives/memo": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.13",
-    "solid-js": "^2.0.0-beta.13"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.13",
-    "solid-js": "2.0.0-beta.13"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

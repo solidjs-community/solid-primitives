@@ -21,17 +21,288 @@
  */
 
 import { type Accessor, createEffect, onCleanup } from "solid-js";
-import { type MaybeAccessor, access, isServer, noop } from "@solid-primitives/utils";
+import { type MaybeAccessor, access, globalRegistry, isServer, noop } from "@solid-primitives/utils";
 
+// ---- ariaHideOutside / createHideOutside ----
+
+/**
+ * Options for {@link createHideOutside}.
+ */
+export interface CreateHideOutsideOptions {
+  /** The elements that should remain visible. */
+  targets: MaybeAccessor<Array<Element>>;
+  /** Nothing will be hidden above this element. Defaults to `document.body`. */
+  root?: MaybeAccessor<HTMLElement | undefined>;
+  /** Whether the hide-outside behavior is disabled. */
+  disabled?: MaybeAccessor<boolean | undefined>;
+  /**
+   * A CSS selector string for elements that should always stay visible regardless of
+   * target containment (e.g. top-layer elements, live announcers). Optional.
+   */
+  alwaysVisibleSelector?: string;
+  /**
+   * Also set the `inert` attribute on hidden elements, in addition to `aria-hidden`.
+   * `aria-hidden` alone only affects the accessibility tree — the background stays focusable
+   * and clickable; `inert` additionally removes it from focus order, tab order, and pointer/
+   * text-selection interaction. *Default = `false`* (matches prior behavior).
+   */
+  inert?: MaybeAccessor<boolean>;
+}
+
+// Keeps a ref count of all hidden/inerted elements so nested usages don't fight, and tracks
+// the stack of active observers. Uses globalRegistry (Symbol.for(...) on globalThis, not
+// module-scope bindings) so this stays correct even if the app's dependency graph ends up with
+// more than one copy of this package installed — module-scope state would otherwise be split
+// across copies (e.g. one copy's cleanup revealing content another copy still needs hidden).
+type HideOutsideRegistry = {
+  refCountMap: WeakMap<Element, number>;
+  inertRefCountMap: WeakMap<Element, number>;
+  observerStack: Array<{ observe(): void; disconnect(): void }>;
+};
+
+const getHideOutsideRegistry = (): HideOutsideRegistry =>
+  globalRegistry<HideOutsideRegistry>("@solid-primitives/interaction:hide-outside", () => ({
+    refCountMap: new WeakMap(),
+    inertRefCountMap: new WeakMap(),
+    observerStack: [],
+  }));
+
+/**
+ * Applies `apply` to `node` the first time it's touched (or observes that a pre-existing native
+ * state already covers it, in which case `node` is left alone entirely and untracked). Ref-counts
+ * nested calls; returns whether `node` is now managed by us (`false` means "not ours — untouched").
+ */
+function refCountedApply(
+  map: WeakMap<Element, number>,
+  tracked: Set<Element>,
+  node: Element,
+  alreadySet: boolean,
+  apply: () => void,
+): boolean {
+  const count = map.get(node) ?? 0;
+  if (alreadySet && count === 0) return false;
+  if (count === 0) apply();
+  map.set(node, count + 1);
+  tracked.add(node);
+  return true;
+}
+
+/** Reverts `unapply` once the last ref-counted hold on `node` in `map` is released. */
+function refCountedRelease(map: WeakMap<Element, number>, node: Element, unapply: () => void): void {
+  const count = map.get(node);
+  if (count == null) return;
+  if (count === 1) {
+    unapply();
+    map.delete(node);
+  } else {
+    map.set(node, count - 1);
+  }
+}
+
+/**
+ * Hides all elements in the DOM outside the given `targets` from screen readers by setting
+ * `aria-hidden="true"` on them, and returns a cleanup function that reverts every change.
+ *
+ * A `MutationObserver` watches for newly inserted nodes and hides them automatically.
+ * Calls are ref-counted, so nested invocations cooperate correctly — tearing down an inner
+ * call never reveals content that an outer call is still hiding.
+ *
+ * This is a non-reactive, imperative primitive. For a reactive version that integrates with
+ * Solid's ownership model use {@link createHideOutside}.
+ *
+ * @param targets - Elements that should remain visible (along with their ancestors and descendants).
+ * @param root - Root element to walk. Defaults to `document.body`.
+ * @param alwaysVisibleSelector - Optional CSS selector for elements that must never be hidden
+ *   (e.g. `"[aria-live]"` for live-region announcers or top-layer elements).
+ * @param inert - Also set the `inert` attribute on hidden elements. *Default = `false`*.
+ * @returns A cleanup function that removes all `aria-hidden`/`inert` changes added by this call.
+ *
+ * @example
+ * ```ts
+ * const cleanup = ariaHideOutside([dialogEl]);
+ *
+ * // When the dialog closes:
+ * cleanup();
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Exempt live-region announcers from being hidden:
+ * const cleanup = ariaHideOutside([dialogEl], document.body, "[aria-live]");
+ * ```
+ */
+export function ariaHideOutside(
+  targets: Element[],
+  root: Element = document.body,
+  alwaysVisibleSelector?: string,
+  inert = false,
+): () => void {
+  const { refCountMap, inertRefCountMap, observerStack } = getHideOutsideRegistry();
+  const visibleNodes = new Set<Element>(targets);
+  const hiddenNodes = new Set<Element>();
+  const inertedNodes = new Set<Element>();
+
+  const walk = (root: Element) => {
+    if (alwaysVisibleSelector) {
+      Array.from(root.querySelectorAll(alwaysVisibleSelector)).forEach(el => visibleNodes.add(el));
+    }
+
+    const acceptNode = (node: Element) => {
+      if (
+        visibleNodes.has(node) ||
+        (node.parentElement &&
+          hiddenNodes.has(node.parentElement) &&
+          node.parentElement.getAttribute("role") !== "row")
+      ) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      for (const target of visibleNodes) {
+        if (node.contains(target)) return NodeFilter.FILTER_SKIP;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    };
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, { acceptNode });
+    const acceptRoot = acceptNode(root);
+    if (acceptRoot === NodeFilter.FILTER_ACCEPT) hide(root);
+    if (acceptRoot !== NodeFilter.FILTER_REJECT) {
+      let node = walker.nextNode() as Element | null;
+      while (node != null) {
+        hide(node);
+        node = walker.nextNode() as Element | null;
+      }
+    }
+  };
+
+  // `inert` is only ever applied to nodes hide() actually manages (returns `true`) — a node
+  // left alone because it already carries an author-set aria-hidden must be left alone for
+  // `inert` too, for the same "not ours to manage" reason.
+  const hide = (node: Element) => {
+    const managed = refCountedApply(
+      refCountMap,
+      hiddenNodes,
+      node,
+      node.getAttribute("aria-hidden") === "true",
+      () => node.setAttribute("aria-hidden", "true"),
+    );
+    if (managed && inert && node instanceof HTMLElement) {
+      refCountedApply(inertRefCountMap, inertedNodes, node, node.inert, () => {
+        node.inert = true;
+      });
+    }
+  };
+
+  observerStack[observerStack.length - 1]?.disconnect();
+
+  walk(root);
+
+  const observer = new MutationObserver((changes) => {
+    for (const change of changes) {
+      if (change.type !== "childList" || change.addedNodes.length === 0) continue;
+      if (![...visibleNodes, ...hiddenNodes].some((node) => node.contains(change.target))) {
+        Array.from(change.removedNodes).forEach(node => {
+          if (node instanceof Element) {
+            visibleNodes.delete(node);
+            hiddenNodes.delete(node);
+          }
+        });
+        Array.from(change.addedNodes).forEach(node => {
+          if (node instanceof Element) walk(node);
+        });
+      }
+    }
+  });
+
+  observer.observe(root, { childList: true, subtree: true });
+
+  const wrapper = {
+    observe() { observer.observe(root, { childList: true, subtree: true }); },
+    disconnect() { observer.disconnect(); },
+  };
+  observerStack.push(wrapper);
+
+  return () => {
+    observer.disconnect();
+    hiddenNodes.forEach(node => refCountedRelease(refCountMap, node, () => node.removeAttribute("aria-hidden")));
+    inertedNodes.forEach(node =>
+      refCountedRelease(inertRefCountMap, node, () => {
+        (node as HTMLElement).inert = false;
+      }),
+    );
+    if (wrapper === observerStack[observerStack.length - 1]) {
+      observerStack.pop();
+      observerStack[observerStack.length - 1]?.observe();
+    } else {
+      observerStack.splice(observerStack.indexOf(wrapper), 1);
+    }
+  };
+}
+
+/**
+ * Reactively hides all elements outside `options.targets` from screen readers using
+ * `aria-hidden`. Re-runs whenever `targets`, `root`, or `disabled` changes, and cleans up
+ * automatically when the reactive owner is disposed.
+ *
+ * For a non-reactive, imperative version use {@link ariaHideOutside}.
+ *
+ * @param options - Configuration. See {@link CreateHideOutsideOptions}.
+ *
+ * @example
+ * ```tsx
+ * function Dialog(props: { open: boolean }) {
+ *   const [ref, setRef] = createSignal<HTMLDivElement>();
+ *
+ *   createHideOutside({
+ *     targets: () => (ref() ? [ref()!] : []),
+ *     disabled: () => !props.open,
+ *   });
+ *
+ *   return (
+ *     <Show when={props.open}>
+ *       <div ref={setRef} role="dialog" aria-modal="true">
+ *         Dialog content
+ *       </div>
+ *     </Show>
+ *   );
+ * }
+ * ```
+ */
+export function createHideOutside(options: CreateHideOutsideOptions): void {
+  createEffect(
+    () => ({
+      disabled: !!access(options.disabled),
+      targets: access(options.targets),
+      root: access(options.root),
+      inert: !!access(options.inert),
+    }),
+    ({ disabled, targets, root, inert }) => {
+      if (disabled) return;
+      return ariaHideOutside(targets, root, options.alwaysVisibleSelector, inert);
+    },
+  );
+}
+
+/** Detail payload carried by every outside-interaction `CustomEvent`. */
 export type EventDetails<T> = {
+  /** The original DOM event that triggered the outside interaction. */
   originalEvent: T;
+  /** `true` when the interaction was a right-click or Ctrl+click on macOS. */
   isContextMenu: boolean;
 };
 
+/** `CustomEvent` fired when a `pointerdown` occurs outside the watched element. */
 export type PointerDownOutsideEvent = CustomEvent<EventDetails<PointerEvent>>;
+
+/** `CustomEvent` fired when focus moves outside the watched element. */
 export type FocusOutsideEvent = CustomEvent<EventDetails<FocusEvent>>;
+
+/** Union of all outside-interaction event types. */
 export type InteractOutsideEvent = PointerDownOutsideEvent | FocusOutsideEvent;
 
+/**
+ * Options shared by {@link createInteractOutside} and {@link makeInteractOutside}
+ * (the latter omits `disabled` via {@link MakeInteractOutsideOptions}).
+ */
 export interface CreateInteractOutsideOptions {
   /** Whether the interact outside events should be listened or not. */
   disabled?: MaybeAccessor<boolean | undefined>;
@@ -62,6 +333,7 @@ export interface CreateInteractOutsideOptions {
   onInteractOutside?: (event: InteractOutsideEvent) => void;
 }
 
+/** {@link CreateInteractOutsideOptions} without `disabled` — for use with {@link makeInteractOutside} and {@link interactOutside}. */
 export type MakeInteractOutsideOptions = Omit<CreateInteractOutsideOptions, "disabled">;
 
 const POINTER_DOWN_OUTSIDE_EVENT = "interactOutside.pointerDownOutside";
@@ -109,9 +381,24 @@ export function makeInteractOutside<T extends Element>(
   if (isServer) return noop;
 
   let clickHandler: () => void = noop;
-  const ownerDoc = el.ownerDocument;
+
+  // el.ownerDocument may be an about:blank document at ref-apply time if the element was
+  // created by a renderer whose `document` global resolved before the real document was ready
+  // (e.g. Vite pre-bundled deps in Storybook iframes). Reading el.ownerDocument inside the
+  // setTimeout ensures we get the document after the element has been adopted into the real DOM.
+  let ownerDoc: Document = el.ownerDocument;
 
   const isEventOutside = (e: Event): boolean => {
+    // `el` can be removed from the document by its owner (e.g. a `<Show>`
+    // unmounting a dismissable layer) before this instance's reactive owner
+    // gets around to calling the cleanup this function returns (listener
+    // removal is tied to `onCleanup`, which can lag a tick behind the DOM
+    // change that triggered it). Once `el` is disconnected there's nothing
+    // left to protect, and `el.contains(target)` would incorrectly read as
+    // "not contained" for every target — including ones legitimately inside
+    // a *new* instance that opened in that same window — misreporting them
+    // as outside interactions on this now-orphaned instance.
+    if (!el.isConnected) return false;
     const target = e.target as Element | null;
     if (!(target instanceof Element)) return false;
     if (!ownerDoc.contains(target)) return false;
@@ -171,12 +458,15 @@ export function makeInteractOutside<T extends Element>(
     );
   };
 
-  // Delay pointerdown registration to avoid triggering on the event that caused this mount.
+  // Delay listener registration to:
+  // 1. Avoid triggering on the event that caused this mount.
+  // 2. Re-read el.ownerDocument after the element has been adopted into the real DOM
+  //    (it may have been created in an about:blank context by a pre-bundled renderer).
   const pointerDownTimeoutId = window.setTimeout(() => {
+    ownerDoc = el.ownerDocument;
     ownerDoc.addEventListener("pointerdown", onPointerDown, true);
+    ownerDoc.addEventListener("focusin", onFocusIn, true);
   }, 0);
-
-  ownerDoc.addEventListener("focusin", onFocusIn, true);
 
   return () => {
     window.clearTimeout(pointerDownTimeoutId);

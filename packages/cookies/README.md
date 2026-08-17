@@ -4,9 +4,10 @@
 
 # @solid-primitives/cookies
 
-[![size](https://img.shields.io/badge/size-427_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/cookies)
+[![size](https://img.shields.io/badge/size-456_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/cookies)
 [![version](https://img.shields.io/npm/v/@solid-primitives/cookies?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/cookies)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive, signal-based cookie primitives for isomorphic use — readable and writable on both the server and the client.
 
@@ -27,8 +28,6 @@ yarn add @solid-primitives/cookies
 # or
 pnpm add @solid-primitives/cookies
 ```
-
-Requires `solid-js@^2.0.0-beta.13` and `@solidjs/web@^2.0.0-beta.13` as peer dependencies.
 
 ## How to use it
 
@@ -54,7 +53,7 @@ import { createServerCookie } from "@solid-primitives/cookies";
 
 const [serverCookie, setServerCookie] = createServerCookie("coolCookie", {
   deserialize: str => (str ? str.split(" ") : []), // Deserializes cookie into a string[]
-  serialize: val => (val ? val.join(" ") : ""),     // Serializes the value back into a string
+  serialize: val => (val ? val.join(" ") : ""), // Serializes the value back into a string
 });
 
 serverCookie(); // => string[]
@@ -89,10 +88,6 @@ import { getCookiesString, parseCookie } from "@solid-primitives/cookies";
 const string = getCookiesString();
 const cookie = parseCookie(string, "cookie_name");
 ```
-
-## Demo
-
-You can view live examples in the [Storybook](https://primitives.solidjs.community/storybook/?path=/docs/network-cookies--docs).
 
 ## Changelog
 

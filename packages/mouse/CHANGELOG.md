@@ -1,5 +1,71 @@
 # @solid-primitives/mouse
 
+## 4.0.0-next.3
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/event-listener@3.0.0-next.3
+  - @solid-primitives/rootless@2.0.0-next.2
+  - @solid-primitives/static-store@1.0.0-next.2
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 4.0.0-next.2
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/event-listener@3.0.0-next.2
+  - @solid-primitives/rootless@2.0.0-next.1
+  - @solid-primitives/static-store@1.0.0-next.1
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 4.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- Updated dependencies [5fc4efa]
+  - @solid-primitives/event-listener@3.0.0-next.1
+  - @solid-primitives/utils@7.0.0-next.1
+
+## 4.0.0-next.0
+
+### Major Changes
+
+- 4a930d0: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/mouse`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `onMount` replaced by `onSettled` for post-render initialization
+  - `sharedConfig.context` replaced by `sharedConfig.hydrating` for hydration detection
+  - `createEffect` migrated to split compute/apply form — reactive target re-attachment now uses explicit cleanup return from the apply phase
+  - Added `test/server.test.ts` with SSR safety coverage for `createMousePosition` and `createPositionToElement`
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+  - @solid-primitives/event-listener@3.0.0-next.0
+  - @solid-primitives/rootless@2.0.0-next.0
+  - @solid-primitives/static-store@1.0.0-next.0
+
 ## 2.1.6
 
 ### Patch Changes

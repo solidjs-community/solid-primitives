@@ -145,11 +145,7 @@ export const ImperativeAPI = meta.story({
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
           <label style={{ "font-size": "0.85rem", color: "#64748b" }}>Write</label>
-          <input
-            value={text()}
-            onInput={e => setText(e.currentTarget.value)}
-            style={inputStyle}
-          />
+          <input value={text()} onInput={e => setText(e.currentTarget.value)} style={inputStyle} />
           <Button onClick={handleWrite}>Write to clipboard</Button>
           <Show when={writeMsg()}>
             <span
@@ -218,11 +214,7 @@ export const ReactiveClipboard = meta.story({
         <h3 style={{ margin: 0 }}>createClipboard</h3>
 
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
-          <input
-            value={text()}
-            onInput={e => setText(e.currentTarget.value)}
-            style={inputStyle}
-          />
+          <input value={text()} onInput={e => setText(e.currentTarget.value)} style={inputStyle} />
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <Button onClick={handleWrite} style={{ flex: 1 }}>
               Write to clipboard

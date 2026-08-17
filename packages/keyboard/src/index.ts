@@ -1,7 +1,7 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSingletonRoot } from "@solid-primitives/rootless";
-import { arrayEquals, INTERNAL_OPTIONS } from "@solid-primitives/utils";
-import { type Accessor, createMemo, createSignal, untrack } from "solid-js";
+import { arrayEquals, INTERNAL_OPTIONS, type MaybeAccessor, access } from "@solid-primitives/utils";
+import { type Accessor, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";
@@ -13,6 +13,29 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
     if (!arrayEquals(sequence[i]!, _model)) return false;
   }
   return true;
+}
+
+/** Does `subset` contain only keys that are also present in `superset`? */
+function isKeySubset(subset: string[], superset: string[]): boolean {
+  return new Set(subset).isSubsetOf(new Set(superset));
+}
+
+/** Do `a` and `b` contain exactly the same keys, regardless of order? */
+function isSameKeySet(a: string[], b: string[]): boolean {
+  return new Set(a).symmetricDifference(new Set(b)).size === 0;
+}
+
+/** Is the event target an editable form control, or inside a `contenteditable` element? */
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  switch (target.tagName) {
+    case "INPUT":
+    case "TEXTAREA":
+    case "SELECT":
+      return true;
+    default:
+      return target.isContentEditable;
+  }
 }
 
 /**
@@ -43,7 +66,7 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
  * })
  * ```
  */
-export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
+export const useKeyDownEvent: ReturnType<typeof createSingletonRoot<Accessor<KeyboardEvent | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -81,7 +104,7 @@ export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<Keyboa
  * })
  * ```
  */
-export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
+export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<string[]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
   if (isServer) {
     return () => [];
   }
@@ -122,7 +145,15 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[
   makeEventListener(window, "keyup", e => {
     if (typeof e.key !== "string") return;
     const key = e.key.toUpperCase();
-    setPressedKeys(prev => prev.filter(_key => _key !== key));
+    // macOS never fires keyup for other keys held down together with Meta —
+    // only Meta's own keyup arrives — so its release must clear everything,
+    // or the other keys' stale state corrupts the next press.
+    // See https://github.com/solidjs-community/solid-primitives/issues/269
+    if (key === "META") {
+      reset();
+    } else {
+      setPressedKeys(prev => prev.filter(_key => _key !== key));
+    }
   });
 
   makeEventListener(window, "blur", reset);
@@ -153,7 +184,7 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[
  * })
  * ```
  */
-export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
+export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor<string | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -193,7 +224,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<st
  * })
  * ```
  */
-export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
+export const useKeyDownSequence: ReturnType<typeof createSingletonRoot<Accessor<string[][]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
   if (isServer) {
     return () => [];
   }
@@ -265,12 +296,24 @@ export function createKeyHold(
  * @param options The options for the shortcut.
  * - `preventDefault` — Controls if the keydown event should have its default action prevented. Enabled by default.
  * - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
+ * - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`,
+ *   or `contenteditable` element, so typing isn't interrupted. Disabled by default — enable it for shortcuts
+ *   made of plain, unmodified keys (e.g. a single letter); combos like `Control+S` are usually fine either way,
+ *   since the modifier prevents a character from being typed.
+ * - `anyOrder` — If `true`, the keys can be pressed in any order (e.g. `Shift+Control` as well as `Control+Shift`),
+ *   as long as they all end up held down together. Disabled by default, requiring `keys` to be pressed in order.
  *
  * @example
  * ```ts
  * createShortcut(["CONTROL", "SHIFT", "C"], () => {
  *    console.log("Ctrl+Shift+C was pressed");
  * });
+ *
+ * // won't fire while typing in a text field
+ * createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: true });
+ *
+ * // triggers for both Control+Shift+M and Shift+Control+M
+ * createShortcut(["Control", "Shift", "M"], () => console.log("M was pressed"), { anyOrder: true });
  * ```
  */
 export function createShortcut(
@@ -279,6 +322,8 @@ export function createShortcut(
   options: {
     preventDefault?: boolean;
     requireReset?: boolean;
+    ignoreWithinInputs?: boolean;
+    anyOrder?: boolean;
   } = {},
 ): void {
   if (isServer || !keys.length) {
@@ -286,7 +331,12 @@ export function createShortcut(
   }
 
   keys = keys.map(key => key.toUpperCase());
-  const { preventDefault = true, requireReset = false } = options;
+  const {
+    preventDefault = true,
+    requireReset = false,
+    ignoreWithinInputs = false,
+    anyOrder = false,
+  } = options;
 
   // Track pressed keys and sequence locally with plain JS state rather than
   // reactive signals. A signal reads from event listeners return
@@ -304,6 +354,7 @@ export function createShortcut(
 
   makeEventListener(window, "keydown", (e: KeyboardEvent) => {
     if (e.repeat || typeof e.key !== "string") return;
+    if (ignoreWithinInputs && isEditableTarget(e.target)) return;
     const key = e.key.toUpperCase();
 
     if (!pressedKeys.includes(key)) {
@@ -329,14 +380,20 @@ export function createShortcut(
     if (requireReset) {
       if (reset) return;
       if (sequence.length < keys.length) {
-        if (equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length))) {
+        const holding = sequence.at(-1) ?? [];
+        const matches = anyOrder
+          ? isKeySubset(holding, keys)
+          : equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length));
+        if (matches) {
           preventDefault && e.preventDefault();
         } else {
           reset = true;
         }
       } else {
         reset = true;
-        if (equalsKeyHoldSequence(sequence, keys)) {
+        const holding = sequence.at(-1) ?? [];
+        const matches = anyOrder ? isSameKeySet(holding, keys) : equalsKeyHoldSequence(sequence, keys);
+        if (matches) {
           preventDefault && e.preventDefault();
           callback(e);
         }
@@ -346,14 +403,21 @@ export function createShortcut(
       if (!last) return;
 
       if (preventDefault && last.length < keys.length) {
-        if (arrayEquals(last, keys.slice(0, keys.length - 1))) {
+        const isOneKeyAway = anyOrder
+          ? last.length === keys.length - 1 && isKeySubset(last, keys)
+          : arrayEquals(last, keys.slice(0, keys.length - 1));
+        if (isOneKeyAway) {
           e.preventDefault();
         }
         return;
       }
-      if (arrayEquals(last, keys)) {
+      const isComplete = anyOrder ? isSameKeySet(last, keys) : arrayEquals(last, keys);
+      if (isComplete) {
         const prev = sequence.at(-2);
-        if (!prev || arrayEquals(prev, keys.slice(0, keys.length - 1))) {
+        const prevWasOneKeyAway = anyOrder
+          ? !!prev && prev.length === keys.length - 1 && isKeySubset(prev, keys)
+          : !!prev && arrayEquals(prev, keys.slice(0, keys.length - 1));
+        if (!prev || prevWasOneKeyAway) {
           preventDefault && e.preventDefault();
           callback(e);
         }
@@ -364,6 +428,16 @@ export function createShortcut(
   makeEventListener(window, "keyup", (e: KeyboardEvent) => {
     if (typeof e.key !== "string") return;
     const key = e.key.toUpperCase();
+
+    // macOS never fires keyup for other keys held down together with Meta —
+    // only Meta's own keyup arrives. Treat it as a signal that every other
+    // tracked key must have been released too, or their stale state corrupts
+    // the next press (see https://github.com/solidjs-community/solid-primitives/issues/269).
+    if (key === "META") {
+      resetAll();
+      return;
+    }
+
     pressedKeys = pressedKeys.filter(k => k !== key);
     if (pressedKeys.length === 0) {
       sequence = [];
@@ -379,4 +453,49 @@ export function createShortcut(
   makeEventListener(window, "contextmenu", (e: MouseEvent) => {
     e.defaultPrevented || resetAll();
   });
+}
+
+export interface CreateKeyDownOptions {
+  /** Whether the listener should be inactive. */
+  disabled?: MaybeAccessor<boolean | undefined>;
+  /** The document to attach the listener to. Defaults to `window.document`. Useful for iframes. */
+  ownerDocument?: Accessor<Document | undefined>;
+}
+
+/**
+ * Listens for a keydown event for a specific key on a document.
+ * Supports a custom `ownerDocument` for use in iframes and portals.
+ *
+ * @param key The key to listen for (matched against `event.key`).
+ * @param callback Handler called when the key is pressed.
+ * @param options `disabled` and `ownerDocument` accessors.
+ *
+ * @example
+ * ```ts
+ * createKeyDown("Escape", e => close(), {
+ *   ownerDocument: () => iframeEl.contentDocument ?? document,
+ * });
+ * ```
+ */
+export function createKeyDown(
+  key: KbdKey,
+  callback: (event: KeyboardEvent) => void,
+  options?: CreateKeyDownOptions,
+): void {
+  if (isServer) return;
+
+  createEffect(
+    () => ({
+      disabled: !!access(options?.disabled),
+      document: options?.ownerDocument?.() ?? window.document,
+    }),
+    ({ disabled, document }: { disabled: boolean; document: Document }) => {
+      if (disabled) return;
+      const handler = (e: KeyboardEvent) => {
+        if (e.key === key) callback(e);
+      };
+      document.addEventListener("keydown", handler);
+      return () => document.removeEventListener("keydown", handler);
+    },
+  );
 }

@@ -11,7 +11,12 @@ const meta = preview.meta({
 
 export default meta;
 
-const CountdownDisplay = (props: { days?: number; hours?: number; minutes?: number; seconds?: number }) => (
+const CountdownDisplay = (props: {
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+}) => (
   <div style={{ display: "flex", gap: "1rem" }}>
     {(
       [
@@ -22,10 +27,19 @@ const CountdownDisplay = (props: { days?: number; hours?: number; minutes?: numb
       ] as const
     ).map(([label, value]) => (
       <div style={{ "text-align": "center" }}>
-        <div style={{ "font-size": "2rem", "font-weight": "bold", "font-variant-numeric": "tabular-nums", "min-width": "2.5ch" }}>
+        <div
+          style={{
+            "font-size": "2rem",
+            "font-weight": "bold",
+            "font-variant-numeric": "tabular-nums",
+            "min-width": "2.5ch",
+          }}
+        >
           {String(value ?? 0).padStart(2, "0")}
         </div>
-        <div style={{ "font-size": "0.75rem", color: "#64748b", "text-transform": "uppercase" }}>{label}</div>
+        <div style={{ "font-size": "0.75rem", color: "#64748b", "text-transform": "uppercase" }}>
+          {label}
+        </div>
       </div>
     ))}
   </div>
@@ -51,7 +65,14 @@ export const Countdown = meta.story({
         <h3 style={{ margin: 0 }}>createCountdown</h3>
 
         <div style={{ display: "flex", gap: "1rem", "flex-wrap": "wrap" }}>
-          <label style={{ display: "flex", "flex-direction": "column", gap: "0.25rem", "font-size": "0.85rem" }}>
+          <label
+            style={{
+              display: "flex",
+              "flex-direction": "column",
+              gap: "0.25rem",
+              "font-size": "0.85rem",
+            }}
+          >
             From
             <input
               type="datetime-local"
@@ -59,7 +80,14 @@ export const Countdown = meta.story({
               onInput={e => setFrom(new Date(e.currentTarget.value))}
             />
           </label>
-          <label style={{ display: "flex", "flex-direction": "column", gap: "0.25rem", "font-size": "0.85rem" }}>
+          <label
+            style={{
+              display: "flex",
+              "flex-direction": "column",
+              gap: "0.25rem",
+              "font-size": "0.85rem",
+            }}
+          >
             To
             <input
               type="datetime-local"
@@ -108,12 +136,11 @@ export const CountdownFromNow = meta.story({
       <Container minWidth={340}>
         <h3 style={{ margin: 0 }}>createCountdownFromNow</h3>
 
-        <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}>
+        <div
+          style={{ display: "flex", gap: "0.5rem", "align-items": "center", "flex-wrap": "wrap" }}
+        >
           {PRESETS.map(p => (
-            <Button
-              onClick={() => setTarget(new Date(Date.now() + p.ms))}
-              variant="outline"
-            >
+            <Button onClick={() => setTarget(new Date(Date.now() + p.ms))} variant="outline">
               {p.label}
             </Button>
           ))}

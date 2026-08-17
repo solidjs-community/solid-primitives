@@ -31,15 +31,18 @@ export default meta;
 
 const VIDEO = "/video/big_buck_bunny_sall.mp4";
 
-const fmt = (s: number) =>
-  `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 // duration() throws NotReadyError until metadata loads. Storybook's React-hosted
 // docs page intercepts that throw before Solid's <Loading> boundary can catch it,
 // crashing the story. Try-catch here keeps the error contained in solid's reactive
 // graph so Show can gate on readiness instead.
 const safeDur = (dur: () => number): number | undefined => {
-  try { return dur(); } catch { return undefined; }
+  try {
+    return dur();
+  } catch {
+    return undefined;
+  }
 };
 
 const SPEEDS = [0.5, 1, 1.5, 2] as const;
@@ -147,7 +150,9 @@ export const FullControls = meta.story({
         <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
           <Show
             when={dur() !== undefined}
-            fallback={<span style={{ color: colors.muted, "font-size": font.sizeSm }}>Loading…</span>}
+            fallback={
+              <span style={{ color: colors.muted, "font-size": font.sizeSm }}>Loading…</span>
+            }
           >
             <input
               type="range"
@@ -157,7 +162,13 @@ export const FullControls = meta.story({
               onInput={e => video.seek(Number(e.currentTarget.value))}
               style={{ flex: "1", "min-width": "0" }}
             />
-            <span style={{ "font-size": font.sizeSm, "font-family": font.mono, "white-space": "nowrap" }}>
+            <span
+              style={{
+                "font-size": font.sizeSm,
+                "font-family": font.mono,
+                "white-space": "nowrap",
+              }}
+            >
               {fmt(video.currentTime())} / {fmt(dur()!)}
             </span>
           </Show>
@@ -181,7 +192,9 @@ export const FullControls = meta.story({
             disabled={video.muted()}
             style={{ flex: "1" }}
           />
-          <span style={{ "font-size": font.sizeSm, "font-family": font.mono, "white-space": "nowrap" }}>
+          <span
+            style={{ "font-size": font.sizeSm, "font-family": font.mono, "white-space": "nowrap" }}
+          >
             {(video.volume() * 100).toFixed(0)}%
           </span>
         </div>
@@ -248,10 +261,7 @@ export const ReactiveSource = meta.story({
         <ButtonRow>
           <For each={CLIPS}>
             {(c, i) => (
-              <Button
-                onClick={() => setIdx(i())}
-                variant={idx() === i() ? "primary" : "outline"}
-              >
+              <Button onClick={() => setIdx(i())} variant={idx() === i() ? "primary" : "outline"}>
                 {c.label}
               </Button>
             )}
@@ -265,9 +275,7 @@ export const ReactiveSource = meta.story({
           <Show
             when={dur() !== undefined}
             fallback={
-              <span style={{ color: colors.warning, "font-size": font.sizeSm }}>
-                ⏳ Loading…
-              </span>
+              <span style={{ color: colors.warning, "font-size": font.sizeSm }}>⏳ Loading…</span>
             }
           >
             <span style={{ "font-size": font.sizeSm, "font-family": font.mono }}>

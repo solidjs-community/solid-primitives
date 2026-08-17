@@ -86,11 +86,7 @@ export const UncontrolledStory = meta.story({
           <code style={{ color: "#334155" }}>[{changeLog().join(", ")}]</code>
         </div>
 
-        <Button
-          onClick={() => setCount(0)}
-          variant="outline"
-          style={{ width: "100%" }}
-        >
+        <Button onClick={() => setCount(0)} variant="outline" style={{ width: "100%" }}>
           Reset to 0
         </Button>
 
@@ -292,7 +288,9 @@ export const TypedVariantsStory = meta.story({
               style={{ ...inputStyle, "font-size": "0.85rem" }}
               onKeyDown={e => e.key === "Enter" && addTag()}
             />
-            <Button onClick={addTag} variant="outline">Add</Button>
+            <Button onClick={addTag} variant="outline">
+              Add
+            </Button>
           </div>
         </div>
 

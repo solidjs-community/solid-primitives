@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/masonry",
-  "version": "1.0.0",
+  "version": "2.0.0-next.2",
   "description": "Primitives for creating a reactive masonry layout.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,12 +15,12 @@
   },
   "primitive": {
     "name": "masonry",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createMasonry"
     ],
     "category": "UI Patterns",
-    "gzip": 661
+    "gzip": 662
   },
   "keywords": [
     "solid",
@@ -45,19 +45,23 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^2.0.0-beta.14"
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
     "@solid-primitives/media": "workspace:^",
-    "solid-js": "2.0.0-beta.14"
+    "solid-js": "catalog:"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

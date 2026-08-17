@@ -21,8 +21,6 @@ import {
   StatRow,
 } from "../../../.storybook/ui/index.js";
 
-// ─── Mock SSE source factories (no server required) ───────────────────────────
-
 function buildHandle() {
   let rs: number = SSEReadyState.CONNECTING;
   const source = {
@@ -38,7 +36,12 @@ function buildHandle() {
       return false;
     },
   } as unknown as SSESourceHandle;
-  return { source, setRs: (v: number) => { rs = v; } };
+  return {
+    source,
+    setRs: (v: number) => {
+      rs = v;
+    },
+  };
 }
 
 /** Emits `messages` in round-robin on `interval` ms after `openDelay`. */
@@ -94,9 +97,7 @@ const makeFailingMock = (failAfterMs = 3000, msgCount = 2): SSESourceFn => {
             setTimeout(
               () => {
                 if (!closed)
-                  options.onMessage?.(
-                    new MessageEvent("message", { data: `message ${i + 1}` }),
-                  );
+                  options.onMessage?.(new MessageEvent("message", { data: `message ${i + 1}` }));
               },
               (i + 1) * 700,
             ),
@@ -124,8 +125,6 @@ const makeFailingMock = (failAfterMs = 3000, msgCount = 2): SSESourceFn => {
   };
 };
 
-// ─── Meta ─────────────────────────────────────────────────────────────────────
-
 const meta = preview.meta({
   title: "Network/SSE",
   tags: ["autodocs"],
@@ -141,12 +140,8 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── Shared display helpers ───────────────────────────────────────────────────
-
 const STATE_LABEL = ["connecting", "open", "closed"] as const;
 const STATE_VARIANT = ["info", "success", "error"] as const;
-
-// ─── Stories ─────────────────────────────────────────────────────────────────
 
 export const StreamWithControlsStory = meta.story({
   name: "Reactive stream with state & controls",
@@ -188,9 +183,7 @@ export const StreamWithControlsStory = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>readyState</span>
-          <Badge variant={STATE_VARIANT[readyState()]}>
-            {STATE_LABEL[readyState()]}
-          </Badge>
+          <Badge variant={STATE_VARIANT[readyState()]}>{STATE_LABEL[readyState()]}</Badge>
         </div>
         <StatRow label="data()" value={data()} />
         <ButtonRow>
@@ -237,9 +230,7 @@ export const BoundaryStory = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>readyState</span>
-          <Badge variant={STATE_VARIANT[readyState()]}>
-            {STATE_LABEL[readyState()]}
-          </Badge>
+          <Badge variant={STATE_VARIANT[readyState()]}>{STATE_LABEL[readyState()]}</Badge>
         </div>
         <Errored
           fallback={_err => (
@@ -314,9 +305,7 @@ export const JsonTransformStory = meta.story({
           }}
         >
           <span style={{ "font-size": font.sizeBase, color: colors.muted }}>Sensor feed</span>
-          <Badge variant={STATE_VARIANT[readyState()]}>
-            {STATE_LABEL[readyState()]}
-          </Badge>
+          <Badge variant={STATE_VARIANT[readyState()]}>{STATE_LABEL[readyState()]}</Badge>
         </div>
         <Card>
           <StatRow label="sensor" value={data().sensor} />

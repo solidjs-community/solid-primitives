@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "4.3.4",
+  "version": "5.0.0-next.4",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -29,7 +29,7 @@
       "makeObjectStorage"
     ],
     "category": "Browser APIs",
-    "gzip": 2013
+    "gzip": 2218
   },
   "files": [
     "dist"
@@ -63,9 +63,12 @@
       ]
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -82,17 +85,16 @@
   },
   "peerDependencies": {
     "@tauri-apps/plugin-store": "*",
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "peerDependenciesMeta": {
-    "solid-start": {
-      "optional": true
-    },
     "@tauri-apps/plugin-store": {
       "optional": true
     }
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:"
   }
 }

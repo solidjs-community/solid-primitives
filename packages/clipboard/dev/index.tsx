@@ -18,7 +18,7 @@ const App: Component = () => {
           <div class="flex flex-col rounded-lg bg-white p-5 shadow">
             <input
               use:copyToClipboard={{ highlight: input() }}
-              class="border-3 rounded-md border-blue-700 p-3 text-center text-2xl"
+              class="rounded-md border-3 border-blue-700 p-3 text-center text-2xl"
               value="Copy me by clicking!"
             />
             <button

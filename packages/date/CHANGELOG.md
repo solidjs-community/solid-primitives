@@ -1,5 +1,63 @@
 # @solid-primitives/date
 
+## 3.0.0-next.3
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/timer@1.4.5-next.1
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 3.0.0-next.2
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/timer@1.4.5-next.0
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 3.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- Updated dependencies [5fc4efa]
+  - @solid-primitives/utils@7.0.0-next.1
+
+## 3.0.0-next.0
+
+### Major Changes
+
+- 607d43c: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `isServer` is now imported from `@solidjs/web` (not `solid-js/web`)
+  - `createStore` is now imported from `solid-js` (not `solid-js/store`)
+  - `@solid-primitives/timer` and `@solid-primitives/memo` dependencies removed; `TimeoutSource` type is now defined locally
+  - `createDateNow`: `createEffect` converted to split `(compute, apply)` form required by Solid 2.0; cleanup returned from apply phase instead of `onCleanup`
+  - `createCountdown`: `createComputed` (removed in Solid 2.0) replaced with `createRenderEffect(compute, apply)`
+  - `createDate`: `createWritableMemo` (removed in Solid 2.0) replaced with `createSignal(fn)` overload
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 2.1.6
 
 ### Patch Changes

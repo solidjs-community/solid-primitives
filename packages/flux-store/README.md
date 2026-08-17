@@ -4,9 +4,10 @@
 
 # @solid-primitives/flux-store
 
-[![size](https://img.shields.io/badge/size-276_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/flux-store)
+[![size](https://img.shields.io/badge/size-263_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/flux-store)
 [![version](https://img.shields.io/npm/v/@solid-primitives/flux-store?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/flux-store)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 A library for creating Solid stores that enforce a one-way data flow through explicit getters for reads and actions for writes.
 
@@ -50,20 +51,24 @@ const counterStore = createFluxStore(
     }),
     actions: setState => ({
       increment(by = 1) {
-        setState(s => { s.value += by; });
+        setState(s => {
+          s.value += by;
+        });
       },
       reset() {
-        setState(s => { s.value = 0; });
+        setState(s => {
+          s.value = 0;
+        });
       },
     }),
   },
 );
 
-counterStore.getters.count();     // => 5
+counterStore.getters.count(); // => 5
 counterStore.actions.increment();
-counterStore.getters.count();     // => 6
+counterStore.getters.count(); // => 6
 counterStore.actions.reset();
-counterStore.getters.count();     // => 0
+counterStore.getters.count(); // => 0
 ```
 
 ## `createFluxStoreFactory`
@@ -83,7 +88,9 @@ const createToggleStore = createFluxStoreFactory(
     }),
     actions: setState => ({
       toggle() {
-        setState(s => { s.value = !s.value; });
+        setState(s => {
+          s.value = !s.value;
+        });
       },
     }),
   },

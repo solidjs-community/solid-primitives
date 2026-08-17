@@ -1,2 +1,2 @@
-export * from "./createIdleTimer.js";
-export * from "./types.js";
+export * from "./createIdleTimer.ts";
+export * from "./types.ts";

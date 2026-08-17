@@ -4,9 +4,10 @@
 
 # @solid-primitives/deep
 
-[![size](https://img.shields.io/badge/size-1.3_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/deep)
+[![size](https://img.shields.io/badge/size-952_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/deep)
 [![version](https://img.shields.io/npm/v/@solid-primitives/deep?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/deep)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitives for tracking and observing nested reactive objects in Solid.
 
@@ -23,19 +24,19 @@ import { deep } from "solid-js";
 
 createEffect(
   () => deep(store),
-  snapshot => localStorage.setItem("state", JSON.stringify(snapshot))
+  snapshot => localStorage.setItem("state", JSON.stringify(snapshot)),
 );
 ```
 
 This package complements that with three distinct utilities:
 
-| | Solid's `deep` | `trackDeep` | `trackStore` | `captureStoreUpdates` |
-|---|---|---|---|---|
-| Tracks all nested changes | ✓ | ✓ | ✓ | ✓ |
-| Returns live store proxy | — | ✓ | ✓ | — |
-| Returns plain snapshot | ✓ | — | — | — |
-| Works on plain objects wrapping stores | — | ✓ | — | — |
-| Reports what changed and where | — | — | — | ✓ |
+|                                        | Solid's `deep` | `trackDeep` | `trackStore` | `captureStoreUpdates` |
+| -------------------------------------- | -------------- | ----------- | ------------ | --------------------- |
+| Tracks all nested changes              | ✓              | ✓           | ✓            | ✓                     |
+| Returns live store proxy               | —              | ✓           | ✓            | —                     |
+| Returns plain snapshot                 | ✓              | —           | —            | —                     |
+| Works on plain objects wrapping stores | —              | ✓           | —            | —                     |
+| Reports what changed and where         | —              | —           | —            | ✓                     |
 
 **Use Solid's `deep`** when you want to observe all changes and immediately consume a serializable value (e.g. persist to localStorage, send over the wire).
 
@@ -74,7 +75,7 @@ createEffect(
   () => trackDeep(state),
   () => {
     /* execute some logic whenever the state changes */
-  }
+  },
 );
 ```
 
@@ -85,7 +86,7 @@ const deeplyTrackedStore = () => trackDeep(sign);
 createEffect(
   () => deeplyTrackedStore(),
   //    ^ this causes a re-execution of the effect on deep changes of properties
-  value => console.log("Store is:", value)
+  value => console.log("Store is:", value),
 );
 ```
 
@@ -107,7 +108,7 @@ const plain = snapshot(state);
 
 createEffect(
   () => trackDeep(plain), // This will NOT work — plain objects are not reactive
-  () => {}
+  () => {},
 );
 ```
 
@@ -130,7 +131,7 @@ createEffect(
   () => trackStore(state),
   () => {
     /* execute some logic whenever the state changes */
-  }
+  },
 );
 ```
 
@@ -151,7 +152,9 @@ const getDelta = captureStoreUpdates(state);
 
 getDelta(); // [{ path: [], value: { todos: [] } }]
 
-setState(s => { s.todos = ["foo"]; });
+setState(s => {
+  s.todos = ["foo"];
+});
 
 getDelta(); // [{ path: ["todos"], value: ["foo"] }]
 ```
@@ -168,7 +171,7 @@ createEffect(
   delta => {
     /* execute some logic whenever the state changes */
     console.log(delta);
-  }
+  },
 );
 ```
 
@@ -184,11 +187,11 @@ const delta = createMemo(captureStoreUpdates(state));
 // both of these effects will receive the same delta
 createEffect(
   () => delta(),
-  value => console.log(value)
+  value => console.log(value),
 );
 createEffect(
   () => delta(),
-  value => console.log(value)
+  value => console.log(value),
 );
 ```
 

@@ -1,0 +1,200 @@
+---
+title: Migration Guide
+lastUpdated: false
+---
+
+# Migrating from 1.0 to 2.0
+
+Solid Primitives 2.0 tracks **Solid 2.0** (`solid-js@^2.0.0-rc.0`). Most packages published
+under the `next` dist-tag have been migrated to the new APIs and are incompatible with Solid
+1.x (see below for the packages that haven't). If you're still on Solid 1.x, keep using the
+stable releases published from `main` — there's no rush to move until you're ready to move
+your whole app to Solid 2.0 as well, since these packages can't straddle both major versions
+at once.
+
+This page covers the changes that show up repeatedly across packages. Some packages have
+additional package-specific breaking changes beyond what's listed here — check that package's
+own `CHANGELOG.md` (linked from its docs page) before upgrading it specifically.
+
+## Removed and changed packages
+
+Before you upgrade, check whether anything you depend on is affected by one of these — they're
+not covered by the general API changes further down.
+
+**`@solid-primitives/stream` is gone — replaced by [`@solid-primitives/mediastream`](/mediastream).**
+It wasn't renamed in place; the old package was deleted from the repo ("Stream is now
+mediastream, clean up the old package") and its APIs reshaped for Solid 2.0's async model (see
+the [async primitives section](#async-primitives-no-more-createresource) below). If you depend
+on `stream`, you'll need to switch packages, not just bump a version.
+
+**Five packages are still Solid 1.x only and haven't been migrated to Solid 2.0 in this
+release:** [`fetch`](/fetch), [`immutable`](/immutable), [`db-store`](/db-store),
+[`graphql`](/graphql), and [`resource`](/resource). If your app depends on any of these, you
+can't move it to Solid 2.0 yet without dropping or replacing that dependency — there's no
+Solid-2.0-compatible version to bump to.
+
+**A couple of packages lost functionality outright, not just a renamed API:**
+
+- [`@solid-primitives/pagination`](/pagination)'s `createInfiniteScroll` no longer exposes
+  `.loading`/`.error` — since `createResource` is gone, you now call `end()` or handle fetch
+  errors yourself, rather than reading them off a resource object.
+- [`@solid-primitives/i18n`](/i18n) no longer supports `Suspense`-driven dynamic dictionary
+  loading through `createResource` — use `createMemo` with an async function instead, wrapped
+  in `<Loading>`.
+
+## Peer dependencies
+
+Every package now requires:
+
+```json
+{
+  "peerDependencies": {
+    "solid-js": "^2.0.0-rc.0",
+    "@solidjs/web": "^2.0.0-rc.0"
+  }
+}
+```
+
+Bump both together — a primitive built against Solid 2.0's reactivity model won't work
+correctly against a 1.x runtime, and vice versa.
+
+## `isServer` moved
+
+```ts
+// 1.x
+import { isServer } from "solid-js/web";
+
+// 2.0
+import { isServer } from "@solidjs/web";
+```
+
+Solid 2.0 splits the DOM renderer out of `solid-js` entirely — see the
+[JSR & NPM](/jsr-npm) and [Philosophy](/philosophy) pages for more on how this project tracks
+upstream Solid changes.
+
+## `use:` directives → `ref` factories
+
+Solid 2.0 removes the `use:` directive syntax. Any primitive that used to expose a directive
+now exposes a ref callback factory instead — call it and pass the result to `ref`:
+
+```tsx
+// 1.x
+<input use:fileUploader={options} />
+
+// 2.0
+<input ref={fileUploader(options)} />
+
+// combine with other refs
+<input ref={[autofocus, fileUploader(options)]} />
+```
+
+(Real example from [`@solid-primitives/upload`](/upload)'s `fileUploader`.)
+
+## `Context.Provider` → use the context directly
+
+Solid 2.0 removes `Context.Provider` — a context object is used directly as its own provider
+component:
+
+```tsx
+// 1.x
+<MyContext.Provider value={value}>{children}</MyContext.Provider>
+
+// 2.0
+<MyContext value={value}>{children}</MyContext>
+```
+
+Packages that expose their own context helpers (`createContextProvider`, `MultiProvider` in
+[`@solid-primitives/context`](/context), `AnalyticsProvider` in
+[`@solid-primitives/analytics`](/analytics), etc.) have been updated internally, but if you were
+reaching into a primitive-returned context and calling `.Provider` on it yourself, update that
+call site too.
+
+## Async primitives: no more `createResource`
+
+`createResource` is removed from Solid 2.0. Primitives that used to return a `Resource` (with
+`.loading`/`.error`/`mutate`/`refetch`) now return a plain accessor, and loading/error states
+are handled by `<Loading>`/`<Errored>` boundaries instead of resource properties:
+
+```ts
+// 1.x
+const [stream, { mutate, refetch }] = createStream(source);
+stream.loading; // boolean
+stream();       // MediaStream | undefined
+
+// 2.0
+const [stream, { stop, mute }] = createStream(source);
+stream(); // MediaStream | undefined — wrap the consumer in <Loading> for pending state
+```
+
+(Real example from [`@solid-primitives/mediastream`](/mediastream)'s `createStream` /
+`createScreen` — `mutate`/`refetch` are gone entirely since source reactivity now drives
+re-acquisition automatically.)
+
+If you were reading `.loading` or calling `.refetch()` directly on a primitive's return value,
+that API surface no longer exists — wrap the consuming component in `<Loading>` for the pending
+state, and rely on the primitive's own reactive source (a signal you pass in) to trigger
+re-fetching instead of an imperative `refetch`.
+
+## `classList` → `class`
+
+If you're composing a primitive's output with your own components, note that Solid 2.0 merges
+`classList` into `class`, which now accepts a string, array, or object:
+
+```tsx
+// 1.x
+<div class="card" classList={{ active: isActive() }} />
+
+// 2.0
+<div class={["card", { active: isActive() }]} />
+```
+
+## `JSX.Element` → `Element`
+
+Public API types that used to reference `JSX.Element` from `solid-js` now use the
+renderer-neutral `Element` type instead, matching Solid 2.0's type model:
+
+```ts
+// 1.x
+import type { JSX } from "solid-js";
+type Props = { children?: JSX.Element };
+
+// 2.0
+import type { Element } from "solid-js";
+type Props = { children?: Element };
+```
+
+If you were annotating your own components' props to match a primitive's exported types,
+update those annotations too.
+
+## Split effects, if you're extending a primitive
+
+If you're wrapping or extending a primitive with your own `createEffect` calls, Solid 2.0
+requires the two-argument compute/apply form:
+
+```ts
+// 1.x
+createEffect(() => {
+  const value = source();
+  doSomething(value);
+});
+
+// 2.0
+createEffect(
+  () => source(),           // compute — reactive reads only
+  value => doSomething(value), // apply — side effects
+);
+```
+
+This is a Solid core change, not a Solid Primitives one — see Solid's own 2.0 documentation for
+the full reactivity model change (batching, owned-scope write restrictions, and more).
+
+## Finding what changed in a specific package
+
+Every package's docs page includes a **Version** cell linking to its current release, and the
+`CHANGELOG.md` in that package's directory records every breaking change made during the 2.0
+migration under a `Major Changes` heading. If a primitive you depend on isn't covered above,
+that's the place to check first.
+
+Stuck partway through, or found something this page doesn't cover? Open a discussion on
+[GitHub](https://github.com/solidjs-community/solid-primitives) — see the
+[Contributors](/contributors) page for how the project handles issues and PRs.

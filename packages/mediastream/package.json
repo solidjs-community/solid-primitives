@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mediastream",
-  "version": "0.1.0",
+  "version": "1.0.0-next.2",
   "description": "Primitives to work with media streams from microphones, cameras, and the screen",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -17,7 +17,7 @@
   },
   "primitive": {
     "name": "mediastream",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createStream",
       "createAmplitudeStream",
@@ -25,7 +25,8 @@
       "createMediaPermissionRequest",
       "createScreen"
     ],
-    "category": "Browser APIs"
+    "category": "Browser APIs",
+    "gzip": 1057
   },
   "files": [
     "dist"
@@ -43,8 +44,12 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -60,12 +65,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "@solidjs/web": "^2.0.0-beta.14",
-    "solid-js": "^2.0.0-beta.14"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.14",
-    "solid-js": "2.0.0-beta.14"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

@@ -118,7 +118,13 @@ export const RemSizeSignal = meta.story({
             }}
           >
             <span style={{ color: "#64748b" }}>getRemSize() snapshot</span>
-            <strong style={{ "font-variant-numeric": "tabular-nums", "font-family": "monospace", color: "#1e293b" }}>
+            <strong
+              style={{
+                "font-variant-numeric": "tabular-nums",
+                "font-family": "monospace",
+                color: "#1e293b",
+              }}
+            >
               {getRemSize()}px
             </strong>
           </div>
@@ -133,7 +139,13 @@ export const RemSizeSignal = meta.story({
             }}
           >
             <span style={{ color: "#64748b" }}>remSize() signal</span>
-            <strong style={{ "font-variant-numeric": "tabular-nums", "font-family": "monospace", color: "#1e293b" }}>
+            <strong
+              style={{
+                "font-variant-numeric": "tabular-nums",
+                "font-family": "monospace",
+                color: "#1e293b",
+              }}
+            >
               {remSize()}px
             </strong>
           </div>
@@ -148,7 +160,13 @@ export const RemSizeSignal = meta.story({
             }}
           >
             <span style={{ color: "#64748b" }}>ratio vs 16px baseline</span>
-            <strong style={{ "font-variant-numeric": "tabular-nums", "font-family": "monospace", color: "#1e293b" }}>
+            <strong
+              style={{
+                "font-variant-numeric": "tabular-nums",
+                "font-family": "monospace",
+                color: "#1e293b",
+              }}
+            >
               ×{ratio().toFixed(2)}
             </strong>
           </div>
@@ -163,7 +181,13 @@ export const RemSizeSignal = meta.story({
             }}
           >
             <span style={{ color: "#64748b" }}>1rem equals</span>
-            <strong style={{ "font-variant-numeric": "tabular-nums", "font-family": "monospace", color: "#1e293b" }}>
+            <strong
+              style={{
+                "font-variant-numeric": "tabular-nums",
+                "font-family": "monospace",
+                color: "#1e293b",
+              }}
+            >
               {remSize()}px
             </strong>
           </div>

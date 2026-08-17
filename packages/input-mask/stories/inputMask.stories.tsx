@@ -51,9 +51,9 @@ export const DateMask = meta.story({
         <ValueDisplay label="value" value={value()} />
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          String mask placeholders: <code>9</code> = digit, <code>a</code> = letter,{" "}
-          <code>*</code> = alphanumeric. Fixed characters like <code>/</code> are inserted
-          automatically as you type.
+          String mask placeholders: <code>9</code> = digit, <code>a</code> = letter, <code>*</code>{" "}
+          = alphanumeric. Fixed characters like <code>/</code> are inserted automatically as you
+          type.
         </p>
       </Container>
     );

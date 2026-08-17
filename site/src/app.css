@@ -1,0 +1,667 @@
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+:root {
+  /* Brand colors */
+  --pl-primary: #017ad4;
+  --pl-secondary: #44b8fa;
+
+  --sb-hero-name-background: linear-gradient(-20deg, var(--pl-primary) 30%, var(--pl-secondary));
+  --sb-hero-background: linear-gradient(-45deg, var(--pl-primary) 50%, var(--pl-secondary) 50%);
+
+  --sb-font-headings: "Geist Variable", Segoe UI, Roboto, sans-serif;
+  --sb-font-text: "Geist Variable", Segoe UI, Roboto, sans-serif;
+  --sb-font-mono: "Geist Mono Variable", Menlo, Consolas, monospace;
+}
+
+/* Soft gradient + graph-paper grid wash behind the whole site — concentrated
+   near the top so it reads as an accent near the header/hero rather than
+   tinting long articles. Sits on `html` itself: the header/sidenav/article
+   surfaces are transparent on desktop and let it show through the gaps
+   between them.
+   Layers (top to bottom): an opaque fade that erases everything below it
+   into the solid page color, the grid lines, then the radial glow.
+   The fade/glow use fixed px distances from the top, not percentages —
+   percentages here are relative to the *whole document's* scroll height
+   (the canvas), so on a long article they wouldn't fade until deep down
+   the page. Pixels keep the effect confined to a fixed band near the top
+   regardless of how long the page is. */
+html[data-theme*="light"] {
+  --pl-grid-line: color-mix(in hsl, var(--pl-primary) 12%, transparent);
+  --pl-bg-image:
+    linear-gradient(180deg, transparent 0px, transparent 260px, var(--sb-background-color) 620px),
+    repeating-linear-gradient(to right, var(--pl-grid-line) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(to bottom, var(--pl-grid-line) 0 1px, transparent 1px 48px),
+    radial-gradient(1100px 640px at 12% -150px, color-mix(in hsl, var(--pl-primary) 20%, transparent), transparent 65%);
+  --pl-bg-repeat: no-repeat, repeat, repeat, no-repeat;
+  background-color: var(--sb-background-color);
+  background-image: var(--pl-bg-image);
+  background-repeat: var(--pl-bg-repeat);
+}
+html[data-theme*="dark"] {
+  --pl-grid-line: color-mix(in hsl, var(--pl-primary) 16%, transparent);
+  --pl-bg-image:
+    linear-gradient(180deg, transparent 0px, transparent 260px, var(--sb-background-color) 620px),
+    repeating-linear-gradient(to right, var(--pl-grid-line) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(to bottom, var(--pl-grid-line) 0 1px, transparent 1px 48px),
+    radial-gradient(1100px 640px at 12% -150px, color-mix(in hsl, var(--pl-primary) 16%, transparent), transparent 65%);
+  --pl-bg-repeat: no-repeat, repeat, repeat, no-repeat;
+  background-color: var(--sb-background-color);
+  background-image: var(--pl-bg-image);
+  background-repeat: var(--pl-bg-repeat);
+}
+
+/* Tighten the vertical rhythm between sidebar primitive links.
+   Class names are CSS-module-hashed by solidbase, so target by substring. */
+[class*="sidenav-link_"] {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+  line-height: 1.1rem !important;
+}
+
+/* Match the "On This Page" table of contents to the left nav's vertical rhythm. */
+[class*="_toc_"] [class*="item_"] > a {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+  line-height: 1.1rem !important;
+}
+
+/* Category icons in the left sidebar — the same Phosphor icons used in the
+   home page's category strip, on a solid blue circle badge. The sidebar's
+   category headers have no per-item icon hook (they're plain generated
+   <h2>s with no class), so these are CSS backgrounds selected by position
+   instead of a real <img>/<svg>. This depends on the sidebar's category
+   order matching the list below — if categories are added, removed, or
+   reordered, update both here and CATEGORY_ORDER in site/scripts/generate.ts.
+   Note: this uses a plain (pre-colored white) background-image layered over
+   a background-color circle, not `mask-image` — a masked element's
+   box-shadow doesn't render in this browser, so a mask+box-shadow "padded
+   circle" trick silently produces no visible circle at all. */
+/* Flex row instead of inline content — with `::before` as plain inline content,
+   a wrapped second line of text (e.g. "Display & Media") starts back at the left
+   edge under the icon instead of staying aligned next to it. */
+[class*="sidenav-links_"] > ul > li h2 {
+  display: flex;
+  align-items: center;
+}
+[class*="sidenav-links_"] > ul > li h2::before {
+  content: "";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.6rem;
+  border-radius: var(--sb-border-radius);
+  background-color: var(--pl-primary);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 55%;
+}
+
+/* 1. Animation -> film-strip */
+[class*="sidenav-links_"] > ul > li:nth-child(1) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16M40 88h80v80H40Zm96-16V56h32v16Zm-16 0H88V56h32Zm0 112v16H88v-16Zm16 0h32v16h-32Zm0-16V88h80v80Zm80-96h-32V56h32ZM72 56v16H40V56ZM40 184h32v16H40Zm176 16h-32v-16h32z'/%3E%3C/svg%3E");
+}
+
+/* 2. Browser APIs -> globe */
+[class*="sidenav-links_"] > ul > li:nth-child(2) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24m88 104a87.6 87.6 0 0 1-3.33 24h-38.51a157.4 157.4 0 0 0 0-48h38.51a87.6 87.6 0 0 1 3.33 24m-114 40h52a115.1 115.1 0 0 1-26 45a115.3 115.3 0 0 1-26-45m-3.9-16a140.8 140.8 0 0 1 0-48h59.88a140.8 140.8 0 0 1 0 48ZM40 128a87.6 87.6 0 0 1 3.33-24h38.51a157.4 157.4 0 0 0 0 48H43.33A87.6 87.6 0 0 1 40 128m114-40h-52a115.1 115.1 0 0 1 26-45a115.3 115.3 0 0 1 26 45m52.33 0h-35.62a135.3 135.3 0 0 0-22.3-45.6A88.29 88.29 0 0 1 206.37 88Zm-98.74-45.6A135.3 135.3 0 0 0 85.29 88H49.63a88.29 88.29 0 0 1 57.96-45.6M49.63 168h35.66a135.3 135.3 0 0 0 22.3 45.6A88.29 88.29 0 0 1 49.63 168m98.78 45.6a135.3 135.3 0 0 0 22.3-45.6h35.66a88.29 88.29 0 0 1-57.96 45.6'/%3E%3C/svg%3E");
+}
+
+/* 3. Control Flow -> flow-arrow */
+[class*="sidenav-links_"] > ul > li:nth-child(3) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='m245.66 74.34l-32-32a8 8 0 0 0-11.32 11.32L220.69 72H208c-49.33 0-61.05 28.12-71.38 52.92c-9.38 22.51-16.92 40.59-49.48 42.84a40 40 0 1 0 .1 16c43.26-2.65 54.34-29.15 64.14-52.69C161.41 107 169.33 88 208 88h12.69l-18.35 18.34a8 8 0 0 0 11.32 11.32l32-32a8 8 0 0 0 0-11.32M48 200a24 24 0 1 1 24-24a24 24 0 0 1-24 24'/%3E%3C/svg%3E");
+}
+
+/* 4. Display & Media -> image */
+[class*="sidenav-links_"] > ul > li:nth-child(4) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16m0 16v102.75l-26.07-26.06a16 16 0 0 0-22.63 0l-20 20l-44-44a16 16 0 0 0-22.62 0L40 149.37V56ZM40 172l52-52l80 80H40Zm176 28h-21.37l-36-36l20-20L216 181.38zm-72-100a12 12 0 1 1 12 12a12 12 0 0 1-12-12'/%3E%3C/svg%3E");
+}
+
+/* 5. Forms -> note-pencil */
+[class*="sidenav-links_"] > ul > li:nth-child(5) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='m229.66 58.34l-32-32a8 8 0 0 0-11.32 0l-96 96A8 8 0 0 0 88 128v32a8 8 0 0 0 8 8h32a8 8 0 0 0 5.66-2.34l96-96a8 8 0 0 0 0-11.32M124.69 152H104v-20.69l64-64L188.69 88ZM200 76.69L179.31 56L192 43.31L212.69 64ZM224 128v80a16 16 0 0 1-16 16H48a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h80a8 8 0 0 1 0 16H48v160h160v-80a8 8 0 0 1 16 0'/%3E%3C/svg%3E");
+}
+
+/* 6. Inputs -> keyboard */
+[class*="sidenav-links_"] > ul > li:nth-child(6) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M224 48H32a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16m0 144H32V64h192zm-16-64a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8m0-32a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8M72 160a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8m96 0a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m40 0a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8'/%3E%3C/svg%3E");
+}
+
+/* 7. Network -> broadcast */
+[class*="sidenav-links_"] > ul > li:nth-child(7) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M128 88a40 40 0 1 0 40 40a40 40 0 0 0-40-40m0 64a24 24 0 1 1 24-24a24 24 0 0 1-24 24m73.71 7.14a80 80 0 0 1-14.08 22.2a8 8 0 0 1-11.92-10.67a63.95 63.95 0 0 0 0-85.33a8 8 0 1 1 11.92-10.67a80.08 80.08 0 0 1 14.08 84.47M69 103.09a64 64 0 0 0 11.26 67.58a8 8 0 0 1-11.92 10.67a79.93 79.93 0 0 1 0-106.67a8 8 0 1 1 11.95 10.67A63.8 63.8 0 0 0 69 103.09M248 128a119.58 119.58 0 0 1-34.29 84a8 8 0 1 1-11.42-11.2a103.9 103.9 0 0 0 0-145.56A8 8 0 1 1 213.71 44A119.58 119.58 0 0 1 248 128M53.71 200.78A8 8 0 1 1 42.29 212a119.87 119.87 0 0 1 0-168a8 8 0 1 1 11.42 11.2a103.9 103.9 0 0 0 0 145.56Z'/%3E%3C/svg%3E");
+}
+
+/* 8. Reactivity -> lightning */
+[class*="sidenav-links_"] > ul > li:nth-child(8) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M215.79 118.17a8 8 0 0 0-5-5.66L153.18 90.9l14.66-73.33a8 8 0 0 0-13.69-7l-112 120a8 8 0 0 0 3 13l57.63 21.61l-14.62 73.25a8 8 0 0 0 13.69 7l112-120a8 8 0 0 0 1.94-7.26M109.37 214l10.47-52.38a8 8 0 0 0-5-9.06L62 132.71l84.62-90.66l-10.46 52.38a8 8 0 0 0 5 9.06l52.8 19.8Z'/%3E%3C/svg%3E");
+}
+
+/* 9. Sensors -> compass */
+[class*="sidenav-links_"] > ul > li:nth-child(9) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88m44.42-143.16l-64 32a8.05 8.05 0 0 0-3.58 3.58l-32 64A8 8 0 0 0 80 184a8.1 8.1 0 0 0 3.58-.84l64-32a8.05 8.05 0 0 0 3.58-3.58l32-64a8 8 0 0 0-10.74-10.74M138 138l-40.11 20.11L118 118l40.15-20.07Z'/%3E%3C/svg%3E");
+}
+
+/* 10. UI Patterns -> puzzle-piece */
+[class*="sidenav-links_"] > ul > li:nth-child(10) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M220.27 158.54a8 8 0 0 0-7.7-.46a20 20 0 1 1 0-36.16a8 8 0 0 0 11.43-7.23V72a16 16 0 0 0-16-16h-36.22a35 35 0 0 0 .22-4a36.1 36.1 0 0 0-11.36-26.24a36 36 0 0 0-60.55 23.62a36.6 36.6 0 0 0 .14 6.62H64a16 16 0 0 0-16 16v32.22a35 35 0 0 0-4-.22a36.12 36.12 0 0 0-26.24 11.36a35.7 35.7 0 0 0-9.69 27a36.08 36.08 0 0 0 33.31 33.6a35.7 35.7 0 0 0 6.62-.14V208a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16v-42.69a8 8 0 0 0-3.73-6.77M208 208H64v-42.69a8 8 0 0 0-11.43-7.23a20 20 0 1 1 0-36.16A8 8 0 0 0 64 114.69V72h46.69a8 8 0 0 0 7.23-11.43a20 20 0 1 1 36.16 0A8 8 0 0 0 161.31 72H208v32.23a35.7 35.7 0 0 0-6.62-.14A36 36 0 0 0 204 176a35 35 0 0 0 4-.22Z'/%3E%3C/svg%3E");
+}
+
+/* 11. Utilities -> wrench */
+[class*="sidenav-links_"] > ul > li:nth-child(11) h2::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='white' d='M226.76 69a8 8 0 0 0-12.84-2.88l-40.3 37.19l-17.23-3.7l-3.7-17.23l37.19-40.3A8 8 0 0 0 187 29.24A72 72 0 0 0 88 96a72.3 72.3 0 0 0 6 28.94L33.79 177c-.15.12-.29.26-.43.39a32 32 0 0 0 45.26 45.26c.13-.13.27-.28.39-.42L131.06 162A72 72 0 0 0 232 96a71.6 71.6 0 0 0-5.24-27M160 152a56.14 56.14 0 0 1-27.07-7a8 8 0 0 0-9.92 1.77l-55.9 64.74a16 16 0 0 1-22.62-22.62L109.18 133a8 8 0 0 0 1.77-9.93a56 56 0 0 1 58.36-82.31l-31.2 33.81a8 8 0 0 0-1.94 7.1l5.66 26.33a8 8 0 0 0 6.14 6.14l26.35 5.66a8 8 0 0 0 7.1-1.94l33.81-31.2A56.06 56.06 0 0 1 160 152'/%3E%3C/svg%3E");
+}
+
+/* Stage badges in the per-primitive meta table (see site/scripts/generate.ts).
+   Colors match assets/badges/stage-*.json for consistency with the repo's own badges. */
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  padding: 0.15em 0.55em;
+  border-radius: var(--sb-border-radius);
+  font-family: var(--sb-font-mono);
+  font-weight: 600;
+  font-size: 0.85em;
+  color: white;
+}
+.stage-badge.stage-0 {
+  background: #fa233e;
+}
+.stage-badge.stage-1 {
+  background: #ffa15c;
+}
+.stage-badge.stage-2 {
+  background: #e9de47;
+  color: #1a1a1a;
+}
+.stage-badge.stage-3 {
+  background: #12c3a2;
+}
+.stage-badge.stage-4 {
+  background: #2962ff;
+}
+
+/* "Demo" button in the per-primitive meta table (see site/scripts/generate.ts) —
+   links out to the package's first Storybook story. */
+.demo-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.3em 0.75em;
+  border-radius: var(--sb-border-radius);
+  background: var(--pl-primary);
+  color: white !important;
+  font-weight: 600;
+  font-size: 0.85em;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+.demo-button:hover {
+  background: var(--pl-secondary);
+}
+
+/* Primitive-name headings (e.g. `readClipboard`) render as a single inline code
+   span — style them as plain bold headings with an underline instead of the
+   default inline-code "pill" look. */
+[class*="_h2_"] > a > [class*="_code_"],
+[class*="_h3_"] > a > [class*="_code_"],
+[class*="_h4_"] > a > [class*="_code_"] {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-weight: 600;
+}
+
+[class*="_h2_"]:has(> a > code),
+[class*="_h3_"]:has(> a > code),
+[class*="_h4_"]:has(> a > code) {
+  border-bottom: 1px solid color-mix(in hsl, var(--sb-decoration-color) 15%, transparent);
+  padding-bottom: 0.3em;
+}
+
+/* The theme forces logo images to height: 1rem, width: 100%, which stretches our
+   wide wordmark to fill the flex row. Size it naturally at 2x instead. */
+[class*="logo-link_"] > img {
+  height: 2rem !important;
+  width: auto !important;
+}
+
+/* Swap the logo image itself per theme — the config only supports a single
+   src, so override the rendered content via CSS instead of the src attribute. */
+[data-theme*="light"] [class*="logo-link_"] > img {
+  content: url("/logo-light.png");
+}
+[data-theme*="dark"] [class*="logo-link_"] > img {
+  content: url("/logo-dark.png");
+}
+
+/* "v2.0" badge next to the logo. The theme already reserves a flex slot right
+   after the logo for its own (unused, since we don't configure multi-version
+   docs) version-selector — repurpose it via generated content instead of
+   wiring up that whole feature for a single static label. */
+[class*="version-selector_"]::after {
+  content: "v2.0";
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15em 0.55em;
+  border-radius: var(--sb-border-radius);
+  background: var(--pl-primary);
+  color: white;
+  font-family: var(--sb-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Footer logo (separate component/class from the header logo) — 75% larger
+   than the theme's default 1rem. Width is "max-content" from the theme,
+   which keeps the image's aspect ratio as height changes. */
+[class*="_logo_"] {
+  height: 1.75rem !important;
+}
+
+[data-theme*="light"] [class*="_logo_"] {
+  content: url("/logo-light.png");
+}
+[data-theme*="dark"] [class*="_logo_"] {
+  content: url("/logo-dark.png");
+}
+
+/* The theme's article headings default to font-weight: 400 for all levels;
+   make section titles like "How to use it" stand out more. */
+[class*="_h2_"],
+[class*="_h3_"],
+[class*="_h4_"] {
+  font-weight: 700 !important;
+}
+
+/* Bold page title. */
+[class*="_h1_"] {
+  font-weight: 700 !important;
+}
+
+/* Bold and enlarge the sidebar category group headers (Animation, Browser APIs, etc). */
+[class*="section-trigger_"] h2 {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Light divider under each sidebar category header, separating it from its
+   list of primitives below. */
+[class*="section-trigger_"] {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid color-mix(in hsl, var(--sb-decoration-color) 15%, transparent);
+}
+
+
+/* ---------------------------------------------------------------------- */
+/* Custom landing-page hero + category strip (src/routes/index.mdx).      */
+/* Solidbase's built-in `hero`/`features` frontmatter blocks are fixed to */
+/* a centered layout and a plain card grid, so the home page bypasses     */
+/* them entirely and writes its own markup here instead.                 */
+/* ---------------------------------------------------------------------- */
+
+article:has(.pl-hero) > [class*="content_"] {
+  max-width: min(calc(100dvw - 2.5rem), 64rem) !important;
+}
+
+/* MDX auto-wraps multi-line text inside a block container in its own <p>
+   (with the theme's default margin/color) regardless of the outer tag — reset
+   it here so the headline/subtitle's own typography wins. */
+.pl-headline p,
+.pl-subtitle p {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.pl-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2.5rem 0 0.5rem;
+}
+
+.pl-hero-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pl-hero-cube {
+  flex: none;
+  width: clamp(9rem, 18vw, 16rem);
+  height: auto;
+  filter: drop-shadow(0 1.5rem 3rem color-mix(in hsl, var(--pl-primary) 35%, transparent));
+}
+
+@media screen and (max-width: 56rem) {
+  .pl-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .pl-hero-cube {
+    align-self: center;
+    width: clamp(7rem, 40vw, 11rem);
+  }
+}
+
+.pl-eyebrow {
+  font-family: var(--sb-font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pl-primary);
+  margin: 0 0 1rem;
+}
+.pl-eyebrow::before {
+  /* Inline (not flex) so the dash wraps as part of the text run instead of
+     landing on its own line on narrow screens. */
+  content: "— ";
+}
+
+.pl-headline {
+  font-family: var(--sb-font-headings);
+  font-size: clamp(1.85rem, 8vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--sb-heading-color);
+  margin: 0 0 1.25rem;
+}
+.pl-headline .pl-accent {
+  color: var(--pl-primary);
+}
+
+.pl-subtitle {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--sb-text-color);
+  max-width: 40rem;
+  margin: 0 0 2rem;
+}
+
+.pl-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.pl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--sb-border-radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition-property: background-color, border-color;
+  transition-timing-function: var(--sb-transition-timing);
+  transition-duration: 0.15s;
+}
+.pl-btn-brand {
+  background: var(--pl-primary);
+  color: white;
+}
+.pl-btn-brand:hover {
+  background: color-mix(in hsl, var(--pl-primary) 85%, black);
+}
+.pl-btn-alt {
+  background: transparent;
+  color: var(--sb-heading-color);
+  border: 1px solid color-mix(in hsl, var(--sb-decoration-color) 30%, transparent);
+}
+.pl-btn-alt:hover {
+  background: color-mix(in hsl, var(--sb-text-color) 6%, transparent);
+}
+
+/* Live project stats (npm downloads, open issues/PRs — see site/scripts/generate.ts's
+   getProjectStats) between the hero actions and the category grid. */
+.pl-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 0 0 3rem;
+}
+.pl-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in hsl, var(--sb-decoration-color) 15%, transparent);
+  border-radius: calc(var(--sb-border-radius) * 1.5);
+  background: color-mix(in hsl, var(--sb-background-color) 97%, var(--sb-tint-color-opposite));
+  text-decoration: none;
+  color: inherit;
+  transition-property: border-color, transform, box-shadow, background-color;
+  transition-timing-function: var(--sb-transition-timing);
+  transition-duration: 0.15s;
+}
+.pl-stat:hover,
+.pl-stat:focus-visible {
+  border-color: color-mix(in hsl, var(--pl-primary) 45%, transparent);
+  background: var(--sb-background-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -12px color-mix(in hsl, var(--pl-primary) 35%, transparent);
+}
+.pl-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--pl-primary);
+  line-height: 1.1;
+}
+.pl-stat-label {
+  font-family: var(--sb-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in hsl, var(--sb-text-color) 65%, transparent);
+}
+.pl-stats-updated {
+  grid-column: 1 / -1;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  text-align: right;
+  color: color-mix(in hsl, var(--sb-text-color) 50%, transparent);
+}
+
+@media screen and (max-width: 40rem) {
+  .pl-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* No more single big enclosing box — the header sits directly on the page
+   background, and each category gets its own square card below. */
+.pl-strip {
+  margin: 0 0 3rem;
+}
+
+.pl-strip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--sb-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in hsl, var(--sb-text-color) 65%, transparent);
+}
+.pl-strip-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.pl-strip-note::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--pl-primary);
+  display: inline-block;
+}
+
+.pl-strip-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.pl-step {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in hsl, var(--sb-decoration-color) 15%, transparent);
+  border-radius: calc(var(--sb-border-radius) * 1.5);
+  background: color-mix(in hsl, var(--sb-background-color) 97%, var(--sb-tint-color-opposite));
+  text-decoration: none;
+  color: inherit;
+  transition-property: border-color, transform, box-shadow, background-color;
+  transition-timing-function: var(--sb-transition-timing);
+  transition-duration: 0.15s;
+}
+.pl-step:hover,
+.pl-step:focus-visible {
+  border-color: color-mix(in hsl, var(--pl-primary) 45%, transparent);
+  background: var(--sb-background-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -12px color-mix(in hsl, var(--pl-primary) 35%, transparent);
+}
+
+.pl-step-icon {
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--sb-border-radius);
+  background: color-mix(in hsl, var(--pl-primary) 12%, transparent);
+  color: var(--pl-primary);
+}
+.pl-step-icon svg {
+  width: 3.15rem;
+  height: 3.15rem;
+}
+.pl-step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.pl-step-label {
+  font-family: var(--sb-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in hsl, var(--sb-text-color) 60%, transparent);
+}
+.pl-step-title {
+  font-weight: 400;
+  color: var(--sb-heading-color);
+  font-size: 0.95rem;
+}
+
+@media screen and (max-width: 56rem) {
+  .pl-strip-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (max-width: 40rem) {
+  .pl-strip-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pl-step {
+    aspect-ratio: auto;
+    min-height: 8rem;
+  }
+}
+
+/* Links wrapping nothing but an inline code pill (e.g. `filesystem` in the
+   primitives overview list) get an underline from the theme's link style,
+   but it's an inset box-shadow on the plain (non-rounded) <a> box — a
+   flat-bottomed rectangle that clips straight across the code pill's rounded
+   bottom corners. The pill's own color/background already reads as a
+   distinct, clickable element, so drop the underline here instead. */
+[class*="_a_"]:has(> [class*="_code_"]) {
+  box-shadow: none !important;
+}
+
+/* Stack the per-primitive meta table (Stage/Category/Version/Last Updated/Demo —
+   see site/scripts/generate.ts) into label/value rows on narrow viewports, since
+   five columns don't fit a phone width. Column order is fixed, so nth-child works
+   whether or not a given page has the (optional) Demo column. */
+@media (max-width: 640px) {
+  [class*="_table_"] table,
+  [class*="_table_"] thead,
+  [class*="_table_"] tbody,
+  [class*="_table_"] th,
+  [class*="_table_"] td,
+  [class*="_table_"] tr {
+    display: block;
+    width: 100%;
+  }
+  [class*="_table_"] thead {
+    display: none;
+  }
+  [class*="_table_"] tr + tr {
+    border-top: 1px solid color-mix(in hsl, var(--sb-decoration-color) 15%, transparent);
+  }
+  [class*="_table_"] td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem !important;
+    border: none !important;
+  }
+  [class*="_table_"] td::before {
+    font-weight: 600;
+  }
+  [class*="_table_"] td:nth-child(1)::before {
+    content: "Stage";
+  }
+  [class*="_table_"] td:nth-child(2)::before {
+    content: "Category";
+  }
+  [class*="_table_"] td:nth-child(3)::before {
+    content: "Version";
+  }
+  [class*="_table_"] td:nth-child(4)::before {
+    content: "Last Updated";
+  }
+  [class*="_table_"] td:nth-child(5)::before {
+    content: "Demo";
+  }
+}
+
+/* The theme only collapses the top nav into its hamburger menu below 500px (it was designed
+   for a short 2-item nav). With 6 items (Guide/Primitives/Philosophy/JSR & NPM/Contributors/
+   Security) that leaves a wide "tablet" range where every link is forced onto one flat row
+   with no room to breathe. Widen the collapse threshold so it switches to the hamburger well
+   before that gets cramped. Matches the theme's own selector/specificity approach (`!important`
+   attribute selectors against the hashed CSS-module class names) since Header.module.css's
+   500px query already uses `!important` on the same properties. */
+@media screen and (max-width: 900px) {
+  [class*="_top-nav_"] > *:not([class*="_mobile-nav-menu_"]) {
+    display: none !important;
+  }
+  [class*="_mobile-nav-menu_"] {
+    display: block !important;
+  }
+}

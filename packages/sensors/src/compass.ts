@@ -1,8 +1,8 @@
 import { createSignal, onCleanup } from "solid-js";
 import type { SignalOptions } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { makeSensor } from "./sensor.js";
-import type { GenericSensor } from "./sensor.js";
+import { makeSensor } from "./sensor.ts";
+import type { GenericSensor } from "./sensor.ts";
 
 const OWNED_WRITE: SignalOptions<unknown> = { ownedWrite: true };
 

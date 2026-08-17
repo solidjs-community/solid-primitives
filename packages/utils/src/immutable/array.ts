@@ -1,7 +1,7 @@
-import { type AnyClass, compare, type ItemsOf, type Many, ofClass } from "../index.js";
-import { withArrayCopy } from "./copy.js";
-import { get } from "./object.js";
-import type { FlattenArray, MappingFn, Predicate } from "./types.js";
+import { type AnyClass, compare, type ItemsOf, type Many, ofClass } from "../index.ts";
+import { withArrayCopy } from "./copy.ts";
+import { get } from "./object.ts";
+import type { FlattenArray, MappingFn, Predicate } from "./types.ts";
 
 /**
  * non-mutating `Array.prototype.push()`

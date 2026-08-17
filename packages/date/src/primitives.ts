@@ -9,14 +9,14 @@ import {
   createStore,
   type Store,
 } from "solid-js";
-import { DEFAULT_MESSAGES, HOUR, MINUTE } from "./variables.js";
+import { DEFAULT_MESSAGES, HOUR, MINUTE } from "./variables.ts";
 import {
   formatDate,
   formatDateRelative,
   getCountdown,
   getDate,
   getDateDifference,
-} from "./utils.js";
+} from "./utils.ts";
 import type {
   Countdown,
   DateInit,
@@ -24,7 +24,7 @@ import type {
   GetUpdateInterval,
   TimeAgoOptions,
   TimeoutSource,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Creates a reactive `Date` signal.

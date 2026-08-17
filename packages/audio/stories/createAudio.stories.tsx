@@ -52,12 +52,21 @@ export const ReactivePlayer = meta.story({
           </For>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            "align-items": "center",
+            "margin-bottom": "0.75rem",
+          }}
+        >
           <Button onClick={() => audio.setPlaying(!audio.playing())} variant="secondary">
             {audio.playing() ? "⏸ Pause" : "▶ Play"}
           </Button>
 
-          <Loading fallback={<span style={{ color: "#94a3b8", "font-size": "0.85rem" }}>Loading…</span>}>
+          <Loading
+            fallback={<span style={{ color: "#94a3b8", "font-size": "0.85rem" }}>Loading…</span>}
+          >
             <SeekSlider current={audio.currentTime} max={audio.duration()} onSeek={audio.seek} />
             <span style={{ "font-size": "0.85rem", "font-variant-numeric": "tabular-nums" }}>
               {formatTime(audio.currentTime())} / {formatTime(audio.duration())}
@@ -90,8 +99,19 @@ export const ReactiveSource = meta.story({
       <div style={{ "font-family": "system-ui", padding: "1.5rem", "min-width": "320px" }}>
         <h3 style={{ margin: "0 0 1rem" }}>Reactive source swap</h3>
 
-        <div style={{ display: "flex", gap: "0.5rem", "align-items": "center", "margin-bottom": "1rem" }}>
-          <Button onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx() === 0} variant="outline">
+        <div
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            "align-items": "center",
+            "margin-bottom": "1rem",
+          }}
+        >
+          <Button
+            onClick={() => setIdx(i => Math.max(0, i - 1))}
+            disabled={idx() === 0}
+            variant="outline"
+          >
             ← Prev
           </Button>
           <strong>{SAMPLES.at(idx())?.label}</strong>
@@ -104,12 +124,23 @@ export const ReactiveSource = meta.story({
           </Button>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", "align-items": "center", "margin-bottom": "0.75rem" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            "align-items": "center",
+            "margin-bottom": "0.75rem",
+          }}
+        >
           <Button onClick={() => audio.setPlaying(!audio.playing())} variant="secondary">
             {audio.playing() ? "⏸ Pause" : "▶ Play"}
           </Button>
 
-          <Loading fallback={<span style={{ color: "#f59e0b", "font-size": "0.85rem" }}>⏳ Buffering…</span>}>
+          <Loading
+            fallback={
+              <span style={{ color: "#f59e0b", "font-size": "0.85rem" }}>⏳ Buffering…</span>
+            }
+          >
             <span style={{ "font-size": "0.85rem" }}>
               {formatTime(audio.currentTime())} / {formatTime(audio.duration())}
             </span>

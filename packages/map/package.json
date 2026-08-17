@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/map",
-  "version": "0.7.3",
+  "version": "1.0.0-next.2",
   "description": "The Map & WeakMap data structures as a reactive signals.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -14,13 +14,13 @@
   },
   "primitive": {
     "name": "map",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "ReactiveMap",
       "ReactiveWeakMap"
     ],
     "category": "Reactivity",
-    "gzip": 949
+    "gzip": 747
   },
   "keywords": [
     "map",
@@ -44,21 +44,26 @@
       "default": "./dist/index.js"
     }
   },
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "dependencies": {
     "@solid-primitives/trigger": "workspace:^"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

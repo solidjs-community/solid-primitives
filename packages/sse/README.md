@@ -4,9 +4,10 @@
 
 # @solid-primitives/sse
 
-[![size](https://img.shields.io/badge/size-1.08_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/sse)
+[![size](https://img.shields.io/badge/size-1.61_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/sse)
 [![version](https://img.shields.io/npm/v/@solid-primitives/sse?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/sse)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Primitives for [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) using the browser's built-in `EventSource` API. Designed for Solid 2.0's async reactivity model.
 
@@ -21,6 +22,8 @@ Primitives for [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web
 
 ```bash
 npm install @solid-primitives/sse
+# or
+yarn add @solid-primitives/sse
 # or
 pnpm add @solid-primitives/sse
 ```
@@ -176,13 +179,13 @@ Without `on`, `<Loading>` keeps showing stale content during revalidation. With 
 
 ### Return value
 
-| Property     | Type                                     | Description                                                                              |
-| ------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `source`     | `Accessor<SSESourceHandle \| undefined>` | Underlying source instance; `undefined` on SSR                                           |
+| Property     | Type                                     | Description                                                                                 |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `source`     | `Accessor<SSESourceHandle \| undefined>` | Underlying source instance; `undefined` on SSR                                              |
 | `data`       | `Accessor<T>`                            | Latest message data; throws `NotReadyError` until first message, terminal errors thereafter |
-| `readyState` | `Accessor<SSEReadyState>`                | `SSEReadyState.CONNECTING` / `.OPEN` / `.CLOSED`                                         |
-| `close`      | `VoidFunction`                           | Close the connection                                                                     |
-| `reconnect`  | `VoidFunction`                           | Force-close and reopen; resets `data` to pending                                         |
+| `readyState` | `Accessor<SSEReadyState>`                | `SSEReadyState.CONNECTING` / `.OPEN` / `.CLOSED`                                            |
+| `close`      | `VoidFunction`                           | Close the connection                                                                        |
+| `reconnect`  | `VoidFunction`                           | Force-close and reopen; resets `data` to pending                                            |
 
 ### Initial value
 

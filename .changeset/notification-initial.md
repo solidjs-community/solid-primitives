@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/notification": minor
+"@solid-primitives/notification": major
 ---
 
 Add `@solid-primitives/notification` package (Stage 0)

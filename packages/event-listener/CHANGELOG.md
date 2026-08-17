@@ -1,5 +1,81 @@
 # @solid-primitives/event-listener
 
+## 3.0.0-next.3
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 3.0.0-next.2
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 3.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- Updated dependencies [5fc4efa]
+  - @solid-primitives/utils@7.0.0-next.1
+
+## 3.0.0-next.0
+
+### Major Changes
+
+- 4a5bf32: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/media`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - Requires Solid.js v2 — `classList` is replaced by `class` with object/array forms in consuming code
+
+  ### `@solid-primitives/utils`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createHydratableSignal`: uses `onSettled` (was `onMount`) and `sharedConfig.hydrating` (was `sharedConfig.context`) for hydration detection
+  - `INTERNAL_OPTIONS`: `{ internal: true }` changed to `{ pureWrite: true }` to match Solid 2.0 `SignalOptions`
+  - `defaultEquals` now aliases `isEqual` (was `equalFn`)
+  - `defer`: `AccessorArray<S>` type replaced with `Accessor<S>[]` (type was removed in Solid 2.0)
+
+  ### `@solid-primitives/static-store`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createStaticStore`: uses `getObserver` (was `getListener`) and `{ pureWrite: true }` (was `{ internal: true }`)
+  - Removed explicit `batch()` calls — updates are automatically batched in Solid 2.0
+  - `createHydratableStaticStore`: uses `onSettled` (was `onMount`) and `sharedConfig.hydrating` (was `sharedConfig.context`)
+
+  ### `@solid-primitives/rootless`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createHydratableSingletonRoot`: uses `sharedConfig.hydrating` (was `sharedConfig.context`)
+  - `createRootPool`: removed `batch()` calls — Solid 2.0 auto-batches on microtasks
+
+  ### `@solid-primitives/event-listener`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web` across all source files
+  - `createEventListener` and `createRenderEffect` converted to split compute/apply effect pattern required by Solid 2.0
+  - `eventListener` directive converted to split effect pattern; cleanup is returned from apply phase instead of using `onCleanup`
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 2.4.5
 
 ### Patch Changes

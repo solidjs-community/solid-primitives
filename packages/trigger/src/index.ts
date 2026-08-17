@@ -46,17 +46,17 @@ export class TriggerCache<T> {
     this.#map = new (mapConstructor as MapConstructor)();
   }
 
-  dirty(key: T) {
+  dirty(key: T): void {
     if (isServer) return;
     this.#map.get(key)?.$$();
   }
 
-  dirtyAll() {
+  dirtyAll(): void {
     if (isServer) return;
     for (const trigger of this.#map.values()) trigger.$$();
   }
 
-  track(key: T) {
+  track(key: T): void {
     if (!getObserver()) return;
     let trigger = this.#map.get(key);
     if (!trigger) {

@@ -27,7 +27,7 @@ const WindowMousemove: Component = () => {
   const [mouse, setMouse] = createSignal({ x: 0, y: 0 });
 
   return (
-    <div class="fixed left-4 top-4">
+    <div class="fixed top-4 left-4">
       <Show when={listen()}>
         <WindowEventListener onmousemove={({ x, y }) => setMouse({ x, y })} />
       </Show>
@@ -57,7 +57,7 @@ const List: Component = () => {
           {i => (
             <div
               ref={el => setItems(p => [...p, el])}
-              class="cursor-pointer select-none bg-yellow-500 p-6 text-gray-900"
+              class="cursor-pointer bg-yellow-500 p-6 text-gray-900 select-none"
             >
               {i}
             </div>
@@ -120,7 +120,7 @@ const EventMap: Component = () => {
       <p>Last event: {lastEvent()?.type}</p>
       <div
         ref={ref}
-        class="w-46 center-child h-32 select-none rounded-lg bg-green-500 bg-opacity-70"
+        class="center-child bg-opacity-70 h-32 w-46 rounded-lg bg-green-500 select-none"
       >
         <p>TARGET</p>
       </div>

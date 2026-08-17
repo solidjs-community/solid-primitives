@@ -14,7 +14,7 @@ type PackageData = {
   "Solid 2": string;
 };
 
-// eslint-disable-next-line no-console
+// oxlint-disable-next-line no-console
 console.log("updateReadme", "Updating README documentation");
 
 const githubURL = "https://github.com/solidjs-community/solid-primitives/tree/main/packages/";
@@ -28,21 +28,20 @@ const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process";
 
 const categories: Record<string, PackageData[]> = {};
-const rootDependencies: string[] = [
-  `@solid-primitives/utils`, // utils are not included in the modulesData
-];
 
 (async () => {
   const modulesData = await utils.getModulesData();
+  let utilsList: string[] = [];
 
   for (const module of modulesData) {
     if (module.primitive == null) continue;
 
-    const packageName = `@solid-primitives/${module.name}`;
-
-    if (module.workspace_deps.length === 0) {
-      rootDependencies.push(packageName);
+    if (module.name === "utils") {
+      utilsList = module.primitive.list;
+      continue;
     }
+
+    const packageName = `@solid-primitives/${module.name}`;
 
     const data = {} as PackageData;
 
@@ -78,9 +77,13 @@ const rootDependencies: string[] = [
       data.NPM = `[![VERSION](${npmShield}${packageName}?style=for-the-badge&label=)](${npmURL}${packageName})`;
     }
     data.Stage = `[![STAGE](${stageShieldBaseURL}${module.primitive.stage}.json)](${stageShieldLink})`;
-    data.Primitives = module.primitive.list
-      .map(prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`)
-      .join("<br />");
+    const primLinks = module.primitive.list.map(
+      prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`,
+    );
+    data.Primitives =
+      primLinks.length > 15
+        ? `<details><summary>${primLinks.length} primitives</summary>${primLinks.join(", ")}</details>`
+        : primLinks.join("<br />");
     data["Solid 2"] = /^[\^~]?2\./.test(module.solid_peer_version ?? "") ? "✓" : "";
     // Merge the package into the correct category
     const cat = categories[module.primitive.category];
@@ -104,17 +107,20 @@ const rootDependencies: string[] = [
 
   readme = utils.insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 
-  // Update Combined Downloads Badge
+  // Update Utils Table
 
-  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${rootDependencies.join(
-    ",",
-  )})](https://dash.deno.com/playground/combined-npm-downloads)`;
-
-  readme = utils.insertTextBetweenComments(
-    readme,
-    combinedDownloadsBadge,
-    "INSERT-NPM-DOWNLOADS-BADGE",
-  );
+  const COLS = 4;
+  const utilsGithubURL = `${githubURL}utils#`;
+  const utilsRows: string[] = [];
+  for (let i = 0; i < utilsList.length; i += COLS) {
+    const cells = utilsList
+      .slice(i, i + COLS)
+      .map(fn => `[${fn}](${utilsGithubURL}${fn.toLowerCase()})`);
+    while (cells.length < COLS) cells.push("");
+    utilsRows.push(`|${cells.join("|")}|`);
+  }
+  const utilsTable = [`|${"  |".repeat(COLS)}`, `|${"---|".repeat(COLS)}`, ...utilsRows].join("\n");
+  readme = utils.insertTextBetweenComments(readme, utilsTable, "INSERT-UTILS-TABLE");
 
   writeFileSync(pathToREADME, readme);
 })();

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/list",
-  "version": "0.1.2",
+  "version": "1.0.0-next.2",
   "description": "A List component, an alternative to For and Index.",
   "author": "Maciek50322 <34212298+maciek50322@users.noreply.github.com>",
   "contributors": [],
@@ -15,13 +15,13 @@
   },
   "primitive": {
     "name": "list",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "listArray",
       "List"
     ],
     "category": "Control Flow",
-    "gzip": 774
+    "gzip": 1289
   },
   "keywords": [
     "solid",
@@ -45,17 +45,26 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
   }
 }

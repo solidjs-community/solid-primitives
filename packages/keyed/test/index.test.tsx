@@ -29,7 +29,11 @@ describe("keyArray", () => {
     // Signal created outside createRoot so writes don't throw SIGNAL_WRITE_IN_OWNED_SCOPE
     const [list, setList] = createSignal([el1, el2, el3]);
     const { mapped, dispose } = createRoot(d => ({
-      mapped: keyArray(list, v => v.id, v => v().id),
+      mapped: keyArray(
+        list,
+        v => v.id,
+        v => v().id,
+      ),
       dispose: d,
     }));
 
@@ -50,7 +54,11 @@ describe("keyArray", () => {
           list,
           v => v.id,
           // Use a getter so item.value reads the signal directly without needing effects
-          v => ({ get value() { return v().value; } }),
+          v => ({
+            get value() {
+              return v().value;
+            },
+          }),
         ),
       ),
       dispose: d,
@@ -74,12 +82,28 @@ describe("keyArray", () => {
     let maprun = 0;
 
     const { rawMapped, dispose } = createRoot(d => {
-      const rawMapped = keyArray(list, v => v.id, (v, i) => {
-        maprun++;
-        return { get i() { return i(); }, v: v().value };
-      });
+      const rawMapped = keyArray(
+        list,
+        v => v.id,
+        (v, i) => {
+          maprun++;
+          return {
+            get i() {
+              return i();
+            },
+            v: v().value,
+          };
+        },
+      );
       // createMemo runs synchronously within flush — no deferred apply needed
-      createMemo(() => { rawMapped(); changes++; }, undefined, { equals: false });
+      createMemo(
+        () => {
+          rawMapped();
+          changes++;
+        },
+        undefined,
+        { equals: false },
+      );
       return { rawMapped, dispose: d };
     });
 
@@ -124,7 +148,13 @@ describe("keyArray", () => {
     ]);
 
     const { mapped, dispose } = createRoot(d => ({
-      mapped: createMemo(keyArray(() => list, e => e.i, (item, index) => [item, index] as const)),
+      mapped: createMemo(
+        keyArray(
+          () => list,
+          e => e.i,
+          (item, index) => [item, index] as const,
+        ),
+      ),
       dispose: d,
     }));
 
@@ -181,7 +211,13 @@ describe("keyArray", () => {
 
     const [list, setList] = createSignal<[string, {}][]>(entriesFrom);
     const { mapped, dispose } = createRoot(d => ({
-      mapped: createMemo(keyArray(list, v => v[0], v => v()[1])),
+      mapped: createMemo(
+        keyArray(
+          list,
+          v => v[0],
+          v => v()[1],
+        ),
+      ),
       dispose: d,
     }));
 

@@ -99,8 +99,8 @@ export const CreateInteractOutsideStory = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          <code>disabled: () =&gt; !open()</code> suspends the listener while the popover is
-          hidden, so no unnecessary event processing occurs.
+          <code>disabled: () =&gt; !open()</code> suspends the listener while the popover is hidden,
+          so no unnecessary event processing occurs.
         </p>
       </div>
     );
@@ -192,8 +192,7 @@ export const InteractOutsideRefStory = meta.story({
         </Show>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          The <code>ref</code> callback is the only wiring needed — no signals or effects to
-          manage.
+          The <code>ref</code> callback is the only wiring needed — no signals or effects to manage.
         </p>
       </div>
     );
@@ -221,7 +220,8 @@ export const MakeInteractOutsideStory = meta.story({
       cleanup = makeInteractOutside(boxRef, {
         onPointerDownOutside: () =>
           setStatus(`Outside click at ${new Date().toLocaleTimeString()}`),
-        onFocusOutside: () => setStatus(`Focus moved outside at ${new Date().toLocaleTimeString()}`),
+        onFocusOutside: () =>
+          setStatus(`Focus moved outside at ${new Date().toLocaleTimeString()}`),
       });
       setListening(true);
       setStatus("Listening for outside interactions…");
@@ -300,8 +300,8 @@ export const MakeInteractOutsideStory = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          The returned cleanup function removes all listeners. Useful outside Solid component
-          trees or when lifecycle hooks are unavailable.
+          The returned cleanup function removes all listeners. Useful outside Solid component trees
+          or when lifecycle hooks are unavailable.
         </p>
       </Container>
     );

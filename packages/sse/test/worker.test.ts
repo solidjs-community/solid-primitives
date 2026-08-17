@@ -4,8 +4,6 @@ import { createRoot, flush } from "solid-js";
 import { createSSE, SSEReadyState } from "../src/sse.js";
 import { makeSSEWorker, type SSEWorkerMessage, type SSEWorkerTarget } from "../src/worker.js";
 
-// ─── MockWorkerTarget ─────────────────────────────────────────────────────────
-
 /**
  * Minimal stub for a Worker / SharedWorker.port.
  * Records outgoing `postMessage` calls so tests can assert on them,
@@ -23,8 +21,6 @@ class MockWorkerTarget extends EventTarget implements SSEWorkerTarget {
     this.dispatchEvent(new MessageEvent("message", { data }));
   }
 }
-
-// ─── makeSSEWorker unit tests ─────────────────────────────────────────────────
 
 describe("makeSSEWorker", () => {
   it("returns a SSESourceFn (callable function)", () => {
@@ -201,8 +197,6 @@ describe("makeSSEWorker", () => {
     sourceB.close();
   });
 });
-
-// ─── createSSE + makeSSEWorker integration ────────────────────────────────────
 
 describe("createSSE with worker source", () => {
   beforeAll(() => vi.useFakeTimers());

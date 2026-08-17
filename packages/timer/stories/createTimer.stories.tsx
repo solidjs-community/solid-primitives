@@ -67,7 +67,8 @@ export const MakeTimer = meta.story({
         </div>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
-          Cleanup is manual — <code>onCleanup(makeTimer(...))</code> ties it to the component lifecycle.
+          Cleanup is manual — <code>onCleanup(makeTimer(...))</code> ties it to the component
+          lifecycle.
         </p>
       </Container>
     );
@@ -99,10 +100,7 @@ export const CreateTimerStory = meta.story({
 
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
           {([250, 500, 1000, 2000] as const).map(ms => (
-            <Button
-              onClick={() => setDelay(ms)}
-              variant={delay() === ms ? "primary" : "outline"}
-            >
+            <Button onClick={() => setDelay(ms)} variant={delay() === ms ? "primary" : "outline"}>
               {ms}ms
             </Button>
           ))}
@@ -143,10 +141,7 @@ export const CreateTimeoutLoop = meta.story({
 
         <div style={{ display: "flex", gap: "0.5rem", "flex-wrap": "wrap" }}>
           {([250, 500, 1000, 2000] as const).map(ms => (
-            <Button
-              onClick={() => setDelay(ms)}
-              variant={delay() === ms ? "primary" : "outline"}
-            >
+            <Button onClick={() => setDelay(ms)} variant={delay() === ms ? "primary" : "outline"}>
               {ms}ms
             </Button>
           ))}
@@ -159,7 +154,8 @@ export const CreateTimeoutLoop = meta.story({
         </div>
 
         <p style={{ "font-size": "0.8rem", color: "#64748b", margin: 0 }}>
-          Change the delay mid-tick — it takes effect on the <em>next</em> execution, not the current one.
+          Change the delay mid-tick — it takes effect on the <em>next</em> execution, not the
+          current one.
         </p>
       </Container>
     );

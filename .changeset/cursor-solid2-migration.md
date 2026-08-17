@@ -6,7 +6,7 @@ Migrate to Solid.js v2.0 and add new primitives
 
 ## Breaking Changes
 
-**Peer dependency**: `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10` are now required.
+**Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
 - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
 - `createElementCursor` and `createBodyCursor` updated to the split compute/apply effect pattern required by Solid 2.0 — cleanup is returned from the apply phase instead of using `onCleanup`

@@ -1,5 +1,68 @@
 # @solid-primitives/pagination
 
+## 1.0.0-next.6
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 1.0.0-next.5
+
+### Patch Changes
+
+- 3762864: Removed a leftover `declare module "solid-js"` global JSX augmentation (and its associated unused `_E` type alias) from `createInfiniteScroll`. It was left over from an earlier `use:` directive-based implementation that was replaced by the current plain ref-callback API (`loader: (el: Element) => void`) — nothing in the package referenced it anymore. JSR's publish step rejects packages that modify global types, which was blocking `deno publish` for this package. No API or behavior changes.
+
+## 1.0.0-next.4
+
+### Minor Changes
+
+- 830248b: add `initialPageCount` option to `createInfiniteScroll`, letting SSR request pages up front (for SEO/perceived speed) instead of always starting empty on the server
+
+## 1.0.0-next.3
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 1.0.0-next.2
+
+### Patch Changes
+
+- 71c6bc2: fix keyboard focus loss
+
+## 1.0.0-next.1
+
+### Minor Changes
+
+- 4a511cf: Add `firstAriaLabel`/`prevAriaLabel`/`nextAriaLabel`/`lastAriaLabel` options to `createPagination`, applied as an `aria-label` on the corresponding button props (resolves #750). Previously the first/prev/next/last buttons had no accessible name beyond their visible content, which defaults to bare symbols (`|<`, `<`, `>`, `>|`) — screen reader users got no meaningful announcement. Defaults are `"First page"`, `"Previous page"`, `"Next page"`, `"Last page"`; override any of them independently. These are separate from the existing `firstContent`/`prevContent`/`nextContent`/`lastContent` options, which control visible (possibly JSX/icon) content — `aria-label` must be a plain string, so it can't reuse those.
+
+## 1.0.0-next.0
+
+### Major Changes
+
+- b3a91c6: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/pagination`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `createPagination`: page clamping when pages count decreases is now implemented via a derived memo instead of `createComputed` (which was removed in Solid 2.0). The clamping is reactive and automatic.
+  - `createInfiniteScroll`: removed `createResource` dependency (removed in Solid 2.0). Fetching is now implemented with `createEffect` and a cancellation pattern. The `pages.loading` and `pages.error` resource properties are no longer available; use `end()` or wrap the fetcher to handle errors externally.
+  - `batch()` calls removed — Solid 2.0 batches updates automatically via microtasks. Tests require `flush()` after signal writes to observe committed values.
+  - All internal signals use `{ ownedWrite: true }` to allow setters to be called from reactive scopes and event handlers without triggering ownership warnings.
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 0.5.1
 
 ### Patch Changes

@@ -197,9 +197,9 @@ export const CreateBroadcastChannelStory = meta.story({
         </div>
 
         <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
-          <code>message()</code> is <code>null</code> until a message arrives from another tab.
-          Both stories share channel <code>sp-broadcast-demo</code>, so posting from either tab
-          updates this signal.
+          <code>message()</code> is <code>null</code> until a message arrives from another tab. Both
+          stories share channel <code>sp-broadcast-demo</code>, so posting from either tab updates
+          this signal.
         </p>
       </Container>
     );

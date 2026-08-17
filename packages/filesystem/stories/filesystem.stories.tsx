@@ -34,10 +34,7 @@ const meta = preview.meta({
 
 export default meta;
 
-// ---------------------------------------------------------------------------
 // Shared tree-node component used by multiple stories
-// ---------------------------------------------------------------------------
-
 type AnyFs = SyncFileSystem | AsyncFileSystem;
 
 const FsNode = (props: {
@@ -78,15 +75,7 @@ const FsNode = (props: {
             "line-height": "1",
           }}
         >
-          {type() === "dir"
-            ? open()
-              ? "▼"
-              : "▶"
-            : props.onWrite
-              ? open()
-                ? "▾"
-                : "▸"
-              : "·"}
+          {type() === "dir" ? (open() ? "▼" : "▶") : props.onWrite ? (open() ? "▾" : "▸") : "·"}
         </button>
         <span
           style={{
@@ -153,10 +142,7 @@ const FsNode = (props: {
   );
 };
 
-// ---------------------------------------------------------------------------
 // Story 1 – Virtual file tree
-// ---------------------------------------------------------------------------
-
 export const VirtualTree = meta.story({
   name: "Virtual file tree",
   parameters: {
@@ -170,7 +156,7 @@ export const VirtualTree = meta.story({
   render: () => {
     const adapter = makeVirtualFileSystem({
       src: {
-        "index.ts": 'export const greet = (name: string) => `Hello, ${name}!`;\n',
+        "index.ts": "export const greet = (name: string) => `Hello, ${name}!`;\n",
         "types.ts": "export type ID = string;\n",
       },
       "README.md": "# My Project\n",
@@ -256,10 +242,7 @@ export const VirtualTree = meta.story({
   },
 });
 
-// ---------------------------------------------------------------------------
 // Story 2 – rsync between filesystems
-// ---------------------------------------------------------------------------
-
 export const RsyncCopy = meta.story({
   name: "rsync copy",
   parameters: {
@@ -417,10 +400,7 @@ export const RsyncCopy = meta.story({
   },
 });
 
-// ---------------------------------------------------------------------------
 // Story 3 – localStorage-backed virtual FS
-// ---------------------------------------------------------------------------
-
 export const LocalStorageVfs = meta.story({
   name: "localStorage persistence",
   parameters: {
@@ -564,10 +544,7 @@ export const LocalStorageVfs = meta.story({
   },
 });
 
-// ---------------------------------------------------------------------------
 // Story 4 – Browser File System Access API
-// ---------------------------------------------------------------------------
-
 export const BrowserDirectoryAccess = meta.story({
   name: "Browser directory picker",
   parameters: {
@@ -613,7 +590,11 @@ export const BrowserDirectoryAccess = meta.story({
       <Container width={340}>
         <ButtonRow>
           <Button onClick={pick} disabled={picking()} variant={currentFs() ? "outline" : "primary"}>
-            {picking() ? "Waiting for picker…" : currentFs() ? "Pick another directory" : "Pick a directory"}
+            {picking()
+              ? "Waiting for picker…"
+              : currentFs()
+                ? "Pick another directory"
+                : "Pick a directory"}
           </Button>
         </ButtonRow>
 

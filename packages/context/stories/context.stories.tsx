@@ -1,14 +1,12 @@
 import { createSignal, createContext, useContext } from "solid-js";
 import preview from "../../../.storybook/preview.js";
-import { createContextProvider, createLayeredContext, MultiProvider } from "@solid-primitives/context";
-import readme from "../README.md?raw";
 import {
-  Container,
-  Card,
-  Button,
-  ButtonRow,
-  StatRow,
-} from "../../../.storybook/ui/index.js";
+  createContextProvider,
+  createLayeredContext,
+  MultiProvider,
+} from "@solid-primitives/context";
+import readme from "../README.md?raw";
+import { Container, Card, Button, ButtonRow, StatRow } from "../../../.storybook/ui/index.js";
 import { colors, font, radii } from "../../../.storybook/ui/tokens.js";
 
 const meta = preview.meta({
@@ -181,7 +179,14 @@ export const LayeredOverrides = meta.story({
           <span style={{ "font-weight": "600", color: c.fg, "font-size": font.sizeSm }}>
             {props.depth}
           </span>
-          <span style={{ "font-family": font.mono, "font-size": font.sizeSm, color: c.fg, opacity: "0.75" }}>
+          <span
+            style={{
+              "font-family": font.mono,
+              "font-size": font.sizeSm,
+              color: c.fg,
+              opacity: "0.75",
+            }}
+          >
             accent={theme.accent} · scale={theme.scale}
           </span>
         </div>
@@ -193,10 +198,24 @@ export const LayeredOverrides = meta.story({
         <Container width={420}>
           <h3 style={{ margin: 0 }}>Layered theme</h3>
           <ThemeDisplay depth="Root" />
-          <div style={{ "padding-left": "1rem", display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
+          <div
+            style={{
+              "padding-left": "1rem",
+              display: "flex",
+              "flex-direction": "column",
+              gap: "0.5rem",
+            }}
+          >
             <ThemeProvider accent="emerald">
               <ThemeDisplay depth="↳ Level 1 — accent override" />
-              <div style={{ "padding-left": "1rem", display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
+              <div
+                style={{
+                  "padding-left": "1rem",
+                  display: "flex",
+                  "flex-direction": "column",
+                  gap: "0.5rem",
+                }}
+              >
                 <ThemeProvider scale="lg">
                   <ThemeDisplay depth="↳↳ Level 2 — scale override" />
                   <div style={{ "padding-left": "1rem" }}>

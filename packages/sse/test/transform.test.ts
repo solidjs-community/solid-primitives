@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { json, ndjson, lines, number, safe, pipe } from "../src/transform.js";
 
-// ── json ──────────────────────────────────────────────────────────────────────
-
 describe("json", () => {
   it("parses a JSON object", () => {
     expect(json('{"a":1}')).toEqual({ a: 1 });
@@ -24,8 +22,6 @@ describe("json", () => {
     expect(() => json("not json")).toThrow();
   });
 });
-
-// ── ndjson ────────────────────────────────────────────────────────────────────
 
 describe("ndjson", () => {
   it("parses each line as a JSON value", () => {
@@ -57,8 +53,6 @@ describe("ndjson", () => {
   });
 });
 
-// ── lines ─────────────────────────────────────────────────────────────────────
-
 describe("lines", () => {
   it("splits data into lines", () => {
     expect(lines("one\ntwo\nthree")).toEqual(["one", "two", "three"]);
@@ -81,8 +75,6 @@ describe("lines", () => {
   });
 });
 
-// ── number ────────────────────────────────────────────────────────────────────
-
 describe("number", () => {
   it("parses an integer string", () => {
     expect(number("42")).toBe(42);
@@ -104,8 +96,6 @@ describe("number", () => {
     expect(number("not a number")).toBeNaN();
   });
 });
-
-// ── safe ──────────────────────────────────────────────────────────────────────
 
 describe("safe", () => {
   it("returns the transform result when successful", () => {
@@ -143,8 +133,6 @@ describe("safe", () => {
     expect(result).toEqual({ a: 0 });
   });
 });
-
-// ── pipe ──────────────────────────────────────────────────────────────────────
 
 describe("pipe", () => {
   it("passes the string through both transforms in order", () => {

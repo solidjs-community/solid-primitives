@@ -4,9 +4,10 @@
 
 # @solid-primitives/graphql
 
-[![size](https://img.shields.io/badge/size-975_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/graphql)
+[![size](https://img.shields.io/badge/size-978_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/graphql)
 [![size](https://img.shields.io/npm/v/@solid-primitives/graphql?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/graphql)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Creates a reactive GraphQL query client.
 
@@ -165,12 +166,6 @@ const newQuery = createGraphQLClient("https://foobar.com/v1/api", { fetcher: nod
 ```
 
 Remember, just like with [`createResource`](https://www.solidjs.com/docs/latest/api#createresource), you will need an [`<ErrorBoundary>`](https://www.solidjs.com/docs/latest/api#%3Cerrorboundary%3E) to catch the errors, even if they are accessible inside the resource. Otherwise, uncaught errors might disrupt your application.
-
-## Demo
-
-You may view a working example here:
-
-https://codesandbox.io/s/solid-primitives-graphql-demo-g6fv6?file=/index.tsx
 
 ## Changelog
 

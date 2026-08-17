@@ -122,9 +122,13 @@ export const RelativeCursorInElement = meta.story({
   render: () => {
     const mouse = useMousePosition();
     let ref!: HTMLDivElement;
-    const relative = createPositionToElement(() => ref, () => mouse, {
-      initialValue: { isInside: false },
-    });
+    const relative = createPositionToElement(
+      () => ref,
+      () => mouse,
+      {
+        initialValue: { isInside: false },
+      },
+    );
 
     return (
       <Container minWidth={300}>

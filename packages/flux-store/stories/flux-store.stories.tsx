@@ -9,7 +9,6 @@ import {
 } from "../src/index.js";
 import readme from "../README.md?raw";
 import {
-  Badge,
   BoolRow,
   Button,
   ButtonRow,
@@ -39,8 +38,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: createFluxStore — derived state via getters ─────────────────────
-
 export const BudgetTracker = meta.story({
   name: "Getters derive from reactive state",
   parameters: {
@@ -61,8 +58,14 @@ export const BudgetTracker = meta.story({
           isOverBudget: () => s.spent > s.total,
         }),
         actions: setState => ({
-          add: (n: number) => setState(s => { s.spent = Math.min(400, s.spent + n); }),
-          reset: () => setState(s => { s.spent = 0; }),
+          add: (n: number) =>
+            setState(s => {
+              s.spent = Math.min(400, s.spent + n);
+            }),
+          reset: () =>
+            setState(s => {
+              s.spent = 0;
+            }),
         }),
       },
     );
@@ -96,8 +99,6 @@ export const BudgetTracker = meta.story({
   },
 });
 
-// ── Story 2: createFluxStoreFactory — isolated instances ─────────────────────
-
 export const IsolatedInstances = meta.story({
   name: "Isolated instances from one factory",
   parameters: {
@@ -116,8 +117,14 @@ export const IsolatedInstances = meta.story({
           score: () => s.score,
         }),
         actions: setState => ({
-          point: () => setState(s => { s.score += 1; }),
-          reset: () => setState(s => { s.score = 0; }),
+          point: () =>
+            setState(s => {
+              s.score += 1;
+            }),
+          reset: () =>
+            setState(s => {
+              s.score = 0;
+            }),
         }),
       },
     );
@@ -214,8 +221,6 @@ export const IsolatedInstances = meta.story({
   },
 });
 
-// ── Story 3: createActions — wrapping functions to run untracked ──────────────
-
 export const UntrackWrappers = meta.story({
   name: "Wrapping setters as untracked actions",
   parameters: {
@@ -270,7 +275,11 @@ export const UntrackWrappers = meta.story({
         </Section>
 
         <BoolRow label="animations" value={animations()} />
-        <Button variant="secondary" onClick={actions.toggleAnimations} style={{ "align-self": "flex-start" }}>
+        <Button
+          variant="secondary"
+          onClick={actions.toggleAnimations}
+          style={{ "align-self": "flex-start" }}
+        >
           {animations() ? "Disable" : "Enable"} animations
         </Button>
 
@@ -281,8 +290,6 @@ export const UntrackWrappers = meta.story({
     );
   },
 });
-
-// ── Story 4: createAction — single untracked function wrapper ─────────────────
 
 export const SingleActionWrapper = meta.story({
   name: "Single function wrapped as action",
