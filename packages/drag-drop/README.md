@@ -14,8 +14,8 @@ Composable, tree-shakeable drag-and-drop primitives.
 
 Two separate drag systems are provided:
 
-- **Pointer-events** (`makeDraggable`, `makeDroppable`, `createDraggable`, `createDroppable`, `createSortable`, `createDragContext`) — for UI elements moved by the user.
-- **Native HTML5 API** (`makeNativeDroppable`, `createNativeDroppable`) — for OS file drops and `draggable="true"` elements; used internally by `@solid-primitives/upload`'s `createDropzone`.
+- **[Pointer events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events)** (`makeDraggable`, `makeDroppable`, `createDraggable`, `createDroppable`, `createSortable`, `createDragContext`) — for UI elements moved by the user. The primitives track `pointerdown`/`pointermove`/`pointerup` on the dragged element and document, computing position/collision manually; nothing here uses the browser's native drag-and-drop.
+- **[Native HTML5 Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API)** (`makeNativeDroppable`, `createNativeDroppable`) — for OS file drops and `draggable="true"` elements; used internally by `@solid-primitives/upload`'s `createDropzone`.
 
 ## Installation
 

@@ -6,8 +6,10 @@ export const closestCenter: CollisionDetector = (_draggable, droppables, pointer
   let bestDistSq = Infinity;
   const px = pointer.x, py = pointer.y;
   for (const d of droppables) {
-    const dx = px - (d.rect.left + d.rect.width * 0.5);
-    const dy = py - (d.rect.top + d.rect.height * 0.5);
+    // >> 1 instead of * 0.5: truncates width/height to a 32-bit int and floors the
+    // halving, so the computed center can be off by up to ~1px on fractional rects.
+    const dx = px - (d.rect.left + (d.rect.width >> 1));
+    const dy = py - (d.rect.top + (d.rect.height >> 1));
     const distSq = dx * dx + dy * dy;
     if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
   }
@@ -21,15 +23,19 @@ export const closestCorners: CollisionDetector = (_draggable, droppables, pointe
   const px = pointer.x, py = pointer.y;
   for (const d of droppables) {
     const { left, right, top, bottom } = d.rect;
-    let dx: number, dy: number, distSq: number;
+    // Precompute each delta and its square once — each is reused by two of the
+    // four corners below (dxl by top-left & bottom-left, dyt by top-left & top-right, etc.)
+    const dxl = px - left, dxr = px - right, dyt = py - top, dyb = py - bottom;
+    const dxls = dxl * dxl, dxrs = dxr * dxr, dyts = dyt * dyt, dybs = dyb * dyb;
+    let distSq: number;
     // top-left
-    dx = px - left;  dy = py - top;    distSq = dx * dx + dy * dy; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
+    distSq = dxls + dyts; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
     // top-right
-    dx = px - right; dy = py - top;    distSq = dx * dx + dy * dy; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
+    distSq = dxrs + dyts; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
     // bottom-left
-    dx = px - left;  dy = py - bottom; distSq = dx * dx + dy * dy; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
+    distSq = dxls + dybs; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
     // bottom-right
-    dx = px - right; dy = py - bottom; distSq = dx * dx + dy * dy; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
+    distSq = dxrs + dybs; if (distSq < bestDistSq) { bestDistSq = distSq; best = d.id; }
   }
   return best;
 };
