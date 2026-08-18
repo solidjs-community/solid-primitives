@@ -1,5 +1,5 @@
 import { type Component, createSignal } from "solid-js";
-import { createVideoPlayer } from "../src/index.js";
+import { createVideoPlayer, createVideoFrameCallback } from "../src/index.js";
 
 const DEMO_URL =
   "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
@@ -7,6 +7,13 @@ const DEMO_URL =
 const App: Component = () => {
   const [src, setSrc] = createSignal(DEMO_URL);
   const video = createVideoPlayer(src);
+  const [presentedFrames, setPresentedFrames] = createSignal(0);
+  const [videoEl, setVideoEl] = createSignal<HTMLVideoElement>();
+
+  const [, start] = createVideoFrameCallback(videoEl, (_now, metadata) =>
+    setPresentedFrames(metadata.presentedFrames),
+  );
+  start();
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
@@ -16,6 +23,7 @@ const App: Component = () => {
           ref={el => {
             // sync the reactive player into the DOM element
             (video as any).player = el;
+            setVideoEl(el);
           }}
           src={src()}
           style={{ width: "640px", "max-width": "100%" }}
@@ -43,6 +51,7 @@ const App: Component = () => {
           <p>
             Dimensions: {video.videoWidth()} × {video.videoHeight()}
           </p>
+          <p>Presented frames (via createVideoFrameCallback): {presentedFrames()}</p>
         </div>
 
         <div class="flex items-center gap-2">

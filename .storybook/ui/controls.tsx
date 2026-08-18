@@ -1,8 +1,11 @@
-import type { JSX } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { colors, font, radii } from "./tokens.js";
 
 export const Button = (props: {
-  onClick?: () => void;
+  "aria-current"?: "page";
+  "aria-label"?: string;
+  onClick?: (ev: MouseEvent) => void;
+  onKeyUp?: (ev: KeyboardEvent) => void;
   children: JSX.Element;
   variant?: "primary" | "secondary" | "outline" | "ghost";
   color?: string;
@@ -12,9 +15,12 @@ export const Button = (props: {
   ref?: HTMLButtonElement | ((el: HTMLButtonElement) => void);
 }) => (
   <button
+    aria-label={props["aria-label"]}
+    aria-current={props["aria-current"]}
     ref={props.ref}
     type={props.type ?? "button"}
     onClick={props.onClick}
+    onKeyUp={props.onKeyUp}
     disabled={props.disabled}
     style={{
       padding: "0.5rem 1.1rem",

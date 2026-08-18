@@ -150,6 +150,72 @@ export const VirtualListComponent = meta.story({
   },
 });
 
+export const RowLayoutClass = meta.story({
+  name: "Styling rows with `class`",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The `class` prop is applied to the element wrapping the rendered rows, so you can lay them out with flexbox or grid instead of styling each row individually. Here it adds `display: flex; flex-flow: column; gap: 0.4rem;` to space out rows uniformly.",
+      },
+    },
+  },
+  render: () => {
+    const items = ALL_ITEMS.slice(0, 30);
+
+    return (
+      <Container minWidth={380}>
+        <h3 style={{ margin: 0 }}>{'<VirtualList class="...">'}</h3>
+
+        <style>{`
+          .virtual-story-row-list {
+            display: flex;
+            flex-flow: column;
+            gap: 0.4rem;
+            width: 100%;
+            padding: 0.4rem;
+            box-sizing: border-box;
+          }
+        `}</style>
+
+        <VirtualList each={items} rootHeight={280} rowHeight={44} class="virtual-story-row-list">
+          {(item: Accessor<(typeof ALL_ITEMS)[number]>) => (
+            <div
+              style={{
+                height: "44px",
+                display: "flex",
+                "align-items": "center",
+                "padding-left": "0.75rem",
+                gap: "0.6rem",
+                "border-radius": "6px",
+                background: "#f8fafc",
+                "box-sizing": "border-box",
+                width: "320px",
+              }}
+            >
+              <div
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  "border-radius": "50%",
+                  background: item().color,
+                  "flex-shrink": 0,
+                }}
+              />
+              <span style={{ "font-size": "0.85rem", color: "#334155" }}>{item().label}</span>
+            </div>
+          )}
+        </VirtualList>
+
+        <p style={{ margin: 0, "font-size": "0.8rem", color: "#64748b" }}>
+          Without <code>class</code>, rows would need their own margin to create gaps. With it, the
+          row wrapper itself becomes a flex column with a uniform <code>gap</code>.
+        </p>
+      </Container>
+    );
+  },
+});
+
 export const HeadlessVirtualList = meta.story({
   name: "createVirtualList (headless)",
   parameters: {
@@ -233,7 +299,7 @@ export const HeadlessVirtualList = meta.story({
                 width: "100%",
               }}
             >
-              <For each={virtual().visibleItems}>
+              <For each={virtual().visibleItems} keyed={false}>
                 {(item: Accessor<string>) => (
                   <div
                     style={{

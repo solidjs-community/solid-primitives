@@ -13,7 +13,7 @@ import { asArray } from "@solid-primitives/utils";
 /** @internal $TYPE is only used for type inference */
 declare const $TYPE: unique symbol;
 /** @internal */
-const $TOKENIZER = Symbol(!isServer && DEV ? "jsx-tokenizer" : "");
+const $TOKENIZER: unique symbol = Symbol(!isServer && DEV ? "jsx-tokenizer" : "");
 
 /**
  * Identifies a JSX Tokenizer. It is returned by {@link createTokenizer} (or {@link createToken}) and used by {@link createToken} and {@link resolveTokens}.
@@ -115,7 +115,7 @@ export function createToken<P extends object, T>(
       : () => {
           !isServer &&
             DEV &&
-            // eslint-disable-next-line no-console
+            // oxlint-disable-next-line no-console
             console.warn(
               `Tokens can only be rendered with resolveTokens. ("${symbol.description}")`,
             );
@@ -149,7 +149,7 @@ function getResolvedTokens(
   // other element
   else if (addElements) resolved.push(value);
   else if (!isServer && DEV && value)
-    // eslint-disable-next-line no-console
+    // oxlint-disable-next-line no-console
     console.warn(`Invalid JSX Element passed to token resolver:`, value);
 
   return resolved;

@@ -131,7 +131,7 @@ function setProperty(
     if (state[$HAS] && state[$HAS][property] && prev === undefined) state[$HAS][property].$();
   }
 
-  // eslint-disable-next-line prefer-const
+  // oxlint-disable-next-line prefer-const
   let nodes = getNodes(state, $NODE),
     node: DataNode | undefined;
 

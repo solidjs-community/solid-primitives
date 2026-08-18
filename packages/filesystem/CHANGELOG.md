@@ -1,5 +1,46 @@
 # @solid-primitives/filesystem
 
+## 3.0.0-next.3
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+
+## 3.0.0-next.2
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
+## 3.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+## 3.0.0-next.0
+
+### Major Changes
+
+- 591095f: Migrate to Solid.js v2.0 (beta.14).
+
+  Breaking changes:
+
+  - `solid-js` peer dependency updated to `^2.0.0-beta.14`
+  - `@solidjs/web` is now a required peer dependency
+  - `isServer` is now imported from `@solidjs/web`
+  - `createSyncFileSystem` and `createAsyncFileSystem` internal signals use `ownedWrite: true` to support writes from reactive scopes
+  - `createAsyncFileSystem` no longer uses `createResource` — reads are backed by plain signals with manual `Promise`-based fetching, eliminating `ResourceActions` from the API
+  - The `toPromise` helper in `tools.ts` uses the Solid 2.0 split `createEffect(compute, apply)` pattern
+
 ## 1.3.3
 
 ### Patch Changes

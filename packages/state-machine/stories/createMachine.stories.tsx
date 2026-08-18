@@ -31,8 +31,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Traffic Light ────────────────────────────────────────────────────
-
 const LIGHTS = [
   { key: "red" as const, color: "#ef4444" },
   { key: "yellow" as const, color: "#f59e0b" },
@@ -123,8 +121,6 @@ export const TrafficLight = meta.story({
   },
 });
 
-// ── Story 2: Lifecycle Counter ────────────────────────────────────────────────
-
 export const LifecycleCounter = meta.story({
   name: "Counter lifecycle",
   parameters: {
@@ -202,8 +198,6 @@ export const LifecycleCounter = meta.story({
   },
 });
 
-// ── Story 3: JSX as State Value ───────────────────────────────────────────────
-
 export const InlineEdit = meta.story({
   name: "JSX as state value",
   parameters: {
@@ -220,7 +214,9 @@ export const InlineEdit = meta.story({
     // Forward references so state callbacks can trigger external transitions.
     // These are assigned after createMachine returns; closures capture the
     // binding, not the value, so they resolve correctly at call time.
+    // oxlint-disable-next-line prefer-const
     let toEdit!: () => void;
+    // oxlint-disable-next-line prefer-const
     let toRead!: () => void;
 
     const state = createMachine<{

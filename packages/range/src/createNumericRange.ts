@@ -1,7 +1,7 @@
 import type { Accessor } from "solid-js";
 import type { MaybeAccessor } from "@solid-primitives/utils";
 import { access } from "@solid-primitives/utils";
-import { mapRange } from "./mapRange.js";
+import { mapRange } from "./mapRange.ts";
 
 /**
  * Reactively generates an array of numbers for the given range.

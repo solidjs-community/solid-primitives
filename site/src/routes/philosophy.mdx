@@ -1,0 +1,110 @@
+---
+title: Philosophy
+lastUpdated: false
+---
+
+# Philosophy
+
+Solid Primitives exists to bring the community together around a single, well-maintained
+foundation of reactive primitives, instead of everyone reinventing the same `useMouse` or
+`useDebounce` in isolation. Other ecosystems have enormous catalogues of hooks and utilities,
+but a lot of that is built as untested one-offs designed for narrow needs — the less concise
+each of those building blocks is, the more they end up repeating each other. Our goal is a
+centralized, powerful primitive foundation the whole Solid ecosystem can build on.
+
+## Design maxims
+
+Every primitive in this repository is held to the same bar. Concretely, that means each one is:
+
+1. Documented and follows a consistent style guide
+2. Well tested
+3. As small, concise, and practical as possible
+4. A single primitive for a single purpose
+5. Built with no dependencies, or as few as possible
+6. SSR-safe (or explicitly short-circuited where it can't be)
+7. A wrapper around base-level Browser APIs, not a reimplementation of them
+8. Designed to be progressively improved as new platform features land
+9. Focused on composition over isolated, monolithic logic
+10. Guided by community voice and real needs, not a fixed roadmap
+11. Strongly typed, with real TypeScript support
+12. ESM-only — no CJS
+13. Fast — Solid's performance model is part of the deal
+
+## Composition over monoliths
+
+Every primitive is designed to be composed or decomposed into smaller units, not shipped as a
+single do-everything API. That's a deliberate tree-shaking decision: you should only ship what
+you actually use, picking existing primitives as building blocks rather than paying for an
+entire library's surface area to use one piece of it.
+
+This also shows up in a naming convention borrowed from the wider Solid/React ecosystem: a
+`make` prefix marks a **non-reactive** foundation primitive — it does the bare essential setup
+and teardown (e.g. `makeTimer` schedules and cleans up a timer) — while `create` marks the
+**reactive** primitive built on top of it (`createTimer` composes `makeTimer` into a fully
+reactive signal). Reach for `make*` when you just need the side effect managed; reach for
+`create*` when you need the reactive value.
+
+## `@solid-primitives/utils`
+
+Composition needs a shared foundation to compose against, and that foundation is
+[`@solid-primitives/utils`](/utils). It isn't a primitive itself — it's a centralized home for
+the reactive utility types and helper functions that the rest of the library builds on:
+immutable data helpers, type guards, common accessor/setter shapes, and the small pieces of
+plumbing that would otherwise get quietly reimplemented, slightly differently, in every
+package that needed them.
+
+That centralization is the whole point. Over two-thirds of the packages in this repository
+depend on `@solid-primitives/utils` internally, which means a fix or improvement made once
+here is inherited everywhere at once, instead of drifting into dozens of near-duplicate
+implementations that each age differently. It's deliberately kept narrow and dependency-light
+so that depending on it doesn't reintroduce the bloat the rest of this philosophy is trying to
+avoid — it's a shared foundation, not a dumping ground.
+
+That same narrowness is why it's useful beyond Solid Primitives itself: projects outside of
+this repository, including some with no other dependency on the rest of this library, pull in
+`@solid-primitives/utils` on its own for the same reactive-utility building blocks. It's
+designed to be a stable, minimal dependency other projects can lean on, not just an internal
+implementation detail of this one.
+
+## The 80/20 rule
+
+Solid Primitives is about covering the 80–90% common case well, not chasing every possible
+use case. We're intentionally less prescriptive than monolithic hook libraries — granular
+solutions over one giant primitive that tries to do everything. The remaining 10–20% of
+complex, bespoke needs are left to the broader ecosystem to compose on top of what's here.
+That's on purpose: it keeps this library from turning into unbounded bloat, and it keeps each
+primitive legible enough that you can actually reason about what it does.
+
+## The stage process
+
+New primitives don't arrive fully formed. Since November 2021, contributions move through a
+ratification process loosely modeled on the
+[TC39 proposal stage process](https://tc39.es/process-document/):
+
+| Stage                                       | Meaning                     |
+| -------------------------------------------- | --------------------------- |
+| <span class="stage-badge stage-0">0</span> | Initial submission          |
+| <span class="stage-badge stage-1">1</span> | Demonstrations and examples |
+| <span class="stage-badge stage-2">2</span> | General use (experimental)  |
+| <span class="stage-badge stage-3">3</span> | Pre-shipping (final effort) |
+| <span class="stage-badge stage-4">4</span> | Accepted / shipped          |
+
+Treat Stage 0–1 primitives with caution — the design or implementation may still change.
+From Stage 2 onward we actively work to avoid breaking changes, and a primitive that reaches
+Stage 2 is on track to stay an official package through to full acceptance.
+
+## Why so many packages?
+
+We deliberately don't publish a single all-in-one `solid-primitives` package. A monolithic
+install is an invitation to grab everything "just in case," which is exactly the habit we're
+trying not to encourage — the moment installing more is free, people stop asking whether they
+actually need it, and payloads grow without anyone deciding that on purpose.
+
+This project is large — dozens of packages covering everything from DOM events to state
+machines — and that scale is precisely why granularity matters here more than it would for a
+smaller library. Installing `@solid-primitives/mouse` instead of `solid-primitives` means the
+choice to depend on mouse tracking was a deliberate one, visible in your `package.json`, not a
+side effect of pulling in a catalogue you never asked for. Each package boundary is a moment of
+intention: you can see exactly what your project depends on and why, and an experimental
+Stage 0 package can exist without dragging down the stability guarantees of a Stage 4 one it
+happens to ship alongside.

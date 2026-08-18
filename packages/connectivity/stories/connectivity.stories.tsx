@@ -35,10 +35,7 @@ const meta = preview.meta({
 
 export default meta;
 
-// ---------------------------------------------------------------------------
 // Story 1 — createConnectivitySignal
-// ---------------------------------------------------------------------------
-
 export const OnlineOfflineBadge = meta.story({
   name: "Online / offline status",
   parameters: {
@@ -103,10 +100,7 @@ export const OnlineOfflineBadge = meta.story({
   },
 });
 
-// ---------------------------------------------------------------------------
 // Story 2 — createNetworkInformation
-// ---------------------------------------------------------------------------
-
 function qualityFromNetwork(
   effectiveType: string | undefined,
   saveData: boolean | undefined,
@@ -187,10 +181,7 @@ export const ConnectionQualitySignals = meta.story({
   },
 });
 
-// ---------------------------------------------------------------------------
 // Story 3 — makeNetworkInformation
-// ---------------------------------------------------------------------------
-
 function formatEntry(s: NetworkState): { label: string; time: string } {
   const label = s.online ? "online" : "offline";
   const parts: string[] = [];

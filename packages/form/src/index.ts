@@ -1,11 +1,11 @@
-export { createForm, toFormData } from "./form.js";
-export { createFormResetListener } from "./form-reset-listener.js";
+export { createForm, toFormData } from "./form.ts";
+export { createFormResetListener } from "./form-reset-listener.ts";
 export {
   createFormControl,
   createFormControlInput,
   FormControlContext,
   useFormControl,
-} from "./form-control.js";
+} from "./form-control.ts";
 
 export type {
   ValidatorFn,
@@ -18,4 +18,4 @@ export type {
   CreateFormControlInputProps,
   FormControlDataSet,
   FormControlContextValue,
-} from "./types.js";
+} from "./types.ts";

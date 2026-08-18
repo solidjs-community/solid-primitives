@@ -4,7 +4,7 @@
 
 # @solid-primitives/presence
 
-[![size](https://img.shields.io/badge/size-649_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/presence)
+[![size](https://img.shields.io/badge/size-648_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/presence)
 [![version](https://img.shields.io/npm/v/@solid-primitives/presence?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/presence)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -118,6 +118,42 @@ const SecondExample = () => {
           }}
         >
           {presence.mountedItem()}
+        </div>
+      </Show>
+    </div>
+  );
+};
+```
+
+### `createPresence` with a store
+
+`createPresence`'s first argument must be an `Accessor` — a function. Reading a store property directly (`store.panelOpen`) passes its current value once and won't update reactively; wrap the access in a function (`() => store.panelOpen`) so `createPresence` can subscribe to changes:
+
+```tsx
+const ThirdExample = () => {
+  const [store, setStore] = createStore({ panelOpen: true });
+
+  // ✅ wrapped in an accessor
+  const { isVisible, isMounted } = createPresence(() => store.panelOpen, {
+    transitionDuration: 500,
+  });
+
+  // ❌ createPresence(store.panelOpen, { transitionDuration: 500 })
+  //    — this is a boolean, not an Accessor<boolean>, and won't type-check
+
+  return (
+    <div>
+      <button onclick={() => setStore("panelOpen", open => !open)}>
+        {store.panelOpen ? "Hide" : "Show"} panel
+      </button>
+      <Show when={isMounted()}>
+        <div
+          style={{
+            transition: "all .5s ease",
+            opacity: isVisible() ? "1" : "0",
+          }}
+        >
+          I am the panel!
         </div>
       </Show>
     </div>

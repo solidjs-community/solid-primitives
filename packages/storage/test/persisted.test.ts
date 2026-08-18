@@ -9,7 +9,7 @@ import {
   latest,
   refresh,
 } from "solid-js";
-import { makePersisted } from "../src/persisted.js";
+import { makePersisted, messageSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
@@ -126,13 +126,13 @@ describe("makePersisted", () => {
   
   it("only updates the leaves in initialization", async () => {
     mockAsyncStorage.setItem("test4a", JSON.stringify({ a: { b: { c: 1 } } }));
-    let triggered = { a: 0, b: 0, c: 0 };
+    const triggered = { a: 0, b: 0, c: 0 };
     await createRoot(async (dispose) => {
       const [state, setState] = createStore({ a: { b: { c: 0 } } });
       createEffect(() => state.a, (_) => { triggered.a++; });
       createEffect(() => state.a.b, (_) => { triggered.b++; });
       createEffect(() => state.a.b.c, (_) => { triggered.c++; });
-      const [store, setStore, init] = makePersisted(
+      const [store, _setStore] = makePersisted(
         [state, setState],
         { storage: mockAsyncStorage, name: "test4a" }
       );
@@ -193,5 +193,73 @@ describe("makePersisted", () => {
       name: "test8",
     });
     expect(init).toBe(promise);
+  });
+  
+  it("defers the initialization if the hydrated option is set", async () => {
+    const anotherMockStorage = { ...mockStorage };
+    anotherMockStorage.setItem("test18", '"init"');
+    const [signal, _setSignal] = makePersisted(
+      createSignal("default"), 
+      { storage: anotherMockStorage, name: "test18", hydrated: true }
+    );
+    flush();
+    expect(signal()).toBe("default");
+    await new Promise(r => setTimeout(r, 200));
+    flush();
+    expect(signal()).toBe("init"); 
+  });
+});
+
+describe("storageSync", () => {
+  it("receives messages", () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    storageSync[0](subscriber);
+    const event = new StorageEvent(
+      "storage",
+      { key: "test9", newValue: "received", timeStamp: Date.now(), url: "https://storage.solid-primitives.org" }
+    );
+    window.dispatchEvent(event);
+    flush();
+    expect(message()).toEqual(event);
+  });
+});
+
+describe("messageSync", () => {
+  it("sends and receives messages", async () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = messageSync(window, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test10", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test10",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
+  });
+});
+
+describe("wsSync", () => {
+  it("sends and receives messages", async () => {
+    const mockWs = {
+      addEventListener: (name: string, handler: (ev: unknown) => void) => { 
+        expect(name).toBe("message");
+        mockWs.send = (data) => handler(new MessageEvent("message", { data }));
+      },
+    };
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = wsSync(mockWs, true, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test11", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test11",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
   });
 });

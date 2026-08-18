@@ -10,7 +10,7 @@ import {
 } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
 import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
-import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./common.js";
+import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./common.ts";
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<IndexRange>` control flow.
@@ -113,7 +113,7 @@ export function indexRange<T>(
   return () => {
     let _step = getStep();
     if (_step === 0) {
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       if (!isServer && DEV) console.warn("Range cannot have a step of 0");
       return items;
     }

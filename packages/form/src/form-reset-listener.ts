@@ -14,7 +14,7 @@ import { type Accessor, createEffect } from "solid-js";
 export function createFormResetListener(
 	element: Accessor<HTMLElement | null | undefined>,
 	handler: () => void,
-) {
+): void {
 	createEffect(
 		() => element(),
 		(element) => {

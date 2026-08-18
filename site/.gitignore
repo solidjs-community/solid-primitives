@@ -2,6 +2,16 @@
 .solid
 .vinxi
 .output
+.nitro
+.wrangler
+dist
 
-# TEMP
-src/_generated/*
+# Generated docs content — produced by `pnpm generate`
+src/routes/*.mdx
+!src/routes/index.mdx
+!src/routes/philosophy.mdx
+!src/routes/jsr-npm.mdx
+!src/routes/security.mdx
+!src/routes/contributors.mdx
+!src/routes/migration.mdx
+src/generated/

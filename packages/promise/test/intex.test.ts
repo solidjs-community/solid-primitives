@@ -266,7 +266,7 @@ describe("untilAll", () => {
   });
 
   test("rejects when the root disposes before all conditions are met", async () => {
-    const [a, setA] = createSignal(false);
+    const [a, _setA] = createSignal(false);
     let threw = false;
 
     const dispose = createRoot(dispose => {
@@ -496,6 +496,7 @@ describe("retry", () => {
   });
 
   test("does not delay after the last failed attempt", async () => {
+    // oxlint-disable-next-line no-unused-vars
     let attempts = 0;
     const delayFn = vi.fn(() => 500);
 

@@ -4,7 +4,6 @@ import { MatchTag, MatchValue } from "@solid-primitives/match";
 import readme from "../README.md?raw";
 import {
   Button,
-  ButtonRow,
   Container,
   Card,
   Section,
@@ -30,8 +29,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ── Story 1: Discriminated union by type field ────────────────────────────────
 
 type Shape =
   | { type: "circle"; radius: number }
@@ -143,8 +140,6 @@ export const DiscriminatedUnion = meta.story({
   },
 });
 
-// ── Story 2: Custom tag field ─────────────────────────────────────────────────
-
 type Notification =
   | { kind: "info"; message: string }
   | { kind: "warning"; message: string; code: number }
@@ -207,19 +202,19 @@ export const CustomTagField = meta.story({
             case={{
               info: v => (
                 <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-                  <Badge variant="info">info</Badge>
+                  <Badge variant={BADGE_VARIANT.info}>info</Badge>
                   <span style={{ "font-size": font.sizeSm }}>{v().message}</span>
                 </div>
               ),
               warning: v => (
                 <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-                  <Badge variant="warning">warning #{v().code}</Badge>
+                  <Badge variant={BADGE_VARIANT.warning}>warning #{v().code}</Badge>
                   <span style={{ "font-size": font.sizeSm }}>{v().message}</span>
                 </div>
               ),
               error: v => (
                 <div style={{ display: "flex", "flex-direction": "column", gap: "0.3rem" }}>
-                  <Badge variant="error">error #{v().code}</Badge>
+                  <Badge variant={BADGE_VARIANT.error}>error #{v().code}</Badge>
                   <span style={{ "font-size": font.sizeSm }}>{v().message}</span>
                   <BoolRow label="fatal" value={v().fatal} />
                 </div>
@@ -240,8 +235,6 @@ export const CustomTagField = meta.story({
     );
   },
 });
-
-// ── Story 3: Partial matching with fallback ───────────────────────────────────
 
 type MediaEvent =
   | { type: "play" }
@@ -330,8 +323,6 @@ export const PartialMatch = meta.story({
     );
   },
 });
-
-// ── Story 4: MatchValue on union literals ─────────────────────────────────────
 
 type Status = "idle" | "loading" | "success" | "error";
 

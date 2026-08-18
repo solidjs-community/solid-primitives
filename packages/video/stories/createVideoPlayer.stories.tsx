@@ -25,6 +25,7 @@ export default meta;
 
 const VIDEO = "/video/big_buck_bunny_sall.mp4";
 
+// oxlint-disable-next-line no-unused-vars
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 const SPEEDS = [0.5, 1, 1.5, 2] as const;

@@ -23,7 +23,7 @@ export const stringMaskRegExp: Record<string, RegExp> = {
 };
 
 /** Convert a string mask to an array mask */
-export const stringMaskToArray = (mask: string, regexps = stringMaskRegExp) =>
+export const stringMaskToArray = (mask: string, regexps: typeof stringMaskRegExp = stringMaskRegExp): (RegExp | string)[] =>
   [...mask].map(c => regexps[c] || c);
 
 /** Convert a regex mask to a mask function */
@@ -82,7 +82,7 @@ export const maskArrayToFn =
   };
 
 /** Convert an array or string mask to a mask function */
-export const anyMaskToFn = (mask: InputMask, regexps?: Record<string, RegExp>) =>
+export const anyMaskToFn = (mask: InputMask, regexps?: Record<string, RegExp>): InputMaskFn =>
   typeof mask === "function"
     ? mask
     : typeof mask[1] === "function" && mask[0] instanceof RegExp

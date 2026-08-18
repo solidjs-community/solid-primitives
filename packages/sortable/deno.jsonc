@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/sortable",
+  "version": "1.0.0-next.0",
+  "description": "Reactive sorting primitives — comparators, reactive sort, sorted search/insert, and granular per-item rank tracking.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

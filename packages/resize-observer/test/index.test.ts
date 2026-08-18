@@ -1,7 +1,7 @@
 import { describe, test, expect, afterAll } from "vitest";
 import { createRoot, createSignal, createStore, flush, onSettled } from "solid-js";
 import {
-  Size,
+  SizeWithClient,
   createElementSize,
   createResizeObserver,
   getElementSize,
@@ -10,7 +10,7 @@ import {
 
 declare global {
   interface HTMLElement {
-    __mock_size?: Size;
+    __mock_size?: SizeWithClient;
   }
 }
 
@@ -19,8 +19,25 @@ HTMLElement.prototype.getBoundingClientRect = function (this) {
   return { ...real_getBoundingClientRect.call(this), ...this.__mock_size };
 };
 
+const real_clientWidth = Object.getOwnPropertyDescriptor(Element.prototype, "clientWidth")!;
+const real_clientHeight = Object.getOwnPropertyDescriptor(Element.prototype, "clientHeight")!;
+Object.defineProperty(Element.prototype, "clientWidth", {
+  configurable: true,
+  get(this: HTMLElement) {
+    return this.__mock_size?.clientWidth ?? real_clientWidth.get!.call(this);
+  },
+});
+Object.defineProperty(Element.prototype, "clientHeight", {
+  configurable: true,
+  get(this: HTMLElement) {
+    return this.__mock_size?.clientHeight ?? real_clientHeight.get!.call(this);
+  },
+});
+
 afterAll(() => {
   HTMLElement.prototype.getBoundingClientRect = real_getBoundingClientRect;
+  Object.defineProperty(Element.prototype, "clientWidth", real_clientWidth);
+  Object.defineProperty(Element.prototype, "clientHeight", real_clientHeight);
 });
 
 let _targets: Set<Element>;
@@ -216,20 +233,32 @@ describe("getWindowSize", () => {
 
 describe("getElementSize", () => {
   test("returns window size", () => {
-    expect(getElementSize(document.createElement("div"))).toEqual({ width: 0, height: 0 });
-    expect(getElementSize(undefined)).toEqual({ width: null, height: null });
+    expect(getElementSize(document.createElement("div"))).toEqual({
+      width: 0,
+      height: 0,
+      clientWidth: 0,
+      clientHeight: 0,
+    });
+    expect(getElementSize(undefined)).toEqual({
+      width: null,
+      height: null,
+      clientWidth: null,
+      clientHeight: null,
+    });
   });
 });
 
 describe("createElementSize", () => {
   const div = document.createElement("div");
-  div.__mock_size = { width: 100, height: 200 };
+  div.__mock_size = { width: 100, height: 200, clientWidth: 90, clientHeight: 190 };
 
   test("will return element size immediately", () => {
     createRoot(dispose => {
-      const { width, height } = createElementSize(div);
+      const { width, height, clientWidth, clientHeight } = createElementSize(div);
       expect(width).toBe(100);
       expect(height).toBe(200);
+      expect(clientWidth).toBe(90);
+      expect(clientHeight).toBe(190);
       dispose();
     });
   });
@@ -239,10 +268,14 @@ describe("createElementSize", () => {
       const size = createElementSize(() => div);
       expect(size.width).toBe(null);
       expect(size.height).toBe(null);
+      expect(size.clientWidth).toBe(null);
+      expect(size.clientHeight).toBe(null);
 
       onSettled(() => {
         expect(size.width).toBe(100);
         expect(size.height).toBe(200);
+        expect(size.clientWidth).toBe(90);
+        expect(size.clientHeight).toBe(190);
         dispose();
       });
     });

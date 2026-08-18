@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createMemo, createRoot, createSignal, flush, onSettled, sharedConfig } from "solid-js";
+import { createMemo, createRoot, flush, onSettled, sharedConfig } from "solid-js";
 import { createIsMounted, isHydrated } from "../src/index.js";
 
 describe("createIsMounted", () => {

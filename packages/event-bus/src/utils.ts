@@ -1,7 +1,7 @@
 import { push } from "@solid-primitives/utils/immutable";
 import { type AnyFunction } from "@solid-primitives/utils";
 import { createEffect, createSignal, getOwner, runWithOwner } from "solid-js";
-import type { Listen, Listener, Emit } from "./eventBus.js";
+import type { Listen, Listener, Emit } from "./eventBus.ts";
 
 /**
  * Turns a stream-like listen function, into a promise resolving when the first event is captured.

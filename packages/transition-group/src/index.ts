@@ -8,9 +8,9 @@ import {
 } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { noop } from "@solid-primitives/utils";
-import type { ListTransitionOptions, SwitchTransitionOptions } from "./types.js";
+import type { ListTransitionOptions, SwitchTransitionOptions } from "./types.ts";
 
-export type * from "./types.js";
+export type * from "./types.ts";
 
 const noopTransition = (_el: any, done: () => void) => done();
 

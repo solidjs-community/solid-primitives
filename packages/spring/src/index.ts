@@ -214,7 +214,7 @@ export function makeSpring<T extends SpringTarget>(
     value_last = value_current;
     setSignal((value_current = new_value));
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (settled) {
       stopAnimation();
     } else {
@@ -351,7 +351,7 @@ export function createSpring<T extends SpringTarget>(
 export function createDerivedSpring<T extends SpringTarget>(
   target: Accessor<T>,
   options?: SpringOptions | Accessor<SpringOptions>,
-) {
+): Accessor<WidenSpringTarget<T>> {
   const [springValue, setSpringValue] = createSpring(target(), options);
 
   if (!isServer) {

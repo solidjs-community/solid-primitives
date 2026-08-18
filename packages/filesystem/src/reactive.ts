@@ -11,9 +11,9 @@ import type {
   AsyncFileSystemAdapter,
   DirEntries,
   Watcher,
-} from "./types.js";
+} from "./types.ts";
 
-import { getItemName, getParentDir } from "./tools.js";
+import { getItemName, getParentDir } from "./tools.ts";
 
 type SignalMap<T> = Map<string, [Accessor<T>, Setter<T>]>;
 
@@ -25,7 +25,7 @@ type AsyncEntry<T> = {
 
 const makeAsyncEntry = <T>(fetch: () => Promise<T | undefined>): AsyncEntry<T> => {
   const [read, write] = createSignal<T | undefined>(undefined, OWNED_WRITE);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line @typescript-eslint/no-explicit-any
   const set = write as (v: T | undefined) => void;
   const doFetch = () => {
     fetch().then(v => set(v));

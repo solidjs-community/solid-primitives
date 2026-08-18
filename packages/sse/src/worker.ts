@@ -3,9 +3,7 @@ import {
   type SSEReadyStateValue,
   type SSEOptions,
   type SSESourceFn,
-} from "./sse.js";
-
-// ─── Protocol types ───────────────────────────────────────────────────────────
+} from "./sse.ts";
 
 /**
  * Discriminated union of all messages exchanged between the main thread
@@ -25,8 +23,6 @@ export type SSEWorkerTarget = {
   addEventListener(type: "message", listener: (e: MessageEvent<SSEWorkerMessage>) => void): void;
   removeEventListener(type: "message", listener: (e: MessageEvent<SSEWorkerMessage>) => void): void;
 };
-
-// ─── makeSSEWorker ────────────────────────────────────────────────────────────
 
 /**
  * Returns a `SSESourceFn` that tunnels EventSource connections through a Worker.

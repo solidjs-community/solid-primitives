@@ -17,6 +17,6 @@ export {
   type CreateSSEOptions,
   type SSEReturn,
   type CreateSSEStreamOptions,
-} from "./sse.js";
+} from "./sse.ts";
 
-export { json, ndjson, lines, number, safe, pipe } from "./transform.js";
+export { json, ndjson, lines, number, safe, pipe } from "./transform.ts";

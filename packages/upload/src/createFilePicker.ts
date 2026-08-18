@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { transformFiles, createInputComponent } from "./helpers.js";
-import type { FilePicker, FilePickerOptions, UploadFile, UserCallback } from "./types.js";
+import { transformFiles, createInputComponent } from "./helpers.ts";
+import type { FilePicker, FilePickerOptions, UploadFile, UserCallback } from "./types.ts";
 
 /**
  * Primitive to open the OS file-picker and expose the selected files reactively.

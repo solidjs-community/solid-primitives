@@ -1,9 +1,9 @@
 import { createEffect, createRoot } from "solid-js";
-import type { AsyncFileSystem, SyncFileSystem, FileSystemAdapter, DirEntries } from "./types.js";
+import type { AsyncFileSystem, SyncFileSystem, FileSystemAdapter, DirEntries } from "./types.ts";
 
-export const getParentDir = (path: string) => path.split("/").slice(0, -1).join("/") || "/";
+export const getParentDir = (path: string): string => path.split("/").slice(0, -1).join("/") || "/";
 
-export const getItemName = (path: string) => path.split("/").at(-1);
+export const getItemName = (path: string): string | undefined => path.split("/").at(-1);
 
 export const limitPath =
   (basePath: string) =>
@@ -67,7 +67,7 @@ export const rsync = async (
           `${dest}${dest.endsWith("/") ? "" : "/"}${getItemName(entry)}`,
         ));
     }
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (srcType === "file") {
     const fileData =
       "async" in fs1 ? await fs1.readFile(src) : await toPromise(() => fs1.readFile(src));

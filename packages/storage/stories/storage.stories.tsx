@@ -5,7 +5,6 @@ import readme from "../README.md?raw";
 import {
   Button,
   ButtonRow,
-  Code,
   Container,
   Section,
   StatRow,

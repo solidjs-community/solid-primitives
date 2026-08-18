@@ -4,7 +4,7 @@
 
 # @solid-primitives/video
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/video?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/video)
+[![size](https://img.shields.io/badge/size-1.88_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/video)
 [![version](https://img.shields.io/npm/v/@solid-primitives/video?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/video)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -126,6 +126,49 @@ function createVideoPlayer(
   src: VideoSource | Accessor<VideoSource>,
   options?: VideoControlsOptions,
 ): VideoControlsReturn;
+```
+
+### `makeVideoFrameCallback`
+
+Wraps [`HTMLVideoElement.requestVideoFrameCallback`](https://wicg.github.io/video-rvfc/), which fires once per displayed video frame instead of once per display refresh — it stops naturally while the video is paused, and the `metadata` argument (`mediaTime`, `presentedFrames`, etc.) lets you sync work to actual playback instead of wall-clock time. No Solid owner required.
+
+```ts
+const [player, cleanup] = makeVideo("clip.mp4");
+const [running, start, stop] = makeVideoFrameCallback(player, (now, metadata) => {
+  draw(metadata.mediaTime);
+});
+start();
+stop();
+cleanup();
+```
+
+```ts
+function makeVideoFrameCallback(
+  video: HTMLVideoElement,
+  callback: VideoFrameRequestCallback,
+): [running: () => boolean, start: VoidFunction, stop: VoidFunction];
+```
+
+### `createVideoFrameCallback`
+
+Reactive version of `makeVideoFrameCallback` — takes an accessor for the video element, so it re-attaches whenever the element changes and stops cleanly when it becomes `undefined`. `running` is a Solid signal, and playback is automatically stopped `onCleanup`.
+
+```ts
+const video = createVideo("clip.mp4");
+const [running, start, stop] = createVideoFrameCallback(
+  () => video.player,
+  (now, metadata) => {
+    console.log(metadata.presentedFrames);
+  },
+);
+start();
+```
+
+```ts
+function createVideoFrameCallback(
+  el: Accessor<HTMLVideoElement | undefined>,
+  callback: VideoFrameRequestCallback,
+): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
 ```
 
 ## Types

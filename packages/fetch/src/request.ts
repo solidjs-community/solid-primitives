@@ -1,18 +1,19 @@
-import { type RequestContext } from "./fetch.js";
+import { type RequestContext } from "./fetch.ts";
 import { isServer } from "solid-js/web";
+import type NodeFetch from "node-fetch";
 
 export type Request<FetcherArgs extends any[]> = <Result>(
   ...args: any[]
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
-let fetchFallback = globalThis.fetch as typeof fetch | undefined;
+let fetchFallback: typeof fetch | typeof NodeFetch | undefined = globalThis.fetch as typeof fetch | undefined;
 if (isServer && !fetchFallback) {
   try {
-    const nodeFetch = require("node-fetch");
+    const { default: nodeFetch } = await import("node-fetch");
     fetchFallback = nodeFetch;
   } catch (_e) {
     fetchFallback = () => {
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       console.warn(
         '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"',
       );
@@ -21,6 +22,12 @@ if (isServer && !fetchFallback) {
   }
 }
 
+/**
+ * The default request handler installed by `createFetch` at the base of the
+ * modifier chain: calls `fetch` (or `node-fetch` on the server) and parses the
+ * response as JSON, text, or a `Blob` based on its `content-type`, unless a
+ * custom `responseHandler` is set on the request context.
+ */
 export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
   fetchFn => requestContext => {
     requestContext.fetcher = <Result>(requestData: [info: RequestInfo, init?: RequestInit]) =>

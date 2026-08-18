@@ -16,8 +16,6 @@ import {
   perceptualColorScale,
 } from "../src/colors/manipulation.js";
 
-// ─── Safe parsing ─────────────────────────────────────────────────────────────
-
 describe("tryParseColor", () => {
   it("returns a Color for valid input", () => {
     const result = tryParseColor("#3264C8");
@@ -63,8 +61,6 @@ describe("detectColorFormat", () => {
     expect(detectColorFormat(input)).toBe(expected);
   });
 });
-
-// ─── Manipulation ─────────────────────────────────────────────────────────────
 
 describe("lighten", () => {
   it("increases lightness by amount × 100 percentage points", () => {
@@ -164,8 +160,6 @@ describe("mix", () => {
   });
 });
 
-// ─── Accessibility ────────────────────────────────────────────────────────────
-
 describe("contrastRatio", () => {
   it("black on white = 21", () => {
     expect(contrastRatio(parseColor("#000"), parseColor("#fff"))).toBeCloseTo(21, 0);
@@ -202,8 +196,6 @@ describe("isReadable", () => {
     expect(isReadable(fg, parseColor("#fff"), "AA", "large")).toBe(true);
   });
 });
-
-// ─── Color scales ─────────────────────────────────────────────────────────────
 
 describe("colorScale", () => {
   it("returns exactly `steps` colors", () => {

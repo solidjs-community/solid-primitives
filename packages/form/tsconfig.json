@@ -1,22 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "dist",
-    "rootDir": "src"
-  },
-  "references": [
-    {
-      "path": "../a11y"
-    },
-    {
-      "path": "../event-listener"
-    },
-    {
-      "path": "../utils"
-    }
-  ],
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

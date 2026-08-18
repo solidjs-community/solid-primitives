@@ -38,11 +38,28 @@ import {
   get,
   merge,
   update,
+  toggle,
 } from "../src/index.js";
 import { createRoot, createSignal, flush } from "solid-js";
 import { compare } from "@solid-primitives/utils";
 
-// ─── CONVERT ────────────────────────────────────────────────────────────────
+describe("toggle()", () => {
+  it("flips the current value", () =>
+    createRoot(dispose => {
+      const [isOpen, setIsOpen] = createSignal(false, { ownedWrite: true });
+      const toggleOpen = toggle(setIsOpen);
+
+      expect(isOpen()).toBe(false);
+      toggleOpen();
+      flush();
+      expect(isOpen()).toBe(true);
+      toggleOpen();
+      flush();
+      expect(isOpen()).toBe(false);
+
+      dispose();
+    }));
+});
 
 describe("string()", () => {
   it("coerces a number to string", () =>
@@ -159,8 +176,6 @@ describe("join()", () => {
   });
 });
 
-// ─── STRING ─────────────────────────────────────────────────────────────────
-
 describe("lowercase()", () => {
   it("lowercases a string", () =>
     createRoot(dispose => {
@@ -271,8 +286,6 @@ describe("template`...`", () => {
   });
 });
 
-// ─── NUMBER ─────────────────────────────────────────────────────────────────
-
 describe("add()", () => {
   it("adds two numbers", () =>
     createRoot(dispose => {
@@ -295,7 +308,7 @@ describe("add()", () => {
 
   it("updates when signal changes", () => {
     const [a, setA] = createSignal(1);
-    const [b, setB] = createSignal(2);
+    const [b, _setB] = createSignal(2);
     const { result, dispose } = createRoot(d => ({ result: add(a, b), dispose: d }));
     expect(result()).toBe(3);
     setA(10);
@@ -522,8 +535,6 @@ describe("clamp()", () => {
     dispose();
   });
 });
-
-// ─── ARRAY ──────────────────────────────────────────────────────────────────
 
 describe("push()", () => {
   it("appends items to the array", () =>
@@ -898,8 +909,6 @@ describe("filterOutInstance()", () => {
     }));
 });
 
-// ─── OBJECT ─────────────────────────────────────────────────────────────────
-
 describe("omit()", () => {
   it("omits a single key", () =>
     createRoot(dispose => {
@@ -1006,9 +1015,24 @@ describe("merge()", () => {
     expect(result()).toEqual({ color: "blue", size: 24 });
     dispose();
   });
-});
 
-// ─── UPDATE ─────────────────────────────────────────────────────────────────
+  // https://github.com/solidjs-community/solid-primitives/issues/236
+  // `merge` used to return a plain object instead of an Accessor, so calling
+  // the result as a function threw. Verifies the fix and that it stays reactive.
+  it("returns a callable, reactive Accessor when mixing a derived accessor with a plain object", () => {
+    const [user, setUser] = createSignal({ name: "Carter" });
+    const { profileConfig, dispose } = createRoot(d => ({
+      profileConfig: merge(pick(user, "name"), { uiType: "HEADER" }),
+      dispose: d,
+    }));
+    expect(profileConfig).toBeTypeOf("function");
+    expect(profileConfig()).toEqual({ name: "Carter", uiType: "HEADER" });
+    setUser({ name: "Alice" });
+    flush();
+    expect(profileConfig()).toEqual({ name: "Alice", uiType: "HEADER" });
+    dispose();
+  });
+});
 
 describe("update()", () => {
   it("sets a top-level key to a plain value", () =>

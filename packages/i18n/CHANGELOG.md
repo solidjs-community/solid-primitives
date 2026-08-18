@@ -1,5 +1,54 @@
 # @solid-primitives/i18n
 
+## 3.0.0-next.4
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+
+## 3.0.0-next.3
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
+## 3.0.0-next.2
+
+### Minor Changes
+
+- c29c40c: Add rich text support for translations that need to embed JSX (links, formatted text, etc.), resolving #715.
+
+  - `resolveRichTemplate` — a `resolveTemplate` variant that accepts JSX values (not just strings) in `{{ placeholder }}` substitutions, returning a plain string when every value is a string, or JSX otherwise.
+  - `richText(string, tags)` — resolves `<tag>content</tag>` markup in an already-resolved string into JSX, by calling the matching renderer in `tags` with the tag's inner content. Meant to be composed with `resolveTemplate`/`resolveRichTemplate` for `{{ }}` variables. Tag names aren't type-checked against `tags`; an unmapped tag logs a dev-only warning and renders its contents as plain text (stripped from production builds).
+  - `BaseTemplateArgs` is widened from `Record<string, string | number | boolean>` to `Record<string, unknown>` to allow JSX (or any other value) as a template argument. This is additive and doesn't change any existing behavior — the built-in `resolveTemplate` still stringifies its arguments the same way it always has.
+  - New peer dependency: `@solidjs/web@^2.0.0-beta.15` (previously only `solid-js` was required), needed for the `JSX.Element` type and the dev-only warning.
+
+  The existing pattern of dictionary entries as plain functions returning JSX (e.g. `hello: (name) => <>Hi {name}</>`) already worked before this change and remains the recommended approach for dictionaries fully owned in TS/TSX — the additions here are for dictionaries loaded as translated strings (e.g. from JSON).
+
+## 3.0.0-next.1
+
+### Minor Changes
+
+- 2c46ed3: Add an optional `onMissingKey` third argument to `translator()`, called when the dictionary is loaded but has no value at the requested path — as opposed to when the dictionary itself isn't available yet, which still resolves to `undefined` regardless (resolves #765). Also export `missingKeyAsPath`, a ready-made handler that falls back to the requested path itself (e.g. `"food.meat"`), making missing translations visible in the UI instead of silently rendering blank. The default behavior (no handler passed) is unchanged — missing keys still resolve to `undefined`, matching the existing `NullableTranslator`/`scopedTranslator` documented behavior — so this is purely additive and opt-in.
+
+## 3.0.0-next.0
+
+### Major Changes
+
+- 8a0f3dc: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
+
+  ### `@solid-primitives/i18n`
+  - `createResource` is removed in Solid 2.0 — use `createMemo` with an async function for dynamic dictionary loading, or a synchronous `createMemo` for static dictionaries
+  - `Suspense` is replaced by `Loading` from `solid-js` for wrapping async dictionary reads
+  - `useTransition` is removed — use `isPending()` from `solid-js` to observe transition state
+  - `onMount` replaced by `onSettled` for post-hydration lifecycle callbacks
+  - `createEffect` now requires the split compute/apply form: `createEffect(compute, effect)` — single-argument usage is no longer supported
+  - The `jsx` entry in test dictionaries no longer returns JSX elements; the test helper `setup.tsx` is renamed to `setup.ts` with plain object returns
+
 ## 2.2.1
 
 ### Patch Changes

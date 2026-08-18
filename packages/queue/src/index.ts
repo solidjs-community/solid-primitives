@@ -1,3 +1,3 @@
-export * from "./queue.js";
-export * from "./priority-queue.js";
-export * from "./task-queue.js";
+export * from "./queue.ts";
+export * from "./priority-queue.ts";
+export * from "./task-queue.ts";

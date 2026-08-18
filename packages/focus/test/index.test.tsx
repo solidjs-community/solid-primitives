@@ -1,8 +1,12 @@
 import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
-import { autofocus, createAutofocus, createFocusTrap } from "../src/index.js";
-
-// ─── Shared focus tracking ────────────────────────────────────────────────────
+import {
+  autofocus,
+  createAutofocus,
+  createFocusTrap,
+  createFocusRestore,
+  createFocusGroup,
+} from "../src/index.js";
 
 let focused: HTMLElement | null = null;
 
@@ -10,8 +14,6 @@ const original_focus = HTMLElement.prototype.focus;
 HTMLElement.prototype.focus = function (this: HTMLElement) {
   focused = this;
 };
-
-// ─── Fake timers + rAF stub ───────────────────────────────────────────────────
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -33,15 +35,11 @@ afterAll(() => {
   HTMLElement.prototype.focus = original_focus;
 });
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
 /** Run all pending effects then drain all timers (including nested rAFs). */
 const settle = () => {
   flush();
   vi.runAllTimers();
 };
-
-// ─── autofocus ────────────────────────────────────────────────────────────────
 
 describe("autofocus", () => {
   test("focuses the element with autofocus attribute", () => {
@@ -73,8 +71,6 @@ describe("autofocus", () => {
     dispose();
   });
 });
-
-// ─── createAutofocus ──────────────────────────────────────────────────────────
 
 describe("createAutofocus", () => {
   const el = document.createElement("button"),
@@ -117,8 +113,6 @@ describe("createAutofocus", () => {
     expect(focused).toBe(el2); // no focus after dispose
   });
 });
-
-// ─── createFocusTrap ──────────────────────────────────────────────────────────
 
 /** Build a container with `n` focusable buttons and return them. */
 function makeContainer(n: number): { container: HTMLElement; buttons: HTMLButtonElement[] } {
@@ -433,6 +427,577 @@ describe("createFocusTrap", () => {
     setEl(container);
     settle();
     expect(focused).toBe(buttons[0]);
+    dispose();
+  });
+});
+
+describe("createFocusRestore", () => {
+  test("does not move focus on activation", () => {
+    const trigger = document.createElement("button");
+    document.body.appendChild(trigger);
+    trigger.focus();
+    focused = null; // reset after the manual .focus() above
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled: true });
+      return dispose;
+    });
+
+    settle();
+    expect(focused).toBe(null); // createFocusRestore never focuses anything itself
+    dispose();
+    trigger.remove();
+  });
+
+  test("restores focus to the previously focused element on deactivation", () => {
+    const trigger = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    setEnabled(false);
+    settle();
+    expect(focused).toBe(trigger);
+    dispose();
+  });
+
+  test("a reactivation before a pending restore fires does not corrupt that restore's target", () => {
+    // Regression test: the restore target used to be read lazily from a shared outer variable
+    // inside the afterPaint-deferred callback. If something reactivated focus-restore (capturing
+    // a *new* "currently focused" element) before the still-pending restore from the *previous*
+    // deactivation had a chance to fire, that pending restore would incorrectly pick up the new
+    // value instead of the one that was current when it was scheduled.
+    const trigger1 = document.createElement("button");
+    const trigger2 = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", { get: () => trigger1, configurable: true });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled });
+      return dispose;
+    });
+
+    settle(); // originalFocusedElement captured as trigger1
+
+    setEnabled(false); // schedules a restore that should target trigger1
+    flush(); // runs the deactivation synchronously — the afterPaint restore is now pending, not yet fired
+
+    // Before that pending restore fires, something reactivates focus-restore against a
+    // different currently-focused element, and stays enabled (no second deactivation, so no
+    // second restore gets queued — isolates exactly the race being tested).
+    Object.defineProperty(document, "activeElement", { get: () => trigger2, configurable: true });
+    setEnabled(true);
+    flush();
+
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    vi.runAllTimers(); // drains the still-pending first restore
+    expect(focused).toBe(trigger1); // not trigger2
+    dispose();
+  });
+
+  test("restores focus on dispose even without enabled changing first", () => {
+    const trigger = document.createElement("button");
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore();
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    dispose();
+    settle();
+    expect(focused).toBe(trigger);
+  });
+
+  test("uses finalFocusElement when provided", () => {
+    const trigger = document.createElement("button");
+    const customFinal = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled, finalFocusElement: customFinal });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    setEnabled(false);
+    settle();
+    expect(focused).toBe(customFinal);
+    dispose();
+  });
+
+  test("onFinalFocus callback is called on deactivation", () => {
+    const trigger = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+    const onFinalFocus = vi.fn();
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled, onFinalFocus });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    setEnabled(false);
+    settle();
+    expect(onFinalFocus).toHaveBeenCalledOnce();
+    dispose();
+  });
+
+  test("onFinalFocus preventDefault suppresses focus restore", () => {
+    const trigger = document.createElement("button");
+    const [enabled, setEnabled] = createSignal(true);
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled, onFinalFocus: e => e.preventDefault() });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    focused = null;
+    setEnabled(false);
+    settle();
+    expect(focused).toBe(null); // prevented
+    dispose();
+  });
+
+  test("does not restore focus when enabled is false throughout", () => {
+    const trigger = document.createElement("button");
+
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", {
+      get: () => trigger,
+      configurable: true,
+    });
+
+    const dispose = createRoot(dispose => {
+      createFocusRestore({ enabled: false });
+      return dispose;
+    });
+
+    settle();
+    Object.defineProperty(document, "activeElement", origActiveElement);
+
+    dispose();
+    settle();
+    expect(focused).toBe(null);
+  });
+});
+
+describe("createFocusGroup", () => {
+  test("focusFirst focuses and returns the first focusable element", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(() => container);
+    expect(group.focusFirst()).toBe(buttons[0]);
+    expect(focused).toBe(buttons[0]);
+  });
+
+  test("focusLast focuses and returns the last focusable element", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(() => container);
+    expect(group.focusLast()).toBe(buttons[2]);
+    expect(focused).toBe(buttons[2]);
+  });
+
+  test("focusNext moves to the next element from `from`", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(() => container);
+    expect(group.focusNext({ from: buttons[0] })).toBe(buttons[1]);
+    expect(focused).toBe(buttons[1]);
+  });
+
+  test("focusNext defaults to the currently focused element", () => {
+    const { container, buttons } = makeContainer(3);
+    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+    Object.defineProperty(document, "activeElement", { get: () => buttons[0], configurable: true });
+
+    const group = createFocusGroup(() => container);
+    expect(group.focusNext()).toBe(buttons[1]);
+
+    Object.defineProperty(document, "activeElement", origActiveElement);
+  });
+
+  test("focusPrevious moves to the previous element from `from`", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(() => container);
+    expect(group.focusPrevious({ from: buttons[2] })).toBe(buttons[1]);
+    expect(focused).toBe(buttons[1]);
+  });
+
+  test("focusNext wraps from the last element when wrap is true", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(() => container);
+    expect(group.focusNext({ from: buttons[2], wrap: true })).toBe(buttons[0]);
+    expect(focused).toBe(buttons[0]);
+  });
+
+  test("focusPrevious wraps from the first element when wrap is true", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(() => container);
+    expect(group.focusPrevious({ from: buttons[0], wrap: true })).toBe(buttons[2]);
+    expect(focused).toBe(buttons[2]);
+  });
+
+  test("does not wrap when wrap is false", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(() => container);
+    expect(group.focusNext({ from: buttons[2], wrap: false })).toBe(undefined);
+    expect(focused).toBe(null);
+  });
+
+  test("respects defaultOptions", () => {
+    const { container, buttons } = makeContainer(3);
+    const group = createFocusGroup(
+      () => container,
+      () => ({ wrap: true }),
+    );
+    expect(group.focusNext({ from: buttons[2] })).toBe(buttons[0]);
+  });
+
+  test("tabbable option only includes tabbable elements", () => {
+    const container = document.createElement("div");
+    const a = document.createElement("button");
+    const b = document.createElement("button");
+    b.tabIndex = -1; // focusable but not tabbable
+    container.append(a, b);
+
+    const group = createFocusGroup(() => container);
+    expect(group.focusNext({ from: a, tabbable: true })).toBe(undefined); // b excluded
+    expect(group.focusNext({ from: a, tabbable: false })).toBe(b); // all focusable
+  });
+
+  test("accept option filters elements", () => {
+    const container = document.createElement("div");
+    const a = document.createElement("button");
+    a.id = "keep";
+    const b = document.createElement("button");
+    b.id = "skip";
+    container.append(a, b);
+
+    const group = createFocusGroup(() => container);
+    expect(group.focusNext({ from: a, accept: el => el.id !== "skip" })).toBe(undefined);
+    expect(group.focusFirst({ accept: el => el.id !== "skip" })).toBe(a);
+  });
+
+  test("returns undefined when root is not set", () => {
+    const group = createFocusGroup(() => undefined);
+    expect(group.focusFirst()).toBe(undefined);
+    expect(group.focusNext()).toBe(undefined);
+    expect(group.focusPrevious()).toBe(undefined);
+    expect(group.focusLast()).toBe(undefined);
+  });
+});
+
+describe("createFocusGroup keyboard navigation", () => {
+  const key = (key: string, opts: KeyboardEventInit = {}) =>
+    new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...opts });
+
+  /** Flush pending effects so `createFocusGroup` has attached its keydown listener, then dispatch `event` on `target`. */
+  const press = (container: HTMLElement, target: Element, event: KeyboardEvent) => {
+    flush();
+    target.dispatchEvent(event);
+    return event;
+  };
+
+  test("ArrowDown moves focus to the next element (vertical by default)", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(() => container);
+      press(container, buttons[0]!, key("ArrowDown"));
+      expect(focused).toBe(buttons[1]);
+      dispose();
+    });
+  });
+
+  test("ArrowUp moves focus to the previous element", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(() => container);
+      press(container, buttons[2]!, key("ArrowUp"));
+      expect(focused).toBe(buttons[1]);
+      dispose();
+    });
+  });
+
+  test("ArrowDown does not wrap by default", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(() => container);
+      press(container, buttons[2]!, key("ArrowDown"));
+      expect(focused).toBe(null);
+      dispose();
+    });
+  });
+
+  test("ArrowDown wraps when wrap is true", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(
+        () => container,
+        () => ({ wrap: true }),
+      );
+      press(container, buttons[2]!, key("ArrowDown"));
+      expect(focused).toBe(buttons[0]);
+      dispose();
+    });
+  });
+
+  test("ArrowUp wraps when wrap is true", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(
+        () => container,
+        () => ({ wrap: true }),
+      );
+      press(container, buttons[0]!, key("ArrowUp"));
+      expect(focused).toBe(buttons[2]);
+      dispose();
+    });
+  });
+
+  test("horizontal orientation uses left/right arrows", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(
+        () => container,
+        () => ({ orientation: "horizontal" }),
+      );
+      press(container, buttons[0]!, key("ArrowRight"));
+      expect(focused).toBe(buttons[1]);
+      press(container, buttons[1]!, key("ArrowLeft"));
+      expect(focused).toBe(buttons[0]);
+      dispose();
+    });
+  });
+
+  test("horizontal RTL flips the arrow keys", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(
+        () => container,
+        () => ({ orientation: "horizontal", textDirection: "rtl" }),
+      );
+      press(container, buttons[0]!, key("ArrowLeft"));
+      expect(focused).toBe(buttons[1]);
+      press(container, buttons[1]!, key("ArrowRight"));
+      expect(focused).toBe(buttons[0]);
+      dispose();
+    });
+  });
+
+  test("Home and End move to the first and last element", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(() => container);
+      press(container, buttons[0]!, key("Home"));
+      expect(focused).toBe(buttons[0]);
+      press(container, buttons[1]!, key("End"));
+      expect(focused).toBe(buttons[2]);
+      dispose();
+    });
+  });
+
+  test("handles accessor options", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(
+        () => container,
+        () => ({ orientation: () => "horizontal" }),
+      );
+      press(container, buttons[0]!, key("ArrowRight"));
+      expect(focused).toBe(buttons[1]);
+      dispose();
+    });
+  });
+
+  test("Tab moves to the next element when focus is inside the group", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const origActiveElement = Object.getOwnPropertyDescriptor(
+        Document.prototype,
+        "activeElement",
+      )!;
+      Object.defineProperty(document, "activeElement", {
+        get: () => buttons[0],
+        configurable: true,
+      });
+
+      createFocusGroup(() => container);
+      const event = key("Tab");
+      const prevent = vi.spyOn(event, "preventDefault");
+      press(container, buttons[0]!, event);
+
+      expect(focused).toBe(buttons[1]);
+      expect(prevent).toHaveBeenCalled();
+      Object.defineProperty(document, "activeElement", origActiveElement);
+      dispose();
+    });
+  });
+
+  test("Shift+Tab moves to the previous element", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const origActiveElement = Object.getOwnPropertyDescriptor(
+        Document.prototype,
+        "activeElement",
+      )!;
+      Object.defineProperty(document, "activeElement", {
+        get: () => buttons[2],
+        configurable: true,
+      });
+
+      createFocusGroup(() => container);
+      press(container, buttons[2]!, key("Tab", { shiftKey: true }));
+      expect(focused).toBe(buttons[1]);
+      Object.defineProperty(document, "activeElement", origActiveElement);
+      dispose();
+    });
+  });
+
+  test("Tab does not move focus when focus is outside the group", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(() => container);
+      press(container, buttons[0]!, key("Tab"));
+      expect(focused).toBe(null);
+      dispose();
+    });
+  });
+
+  test("arrow keys call preventDefault", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(() => container);
+      const event = key("ArrowDown");
+      const prevent = vi.spyOn(event, "preventDefault");
+      press(container, buttons[0]!, event);
+      expect(prevent).toHaveBeenCalled();
+      dispose();
+    });
+  });
+
+  test("does not attach a listener when root is not set", () => {
+    createRoot(dispose => {
+      createFocusGroup(() => undefined);
+      const event = key("ArrowDown");
+      const prevent = vi.spyOn(event, "preventDefault");
+      flush();
+      document.body.dispatchEvent(event);
+      expect(prevent).not.toHaveBeenCalled();
+      expect(focused).toBe(null);
+      dispose();
+    });
+  });
+
+  test("keyboardNavigation: false disables key handling", () => {
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      createFocusGroup(
+        () => container,
+        () => ({ keyboardNavigation: false }),
+      );
+      const event = key("ArrowDown");
+      const prevent = vi.spyOn(event, "preventDefault");
+      press(container, buttons[0]!, event);
+      expect(focused).toBe(null);
+      expect(prevent).not.toHaveBeenCalled();
+      dispose();
+    });
+  });
+
+  test("keyboardNavigation can be toggled reactively", () => {
+    const { container, buttons } = makeContainer(3);
+    const [enabled, setEnabled] = createSignal(true);
+    let dispose!: () => void;
+    createRoot(d => {
+      dispose = d;
+      createFocusGroup(
+        () => container,
+        () => ({ keyboardNavigation: enabled() }),
+      );
+      press(container, buttons[0]!, key("ArrowDown"));
+      expect(focused).toBe(buttons[1]);
+    });
+
+    setEnabled(false);
+    focused = null;
+    press(container, buttons[0]!, key("ArrowDown"));
+    expect(focused).toBe(null);
+
+    setEnabled(true);
+    press(container, buttons[0]!, key("ArrowDown"));
+    expect(focused).toBe(buttons[1]);
+    dispose();
+  });
+
+  test("keydown listener follows the ref and is removed from the previous ref", () => {
+    const { container, buttons } = makeContainer(3);
+    const otherContainer = document.createElement("div");
+    const otherButtons = [document.createElement("button"), document.createElement("button")];
+    otherButtons.forEach(btn => otherContainer.appendChild(btn));
+
+    const [ref, setRef] = createSignal<HTMLElement | undefined>(container);
+    let dispose!: () => void;
+    createRoot(d => {
+      dispose = d;
+      createFocusGroup(ref);
+      press(container, buttons[0]!, key("ArrowDown"));
+      expect(focused).toBe(buttons[1]);
+    });
+
+    setRef(otherContainer);
+    focused = null;
+    press(container, buttons[0]!, key("ArrowDown"));
+    expect(focused).toBe(null); // listener removed from the old container
+
+    press(otherContainer, otherButtons[0]!, key("ArrowDown"));
+    expect(focused).toBe(otherButtons[1]); // listener attached to the new ref
     dispose();
   });
 });

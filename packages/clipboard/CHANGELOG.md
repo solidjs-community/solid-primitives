@@ -1,5 +1,41 @@
 # @solid-primitives/clipboard
 
+## 2.0.0-next.17
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 2.0.0-next.16
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 2.0.0-next.15
+
+### Major Changes
+
+- c05d43f: Upgrade to Solid 2.0 (`solid-js@^2.0.0-beta.14`).
+
+  **`createClipboard`** — replaced `createResource` with a Solid 2.0 async `createMemo`. The accessor starts as `[]` synchronously (no initial suspension) and resolves asynchronously after `refetch()`. Use `isPending(() => clipboard())` for a loading indicator instead of `<Suspense>`.
+
+  **`copyToClipboard`** — converted from a `use:` directive to a `ref` directive factory. Replace `use:copyToClipboard={opts}` with `ref={copyToClipboard(opts)}`.
+
+  **`isServer`** — moved from `solid-js/web` to `@solidjs/web` in Solid 2.0; the package now imports from `@solidjs/web`.
+
+  **`createEffect` + `on`** — `on` helper removed; replaced with the Solid 2.0 split `createEffect(compute, effect)` form with explicit defer-by-default behavior.
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 2.0.0-beta.0
 
 ### Major Changes

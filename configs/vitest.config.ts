@@ -2,6 +2,9 @@ import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 import * as utils from "../scripts/utils/index.js";
 
+// Packages still on solid-js 1.x, not yet migrated to Solid 2.0.
+const UNMIGRATED_PACKAGES = ["fetch", "immutable", "db-store", "graphql", "resource"];
+
 const package_name = utils.getPackageNameFromCWD();
 
 if (package_name == null) {
@@ -37,10 +40,16 @@ export default defineConfig(({ mode }) => {
       ...(from_root
         ? // Testing all packages from root
           {
-            ...(testSSR && { include: ["packages/*/test/server.test.{ts,tsx}"] }),
+            ...(testSSR && {
+              include: ["packages/*/test/server.test.{ts,tsx}"],
+              exclude: UNMIGRATED_PACKAGES.map(name => `packages/${name}/test/server.test.{ts,tsx}`),
+            }),
             ...(!testSSR && {
               include: ["packages/*/test/*.test.{ts,tsx}"],
-              exclude: ["packages/*/test/server.test.{ts,tsx}"],
+              exclude: [
+                "packages/*/test/server.test.{ts,tsx}",
+                ...UNMIGRATED_PACKAGES.map(name => `packages/${name}/test/*.test.{ts,tsx}`),
+              ],
             }),
           }
         : // Testing a single package

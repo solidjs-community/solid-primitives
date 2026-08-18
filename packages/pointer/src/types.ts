@@ -1,5 +1,3 @@
-import type { JSX } from "@solidjs/web";
-
 export type PointerType = "mouse" | "touch" | "pen";
 export type EventTarget = Window | Document | HTMLElement;
 
@@ -44,15 +42,6 @@ export type PointerState = {
 export type PointerStateWithActive = PointerState & { isActive: boolean };
 
 export type PointerListItem = PointerState & { isDown: boolean };
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      pointerHover: PointerHoverDirectiveProps;
-    }
-  }
-}
-export type E = JSX.Element;
 
 export type PointerPositionDirectiveHandler = (state: PointerStateWithActive, el: Element) => void;
 export type PointerPositionDirectiveProps =

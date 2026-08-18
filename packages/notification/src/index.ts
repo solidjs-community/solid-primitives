@@ -1,4 +1,4 @@
-import { action, createOptimistic, createSignal, onCleanup, type Accessor } from "solid-js";
+import { action, affects, createOptimistic, createSignal, onCleanup, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS, isDev, noop, access, type MaybeAccessor } from "@solid-primitives/utils";
 import { createPermission } from "@solid-primitives/permission";
@@ -48,7 +48,7 @@ export function makeNotification(
   const show = (): Notification | null => {
     if (Notification.permission !== "granted") {
       if (isDev)
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         console.warn(
           `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
         );
@@ -138,7 +138,7 @@ export function createNotification(
   const show = (): Notification | null => {
     if (Notification.permission !== "granted") {
       if (isDev)
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         console.warn(
           `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
         );
@@ -223,9 +223,13 @@ export function createNotificationPermission(): {
   const permission = createPermission("notifications");
   const [pending, setPending] = createOptimistic(false, INTERNAL_OPTIONS);
 
-  // createPermission tracks state via the change event — no manual update needed
+  // createPermission tracks state via the change event — no manual update needed.
+  // affects(permission) additionally makes isPending(permission) read true for the whole
+  // request (the standard idiom for callers who don't want the bespoke `pending` accessor),
+  // alongside the existing manual `pending` signal kept for backward compatibility.
   const requestPermission = action(function* () {
     setPending(true);
+    affects(permission);
     try {
       yield Notification.requestPermission();
     } finally {

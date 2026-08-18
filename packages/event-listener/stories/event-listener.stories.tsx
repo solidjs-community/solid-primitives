@@ -3,7 +3,6 @@ import preview from "../../../.storybook/preview.js";
 import {
   makeEventListener,
   createEventListener,
-  createEventSignal,
   WindowEventListener,
 } from "@solid-primitives/event-listener";
 import readme from "../README.md?raw";

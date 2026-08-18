@@ -1,0 +1,84 @@
+{
+  "name": "@solid-primitives/sortable",
+  "version": "1.0.0-next.0",
+  "description": "Reactive sorting primitives — comparators, reactive sort, sorted search/insert, and granular per-item rank tracking.",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/sortable",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "sortable",
+    "stage": 0,
+    "list": [
+      "ascending",
+      "descending",
+      "by",
+      "combine",
+      "reverse",
+      "makeSorted",
+      "createSorted",
+      "sortedIndex",
+      "sortedIndexBy",
+      "insertSorted",
+      "createSortedIndex",
+      "createSortedProjection"
+    ],
+    "category": "Reactivity",
+    "gzip": 743
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "sort",
+    "sortable",
+    "comparator",
+    "reactive"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "pnpm -w build",
+    "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/signal-builders": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
+  },
+  "devDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  }
+}

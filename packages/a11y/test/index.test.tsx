@@ -12,8 +12,6 @@ import {
   createReducedMotion,
 } from "../src/index.js";
 
-// ─── createFormControl ────────────────────────────────────────────────────────
-
 describe("createFormControl", () => {
   it("auto-generates a stable id when none provided", () => {
     createRoot(dispose => {
@@ -72,8 +70,6 @@ describe("createFormControl", () => {
       dispose();
     });
   });
-
-  // ─── dataset ───────────────────────────────────────────────────────────────
 
   it("dataset: undefined validationState sets no data attributes", () => {
     createRoot(dispose => {
@@ -147,8 +143,6 @@ describe("createFormControl", () => {
     dispose();
   });
 
-  // ─── state accessors ───────────────────────────────────────────────────────
-
   it("state accessors reflect props reactively", () => {
     const [required, setRequired] = createSignal<boolean | undefined>(false);
     const [disabled, setDisabled] = createSignal<boolean | undefined>(false);
@@ -166,8 +160,6 @@ describe("createFormControl", () => {
     expect(ctx.isDisabled()).toBe(true);
     dispose();
   });
-
-  // ─── registration ──────────────────────────────────────────────────────────
 
   it("registerLabel sets labelId and cleanup deregisters", () => {
     createRoot(dispose => {
@@ -208,8 +200,6 @@ describe("createFormControl", () => {
       dispose();
     });
   });
-
-  // ─── ARIA computation ──────────────────────────────────────────────────────
 
   it("getAriaLabelledBy: returns undefined with no label registered", () => {
     createRoot(dispose => {
@@ -309,8 +299,6 @@ describe("createFormControl", () => {
     dispose();
   });
 });
-
-// ─── createFormControlInput ───────────────────────────────────────────────────
 
 describe("createFormControlInput", () => {
   function withControl(
@@ -426,6 +414,7 @@ describe("createFormControlInput", () => {
   it("deregisters fieldId on dispose", () => {
     const container = document.createElement("div");
     const ctx = createFormControl({ id: "ctrl" });
+    // oxlint-disable-next-line no-unused-vars
     let fp!: ReturnType<typeof createFormControlInput>["fieldProps"];
 
     const dispose = render(() => {
@@ -446,8 +435,6 @@ describe("createFormControlInput", () => {
     expect(ctx.fieldId()).toBeUndefined();
   });
 });
-
-// ─── useFormControl ───────────────────────────────────────────────────────────
 
 describe("useFormControl", () => {
   it("throws when called outside a FormControlContext", () => {
@@ -477,8 +464,6 @@ describe("useFormControl", () => {
     dispose();
   });
 });
-
-// ─── makeAnnounce / createAnnounce ────────────────────────────────────────────
 
 describe("makeAnnounce", () => {
   beforeEach(() => vi.useFakeTimers());
@@ -573,8 +558,6 @@ describe("createAnnounce", () => {
     });
   });
 });
-
-// ─── createReducedMotion ──────────────────────────────────────────────────────
 
 describe("createReducedMotion", () => {
   let changeListeners: Array<(e: MediaQueryListEvent) => void> = [];

@@ -65,6 +65,7 @@ export type PersistenceOptions<
   serialize?: (data: T) => string;
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
+  hydrated?: boolean;
   action?: (signal: S) => Parameters<typeof action>[0];
 } & (undefined extends O
   ? { storage?: SyncStorage | AsyncStorage }
@@ -151,7 +152,7 @@ export function makePersisted<
           const value = deserialize(data);
           (signal[1] as any)(() => value);
         } catch (e) {
-          // eslint-disable-next-line no-console
+          // oxlint-disable-next-line no-console
           if (DEV) console.warn(e);
         }
       }
@@ -160,14 +161,19 @@ export function makePersisted<
           const value = deserialize(data);
           (signal[1] as any)(reconcile(value, () => true));
         } catch (e) {
-          // eslint-disable-next-line no-console
+          // oxlint-disable-next-line no-console
           if (DEV) console.warn(e);
         }
       };
   let unchanged = true;
 
   if (init instanceof Promise) init.then(data => unchanged && data && set(data));
-  else if (init) set(init);
+  else if (init)
+    // in case of hydration mismatches due to the server lacking the same initial value,
+    // we want to defer the initialization by a short amount so the same state can be used
+    // during hydration
+    if (options.hydrated) setTimeout(() => set(init), 45);
+    else set(init);
 
   const getter: () => T = isSignal ? (signal[0] as () => T) : () => snapshot(signal[0] as T);
 
@@ -223,14 +229,14 @@ export const storageSync: PersistenceSyncAPI = [
 /**
  * messageSync - synchronize over post message or broadcast channel API
  */
-export const messageSync = (channel: Window | BroadcastChannel = window): PersistenceSyncAPI => [
+export const messageSync = (channel: Window | BroadcastChannel = window, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     channel.addEventListener("message", ev => {
       subscriber((ev as MessageEvent).data);
     }),
   (key, newValue) =>
     channel.postMessage(
-      { key, newValue, timeStamp: Date.now(), url: location.href },
+      { key, newValue, timeStamp: Date.now(), url },
       location.origin,
     ),
 ];
@@ -238,7 +244,7 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
 /**
  * wsSync - syncronize persisted storage via web socket
  */
-export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): PersistenceSyncAPI => [
+export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     ws.addEventListener("message", (ev: MessageEvent) => {
       try {
@@ -247,7 +253,7 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): Persistence
           subscriber(data);
         }
       } catch (e) {
-        // eslint-disable-next-line no-console
+        // oxlint-disable-next-line no-console
         if (warnOnError) console.warn(e);
       }
     }),
@@ -257,7 +263,7 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): Persistence
         key,
         newValue,
         timeStamp: +new Date(),
-        ...(globalThis.window ? { url: location.href } : {}),
+        ...(url ? { url } : {}),
       }),
     ),
 ];

@@ -28,7 +28,7 @@ export function useTrackPages(id?: string) {
   });
 
   let intervalId: number = 0;
-  let tabsMap: { [key: string]: boolean } = { [pageId]: true };
+  const tabsMap: { [key: string]: boolean } = { [pageId]: true };
 
   onMessage(({ data }) => {
     const { id, ids, state } = data;

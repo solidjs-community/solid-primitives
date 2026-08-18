@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from "solid-js";
+import { createMemo, createSignal, For } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
   createWritableMemo,
@@ -307,9 +307,13 @@ export const MemoCache = meta.story({
           {log().length === 0 ? (
             <span style={{ color: "#94a3b8" }}>Click a button to start…</span>
           ) : (
-            log().map(entry => (
-              <div style={{ color: entry.startsWith("↩") ? "#10b981" : "#6366f1" }}>{entry}</div>
-            ))
+            <For each={log()} keyed={false}>
+              {entry => (
+                <div style={{ color: entry().startsWith("↩") ? "#10b981" : "#6366f1" }}>
+                  {entry()}
+                </div>
+              )}
+            </For>
           )}
         </div>
 

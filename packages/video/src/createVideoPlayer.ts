@@ -2,7 +2,7 @@ import { createSignal, NotReadyError } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { createVideo, makeVideo } from "./createVideo.js";
+import { createVideo, makeVideo } from "./createVideo.ts";
 import type {
   VideoControls,
   VideoControlsOptions,
@@ -10,7 +10,7 @@ import type {
   VideoEventHandlers,
   VideoOptions,
   VideoSource,
-} from "./types.js";
+} from "./types.ts";
 import type { Accessor } from "solid-js";
 
 /**
@@ -56,7 +56,7 @@ export const makeVideoPlayer = (
     player,
     play: () => player.play(),
     pause: () => player.pause(),
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
     seek: player.fastSeek
       ? (time: number) => player.fastSeek(time)
       : (time: number) => {

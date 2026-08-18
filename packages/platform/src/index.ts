@@ -51,8 +51,8 @@ export const isSafari: boolean =
   !!n.vendor && n.vendor.includes("Apple") && ua && !ua.includes("CriOS") && !ua.includes("FxiOS");
 
 /** Browser is Internet Explorer 6-11 */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-export const isIE = /*@cc_on!@*/ false || !!w.document.documentMode;
+// oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
+export const isIE: boolean = /*@cc_on!@*/ false || !!w.document.documentMode;
 
 /** is Chromium-based browser */
 export const isChromium: boolean = !!w.chrome;

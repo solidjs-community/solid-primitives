@@ -4,7 +4,7 @@ import { createSubRoot } from "@solid-primitives/rootless";
 import { type Directive, entries, type Many, type MaybeAccessor } from "@solid-primitives/utils";
 import { type Accessor, createSignal, getOwner, DEV } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers.js";
+import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers.ts";
 import type {
   Handler,
   OnEventRecord,
@@ -14,9 +14,9 @@ import type {
   PointerPositionDirectiveProps,
   PointerStateWithActive,
   PointerType,
-} from "./types.js";
+} from "./types.ts";
 
-export { getPositionToElement } from "./helpers.js";
+export { getPositionToElement } from "./helpers.ts";
 export type {
   PointerHoverDirectiveHandler,
   PointerHoverDirectiveProps,
@@ -26,7 +26,7 @@ export type {
   PointerState,
   PointerStateWithActive,
   PointerType,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Setups event listeners for pointer events, that will get automatically removed on cleanup.
@@ -127,7 +127,7 @@ export function createPerPointerListeners(
         ) => void
       >
   >,
-) {
+): void {
   if (isServer) {
     return;
   }
@@ -177,7 +177,7 @@ export function createPerPointerListeners(
                 const type = "pointer" + key.substring(2).toLowerCase();
                 return (fn: Handler) => {
                   if (!init) {
-                    // eslint-disable-next-line no-console
+                    // oxlint-disable-next-line no-console
                     if (!isServer && DEV) console.warn(onlyInitMessage);
                     return;
                   }
@@ -215,13 +215,13 @@ export function createPerPointerListeners(
           // onMove()
           fn => {
             if (init) addListener("pointermove", fn, pointerId);
-            // eslint-disable-next-line no-console
+            // oxlint-disable-next-line no-console
             else if (!isServer && DEV) console.warn(onlyInitMessage);
           },
           // onUp()
           fn => {
             if (init) onUp = fn;
-            // eslint-disable-next-line no-console
+            // oxlint-disable-next-line no-console
             else if (!isServer && DEV) console.warn(onlyInitMessage);
           },
         );

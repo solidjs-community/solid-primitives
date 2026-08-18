@@ -41,7 +41,7 @@ export function makeMediaQueryListener(
  * console.log(isSmall());
  * ```
  */
-export function createMediaQuery(query: string, serverFallback = false) {
+export function createMediaQuery(query: string, serverFallback = false): Accessor<boolean> {
   if (isServer) {
     return () => serverFallback;
   }
@@ -64,7 +64,7 @@ export function createMediaQuery(query: string, serverFallback = false) {
  *    prefersDark() // => boolean
  * });
  */
-export function createPrefersDark(serverFallback?: boolean) {
+export function createPrefersDark(serverFallback?: boolean): Accessor<boolean> {
   return createMediaQuery("(prefers-color-scheme: dark)", serverFallback);
 }
 
@@ -136,7 +136,7 @@ export function createBreakpoints<T extends Breakpoints>(
     { enumerable: false, get: () => Object.keys(breakpoints).pop() },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (isServer || !window.matchMedia) return fallback;
 
   const { mediaFeature = "min-width", watchChange = true } = options;

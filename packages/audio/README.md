@@ -4,7 +4,7 @@
 
 # @solid-primitives/audio
 
-[![size](https://img.shields.io/badge/size-851_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/audio)
+[![size](https://img.shields.io/badge/size-852_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/audio)
 [![size](https://img.shields.io/npm/v/@solid-primitives/audio?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/audio)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -108,6 +108,29 @@ const [src, setSrc] = createSignal("track1.mp3");
 const audio = createAudio(src);
 setSrc("track2.mp3");
 ```
+
+#### Seek slider (scrubbing)
+
+`currentTime` updates continuously during playback, so binding a `<input type="range">` directly to it fights the user while they drag the thumb. Track a local "scrubbing" signal to show the dragged position instead, and only call `seek` once the user releases:
+
+```tsx
+const audio = createAudio("example.mp3");
+const [scrubTime, setScrubTime] = createSignal<number | undefined>();
+
+<input
+  type="range"
+  min={0}
+  max={audio.duration()}
+  value={scrubTime() ?? audio.currentTime()}
+  onInput={e => setScrubTime(e.currentTarget.valueAsNumber)}
+  onChange={e => {
+    audio.seek(e.currentTarget.valueAsNumber);
+    setScrubTime(undefined);
+  }}
+/>;
+```
+
+`onInput` fires continuously while dragging (updates the displayed value only); `onChange` fires once on release, when the seek should actually happen.
 
 #### Definition
 

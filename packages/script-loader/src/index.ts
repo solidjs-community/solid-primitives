@@ -19,7 +19,7 @@ export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> 
  *
  * @example
  * createScriptLoader({
- *  src: "https://example.com/script.js",
+ *  src: "https://example.com/script.ts",
  *  onLoad() {
  *    // do your stuff...
  *  }

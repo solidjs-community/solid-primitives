@@ -6,6 +6,7 @@ import {
   createFocusSignal,
   makeFocusListener,
   createFocusTrap,
+  createFocusGroup,
 } from "@solid-primitives/focus";
 import readme from "../README.md?raw";
 import {
@@ -13,7 +14,6 @@ import {
   BoolRow,
   Button,
   ButtonRow,
-  Card,
   colors,
   Container,
   EventLog,
@@ -21,6 +21,7 @@ import {
   inputStyle,
   Kbd,
   radii,
+  StatRow,
 } from "../../../.storybook/ui/index.js";
 
 const meta = preview.meta({
@@ -309,3 +310,68 @@ export const CustomInitialFocus = meta.story({
     );
   },
 });
+
+export const ArrowKeyNavigation = meta.story({
+  name: "Arrow-key focus navigation",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createFocusGroup(ref)` creates a focus group that moves focus between the focusable children of the container — the building block for arrow-key navigation in menus, listboxes and toolbars. Keyboard navigation is enabled by default: the `keydown` listener is attached to the ref automatically, so no manual wiring is needed. Here ArrowDown/ArrowUp cycle with wrap, Home/End jump to the ends.",
+      },
+    },
+  },
+  render: () => {
+    const [ref, setRef] = createSignal<HTMLElement>();
+    const [focusedLabel, setFocusedLabel] = createSignal("One");
+
+    createFocusGroup(ref, () => ({ wrap: true }));
+
+    return (
+      <Container width={320}>
+        <div
+          ref={setRef}
+          onFocusIn={event =>
+            setFocusedLabel((event.target as HTMLElement).getAttribute("aria-label") ?? "Unknown")
+          }
+          role="listbox"
+          aria-label="Focus group"
+          style={{
+            display: "flex",
+            "flex-direction": "column",
+            gap: "0.5rem",
+            background: "white",
+            border: `1px solid ${colors.border}`,
+            "border-radius": radii.lg,
+            padding: "1rem",
+          }}
+        >
+          <MenuItem label="One" />
+          <MenuItem label="Two" />
+          <MenuItem label="Three" />
+        </div>
+        <StatRow label="Focused item" value={focusedLabel()} />
+        <p style={{ margin: 0, "font-size": font.sizeSm, color: colors.mutedFg }}>
+          Focus an item, then use <Kbd>ArrowDown</Kbd> / <Kbd>ArrowUp</Kbd> to cycle with wrap,{" "}
+          <Kbd>Home</Kbd> / <Kbd>End</Kbd> to jump.
+        </p>
+      </Container>
+    );
+  },
+});
+
+function MenuItem(props: { label: string }) {
+  return (
+    <button
+      role="option"
+      aria-label={props.label}
+      style={{
+        ...inputStyle,
+        "text-align": "left",
+        cursor: "pointer",
+      }}
+    >
+      {props.label}
+    </button>
+  );
+}

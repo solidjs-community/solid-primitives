@@ -20,7 +20,6 @@ import {
   radii,
 } from "../../../.storybook/ui/index.js";
 
-// ─── Shared self-contained worker functions ───────────────────────────────────
 // These are serialized via Function.prototype.toString — no closures or imports.
 
 async function isPrime(n: number): Promise<boolean> {
@@ -72,8 +71,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ─── Story 1: Offloaded compute ──────────────────────────────────────────────
 
 export const OffloadedCompute = meta.story({
   name: "Offloaded compute",
@@ -152,8 +149,6 @@ export const OffloadedCompute = meta.story({
     );
   },
 });
-
-// ─── Story 2: Pool round-robin ───────────────────────────────────────────────
 
 type TaskState = { n: number; state: "idle" | "running" | "done"; prime?: boolean; ms?: number };
 
@@ -250,8 +245,6 @@ export const PoolRoundRobin = meta.story({
   },
 });
 
-// ─── Story 3: Auto-refreshing query ─────────────────────────────────────────
-
 export const AutoRefreshingQuery = meta.story({
   name: "Auto-refreshing query",
   parameters: {
@@ -332,8 +325,6 @@ export const AutoRefreshingQuery = meta.story({
   },
 });
 
-// ─── Story 4: Reactive store bridge ─────────────────────────────────────────
-
 export const ReactiveStoreBridge = meta.story({
   name: "Reactive store bridge",
   parameters: {
@@ -413,8 +404,6 @@ export const ReactiveStoreBridge = meta.story({
     );
   },
 });
-
-// ─── Story 5: Cancellable operation ─────────────────────────────────────────
 
 type Phase = "idle" | "running" | "done" | "cancelled";
 

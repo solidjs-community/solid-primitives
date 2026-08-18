@@ -1,5 +1,61 @@
 # @solid-primitives/range
 
+## 1.0.0-next.3
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 1.0.0-next.2
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- Updated dependencies [5fc4efa]
+  - @solid-primitives/utils@7.0.0-next.1
+
+## 1.0.0-next.0
+
+### Major Changes
+
+- fa2a427: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `isServer` is now imported from `@solidjs/web` (was `solid-js/web`)
+  - `JSX` types are now imported from `@solidjs/web` (was `solid-js`)
+  - `indexRange` internal signals now use `ownedWrite: true` so they can be updated from inside reactive scopes (e.g. when `IndexRange` wraps in `createMemo`)
+  - `createEffect` usage in user code must use the split compute/apply form required by Solid 2.0 — see updated README examples
+  - Signal writes are now batched by default; call `flush()` after writing signals before reading the resulting mapped array
+  - `<Repeat>` is **deprecated** — Solid 2.0 ships an equivalent built-in `<Repeat count={n}>` in `@solidjs/web`. See the README for migration guidance. The `repeat` primitive continues to be supported for cases that require incremental child creation/disposal.
+
+### Patch Changes
+
+- Updated dependencies [89c5324]
+- Updated dependencies [4a5bf32]
+  - @solid-primitives/utils@7.0.0-next.0
+
 ## 0.2.4
 
 ### Patch Changes

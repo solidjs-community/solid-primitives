@@ -1,5 +1,35 @@
 # @solid-primitives/lifecycle
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+
+## 1.0.0-next.0
+
+### Major Changes
+
+- 9453354: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `isServer` is now imported from `@solidjs/web` (was `solid-js/web`)
+  - `onMount` replaced with `onSettled` — `createIsMounted` now schedules its signal update after the owner settles
+  - `getListener` replaced with `getObserver` — `isHydrated` uses `getObserver` to detect reactive context
+  - `sharedConfig.context` replaced with `sharedConfig.hydrating` — `isHydrated` now reads the boolean `hydrating` flag
+  - `renderToString` in server tests now imported from `@solidjs/web` (was `solid-js/web`)
+
+  No changes to the public API: `createIsMounted`, `isHydrated`, and `onElementConnect` signatures are unchanged.
+
 ## 0.1.2
 
 ### Patch Changes

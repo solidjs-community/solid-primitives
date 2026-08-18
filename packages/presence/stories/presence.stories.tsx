@@ -96,7 +96,7 @@ export const ItemSwitcher = meta.story({
   render: () => {
     const ITEMS = ["Alpha", "Beta", "Gamma", "Delta"] as const;
     const [active, setActive] = createSignal<(typeof ITEMS)[number] | undefined>(ITEMS[0]);
-    const { isMounted, mountedItem, isVisible, isEntering, isExiting } = createPresence(active, {
+    const { isMounted, mountedItem, isEntering, isExiting } = createPresence(active, {
       transitionDuration: 400,
     });
 
