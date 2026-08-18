@@ -26,9 +26,7 @@
       "makeMotionPath",
       "createMotionPath",
       "makeSequence",
-      "createPresenceAnimation",
-      "createPresenceA",
-      "createPresenceB"
+      "createPresenceAnimation"
     ],
     "category": "Animation"
   },
