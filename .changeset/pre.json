@@ -103,13 +103,15 @@
     "@solid-primitives/url": "0.1.0",
     "@solid-primitives/favicon": "0.0.100",
     "@solid-primitives/sortable": "0.0.100",
-    "@solid-primitives/drag-drop": "0.0.100"
+    "@solid-primitives/drag-drop": "0.0.100",
+    "@solid-primitives/animation": "1.0.0-next.0"
   },
   "changesets": [
     "a11y-dataset-hydration-safety",
     "a11y-solid2-initial",
     "active-element-solid2-migration",
     "analytics-solid2-redesign",
+    "animation-initial",
     "async-docs-and-test-fixes",
     "audio-solid2-migration",
     "bounds-solid2-migration",
