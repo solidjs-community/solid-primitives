@@ -33,6 +33,9 @@ pnpm add @solid-primitives/animation
 | [`createStagger`](#makestagger--createstagger) | Reactive `makeStagger` |
 | [`makeAnimationGroup`](#makeanimationgroup--createanimationgroup) | Coordinate multiple animations as a unit |
 | [`createAnimationGroup`](#makeanimationgroup--createanimationgroup) | Reactive `makeAnimationGroup` |
+| [`makeMotionPath`](#makemotionpath--createmotionpath) | Animate an element along a CSS Motion Path |
+| [`createMotionPath`](#makemotionpath--createmotionpath) | Reactive `makeMotionPath` |
+| [`makeSequence`](#makesequence) | Chain animation factories into a sequential playlist |
 | [`createPresenceAnimation`](#createpresenceanimation) | Mount/unmount lifecycle with WAAPI enter/exit animations |
 
 ---
@@ -138,6 +141,8 @@ type ViewAnimationOptions = Omit<KeyframeAnimationOptions, "timeline"> & {
   subject?: Element;             // element to observe — defaults to target
   axis?: "block" | "inline" | "x" | "y";
   inset?: string | string[];     // shrinks/expands the intersection root
+  rangeStart?: string;           // default: "entry 0%" — element starts entering the scroll port
+  rangeEnd?: string;             // default: "entry 100%" — element has fully entered the scroll port
 };
 
 function makeViewAnimation(
@@ -285,6 +290,80 @@ function makeAnimationGroup(
 function createAnimationGroup(
   animations: Accessor<(Animation | null | undefined)[]>,
 ): AnimationGroupControls
+```
+
+---
+
+## `makeMotionPath` / `createMotionPath`
+
+Animates an element along a [CSS Motion Path](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_motion_path) using WAAPI — sets `offset-path` and `offset-rotate` on the element and animates `offsetDistance` from `0%` to `100%`. The path/rotation styles are left in place after the animation so `fill: "forwards"` works correctly.
+
+```ts
+// Imperative — path is an SVG path string, passed to path("…")
+const anim = makeMotionPath(dotEl, "M0,0 C50,100 150,0 200,100", {
+  duration: 2000,
+  fill: "forwards",
+});
+
+// Any valid offset-path value also works, e.g. a shape function
+makeMotionPath(dotEl, "circle(50%)", { duration: 1500, iterations: Infinity });
+
+// Reactive — re-runs whenever target, path, or options change
+const anim = createMotionPath(
+  () => dotRef,
+  () => currentPath(),
+  { duration: 2000, rotate: "auto" },
+);
+anim()?.pause();
+```
+
+```ts
+type MotionPathOptions = KeyframeAnimationOptions & {
+  rotate?: string; // offset-rotate — "auto", "0deg", "reverse", etc. Default: "auto"
+};
+
+function makeMotionPath(
+  el: HTMLElement,
+  path: string,
+  options?: MotionPathOptions,
+): Animation
+
+function createMotionPath(
+  target: Accessor<HTMLElement | null | undefined>,
+  path: MaybeAccessor<string>,
+  options?: MaybeAccessor<MotionPathOptions>,
+): Accessor<Animation | undefined>
+```
+
+---
+
+## `makeSequence`
+
+Chains animation factories into a sequential playlist: each factory is called and its animation allowed to finish before the next factory runs. Factories are invoked **lazily** — each is called only when its turn arrives, so animations are created and started just in time rather than all upfront. A factory returning `null`/`undefined` skips that step without breaking the chain.
+
+Calling `play()` while a sequence is already running discards the current run and starts fresh from the beginning.
+
+```ts
+const seq = makeSequence([
+  () => makeAnimate(headerEl, fadeIn, { duration: 300 }),
+  () => makeAnimate(bodyEl, slideIn, { duration: 400 }),
+  () => makeAnimate(footerEl, fadeIn, { duration: 300 }),
+]);
+
+seq.play();   // header → body → footer, each starts after the last finishes
+seq.cancel(); // stops immediately
+seq.play();   // restart from the beginning
+```
+
+```ts
+type AnimationFactory = () => Animation | null | undefined;
+
+type SequenceControls = {
+  play: () => void;   // starts from the first factory, discarding any in-progress run
+  cancel: () => void; // stops the sequence; the currently-playing animation is cancelled
+};
+
+function makeSequence(factories: AnimationFactory[]): SequenceControls
 ```
 
 ---
