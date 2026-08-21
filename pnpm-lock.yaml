@@ -721,6 +721,12 @@ importers:
 
   packages/raf:
     dependencies:
+      '@solid-primitives/rootless':
+        specifier: workspace:^
+        version: link:../rootless
+      '@solid-primitives/set':
+        specifier: workspace:^
+        version: link:../set
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
