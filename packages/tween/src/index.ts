@@ -1,6 +1,9 @@
 import { createSignal, createEffect, onCleanup, on } from "solid-js";
 import { isServer } from "solid-js/web";
 
+export * from "./spring.js";
+export * from "./vector.js";
+
 export type TweenProps = {
   duration?: number;
   ease?: (t: number) => number;
