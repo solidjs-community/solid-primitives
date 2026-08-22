@@ -3,6 +3,8 @@ import { isServer } from "solid-js/web";
 import { access, noop } from "@solid-primitives/utils";
 import { createStaticStore } from "@solid-primitives/static-store";
 
+export * from "./webaudio.js";
+
 // Set of control enums
 export enum AudioState {
   LOADING = "loading",
