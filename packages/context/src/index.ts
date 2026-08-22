@@ -8,6 +8,8 @@ import {
 } from "solid-js";
 import type { ContextProviderComponent } from "../node_modules/solid-js/types/reactive/signal.js";
 
+export * from "./consume.jsx";
+
 export type ContextProviderProps = {
   children?: JSX.Element;
 } & Record<string, unknown>;
@@ -61,38 +63,10 @@ export function createContextProvider<T, P extends ContextProviderProps>(
   ];
 }
 
-/*
-
-MultiProvider inspired by the preact-multi-provider package from Marvin Hagemeister
-See https://github.com/marvinhagemeister/preact-multi-provider
-
-
-Type validation of the `values` array thanks to the amazing @otonashixav (https://github.com/otonashixav)
-
-*/
-
 /**
  * A component that allows you to provide multiple contexts at once. It will work exactly like nesting multiple providers as separate components, but it will save you from the nesting.
  *
  * @param values Array of tuples of `[ContextProviderComponent, value]` or `[Context, value]` or bound `ContextProviderComponent` (that doesn't take a `value` property).
- *
- * @example
- * ```tsx
- * // before
- * <CounterCtx.Provider value={1}>
- *   <NameCtx.Provider value="John">
- *     <App/>
- *   </NameCtx.Provider>
- * </CounterCtx.Provider>
- *
- * // after
- * <MultiProvider values={[
- *  [CounterCtx.Provider, 1],
- *  [NameCtx.Provider, "John"]
- * ]}>
- *  <App/>
- * </MultiProvider>
- * ```
  */
 export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props: {
   values: {
