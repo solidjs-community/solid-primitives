@@ -2,6 +2,10 @@ import { createMemo, createSignal, getOwner, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import { createStore } from "solid-js/store";
 
+export * from "./wakelock.js";
+export * from "./vibration.js";
+export * from "./orientation.js";
+
 /**
  * Creates a list of all media devices
  *
