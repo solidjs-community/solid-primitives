@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/animation",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "description": "SolidJS primitives for the Web Animations API (WAAPI) — reactive wrappers for element.animate, scroll timelines, view timelines, FLIP, stagger, and animation groups.",
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/animation",
