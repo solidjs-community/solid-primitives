@@ -2,9 +2,12 @@ import {
   type Accessor,
   createSignal,
   getListener,
+  getOwner,
   onCleanup,
   onMount,
+  runWithOwner,
   sharedConfig,
+  type Owner,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 
@@ -67,4 +70,132 @@ export function onElementConnect(el: Element, fn: VoidFunction): void {
   );
   observer.observe(el);
   onCleanup(() => observer.disconnect());
+}
+
+export interface DeferredOptions {
+  /**
+   * Delay in milliseconds before executing the callback.
+   * @default 250
+   */
+  delayMs?: number;
+  /**
+   * If true, uses requestIdleCallback when available instead of setTimeout.
+   * @default false
+   */
+  idle?: boolean;
+  /**
+   * Maximum timeout in milliseconds when using requestIdleCallback.
+   * @default 1000
+   */
+  idleTimeout?: number;
+}
+
+/**
+ * Executes a callback exactly once after client-side hydration and the initial microtask queue have settled.
+ * Preserves the reactive Owner context from the call-site.
+ * Safe for SSR (no-op on server).
+ *
+ * @param fn Callback to execute post-hydration.
+ * @example
+ * ```tsx
+ * onInitialRender(() => {
+ *   initCanvasRenderer();
+ * });
+ * ```
+ */
+export function onInitialRender(fn: () => void | Promise<void>): void {
+  if (isServer) return;
+
+  const owner: Owner | null = getOwner();
+
+  onMount(() => {
+    let active = true;
+
+    onCleanup(() => {
+      active = false;
+    });
+
+    queueMicrotask(() => {
+      if (!active) return;
+
+      if (owner) {
+        runWithOwner(owner, () => {
+          void fn();
+        });
+      } else {
+        void fn();
+      }
+    });
+  });
+}
+
+/**
+ * Defers callback execution until after a specified delay or idle window post-mount.
+ * If the component unmounts before execution, the scheduled callback is aborted.
+ * Preserves the reactive Owner context from the call-site.
+ * Safe for SSR (no-op on server).
+ *
+ * @param fn Callback to execute after deferral.
+ * @param options Configuration for delay or idle scheduling.
+ * @returns An abort function to cancel execution manually if needed.
+ * @example
+ * ```tsx
+ * onDeferred(() => {
+ *   loadAnalytics();
+ * }, { delayMs: 500, idle: true });
+ * ```
+ */
+export function onDeferred(
+  fn: () => void | Promise<void>,
+  options: DeferredOptions | number = 250,
+): () => void {
+  if (isServer) return () => {};
+
+  const config: DeferredOptions =
+    typeof options === "number" ? { delayMs: options } : options;
+
+  const delayMs = config.delayMs ?? 250;
+  const useIdle = config.idle ?? false;
+  const idleTimeout = config.idleTimeout ?? 1000;
+  const owner: Owner | null = getOwner();
+
+  let handle: number | ReturnType<typeof setTimeout> | null = null;
+  let active = true;
+
+  const cancel = (): void => {
+    active = false;
+    if (handle !== null) {
+      if (useIdle && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(handle as number);
+      } else {
+        clearTimeout(handle as ReturnType<typeof setTimeout>);
+      }
+      handle = null;
+    }
+  };
+
+  onMount(() => {
+    onCleanup(cancel);
+
+    const execute = (): void => {
+      if (!active) return;
+      handle = null;
+
+      if (owner) {
+        runWithOwner(owner, () => {
+          void fn();
+        });
+      } else {
+        void fn();
+      }
+    };
+
+    if (useIdle && typeof window !== "undefined" && "requestIdleCallback" in window) {
+      handle = window.requestIdleCallback(execute, { timeout: idleTimeout });
+    } else {
+      handle = setTimeout(execute, delayMs);
+    }
+  });
+
+  return cancel;
 }
