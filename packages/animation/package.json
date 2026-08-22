@@ -28,7 +28,8 @@
       "makeSequence",
       "createPresenceAnimation"
     ],
-    "category": "Animation"
+    "category": "Animation",
+    "gzip": 1559
   },
   "files": [
     "dist"
