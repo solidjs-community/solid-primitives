@@ -142,6 +142,7 @@
     "flux-store-solid2-migration",
     "focus-restore-primitive",
     "focus-solid2-migration",
+    "form-change-mode-dirty-gate-fix",
     "form-solid2-initial",
     "fullscreen-solid-2-migration",
     "geolocation-solid2-async-reactivity",
