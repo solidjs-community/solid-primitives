@@ -202,6 +202,16 @@ importers:
         specifier: 'catalog:'
         version: 2.0.0-rc.0
 
+  packages/animation:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-rc.0
+
   packages/async:
     devDependencies:
       solid-js:

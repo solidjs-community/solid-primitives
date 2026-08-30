@@ -2118,12 +2118,6 @@
         "react"
       ]
     },
-    "@napi-rs/wasm-runtime@1.1.6_@emnapi+core@1.11.1_@emnapi+runtime@1.11.1": {
-      "integrity": "sha512-ZLv/JdUfkvOy9eCnnBaGfiO+XimbjebAeO+MRQqD/B+FR1tnRN0tpKSJHRbE8sFfS6aqsXZ67TQjfwfsxULVbg==",
-      "dependencies": [
-        "@tybys/wasm-util"
-      ]
-    },
     "@napi-rs/wasm-runtime@1.1.6_@emnapi+core@1.11.2_@emnapi+runtime@1.11.2": {
       "integrity": "sha512-ZLv/JdUfkvOy9eCnnBaGfiO+XimbjebAeO+MRQqD/B+FR1tnRN0tpKSJHRbE8sFfS6aqsXZ67TQjfwfsxULVbg==",
       "dependencies": [
@@ -2503,7 +2497,7 @@
       "dependencies": [
         "@emnapi/core@1.11.1",
         "@emnapi/runtime@1.11.1",
-        "@napi-rs/wasm-runtime@1.1.6_@emnapi+core@1.11.1_@emnapi+runtime@1.11.1"
+        "@napi-rs/wasm-runtime@1.1.6_@emnapi+core@1.9.2_@emnapi+runtime@1.9.2"
       ],
       "cpu": ["wasm32"]
     },
@@ -2789,7 +2783,7 @@
       "dependencies": [
         "@emnapi/core@1.11.1",
         "@emnapi/runtime@1.11.1",
-        "@napi-rs/wasm-runtime@1.1.6_@emnapi+core@1.11.1_@emnapi+runtime@1.11.1"
+        "@napi-rs/wasm-runtime@1.1.6_@emnapi+core@1.9.2_@emnapi+runtime@1.9.2"
       ],
       "cpu": ["wasm32"]
     },
@@ -8808,6 +8802,13 @@
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0-beta.34",
+            "npm:solid-js@2.0.0-beta.34"
+          ]
+        }
+      },
+      "packages/animation": {
+        "packageJson": {
+          "dependencies": [
             "npm:solid-js@2.0.0-beta.34"
           ]
         }
