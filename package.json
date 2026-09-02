@@ -33,7 +33,7 @@
     "measure": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/measure.ts",
     "version": "changeset version && pnpm jsr:sync-versions && pnpm i --no-frozen-lockfile && git add .",
     "release": "pnpm build && changeset publish",
-    "release-tagged": "pnpm build && (test -f .changeset/pre.json && changeset publish || changeset publish --tag $BRANCH_NAME)"
+    "release-tagged": "pnpm build && if [ -f .changeset/pre.json ]; then changeset publish; else changeset publish --tag \"$BRANCH_NAME\"; fi"
   },
   "devDependencies": {
     "@babel/core": "catalog:",
