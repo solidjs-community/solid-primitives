@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 1.0.0-next.7
+
+### Minor Changes
+
+- 97e7cf8: pagination: new ellipsis pattern
+
 ## 1.0.0-next.6
 
 ### Patch Changes

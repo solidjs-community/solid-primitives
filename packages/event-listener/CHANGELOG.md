@@ -1,5 +1,11 @@
 # @solid-primitives/event-listener
 
+## 3.0.0-next.4
+
+### Patch Changes
+
+- ab4c926: fix(event-listener): balance hydration ids for createEventListener
+
 ## 3.0.0-next.3
 
 ### Patch Changes
