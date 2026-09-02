@@ -6,7 +6,7 @@ import {
   type Directive,
   tryOnCleanup,
 } from "@solid-primitives/utils";
-import { type Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
+import { type Accessor, createEffect, createOwner, createRenderEffect, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
 import type {
   EventListenerDirectiveProps,
@@ -108,7 +108,14 @@ export function createEventListener(
   handler: (event: Event) => void,
   options?: EventListenerOptions,
 ): void {
-  if (isServer) return;
+  if (isServer) {
+    // The client mints one tracked-effect owner (createEffect/createRenderEffect
+    // below). Mint a matching owner on the server so the parent's hydration-id
+    // child counter stays aligned; otherwise every sibling after this listener
+    // shifts its hydration id by one (Solid 2 rc strict id alignment).
+    createOwner();
+    return;
+  }
 
   type State = { els: EventTarget[]; types: string[] };
 
