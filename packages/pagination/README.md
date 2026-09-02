@@ -5,7 +5,7 @@
 # @solid-primitives/pagination
 
 [![docs](https://img.shields.io/badge/-docs-blue?style=for-the-badge)](https://primitives.solidjs.community/package/pagination)
-[![size](https://img.shields.io/badge/size-2.01_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/pagination)
+[![size](https://img.shields.io/badge/size-2.13_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/pagination)
 [![version](https://img.shields.io/npm/v/@solid-primitives/pagination?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/pagination)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -33,39 +33,43 @@ Provides an array with the properties to fill your pagination with and a page se
 ### How to use it
 
 ```ts
-type PaginationOptions = {
+export type PaginationOptions = {
   /** the overall number of pages */
   pages: number;
   /** the highest number of pages to show at the same time */
   maxPages?: number;
   /** start with another page than `1` */
   initialPage?: number;
-  /** show an element for the first page */
-  showFirst?: boolean | ((page: number, pages: number) => boolean);
+  /** number of pages a large jump, if it should exist, should skip */
+  jumpPages?: number;
   /** show an element for the previous page */
   showPrev?: boolean | ((page: number, pages: number) => boolean);
   /** show an element for the next page */
   showNext?: boolean | ((page: number, pages: number) => boolean);
-  /** show an element for the last page */
-  showLast?: boolean | ((page: number, pages: number) => boolean);
-  /** content for the first page element, e.g. an SVG icon, default is "|<" */
-  firstContent?: JSX.Element;
   /** content for the previous page element, e.g. an SVG icon, default is "<" */
   prevContent?: JSX.Element;
   /** content for the next page element, e.g. an SVG icon, default is ">" */
   nextContent?: JSX.Element;
-  /** content for the last page element, e.g. an SVG icon, default is ">|" */
-  lastContent?: JSX.Element;
-  /** accessible name for the first page element, default is "First page" */
-  firstAriaLabel?: string;
   /** accessible name for the previous page element, default is "Previous page" */
   prevAriaLabel?: string;
   /** accessible name for the next page element, default is "Next page" */
   nextAriaLabel?: string;
+  /** show an element for the first page */
+  showFirst?: boolean | ((page: number, pages: number) => boolean);
+  /** show an element for the last page */
+  showLast?: boolean | ((page: number, pages: number) => boolean);
+  /** content for the first page element, e.g. an SVG icon, default is "|<" */
+  firstContent?: JSX.Element;
+  /** content for the last page element, e.g. an SVG icon, default is ">|" */
+  lastContent?: JSX.Element;
+  /** accessible name for the first page element, default is "First page" */
+  firstAriaLabel?: string;  
   /** accessible name for the last page element, default is "Last page" */
   lastAriaLabel?: string;
-  /** number of pages a large jump, if it should exist, should skip */
-  jumpPages?: number;
+  /** always show first and last page, with an adjacent ellipsis if there is a gap */
+  showEllipsis?: boolean | ((page: number, pages: number) => boolean);
+  /** content for the ellipsis element, e.g. an SVG icon or a text */
+  ellipsisContent?: () => JSX.Element;
 };
 
 // Returns a tuple of props, page and setPage.
@@ -115,6 +119,27 @@ return (
   </nav>
 );
 ```
+
+### Ellipsis-style pagination
+
+Beyond the classic pagination pattern, this primitive now also supports an ellipsis-style pattern. The difference is best illustrated like this:
+
+
+#### Classic
+
+```
+[First] [Previous] [3] [4] |5| [6] [7] [Next] [Last]
+```
+
+#### Ellipsis
+
+```
+[Previous] [1] ... [4] |5| [6] ... [7] [Next]
+```
+
+This does away with the duplication of `[First]` and `[1]` and `[Last]` and its respective page. You merely need to set the `showEllipsis` option and handle the `inert` attribute for the ellipsis if not already supported.
+
+In this mode, the first and last page are always present, and while the `maxPages` option will still reflect the number of page items that are displayed, each visible ellipsis will take the place of a page item. Also, the `[First]` and `[Last]` buttons are always disabled, regardless of settings.
 
 ### TODO
 

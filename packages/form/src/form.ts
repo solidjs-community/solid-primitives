@@ -107,6 +107,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
   const [submitted, setSubmitted] = createSignal(false, { ownedWrite: true });
   const formValidateOn = config.validateOn ?? "change";
 
+  // Must be declared before the field loop: validateOn:"change" error memos close over this
+  // signal (see the dirty-gating comment below), and the field-level `dirty` memo used by the
+  // form-level `dirty` accessor further down needs it too. See that memo's comment for what it's
+  // for.
+  const [dirtyVer, bumpDirtyVer] = createSignal(0, { ownedWrite: true });
+
   type InternalField = {
     initial: any;
     value: Accessor<any>;
@@ -204,15 +210,38 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       }
     }
 
+    // Validator-only error (no external component) — this is the part that respects validateOn
+    // timing below. Kept separate from _rawError so a setError() call is never accidentally
+    // gated along with it.
+    const validatorError: Accessor<string | null> = validators.length === 0
+      ? () => null
+      : createMemo(() => _syncError() ?? asyncError());
+
     // Always tracks the true validation state; never gated by validateOn.
     const _rawError: Accessor<string | null> = validators.length === 0
       ? externalError
-      : createMemo(() => _syncError() ?? asyncError() ?? externalError());
+      : createMemo(() => validatorError() ?? externalError());
 
-    // Displayed error respects validateOn; raw error (used by valid() and errors()) does not.
+    // Displayed error respects validateOn — but only for the validator portion. An external
+    // error (setError()) is caller-injected out-of-band (e.g. a server response) and is always
+    // shown the moment it's set, regardless of mode/touched/submitted/dirty.
+    //
+    // "change" still needs its own gate on the validator portion - not "always show it" - or a
+    // field whose initial value fails validation (e.g. a required field starting empty) would
+    // render errored before the user has touched anything. Gated on dirtiness (current value ≠
+    // initial) rather than on any "has an input event fired" flag, so a programmatic setValue
+    // back to the initial value correctly re-hides the error too. dirtyVer forces recompute on
+    // reset(newValues), same as the form-level `dirty` memo below - see its comment.
     const error = validateOn === "change"
-      ? _rawError
-      : createMemo(() => (validateOn === "blur" ? touched() : submitted()) ? _rawError() : null);
+      ? createMemo(() => {
+          dirtyVer();
+          const isDirty = value() !== fc.initial;
+          return (isDirty ? validatorError() : null) ?? externalError();
+        })
+      : createMemo(() => {
+          const showValidator = validateOn === "blur" ? touched() : submitted();
+          return (showValidator ? validatorError() : null) ?? externalError();
+        });
 
     internalFields[name] = {
       initial: fc.initial,
@@ -259,8 +288,8 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
   }) as Accessor<Partial<Record<keyof C & string, string>>>;
 
   // Dirty is "current value ≠ initial". When reset(newValues) changes the initial baseline,
-  // field values might be unchanged but dirty must still recompute — this counter triggers that.
-  const [dirtyVer, bumpDirtyVer] = createSignal(0, { ownedWrite: true });
+  // field values might be unchanged but dirty must still recompute — dirtyVer (declared above
+  // the field loop) triggers that.
   const dirty = createMemo(() => {
     dirtyVer();
     return fieldEntries.some(([, f]) => f.value() !== f.initial);

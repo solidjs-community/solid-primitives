@@ -69,7 +69,10 @@ describe("validation", () => {
         fields: { email: { initial: "not-an-email", validate: isEmail } },
       });
 
-      expect(form.fields.email.error()).toBe("Invalid email");
+      // Pristine field, so "change" mode's display gate hides it from error() - errors()
+      // (never gated by validateOn) is what this test actually means to exercise: does the
+      // validator run and report correctly.
+      expect(form.errors().email).toBe("Invalid email");
       dispose();
     });
   });
@@ -82,7 +85,7 @@ describe("validation", () => {
         },
       });
 
-      expect(form.fields.password.error()).toBe("Minimum 8 characters");
+      expect(form.errors().password).toBe("Minimum 8 characters");
 
       form.fields.password.setValue("abcdefgh");
       flush();
@@ -102,7 +105,7 @@ describe("validation", () => {
         fields: { email: { initial: "", validate: isEmail } },
       });
 
-      expect(form.fields.email.error()).toBe("Invalid email");
+      expect(form.errors().email).toBe("Invalid email");
 
       form.fields.email.setValue("user@example.com");
       flush();
@@ -609,13 +612,23 @@ describe("submitted", () => {
 });
 
 describe("validateOn", () => {
-  it("change (default): error() shows immediately", () => {
+  it("change (default): error() is null until the field is dirtied", () => {
     createRoot(dispose => {
       const form = createForm({
         fields: { email: { initial: "", validate: isEmail } },
       });
 
+      // Invalid from the start (empty fails isEmail), but untouched - shouldn't render errored.
+      expect(form.fields.email.error()).toBe(null);
+
+      form.fields.email.setValue("not-an-email");
+      flush();
       expect(form.fields.email.error()).toBe("Invalid email");
+
+      // Setting it back to the initial value un-dirties it - error hides again.
+      form.fields.email.setValue("");
+      flush();
+      expect(form.fields.email.error()).toBe(null);
       dispose();
     });
   });
@@ -766,7 +779,10 @@ describe("async validators", () => {
     flush();
     await new Promise(r => setTimeout(r, 20));
     flush();
-    expect(form.fields.email.error()).toBe("Email already taken");
+    // Field is untouched/pristine (never dirtied via setValue), so the "change"-mode display
+    // gate hides it from error() - but the validator genuinely ran and found it invalid, which
+    // errors() (never gated by validateOn) confirms.
+    expect(form.errors().email).toBe("Email already taken");
     expect(form.fields.email.pending()).toBe(false);
   });
 
@@ -785,8 +801,9 @@ describe("async validators", () => {
       }),
     );
 
-    // Sync validator fires immediately
-    expect(form.fields.email.error()).toBe("Invalid email");
+    // Sync validator fires immediately - checked via errors() since the field is still
+    // pristine and "change" mode's display gate hides it from error() until dirtied.
+    expect(form.errors().email).toBe("Invalid email");
 
     form.fields.email.setValue("taken@example.com");
     flush();
@@ -834,8 +851,9 @@ describe("async validators", () => {
       });
 
       flush();
-      // isEmail("") fails synchronously — async validator must not run
-      expect(form.fields.email.error()).toBe("Invalid email");
+      // isEmail("") fails synchronously — async validator must not run. Checked via errors()
+      // since the field is pristine and "change" mode's display gate hides it from error().
+      expect(form.errors().email).toBe("Invalid email");
       expect(form.fields.email.pending()).toBe(false);
       expect(form.pending()).toBe(false);
       dispose();
@@ -1464,6 +1482,9 @@ describe("setError", () => {
         fields: { email: { initial: "bad", validate: isEmail } },
       });
 
+      // Dirty the field (still invalid) so the validator error is actually displayed under
+      // "change" mode's dirty gate - otherwise there'd be nothing to take priority over yet.
+      form.fields.email.setValue("still-bad");
       form.fields.email.setError("Server error");
       flush();
       // Client-side validator error wins — shown first
