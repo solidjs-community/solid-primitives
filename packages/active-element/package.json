@@ -19,7 +19,7 @@
       "createActiveElement"
     ],
     "category": "Inputs",
-    "gzip": 540
+    "gzip": 544
   },
   "private": false,
   "sideEffects": false,
