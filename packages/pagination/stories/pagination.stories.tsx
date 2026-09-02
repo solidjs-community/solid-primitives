@@ -123,6 +123,74 @@ export const CreatePaginationStory = meta.story({
   },
 });
 
+export const CreateEllipsisPaginationStory = meta.story({
+  name: "Pagination bar (ellipsis)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createPagination` returns a reactive array of button props alongside `page` and `setPage`. Each prop object's `aria-current` and `disabled` are reactive getters — object identity is stable so `<For>` only touches changed DOM attributes when the page changes. This is the new ellipsis pattern",
+      },
+    },
+  },
+  render: () => {
+    const [totalPages, setTotalPages] = createSignal(20);
+    const [maxVisible, setMaxVisible] = createSignal(7);
+    // untrack: Storybook's Solid renderer wraps every story's render() in its
+    // own createMemo. Without this, createPagination's internal setup memo
+    // reading totalPages()/maxVisible() during its first synchronous compute
+    // leaks as a dependency of that outer memo, causing it to re-invoke this
+    // entire render() function (creating brand-new signals) whenever those
+    // values change — which breaks rendering. See
+    // https://github.com/solidjs-community/solid-primitives/issues/795
+    const [paginationProps, page, _setPage] = untrack(() =>
+      createPagination(() => ({
+        pages: totalPages(),
+        maxPages: maxVisible(),
+        showEllipsis: true,
+      })),
+    );
+
+    return (
+      <Errored fallback={(err, reset) => <p>Error: {err} <button type="reset" onClick={reset}>Reset</button></p>}>
+        <Container minWidth={400}>
+          <StatRow label="Current page" value={page()} />
+          <PaginationBar props={paginationProps} />
+          <Separator />
+          <Section title="Max visible">
+            <ButtonRow>
+              <For each={[5, 7, 10] as const}>
+                {n => (
+                  <Button
+                    variant={maxVisible() === n ? "primary" : "outline"}
+                    onClick={() => setMaxVisible(n)}
+                  >
+                    {n}
+                  </Button>
+                )}
+              </For>
+            </ButtonRow>
+          </Section>
+          <Section title="Total pages">
+            <ButtonRow>
+              <For each={[10, 20, 50] as const}>
+                {n => (
+                  <Button
+                    variant={totalPages() === n ? "primary" : "outline"}
+                    onClick={() => setTotalPages(n)}
+                  >
+                    {n}
+                  </Button>
+                )}
+              </For>
+            </ButtonRow>
+          </Section>
+        </Container>
+      </Errored>
+    );
+  },
+});
+
 export const CreateSegmentStory = meta.story({
   name: "Paged item grid",
   parameters: {
@@ -142,7 +210,7 @@ export const CreateSegmentStory = meta.story({
         pages: Math.ceil(ITEMS.length / limit()),
         maxPages: 5,
         showFirst: false,
-        showLast: false,
+        showLast: false,        
       })),
     );
     const segment = createSegment(ITEMS, limit, page);

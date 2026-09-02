@@ -4,6 +4,7 @@ import { colors, font, radii } from "./tokens.js";
 export const Button = (props: {
   "aria-current"?: "page";
   "aria-label"?: string;
+  inert?: boolean;
   onClick?: (ev: MouseEvent) => void;
   onKeyUp?: (ev: KeyboardEvent) => void;
   children: JSX.Element;
@@ -17,6 +18,7 @@ export const Button = (props: {
   <button
     aria-label={props["aria-label"]}
     aria-current={props["aria-current"]}
+    inert={props.inert}
     ref={props.ref}
     type={props.type ?? "button"}
     onClick={props.onClick}

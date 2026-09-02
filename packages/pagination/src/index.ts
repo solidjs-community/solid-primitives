@@ -62,38 +62,44 @@ export type PaginationOptions = {
   maxPages?: number;
   /** start with another page than `1` */
   initialPage?: number;
-  /** show an element for the first page */
-  showFirst?: boolean | ((page: number, pages: number) => boolean);
+  /** number of pages a large jump, if it should exist, should skip */
+  jumpPages?: number;
   /** show an element for the previous page */
   showPrev?: boolean | ((page: number, pages: number) => boolean);
   /** show an element for the next page */
   showNext?: boolean | ((page: number, pages: number) => boolean);
-  /** show an element for the last page */
-  showLast?: boolean | ((page: number, pages: number) => boolean);
-  /** content for the first page element, e.g. an SVG icon, default is "|<" */
-  firstContent?: JSX.Element;
   /** content for the previous page element, e.g. an SVG icon, default is "<" */
   prevContent?: JSX.Element;
   /** content for the next page element, e.g. an SVG icon, default is ">" */
   nextContent?: JSX.Element;
-  /** content for the last page element, e.g. an SVG icon, default is ">|" */
-  lastContent?: JSX.Element;
-  /** accessible name for the first page element, default is "First page" */
-  firstAriaLabel?: string;
   /** accessible name for the previous page element, default is "Previous page" */
   prevAriaLabel?: string;
   /** accessible name for the next page element, default is "Next page" */
   nextAriaLabel?: string;
+  /** show an element for the first page */
+  showFirst?: boolean | ((page: number, pages: number) => boolean);
+  /** show an element for the last page */
+  showLast?: boolean | ((page: number, pages: number) => boolean);
+  /** content for the first page element, e.g. an SVG icon, default is "|<" */
+  firstContent?: JSX.Element;
+  /** content for the last page element, e.g. an SVG icon, default is ">|" */
+  lastContent?: JSX.Element;
+  /** accessible name for the first page element, default is "First page" */
+  firstAriaLabel?: string;  
   /** accessible name for the last page element, default is "Last page" */
   lastAriaLabel?: string;
-  /** number of pages a large jump, if it should exist, should skip */
-  jumpPages?: number;
+  /** always show first and last page, with an adjacent ellipsis if there is a gap */
+  showEllipsis?: boolean | ((page: number, pages: number) => boolean);
+  /** content for the ellipsis element, e.g. an SVG icon or a text */
+  ellipsisContent?: () => JSX.Element;
 };
 
 export type PaginationProps = {
   "aria-current"?: "page";
   "aria-label"?: string;
   disabled?: boolean;
+  /** hides ellipsis from screen readers to be accessible */ 
+  inert?: boolean;
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
   onKeyUp?: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent>;
   children: JSX.Element;
@@ -117,6 +123,7 @@ export const PAGINATION_DEFAULTS = {
   prevAriaLabel: "Previous page",
   nextAriaLabel: "Next page",
   lastAriaLabel: "Last page",
+  ellipsisContent: "...",
 } as const;
 
 const normalizeOption = (
@@ -155,6 +162,8 @@ export const createPagination = (
   options?: MaybeAccessor<PaginationOptions>,
 ): [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>] => {
   const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
+  const showEllipsisOpt = opts().showEllipsis;
+
   // ownedWrite allows setPage to be called from event handlers and reactive scopes
   const [rawPage, setPage] = wrapSetter(
     createSignal<number>(opts().initialPage || 1, { ownedWrite: true }),
@@ -170,7 +179,7 @@ export const createPagination = (
 
   // Clamp page to valid range reactively — handles page count decreasing below current page
   const page: Accessor<number> = createMemo(() => Math.max(1, Math.min(rawPage(), opts().pages)));
-  
+
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
     // select the parent before we might get detached
     let parent = ev.currentTarget, current;
@@ -317,9 +326,23 @@ export const createPagination = (
       },
     },
   );
+  const ellipsis = Object.defineProperties(
+     ({ inert: true } as unknown as PaginationProps[number]),
+     {
+       children: { 
+         get: typeof opts().ellipsisContent === "function" ? opts().ellipsisContent : () => PAGINATION_DEFAULTS.ellipsisContent,
+         set: noop,
+         enumerable: true,
+       },
+     },
+  );
 
+  const showEllipsis = typeof showEllipsisOpt === "function"
+    ? () => showEllipsisOpt(page(), pages().length)
+    : () => showEllipsisOpt;
+    
   const start = createMemo(() =>
-    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1),
+    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1)
   );
   const showFirst = createMemo(() =>
     normalizeOption("showFirst", opts().showFirst, page(), opts().pages),
@@ -333,28 +356,22 @@ export const createPagination = (
   const showLast = createMemo(() =>
     normalizeOption("showLast", opts().showLast, page(), opts().pages),
   );
-
+  
   const paginationProps = createMemo<PaginationProps>(() => {
+    const firstEllipsis = showEllipsis() && start() > 0;
+    const lastEllipsis = showEllipsis() && start() + maxPages() < pages().length - 1;
     const props = [];
-    if (showFirst()) {
-      props.push(first);
-    }
-    if (opts().jumpPages) {
-      props.push(jumpBack);
-    }
-    if (showPrev()) {
-      props.push(back);
-    }
-    props.push(...pages().slice(start(), start() + maxPages()));
-    if (showNext()) {
-      props.push(next);
-    }
-    if (opts().jumpPages) {
-      props.push(jumpForth);
-    }
-    if (showLast()) {
-      props.push(last);
-    }
+    
+    if (showFirst() && !showEllipsis()) props.push(first);
+    if (opts().jumpPages) props.push(jumpBack);
+    if (showPrev()) props.push(back);
+    if (firstEllipsis) props.push(pages()[0], ellipsis);
+    props.push(...pages().slice(start() + (firstEllipsis ? 2 : 0), start() + maxPages() - (lastEllipsis ? 2 : 0)));
+    if (lastEllipsis) props.push(ellipsis, pages().at(-1));
+    if (showNext()) props.push(next);
+    if (opts().jumpPages) props.push(jumpForth);
+    if (showLast() && !showEllipsis()) props.push(last);
+
     return props;
   });
 
