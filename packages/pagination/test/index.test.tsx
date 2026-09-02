@@ -48,6 +48,29 @@ describe("createPagination", () => {
     expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(3);
     dispose();
   });
+  
+  test("createPagination with ellipsis returns correct props", () => {
+    const { paginationProps, page, setPage, dispose } = createRoot(dispose => {
+      const [paginationProps, page, setPage] = createPagination({ pages: 100, showEllipsis: true });
+      return { paginationProps, page, setPage, dispose };
+    });
+    expect(paginationProps().map(({ children }) => children)).toEqual([
+      "<",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "...",
+      "100",
+      ">",
+    ]);
+    expect(paginationProps()[9].inert).toBeTruthy();
+    dispose();
+  });
 
   test("createPagination applies default aria-labels", () => {
     const { paginationProps, dispose } = createRoot(dispose => {
