@@ -23,7 +23,7 @@
       "DocumentEventListener"
     ],
     "category": "Browser APIs",
-    "gzip": 896
+    "gzip": 905
   },
   "private": false,
   "sideEffects": false,

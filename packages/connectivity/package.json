@@ -21,7 +21,7 @@
       "createConnectivitySignal"
     ],
     "category": "Network",
-    "gzip": 976
+    "gzip": 982
   },
   "files": [
     "dist"
