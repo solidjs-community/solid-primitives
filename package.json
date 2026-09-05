@@ -31,9 +31,10 @@
     "jsr:sync-versions:check": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/sync-jsr-versions.ts --check",
     "update-readme": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/update-readme.ts",
     "measure": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/measure.ts",
+    "verify:manifests": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/verify-published-manifests.ts",
     "version": "changeset version && pnpm jsr:sync-versions && pnpm i --no-frozen-lockfile && git add .",
-    "release": "pnpm build && changeset publish",
-    "release-tagged": "pnpm build && if [ -f .changeset/pre.json ]; then changeset publish; else changeset publish --tag \"$BRANCH_NAME\"; fi"
+    "release": "pnpm build && pnpm run verify:manifests && changeset publish",
+    "release-tagged": "pnpm build && pnpm run verify:manifests && if [ -f .changeset/pre.json ]; then changeset publish; else changeset publish --tag \"$BRANCH_NAME\"; fi"
   },
   "devDependencies": {
     "@babel/core": "catalog:",
