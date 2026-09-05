@@ -139,6 +139,7 @@
     "favicon-initial",
     "filesystem-solid2-migration",
     "fix-barrel-exports-rolldown-compat",
+    "fix-catalog-protocol-republish",
     "fix-event-listener-hydration",
     "flux-store-solid2-migration",
     "focus-restore-primitive",
