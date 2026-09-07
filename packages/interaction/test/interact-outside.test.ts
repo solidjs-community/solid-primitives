@@ -307,4 +307,110 @@ describe("createInteractOutside", () => {
       second.cleanup();
     });
   });
+
+  describe("Shadow DOM", () => {
+    // These listeners live on the document, so an event originating inside a shadow tree is
+    // retargeted to that tree's host before it arrives. A watched element rendered inside a shadow
+    // root would therefore see every one of its own interactions reported as the host — an
+    // *ancestor* of it, not a descendant — so `el.contains(target)` read false and the element
+    // treated its own content as outside. The visible symptom is a popover that dismisses when you
+    // click inside it, and a trigger that closes and immediately reopens.
+    function setupShadowTest(extraProps: Partial<CreateInteractOutsideProps> = {}) {
+      const onFocusOutside = vi.fn();
+      const onPointerDownOutside = vi.fn();
+      const onInteractOutside = vi.fn();
+
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+      const shadowRoot = host.attachShadow({ mode: "open" });
+
+      // A child of the watched element, not the element itself: only a descendant is deep enough
+      // for retargeting to change the answer.
+      const inside = createElement("div", "inside");
+      const insideChild = createElement("div", "inside-child");
+      inside.appendChild(insideChild);
+      shadowRoot.appendChild(inside);
+
+      // A sibling in the same shadow root — genuinely outside, and must stay that way.
+      const outside = createElement("div", "outside");
+      shadowRoot.appendChild(outside);
+
+      const dispose = createRoot(d => {
+        createInteractOutside(
+          { onFocusOutside, onPointerDownOutside, onInteractOutside, ...extraProps },
+          () => inside,
+        );
+        return d;
+      });
+
+      flush();
+      vi.runAllTimers();
+
+      return {
+        mocks: { onFocusOutside, onPointerDownOutside, onInteractOutside },
+        inside,
+        insideChild,
+        outside,
+        cleanup: () => {
+          dispose();
+          host.remove();
+        },
+      };
+    }
+
+    it("does not trigger on pointerdown inside the watched element's own shadow content", () => {
+      const { mocks, insideChild, cleanup } = setupShadowTest();
+
+      insideChild.dispatchEvent(
+        new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "mouse" }),
+      );
+
+      expect(mocks.onPointerDownOutside).not.toHaveBeenCalled();
+      expect(mocks.onInteractOutside).not.toHaveBeenCalled();
+      cleanup();
+    });
+
+    it("does not trigger when focus moves into the watched element's own shadow content", () => {
+      const { mocks, insideChild, cleanup } = setupShadowTest();
+
+      insideChild.dispatchEvent(new FocusEvent("focusin", { bubbles: true, composed: true }));
+
+      expect(mocks.onFocusOutside).not.toHaveBeenCalled();
+      expect(mocks.onInteractOutside).not.toHaveBeenCalled();
+      cleanup();
+    });
+
+    it("still triggers on pointerdown on a sibling in the same shadow root", () => {
+      const { mocks, outside, cleanup } = setupShadowTest();
+
+      outside.dispatchEvent(
+        new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "mouse" }),
+      );
+
+      expect(mocks.onPointerDownOutside).toHaveBeenCalledTimes(1);
+      expect(mocks.onInteractOutside).toHaveBeenCalledTimes(1);
+      cleanup();
+    });
+
+    it("passes the retargeted element, not the shadow host, to shouldExcludeElement", () => {
+      // The mechanism behind kobaltedev/kobalte#445: a consumer excludes its trigger via
+      // `shouldExcludeElement`, but was handed the shadow host, which never matches the trigger —
+      // so the layer dismissed on the very interaction that was meant to be exempt.
+      const seen: Element[] = [];
+      const { outside, cleanup } = setupShadowTest({
+        shouldExcludeElement: el => {
+          seen.push(el);
+          return false;
+        },
+      });
+
+      outside.dispatchEvent(
+        new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "mouse" }),
+      );
+
+      expect(seen).toContain(outside);
+      expect(seen.some(el => el.shadowRoot != null)).toBe(false);
+      cleanup();
+    });
+  });
 });
