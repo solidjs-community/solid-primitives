@@ -16,14 +16,8 @@ for (const dev of [true, false]) {
     bundle: true,
     platform: "node",
     format: "esm",
-    alias: {
-      "@solidjs/signals": path("../../../../solid/packages/signals/src/index.ts"),
-      "solid-js": path("../../../../solid/packages/solid/src/index.ts"),
-      "solid-js/internal": path("../../../../solid/packages/solid/src/internal.ts"),
-      "@solidjs/web": path("../../../../solid/packages/web/src/index.ts"),
-    },
-    // Internal invariant registries intentionally retain companion owners.
-    define: { __DEV__: String(dev), __OBSERVE__: String(dev), __TEST__: "false" },
+    // Exercise the shipped client builds, including in this Node GC process.
+    conditions: ["browser", ...(dev ? ["development"] : [])],
   });
   process.stdout.write(`Weak collection GC (${dev ? "development" : "production"})\n`);
   const result = spawnSync(process.execPath, ["--expose-gc", outfile], { stdio: "inherit" });

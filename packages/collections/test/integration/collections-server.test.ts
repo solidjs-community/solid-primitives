@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createRoot, NotReadyError } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { getProjectionTrace } from "collection-test-server-signals";
+import { getProjectionTrace } from "solid-js/internal";
 import { createReactiveMap, createReactiveSet } from "../../src/index.js";
 const disposers: (() => void)[] = [];
 function root<T>(fn: () => T): T {

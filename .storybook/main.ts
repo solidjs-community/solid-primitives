@@ -47,10 +47,11 @@ const config: StorybookConfig = {
           },
         },
       ],
+      // Keep direct signals imports in the same prebundle as Solid's runtime.
+      optimizeDeps: { include: ["@solidjs/signals"] },
       resolve: {
         conditions: ["@solid-primitives/source"],
         alias: [{ find: "solid-js/web", replacement: "@solidjs/web" }],
-        dedupe: ["react", "react-dom"],
       },
     });
   },

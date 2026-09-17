@@ -17,7 +17,7 @@ Insertion order uses an immutable AVL tree of ordinals and slot names. Structura
 
 Iterators read the current store order when consumed. They advance with a stack until the visible root changes, then seek after the last ordinal. Weak key caches prevent historical iterator trees from retaining deleted object keys. Values use frozen wrapper objects so shallow ingestion does not alter user objects. The serializer handles shared identities and cycles through the backing store.
 
-The implementation uses public Solid APIs. Private node inspections and sibling-source aliases occur only in tests.
+The implementation uses public Solid APIs. Private node inspections and projection-trace inspection through `solid-js/internal` occur only in tests.
 
 ## Behavioral boundaries
 
@@ -29,7 +29,7 @@ The implementation uses public Solid APIs. Private node inspections and sibling-
 
 ## Validation
 
-Build the sibling Solid packages and declarations first, including its Babel plugin, signals declarations at `packages/signals/dist/types`, and Solid declarations at `packages/solid/types`. The focused configurations resolve those sources and declarations explicitly.
+Install the workspace dependencies before running the package checks. Runtime tests, type checking, and Storybook use the installed Solid packages.
 
 From this package directory:
 
@@ -40,9 +40,9 @@ pnpm lint
 pnpm build
 ```
 
-`test` runs server rendering before client hydration, then the weak lifetime suite in separate development/production processes with real GC. A failed server run prevents consumption of stale fixtures. Tests live under `test/integration` so the ordinary RC-based suite does not accidentally load the source-only integration setup. Generated bundles and hydration fixtures stay under the ignored `node_modules/.cache` directory.
+`test` runs server rendering before client hydration, then the weak lifetime suite in separate development/production processes with real GC. A failed server run prevents consumption of stale fixtures. The shared test runner discovers `test/*.test.*`; keeping this suite under `test/integration` lets the package runner select the right compiler/runtime conditions, generate fresh SSR fixtures before hydration, and enable GC for lifetime checks. Generated bundles and hydration fixtures stay under the ignored `node_modules/.cache` directory.
 
-Coverage includes lazy node allocation/release, raw identity, native collection behavior and live iteration, a deterministic 2,000-operation comparison with native Map, replacement order, errors, refresh, async supersession/disposal, held truth, optimistic rollback, shared serialized identities, delayed hydration, and weak-key/value lifetime. The focused suite contains 38 server cases, 129 client/codec cases, and 40 GC cases in each build profile.
+Coverage includes lazy node allocation/release, raw identity, native collection behavior and live iteration, a deterministic 2,000-operation comparison with native Map, replacement order, errors, refresh, async supersession/disposal, held truth, optimistic rollback, shared serialized identities, delayed hydration, and weak-key/value lifetime.
 
 To run lifetime checks alone or measure the current collection implementation:
 
@@ -52,3 +52,17 @@ pnpm bench
 ```
 
 The benchmarks cover structural edits, a single edit among 1,000 observed values, and full traversal. Native Set provides a reference for structural edits and traversal; it does not perform reactive notification.
+
+## Storybook
+
+Run from the repository root:
+
+```sh
+pnpm storybook
+# or build a static preview:
+pnpm build-storybook
+```
+
+Stories live under `stories/` and are discovered by the shared Storybook configuration, using the workspace dependencies.
+
+Both Map and Set have basic, derived async, derived async iterable, derived async + optimistic, and weak-variant examples. Requests are simulated locally. The optimistic examples offer accepted and rejected saves; the streaming examples can be restarted while a previous stream is still running.
