@@ -1,0 +1,84 @@
+{
+  "name": "@solid-primitives/collections",
+  "version": "0.1.0",
+  "description": "Reactive Map, Set, WeakMap, and WeakSet primitives with async sources, optimistic updates, and SSR.",
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/collections",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "collections",
+    "stage": 0,
+    "list": [
+      "createReactiveMap",
+      "createReactiveSet",
+      "createReactiveWeakMap",
+      "createReactiveWeakSet"
+    ],
+    "category": "Reactivity"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "collections",
+    "map",
+    "set",
+    "weakmap",
+    "weakset",
+    "reactive"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "@solid-primitives/source": "./src/index.ts",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./serialization": {
+      "import": {
+        "@solid-primitives/source": "./src/serialization.ts",
+        "types": "./dist/serialization.d.ts",
+        "default": "./dist/serialization.js"
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "serialization": [
+        "./dist/serialization.d.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "node scripts/test.mjs",
+    "test:gc": "node scripts/test-gc.mjs",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "lint": "oxlint src test --max-warnings 0",
+    "bench": "vitest bench --run --config vitest.config.ts"
+  },
+  "peerDependencies": {
+    "@solidjs/signals": "catalog:peer",
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer"
+  },
+  "devDependencies": {
+    "@solidjs/signals": "catalog:",
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "isolatedDeclarations": false, "noEmit": true, "types": ["node"] },
+  "include": [
+    "test/integration/collections.type-tests.ts",
+    "test/integration/gc/weak-collections.test.ts"
+  ]
+}

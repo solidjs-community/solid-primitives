@@ -1,0 +1,14 @@
+{
+  "name": "@solid-primitives/collections",
+  "version": "0.0.100",
+  "description": "Reactive Map, Set, WeakMap, and WeakSet factories with computed drafts, async sources, optimistic updates, and SSR.",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./serialization": "./src/serialization.ts",
+  },
+  "publish": {
+    "include": ["README.md", "LICENSE", "src/**/*.ts", "package.json"],
+    "exclude": ["dist", "docs", "scripts", "test", "node_modules", "*.config.ts", "tsconfig*.json"],
+  },
+}
