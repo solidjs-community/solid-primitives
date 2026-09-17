@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "paths": {
+      "@solidjs/signals": ["../../../solid/packages/signals/dist/types/index.d.ts"],
+      "@solidjs/signals/*": ["../../../solid/packages/signals/dist/types/*"],
+      "solid-js": ["../../../solid/packages/solid/types/index.d.ts"]
+    }
+  },
+  "include": ["src"]
+}

@@ -49,6 +49,7 @@ catalogs:
   peer:
     solid-js: ^2.0.0-rc.0
     '@solidjs/web': ^2.0.0-rc.0
+    '@solidjs/signals': 2.0.0-rc.0
 
 patchedDependencies:
   storybook-solidjs-vite@10.5.2: patches/storybook-solidjs-vite@10.5.2.patch
