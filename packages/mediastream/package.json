@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mediastream",
-  "version": "1.0.0-next.2",
+  "version": "1.0.0-next.3",
   "description": "Primitives to work with media streams from microphones, cameras, and the screen",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/media",
-  "version": "4.0.0-next.2",
+  "version": "4.0.0-next.3",
   "description": "Primitives for media query and device features",
   "license": "MIT",
   "exports": "./src/index.ts",
