@@ -5,6 +5,11 @@ packages:
 overrides:
   react: 19.2.7
   react-dom: 19.2.7
+  # @solidjs/vite-plugin asks for `babel-preset-solid: ^2.0.0-rc.0`, which pnpm happily
+  # satisfies with an older rc already present in the lockfile. Pin it to the same rc.2
+  # the catalog uses so exactly one Solid 2 preset compiles JSX across both vitest
+  # configs. Scoped, so the Solid 1 copies (unplugin-solid, storybook) are untouched.
+  '@solidjs/vite-plugin>babel-preset-solid': 2.0.0-rc.2
   # @kobalte/solidbase still depends on @solidjs/router ^0.15.3. Without this
   # override the site app and solidbase get separate router instances, which
   # breaks SSR. Remove once solidbase depends on router 1.
@@ -26,9 +31,9 @@ packageExtensions:
       esbuild: ^0.25.0
 
 minimumReleaseAgeExclude:
-  - '@solidjs/signals@2.0.0-rc.0'
-  - '@solidjs/web@2.0.0-rc.0'
-  - solid-js@2.0.0-rc.0
+  - '@solidjs/signals@2.0.0-rc.9'
+  - '@solidjs/web@2.0.0-rc.9'
+  - solid-js@2.0.0-rc.9
   - '@dom-expressions/babel-plugin-jsx@0.50.0-next.42'
   - babel-preset-solid@2.0.0-rc.0
 
@@ -39,16 +44,17 @@ onlyBuiltDependencies:
 catalog:
   tsdown: ^0.22.3
   unplugin-solid: ^1.0.0
-  solid-js: 2.0.0-rc.0
-  '@solidjs/web': 2.0.0-rc.0
-  '@solidjs/signals': 2.0.0-rc.0
-  babel-preset-solid: 2.0.0-rc.0
+  solid-js: 2.0.0-rc.9
+  '@solidjs/web': 2.0.0-rc.9
+  '@solidjs/signals': 2.0.0-rc.9
+  babel-preset-solid: 2.0.0-rc.2
+  '@solidjs/vite-plugin': 3.0.0-next.31
   '@babel/core': ^7.29.7
 
 catalogs:
   peer:
-    solid-js: ^2.0.0-rc.0
-    '@solidjs/web': ^2.0.0-rc.0
+    solid-js: ^2.0.0-rc.9
+    '@solidjs/web': ^2.0.0-rc.9
 
 patchedDependencies:
   storybook-solidjs-vite@10.5.2: patches/storybook-solidjs-vite@10.5.2.patch

@@ -1,5 +1,5 @@
 import { defineConfig, type Plugin } from "vitest/config";
-import solidPlugin from "vite-plugin-solid";
+import solidPlugin from "@solidjs/vite-plugin";
 import * as utils from "../../scripts/utils/index.js";
 
 const package_name = utils.getPackageNameFromCWD();

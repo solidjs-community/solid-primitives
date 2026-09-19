@@ -1,0 +1,106 @@
+---
+"@solid-primitives/a11y": patch
+"@solid-primitives/active-element": patch
+"@solid-primitives/analytics": patch
+"@solid-primitives/animation": patch
+"@solid-primitives/async": patch
+"@solid-primitives/audio": patch
+"@solid-primitives/bounds": patch
+"@solid-primitives/broadcast-channel": patch
+"@solid-primitives/clipboard": patch
+"@solid-primitives/connectivity": patch
+"@solid-primitives/context": patch
+"@solid-primitives/controlled-props": patch
+"@solid-primitives/controlled-signal": patch
+"@solid-primitives/cookies": patch
+"@solid-primitives/cursor": patch
+"@solid-primitives/date": patch
+"@solid-primitives/deep": patch
+"@solid-primitives/destructure": patch
+"@solid-primitives/devices": patch
+"@solid-primitives/drag-drop": patch
+"@solid-primitives/event-bus": patch
+"@solid-primitives/event-dispatcher": patch
+"@solid-primitives/event-listener": patch
+"@solid-primitives/event-props": patch
+"@solid-primitives/favicon": patch
+"@solid-primitives/filesystem": patch
+"@solid-primitives/flux-store": patch
+"@solid-primitives/focus": patch
+"@solid-primitives/form": patch
+"@solid-primitives/fullscreen": patch
+"@solid-primitives/geolocation": patch
+"@solid-primitives/gestures": patch
+"@solid-primitives/history": patch
+"@solid-primitives/i18n": patch
+"@solid-primitives/idle": patch
+"@solid-primitives/input-mask": patch
+"@solid-primitives/interaction": patch
+"@solid-primitives/intersection-observer": patch
+"@solid-primitives/jsx-tokenizer": patch
+"@solid-primitives/keyboard": patch
+"@solid-primitives/keyed": patch
+"@solid-primitives/lifecycle": patch
+"@solid-primitives/list": patch
+"@solid-primitives/list-state": patch
+"@solid-primitives/map": patch
+"@solid-primitives/marker": patch
+"@solid-primitives/masonry": patch
+"@solid-primitives/match": patch
+"@solid-primitives/media": patch
+"@solid-primitives/mediastream": patch
+"@solid-primitives/memo": patch
+"@solid-primitives/mouse": patch
+"@solid-primitives/mutable": patch
+"@solid-primitives/mutation-observer": patch
+"@solid-primitives/notification": patch
+"@solid-primitives/orientation": patch
+"@solid-primitives/page-utilities": patch
+"@solid-primitives/pagination": patch
+"@solid-primitives/permission": patch
+"@solid-primitives/platform": patch
+"@solid-primitives/pointer": patch
+"@solid-primitives/presence": patch
+"@solid-primitives/promise": patch
+"@solid-primitives/props": patch
+"@solid-primitives/queue": patch
+"@solid-primitives/raf": patch
+"@solid-primitives/range": patch
+"@solid-primitives/refs": patch
+"@solid-primitives/resize-observer": patch
+"@solid-primitives/rootless": patch
+"@solid-primitives/scheduled": patch
+"@solid-primitives/script-loader": patch
+"@solid-primitives/scroll": patch
+"@solid-primitives/selection": patch
+"@solid-primitives/sensors": patch
+"@solid-primitives/set": patch
+"@solid-primitives/share": patch
+"@solid-primitives/signal-builders": patch
+"@solid-primitives/sortable": patch
+"@solid-primitives/spring": patch
+"@solid-primitives/sse": patch
+"@solid-primitives/state-machine": patch
+"@solid-primitives/static-store": patch
+"@solid-primitives/storage": patch
+"@solid-primitives/styles": patch
+"@solid-primitives/timer": patch
+"@solid-primitives/transition-group": patch
+"@solid-primitives/trigger": patch
+"@solid-primitives/tween": patch
+"@solid-primitives/upload": patch
+"@solid-primitives/url": patch
+"@solid-primitives/utils": patch
+"@solid-primitives/vibrate": patch
+"@solid-primitives/video": patch
+"@solid-primitives/virtual": patch
+"@solid-primitives/websocket": patch
+"@solid-primitives/workers": patch
+---
+
+Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+Two behavior fixes were needed to keep up with upstream changes in this range:
+
+- `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+- `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the *previous* one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
