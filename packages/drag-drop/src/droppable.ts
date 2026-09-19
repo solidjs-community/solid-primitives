@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, DEV, flush } from "solid-js";
+import { createEffect, createMemo, createSignal, DEV } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { useDragContext } from "./context.tsx";
@@ -139,7 +139,6 @@ export function createDroppable<T = unknown>(
     setElSignal(() => el);
     applyStyle(el, options.style);
     applyClass(el, options.class);
-    flush();
   };
 
   return { ref, isOver, active, id };
@@ -311,7 +310,6 @@ export function createNativeDroppable(
 
   const ref = (el: HTMLElement) => {
     setElSignal(() => el);
-    flush();
   };
 
   return { ref, isOver };

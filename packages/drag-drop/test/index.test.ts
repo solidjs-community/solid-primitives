@@ -1073,6 +1073,7 @@ describe("createNativeDroppable", () => {
       const div = el();
       const drop = createNativeDroppable();
       drop.ref(div);
+      flush(); // refs no longer flush; effects attach on the next flush
 
       drag(div, "dragenter");
       flush();
@@ -1091,6 +1092,7 @@ describe("createNativeDroppable", () => {
       const div = el();
       const drop = createNativeDroppable();
       drop.ref(div);
+      flush(); // refs no longer flush; effects attach on the next flush
 
       drag(div, "dragenter"); // depth = 1
       drag(div, "dragenter"); // depth = 2
@@ -1115,6 +1117,7 @@ describe("createNativeDroppable", () => {
       let enterCount = 0;
       const drop = createNativeDroppable({ onEnter: () => enterCount++ });
       drop.ref(div);
+      flush(); // refs no longer flush; effects attach on the next flush
 
       drag(div, "dragenter"); // depth = 1 — fires
       drag(div, "dragenter"); // depth = 2 (bubbled from a child) — must not fire again
@@ -1131,6 +1134,7 @@ describe("createNativeDroppable", () => {
       let rejectNext = true;
       const drop = createNativeDroppable({ accept: () => !rejectNext });
       drop.ref(div);
+      flush(); // refs no longer flush; effects attach on the next flush
 
       drag(div, "dragenter"); // rejected — depth must stay at 0, not go negative
       drag(div, "dragleave");
@@ -1151,6 +1155,7 @@ describe("createNativeDroppable", () => {
       const div = el();
       const drop = createNativeDroppable();
       drop.ref(div);
+      flush(); // refs no longer flush; effects attach on the next flush
 
       drag(div, "dragenter");
       flush();
@@ -1169,6 +1174,7 @@ describe("createNativeDroppable", () => {
       let dropped = false;
       const drop = createNativeDroppable({ onDrop: () => { dropped = true; } });
       drop.ref(div);
+      flush(); // refs no longer flush; effects attach on the next flush
       drag(div, "drop");
       expect(dropped).toBe(true);
       dispose();
@@ -1181,6 +1187,7 @@ describe("createNativeDroppable", () => {
       let dropped = false;
       const drop = createNativeDroppable({ accept: () => false, onDrop: () => { dropped = true; } });
       drop.ref(div);
+      flush(); // refs no longer flush; effects attach on the next flush
       drag(div, "drop");
       expect(dropped).toBe(false);
       dispose();
