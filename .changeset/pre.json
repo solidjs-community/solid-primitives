@@ -130,6 +130,7 @@
     "deep-solid2-migration",
     "destructure-solid2-migration",
     "devices-solid2-migration",
+    "drag-drop-no-flush-in-ref",
     "drag-new-package",
     "eleven-baths-build",
     "eleven-buttons-jump",
