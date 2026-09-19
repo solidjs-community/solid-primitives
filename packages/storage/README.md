@@ -115,7 +115,7 @@ const [state, setState] = makePersisted(createSignal(), {
 LocalForage uses indexedDB or WebSQL if available to greatly increase the size of what can be stored. Just drop it in as a storage (only supported in the client):
 
 ```ts
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import { makePersisted } from "@solid-primitives/storage";
 import localforage from "localforage";
 

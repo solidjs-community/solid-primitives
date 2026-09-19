@@ -136,17 +136,17 @@ function createFocusSignal(target: MaybeAccessor<Element>): Accessor<boolean>;
 
 ## `focus`
 
-A directive that notifies you when the element becomes active or inactive.
+A ref factory that notifies you when the element becomes active or inactive.
 
 ```tsx
 const [active, setActive] = createSignal(false)
-<input use:focus={setActive} />
+<input ref={focus(setActive)} />
 ```
 
 #### Definition
 
 ```ts
-Directive<(isActive: boolean) => void>;
+function focus(callback: (isActive: boolean) => void): (target: Element) => void;
 ```
 
 ## Changelog

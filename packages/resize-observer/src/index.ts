@@ -118,9 +118,10 @@ export function getWindowSize(): Size {
  * Creates a reactive store-like object of current width and height dimensions of window, page and screen.
  * @example
  * const size = createWindowSize();
- * createEffect(() => {
- *   console.log(size.width, size.height)
- * })
+ * createEffect(
+ *   () => [size.width, size.height],
+ *   ([width, height]) => console.log(width, height),
+ * );
  */
 export function createWindowSize(): Readonly<Size> {
   if (isServer) {
@@ -138,9 +139,10 @@ export function createWindowSize(): Readonly<Size> {
  *
  * @example
  * const size = useWindowSize();
- * createEffect(() => {
- *   console.log(size.width, size.height)
- * })
+ * createEffect(
+ *   () => [size.width, size.height],
+ *   ([width, height]) => console.log(width, height),
+ * );
  */
 export const useWindowSize: typeof createWindowSize =
   /*#__PURE__*/ createHydratableSingletonRoot(createWindowSize);
@@ -173,9 +175,10 @@ export function getElementSize(target: Element | false | undefined | null): Null
  * @returns `{ width: number, height: number, clientWidth: number, clientHeight: number }`
  * @example
  * const size = createElementSize(document.body);
- * createEffect(() => {
- *   console.log(size.width, size.height, size.clientWidth, size.clientHeight)
- * })
+ * createEffect(
+ *   () => [size.width, size.height, size.clientWidth, size.clientHeight],
+ *   ([width, height, clientWidth, clientHeight]) => console.log(width, height, clientWidth, clientHeight),
+ * );
  */
 export function createElementSize(target: Element): Readonly<SizeWithClient>;
 export function createElementSize(

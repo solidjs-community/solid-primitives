@@ -61,7 +61,10 @@ export const createBranch: typeof createSubRoot = createSubRoot;
  *
  * @example
  * const handleClick = createCallback(() => {
- *    createEffect(() => {})
+ *    createEffect(
+ *      () => count(),
+ *      count => console.log(count),
+ *    )
  * })
  */
 export const createCallback = <T extends AnyFunction>(
@@ -78,7 +81,10 @@ export const createCallback = <T extends AnyFunction>(
  * @example
  * ```ts
  * const dispose = createDisposable(dispose => {
- *    createEffect(() => {...})
+ *    createEffect(
+ *      () => count(),
+ *      count => {...},
+ *    )
  * });
  * // dispose later (if not, will dispose automatically)
  * dispose()
@@ -217,11 +223,14 @@ export type RootPoolFunction<TArg, TResult> = (
  * const useCounter = createRootPool((arg, active, dispose) => {
  *   const [count, setCount] = createSignal(arg())
  *
- *   createEffect(() => {
- *     if (!active()) return
- *     // so some side effect
- *     console.log("count", count())
- *   })
+ *   createEffect(
+ *     () => (active() ? count() : undefined),
+ *     count => {
+ *       if (count === undefined) return
+ *       // do some side effect
+ *       console.log("count", count)
+ *     },
+ *   )
  *
  *   return <button onClick={() => setCount(count() + 1)}>Count: {count()}</button>
  * })

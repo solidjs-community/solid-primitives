@@ -1,7 +1,7 @@
 import { createEventListener } from "@solid-primitives/event-listener";
 import { remove, split } from "@solid-primitives/utils/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
-import { type Directive, entries, type Many, type MaybeAccessor } from "@solid-primitives/utils";
+import { entries, INTERNAL_OPTIONS, type Many, type MaybeAccessor } from "@solid-primitives/utils";
 import { type Accessor, createSignal, getOwner, DEV } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers.ts";
@@ -328,21 +328,48 @@ export function createPointerList(
 }
 
 //
-// DIRECTIVES:
+// DIRECTIVES (ref factories):
 //
 
 /**
- * A directive that will fire a callback once the pointer position change.
+ * The element a directive is applied to. The ref-factory form captures it through a signal
+ * written by the (unowned) ref callback, so the listeners created in the owned setup phase
+ * attach once the element exists; the 1.x two-argument form already has it in hand.
  */
-export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, props) => {
-  const { pointerTypes, handler } = (() => {
-    const v = props();
-    return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
-  })();
-  const runHandler = (e: PointerEvent, active = true) => handler(toStateActive(e, active), el);
+function directiveTarget<P>(
+  a: Element | P,
+  b: Accessor<P> | undefined,
+): [target: Accessor<Element | undefined>, props: P, ref: ((el: Element) => void) | undefined] {
+  if (b !== undefined) return [() => a as Element, b(), undefined];
+  const [target, setTarget] = createSignal<Element | undefined>(undefined, INTERNAL_OPTIONS);
+  return [target, a as P, el => setTarget(el)];
+}
+
+/**
+ * A ref factory (directive) that fires a callback whenever the pointer position over the
+ * element changes. Listeners are created in the calling component and disposed with it.
+ *
+ * @param props a handler `(state, el) => void`, or `{ handler, pointerTypes }`
+ * @returns a ref callback
+ * @example
+ * <div ref={pointerPosition(e => setPos({ x: e.x, y: e.y }))} />
+ */
+export function pointerPosition(props: PointerPositionDirectiveProps): (el: Element) => void;
+/** Directive form kept from 1.x (`use:pointerPosition`). Prefer the ref-factory form. */
+export function pointerPosition(el: Element, props: Accessor<PointerPositionDirectiveProps>): void;
+export function pointerPosition(
+  a: Element | PointerPositionDirectiveProps,
+  b?: Accessor<PointerPositionDirectiveProps>,
+): ((el: Element) => void) | void {
+  if (isServer) return b !== undefined ? undefined : () => {};
+  const [target, props, ref] = directiveTarget(a, b);
+  const { pointerTypes, handler } =
+    typeof props === "function" ? { handler: props, pointerTypes: undefined } : props;
+  const runHandler = (e: PointerEvent, active = true) =>
+    handler(toStateActive(e, active), target()!);
   let pointer: null | number = null;
   createPointerListeners({
-    target: el,
+    target,
     pointerTypes,
     onEnter: e => {
       if (pointer === null) {
@@ -360,27 +387,41 @@ export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, pr
       }
     },
   });
-};
+  return ref;
+}
 
 /**
- * A directive for checking if the element is being hovered by at least one pointer.
+ * A ref factory (directive) reporting whether the element is hovered by at least one pointer.
+ * Listeners are created in the calling component and disposed with it.
+ *
+ * @param props a handler `(hovering, el) => void`, or `{ handler, pointerTypes }`
+ * @returns a ref callback
+ * @example
+ * <div ref={pointerHover(setHovering)} />
  */
-export const pointerHover: Directive<PointerHoverDirectiveProps> = (el, props) => {
-  const { pointerTypes, handler } = (() => {
-    const v = props();
-    return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
-  })();
+export function pointerHover(props: PointerHoverDirectiveProps): (el: Element) => void;
+/** Directive form kept from 1.x (`use:pointerHover`). Prefer the ref-factory form. */
+export function pointerHover(el: Element, props: Accessor<PointerHoverDirectiveProps>): void;
+export function pointerHover(
+  a: Element | PointerHoverDirectiveProps,
+  b?: Accessor<PointerHoverDirectiveProps>,
+): ((el: Element) => void) | void {
+  if (isServer) return b !== undefined ? undefined : () => {};
+  const [target, props, ref] = directiveTarget(a, b);
+  const { pointerTypes, handler } =
+    typeof props === "function" ? { handler: props, pointerTypes: undefined } : props;
   const pointers = new Set<number>();
   createPointerListeners({
-    target: el as HTMLElement,
+    target,
     pointerTypes: pointerTypes,
     onEnter: e => {
       pointers.add(e.pointerId);
-      handler(true, el);
+      handler(true, target()!);
     },
     onLeave: e => {
       pointers.delete(e.pointerId);
-      if (pointers.size === 0) handler(false, el);
+      if (pointers.size === 0) handler(false, target()!);
     },
   });
-};
+  return ref;
+}

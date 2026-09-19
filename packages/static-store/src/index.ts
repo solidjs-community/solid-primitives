@@ -38,9 +38,10 @@ export type StaticStoreSetter<T extends object> = {
  *  setSize({ width: el.offsetWidth, height: el.offsetHeight });
  * });
  *
- * createEffect(() => {
- *   console.log(size.width, size.height);
- * })
+ * createEffect(
+ *   () => [size.width, size.height],
+ *   ([width, height]) => console.log(width, height),
+ * );
  * ```
  */
 export function createStaticStore<T extends Record<string, Exclude<unknown, Function>>>(
@@ -125,9 +126,10 @@ export function createHydratableStaticStore<T extends Record<string, Exclude<unk
  *
  * const store = createDerivedStaticStore(size);
  *
- * createEffect(() => {
- *   console.log(store.width, store.height);
- * })
+ * createEffect(
+ *   () => [store.width, store.height],
+ *   ([width, height]) => console.log(width, height),
+ * );
  * ```
  */
 export function createDerivedStaticStore<Next extends Prev & object, Prev = Next>(

@@ -1,5 +1,5 @@
-import { createMemo, createSignal, type Accessor } from "solid-js";
-import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
+import { createMemo, type Accessor } from "solid-js";
+import { INTERNAL_OPTIONS, createServerSafeSignal } from "@solid-primitives/utils";
 
 export type Queue<T> = {
   readonly first: T | undefined;
@@ -93,7 +93,7 @@ export function makeQueue<T>(initialValues: T[] = []): Queue<T> {
  * ```
  */
 export function createQueue<T>(initialValues: T[] = []): ReactiveQueue<T> {
-  const [items, setItems] = createSignal<T[]>([...initialValues], INTERNAL_OPTIONS);
+  const [items, setItems] = createServerSafeSignal<T[]>([...initialValues], INTERNAL_OPTIONS);
 
   const first = createMemo(() => items()[0]);
   const last = createMemo(() => {

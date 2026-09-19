@@ -1,9 +1,10 @@
 import { describe, test, expect, assert, vi } from "vitest";
-import { createSignal, createStore, flush } from "solid-js";
+import { createEffect, createRoot, createSignal, createStore, flush } from "solid-js";
 import {
   handleDiffArray,
   arrayEquals,
   createHydratableSignal,
+  createServerSafeSignal,
   wrapSetter,
   globalRegistry,
 } from "../src/index.js";
@@ -166,5 +167,28 @@ describe("wrapSetter", () => {
     expect(wrappedSignal[2]).toBe(modifiedSignal[2]);
     expect(wrappedSignal[3]).toBe(modifiedSignal[3]);
     expect(wrappedSignal).toHaveLength(modifiedSignal.length);
+  });
+});
+describe("createServerSafeSignal", () => {
+  test("is a real signal on the client", () => {
+    const [count, setCount] = createServerSafeSignal(0);
+    let seen: number | undefined;
+    const dispose = createRoot(d => {
+      createEffect(
+        () => count(),
+        v => {
+          seen = v;
+        },
+      );
+      return d;
+    });
+    flush();
+    expect(seen).toBe(0);
+
+    expect(setCount(c => c + 1)).toBe(1);
+    flush();
+    expect(count()).toBe(1);
+    expect(seen).toBe(1);
+    dispose();
   });
 });

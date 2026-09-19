@@ -333,7 +333,7 @@ hub.on("order", event => console.log("New order:", event));
 
 ```ts
 import { createSSE } from "@solid-primitives/sse";
-import { createStore } from "solid-js/store";
+import { createStore } from "solid-js";
 
 const [messages, setMessages] = createStore<string[]>([]);
 

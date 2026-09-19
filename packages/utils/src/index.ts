@@ -309,6 +309,37 @@ export function createMicrotask<A extends any[] | []>(fn: (...a: A) => void): (.
 }
 
 /**
+ * `createSignal` on the client; a plain mutable box on the server.
+ *
+ * Solid 2 treats a setter that runs during a server render as an error in waiting
+ * (`SERVER_WRITE`: the write lands as inert data today and throws in a later release) — server
+ * render is pure, state enters through async sources. Primitives that hold *interactive*
+ * state (a cursor, a toggle, a controlled value) have no async source, so on the server they
+ * keep a plain value instead: reads and updater-form writes behave the same within a request,
+ * and nothing touches the reactive graph.
+ *
+ * The signal is still *created* on the server — hydration ids are handed out per created
+ * primitive, so a server branch that skipped it would misalign keys with the client
+ * ("Hydration key miss"). It is simply never read or written there.
+ *
+ * @param value initial value
+ * @param options signal options (the signal only matters on the client)
+ * @returns a `[get, set]` tuple with `createSignal`'s shape
+ * @see {@link createSignal}
+ */
+export function createServerSafeSignal<T>(
+  value: T,
+  options?: SignalOptions<T>,
+): ReturnType<typeof createSignal<T>> {
+  const signal = createSignal(value as Exclude<T, Function>, options);
+  if (!isServer) return signal;
+  const get = () => value;
+  const set = (next?: unknown) =>
+    (value = typeof next === "function" ? (next as (prev: T) => T)(value) : (next as T));
+  return [get, set] as unknown as ReturnType<typeof createSignal<T>>;
+}
+
+/**
  * A hydratable version of the {@link createSignal}. It will use the serverValue on the server and the update function on the client. If initialized during hydration it will use serverValue as the initial value and update it once hydration is complete.
  *
  * @param serverValue initial value of the state on the server

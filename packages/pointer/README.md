@@ -144,17 +144,15 @@ createEffect(() => {
 
 ```tsx
 import { pointerPosition } from "@solid-primitives/pointer";
-// place this in code to avoid being tree-shaken
-pointerPosition;
 
 const [pos, setPos] = createSignal({ x: 0, y: 0 });
 const [hovering, setHovering] = createSignal(false);
 
 <div
-  use:pointerPosition={e => {
+  ref={pointerPosition(e => {
     setPos({ x: e.x, y: e.y });
     setHovering(e.isActive);
-  }}
+  })}
 />;
 ```
 
@@ -198,12 +196,10 @@ A directive for checking if the element is being hovered by at least one pointer
 
 ```ts
 import { pointerHover } from "@solid-primitives/pointer";
-// place this in code to avoid being tree-shaken
-pointerHover;
 
 const [hovering, setHovering] = createSignal(false);
 
-<div use:pointerHover={setHovering} />;
+<div ref={pointerHover(setHovering)} />;
 ```
 
 ## Changelog

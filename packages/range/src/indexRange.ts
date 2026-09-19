@@ -26,7 +26,10 @@ import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./c
  * const [to, setTo] = createSignal(5)
  * const mapped = indexRange(() => 0, to, () => 0.5, number => {
  *    const [value, setValue] = createSignal(number());
- *    createEffect(() => handleNewNumber(number()))
+ *    createEffect(
+ *      () => number(),
+ *      handleNewNumber,
+ *    )
  *    return value
  * })
  * mapped() // => [0, 0.5, 1, 1.5, 2...]

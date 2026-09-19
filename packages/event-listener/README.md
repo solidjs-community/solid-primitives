@@ -185,16 +185,17 @@ You can listen to multiple events with single `createEventListener` primitive.
 createEventListener(el, ["mousemove", "mouseenter", "mouseleave"], e => {});
 ```
 
-### Directive Usage
+### Ref factory (directive) usage
 
-props passed to the directive are also reactive, so you can change handlers on the fly.
+`eventListener` returns a ref callback. Pass the props as a tuple, or as an accessor to swap handlers on the fly.
 
 ```tsx
 import { eventListener } from "@solid-primitives/event-listener";
-// avoids tree-shaking the directive:
-eventListener;
 
-<button use:eventListener={["click", () => console.log("Click")]}>Click!</button>;
+<button ref={eventListener(["click", () => console.log("Click")])}>Click!</button>;
+
+// reactive props — the listener is re-attached when they change
+<button ref={eventListener(() => ["click", handler()])}>Click!</button>;
 ```
 
 ## `createEventSignal`

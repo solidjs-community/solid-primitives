@@ -30,7 +30,7 @@ pnpm add @solid-primitives/lifecycle
 
 Returns a boolean signal indicating whether the component is mounted or not.
 
-It's a simple wrapper around `createSignal` and `onMount`,
+It's a simple wrapper around `createSignal` and `onSettled`,
 but it can make your code feel more declarative - especially when used with `createMemo`.
 
 ```tsx
@@ -93,14 +93,14 @@ export const ClientOnly: FlowComponent = props => {
 
 ## `onElementConnect`
 
-`onMount` is a common lifecycle hook that is used to perform side-effects when the component is mounted.
+`onSettled` is a common lifecycle hook that is used to perform side-effects when the component is mounted.
 However, it is not certain that the elements are actually connected to the DOM when the mount callback is called.
 
 > **Note** If that's the case, it might be a sign that you are executing components that are not visible to the users my mistake.
 >
 > And if this is something intentional, you probably already have a way to hook into the actual DOM rendering.
 >
-> If you are not sure, you can use `onElementConnect` instead of `onMount` to make sure that you are caling your callback when the elements are connected to the DOM.
+> If you are not sure, you can use `onElementConnect` instead of `onSettled` to make sure that you are caling your callback when the elements are connected to the DOM.
 
 ```tsx
 <div
@@ -108,7 +108,7 @@ However, it is not certain that the elements are actually connected to the DOM w
     // often false, but will be true during hydration
     el.isConnected;
 
-    onMount(() => {
+    onSettled(() => {
       // often true, but will be false if the executed component is not actually getting rendered
       el.isConnected;
     });

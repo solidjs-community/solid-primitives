@@ -346,7 +346,7 @@ example), read it once and skip the guess entirely:
 
 ```tsx
 // src/entry-server.tsx — same createHandler/StartServer wrapper as above, `document` swapped for:
-import { getRequestEvent } from "solid-js/web";
+import { getRequestEvent } from "@solidjs/web";
 import { FaviconLink } from "@solid-primitives/favicon";
 
 const document = ({ assets, children, scripts }) => {

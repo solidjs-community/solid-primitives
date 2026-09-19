@@ -142,7 +142,10 @@ export function createSearchParams(init: ReactiveSearchParamsInit = ""): Reactiv
  * @example
  * ```ts
  * const params = new ReactiveSearchParams("foo=1&foo=2&bar=baz");
- * createEffect(() => console.log(params.getAll("foo")));
+ * createEffect(
+ *   () => params.getAll("foo"),
+ *   foo => console.log(foo),
+ * );
  * params.append("foo", "3");
  * ```
  */
