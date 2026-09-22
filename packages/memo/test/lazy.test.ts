@@ -33,6 +33,7 @@ describe("createLazyMemo", () => {
     });
 
     setCount(1);
+    flush();
     expect(runs, "0 before access").toBe(0);
 
     expect(memo(), "memo matches the signal on the first access").toBe(1);

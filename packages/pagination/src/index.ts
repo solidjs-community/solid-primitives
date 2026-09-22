@@ -1,5 +1,6 @@
 import {
   access,
+  createServerSafeSignal,
   tryOnCleanup,
   noop,
   wrapSetter,
@@ -15,6 +16,7 @@ import {
   mapArray,
   flush,
   onCleanup,
+  untrack,
 } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
 
@@ -149,9 +151,10 @@ const normalizeOption = (
  * ```tsx
  * const [paginationProps, page, setPage] = createPagination({ pages: 100 });
  *
- * createEffect(() => {
- *   console.log(page());
- * })
+ * createEffect(
+ *   () => page(),
+ *   page => console.log(page),
+ * );
  *
  * <nav class="pagination">
  *   <For each={paginationProps()}>{props => <button {...props} />}</For>
@@ -162,11 +165,10 @@ export const createPagination = (
   options?: MaybeAccessor<PaginationOptions>,
 ): [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>] => {
   const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
-  const showEllipsisOpt = opts().showEllipsis;
 
   // ownedWrite allows setPage to be called from event handlers and reactive scopes
   const [rawPage, setPage] = wrapSetter(
-    createSignal<number>(opts().initialPage || 1, { ownedWrite: true }),
+    createSignal<number>(untrack(() => opts().initialPage) || 1, { ownedWrite: true }),
     setter =>
       (p: number | ((prev: number) => number)): number => {
         const n = typeof p === "function" ? p(page()) : p;
@@ -330,16 +332,24 @@ export const createPagination = (
      ({ inert: true } as unknown as PaginationProps[number]),
      {
        children: { 
-         get: typeof opts().ellipsisContent === "function" ? opts().ellipsisContent : () => PAGINATION_DEFAULTS.ellipsisContent,
+         // Read through `opts()` per access: choosing the getter at creation reads the option
+         // at the top level of the calling component (STRICT_READ_UNTRACKED) and freezes it.
+         get: () => {
+           const content = opts().ellipsisContent;
+           return typeof content === "function" ? content() : PAGINATION_DEFAULTS.ellipsisContent;
+         },
          set: noop,
          enumerable: true,
        },
      },
   );
 
-  const showEllipsis = typeof showEllipsisOpt === "function"
-    ? () => showEllipsisOpt(page(), pages().length)
-    : () => showEllipsisOpt;
+  // Read through `opts()` on each call rather than once at creation: a top-level read here
+  // would freeze the option and warn STRICT_READ_UNTRACKED in the calling component.
+  const showEllipsis = () => {
+    const opt = opts().showEllipsis;
+    return typeof opt === "function" ? opt(page(), pages().length) : opt;
+  };
     
   const start = createMemo(() =>
     Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1)
@@ -433,14 +443,16 @@ export function createInfiniteScroll<T>(
   },
 ] {
   const initialPageCount = options?.initialPageCount ?? (isServer ? 0 : 1);
-  // ownedWrite allows setters to be called from reactive scopes and event handlers
-  const [pageCount, setPageCount] = createSignal(initialPageCount, { ownedWrite: true });
-  const [end, setEnd] = createSignal(false, { ownedWrite: true });
+  // ownedWrite allows setters to be called from reactive scopes and event handlers.
+  // createServerSafeSignal: pages requested up front on the server settle their fetch state
+  // there too, and a setter must not run during a server render (`SERVER_WRITE`).
+  const [pageCount, setPageCount] = createServerSafeSignal(initialPageCount, { ownedWrite: true });
+  const [end, setEnd] = createServerSafeSignal(false, { ownedWrite: true });
   // Bumped by reset() so every page key changes shape — a page index alone
   // wouldn't work as a mapArray key here, since going from e.g. 5 pages
   // straight to 1 in a single write never makes index 0 "leave" the list,
   // so mapArray would keep the stale, already-settled page cached.
-  const [generation, setGeneration] = createSignal(0, { ownedWrite: true });
+  const [generation, setGeneration] = createServerSafeSignal(0, { ownedWrite: true });
 
   // Set by the IO block below (browser only); re-observes the sentinel after
   // a page resolves so IO fires again if it's still in the viewport — this
@@ -461,10 +473,10 @@ export function createInfiniteScroll<T>(
   const pages = mapArray(pageKeys, key => {
     const index = Number(key.slice(key.indexOf(":") + 1));
 
-    const [fetching, setFetching] = createSignal(true, { ownedWrite: true });
-    const [error, setError] = createSignal<unknown>(undefined, { ownedWrite: true });
+    const [fetching, setFetching] = createServerSafeSignal(true, { ownedWrite: true });
+    const [error, setError] = createServerSafeSignal<unknown>(undefined, { ownedWrite: true });
     // Bumped on retry so `content` (below) re-reads the latest `request`.
-    const [attempt, setAttempt] = createSignal(0, { ownedWrite: true });
+    const [attempt, setAttempt] = createServerSafeSignal(0, { ownedWrite: true });
 
     // The primitive owns the promise directly (rather than calling
     // `fetcher` from inside an async `createMemo`) because the framework's

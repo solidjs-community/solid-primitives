@@ -11,9 +11,10 @@ import { makeEventListener } from "@solid-primitives/event-listener";
  * ```ts
  * const visible = createPageVisibility();
  *
- * createEffect(() => {
- *    visible() // => boolean
- * })
+ * createEffect(
+ *   () => visible(), // => boolean
+ *   visible => console.log(visible),
+ * );
  * ```
  */
 export const createPageVisibility = (): Accessor<boolean> => {
@@ -35,9 +36,10 @@ export const createPageVisibility = (): Accessor<boolean> => {
  * ```ts
  * const visible = usePageVisibility();
  *
- * createEffect(() => {
- *    visible() // => boolean
- * })
+ * createEffect(
+ *   () => visible(), // => boolean
+ *   visible => console.log(visible),
+ * );
  * ```
  */
 export const usePageVisibility: () => Accessor<boolean> =

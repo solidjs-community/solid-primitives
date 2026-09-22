@@ -30,8 +30,8 @@
     ]
   },
   "catalog": {
-    "solid-js": "2.0.0-beta.34",
-    "@solidjs/web": "2.0.0-beta.34",
+    "solid-js": "2.0.0-rc.9",
+    "@solidjs/web": "2.0.0-rc.9",
     "tsdown": "^0.22.3",
     "unplugin-solid": "^1.0.0"
   },

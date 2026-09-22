@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, flush } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { DEFAULT_KEYBOARD_STEP, useDragContext } from "./context.tsx";
@@ -281,7 +281,6 @@ export function createDraggable<T = unknown>(
     applyStyle(el, options.style);
     applyClass(el, options.class);
     markAsDraggable(el);
-    flush();
   };
 
   return { ref, isDragging, transform: currentTransform, id };

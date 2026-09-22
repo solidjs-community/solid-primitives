@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-props",
-  "version": "1.0.0-next.2",
+  "version": "1.0.0-next.3",
   "description": "Primitive to manage events in a reactive way.",
   "license": "MIT",
   "exports": "./src/index.ts",

@@ -67,6 +67,7 @@ describe("makePersisted", () => {
       name: "test1",
     });
     setSignal("persisted");
+    flush();
     expect(mockStorage.getItem("test1")).toBe('"persisted"');
     expect(latest(signal)).toBe("persisted");
   });
@@ -98,6 +99,7 @@ describe("makePersisted", () => {
   it("reads the persisted value from a synchronous storage into the signal", () => {
     mockStorage.setItem("test2", '"persistence"');
     const [signal] = makePersisted(createSignal(), { storage: mockStorage, name: "test2" });
+    flush();
     expect(latest(signal)).toBe("persistence");
   });
 
@@ -107,9 +109,11 @@ describe("makePersisted", () => {
       name: "test3",
     });
     setSignal("test");
+    flush();
     expect(mockStorage.getItem("test3")).toBe('"test"');
     expect(latest(signal)).toBe("test");
     setSignal(undefined);
+    flush();
     expect(mockStorage.getItem("test3")).toBeNull();
   });
 
@@ -150,6 +154,7 @@ describe("makePersisted", () => {
       name: "test5",
     });
     setSignal("async");
+    flush();
     expect(latest(signal)).toBe("async");
     expect(await mockAsyncStorage.getItem("test5")).toBe('"async"');
   });
@@ -161,8 +166,10 @@ describe("makePersisted", () => {
       name: "test6",
     });
     await Promise.resolve();
+    flush();
     expect(latest(signal)).toBe("predefined");
     setSignal("overwritten");
+    flush();
     await Promise.resolve();
     expect(await mockAsyncStorage.getItem("test6")).toBe('"overwritten"');
   });
@@ -178,8 +185,10 @@ describe("makePersisted", () => {
       storage: slowMockAsyncStorage,
       name: "test7",
     });
+    flush();
     expect(latest(signal)).toBe("init");
     setSignal("overwritten");
+    flush();
     resolve("persisted");
     expect(latest(signal)).toBe("overwritten");
   });

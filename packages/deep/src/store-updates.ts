@@ -28,7 +28,8 @@ type StoreNode = Record<typeof $TRACK, unknown> & Static;
 type StoreNodeChildren = Static<StoreNode>;
 
 // One lazy memo per store node, keyed by node identity. The memo re-runs whenever the node's
-// structure changes ([$TRACK] subscription) and returns the current set of child store nodes.
+// structure ([$TRACK]) or any of its direct property values change, and returns the current
+// set of child store nodes.
 // Detached from any owner so it lives as long as the node is reachable, then self-disposes.
 const StoreNodeChildrenCache = new WeakMap<StoreNode, Accessor<StoreNodeChildren>>();
 
@@ -47,18 +48,25 @@ function getStoreNodechildren(node: StoreNode): StoreNodeChildren {
         // Subscribe to structural changes (key additions/removals) on this node.
         node[$TRACK];
         // snapshot() inside untrack() gives us the plain key list without subscribing to
-        // individual property signals — we only want to know which keys exist, not their values.
+        // individual property signals — we only want to know which keys exist here.
         const unwrapped = untrack(() => snapshot(node));
         const children: StoreNodeChildren = isArray ? [] : {};
         for (const [key, child] of entries(unwrapped)) {
+          // Tracked read of the live proxy. As of solid-js 2.0.0-rc.1, [$TRACK] only fires
+          // for structural changes, so a leaf value change (`s.a.b = "x"`) no longer
+          // notifies this memo. Reading each key through the proxy subscribes to that
+          // property's own signal, which restores per-value change detection. It only
+          // subscribes to this node's direct slots — a change deeper inside a child object
+          // still re-runs that child's memo instead, so updates stay reported at the
+          // shallowest node that actually changed.
+          const live = node[key as any];
           let childNode: any;
           if (
             child != null &&
             typeof child === "object" &&
-            // Prefer the proxy stored on the plain value ($PROXY), falling back to reading the
-            // key through the live store proxy (which re-wraps nested objects on access).
-            ((childNode = (child as any)[$PROXY]) ||
-              ((childNode = untrack(() => node[key as any])) && $TRACK in childNode))
+            // Prefer the proxy stored on the plain value ($PROXY), falling back to the live
+            // store proxy read above (which re-wraps nested objects on access).
+            ((childNode = (child as any)[$PROXY]) || ((childNode = live) && $TRACK in childNode))
           ) {
             children[key as any] = childNode;
           }

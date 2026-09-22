@@ -632,105 +632,141 @@ describe("createFocusRestore", () => {
 
 describe("createFocusGroup", () => {
   test("focusFirst focuses and returns the first focusable element", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(() => container);
-    expect(group.focusFirst()).toBe(buttons[0]);
-    expect(focused).toBe(buttons[0]);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(() => container);
+      expect(group.focusFirst()).toBe(buttons[0]);
+      expect(focused).toBe(buttons[0]);
+      dispose();
+    });
   });
 
   test("focusLast focuses and returns the last focusable element", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(() => container);
-    expect(group.focusLast()).toBe(buttons[2]);
-    expect(focused).toBe(buttons[2]);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(() => container);
+      expect(group.focusLast()).toBe(buttons[2]);
+      expect(focused).toBe(buttons[2]);
+      dispose();
+    });
   });
 
   test("focusNext moves to the next element from `from`", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(() => container);
-    expect(group.focusNext({ from: buttons[0] })).toBe(buttons[1]);
-    expect(focused).toBe(buttons[1]);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(() => container);
+      expect(group.focusNext({ from: buttons[0] })).toBe(buttons[1]);
+      expect(focused).toBe(buttons[1]);
+      dispose();
+    });
   });
 
   test("focusNext defaults to the currently focused element", () => {
-    const { container, buttons } = makeContainer(3);
-    const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
-    Object.defineProperty(document, "activeElement", { get: () => buttons[0], configurable: true });
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const origActiveElement = Object.getOwnPropertyDescriptor(Document.prototype, "activeElement")!;
+      Object.defineProperty(document, "activeElement", { get: () => buttons[0], configurable: true });
 
-    const group = createFocusGroup(() => container);
-    expect(group.focusNext()).toBe(buttons[1]);
+      const group = createFocusGroup(() => container);
+      expect(group.focusNext()).toBe(buttons[1]);
 
-    Object.defineProperty(document, "activeElement", origActiveElement);
+      Object.defineProperty(document, "activeElement", origActiveElement);
+      dispose();
+    });
   });
 
   test("focusPrevious moves to the previous element from `from`", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(() => container);
-    expect(group.focusPrevious({ from: buttons[2] })).toBe(buttons[1]);
-    expect(focused).toBe(buttons[1]);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(() => container);
+      expect(group.focusPrevious({ from: buttons[2] })).toBe(buttons[1]);
+      expect(focused).toBe(buttons[1]);
+      dispose();
+    });
   });
 
   test("focusNext wraps from the last element when wrap is true", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(() => container);
-    expect(group.focusNext({ from: buttons[2], wrap: true })).toBe(buttons[0]);
-    expect(focused).toBe(buttons[0]);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(() => container);
+      expect(group.focusNext({ from: buttons[2], wrap: true })).toBe(buttons[0]);
+      expect(focused).toBe(buttons[0]);
+      dispose();
+    });
   });
 
   test("focusPrevious wraps from the first element when wrap is true", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(() => container);
-    expect(group.focusPrevious({ from: buttons[0], wrap: true })).toBe(buttons[2]);
-    expect(focused).toBe(buttons[2]);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(() => container);
+      expect(group.focusPrevious({ from: buttons[0], wrap: true })).toBe(buttons[2]);
+      expect(focused).toBe(buttons[2]);
+      dispose();
+    });
   });
 
   test("does not wrap when wrap is false", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(() => container);
-    expect(group.focusNext({ from: buttons[2], wrap: false })).toBe(undefined);
-    expect(focused).toBe(null);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(() => container);
+      expect(group.focusNext({ from: buttons[2], wrap: false })).toBe(undefined);
+      expect(focused).toBe(null);
+      dispose();
+    });
   });
 
   test("respects defaultOptions", () => {
-    const { container, buttons } = makeContainer(3);
-    const group = createFocusGroup(
-      () => container,
-      () => ({ wrap: true }),
-    );
-    expect(group.focusNext({ from: buttons[2] })).toBe(buttons[0]);
+    createRoot(dispose => {
+      const { container, buttons } = makeContainer(3);
+      const group = createFocusGroup(
+        () => container,
+        () => ({ wrap: true }),
+      );
+      expect(group.focusNext({ from: buttons[2] })).toBe(buttons[0]);
+      dispose();
+    });
   });
 
   test("tabbable option only includes tabbable elements", () => {
-    const container = document.createElement("div");
-    const a = document.createElement("button");
-    const b = document.createElement("button");
-    b.tabIndex = -1; // focusable but not tabbable
-    container.append(a, b);
+    createRoot(dispose => {
+      const container = document.createElement("div");
+      const a = document.createElement("button");
+      const b = document.createElement("button");
+      b.tabIndex = -1; // focusable but not tabbable
+      container.append(a, b);
 
-    const group = createFocusGroup(() => container);
-    expect(group.focusNext({ from: a, tabbable: true })).toBe(undefined); // b excluded
-    expect(group.focusNext({ from: a, tabbable: false })).toBe(b); // all focusable
+      const group = createFocusGroup(() => container);
+      expect(group.focusNext({ from: a, tabbable: true })).toBe(undefined); // b excluded
+      expect(group.focusNext({ from: a, tabbable: false })).toBe(b); // all focusable
+      dispose();
+    });
   });
 
   test("accept option filters elements", () => {
-    const container = document.createElement("div");
-    const a = document.createElement("button");
-    a.id = "keep";
-    const b = document.createElement("button");
-    b.id = "skip";
-    container.append(a, b);
+    createRoot(dispose => {
+      const container = document.createElement("div");
+      const a = document.createElement("button");
+      a.id = "keep";
+      const b = document.createElement("button");
+      b.id = "skip";
+      container.append(a, b);
 
-    const group = createFocusGroup(() => container);
-    expect(group.focusNext({ from: a, accept: el => el.id !== "skip" })).toBe(undefined);
-    expect(group.focusFirst({ accept: el => el.id !== "skip" })).toBe(a);
+      const group = createFocusGroup(() => container);
+      expect(group.focusNext({ from: a, accept: el => el.id !== "skip" })).toBe(undefined);
+      expect(group.focusFirst({ accept: el => el.id !== "skip" })).toBe(a);
+      dispose();
+    });
   });
 
   test("returns undefined when root is not set", () => {
-    const group = createFocusGroup(() => undefined);
-    expect(group.focusFirst()).toBe(undefined);
-    expect(group.focusNext()).toBe(undefined);
-    expect(group.focusPrevious()).toBe(undefined);
-    expect(group.focusLast()).toBe(undefined);
+    createRoot(dispose => {
+      const group = createFocusGroup(() => undefined);
+      expect(group.focusFirst()).toBe(undefined);
+      expect(group.focusNext()).toBe(undefined);
+      expect(group.focusPrevious()).toBe(undefined);
+      expect(group.focusLast()).toBe(undefined);
+      dispose();
+    });
   });
 });
 

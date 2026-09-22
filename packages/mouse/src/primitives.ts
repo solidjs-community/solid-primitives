@@ -45,9 +45,10 @@ export interface PositionToElementOptions extends UseTouchOptions, FollowTouchOp
  * @example
  * const [el, setEl] = createSignal(ref)
  * const pos = createMousePosition(el, { touch: false })
- * createEffect(() => {
- *   console.log(pos.x, pos.y)
- * })
+ * createEffect(
+ *   () => [pos.x, pos.y],
+ *   ([x, y]) => console.log(x, y),
+ * );
  */
 export function createMousePosition(
   target?: MaybeAccessor<SVGSVGElement | HTMLElement | Window | Document>,
@@ -87,9 +88,10 @@ export function createMousePosition(
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#useMousePosition
  * @example
  * const pos = useMousePosition()
- * createEffect(() => {
- *   console.log(pos.x, pos.y)
- * })
+ * createEffect(
+ *   () => [pos.x, pos.y],
+ *   ([x, y]) => console.log(x, y),
+ * );
  */
 export const useMousePosition: ReturnType<typeof createHydratableSingletonRoot> = /*#__PURE__*/ createHydratableSingletonRoot(
   createMousePosition.bind(void 0, void 0, void 0),
@@ -109,9 +111,10 @@ export const useMousePosition: ReturnType<typeof createHydratableSingletonRoot> 
  * const [el, setEl] = createSignal(ref)
  * const pos = useMousePosition()
  * const relative = createPositionToElement(el, () => pos)
- * createEffect(() => {
- *   console.log(relative.x, relative.y)
- * })
+ * createEffect(
+ *   () => [relative.x, relative.y],
+ *   ([x, y]) => console.log(x, y),
+ * );
  */
 export function createPositionToElement(
   element: Element | Accessor<Element | undefined>,

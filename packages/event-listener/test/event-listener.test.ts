@@ -1,6 +1,6 @@
 import { dispatchFakeEvent, event_target } from "./setup.js";
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal, flush, onSettled } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import {
   createEventListener,
   createEventSignal,
@@ -172,40 +172,44 @@ describe("createEventListener", () => {
     dispose();
   });
 
-  test("disposing on cleanup", () =>
-    createRoot(dispose => {
-      const testEvent = new Event("test3");
-      let count = 0;
+  test("disposing on cleanup", () => {
+    const testEvent = new Event("test3");
+    let count = 0;
+    const dispose = createRoot(dispose => {
       createEventListener<{ test3: Event }>(event_target, "test3", () => {
         count++;
       });
+      return dispose;
+    });
 
-      onSettled(() => {
-        dispatchFakeEvent("test3", testEvent);
-        expect(count, "captured count on mount should be 1").toBe(1);
+    flush(); // run effect phase → adds the listener
+    dispatchFakeEvent("test3", testEvent);
+    expect(count, "captured count on mount should be 1").toBe(1);
 
-        dispose();
+    dispose();
 
-        dispatchFakeEvent("test3", testEvent);
-        expect(count, "captured count after disposing should still be 1").toBe(1);
-      });
-    }));
+    dispatchFakeEvent("test3", testEvent);
+    expect(count, "captured count after disposing should still be 1").toBe(1);
+  });
 });
 
 describe("createEventSignal", () => {
-  test("return autoupdating signal", () =>
-    createRoot(dispose => {
-      const testEvent = new Event("sig_test");
-      const lastEvent = createEventSignal<{ sig_test: Event }>(event_target, "sig_test");
+  test("return autoupdating signal", () => {
+    const testEvent = new Event("sig_test");
+    let lastEvent!: () => Event | undefined;
+    const dispose = createRoot(dispose => {
+      lastEvent = createEventSignal<{ sig_test: Event }>(event_target, "sig_test");
       expect(lastEvent, "returned value is an accessor").toBeTypeOf("function");
       expect(lastEvent(), "returned value is undefined").toBeTypeOf("undefined");
+      return dispose;
+    });
 
-      onSettled(() => {
-        dispatchFakeEvent("sig_test", testEvent);
-        expect(lastEvent()).toBe(testEvent);
-        dispose();
-      });
-    }));
+    flush(); // run effect phase → adds the listener
+    dispatchFakeEvent("sig_test", testEvent);
+    flush(); // apply the signal write made by the handler
+    expect(lastEvent()).toBe(testEvent);
+    dispose();
+  });
 });
 
 describe("eventListener directive", () => {

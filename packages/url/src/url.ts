@@ -103,7 +103,10 @@ export function createURLRecord(
  * const url = createURL("http://example.com");
  * url.host; // => "example.com"
  * url.search = "?foo=bar";
- * createEffect(() => console.log(url.href));
+ * createEffect(
+ *   () => url.href,
+ *   href => console.log(href),
+ * );
  * ```
  */
 export function createURL(url: string, base?: string): ReactiveURL {
@@ -124,7 +127,10 @@ export function createURL(url: string, base?: string): ReactiveURL {
  * const url = new ReactiveURL("http://example.com");
  * url.host; // => "example.com"
  * url.search = "?foo=bar";
- * createEffect(() => console.log(url.href));
+ * createEffect(
+ *   () => url.href,
+ *   href => console.log(href),
+ * );
  * ```
  */
 export class ReactiveURL implements Pick<URL, WritableURLFields | "origin" | "toJSON"> {
@@ -256,7 +262,10 @@ export class ReactiveURL implements Pick<URL, WritableURLFields | "origin" | "to
    * ```ts
    * const url = new ReactiveURL("http://example.com");
    * const { searchParams } = url;
-   * createEffect(() => console.log(searchParams.get("foo")));
+   * createEffect(
+   *   () => searchParams.get("foo"),
+   *   foo => console.log(foo),
+   * );
    * url.search = "?foo=bar"; // will cause the effect to rerun
    * ```
    */

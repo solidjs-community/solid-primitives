@@ -190,8 +190,7 @@ export function makePersisted<
     });
   }
 
-  const persist = () => {
-    const next = untrack(() => latest(getter));
+  const persistValue = (next: T | undefined) => {
     if (next == null) {
       storage.removeItem(name, storageOptions);
       options.sync?.[1](name, null);
@@ -201,11 +200,19 @@ export function makePersisted<
       options.sync?.[1](name, serialized);
     }
   };
+  const persist = () => persistValue(untrack(() => latest(getter)));
   return [
     signal[0], 
     (value: any) => untrack(() => {
       const output = signal[1](value);
-      persist();
+      // As of solid-js 2.0.0-rc.1 a signal write stays pending until the next flush, so
+      // reading it back through `getter` here would still report the *previous* value —
+      // which would persist stale data, or wipe the entry entirely when the previous
+      // value was nullish. A plain signal setter returns the value it just wrote, so
+      // persist that directly. Stores mutate in place and are still read back through
+      // `getter`, as are action-wrapped setters, whose value settles with the promise.
+      if (isSignal && !(output instanceof Promise)) persistValue(output as T);
+      else persist();
       unchanged = false;
       return output instanceof Promise ? output.then(async (result) => { await Promise.resolve(); persist(); return result; }, (err) => { persist(); throw err; }) : output;
     }),

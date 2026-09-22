@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import solidPlugin from "vite-plugin-solid";
+import solidPlugin from "@solidjs/vite-plugin";
 import * as utils from "../scripts/utils/index.js";
 
 // Packages still on solid-js 1.x, not yet migrated to Solid 2.0.

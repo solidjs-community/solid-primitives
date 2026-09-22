@@ -60,9 +60,10 @@ export function createMediaQuery(query: string, serverFallback = false): Accesso
  * @returns a boolean signal
  * @example
  * const prefersDark = usePrefersDark();
- * createEffect(() => {
- *    prefersDark() // => boolean
- * });
+ * createEffect(
+ *   () => prefersDark(), // => boolean
+ *   dark => console.log(dark),
+ * );
  */
 export function createPrefersDark(serverFallback?: boolean): Accessor<boolean> {
   return createMediaQuery("(prefers-color-scheme: dark)", serverFallback);
@@ -76,9 +77,10 @@ export function createPrefersDark(serverFallback?: boolean): Accessor<boolean> {
  * @returns a boolean signal
  * @example
  * const prefersDark = usePrefersDark();
- * createEffect(() => {
- *    prefersDark() // => boolean
- * });
+ * createEffect(
+ *   () => prefersDark(), // => boolean
+ *   dark => console.log(dark),
+ * );
  */
 export const usePrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createHydratableSingletonRoot(
   createPrefersDark.bind(void 0, false),

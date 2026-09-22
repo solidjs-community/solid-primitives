@@ -108,7 +108,10 @@ export type MsCounter = (() => number) & {
  *
  * ```ts
  * const ms = createMs(60);
- * createEffect(() => ms() > 500000 ? ms.stop());
+ * createEffect(
+ *   () => ms() > 500000,
+ *   done => done && ms.stop(),
+ * );
  * return <rect x="0" y="0" height="10" width={Math.min(100, ms() / 5000)} />
  * ```
  */

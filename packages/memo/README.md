@@ -172,15 +172,15 @@ const double = createMemo(() => getDouble(count()));
 
 ## `createDebouncedMemo`
 
-**Removed in v2.** `createDebouncedMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) once that package is updated for Solid 2.0.
+**Removed in v2.** `createDebouncedMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/scheduled`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme).
 
 ## `createThrottledMemo`
 
-**Removed in v2.** `createThrottledMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) once that package is updated for Solid 2.0.
+**Removed in v2.** `createThrottledMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/scheduled`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme).
 
 ## `createAsyncMemo`
 
-**Removed in v2.** `createAsyncMemo` was deprecated in v1 (pointing to `createResource`) and has been removed. `createResource` does not exist in Solid 2.0. Async data fetching in Solid 2.0 can be handled with `createProjection` for store-based async state, or with a signal + `createEffect` for manual async management.
+**Removed in v2.** `createAsyncMemo` was deprecated in v1 (pointing to `createResource`) and has been removed. `createResource` does not exist in Solid 2.0 either: any computation can be async — `createMemo(() => fetchThing(id()))` — and readers wrap it in `<Loading>`. Use `createProjection` for store-shaped async state.
 
 ## `createPureReaction`
 

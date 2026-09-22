@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/deep",
-  "version": "1.0.0-next.3",
+  "version": "1.0.0-next.4",
   "description": "Primitives for tracking and observing nested reactive objects.",
   "author": "Samuel Burbano <me@iosamuel.dev>",
   "contributors": [
@@ -24,7 +24,7 @@
       "captureStoreUpdates"
     ],
     "category": "Reactivity",
-    "gzip": 952
+    "gzip": 954
   },
   "keywords": [
     "solid",

@@ -67,16 +67,10 @@ export function getElementBounds(element: Element | FalsyValue): NullableBounds 
  * const target = document.querySelector("#my_elem")!;
  * const bounds = createElementBounds(target);
  *
- * createEffect(() => {
- *    console.log(
- *      bounds.width, // => number
- *      bounds.height, // => number
- *      bounds.top, // => number
- *      bounds.left, // => number
- *      bounds.right, // => number
- *      bounds.bottom, // => number
- *    );
- * });
+ * createEffect(
+ *   () => [bounds.width, bounds.height, bounds.top, bounds.left, bounds.right, bounds.bottom], // all numbers
+ *   ([width, height, top, left, right, bottom]) => console.log(width, height, top, left, right, bottom),
+ * );
  * ```
  */
 

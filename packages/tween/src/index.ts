@@ -1,4 +1,4 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal, createEffect, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 export type TweenProps = {
@@ -56,7 +56,7 @@ export function createTween(
     () => target(),
     newTarget => {
       start = performance.now();
-      startValue = current();
+      startValue = untrack(current); // one-time read; the apply phase is untracked
       delta = newTarget - startValue;
       cancelId = requestAnimationFrame(tick);
       return () => cancelAnimationFrame(cancelId);

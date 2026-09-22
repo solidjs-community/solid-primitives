@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/notification",
-  "version": "1.0.0-next.3",
+  "version": "1.0.0-next.4",
   "description": "Primitives for the browser Notifications API with reactive permission management",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
@@ -23,7 +23,7 @@
       "createNotificationPermission"
     ],
     "category": "Browser APIs",
-    "gzip": 1231
+    "gzip": 1232
   },
   "keywords": [
     "solid",
