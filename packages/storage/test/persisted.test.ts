@@ -141,4 +141,16 @@ describe("makePersisted", () => {
     });
     expect(init).toBe(promise);
   });
+  it("infers the signal value type from the input without explicit annotations", () => {
+    // Regression test for solid-primitives#1000: under TypeScript 5+/7 the
+    // overloads previously defaulted T to `unknown` instead of inferring it
+    // from the input signal/store, breaking inference at the call site.
+    const [thing, setThing] = makePersisted(createSignal("hello"), {
+      name: "thing",
+      storage: mockStorage,
+    });
+    const _a: string = thing();
+    const _b: string = setThing("world");
+    expect(thing()).toBe("world");
+  });
 });
