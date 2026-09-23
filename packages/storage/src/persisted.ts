@@ -70,6 +70,11 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
       storageOptions?: O;
     });
 
+export type SignalInput = Signal<any> | [Store<any>, SetStoreFunction<any>];
+
+export type SignalType<S extends SignalInput> =
+  S extends Signal<infer T> ? T : S extends [Store<infer T>, SetStoreFunction<infer T>] ? T : never;
+
 export type PersistedState<S> = S & { 2: Promise<string> | string | null };
 
 /**
@@ -92,19 +97,18 @@ export type PersistedState<S> = S & { 2: Promise<string> | string | null };
  * @param {PersistenceOptions<T, O>} options - The options for persistence.
  * @returns {PersistedState<T>} - The persisted signal or store.
  */
-export function makePersisted<T, S extends Signal<T> | [Store<T>, SetStoreFunction<T>]>(
+export function makePersisted<S extends SignalInput>(
   signal: S,
-  options?: PersistenceOptions<T, undefined>,
+  options?: PersistenceOptions<SignalType<S>, undefined>,
+): PersistedState<S>;
+export function makePersisted<S extends SignalInput, O extends Record<string, any>>(
+  signal: S,
+  options: PersistenceOptions<SignalType<S>, O>,
 ): PersistedState<S>;
 export function makePersisted<
-  T,
-  S extends Signal<T> | [Store<T>, SetStoreFunction<T>],
-  O extends Record<string, any>,
->(signal: S, options: PersistenceOptions<T, O>): PersistedState<S>;
-export function makePersisted<
-  T,
-  S extends Signal<T> | [Store<T>, SetStoreFunction<T>],
+  S extends SignalInput,
   O extends Record<string, any> | undefined,
+  T = SignalType<S>,
 >(
   signal: S,
   options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>,
