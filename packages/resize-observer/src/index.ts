@@ -188,6 +188,9 @@ export function createElementSize(
   target: Accessor<Element | false | undefined | null> | Element,
 ): Readonly<NullableSize> {
   if (isServer) {
+    // Reserve the same hydration child id as the client-side target effect,
+    // without evaluating the accessor or touching browser APIs on the server.
+    if (typeof target === "function") createEffect(noop, noop);
     return ELEMENT_SIZE_FALLBACK;
   }
 
