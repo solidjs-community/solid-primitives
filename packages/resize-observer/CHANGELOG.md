@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 4.0.0-next.5
+
+### Patch Changes
+
+- 52673b2: Preserve hydration identifiers when `createElementSize` receives a target accessor during server rendering.
+
 ## 4.0.0-next.4
 
 ### Patch Changes
