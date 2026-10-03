@@ -252,6 +252,37 @@ describe("createElementSize", () => {
   const div = document.createElement("div");
   div.__mock_size = { width: 100, height: 200, clientWidth: 90, clientHeight: 190 };
 
+  test("tracks replacement and missing targets and disconnects on disposal", () => {
+    _targets = new Set<Element>();
+    const next = document.createElement("div");
+    next.__mock_size = { width: 300, height: 400, clientWidth: 290, clientHeight: 390 };
+    const before = disconnect_count;
+    const { size, setTarget, dispose } = createRoot(dispose => {
+      const [target, setTarget] = createSignal<Element | null>(div);
+      return { size: createElementSize(target), setTarget, dispose };
+    });
+    flush();
+    expect(size).toEqual(div.__mock_size);
+    expect(_targets.size).toBe(1);
+    expect(_targets.values().next().value).toBe(div);
+    setTarget(next);
+    flush();
+    expect(size).toEqual(next.__mock_size);
+    expect(_targets.size).toBe(1);
+    expect(_targets.values().next().value).toBe(next);
+    setTarget(null);
+    flush();
+    expect(size).toEqual({ width: null, height: null, clientWidth: null, clientHeight: null });
+    expect(_targets.size).toBe(0);
+    setTarget(div);
+    flush();
+    expect(_targets.size).toBe(1);
+    expect(_targets.values().next().value).toBe(div);
+    dispose();
+    expect(_targets.size).toBe(0);
+    expect(disconnect_count).toBe(before + 1);
+  });
+
   test("will return element size immediately", () => {
     createRoot(dispose => {
       const { width, height, clientWidth, clientHeight } = createElementSize(div);

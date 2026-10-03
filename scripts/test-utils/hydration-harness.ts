@@ -130,6 +130,8 @@ export type HydrationRoundTripResult = {
   html: string;
   /** `container` element the server HTML was hydrated into — still attached to `document.body`. */
   container: HTMLElement;
+  /** Server-rendered top-level nodes, captured before hydration. */
+  serverNodes: Node[];
   /** Every `console.error`/`console.warn` message emitted while `hydrate()` ran. */
   consoleMessages: string[];
   /** Removes `container` from the document. Call in test cleanup. */
@@ -147,9 +149,11 @@ async function runHydrationRoundTrip(appSource: string, cwd: string): Promise<Hy
 
   const container = document.createElement("div");
   container.innerHTML = html;
+  const serverNodes = Array.from(container.childNodes);
   document.body.appendChild(container);
 
   const messages: string[] = [];
+  let dispose: (() => void) | undefined;
   const originalError = console.error;
   const originalWarn = console.warn;
   console.error = (...args: unknown[]) => {
@@ -166,7 +170,7 @@ async function runHydrationRoundTrip(appSource: string, cwd: string): Promise<Hy
     // HTML — jsdom doesn't run scripts assigned via .innerHTML, so this sets up the same global
     // hydrate() otherwise expects to already be there.
     (globalThis as any)._$HY = { events: [], completed: new WeakSet(), r: {}, fe() {} };
-    hydrate(() => App({}), container);
+    dispose = hydrate(() => App({}), container);
     // Solid finalizes hydration (drainHydrationCallbacks) via a `setTimeout`, after any
     // microtask-scheduled reactive updates have settled — wait for both ticks so a
     // late-firing hydration-mismatch warning isn't missed by the console restore below.
@@ -180,8 +184,12 @@ async function runHydrationRoundTrip(appSource: string, cwd: string): Promise<Hy
   return {
     html,
     container,
+    serverNodes,
     consoleMessages: messages,
-    cleanup: () => container.remove(),
+    cleanup: () => {
+      dispose?.();
+      container.remove();
+    },
   };
 }
 
