@@ -282,6 +282,42 @@ export function createHideOutside(options: CreateHideOutsideOptions): void {
   );
 }
 
+/**
+ * The element an event actually originated from.
+ *
+ * `event.target` is retargeted at every shadow boundary the event crosses, so a listener on the
+ * document reports the outermost shadow *host* rather than the element that was interacted with.
+ * `composedPath()[0]` is that element; for an event that crosses no boundary the two are identical,
+ * so this is a no-op outside shadow DOM.
+ */
+function getEventTarget(event: Event): Element | null {
+  const path = typeof event.composedPath === "function" ? event.composedPath() : undefined;
+  const target = path?.[0] ?? event.target;
+
+  return target instanceof Element ? target : null;
+}
+
+/**
+ * `Node.prototype.contains`, but able to see through shadow boundaries.
+ *
+ * `contains` only walks the node tree it is called on, so it answers `false` for a `child` inside a
+ * shadow root — including `document.contains(elementInAShadowRoot)`. When this walk reaches the top
+ * of a shadow tree it continues from that tree's host, answering a containment question about the
+ * *rendered* page rather than about one node tree.
+ */
+function containsComposed(parent: Node, child: Node | null): boolean {
+  let node: Node | null = child;
+
+  while (node) {
+    if (parent === node || parent.contains(node)) return true;
+
+    const root = node.getRootNode();
+    node = root instanceof ShadowRoot ? root.host : null;
+  }
+
+  return false;
+}
+
 /** Detail payload carried by every outside-interaction `CustomEvent`. */
 export type EventDetails<T> = {
   /** The original DOM event that triggered the outside interaction. */
@@ -399,16 +435,20 @@ export function makeInteractOutside<T extends Element>(
     // a *new* instance that opened in that same window — misreporting them
     // as outside interactions on this now-orphaned instance.
     if (!el.isConnected) return false;
-    const target = e.target as Element | null;
-    if (!(target instanceof Element)) return false;
-    if (!ownerDoc.contains(target)) return false;
-    if (el.contains(target)) return false;
+    // Resolved through `composedPath()`, not `e.target`: these listeners are on the document, so an
+    // interaction inside a shadow tree reports that tree's host instead. `el` rendered inside a
+    // shadow root would see every one of its own clicks as the host — an ancestor, not a descendant
+    // — and read them as outside interactions, dismissing itself on pointerdown.
+    const target = getEventTarget(e);
+    if (!target) return false;
+    if (!containsComposed(ownerDoc, target)) return false;
+    if (containsComposed(el, target)) return false;
     return !(options.shouldExcludeElement?.(target) ?? false);
   };
 
   const onPointerDown = (e: PointerEvent) => {
     const handler = () => {
-      const target = e.target as Element | null;
+      const target = getEventTarget(e);
       if (!target || !isEventOutside(e)) return;
 
       target.addEventListener(
@@ -438,7 +478,7 @@ export function makeInteractOutside<T extends Element>(
   };
 
   const onFocusIn = (e: FocusEvent) => {
-    const target = e.target as Element | null;
+    const target = getEventTarget(e);
     if (!target || !isEventOutside(e)) return;
 
     target.addEventListener(
