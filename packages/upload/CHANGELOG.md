@@ -1,5 +1,13 @@
 # @solid-primitives/upload
 
+## 1.0.0-next.7
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/drag-drop@0.1.0-next.3
+
 ## 1.0.0-next.6
 
 ### Patch Changes

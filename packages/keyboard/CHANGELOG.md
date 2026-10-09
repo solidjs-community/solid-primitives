@@ -1,5 +1,15 @@
 # @solid-primitives/keyboard
 
+## 2.0.0-next.7
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/event-listener@3.0.0-next.7
+  - @solid-primitives/rootless@2.0.0-next.4
+  - @solid-primitives/utils@7.0.0-next.6
+
 ## 2.0.0-next.6
 
 ### Patch Changes

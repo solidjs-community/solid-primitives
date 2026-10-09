@@ -1,5 +1,15 @@
 # @solid-primitives/analytics
 
+## 2.0.0-next.4
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/page-utilities@3.0.0-next.4
+  - @solid-primitives/queue@1.0.0-next.5
+  - @solid-primitives/utils@7.0.0-next.6
+
 ## 2.0.0-next.3
 
 ### Patch Changes

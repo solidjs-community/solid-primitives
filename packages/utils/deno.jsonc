@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "7.0.0-next.5",
+  "version": "7.0.0-next.6",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "license": "MIT",
   "exports": {
