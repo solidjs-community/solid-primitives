@@ -79,7 +79,7 @@ describe("makePersisted", () => {
       set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
     };
     const [signal, setSignal] = makePersisted(
-      createOptimistic(() => DataServer.get()),
+      createRoot(() => createOptimistic(() => DataServer.get())),
       {
         storage: mockStorage,
         name: "test1",
@@ -90,6 +90,9 @@ describe("makePersisted", () => {
         }
       }
     );
+    // let the initial server fetch settle before the optimistic write
+    await new Promise(res => setTimeout(res, 0));
+    flush();
     await setSignal("persisted");
     flush();
     expect(mockStorage.getItem("test1")).toBe('"persisted"');
