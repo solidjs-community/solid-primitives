@@ -1,4 +1,4 @@
-import { createSignal, onSettled, Show } from "solid-js";
+import { createSignal, onSettled, runWithOwner, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
   autofocus,
@@ -168,12 +168,12 @@ export const FocusEventLog = meta.story({
     let el2!: HTMLInputElement;
 
     onSettled(() => {
-      const c1 = makeFocusListener(el1, focused =>
-        addLog(`Input A — ${focused ? "focused" : "blurred"}`),
-      );
-      const c2 = makeFocusListener(el2, focused =>
-        addLog(`Input B — ${focused ? "focused" : "blurred"}`),
-      );
+      // onSettled forbids onCleanup, which make* primitives register — so run them
+      // ownerless and tear down manually via the returned cleanup.
+      const [c1, c2] = runWithOwner(null, () => [
+        makeFocusListener(el1, focused => addLog(`Input A — ${focused ? "focused" : "blurred"}`)),
+        makeFocusListener(el2, focused => addLog(`Input B — ${focused ? "focused" : "blurred"}`)),
+      ])!;
       return () => {
         c1();
         c2();

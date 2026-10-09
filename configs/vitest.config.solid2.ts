@@ -61,6 +61,10 @@ const from_root = package_name == null;
 export default defineConfig(({ mode }) => {
   const testSSR = mode === "test:ssr" || mode === "ssr";
 
+  const conditions = testSSR
+    ? ["@solid-primitives/source", "node"]
+    : ["@solid-primitives/source", "browser", "development"];
+
   return {
     plugins: [solidBabelPlugin(testSSR)],
     test: {
@@ -68,9 +72,9 @@ export default defineConfig(({ mode }) => {
       isolate: false,
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
-      transformMode: {
-        web: [/\.[jt]sx$/],
-      },
+      // Solid ships separate dev/browser/server builds selected by resolve conditions;
+      // inline it so vitest resolves through vite (and those conditions) instead of node.
+      server: { deps: { inline: [/solid-js/, /@solidjs\//] } },
       ...(from_root
         ? // Testing all packages from root
           {
@@ -96,9 +100,9 @@ export default defineConfig(({ mode }) => {
           }),
     },
     resolve: {
-      conditions: testSSR
-        ? ["@solid-primitives/source", "node"]
-        : ["@solid-primitives/source", "browser", "development"],
+      conditions,
     },
+    // inlined modules are evaluated through vite's SSR pipeline, which has its own conditions
+    ssr: { resolve: { conditions } },
   };
 });

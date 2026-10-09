@@ -34,9 +34,9 @@ export default defineConfig(({ mode }) => {
       isolate: false,
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
-      transformMode: {
-        web: [/\.[jt]sx$/],
-      },
+      // Solid ships separate dev/browser/server builds selected by resolve conditions;
+      // inline it so vitest resolves through vite (and those conditions) instead of node.
+      server: { deps: { inline: [/solid-js/, /@solidjs\//] } },
       ...(from_root
         ? // Testing all packages from root
           {

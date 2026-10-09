@@ -155,9 +155,11 @@ export function createMasonry<T>(
   options: MasonryOptionsNoElements<T> | MasonryOptions<T, any>,
 ): Accessor<any[]> & { height: Accessor<number> } {
   // The layout memo is declared after `mapped` (it reads it), yet every item's accessors
-  // subscribe to it: the closure below captures the `const` binding, which is initialized
-  // before any item accessor can run. No signal — and so no write during a server render
-  // (`SERVER_WRITE`) — is needed for that wiring.
+  // subscribe to it. `mapArray` may run the mapping callback — and so `mapElement`, which can
+  // read those accessors — before `layout` is assigned, so the subscription is looked up lazily
+  // and skipped until it exists (reads in that window see the initial `0`s; later reads track).
+  // No signal — and so no write during a server render (`SERVER_WRITE`) — is needed for that wiring.
+  let layout: Accessor<number> | undefined;
   const { source, mapHeight, mapElement } = options,
     mapped = mapArray<T, any>(
       source,
@@ -165,7 +167,7 @@ export function createMasonry<T>(
       (item: any, index: any) =>
         mapData(
           item,
-          () => layout(),
+          () => void layout?.(),
           mapHeight,
           mapElement,
           mapElement && mapElement.length > 1 ? index : noopIndex,
@@ -176,7 +178,7 @@ export function createMasonry<T>(
       () => Array.from({ length: columns() }, (): ReturnType<typeof mapped> => []),
       { equals: (a, b) => a.length === b.length },
     ),
-    layout: Accessor<number> = createMemo(() => {
+    layoutMemo: Accessor<number> = (layout = createMemo(() => {
       const items = mapped(),
         columns = getColumns(),
         heights = new Array(columns.length).fill(0);
@@ -206,10 +208,10 @@ export function createMasonry<T>(
       }
 
       return height;
-    }),
+    })),
     result = mapElement ? createMemo(() => mapped().map(i => i.element)) : mapped;
 
-  (result as any).height = layout;
+  (result as any).height = layoutMemo;
 
   return result as any;
 }
