@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/resize-observer",
-  "version": "4.0.0-next.5",
+  "version": "4.0.0-next.6",
   "description": "Reactive primitives for observing resizing of HTML elements.",
   "license": "MIT",
   "exports": "./src/index.ts",

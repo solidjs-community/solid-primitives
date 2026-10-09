@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 2.0.0-next.5
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+
 ## 2.0.0-next.4
 
 ### Patch Changes
