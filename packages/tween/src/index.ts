@@ -1,32 +1,14 @@
 import { createSignal, createEffect, onCleanup, on } from "solid-js";
 import { isServer } from "solid-js/web";
 
+export * from "./spring.js";
+export * from "./vector.js";
+
 export type TweenProps = {
   duration?: number;
   ease?: (t: number) => number;
 };
 
-/**
- * Creates a simple tween method.
- *
- * @param function Target to be modified
- * @param object Object representing the ease and duration
- * @returns Returns the tweening value
- *
- * @example
- * ```ts
- * const [value, setValue] = createSignal(100);
- * const tweenedValue = createTween(value, {
- *   duration: 500,
- *   ease: (t) => 0.5 - Math.cos(Math.PI * t) / 2
- * });
- * ```
- * ```jsx
- * <button onClick={() => setValue(value() === 0 ? 100 : 0)}>
- *   {Math.round(tweenedValue())}
- * </button>
- * ```
- */
 export default function createTween(
   target: () => number,
   { ease = (t: number) => t, duration = 100 }: TweenProps,
@@ -69,5 +51,4 @@ export default function createTween(
   return current;
 }
 
-// TODO: in a major release, remove the default export
 export { createTween };
