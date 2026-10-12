@@ -58,4 +58,38 @@ describe("MultiProvider", () => {
     expect(capture2).toBe("World");
     expect(capture3).toBe(TEST_MESSAGE);
   });
+
+  test("passes arbitrary props to context providers", () => {
+    const [NamedProvider, useNamedContext] = createContextProvider(
+      (props: { name: string; children: JSX.Element }) => props.name,
+    );
+    let capture;
+
+    renderToString(() => (
+      <MultiProvider values={[[NamedProvider, { name: "Provided through MultiProvider" }]]}>
+        {untrack(() => {
+          capture = useNamedContext();
+          return "";
+        })}
+      </MultiProvider>
+    ));
+
+    expect(capture).toBe("Provided through MultiProvider");
+  });
+
+  test("keeps object values wrapped in the value prop for Solid context providers", () => {
+    const ObjectContext = createContext<{ message: string }>();
+    let capture;
+
+    renderToString(() => (
+      <MultiProvider values={[[ObjectContext.Provider, { message: "Object context" }]]}>
+        {untrack(() => {
+          capture = useContext(ObjectContext)?.message;
+          return "";
+        })}
+      </MultiProvider>
+    ));
+
+    expect(capture).toBe("Object context");
+  });
 });
