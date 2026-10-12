@@ -4,14 +4,8 @@ import type { PostMessageOptions, WorkerCallbacks, WorkerExports, WorkerMessage 
 import { KILL, RPC, cjs, setup } from "./utils.js";
 
 export type * from "./types.js";
+export * from "./rpc.js";
 
-/**
- * Creates a very basic WebWorker based on provided code.
- *
- * @param Functions A set of functions to expose via the worker.
- * @param options Web worker options to control the instance.
- * @returns An array with worker, start and stop methods
- */
 export function createWorker(...args: (Function | object)[]): WorkerExports {
   if (isServer) {
     return [new EventTarget() as unknown as Worker, () => {}, () => {}, new Set()];
@@ -63,14 +57,6 @@ export function createWorker(...args: (Function | object)[]): WorkerExports {
   return [worker, start, stop, exports];
 }
 
-/**
- * Creates a worker pool that round-robins work between worker sets.
- *
- * @param number Amount of workers to establish in the pool.
- * @param Functions A set of functions to expose via the worker.
- * @param options Web worker options to control the instance.
- * @returns An array with worker, start and stop methods
- */
 export const createWorkerPool = (
   concurrency: number = 1,
   ...args: (Function | object)[]
@@ -113,12 +99,6 @@ export type WorkerInstruction = {
   concurrency?: number;
 };
 
-/**
- * Creates a complex worker that reads inputs and provides outputs.
- *
- * @param args An instruction list of controls for the worker.
- * @returns Basic start and stop functions
- */
 export const createSignaledWorker = (
   ...args: WorkerInstruction[]
 ): [start: () => void, stop: () => void] => {
