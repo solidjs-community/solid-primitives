@@ -3,7 +3,8 @@ import { isServer } from "solid-js/web";
 import { access, noop } from "@solid-primitives/utils";
 import { createStaticStore } from "@solid-primitives/static-store";
 
-// Set of control enums
+export * from "./webaudio.js";
+
 export enum AudioState {
   LOADING = "loading",
   PLAYING = "playing",
@@ -25,7 +26,6 @@ export type AudioEventHandlers = {
   [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void;
 };
 
-// Helper for producing the audio source
 const unwrapSource = (src: AudioSource) => {
   if (src instanceof HTMLAudioElement) {
     return src;
@@ -39,13 +39,6 @@ function setAudioSrc(el: HTMLAudioElement, src: AudioSource) {
   el[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
 }
 
-/**
- * Generates a basic audio instance with limited functionality.
- *
- * @param src Audio file path or MediaSource to be played
- * @param handlers An array of handlers to bind against the player
- * @return A basic audio player instance
- */
 export const makeAudio = (
   src: AudioSource,
   handlers: AudioEventHandlers = {},
@@ -71,23 +64,6 @@ export const makeAudio = (
   return player;
 };
 
-/**
- * Generates a basic audio player with simple control mechanisms.
- *
- * @param src Audio file path or MediaSource to be played
- * @return options - @type Object
- * @return options.start - Start playing
- * @return options.pause - Pause playing
- * @return options.seek - Seeks to a location in the playhead
- * @return options.setVolume - Sets the volume of the player
- * @return options.player - Raw player instance
- * @return Returns a location signal and one-off async query callback
- *
- * @example
- * ```ts
- * const { start, seek } = makeAudioPlayer('./example1.mp3');
- * ```
- */
 export const makeAudioPlayer = (
   src: AudioSource,
   handlers: AudioEventHandlers = {},
@@ -112,7 +88,6 @@ export const makeAudioPlayer = (
     player,
     play: () => player.play(),
     pause: () => player.pause(),
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     seek: player.fastSeek
       ? (time: number) => player.fastSeek(time)
       : (time: number) => (player.currentTime = time),
@@ -120,33 +95,6 @@ export const makeAudioPlayer = (
   };
 };
 
-/**
- * A reactive audio primitive with basic control actions.
- *
- * @param src Audio source path or MediaSource to be played or an accessor
- * @param playing A signal for controlling the player
- * @param volume A signal for controlling the volume
- * @return [store] - @type Store
- * @return [store.state] - Current state of the player
- * @return [store.currentTime] - Current time of the playhead
- * @return [store.duration] - Duration of the loaded file
- * @return [store.volume] - Current volume of the audio player
- * @return [store.player] - Raw player instance
- * @return [controls] - Controls for the audio player @type Object
- * @return [controls.seek] - Seeks to a specified location
- * @return [controls.play] - Start playing
- * @return [controls.pause] - Pause playing
- * @return [controls.setVolume] - Sets the volume of the player, from 0 to 1
- *
- *
- * @example
- * ```ts
- * const [playing, setPlaying] = createSignal(false);
- * const [volume, setVolume] = createSignal(1);
- * const [audio, controls] = createAudio('./example1.mp3', playing, volume);
- * console.log(audio.duration);
- * ```
- */
 export const createAudio = (
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
@@ -226,7 +174,6 @@ export const createAudio = (
     _setVolume(volume);
   };
 
-  // Bind reactive properties as needed
   if (src instanceof Function) {
     createEffect(() => {
       const newSrc = src();
