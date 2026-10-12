@@ -2,6 +2,7 @@ export * from "./adapter-mocks.js";
 export * from "./adapter-node.js";
 export * from "./adapter-tauri.js";
 export * from "./adapter-web.js";
+export * from "./adapter-opfs.js";
 export * from "./adapter-vfs.js";
 export * from "./reactive.js";
 export * from "./tools.js";
