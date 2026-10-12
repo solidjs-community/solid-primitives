@@ -12,6 +12,7 @@ Primitives simplifying the creation and use of SolidJS Context API.
 
 - [`createContextProvider`](#createcontextprovider) - Create the Context Provider component and useContext function with types inferred from the factory function.
 - [`MultiProvider`](#multiprovider) - A component that allows you to provide multiple contexts at once.
+- [`ConsumeContext`](#consumecontext) - A component that allows you to consume contexts directly within JSX.
 
 ## Installation
 
@@ -129,6 +130,59 @@ import { MultiProvider } from "@solid-primitives/context";
 
 > **Warning**
 > Components and values passed to `MultiProvider` will be evaluated only once, so make sure that the structure is static. If is isn't, please use nested provider components instead.
+
+## `ConsumeContext`
+
+Inspired by React's `Context.Consumer` component, `ConsumeContext` allows using contexts directly within JSX without the needing to extract the content JSX into a separate function.
+
+This is particularly useful when you want to use the context in the same JSX block where you're providing it and directly bind the context value to the frontend.
+
+Note that this component solely serves as syntactic sugar and doesn't provide any additional functionality over inlining SolidJS's `useContext` hook within JSX.
+
+### How to use it
+
+`ConsumeContext` takes a `use` prop that can be either one of the following:
+* A `use...()` function returned by `createContextProvider` or a inline function that returns the context value like `() => useContext(MyContext)`.
+* A `context` prop that takes a raw SolidJS context created by `createContext()`.
+
+```tsx
+import { createContextProvider, ConsumeContext } from "@solid-primitives/context";
+
+// Create a context provider
+const [CounterProvider, useCounter] = createContextProvider(() => {
+  const [count, setCount] = createSignal(0);
+  const increment = () => setCount(count() + 1);
+  return { count, increment };
+});
+
+// Provide it, consume it and use it in the same JSX block
+<CounterProvider>
+  <ConsumeContext use={useCounter}>
+    {({ count, increment }) => (
+      <div>
+        <button onClick={increment}>Increment</button>
+        <span>{count()}</span>
+      </div>
+    )}
+  </ConsumeContext>
+</CounterProvider>
+```
+
+With the raw SolidJS context returned by `createContext()`:
+
+```tsx
+import { ConsumeContext } from "@solid-primitives/context";
+
+// Create a context
+const counterContext = createContext(/*...*/);
+
+// Consume it using the raw context
+<ConsumeContext use={counterContext}>
+  {({ count, increment }) => {
+    // ...
+  }}
+</ConsumeContext>
+```
 
 ## Changelog
 
