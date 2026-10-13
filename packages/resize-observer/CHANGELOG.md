@@ -1,5 +1,15 @@
 # @solid-primitives/resize-observer
 
+## 4.0.0-next.7
+
+### Patch Changes
+
+- 347b49d: Fix Solid 2 hydration owner counting with a transparent resize observer effect and matching window size onSettled calls.
+- Updated dependencies [dd165cd]
+  - @solid-primitives/event-listener@3.0.0-next.8
+  - @solid-primitives/utils@7.0.0-next.7
+  - @solid-primitives/static-store@1.0.0-next.5
+
 ## 4.0.0-next.6
 
 ### Patch Changes
