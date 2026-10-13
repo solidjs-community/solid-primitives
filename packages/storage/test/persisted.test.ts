@@ -207,6 +207,29 @@ describe("makePersisted", () => {
     expect(init).toBe(promise);
   });
   
+  it("keeps early writes and removes disposed message listeners", async () => {
+    mockStorage.setItem("cleanup", '"init"');
+    let messages = 0;
+    let dispose!: () => void;
+    const [value, setValue] = createRoot(cleanup => {
+      dispose = cleanup;
+      messageSync(window)[0](() => messages++);
+      return makePersisted(createSignal("default"), {
+        storage: mockStorage,
+        name: "cleanup",
+        hydrated: true,
+      });
+    });
+    setValue("user write");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(value()).toBe("user write");
+    window.dispatchEvent(new MessageEvent("message"));
+    expect(messages).toBe(1);
+    dispose();
+    window.dispatchEvent(new MessageEvent("message"));
+    expect(messages).toBe(1);
+  });
   it("defers the initialization if the hydrated option is set", async () => {
     const anotherMockStorage = { ...mockStorage };
     anotherMockStorage.setItem("test18", '"init"');

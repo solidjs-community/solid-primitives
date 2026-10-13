@@ -1,5 +1,15 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV } from "solid-js";
+import {
+  action,
+  createUniqueId,
+  latest,
+  untrack,
+  reconcile,
+  snapshot,
+  DEV,
+  getOwner,
+  onCleanup,
+} from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
 export type SyncStorage = {
@@ -172,8 +182,10 @@ export function makePersisted<
     // in case of hydration mismatches due to the server lacking the same initial value,
     // we want to defer the initialization by a short amount so the same state can be used
     // during hydration
-    if (options.hydrated) setTimeout(() => set(init), 45);
-    else set(init);
+    if (options.hydrated) {
+      const timer = setTimeout(() => unchanged && set(init), 45);
+      if (getOwner()) onCleanup(() => clearTimeout(timer));
+    } else set(init);
 
   const getter: () => T = isSignal ? (signal[0] as () => T) : () => snapshot(signal[0] as T);
 
@@ -237,10 +249,13 @@ export const storageSync: PersistenceSyncAPI = [
  * messageSync - synchronize over post message or broadcast channel API
  */
 export const messageSync = (channel: Window | BroadcastChannel = window, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
-  (subscriber: PersistenceSyncCallback) =>
-    channel.addEventListener("message", ev => {
+  (subscriber: PersistenceSyncCallback) => {
+    const handler = (ev: Event) => {
       subscriber((ev as MessageEvent).data);
-    }),
+    };
+    channel.addEventListener("message", handler);
+    if (getOwner()) onCleanup(() => channel.removeEventListener("message", handler));
+  },
   (key, newValue) =>
     channel.postMessage(
       { key, newValue, timeStamp: Date.now(), url },
