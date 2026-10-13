@@ -28,7 +28,7 @@
       "createPreventScroll"
     ],
     "category": "Inputs",
-    "gzip": 2340
+    "gzip": 2350
   },
   "files": [
     "dist"
