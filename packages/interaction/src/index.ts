@@ -196,10 +196,10 @@ export function ariaHideOutside(
 
   walk(root);
 
-  const observer = new MutationObserver((changes) => {
+  const observer = new MutationObserver(changes => {
     for (const change of changes) {
       if (change.type !== "childList" || change.addedNodes.length === 0) continue;
-      if (![...visibleNodes, ...hiddenNodes].some((node) => node.contains(change.target))) {
+      if (![...visibleNodes, ...hiddenNodes].some(node => node.contains(change.target))) {
         Array.from(change.removedNodes).forEach(node => {
           if (node instanceof Element) {
             visibleNodes.delete(node);
@@ -541,5 +541,6 @@ export function createInteractOutside<T extends Element>(
       if (disabled || !el) return;
       return makeInteractOutside(el, options);
     },
+    { transparent: true },
   );
 }

@@ -42,13 +42,9 @@ export function makeMediaQueryListener(
  * ```
  */
 export function createMediaQuery(query: string, serverFallback = false): Accessor<boolean> {
-  if (isServer) {
-    return () => serverFallback;
-  }
-  const mql = window.matchMedia(query);
-  const [state, setState] = createHydratableSignal(serverFallback, () => mql.matches);
-  const update = () => setState(mql.matches);
-  makeEventListener(mql, "change", update);
+  const mql = isServer ? undefined : window.matchMedia(query);
+  const [state, setState] = createHydratableSignal(serverFallback, () => mql!.matches);
+  if (mql) makeEventListener(mql, "change", () => setState(mql.matches));
   return state;
 }
 
@@ -138,12 +134,11 @@ export function createBreakpoints<T extends Breakpoints>(
     { enumerable: false, get: () => Object.keys(breakpoints).pop() },
   );
 
-  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (isServer || !window.matchMedia) return fallback;
-
   const { mediaFeature = "min-width", watchChange = true } = options;
 
   const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!window.matchMedia) return fallback;
     const matches = {} as Record<keyof T, boolean>;
 
     entries(breakpoints).forEach(([token, width]: [t: keyof T, w: string]) => {
@@ -157,6 +152,9 @@ export function createBreakpoints<T extends Breakpoints>(
 
     return matches as Matches<T>;
   });
+
+  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (isServer || !window.matchMedia) return fallback;
 
   return Object.defineProperty(matches, "key", {
     enumerable: false,

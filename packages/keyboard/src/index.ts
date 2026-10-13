@@ -502,5 +502,6 @@ export function createKeyDown(
       document.addEventListener("keydown", handler);
       return () => document.removeEventListener("keydown", handler);
     },
+    { transparent: true },
   );
 }
