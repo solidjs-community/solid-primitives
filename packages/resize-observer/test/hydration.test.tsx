@@ -4,7 +4,7 @@ import {
   type HydrationRoundTripResult,
 } from "../../../scripts/test-utils/hydration-harness.ts";
 
-describe("createElementSize hydration", () => {
+describe("resize-observer hydration", () => {
   let result: HydrationRoundTripResult | undefined;
   const targets = new Set<Element>();
   const disconnect = vi.fn(() => targets.clear());
@@ -30,6 +30,24 @@ describe("createElementSize hydration", () => {
     result?.cleanup();
     result = undefined;
     vi.unstubAllGlobals();
+  });
+
+  it("hydrates resize primitives and their following sibling", async () => {
+    result = await renderHydrationRoundTrip(
+      `
+import { createResizeObserver, createWindowSize } from "@solid-primitives/resize-observer";
+export default function App() {
+  createResizeObserver([], () => {});
+  const size = createWindowSize();
+  return <><div>{size.width}</div><p ref={el => { el.dataset.bound = "yes"; }}>after resize</p></>;
+}
+`,
+      import.meta.dirname,
+    );
+    expect(result.consoleMessages).toEqual([]);
+    expect(result.container.querySelector("p")).toBe(result.serverNodes[1]);
+    expect(result.container.querySelector("p")?.dataset.bound).toBe("yes");
+    expect(result.container.querySelector("div")?.textContent).toBe(String(window.innerWidth));
   });
 
   it.each(["accessor", "element"])(
