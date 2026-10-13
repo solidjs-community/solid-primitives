@@ -251,6 +251,7 @@ export function eventListener(
       el.addEventListener(type, handler, options);
       return () => el.removeEventListener(type, handler, options);
     },
+    { transparent: true },
   );
   return (el: EventTarget) => {
     setTarget(el);
