@@ -56,6 +56,15 @@ type PersistedOptions<Type, StorageOptions> = {
   the output of `createSignal` or `createStore`
 - using `makePersisted` in an SSR scenario where you have different values on the server and the client might lead to hydration mismatches; use the `hydrated` option to defer the initialization so both values are the same
 
+The fourth returned value is a `dispose` function. Call it to unsubscribe from sync events and cancel pending initialization. Cleanup is explicit; to tie it to a Solid owner, register it with `onCleanup`:
+
+```ts
+const [value, setValue, init, dispose] = makePersisted(createSignal("initial"));
+onCleanup(dispose);
+```
+
+Custom sync subscriptions can return an unsubscribe function, which `dispose` will call.
+
 ### Using `makePersisted` with Loading
 
 In case you are using an asynchronous storage and want the initialisation mesh into Suspense instead of mixing it with Show, we provide the output of the initialisation as third part of the returned tuple:

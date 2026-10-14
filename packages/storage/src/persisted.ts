@@ -1,15 +1,5 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import {
-  action,
-  createUniqueId,
-  latest,
-  untrack,
-  reconcile,
-  snapshot,
-  DEV,
-  getOwner,
-  onCleanup,
-} from "solid-js";
+import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV } from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
 export type SyncStorage = {
@@ -61,8 +51,8 @@ export type PersistenceSyncData = {
 export type PersistenceSyncCallback = (data: PersistenceSyncData) => void;
 
 export type PersistenceSyncAPI = [
-  /** subscribes to sync */
-  subscribe: (subscriber: PersistenceSyncCallback) => void,
+  /** Subscribes to sync and optionally returns an unsubscribe function. */
+  subscribe: (subscriber: PersistenceSyncCallback) => void | (() => void),
   update: (key: string, value: string | null | undefined) => void,
 ];
 
@@ -84,7 +74,7 @@ export type PersistenceOptions<
       storageOptions?: O;
     });
 
-export type PersistedState<S, I = Promise<string> | string | null> = S extends [any, any] ? [...S, I] : never;
+export type PersistedState<S, I = Promise<string> | string | null> = S extends [any, any] ? [...S, I, () => void] : never;
 
 export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
 
@@ -149,7 +139,7 @@ export function makePersisted<
     (signal as any)[1] = action(actionFn) as unknown as S[1];
   }
   if (!storage) {
-    return [signal[0], signal[1], null] as unknown as PersistedState<S>;
+    return [signal[0], signal[1], null, () => {}] as unknown as PersistedState<S>;
   }
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
@@ -176,6 +166,7 @@ export function makePersisted<
         }
       };
   let unchanged = true;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
   if (init instanceof Promise) init.then(data => unchanged && data && set(data));
   else if (init)
@@ -183,24 +174,21 @@ export function makePersisted<
     // we want to defer the initialization by a short amount so the same state can be used
     // during hydration
     if (options.hydrated) {
-      const timer = setTimeout(() => unchanged && set(init), 45);
-      if (getOwner()) onCleanup(() => clearTimeout(timer));
+      timer = setTimeout(() => unchanged && set(init), 45);
     } else set(init);
 
   const getter: () => T = isSignal ? (signal[0] as () => T) : () => snapshot(signal[0] as T);
 
-  if (typeof options.sync?.[0] === "function") {
-    options.sync[0]((data: PersistenceSyncData) => {
-      if (
-        data.key !== name ||
-        (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
-        data.newValue === serialize(untrack(getter))
-      ) {
-        return;
-      }
-      set(data.newValue as string);
-    });
-  }
+  const unsubscribe = options.sync?.[0]((data: PersistenceSyncData) => {
+    if (
+      data.key !== name ||
+      (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
+      data.newValue === serialize(untrack(getter))
+    ) {
+      return;
+    }
+    set(data.newValue as string);
+  });
 
   const persistValue = (next: T | undefined) => {
     if (next == null) {
@@ -229,6 +217,11 @@ export function makePersisted<
       return output instanceof Promise ? output.then(async (result) => { await Promise.resolve(); persist(); return result; }, (err) => { persist(); throw err; }) : output;
     }),
     init,
+    () => {
+      unchanged = false;
+      clearTimeout(timer);
+      unsubscribe?.();
+    },
   ] as unknown as PersistedState<S>;
 }
 
@@ -238,8 +231,11 @@ export function makePersisted<
  * If you wish to use e.g. cookieStorage, you may use a different sync method
  */
 export const storageSync: PersistenceSyncAPI = [
-  (subscriber: PersistenceSyncCallback) =>
-    window.addEventListener("storage", ev => subscriber(ev as PersistenceSyncData)),
+  (subscriber: PersistenceSyncCallback) => {
+    const handler = (ev: StorageEvent) => subscriber(ev as PersistenceSyncData);
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  },
   () => {
     /*storage already sends events fulfilling the PersistenceSyncData<T> conditions*/
   },
@@ -254,7 +250,7 @@ export const messageSync = (channel: Window | BroadcastChannel = window, url: st
       subscriber((ev as MessageEvent).data);
     };
     channel.addEventListener("message", handler);
-    if (getOwner()) onCleanup(() => channel.removeEventListener("message", handler));
+    return () => channel.removeEventListener("message", handler);
   },
   (key, newValue) =>
     channel.postMessage(
@@ -267,8 +263,8 @@ export const messageSync = (channel: Window | BroadcastChannel = window, url: st
  * wsSync - syncronize persisted storage via web socket
  */
 export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
-  (subscriber: PersistenceSyncCallback) =>
-    ws.addEventListener("message", (ev: MessageEvent) => {
+  (subscriber: PersistenceSyncCallback) => {
+    const handler = (ev: MessageEvent) => {
       try {
         const data = JSON.parse(ev.data);
         if (["key", "newValue", "timeStamp"].every(item => Object.hasOwn(data, item))) {
@@ -278,7 +274,10 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV, url: string 
         // oxlint-disable-next-line no-console
         if (warnOnError) console.warn(e);
       }
-    }),
+    };
+    ws.addEventListener("message", handler);
+    return () => ws.removeEventListener("message", handler);
+  },
   (key, newValue) =>
     ws.send(
       JSON.stringify({
@@ -298,6 +297,9 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV, url: string 
  * ```
  */
 export const multiplexSync = (...syncAPIs: PersistenceSyncAPI[]): PersistenceSyncAPI => [
-  subscriber => syncAPIs.forEach(([subscribe]) => subscribe(subscriber)),
+  subscriber => {
+    const unsubscribers = syncAPIs.map(([subscribe]) => subscribe(subscriber));
+    return () => unsubscribers.forEach(unsubscribe => unsubscribe?.());
+  },
   (key, value) => syncAPIs.forEach(([_, updater]) => updater(key, value)),
 ];
