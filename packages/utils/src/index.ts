@@ -356,10 +356,7 @@ export function createHydratableSignal<T>(
   update: () => T,
   options?: SignalOptions<T>,
 ): ReturnType<typeof createSignal<T>> {
-  if (isServer) {
-    return createSignal(serverValue as Exclude<T, Function>, options);
-  }
-  if (sharedConfig.hydrating) {
+  if (isServer || sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
     onSettled(() => {
       setState(() => update());

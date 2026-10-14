@@ -1,5 +1,15 @@
 # @solid-primitives/media
 
+## 4.0.0-next.5
+
+### Patch Changes
+
+- dd165cd: Make client-only effects transparent to Solid 2 hydration and call hydratable helpers’ onSettled on both server and client so later nodes bind correctly.
+- Updated dependencies [dd165cd]
+  - @solid-primitives/event-listener@3.0.0-next.8
+  - @solid-primitives/utils@7.0.0-next.7
+  - @solid-primitives/static-store@1.0.0-next.5
+
 ## 4.0.0-next.4
 
 ### Patch Changes

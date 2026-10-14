@@ -100,9 +100,7 @@ export function createHydratableStaticStore<T extends Record<string, Exclude<unk
   serverValue: T,
   update: () => T,
 ): ReturnType<typeof createStaticStore<T>> {
-  if (isServer) return createStaticStore(serverValue);
-
-  if (sharedConfig.hydrating) {
+  if (isServer || sharedConfig.hydrating) {
     const [state, setState] = createStaticStore(serverValue);
     onSettled(() => { setState(update()); });
     return [state, setState];
