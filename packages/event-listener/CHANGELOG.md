@@ -1,5 +1,11 @@
 # @solid-primitives/event-listener
 
+## 3.0.0-next.9
+
+### Patch Changes
+
+- 91a92aa: Republish via npm trusted publishing (no code changes)
+
 ## 3.0.0-next.8
 
 ### Patch Changes
