@@ -234,6 +234,7 @@
     "sse-solid2-async-reactivity",
     "state-machine-solid2-migration",
     "storage-isolated-declarations-fix",
+    "storage-sync-cleanup",
     "styles-solid2-migration",
     "sunny-poets-brush",
     "sweet-olives-talk",
