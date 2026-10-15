@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 5.0.0-next.7
+
+### Patch Changes
+
+- 2dfa8d5: Return an explicit disposer as the fourth value from `makePersisted` to unsubscribe sync listeners and cancel pending initialization. Preserve writes made before deferred initialization.
+
 ## 5.0.0-next.6
 
 ### Patch Changes
