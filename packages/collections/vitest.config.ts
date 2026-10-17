@@ -39,6 +39,16 @@ export default defineConfig(({ mode }) => ({
       ...(mode === "benchmark" ? [] : ["development"]),
     ],
   },
+  // Vitest evaluates inlined dependencies through Vite's SSR pipeline.
+  ssr: {
+    resolve: {
+      conditions: [
+        "@solid-primitives/source",
+        mode === "ssr" ? "node" : "browser",
+        ...(mode === "benchmark" ? [] : ["development"]),
+      ],
+    },
+  },
   test: {
     include:
       mode === "ssr"
@@ -62,7 +72,7 @@ export default defineConfig(({ mode }) => ({
     server: { deps: { inline: ["solid-js", "@solidjs/signals", "@solidjs/web"] } },
     // Codec lifetime checks require real GC in an isolated process.
     pool: "forks",
-    poolOptions: { forks: { execArgv: ["--expose-gc"] } },
+    execArgv: ["--expose-gc"],
     maxWorkers: 1,
     minWorkers: 1,
     benchmark: { include: ["test/integration/collections.bench.ts"] },

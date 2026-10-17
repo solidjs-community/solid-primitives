@@ -16,6 +16,9 @@ for (const dev of [true, false]) {
     bundle: true,
     platform: "node",
     format: "esm",
+    // Linked dependencies may map imports to source in their tsconfig. These
+    // lifetime checks must bundle their shipped builds instead.
+    tsconfigRaw: { compilerOptions: {} },
     // Exercise the shipped client builds, including in this Node GC process.
     conditions: ["browser", ...(dev ? ["development"] : [])],
   });
