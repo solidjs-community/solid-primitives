@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "3.0.0-next.6",
+  "version": "3.0.0-next.9",
   "description": "Primitives to manage creating event listeners.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -23,7 +23,7 @@
       "DocumentEventListener"
     ],
     "category": "Browser APIs",
-    "gzip": 977
+    "gzip": 981
   },
   "private": false,
   "sideEffects": false,

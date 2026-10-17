@@ -1,5 +1,11 @@
 # @solid-primitives/workers
 
+## 2.0.1-next.3
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+
 ## 2.0.1-next.2
 
 ### Patch Changes

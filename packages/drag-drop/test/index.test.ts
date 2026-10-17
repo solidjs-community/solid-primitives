@@ -1,7 +1,7 @@
-import "./setup.js";
+import { restoreGlobals } from "./setup.js";
 import { createRoot, flush } from "solid-js";
 import { render } from "@solidjs/web";
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, afterAll } from "vitest";
 import {
   makeDraggable,
   makeDroppable,
@@ -59,6 +59,8 @@ afterEach(() => {
 });
 
 // ── makeDraggable ─────────────────────────────────────────────────────────────
+
+afterAll(restoreGlobals);
 
 describe("makeDraggable", () => {
   it("calls onStart on left pointerdown", () => {

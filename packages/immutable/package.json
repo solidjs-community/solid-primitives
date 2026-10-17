@@ -20,7 +20,7 @@
       "createImmutable"
     ],
     "category": "Reactivity",
-    "gzip": 1999
+    "gzip": 1955
   },
   "keywords": [
     "solid",

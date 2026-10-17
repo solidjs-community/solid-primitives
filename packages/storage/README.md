@@ -4,7 +4,7 @@
 
 # @solid-primitives/storage
 
-[![size](https://img.shields.io/badge/size-2.23_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)
+[![size](https://img.shields.io/badge/size-2.29_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)
 [![size](https://img.shields.io/npm/v/@solid-primitives/storage?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/storage)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -55,6 +55,15 @@ type PersistedOptions<Type, StorageOptions> = {
 - to use `makePersisted` with other state management APIs, you need some adapter that will project your API to either
   the output of `createSignal` or `createStore`
 - using `makePersisted` in an SSR scenario where you have different values on the server and the client might lead to hydration mismatches; use the `hydrated` option to defer the initialization so both values are the same
+
+The fourth returned value is a `dispose` function. Call it to unsubscribe from sync events and cancel pending initialization. Cleanup is explicit; to tie it to a Solid owner, register it with `onCleanup`:
+
+```ts
+const [value, setValue, init, dispose] = makePersisted(createSignal("initial"));
+onCleanup(dispose);
+```
+
+Custom sync subscriptions can return an unsubscribe function, which `dispose` will call.
 
 ### Using `makePersisted` with Loading
 

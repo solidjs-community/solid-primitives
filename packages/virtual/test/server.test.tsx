@@ -12,11 +12,12 @@ describe("VirtualList", () => {
       </VirtualList>
     ));
 
-    expect(virtualListStr).toEqual(
+    // compilers differ on whether an undefined `class` renders as `class=""` or is omitted
+    expect(virtualListStr.replace(' class=""', "")).toEqual(
       [
         '<div style="overflow:auto;height:20px">',
         '  <div style="position:relative;width:100%;height:10000px">',
-        '    <div class="" style="position:absolute;top:0px">',
+        '    <div style="position:absolute;top:0px">',
         '      <div style="height:10px">0</div>',
         '      <div style="height:10px">1</div>',
         '      <div style="height:10px">2</div>',

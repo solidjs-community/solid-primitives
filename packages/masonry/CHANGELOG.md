@@ -1,5 +1,14 @@
 # @solid-primitives/masonry
 
+## 2.0.0-next.4
+
+### Patch Changes
+
+- 1b703e1: Fix `ReferenceError` ("Cannot access 'layout' before initialization") when `mapElement` reads item accessors (`order()`, `margin()`, `column()`) while the items are first mapped, which `mapArray` now does eagerly.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/utils@7.0.0-next.6
+
 ## 2.0.0-next.3
 
 ### Patch Changes

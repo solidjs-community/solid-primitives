@@ -1,5 +1,14 @@
 # @solid-primitives/history
 
+## 1.0.0-next.5
+
+### Patch Changes
+
+- 1b703e1: Fix undo/redo recording a bogus history entry on Solid 2.0.0-rc.14+, where optimistic writes made outside a parked transition are void. The "restoring" flag is now a plain flag consumed by the next recompute.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/utils@7.0.0-next.6
+
 ## 1.0.0-next.4
 
 ### Patch Changes

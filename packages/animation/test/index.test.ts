@@ -38,8 +38,8 @@ const KF: Keyframe[] = [{ opacity: "0" }, { opacity: "1" }];
 const OPTS: KeyframeAnimationOptions = { duration: 300 };
 
 beforeEach(() => {
-  vi.stubGlobal("ScrollTimeline", vi.fn(() => ({})));
-  vi.stubGlobal("ViewTimeline", vi.fn(() => ({})));
+  vi.stubGlobal("ScrollTimeline", vi.fn(function () {}));
+  vi.stubGlobal("ViewTimeline", vi.fn(function () {}));
 });
 
 afterEach(() => {

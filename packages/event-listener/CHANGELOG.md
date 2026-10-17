@@ -1,5 +1,27 @@
 # @solid-primitives/event-listener
 
+## 3.0.0-next.9
+
+### Patch Changes
+
+- 91a92aa: Republish via npm trusted publishing (no code changes)
+
+## 3.0.0-next.8
+
+### Patch Changes
+
+- dd165cd: Make client-only effects transparent to Solid 2 hydration and call hydratable helpers’ onSettled on both server and client so later nodes bind correctly.
+- Updated dependencies [dd165cd]
+  - @solid-primitives/utils@7.0.0-next.7
+
+## 3.0.0-next.7
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/utils@7.0.0-next.6
+
 ## 3.0.0-next.6
 
 ### Minor Changes

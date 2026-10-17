@@ -9,7 +9,7 @@ import {
   latest,
   refresh,
 } from "solid-js";
-import { makePersisted, messageSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
+import { makePersisted, messageSync, multiplexSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
@@ -79,7 +79,7 @@ describe("makePersisted", () => {
       set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
     };
     const [signal, setSignal] = makePersisted(
-      createOptimistic(() => DataServer.get()),
+      createRoot(() => createOptimistic(() => DataServer.get())),
       {
         storage: mockStorage,
         name: "test1",
@@ -90,6 +90,9 @@ describe("makePersisted", () => {
         }
       }
     );
+    // let the initial server fetch settle before the optimistic write
+    await new Promise(res => setTimeout(res, 0));
+    flush();
     await setSignal("persisted");
     flush();
     expect(mockStorage.getItem("test1")).toBe('"persisted"');
@@ -204,6 +207,44 @@ describe("makePersisted", () => {
     expect(init).toBe(promise);
   });
   
+  it("keeps early writes and explicitly disposes sync and deferred init", async () => {
+    mockStorage.setItem("cleanup", '"init"');
+    const [value, setValue, , dispose] = createRoot(disposeRoot => {
+      const persisted = makePersisted(createSignal("default"), {
+        storage: mockStorage,
+        name: "cleanup",
+        hydrated: true,
+        sync: multiplexSync(messageSync(window), storageSync),
+      });
+      disposeRoot();
+      return persisted;
+    });
+    const send = (newValue: string) => window.dispatchEvent(new MessageEvent("message", {
+      data: { key: "cleanup", newValue: JSON.stringify(newValue) },
+    }));
+    send("synced");
+    flush();
+    expect(value()).toBe("synced");
+    window.dispatchEvent(new StorageEvent("storage", { key: "cleanup", newValue: '"stored"' }));
+    flush();
+    expect(value()).toBe("stored");
+    setValue("user write");
+    const [cancelled, , , cancel] = makePersisted(createSignal("default"), {
+      storage: mockStorage,
+      name: "cleanup",
+      hydrated: true,
+    });
+    cancel();
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(value()).toBe("user write");
+    expect(cancelled()).toBe("default");
+    dispose();
+    send("ignored");
+    window.dispatchEvent(new StorageEvent("storage", { key: "cleanup", newValue: '"ignored"' }));
+    flush();
+    expect(value()).toBe("user write");
+  });
   it("defers the initialization if the hydrated option is set", async () => {
     const anotherMockStorage = { ...mockStorage };
     anotherMockStorage.setItem("test18", '"init"');

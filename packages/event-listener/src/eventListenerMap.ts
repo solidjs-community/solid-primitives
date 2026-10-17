@@ -1,7 +1,6 @@
 import { type AnyFunction, entries, type Many, type MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "./eventListener.ts";
 import type { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types.ts";
-import { isServer } from "@solidjs/web";
 
 export type EventHandlersMap<EventMap> = {
   [EventName in keyof EventMap]: (event: EventMap[EventName]) => void;
@@ -48,9 +47,6 @@ export function createEventListenerMap(
   handlersMap: Record<string, AnyFunction | undefined>,
   options?: EventListenerOptions,
 ): void {
-  if (isServer) {
-    return;
-  }
   for (const [eventName, handler] of entries(handlersMap)) {
     if (handler) createEventListener(targets, eventName, handler, options);
   }

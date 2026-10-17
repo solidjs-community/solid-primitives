@@ -32,6 +32,27 @@ class DragEventShim extends MouseEvent {
   }
 }
 
+// Tests run with `isolate: false`, so anything patched on the global scope leaks into the other
+// test files sharing this worker. Remember the originals so the test file can put them back.
+const g = globalThis as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+const originals = {
+  PointerEvent: g.PointerEvent,
+  DragEvent: g.DragEvent,
+  requestAnimationFrame: g.requestAnimationFrame,
+  cancelAnimationFrame: g.cancelAnimationFrame,
+  innerWidth: window.innerWidth,
+  innerHeight: window.innerHeight,
+};
+
+export function restoreGlobals(): void {
+  g.PointerEvent = originals.PointerEvent;
+  g.DragEvent = originals.DragEvent;
+  g.requestAnimationFrame = originals.requestAnimationFrame;
+  g.cancelAnimationFrame = originals.cancelAnimationFrame;
+  Object.defineProperty(window, "innerWidth", { value: originals.innerWidth, configurable: true });
+  Object.defineProperty(window, "innerHeight", { value: originals.innerHeight, configurable: true });
+}
+
 // Install globally so test files can use `new PointerEvent(...)` / `new DragEvent(...)`
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).PointerEvent = PointerEventShim;

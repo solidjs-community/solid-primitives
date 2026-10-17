@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/interaction",
-  "version": "1.0.0-next.5",
+  "version": "1.0.0-next.7",
   "description": "Primitive for detecting interactions outside a given element.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",
@@ -20,7 +20,7 @@
       "createHideOutside"
     ],
     "category": "Browser APIs",
-    "gzip": 1759
+    "gzip": 1768
   },
   "private": false,
   "sideEffects": false,

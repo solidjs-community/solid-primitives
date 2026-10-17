@@ -16,10 +16,10 @@
     "@kobalte/solidbase": "^0.6.13",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^1.0.0",
-    "@solidjs/start": "^2.0.0",
+    "@solidjs/start": "^2.0.6",
     "nitro": "3.0.260610-beta",
-    "solid-js": "^1.9.14",
-    "vite": "^8.0.0"
+    "solid-js": "^1.9.17",
+    "vite": "^8.3.4"
   },
   "devDependencies": {
     "@iconify-json/ph": "^1.2.2",

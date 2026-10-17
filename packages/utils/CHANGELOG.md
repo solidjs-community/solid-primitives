@@ -1,5 +1,17 @@
 # @solid-primitives/utils
 
+## 7.0.0-next.7
+
+### Patch Changes
+
+- dd165cd: Make client-only effects transparent to Solid 2 hydration and call hydratable helpers’ onSettled on both server and client so later nodes bind correctly.
+
+## 7.0.0-next.6
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+
 ## 7.0.0-next.5
 
 ### Minor Changes

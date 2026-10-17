@@ -1,5 +1,32 @@
 # @solid-primitives/resize-observer
 
+## 4.0.0-next.7
+
+### Patch Changes
+
+- 347b49d: Fix Solid 2 hydration owner counting with a transparent resize observer effect and matching window size onSettled calls.
+- Updated dependencies [dd165cd]
+  - @solid-primitives/event-listener@3.0.0-next.8
+  - @solid-primitives/utils@7.0.0-next.7
+  - @solid-primitives/static-store@1.0.0-next.5
+
+## 4.0.0-next.6
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/event-listener@3.0.0-next.7
+  - @solid-primitives/rootless@2.0.0-next.4
+  - @solid-primitives/static-store@1.0.0-next.4
+  - @solid-primitives/utils@7.0.0-next.6
+
+## 4.0.0-next.5
+
+### Patch Changes
+
+- 52673b2: Preserve hydration identifiers when `createElementSize` receives a target accessor during server rendering.
+
 ## 4.0.0-next.4
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import { type MaybeAccessor, noop } from "@solid-primitives/utils";
-import { createSignal, createMemo, type Accessor, onCleanup } from "solid-js";
+import { createSignal, createMemo, untrack, type Accessor, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 /**
@@ -30,7 +30,9 @@ function createRAF(
     callback(timeStamp);
   };
   const start = () => {
-    if (running()) return;
+    // untracked: a tracking caller (e.g. `createMs` called in a memo) must not subscribe to the
+    // signal it is about to write, or it would re-run forever
+    if (untrack(running)) return;
     setRunning(true);
     requestID = requestAnimationFrame(loop);
   };

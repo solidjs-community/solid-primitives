@@ -37,7 +37,7 @@ describe("createWorker", () => {
       postMessage: vi.fn(),
       terminate: vi.fn(),
     };
-    vi.stubGlobal("Worker", vi.fn(() => mockWorker));
+    vi.stubGlobal("Worker", vi.fn(function () { return mockWorker; }));
   });
 
   it("returns a [worker, start, stop, exports] tuple", () => {
@@ -114,12 +114,14 @@ describe("createWorker", () => {
 
 describe("createWorkerPool", () => {
   beforeEach(() => {
-    vi.stubGlobal("Worker", vi.fn(() => ({
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      postMessage: vi.fn(),
-      terminate: vi.fn(),
-    })));
+    vi.stubGlobal("Worker", vi.fn(function () {
+      return {
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        postMessage: vi.fn(),
+        terminate: vi.fn(),
+      };
+    }));
   });
 
   it("returns a [proxy, start, stop] tuple", () => {
@@ -134,7 +136,7 @@ describe("createWorkerPool", () => {
   });
 
   it("spawns exactly concurrency workers", () => {
-    const mockFn = () => ({ addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() });
+    const mockFn = function () { return { addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() }; };
     const MockW = vi.fn(mockFn);
     vi.stubGlobal("Worker", MockW);
 
@@ -147,7 +149,7 @@ describe("createWorkerPool", () => {
   });
 
   it("start() is idempotent — does not spawn additional workers when pool is running", () => {
-    const mockFn = () => ({ addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() });
+    const mockFn = function () { return { addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() }; };
     const MockW = vi.fn(mockFn);
     vi.stubGlobal("Worker", MockW);
 
@@ -162,7 +164,7 @@ describe("createWorkerPool", () => {
   });
 
   it("stop() clears the worker pool so start() can respawn", () => {
-    const mockFn = () => ({ addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() });
+    const mockFn = function () { return { addEventListener: vi.fn(), removeEventListener: vi.fn(), postMessage: vi.fn(), terminate: vi.fn() }; };
     const MockW = vi.fn(mockFn);
     vi.stubGlobal("Worker", MockW);
 
@@ -228,7 +230,7 @@ describe("abort", () => {
       postMessage: vi.fn(),
       terminate: vi.fn(),
     };
-    vi.stubGlobal("Worker", vi.fn(() => mockWorker));
+    vi.stubGlobal("Worker", vi.fn(function () { return mockWorker; }));
   });
 
   it("abort() rejects the promise with AbortError before the worker responds", async () => {
@@ -275,7 +277,7 @@ describe("abort", () => {
       postMessage: vi.fn(),
       terminate: vi.fn(),
     };
-    vi.stubGlobal("Worker", vi.fn(() => mock));
+    vi.stubGlobal("Worker", vi.fn(function () { return mock; }));
 
     let call!: ReturnType<typeof createWorker<{ add: (a: number, b: number) => number }>>[0]["add"];
     const dispose = createRoot(d => {
@@ -328,7 +330,7 @@ describe("createReactiveWorker + workerScope", () => {
 
   beforeEach(() => {
     channel = makeChannel();
-    vi.stubGlobal("Worker", vi.fn(() => channel.workerObj));
+    vi.stubGlobal("Worker", vi.fn(function () { return channel.workerObj; }));
     vi.stubGlobal("self", channel.selfObj);
   });
 

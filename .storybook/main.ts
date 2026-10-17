@@ -1,5 +1,14 @@
 import type { StorybookConfig } from "storybook-solidjs-vite";
-import { mergeConfig } from "vite";
+import { mergeConfig, type PluginOption } from "vite";
+import solidPlugin from "@solidjs/vite-plugin";
+
+// storybook-solidjs-vite injects the Solid 1 `vite-plugin-solid` (babel-preset-solid 1.x, which
+// emits helpers like `use` that @solidjs/web 2.x no longer exports). Strip it so the Solid 2
+// plugin below is the only JSX compiler.
+const withoutLegacySolidPlugin = (plugins: PluginOption[] = []): PluginOption[] =>
+  plugins.flatMap(p =>
+    Array.isArray(p) ? [withoutLegacySolidPlugin(p)] : p && (p as { name?: string }).name === "solid" ? [] : [p],
+  );
 
 const config: StorybookConfig = {
   stories: ["../packages/*/stories/*.stories.{ts,tsx}"],
@@ -28,8 +37,9 @@ const config: StorybookConfig = {
         "/geist-fonts/geist-sans/Geist-BoldItalic.woff2",
       ),
   async viteFinal(config) {
-    return mergeConfig(config, {
+    return mergeConfig({ ...config, plugins: withoutLegacySolidPlugin(config.plugins) }, {
       plugins: [
+        solidPlugin({ hot: false, solid: { moduleName: "@solidjs/web", omitNestedClosingTags: false } }),
         // babel-preset-solid <beta.14 generates `addEventListener` but @solidjs/web@beta.14
         // renamed it to `addEvent`. Patch any compiled story that uses the old import.
         {

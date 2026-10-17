@@ -161,7 +161,8 @@ describe("createRootPool", () => {
 
       expect(capturedArgs).toEqual([0, 1, 2, 3, 4, 5]);
       expect(roots).toBe(3);
-      expect(cleanups).toEqual([3, 4, 5]);
+      // cleanups run in reverse registration order (LIFO) as of Solid 2 rc.14
+      expect(cleanups).toEqual([5, 4, 3]);
     });
   });
 
@@ -178,9 +179,10 @@ describe("createRootPool", () => {
         d();
       });
 
-      expect(pool()).toBe(2);
-      expect(pool()).toBe(1);
+      // roots return to the pool in LIFO cleanup order, so the first-created is reused first
       expect(pool()).toBe(0);
+      expect(pool()).toBe(1);
+      expect(pool()).toBe(2);
 
       dispose();
     });
