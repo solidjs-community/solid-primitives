@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { action, createEffect, createRoot, createSignal, flush } from "solid-js";
 import { createReactiveMap, createReactiveSet } from "../../src/index.js";
-import { advance, insert, remove, seek, type Order } from "../../src/order.js";
 const disposers: (() => void)[] = [];
 function root<T>(fn: () => T): T {
   return createRoot(d => {
@@ -187,32 +186,103 @@ describe("ordered collections", () => {
       expect(actual.size).toBe(expected.size);
     }
   });
-  it("balances persistent order paths and keeps old roots valid", () => {
-    let tree: Order;
-    const roots: Order[] = [];
-    const validate = (root: Order, min = -Infinity, max = Infinity): number => {
-      if (!root) return 0;
-      expect(root.id > min && root.id < max).toBe(true);
-      const l = validate(root.left, min, root.id),
-        r = validate(root.right, root.id, max);
-      expect(Math.abs(l - r)).toBeLessThanOrEqual(1);
-      expect(root.height).toBe(1 + Math.max(l, r));
-      return root.height;
+  it("matches native collections across mixed keys, batched writes, and concurrent cursors", () => {
+    const keys: unknown[] = [
+      {},
+      {},
+      () => {},
+      Symbol("local"),
+      Symbol.for("global"),
+      NaN,
+      -0,
+      1,
+      "1",
+      1n,
+      true,
+      false,
+      null,
+      undefined,
+      "__proto__",
+      "size",
+      "order",
+    ];
+    const values: unknown[] = [0, -0, NaN, undefined, {}, () => {}];
+    const map = root(() => createReactiveMap<unknown, unknown>());
+    const nativeMap = new Map<unknown, unknown>();
+    const set = root(() => createReactiveSet<unknown>());
+    const nativeSet = new Set<unknown>();
+    const cursors = () =>
+      [
+        [map.keys(), nativeMap.keys()],
+        [map.values(), nativeMap.values()],
+        [map.entries(), nativeMap.entries()],
+        [set.values(), nativeSet.values()],
+        [set.entries(), nativeSet.entries()],
+      ] as const;
+    let active = cursors(),
+      seed = 0x12abcdef;
+    const random = () => {
+      seed ^= seed << 13;
+      seed ^= seed >>> 17;
+      seed ^= seed << 5;
+      return seed >>> 0;
     };
-    for (let i = 0; i < 512; i++) {
-      tree = insert(tree, i, String(i));
-      if (i % 64 === 63) roots.push(tree);
+    for (let batch = 0; batch < 500; batch++) {
+      const edits = 1 + (random() % 6);
+      for (let i = 0; i < edits; i++) {
+        const key = keys[random() % keys.length];
+        switch (random() % 12) {
+          case 0:
+            map.clear();
+            nativeMap.clear();
+            set.clear();
+            nativeSet.clear();
+            break;
+          case 1:
+          case 2:
+          case 3:
+            expect(map.delete(key)).toBe(nativeMap.delete(key));
+            expect(set.delete(key)).toBe(nativeSet.delete(key));
+            break;
+          default: {
+            const value = values[random() % values.length];
+            map.set(key, value);
+            nativeMap.set(key, value);
+            set.add(key);
+            nativeSet.add(key);
+          }
+        }
+      }
+      flush();
+      for (const [a, b] of active) if (random() % 2) expect(a.next()).toEqual(b.next());
+      if (random() % 5 === 0) active = cursors();
+      expect([...map]).toEqual([...nativeMap]);
+      expect([...set]).toEqual([...nativeSet]);
+      expect(map.size).toBe(nativeMap.size);
+      expect(set.size).toBe(nativeSet.size);
+      for (const key of keys) {
+        expect(map.has(key)).toBe(nativeMap.has(key));
+        expect(Object.is(map.get(key), nativeMap.get(key))).toBe(true);
+        expect(set.has(key)).toBe(nativeSet.has(key));
+      }
     }
-    for (let i = 0; i < 512; i += 2) tree = remove(tree!, i);
-    validate(tree);
-    for (let i = 0; i < roots.length; i++) {
-      validate(roots[i]);
-      const stack: any[] = [];
-      seek(roots[i], -1, stack);
-      const values: number[] = [];
-      let item;
-      while ((item = advance(stack))) values.push(item.id);
-      expect(values).toEqual(Array.from({ length: (i + 1) * 64 }, (_, n) => n));
+  });
+
+  it("keeps paused cursors valid through large structural batches", () => {
+    const values = Array.from({ length: 512 }, (_, i) => i);
+    const actual = root(() => createReactiveSet(values));
+    const expected = new Set(values);
+    const cursors = Array.from({ length: 8 }, (_, i) => {
+      const a = actual.values(),
+        b = expected.values();
+      for (let n = 0; n < i * 64; n++) expect(a.next()).toEqual(b.next());
+      return [a, b] as const;
+    });
+    for (const set of [actual, expected]) {
+      for (let i = 0; i < 512; i += 2) set.delete(i);
+      for (let i = 512; i < 768; i++) set.add(i);
     }
+    flush();
+    for (const [a, b] of cursors) expect([...a]).toEqual([...b]);
   });
 });

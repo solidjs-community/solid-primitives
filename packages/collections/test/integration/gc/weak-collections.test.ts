@@ -194,10 +194,10 @@ for (const optimistic of [false, true]) {
 }
 
 test("computed reader companions do not retain unreachable keys and values", async () => {
-  const fixture = root(() => {
+  const map = root(() => createReactiveWeakMap<object, object>(emptyCompute));
+  const fixture = (() => {
     const key = {};
     const value = { key };
-    const map = createReactiveWeakMap<object, object>(emptyCompute);
     map.set(key, value);
     const disposeReader = createRoot(dispose => {
       observe(() => isPending(() => map.get(key)));
@@ -207,12 +207,12 @@ test("computed reader companions do not retain unreachable keys and values", asy
     flush();
     disposeReader();
     flush();
-    return { map, key: new WeakRef(key), value: new WeakRef(value) };
-  });
+    return { key: new WeakRef(key), value: new WeakRef(value) };
+  })();
   await collect();
   assert.equal(fixture.key.deref(), undefined);
   assert.equal(fixture.value.deref(), undefined);
-  assert.equal(fixture.map.has({}), false);
+  assert.equal(map.has({}), false);
 });
 
 test("values are collectible before metadata cleanup; next ordinary write prunes finalized slots", async () => {

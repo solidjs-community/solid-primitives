@@ -13,6 +13,7 @@ export type Kind = (typeof kinds)[number];
 type Key = { tag: string } | string;
 type Value = { n: number; date: Date; missing: undefined; nan: number; big: bigint; self?: Value };
 export let current: {
+  map?: Map<Key, Value>;
   read: () => string;
   update: () => void;
   refresh: () => Promise<unknown>;
@@ -63,7 +64,7 @@ export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
       entry = map.get(k);
     return `${map.has(k)}:${entry?.n}:${entry?.date instanceof Date && entry.big === 1n && entry.self === entry}:${Number.isNaN(entry?.nan)}:${map.size}:${map.has("tail")}`;
   };
-  current = { read, update: () => update(n => n + 1), refresh: () => refresh(map) };
+  current = { map, read, update: () => update(n => n + 1), refresh: () => refresh(map) };
   return (
     <section>
       <Loading fallback={<span data-loading="">loading</span>}>

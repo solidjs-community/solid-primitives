@@ -12,7 +12,7 @@
 import { $REFRESH, type Refreshable, type StoreSetter } from "@solidjs/signals";
 import { createStore, createOptimisticStore, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { advance, build, insert, remove, seek, type Order, type OrderNode } from "./order.js";
+import { collectionWriter, runCompute } from "./compute.js";
 export {
   createReactiveWeakMap,
   createReactiveWeakSet,
@@ -52,16 +52,33 @@ export type ReactiveCollectionCompute<Draft, Result = Draft> = (
 
 type State = Record<PropertyKey, any> & { order: Order; size: number };
 type Entry<K, V> = readonly [K, V];
+type Order = readonly { readonly id: number; readonly slot: string }[];
 
-const sameKey = (a: unknown, b: unknown) => a === b || (a !== a && b !== b);
+// Inherit helpers where supported, without adding a dependency on global Iterator.
+const iteratorPrototype = Object.getPrototypeOf(Object.getPrototypeOf(new Map().keys()));
+
+// Separate closure environments keep input iterables and old loading seeds out
+// of the long-lived ordinal/derive callbacks.
+function createOrdinal(): (root?: Order) => number {
+  let next = 0;
+  return (order?: Order) => {
+    next = Math.max(next, (order?.at(-1)?.id ?? -1) + 1);
+    if (next === Number.MAX_SAFE_INTEGER)
+      throw new RangeError("Collection insertion limit exceeded");
+    return next++;
+  };
+}
 
 // A shallow store permanently raw-marks inserted wrappable objects. Collections
 // must not change a user's object's behavior in OTHER stores. Only our frozen
 // shell reaches that boundary; get() returns the original reference. Primitive
-// values stay unboxed, preserving get(missing) === get(present-undefined) at
-// the subscription-node level. Existing shells are reused for unchanged values.
+// values stay unboxed except -0, which must invalidate a +0 store node.
+// Undefined stays unboxed so absent/present-undefined reads share equality.
+// Existing shells are reused for unchanged values.
 function box(value: unknown): unknown {
-  return value !== null && typeof value === "object" ? Object.freeze({ value }) : value;
+  return (value !== null && typeof value === "object") || Object.is(value, -0)
+    ? Object.freeze({ value })
+    : value;
 }
 function unbox<V>(value: any): V {
   return value !== null && typeof value === "object" ? value.value : value;
@@ -82,27 +99,27 @@ function readKey<K>(state: State, slot: string): K {
 /** No strong registry of absent keys: primitives/global symbols encode
  * directly; objects, functions and local symbols use a WeakMap. Never use a
  * caller's symbol as a slot: it could be one of Solid's store protocol keys. */
-function keyEncoder<K>(): (key: K, state: State) => string {
+function keyEncoder<K>() {
   const objects = new WeakMap<WeakKey, string[]>();
-  const seen = new WeakSet<OrderNode>();
-  const register = (root: Order, state: State): void => {
-    if (!root || seen.has(root)) return;
-    const key = readKey<K>(state, root.slot);
-    if (
-      (typeof key === "object" && key !== null) ||
-      typeof key === "function" ||
-      (typeof key === "symbol" && Symbol.keyFor(key) === undefined)
-    ) {
-      const slots = objects.get(key as WeakKey);
-      if (!slots) objects.set(key as WeakKey, [root.slot]);
-      else if (!slots.includes(root.slot)) slots.push(root.slot);
+  const seen = new WeakSet<Order>();
+  const register = (order: Order, state: State): void => {
+    if (seen.has(order)) return;
+    for (const { slot } of order) {
+      const key = readKey<K>(state, slot);
+      if (
+        (typeof key === "object" && key !== null) ||
+        typeof key === "function" ||
+        (typeof key === "symbol" && Symbol.keyFor(key) === undefined)
+      ) {
+        const slots = objects.get(key as WeakKey);
+        if (!slots) objects.set(key as WeakKey, [slot]);
+        else if (!slots.includes(slot)) slots.push(slot);
+      }
     }
-    register(root.left, state);
-    register(root.right, state);
-    seen.add(root);
+    seen.add(order);
   };
   let next = 0;
-  return (key, state) => {
+  const encode = (key: K, state: State): string => {
     if (key === null) return "l:";
     switch (typeof key) {
       case "object":
@@ -113,7 +130,7 @@ function keyEncoder<K>(): (key: K, state: State) => string {
           if (globalKey !== undefined) return "symbol:" + globalKey;
         }
         // Hydrated snapshots carry the authoritative key identities and slot
-        // names. Visit only new persistent-tree paths, without subscribing the
+        // names. Adopt each visible order once, without subscribing the
         // caller to structure. This also replaces mappings made by trace runs.
         return untrack(() => {
           register(state.order, state);
@@ -137,20 +154,28 @@ function keyEncoder<K>(): (key: K, state: State) => string {
         return typeof key + ":" + String(key);
     }
   };
+  return {
+    encode,
+    order: (order: Order): Order => {
+      // Locally built orders already registered every key through encode().
+      // Only unfamiliar hydrated orders need a scan to adopt wire identities.
+      seen.add(order);
+      return order;
+    },
+  };
 }
 
 class CollectionData<K, V> {
   revision = 0;
-  private readonly keysByNode = new WeakMap<OrderNode, { value: K } | WeakRef<WeakKey>>();
   constructor(
     readonly store: State,
     readonly write: StoreSetter<State>,
-    readonly encode: (key: K, state: State) => string,
+    readonly encoder: ReturnType<typeof keyEncoder<K>>,
     readonly ordinal: (root?: Order) => number,
   ) {}
 
   slot(key: K): string {
-    return this.encode(key, this.store);
+    return this.encoder.encode(key, this.store);
   }
 
   has(key: K): boolean {
@@ -165,16 +190,15 @@ class CollectionData<K, V> {
     // Native Map/Set canonicalize negative zero, including iteration output.
     if (key === 0) key = 0 as K;
     this.write(state => {
-      const slot = this.encode(key, state);
+      const slot = this.encoder.encode(key, state);
       const present = slot in state;
       if (!present) {
         const id = this.ordinal(state.order);
-        state["i:" + slot] = id;
         state["k:" + slot] = boxKey(key);
-        state.order = insert(state.order, id, slot);
+        state.order = this.encoder.order([...state.order, { id, slot }]);
         state.size++;
       }
-      if (!present || unbox(state[slot]) !== value) {
+      if (!present || !Object.is(unbox(state[slot]), value)) {
         state[slot] = box(value);
         this.revision++;
       }
@@ -184,13 +208,12 @@ class CollectionData<K, V> {
   delete(key: K): boolean {
     let deleted = false;
     this.write(state => {
-      const slot = this.encode(key, state);
+      const slot = this.encoder.encode(key, state);
       if (!(slot in state)) return;
       deleted = true;
       this.revision++;
-      state.order = remove(state.order!, state["i:" + slot]);
+      state.order = this.encoder.order(state.order.filter(entry => entry.slot !== slot));
       delete state[slot];
-      delete state["i:" + slot];
       delete state["k:" + slot];
       state.size--;
     });
@@ -201,15 +224,11 @@ class CollectionData<K, V> {
     this.write(state => {
       if (!state.size) return;
       this.revision++;
-      const stack: OrderNode[] = [];
-      seek(state.order, -1, stack);
-      let entry: OrderNode | undefined;
-      while ((entry = advance(stack))) {
-        delete state[entry.slot];
-        delete state["i:" + entry.slot];
-        delete state["k:" + entry.slot];
+      for (const { slot } of state.order) {
+        delete state[slot];
+        delete state["k:" + slot];
       }
-      state.order = undefined;
+      state.order = this.encoder.order([]);
       state.size = 0;
     });
   }
@@ -221,38 +240,31 @@ class CollectionData<K, V> {
       this.revision++;
       const order = [...incoming.keys()];
       // Resolve identities before removing metadata from the old index. The
-      // encoder must never cache a half-written historical tree as adopted.
-      const slots = order.map(key => this.encode(key, state));
-      const stack: OrderNode[] = [];
-      seek(state.order, -1, stack);
-      const oldOrder: K[] = [];
-      let entry: OrderNode | undefined;
-      while ((entry = advance(stack))) {
-        const key = readKey<K>(state, entry.slot);
-        oldOrder.push(key);
-        if (!incoming.has(key)) {
-          delete state[entry.slot];
-          delete state["i:" + entry.slot];
-          delete state["k:" + entry.slot];
+      // encoder must never cache a half-written historical order as adopted.
+      const slots = order.map(key => this.encoder.encode(key, state));
+      const retained = new Set(slots);
+      for (const { slot } of state.order) {
+        if (!retained.has(slot)) {
+          delete state[slot];
+          delete state["k:" + slot];
         }
       }
       let index = 0;
       for (const value of incoming.values()) {
         const slot = slots[index++]!;
-        if (!(slot in state) || unbox(state[slot]) !== value) state[slot] = box(value);
+        if (!(slot in state) || !Object.is(unbox(state[slot]), value)) state[slot] = box(value);
       }
       if (
-        order.length !== oldOrder.length ||
-        order.some((key, index) => !sameKey(key, oldOrder[index]))
+        slots.length !== state.order.length ||
+        slots.some((slot, index) => slot !== state.order[index]!.slot)
       ) {
         // A changed replacement order is a fresh iteration generation, like
         // clear/reinsert, while unchanged value and presence slots stay intact.
         const first = order.length ? this.ordinal(state.order) : 0;
-        state.order = build(
+        state.order = this.encoder.order(
           order.map((key, index) => {
             const slot = slots[index]!,
               id = index === 0 ? first : this.ordinal();
-            state["i:" + slot] = id;
             if (!("k:" + slot in state)) state["k:" + slot] = boxKey(key);
             return { id, slot };
           }),
@@ -262,50 +274,56 @@ class CollectionData<K, V> {
     });
   }
 
-  /** Track on consumption. Seek again only when the visible order changes. */
-  *iterate<R>(select: (key: K, slot: string) => R): Generator<R, undefined, unknown> {
-    let previous: Order;
-    let cursor = -1;
-    const stack: OrderNode[] = [];
-    while (true) {
-      // Read the store's current view directly. A separate memo can retain a
-      // committed root while an untracked iterator sees optimistic slot data.
-      const order = this.store.order;
-      if (order !== previous) {
-        seek(order, cursor, stack);
-        previous = order;
-      }
-      const entry = advance(stack);
-      if (!entry) return;
-      cursor = entry.id;
-      // The order dependency covers key identity; avoid allocating a value
-      // subscription for every metadata slot just to enumerate keys.
-      let reference = this.keysByNode.get(entry);
-      if (!reference) {
-        const key = untrack(() => readKey<K>(this.store, entry.slot));
-        reference =
-          (typeof key === "object" && key !== null) ||
-          typeof key === "function" ||
-          (typeof key === "symbol" && Symbol.keyFor(key) === undefined)
-            ? new WeakRef(key as WeakKey)
-            : { value: key };
-        this.keysByNode.set(entry, reference);
-      }
-      // The current store keeps live keys strongly reachable. Historical
-      // cursor stacks/cache entries must not retain deleted object keys.
-      const key = reference instanceof WeakRef ? (reference.deref() as K) : reference.value;
-      yield select(key, entry.slot);
-    }
+  key(slot: string): K {
+    // Order already tracks identity. Keys need no metadata subscription/cache.
+    return untrack(() => readKey<K>(this.store, slot));
+  }
+
+  /** Track on consumption; old orders/cursors contain slot names, never keys. */
+  iterate<R>(select: (slot: string) => R): MapIterator<R> {
+    let previous: Order | undefined,
+      index = 0,
+      cursor = -1,
+      done = false;
+    // Native cursors have no return(): early loop exits leave them usable.
+    return Object.setPrototypeOf(
+      {
+        next: () => {
+          if (done) return { done: true, value: undefined };
+          const order = this.store.order;
+          if (order !== previous) {
+            let low = 0,
+              high = order.length;
+            while (low < high) {
+              const middle = (low + high) >>> 1;
+              if (order[middle]!.id <= cursor) low = middle + 1;
+              else high = middle;
+            }
+            index = low;
+            previous = order;
+          }
+          const entry = order[index++];
+          if (!entry) {
+            done = true;
+            previous = undefined;
+            return { done: true, value: undefined };
+          }
+          cursor = entry.id;
+          return { done: false, value: select(entry.slot) };
+        },
+      },
+      iteratorPrototype,
+    );
   }
 
   keys(): MapIterator<K> {
-    return this.iterate(key => key);
+    return this.iterate(slot => this.key(slot));
   }
   values(): MapIterator<V> {
-    return this.iterate((_, slot) => unbox<V>(this.store[slot]));
+    return this.iterate(slot => unbox<V>(this.store[slot]));
   }
   entries(): MapIterator<[K, V]> {
-    return this.iterate((key, slot) => [key, unbox<V>(this.store[slot])]);
+    return this.iterate(slot => [this.key(slot), unbox<V>(this.store[slot])]);
   }
 }
 
@@ -387,7 +405,10 @@ class CollectionSet<T> extends Set<T> {
     return this.data.keys();
   }
   override entries(): SetIterator<[T, T]> {
-    return this.data.iterate(value => [value, value]);
+    return this.data.iterate(slot => {
+      const value = this.data.key(slot);
+      return [value, value];
+    });
   }
   override [Symbol.iterator](): SetIterator<T> {
     return this.values();
@@ -428,17 +449,8 @@ function createCollection<K, V, Draft, Result>(
   entries: (result: Result) => Iterable<Entry<K, V>>,
 ): Refreshable<Draft> {
   const slot = keyEncoder<K>();
-  let nextOrdinal = 0;
-  const ordinal = (root?: Order) => {
-    if (root) {
-      while (root.right) root = root.right;
-      nextOrdinal = Math.max(nextOrdinal, root.id + 1);
-    }
-    if (nextOrdinal === Number.MAX_SAFE_INTEGER)
-      throw new RangeError("Collection insertion limit exceeded");
-    return nextOrdinal++;
-  };
-  const seed: State = { order: undefined, size: 0 };
+  const ordinal = createOrdinal();
+  const seed: State = { order: [], size: 0 };
   const factory = options?.optimistic ? createOptimisticStore : createStore;
   const loading = options?.loadingValue !== undefined;
   const storeOptions = {
@@ -452,67 +464,19 @@ function createCollection<K, V, Draft, Result>(
   let state: State, write: StoreSetter<State>;
   if (typeof input === "function") {
     if (loading)
-      new CollectionData<K, V>(
-        seed,
-        fn => {
-          fn(seed);
-        },
-        slot,
-        ordinal,
-      ).replace(entries(options!.loadingValue!));
+      new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(
+        entries(options!.loadingValue!),
+      );
     [state, write] = factory(
       draft => {
-        const data = new CollectionData<K, V>(
-          draft,
-          fn => {
-            fn(draft);
-          },
-          slot,
-          ordinal,
-        );
-        const collection = view(data);
-        const commit = (result: void | Result) => {
-          if (result !== undefined && result !== (collection as unknown))
-            data.replace(entries(result));
-        };
-        const result = input(collection);
-        if (
-          result != null &&
-          typeof (result as AsyncIterable<Result>)[Symbol.asyncIterator] === "function"
-        ) {
-          return (async function* () {
-            // The surrounding projection's draft guards each operation against
-            // supersession, including producer mutations after awaits/yields.
-            let yielded = false,
-              revision = data.revision;
-            for await (const value of result as AsyncIterable<void | Result>) {
-              commit(value);
-              yielded = true;
-              revision = data.revision;
-              yield;
-            }
-            // The store's SSR patch stream flushes on yields. Ensure terminal
-            // draft edits (and a producer that yielded nothing) cross the wire.
-            if (!yielded || revision !== data.revision) yield;
-          })();
-        }
-        if (result != null && typeof (result as PromiseLike<Result>).then === "function") {
-          return Promise.resolve(result as PromiseLike<void | Result>).then(commit);
-        }
-        commit(result as void | Result);
+        const data = new CollectionData<K, V>(draft, collectionWriter(draft), slot, ordinal);
+        return runCompute(input, view(data), result => data.replace(entries(result)), data);
       },
       seed,
       storeOptions,
     );
   } else {
-    new CollectionData<K, V>(
-      seed,
-      fn => {
-        fn(seed);
-      },
-      slot,
-      ordinal,
-    ).replace(input);
+    new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(input);
     [state, write] = factory(seed, storeOptions);
   }
   return view(new CollectionData(state, write, slot, ordinal)) as Refreshable<Draft>;

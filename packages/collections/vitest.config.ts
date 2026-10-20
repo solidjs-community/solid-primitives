@@ -33,20 +33,12 @@ export default defineConfig(({ mode }) => ({
     },
   ],
   resolve: {
-    conditions: [
-      "@solid-primitives/source",
-      mode === "ssr" ? "node" : "browser",
-      ...(mode === "benchmark" ? [] : ["development"]),
-    ],
+    conditions: ["@solid-primitives/source", mode === "ssr" ? "node" : "browser", "development"],
   },
   // Vitest evaluates inlined dependencies through Vite's SSR pipeline.
   ssr: {
     resolve: {
-      conditions: [
-        "@solid-primitives/source",
-        mode === "ssr" ? "node" : "browser",
-        ...(mode === "benchmark" ? [] : ["development"]),
-      ],
+      conditions: ["@solid-primitives/source", mode === "ssr" ? "node" : "browser", "development"],
     },
   },
   test: {
@@ -75,6 +67,5 @@ export default defineConfig(({ mode }) => ({
     execArgv: ["--expose-gc"],
     maxWorkers: 1,
     minWorkers: 1,
-    benchmark: { include: ["test/integration/collections.bench.ts"] },
   },
 }));

@@ -1,8 +1,21 @@
-import { afterAll, bench, describe } from "vitest";
-import { createRoot, createEffect, flush } from "solid-js";
+import { performance } from "node:perf_hooks";
+import { createRoot, createEffect, createSignal, flush } from "solid-js";
 import { createReactiveMap, createReactiveSet } from "../../src/index.js";
 
 const options = { time: 250, warmupTime: 100 };
+const cases: { suite: string; name: string; fn: () => unknown; options: typeof options }[] = [];
+const cleanups: (() => void)[] = [];
+let suite = "";
+function describe(name: string, fn: () => void) {
+  suite = name;
+  fn();
+}
+function afterAll(fn: () => void) {
+  cleanups.push(fn);
+}
+function bench(name: string, fn: () => unknown, options: { time: number; warmupTime: number }) {
+  cases.push({ suite, name, fn, options });
+}
 for (const size of [10, 1000, 10000]) {
   describe(`${size} entries: delete/reinsert`, () => {
     const keys = Array.from({ length: size }, (_, i) => i);
@@ -65,3 +78,69 @@ describe("1000 keys: full iteration", () => {
     );
   }
 });
+
+describe("1000 object keys: edit and traversal", () => {
+  const keys = Array.from({ length: 1000 }, (_, i) => ({ i }));
+  const map = createReactiveMap(keys.map((key, i) => [key, i] as const));
+  bench(
+    "delete/reinsert + flush",
+    () => {
+      map.delete(keys[500]!);
+      map.set(keys[500]!, 500);
+      flush();
+    },
+    options,
+  );
+  for (const kind of ["keys", "values"] as const) {
+    bench(
+      kind,
+      () => {
+        let count = 0;
+        for (const value of map[kind]()) if (value !== undefined) count++;
+        return count;
+      },
+      options,
+    );
+  }
+});
+
+for (const optimistic of [false, true]) {
+  describe(`1000 entries: derived replacements, optimistic=${optimistic}`, () => {
+    for (const reorder of [false, true]) {
+      const [source, update] = createSignal(new Map<number, number>());
+      const map = createReactiveMap(source, { optimistic });
+      let revision = 0;
+      bench(
+        reorder ? "reordered" : "same order",
+        () => {
+          revision++;
+          const keys = Array.from({ length: 1000 }, (_, i) => i);
+          if (reorder && revision % 2) keys.reverse();
+          update(new Map(keys.map(key => [key, key === 500 ? revision : 0])));
+          flush();
+          return map.get(500);
+        },
+        options,
+      );
+    }
+  });
+}
+
+function measure(fn: () => unknown, duration: number): number {
+  let operations = 0;
+  const start = performance.now();
+  let elapsed: number;
+  do {
+    for (let i = 0; i < 10; i++) fn();
+    operations += 10;
+    elapsed = performance.now() - start;
+  } while (elapsed < duration);
+  return elapsed / operations;
+}
+for (const { suite, name, fn, options } of cases) {
+  measure(fn, options.warmupTime);
+  const samples = Array.from({ length: 3 }, () => measure(fn, options.time));
+  samples.sort((a, b) => a - b);
+  process.stdout.write(JSON.stringify({ suite, name, medianMs: samples[1] }) + "\n");
+}
+for (const cleanup of cleanups) cleanup();

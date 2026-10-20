@@ -69,7 +69,7 @@
     "test:gc": "node scripts/test-gc.mjs",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
     "lint": "oxlint src test --max-warnings 0",
-    "bench": "vitest bench --run --config vitest.config.ts"
+    "bench": "node scripts/bench.mjs"
   },
   "peerDependencies": {
     "@solidjs/signals": "catalog:peer",

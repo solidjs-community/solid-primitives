@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { flush } from "solid-js";
+import { action, flush } from "solid-js";
 import { hydrate } from "@solidjs/web";
 import {
   CollectionFixture,
@@ -29,6 +29,61 @@ function apply(container: Element, chunk: string, first: boolean) {
   if (first) container.innerHTML = markup;
   else container.insertAdjacentHTML("beforeend", markup);
   for (const script of scripts) (0, eval)(script);
+}
+
+async function checkLocalEdits(collection: Map<any, any> | Set<unknown>, optimistic: boolean) {
+  const snapshot = [...collection];
+  const shared = [...collection.keys()].find(key => typeof key === "object" && key !== null);
+  expect(shared).toBeDefined();
+  const local = { tag: "client-only" };
+  const before = collection.keys();
+  expect(before.next().value).toBe(shared);
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => {
+    release = resolve;
+  });
+  const edit = () => {
+    if (collection instanceof Map) {
+      const value = collection.get(shared);
+      collection.set(local, value);
+      collection.delete(shared);
+      collection.set(shared, value);
+    } else {
+      collection.add(local);
+      collection.delete(shared);
+      collection.add(shared);
+    }
+  };
+  const pending = optimistic
+    ? action(function* () {
+        edit();
+        yield gate;
+      })()
+    : undefined;
+  if (!optimistic) edit();
+  try {
+    flush();
+    const keys = [...collection.keys()];
+    expect(keys.at(-2)).toBe(local);
+    expect(keys.at(-1)).toBe(shared);
+    expect(collection.has(local)).toBe(true);
+    expect(collection.has(shared)).toBe(true);
+    expect([...before]).toEqual(keys);
+  } finally {
+    release();
+    await pending;
+    flush();
+  }
+  if (!optimistic) {
+    collection.clear();
+    for (const entry of snapshot) {
+      if (collection instanceof Map) collection.set(entry[0], entry[1]);
+      else collection.add(entry);
+    }
+    flush();
+  }
+  expect([...collection]).toEqual(snapshot);
+  expect(collection.has(local)).toBe(false);
 }
 describe("real SSR to collection hydration", () => {
   for (const kind of kinds)
@@ -67,6 +122,7 @@ describe("real SSR to collection hydration", () => {
             );
             expect(container.querySelector("section")).toBe(section);
             expect(container.querySelector("b")).toBe(sibling);
+            if (current.map) await checkLocalEdits(current.map, optimistic);
             current.update();
             flush();
             const updated = streamed ? "true:11:true:true:2:true" : "true:1:true:true:1:false";
@@ -120,6 +176,7 @@ describe("real Set hydration", () => {
             await expectView(container, currentSet.read, "true:true:true:5:true:true");
             expect(container.querySelector("section")).toBe(section);
             expect(container.querySelector("b")).toBe(sibling);
+            await checkLocalEdits(currentSet.set, optimistic);
             currentSet.update();
             flush();
             await expectView(container, currentSet.read, "true:true:true:5:true:true");

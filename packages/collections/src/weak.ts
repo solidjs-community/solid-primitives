@@ -9,6 +9,7 @@ import {
   untrack,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
+import { collectionWriter, runCompute } from "./compute.js";
 import { createWeakCollectionToken, type WeakCollectionToken } from "./weak-token.js";
 import type { ReactiveCollectionOptions, ReactiveCollectionCompute } from "./index.js";
 
@@ -281,62 +282,18 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
   let state: State, write: StoreSetter<State>;
   if (typeof input === "function") {
     if (options?.loadingValue)
-      new WeakData(
-        seed,
-        fn => {
-          fn(seed);
-        },
-        slots,
-      ).replace(options.loadingValue);
+      new WeakData(seed, collectionWriter(seed), slots).replace(options.loadingValue);
     [state, write] = factory(
       draft => {
         slots.drain(draft);
-        const data = new WeakData<K, V>(
-          draft,
-          fn => {
-            fn(draft);
-          },
-          slots,
-          true,
-          false,
-        );
-        const collection = view(data);
-        const commit = (result: void | Result) => {
-          if (result !== undefined && result !== (collection as unknown))
-            data.replace(entries(result));
-        };
-        const result = input(collection);
-        if (
-          result != null &&
-          typeof (result as AsyncIterable<Result>)[Symbol.asyncIterator] === "function"
-        ) {
-          return (async function* () {
-            let yielded = false,
-              revision = data.revision;
-            for await (const value of result as AsyncIterable<void | Result>) {
-              commit(value);
-              yielded = true;
-              revision = data.revision;
-              yield;
-            }
-            if (!yielded || data.revision !== revision) yield;
-          })();
-        }
-        if (result != null && typeof (result as PromiseLike<Result>).then === "function")
-          return Promise.resolve(result as PromiseLike<void | Result>).then(commit);
-        commit(result as void | Result);
+        const data = new WeakData<K, V>(draft, collectionWriter(draft), slots, true, false);
+        return runCompute(input, view(data), result => data.replace(entries(result)), data);
       },
       seed,
       config,
     );
   } else {
-    new WeakData(
-      seed,
-      fn => {
-        fn(seed);
-      },
-      slots,
-    ).replace(input);
+    new WeakData(seed, collectionWriter(seed), slots).replace(input);
     [state, write] = options?.optimistic
       ? createMaintainedStore(seed, slots, options.name)
       : factory(seed, config);
