@@ -29,7 +29,7 @@
       "createBattery"
     ],
     "category": "Sensors",
-    "gzip": 1340
+    "gzip": 1360
   },
   "keywords": [
     "accelerometer",
