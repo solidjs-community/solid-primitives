@@ -198,3 +198,46 @@ export const ArrayMask = meta.story({
     );
   },
 });
+
+export const FunctionMask = meta.story({
+  name: "IPv4 mask (function format)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createInputMask` accepts a function that receives value and selection and returns new value and selection, in this case to block any input that creates an invalid (partial) IPv4 address.",
+      },
+    },
+  },
+  render: () => {
+    const [value, setValue] = createSignal("");
+    let previous = ["", { start: 0, end: 0 }];
+    const mask = createInputMask((addr, sel) => {
+      const isValid = addr.split(/\./g).every(num => num === "" || !/\D/.test(num) && Number(num) < 256);
+      if (isValid) {
+        previous = [addr, sel];
+      } 
+      return previous;
+    });
+
+    return (
+      <Container>
+        <h3 style={{ margin: 0 }}>IPv44 Address — "127.0.0.1"</h3>
+
+        <div style={{ display: "flex", "flex-direction": "column", gap: "0.35rem" }}>
+          <Label>Type an IPv4 Address (0.0.0.0)</Label>
+          <input
+            type="text"
+            placeholder="0.0.0.0"
+            onKeyup={e => setValue(mask(e))}
+            onInput={e => setValue(mask(e))}
+            onPaste={e => setValue(mask(e))}
+            style={inputStyle}
+          />
+        </div>
+
+        <ValueDisplay label="value" value={value()} />
+      </Container>
+    );
+  },
+});
