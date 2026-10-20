@@ -56,3 +56,4 @@ catalogs:
   peer:
     solid-js: ^2.0.0-rc.14
     '@solidjs/web': ^2.0.0-rc.14
+    '@solidjs/signals': 2.0.0-rc.14
