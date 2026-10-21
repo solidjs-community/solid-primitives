@@ -181,6 +181,7 @@
     "masonry-eager-map-element",
     "masonry-solid2-migration",
     "match-solid2-migration",
+    "media-breakpoints-watchchange-cleanup",
     "media-solid2-migration",
     "mediastream-solid2-migration",
     "memo-solid2-migration",
