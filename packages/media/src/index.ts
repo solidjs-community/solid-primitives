@@ -136,25 +136,30 @@ export function createBreakpoints<T extends Breakpoints>(
 
   const { mediaFeature = "min-width", watchChange = true } = options;
 
-  const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
+  const mqls =
     // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!window.matchMedia) return fallback;
-    const matches = {} as Record<keyof T, boolean>;
-
-    entries(breakpoints).forEach(([token, width]: [t: keyof T, w: string]) => {
-      const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
-      matches[token] = mql.matches;
-      if (watchChange)
-        makeEventListener(mql, "change", (e: MediaQueryListEvent) =>
-          setMatches(token, e.matches as any),
+    isServer || !window.matchMedia
+      ? undefined
+      : entries(breakpoints).map(
+          ([token, width]: [t: keyof T, w: string]) =>
+            [token, window.matchMedia(`(${mediaFeature}: ${width})`)] as const,
         );
-    });
 
+  const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
+    if (!mqls) return fallback;
+    const matches = {} as Record<keyof T, boolean>;
+    for (const [token, mql] of mqls) matches[token] = mql.matches;
     return matches as Matches<T>;
   });
 
-  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (isServer || !window.matchMedia) return fallback;
+  if (!mqls) return fallback;
+
+  // registered here rather than in the hydration onSettled, where cleanup is forbidden
+  if (watchChange)
+    for (const [token, mql] of mqls)
+      makeEventListener(mql, "change", (e: MediaQueryListEvent) =>
+        setMatches(token, e.matches as any),
+      );
 
   return Object.defineProperty(matches, "key", {
     enumerable: false,

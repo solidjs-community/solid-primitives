@@ -253,6 +253,23 @@ describe("createBreakpoints", () => {
       result.cleanup();
     }
   });
+  test("hydrates createBreakpoints with watchChange listeners", async () => {
+    const result = await renderHydrationRoundTrip(
+      `
+    import { createBreakpoints } from "@solid-primitives/media";
+    function Child() { const m = createBreakpoints({ sm: "640px" }); return <button ref={el => el.dataset.bound = "child"}>{String(m.sm)}</button>; }
+    export default function App() { return <><Child /><span ref={el => el.dataset.bound = "sibling"}>sibling</span></>; }
+  `,
+      import.meta.dirname,
+    );
+    try {
+      expect(result.consoleMessages).toEqual([]);
+      expect(result.container.querySelector("button")).toBe(result.serverNodes[0]);
+      expect((result.serverNodes[1] as HTMLElement).dataset.bound).toBe("sibling");
+    } finally {
+      result.cleanup();
+    }
+  });
 });
 
 describe("sortBreakpoints", () => {
