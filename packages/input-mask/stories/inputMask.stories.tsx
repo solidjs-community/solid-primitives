@@ -211,7 +211,7 @@ export const FunctionMask = meta.story({
   },
   render: () => {
     const [value, setValue] = createSignal("");
-    let previous = ["", { start: 0, end: 0 }];
+    let previous: [string, Selection] = ["", [0, 0]];
     const mask = createInputMask((addr, sel) => {
       const isValid = addr.split(/\./g).every(num => num === "" || !/\D/.test(num) && Number(num) < 256);
       if (isValid) {
