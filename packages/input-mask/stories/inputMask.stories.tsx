@@ -213,7 +213,9 @@ export const FunctionMask = meta.story({
     const [value, setValue] = createSignal("");
     let previous: [string, Selection] = ["", [0, 0]];
     const mask = createInputMask((addr, sel) => {
-      const isValid = addr.split(/\./g).every(num => num === "" || !/\D/.test(num) && Number(num) < 256);
+      const numbers = addr.split(/\./g);
+      const isValid = numbers.length <= 4 &&
+        numbers.every(num => num === "" || !/\D/.test(num) && Number(num) < 256);
       if (isValid) {
         previous = [addr, sel];
       } 
