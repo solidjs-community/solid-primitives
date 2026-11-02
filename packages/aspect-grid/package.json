@@ -1,0 +1,71 @@
+{
+  "name": "@solid-primitives/aspect-grid",
+  "version": "0.0.100",
+  "description": "A primitive to help style a grid depending on aspect-ratios.",
+  "author": "Alex Lohr <alexthkloss@web.de>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/aspect-grid",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "aspect-grid",
+    "stage": 0,
+    "list": [
+      "createFixedAspectGrid",
+      "createFreeAspectGrid"
+    ],
+    "category": "UI Patterns"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "grid",
+    "layout"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "pnpm -w build",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr",
+    "measure": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/measure.ts"
+  },
+  "dependencies": {
+    "@solid-primitives/mutation-observer": "workspace:^",
+    "@solid-primitives/resize-observer": "workspace:^"
+  },
+  "peerDependencies": {
+    "solid-js": "^2.0.0-rc.20"
+  },
+  "devDependencies": {
+    "solid-js": "^2.0.0-rc.20"
+  }
+}
