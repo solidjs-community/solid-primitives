@@ -151,11 +151,11 @@ export function createPresence<TItem>(
   createEffect(
     () => ({
       currentItem: item(),
-      mounted: mountedItem(),
       isM: isMounted(),
     }),
-    ({ currentItem, mounted, isM }) => {
-      if (mounted !== currentItem) {
+    ({ currentItem, isM }) => {
+
+      if (untrack(mountedItem) !== currentItem) {
         if (isM) {
           setShouldBeMounted(false);
         } else if (itemShouldBeMounted(currentItem)) {
