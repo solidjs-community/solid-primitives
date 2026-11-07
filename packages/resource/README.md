@@ -10,11 +10,12 @@
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 > [!TIP]
-> `solid-js@>=2.0.0` no longer uses resources. You can find most of these helpers for the new version in the `@solid-primitives/async` package.
+> `solid-js@>=2.0.0` no longer uses resources. You can find most of these helpers for the new version in the `@solid-primitives/async` package. This package is now meant to ease the transition by providing the old API for the new version of Solid.js.
 
+A collection of composable primitives to provide the 1.x API of [`createResource`](https://www.solidjs.com/docs/latest/api#createresource) to apps in transition.
 
-A collection of composable primitives to augment [`createResource`](https://www.solidjs.com/docs/latest/api#createresource)
-
+- [`createResource`](#createResource) - creates a signal from an asynchronous fetcher
+- [`Suspense`](#Suspense) - renders fallback while resources inside its boundary are pending
 - [`createAggregated`](#createaggregated) - wraps the resource to aggregate data instead of overwriting it
 - [`createDeepSignal`](#createdeepsignal) - provides a fine-grained signal for the [resource storage option](https://docs.solidjs.com/reference/basic-reactivity/create-resource#options)
 - [`makeAbortable`](#makeabortable) - sets up an AbortSignal with auto-abort on re-fetch or timeout
@@ -48,9 +49,21 @@ const [cachedFetcher, invalidate] = makeCache(fetcher, { storage: localStorage }
 // works with createResource, or any wrapping API with the same interface
 const [data, { refetch }] = createResource(address, fetcher);
 const aggregatedData = createAggregated(data);
+
+return <Suspense fallback={"loading..."}>
+  <ComponentUsingResource />
+</Suspense>
 ```
 
 Obviously, you're not limited to resources using fetch. You can use them on any resource you want.
+
+### createResource
+
+TODO
+
+### <Suspense>
+
+TODO
 
 ### createAggregated
 

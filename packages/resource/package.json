@@ -59,10 +59,11 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.18"
+    "solid-js": "catalog:peer",
+    "@solidjs/web": "catalog:"
   }
 }

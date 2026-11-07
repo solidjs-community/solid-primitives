@@ -1144,9 +1144,12 @@ importers:
 
   packages/resource:
     devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-rc.21(solid-js@2.0.0-rc.21)
       solid-js:
-        specifier: ^1.9.18
-        version: 1.9.18
+        specifier: catalog:peer
+        version: 2.0.0-rc.21
 
   packages/rootless:
     dependencies:

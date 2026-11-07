@@ -1,7 +1,9 @@
-import { catchError, createEffect, createResource, createRoot, createSignal, on } from "solid-js";
+import { createEffect, createRoot, createSignal } from "solid-js";
+import { createErrorBoundary } from "solid-js/internal";
 import { describe, test, expect, vi, afterAll, beforeEach, beforeAll } from "vitest";
 import {
   makeAbortable,
+  createResource,
   createAggregated,
   serializer,
   makeCache,
@@ -19,7 +21,7 @@ export function testEffect<T = void>(
     fail = reject;
   });
   createRoot(dispose => {
-    catchError(() => {
+    createErrorBoundary(() => {
       fn(result => {
         done(result);
         dispose();
@@ -80,18 +82,19 @@ describe("makeAggregated", () => {
       const [data, addData] = createSignal<string[]>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
-      createEffect((run: number = 0) => {
+      let run = 0;
+      createEffect(aggregated, (aggregation) => {        
         if (run === 0) {
-          expect(aggregated(), "initially undefined").toBeUndefined();
+          expect(aggregation, "initially undefined").toBeUndefined();
           addData(["one"]);
         } else if (run === 1) {
-          expect(aggregated(), "adding initial data works").toEqual(["one"]);
+          expect(aggregation, "adding initial data works").toEqual(["one"]);
           addData(["two"]);
         } else if (run === 2) {
-          expect(aggregated(), "adding another point of data works").toEqual(["one", "two"]);
+          expect(aggregation, "adding another point of data works").toEqual(["one", "two"]);
           addData(["three", "four"]);
         } else if (run === 3) {
-          expect(aggregated(), "adding multiple data points works").toEqual([
+          expect(aggregation, "adding multiple data points works").toEqual([
             "one",
             "two",
             "three",
@@ -99,7 +102,7 @@ describe("makeAggregated", () => {
           ]);
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("aggregates objects", () =>
@@ -107,21 +110,22 @@ describe("makeAggregated", () => {
       const [data, addData] = createSignal<Record<string, string>>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
-      createEffect((run: number = 0) => {
+      let run = 0;
+      createEffect(aggregated, (aggregation) => {
         if (run === 0) {
-          expect(aggregated(), "initially undefined").toBeUndefined();
+          expect(aggregation, "initially undefined").toBeUndefined();
           addData({ one: "one" });
         } else if (run === 1) {
-          expect(aggregated(), "adding initial data works").toEqual({ one: "one" });
+          expect(aggregation, "adding initial data works").toEqual({ one: "one" });
           addData({ two: "two" });
         } else if (run === 2) {
-          expect(aggregated(), "adding another point of data works").toEqual({
+          expect(aggregation, "adding another point of data works").toEqual({
             one: "one",
             two: "two",
           });
           addData({ three: "three", four: "four" });
         } else if (run === 3) {
-          expect(aggregated(), "adding multiple data points works").toEqual({
+          expect(aggregation, "adding multiple data points works").toEqual({
             one: "one",
             two: "two",
             three: "three",
@@ -129,7 +133,7 @@ describe("makeAggregated", () => {
           });
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("aggregates strings", () =>
@@ -137,21 +141,22 @@ describe("makeAggregated", () => {
       const [data, addData] = createSignal<string>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
-      createEffect((run: number = 0) => {
+      let run = 0;
+      createEffect(aggregated, (aggregation) => {
         if (run === 0) {
-          expect(aggregated(), "initially undefined").toBeUndefined();
+          expect(aggregation, "initially undefined").toBeUndefined();
           addData("one ");
         } else if (run === 1) {
-          expect(aggregated(), "adding initial data works").toBe("one ");
+          expect(aggregation, "adding initial data works").toBe("one ");
           addData("two ");
         } else if (run === 2) {
-          expect(aggregated(), "adding another point of data works").toBe("one two ");
+          expect(aggregation, "adding another point of data works").toBe("one two ");
           addData("three four");
         } else if (run === 3) {
-          expect(aggregated(), "adding multiple data points works").toBe("one two three four");
+          expect(aggregation, "adding multiple data points works").toBe("one two three four");
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("aggregates numbers", () =>
@@ -159,18 +164,19 @@ describe("makeAggregated", () => {
       const [data, addData] = createSignal<number>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
-      createEffect((run: number = 0) => {
+      let run = 0;
+      createEffect(aggregated, (aggregation) => {
         if (run === 0) {
-          expect(aggregated(), "initially undefined").toBeUndefined();
+          expect(aggregation, "initially undefined").toBeUndefined();
           addData(1);
         } else if (run === 1) {
-          expect(aggregated(), "adding initial data works").toEqual([1]);
+          expect(aggregation, "adding initial data works").toEqual([1]);
           addData(2);
         } else if (run === 2) {
-          expect(aggregated(), "adding another point of data works").toEqual([1, 2]);
+          expect(aggregation, "adding another point of data works").toEqual([1, 2]);
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("an initial value [] allows to aggregate objects into arrays", () =>
@@ -178,21 +184,22 @@ describe("makeAggregated", () => {
       const [data, addData] = createSignal<Record<string, string>>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource, []);
-      createEffect((run: number = 0) => {
+      let run = 0;
+      createEffect(aggregated, (aggregation) => {
         if (run === 0) {
-          expect(aggregated(), "initial value").toEqual([]);
+          expect(aggregation, "initial value").toEqual([]);
           addData({ one: "one" });
         } else if (run === 1) {
-          expect(aggregated(), "adding initial data works").toEqual([{ one: "one" }]);
+          expect(aggregation, "adding initial data works").toEqual([{ one: "one" }]);
           addData({ two: "two" });
         } else if (run === 2) {
-          expect(aggregated(), "adding another point of data works").toEqual([
+          expect(aggregation, "adding another point of data works").toEqual([
             { one: "one" },
             { two: "two" },
           ]);
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
 });
@@ -233,24 +240,24 @@ describe("makeCache", () => {
       const cache = {};
       const [cacheFetcher] = makeCache(fetcher, { cache });
       const [data] = createResource(url, cacheFetcher);
-      createEffect((run: number = 0) => {
-        data();
+      let run = 0;
+      createEffect(data, (content) => {
         if (run === 0) {
           setUrl("test");
         } else if (run === 1) {
-          expect(data()).toBe("test");
+          expect(content).toBe("test");
           expect(fetcher).toHaveBeenCalledTimes(1);
           setUrl("test2");
         } else if (run === 2) {
-          expect(data()).toBe("test2");
+          expect(content).toBe("test2");
           expect(fetcher).toHaveBeenCalledTimes(2);
           setUrl("test");
         } else if (run === 3) {
-          expect(data()).toBe("test");
+          expect(content).toBe("test");
           expect(fetcher).toHaveBeenCalledTimes(2);
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("persists cache", () =>
@@ -268,21 +275,21 @@ describe("makeCache", () => {
         storage: storageMock,
       });
       const [data] = createResource(url, fetcher);
-      createEffect((run: number = 0) => {
-        data();
+      let run = 0;
+      createEffect(data, (content) => {
         if (run === 0) {
           expect(cache).toEqual(JSON.parse(storageMock.getItem("solid-cache")!));
           setUrl("test");
         } else if (run === 1) {
-          expect(data()).toBe("test2");
+          expect(content).toBe("test2");
           invalidate("test");
           setUrl("solid");
         } else if (run === 2) {
-          expect(data()).toBe("solid");
-          expect(storageMock.setItem).toBeCalledWith("solid-cache", JSON.stringify(cache));
+          expect(content).toBe("solid");
+          expect(storageMock.setItem).toHaveBeenCalledWith("solid-cache", JSON.stringify(cache));
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("invalidates cache", () =>
@@ -291,8 +298,8 @@ describe("makeCache", () => {
       const getData = vi.fn(() => Promise.resolve("data"));
       const [fetcher, invalidate] = makeCache(getData, { cache, expires: 1000 });
       const [data, { refetch, mutate }] = createResource(fetcher);
-      createEffect((run: number = 0) => {
-        data();
+      let run = 0;
+      createEffect(data, (content) => {
         if (run === 1) {
           expect(getData).toHaveBeenCalledOnce();
           expect(cache, "data is cached").toHaveProperty("true");
@@ -308,7 +315,7 @@ describe("makeCache", () => {
           expect(cache, "manual invalidation").not.toHaveProperty("true");
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("provides an accessor for automatically invalidated results", () =>
@@ -317,8 +324,8 @@ describe("makeCache", () => {
       const getData = () => Promise.resolve(Math.random());
       const [fetcher, _, invalidated] = makeCache(getData, { cache, expires: 1000 });
       const [data, { refetch }] = createResource(fetcher);
-      createEffect((run: number = 0) => {
-        data();
+      let run = 0;
+      createEffect(data, () => {
         if (run === 0) {
           expect(invalidated()).toBeUndefined();
         } else if (run === 1) {
@@ -328,7 +335,7 @@ describe("makeCache", () => {
           expect(invalidated()).toHaveProperty("source", true);
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
 });
@@ -343,7 +350,8 @@ describe("makeRetrying", () => {
       ];
       const fetcher = vi.fn(() => responses.shift());
       const [data] = createResource(makeRetrying(fetcher, { delay: 0 }));
-      createEffect((run: number = 0) => {
+      let run = 0;
+      createEffect(data, () => {
         expect(data.error).toBeUndefined();
         data();
         if (run === 0) {
@@ -353,7 +361,7 @@ describe("makeRetrying", () => {
           expect(data()).toBe("works");
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("throws after the configured number of retries", () =>
@@ -365,8 +373,8 @@ describe("makeRetrying", () => {
       ];
       const fetcher = vi.fn(() => responses.shift());
       const [data] = createResource(makeRetrying(fetcher, { delay: 0, retries: 1 }));
-      createEffect((run: number = 0) => {
-        !data.error && data();
+      let run = 0;
+      createEffect(() => !data.error && data(), () => {
         if (run === 0) {
           expect(fetcher).toHaveBeenCalledOnce();
         } else if (run === 1) {
@@ -374,7 +382,7 @@ describe("makeRetrying", () => {
           expect(data.error).toEqual(new Error("2"));
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
 });
@@ -390,33 +398,32 @@ describe("createDeepSignal", () => {
       const [answers, setAnswers] = createSignal<{ x: string[]; y: string[] }>({ x: [], y: [] });
       const fetcher = () => Promise.resolve(responses.shift());
       const [data, { refetch }] = createResource(fetcher, { storage: createDeepSignal });
+      let run = 0;
       createEffect(
-        on(
-          () => data()?.x,
-          answer => answer && setAnswers(a => ({ x: [...a.x, answer], y: a.y })),
-        ),
+        () => data()?.x,
+        answer => {
+          answer && setAnswers(a => ({ x: [...a.x, answer], y: a.y }));
+        },
       );
       createEffect(
-        on(
-          () => data()?.y,
-          answer => answer && setAnswers(a => ({ x: a.x, y: [...a.y, answer] })),
-        ),
+        () => data()?.y,
+        answer => {
+          answer && setAnswers(a => ({ x: a.x, y: [...a.y, answer] }));
+        },
       );
-      createEffect(() => {
-        data();
-        data()?.x;
-        data()?.y;
+      createEffect(
+        () => [data(), data()?.x, data()?.y], () => {
         if (responses.length) {
           refetch();
         }
       });
-      createEffect((run: number = 0) => {
+      createEffect(answers, () => {
         answers();
         if (run === 3) {
           expect(answers()).toEqual({ x: ["test", "test2", "test3"], y: ["test", "test2"] });
           done();
         }
-        return run + 1;
+        run++;
       });
     }));
   test("mutates the resource with callback", () =>
@@ -425,8 +432,8 @@ describe("createDeepSignal", () => {
         storage: createDeepSignal,
       });
       mutate(() => ({ counter: 2 }));
-      createEffect(() => {
-        expect(data()?.counter).toBe(2);
+      createEffect(data, (value) => {
+        expect(value?.counter).toBe(2);
         done();
       });
     }));
@@ -436,8 +443,8 @@ describe("createDeepSignal", () => {
         storage: createDeepSignal,
       });
       mutate({ counter: 2 });
-      createEffect(() => {
-        expect(data()?.counter).toBe(2);
+      createEffect(data, (value) => {
+        expect(value?.counter).toBe(2);
         done();
       });
     }));

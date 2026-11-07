@@ -8,12 +8,236 @@ import {
   createMemo,
   createSignal,
   type Accessor,
-  type ResourceFetcher,
-  type ResourceFetcherInfo,
   type Signal,
   onCleanup,
+  createStore,
+  createComponent,
+  isPending,
+  Show,
 } from "solid-js";
-import { createStore, reconcile, unwrap } from "solid-js/store";
+
+import { type JSX } from "@solidjs/web";
+
+interface Unresolved {
+  state: "unresolved";
+  loading: false;
+  error: undefined;
+  latest: undefined;
+  (): undefined;
+}
+
+interface Pending {
+  state: "pending";
+  loading: true;
+  error: undefined;
+  latest: undefined;
+  (): undefined;
+}
+
+interface Ready<T> {
+  state: "ready";
+  loading: false;
+  error: undefined;
+  latest: T;
+  (): T;
+}
+
+interface Refreshing<T> {
+  state: "refreshing";
+  loading: true;
+  error: undefined;
+  latest: T;
+  (): T;
+}
+
+interface Errored {
+  state: "errored";
+  loading: false;
+  error: any;
+  latest: never;
+  (): never;
+}
+
+export type Resource<T> = Unresolved | Pending | Ready<T> | Refreshing<T> | Errored;
+
+export type InitializedResource<T> = Ready<T> | Refreshing<T> | Errored;
+
+export type ResourceActions<T, R = unknown> = {
+  mutate: Signal<T>[1];
+  refetch: (info?: R) => T | Promise<T> | undefined | null;
+};
+
+export type ResourceSource<S> = S | false | null | undefined | (() => S | false | null | undefined);
+
+export type ResourceFetcher<S, T, R = unknown> = (
+  k: S,
+  info: ResourceFetcherInfo<T, R>
+) => T | Promise<T>;
+
+export type ResourceFetcherInfo<T, R = unknown> = {
+  value: T | undefined;
+  refetching: R | boolean;
+};
+
+export type ResourceOptions<T, S = unknown> = {
+  initialValue?: T;
+  name?: string;
+  deferStream?: boolean;
+  ssrLoadFrom?: "initial" | "server";
+  storage?: <X>(...args: any[]) => Signal<X>;
+  onHydrated?: (k: S | undefined, info: { value: T | undefined }) => void;
+};
+
+export type InitializedResourceOptions<T, S = unknown> = ResourceOptions<T, S> & {
+  initialValue: T;
+};
+
+export type ResourceReturn<T, R = unknown> = [Resource<T>, ResourceActions<T | undefined, R>];
+
+export type InitializedResourceReturn<T, R = unknown> = [
+  InitializedResource<T>,
+  ResourceActions<T, R>
+];
+
+/**
+ * Creates a resource that wraps a repeated promise in a reactive pattern:
+ * ```typescript
+ * // Without source
+ * const [resource, { mutate, refetch }] = createResource(fetcher, options);
+ * // With source
+ * const [resource, { mutate, refetch }] = createResource(source, fetcher, options);
+ * ```
+ * @param source - reactive data function which has its non-nullish and non-false values passed to the fetcher, optional
+ * @param fetcher - function that receives the source (true if source not provided), the last or initial value, and whether the resource is being refetched, and returns a value or a Promise:
+ * ```typescript
+ * const fetcher: ResourceFetcher<S, T, R> = (
+ *   sourceOutput: S,
+ *   info: { value: T | undefined, refetching: R | boolean }
+ * ) => T | Promise<T>;
+ * ```
+ * @param options - an optional object with the initialValue and the name (for debugging purposes); see {@link ResourceOptions}
+ *
+ * @returns ```typescript
+ * [Resource<T>, { mutate: Setter<T>, refetch: () => void }]
+ * ```
+ *
+ * * Setting an `initialValue` in the options will mean that both the prev() accessor and the resource should never return undefined (if that is wanted, you need to extend the type with undefined)
+ * * `mutate` allows to manually overwrite the resource without calling the fetcher
+ * * `refetch` will re-run the fetcher without changing the source, and if called with a value, that value will be passed to the fetcher via the `refetching` property on the fetcher's second parameter
+ *
+ * @description https://docs.solidjs.com/reference/basic-reactivity/create-resource
+ */
+export function createResource<T, R = unknown, I = T>(
+  fetcher: (k: true, info: ResourceFetcherInfo<T | I, R>) => T | Promise<T>,
+  options: ResourceOptions<T | I, true> & { initialValue: I }
+): InitializedResourceReturn<T | I, R>;
+export function createResource<T, R = unknown>(
+  fetcher: ResourceFetcher<true, T, R>,
+  options?: ResourceOptions<NoInfer<T>, true>
+): ResourceReturn<T, R>;
+export function createResource<T, S, R = unknown, I = T>(
+  source: ResourceSource<S>,
+  fetcher: (k: S, info: ResourceFetcherInfo<T | I, R>) => T | Promise<T>,
+  options: ResourceOptions<T | I, S> & { initialValue: I }
+): InitializedResourceReturn<T | I, R>;
+export function createResource<T, S, R = unknown>(
+  source: ResourceSource<S>,
+  fetcher: ResourceFetcher<S, T, R>,
+  options?: ResourceOptions<NoInfer<T>, S>
+): ResourceReturn<T, R>;
+export function createResource<T, S, R>(
+  pSource: ResourceSource<S> | ResourceFetcher<S, T, R>,
+  pFetcher?: ResourceFetcher<S, T, R> | ResourceOptions<T, S>,
+  pOptions?: ResourceOptions<T, S> | undefined
+): ResourceReturn<T, R> {
+  let source: ResourceSource<S>;
+  let fetcher: ResourceFetcher<S, T, R>;
+  let options: ResourceOptions<T, S>;
+
+  if (typeof pFetcher === "function") {
+    source = pSource as ResourceSource<S>;
+    fetcher = pFetcher as ResourceFetcher<S, T, R>;
+    options = pOptions || ({} as ResourceOptions<T, S>);
+  } else {
+    source = true as ResourceSource<S>;
+    fetcher = pSource as ResourceFetcher<S, T, R>;
+    options = (pFetcher || {}) as ResourceOptions<T, S>;
+  }
+  
+  let error: any;
+  let value: T | undefined = options.initialValue;
+  let refetching = false;
+  let state: Resource<T>["state"] = "unresolved";
+  
+  const [getter, setter] = (options.storage ?? createSignal)(async () => {
+    if (state !== "refreshing") {      
+      state = "pending";
+    }
+    let sourceValue = source instanceof Function ? source() : source;
+    if (!sourceValue) return value as T;
+    try {
+      const result = await fetcher(sourceValue, { value, refetching });
+      value = result;
+      state = "ready";
+    } catch (err: any) {
+      error = err;
+      state = "errored";
+    } finally {
+      refetching = false;
+      return value as T;
+    }
+  }, {
+    name: options.name,
+    deferStream: options.deferStream,
+    loadingValue: value,
+    
+  });
+  
+  return [Object.assign(() => {
+      if (error) throw error;
+      return getter();
+    }, {
+    get state() { return state; },
+    get loading() { return state === "pending"; },
+    get error(): any {
+      const output = error;
+      error = undefined;
+      return output;
+    },
+    get latest() { return value; }
+  }), {
+    mutate: (value: T | undefined) => {
+      state = "ready";
+      return setter(value! as any);
+    },
+    refetch: () => {
+      state = "refreshing";
+      // TODO: actually refetch
+    },
+  }] as unknown as ResourceReturn<T>;
+}
+
+export type SuspenseProps = {
+  children: JSX.Element;
+  fallback?: JSX.Element;
+}
+
+/**
+ * Tracks all resources inside a component and renders a fallback until they are all resolved
+ * ```typescript
+ * const AsyncComponent = lazy(() => import('./component'));
+ *
+ * <Suspense fallback={<LoadingIndicator />}>
+ *   <AsyncComponent />
+ * </Suspense>
+ * ```
+ * @description https://docs.solidjs.com/reference/components/suspense
+ */
+export const Suspense = (props: SuspenseProps): JSX.Element => createComponent(Show, {
+  get when() { return !isPending(() => props.children); },
+  get fallback() { return props.fallback; },
+  get children() { return () => props.children; },
+});
 
 /** Options for {@link makeAbortable} and {@link createAbortable}. */
 export type AbortableOptions = {
@@ -305,7 +529,7 @@ export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initial
             : previous
               ? [previous, current]
               : [current];
-  }, initialValue);
+  }, { loadingValue: initialValue });
 }
 
 /**
@@ -322,8 +546,8 @@ export function createDeepSignal<T>(v?: T): Signal<T> {
   const [store, setStore] = createStore([v]);
   return [
     () => store[0],
-    (update: T) => (
-      setStore(0, reconcile(typeof update === "function" ? update(unwrap(store[0])) : update)),
+    (update: T | undefined) => (
+      setStore(current => { current[0] = update; }),
       store[0]
     ),
   ] as Signal<T>;
