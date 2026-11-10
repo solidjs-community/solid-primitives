@@ -413,6 +413,7 @@ describe("fetch primitive", () => {
             vitest.advanceTimersByTime(10010);
           }
           if (iteration === 2) {
+            vitest.useRealTimers();
             expect(calls).toBe(2);
             dispose();
             resolve();
