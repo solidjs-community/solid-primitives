@@ -386,13 +386,18 @@ describe("createUndoHistory", () => {
   test("undo/redo don't record a bogus entry under natural (non-flushed) microtask timing", async () => {
     // Regression test: the internal "ignore recording during undo/redo" flag
     // must not depend on a separately-scheduled microtask racing against
-    // Solid's own auto-batched write flush — a single explicit flush() call
-    // right after undo()/redo() can mask that race, so this deliberately
-    // awaits real microtask ticks instead.
+    // Solid's write flush. Draining real microtask ticks *before* settling is
+    // what catches that race — a stray scheduled microtask would run here and
+    // corrupt the state before the assertions below.
+    //
+    // As of solid-js 2.0.0-rc.1 a tracking store in the graph suppresses the
+    // automatic write flush entirely (neither microtasks nor timers settle it),
+    // so the writes are settled explicitly after the ticks have been drained.
     const tick = async () => {
       await Promise.resolve();
       await Promise.resolve();
       await Promise.resolve();
+      flush();
     };
 
     const [a, setA] = createSignal(0);

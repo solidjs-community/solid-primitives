@@ -1,5 +1,5 @@
 import { type Many, falseFn, noop } from "@solid-primitives/utils";
-import { type Accessor, createMemo, createOptimistic, createStore, untrack } from "solid-js";
+import { type Accessor, createMemo, createStore, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 /**
@@ -91,16 +91,24 @@ export function createUndoHistory(
     };
   }
 
+  // Set while an undo/redo restore is propagating, so the resulting source
+  // change isn't recorded as a new entry. A plain flag rather than an optimistic
+  // signal: an optimistic write outside a parked transition is void in Solid 2.
+  let disableTracking = false;
+
   const limit = options?.limit ?? 100,
     // Each source gets its own memo so an unrelated source's recompute
     // doesn't produce a fresh (reference-unequal) closure for this one —
     // that reference stability is what lets `jump` skip no-op restores.
     sources = (Array.isArray(source) ? source : [source]).map(s => createMemo(s)),
-    [disableTracking, setDisableTracking] = createOptimistic(false),
     [store, setStore] = createStore<HistoryState>(
       draft => {
         const setters: Setters = sources.map(s => s() || undefined);
-        if (untrack(disableTracking) || setters.every(s => s === undefined)) return;
+        if (disableTracking) {
+          disableTracking = false;
+          return;
+        }
+        if (setters.every(s => s === undefined)) return;
 
         // drop any redo-only tail (entries beyond the current position),
         // insert the new entry, then trim to at most `limit` past entries.
@@ -115,7 +123,6 @@ export function createUndoHistory(
       return target >= 0 && target < state.items.length ? target : null;
     },
     jump = (amount: -1 | 1) => {
-      setDisableTracking(true);
       let toEntry: Setters | undefined, fromEntry: Setters | undefined;
       setStore(draft => {
         const targetIndex = getTargetIndex(draft, amount);
@@ -127,6 +134,7 @@ export function createUndoHistory(
       if (!toEntry || !fromEntry) return;
       const setters = toEntry,
         prevSetters = fromEntry;
+      disableTracking = true;
       untrack(() => {
         for (let i = 0; i < setters.length; i++) {
           // only call the setter if it was active on both sides of the move
@@ -138,6 +146,9 @@ export function createUndoHistory(
           if (setter !== undefined && prevSetter !== undefined && setter !== prevSetter) setter();
         }
       });
+      // The recompute the setters schedule consumes the flag; this clears it
+      // when they changed nothing and no recompute follows.
+      queueMicrotask(() => (disableTracking = false));
     };
 
   return {

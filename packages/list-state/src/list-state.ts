@@ -1,5 +1,4 @@
-import { createSignal } from "solid-js";
-import { access } from "@solid-primitives/utils";
+import { access, createServerSafeSignal } from "@solid-primitives/utils";
 import type { ListStateOptions, ListStateReturn } from "./types.ts";
 
 /**
@@ -50,7 +49,9 @@ export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<
     onActiveChange: props.onActiveChange,
   };
 
-  const [active, setActive] = createSignal<T | undefined>(defaultedProps.initialActive as never);
+  // Interactive state has no async source, so on the server these are plain boxes rather
+  // than signals — a setter must not run during a server render (`SERVER_WRITE`).
+  const [active, setActive] = createServerSafeSignal<T | undefined>(defaultedProps.initialActive as never);
 
   const nextKeys = () => {
     const vimKeys = access(defaultedProps.vimKeys);

@@ -1,5 +1,4 @@
-import { createSignal } from "solid-js";
-import { access } from "@solid-primitives/utils";
+import { access, createServerSafeSignal } from "@solid-primitives/utils";
 import type { MultiSelectListStateOptions, MultiSelectListStateReturn } from "./types.ts";
 
 /**
@@ -66,9 +65,11 @@ export function createMultiSelectListState<T>(
     onSelectedChange: options.onSelectedChange,
   };
 
-  const [cursor, setCursor] = createSignal<T | undefined>(defaultedProps.initialCursor as never);
-  const [active, setActive] = createSignal<T[]>(defaultedProps.initialActive);
-  const [selected, setSelected] = createSignal<T[]>(defaultedProps.initialSelected);
+  // Interactive state has no async source, so on the server these are plain boxes rather
+  // than signals — a setter must not run during a server render (`SERVER_WRITE`).
+  const [cursor, setCursor] = createServerSafeSignal<T | undefined>(defaultedProps.initialCursor as never);
+  const [active, setActive] = createServerSafeSignal<T[]>(defaultedProps.initialActive);
+  const [selected, setSelected] = createServerSafeSignal<T[]>(defaultedProps.initialSelected);
 
   let direction: "next" | "previous" | null = null;
 

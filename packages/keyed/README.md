@@ -54,13 +54,9 @@ const mapped = keyArray(
   source,
   model => model.id,
   (model, index) => {
-    const [name, setName] = createSignal(model().name);
-    const [description, setDescription] = createSignal(model().description);
-
-    createComputed(() => {
-      setName(model().name);
-      setDescription(model().description);
-    });
+    // writable derived signals: follow the model, and can still be overridden locally
+    const [name, setName] = createSignal(() => model().name);
+    const [description, setDescription] = createSignal(() => model().description);
 
     return {
       id: model.id,

@@ -36,7 +36,7 @@
 
 import { transformAsync } from "@babel/core";
 import babelTypescript from "@babel/preset-typescript";
-import babelSolid from "babel-preset-solid";
+import babelSolid from "@solidjs/babel-plugin";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -45,26 +45,17 @@ import { pathToFileURL } from "node:url";
 async function compile(source: string, generate: "ssr" | "dom"): Promise<string> {
   const result = await transformAsync(source, {
     filename: "hydration-app.tsx",
-    // Presets apply last-to-first: typescript strips types before babel-preset-solid sees JSX.
-    presets: [
-      [
-        babelSolid,
-        {
-          moduleName: "@solidjs/web",
-          generate,
-          hydratable: true,
-          omitNestedClosingTags: false,
-        },
-      ],
-      [babelTypescript, { isTSX: true, allExtensions: true }],
-    ],
+    // Plugins run before presets, so the Solid plugin would see TS syntax; the typescript
+    // preset is a sibling visitor pass and strips types in the same traversal.
+    plugins: [[babelSolid, { moduleName: "@solidjs/web", generate, hydratable: true }]],
+    presets: [[babelTypescript, { isTSX: true, allExtensions: true }]],
     ast: false,
     sourceMaps: false,
     configFile: false,
     babelrc: false,
     parserOpts: { plugins: ["jsx", "typescript"] },
   });
-  if (!result?.code) throw new Error("[hydration-harness] babel-preset-solid produced no output");
+  if (!result?.code) throw new Error("[hydration-harness] @solidjs/babel-plugin produced no output");
   return result.code;
 }
 
@@ -130,6 +121,8 @@ export type HydrationRoundTripResult = {
   html: string;
   /** `container` element the server HTML was hydrated into — still attached to `document.body`. */
   container: HTMLElement;
+  /** Server-rendered top-level nodes, captured before hydration. */
+  serverNodes: Node[];
   /** Every `console.error`/`console.warn` message emitted while `hydrate()` ran. */
   consoleMessages: string[];
   /** Removes `container` from the document. Call in test cleanup. */
@@ -147,9 +140,11 @@ async function runHydrationRoundTrip(appSource: string, cwd: string): Promise<Hy
 
   const container = document.createElement("div");
   container.innerHTML = html;
+  const serverNodes = Array.from(container.childNodes);
   document.body.appendChild(container);
 
   const messages: string[] = [];
+  let dispose: (() => void) | undefined;
   const originalError = console.error;
   const originalWarn = console.warn;
   console.error = (...args: unknown[]) => {
@@ -166,7 +161,7 @@ async function runHydrationRoundTrip(appSource: string, cwd: string): Promise<Hy
     // HTML — jsdom doesn't run scripts assigned via .innerHTML, so this sets up the same global
     // hydrate() otherwise expects to already be there.
     (globalThis as any)._$HY = { events: [], completed: new WeakSet(), r: {}, fe() {} };
-    hydrate(() => App({}), container);
+    dispose = hydrate(() => App({}), container);
     // Solid finalizes hydration (drainHydrationCallbacks) via a `setTimeout`, after any
     // microtask-scheduled reactive updates have settled — wait for both ticks so a
     // late-firing hydration-mismatch warning isn't missed by the console restore below.
@@ -180,8 +175,12 @@ async function runHydrationRoundTrip(appSource: string, cwd: string): Promise<Hy
   return {
     html,
     container,
+    serverNodes,
     consoleMessages: messages,
-    cleanup: () => container.remove(),
+    cleanup: () => {
+      dispose?.();
+      container.remove();
+    },
   };
 }
 

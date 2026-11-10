@@ -16,7 +16,10 @@ import { abs, accessor, ceil, floor, min, type RangeProps, toFunction } from "./
  * const [to, setTo] = createSignal(5)
  * const mapped = mapRange(() => 0, to, () => 0.5, number => {
  *    const [value, setValue] = createSignal(number);
- *    createEffect(() => {...})
+ *    createEffect(
+ *      () => value(),
+ *      value => {...},
+ *    )
  *    return value
  * })
  * mapped() // => [0, 0.5, 1, 1.5, 2...]

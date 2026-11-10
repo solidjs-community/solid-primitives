@@ -566,7 +566,8 @@ describe("createReducedMotion", () => {
   beforeEach(() => {
     changeListeners = [];
     mqMatches = false;
-    vi.spyOn(window, "matchMedia").mockImplementation(
+    vi.stubGlobal(
+      "matchMedia",
       query =>
         ({
           matches: mqMatches,

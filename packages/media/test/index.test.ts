@@ -1,3 +1,4 @@
+import { renderHydrationRoundTrip } from "../../../scripts/test-utils/hydration-harness.ts";
 import { describe, test, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
 import { createRoot } from "solid-js";
 import { createBreakpoints, sortBreakpoints } from "../src/index.js";
@@ -231,6 +232,43 @@ describe("createBreakpoints", () => {
       dispose();
     });
     expect(removeListenerMock).not.toBeCalled();
+  });
+  test("hydrates primitive output and its following sibling", async () => {
+    const result = await renderHydrationRoundTrip(
+      `
+    import { createMediaQuery, createBreakpoints } from "@solid-primitives/media";
+    import { isServer } from "@solidjs/web";
+    function Child() { createMediaQuery("(min-width: 640px)"); if (!isServer) window.matchMedia = undefined; createBreakpoints({ sm: "640px" }, { watchChange: false }); return <button ref={el => el.dataset.bound = "child"}>child</button>; }
+    export default function App() { return <><Child /><span ref={el => el.dataset.bound = "sibling"}>sibling</span></>; }
+  `,
+      import.meta.dirname,
+    );
+    try {
+      expect(result.consoleMessages).toEqual([]);
+      expect(result.container.querySelector("button")).toBe(result.serverNodes[0]);
+      expect(result.container.querySelector("span")).toBe(result.serverNodes[1]);
+      expect((result.serverNodes[0] as HTMLElement).dataset.bound).toBe("child");
+      expect((result.serverNodes[1] as HTMLElement).dataset.bound).toBe("sibling");
+    } finally {
+      result.cleanup();
+    }
+  });
+  test("hydrates createBreakpoints with watchChange listeners", async () => {
+    const result = await renderHydrationRoundTrip(
+      `
+    import { createBreakpoints } from "@solid-primitives/media";
+    function Child() { const m = createBreakpoints({ sm: "640px" }); return <button ref={el => el.dataset.bound = "child"}>{String(m.sm)}</button>; }
+    export default function App() { return <><Child /><span ref={el => el.dataset.bound = "sibling"}>sibling</span></>; }
+  `,
+      import.meta.dirname,
+    );
+    try {
+      expect(result.consoleMessages).toEqual([]);
+      expect(result.container.querySelector("button")).toBe(result.serverNodes[0]);
+      expect((result.serverNodes[1] as HTMLElement).dataset.bound).toBe("sibling");
+    } finally {
+      result.cleanup();
+    }
   });
 });
 

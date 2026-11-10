@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/signal-builders",
-  "version": "1.0.0-next.4",
+  "version": "1.0.0-next.6",
   "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -25,7 +25,7 @@
       "template"
     ],
     "category": "Reactivity",
-    "gzip": 1533
+    "gzip": 1534
   },
   "keywords": [
     "solid",
@@ -56,7 +56,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -70,6 +70,6 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   }
 }

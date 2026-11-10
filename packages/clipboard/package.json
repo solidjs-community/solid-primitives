@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/clipboard",
-  "version": "2.0.0-next.17",
+  "version": "2.0.0-next.19",
   "description": "Primitives for reading and writing to clipboard.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -45,7 +45,7 @@
   },
   "scripts": {
     "start": "vite serve dev",
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -70,6 +70,6 @@
   "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   }
 }

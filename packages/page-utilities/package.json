@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/page-utilities",
-  "version": "3.0.0-next.2",
+  "version": "3.0.0-next.4",
   "description": "Primitives for page visibility and navigation blocking",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -23,7 +23,7 @@
       "createPageLeaveBlocker"
     ],
     "category": "Display & Media",
-    "gzip": 732
+    "gzip": 729
   },
   "files": [
     "dist"
@@ -46,7 +46,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -72,6 +72,6 @@
   "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   }
 }

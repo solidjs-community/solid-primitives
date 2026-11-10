@@ -77,9 +77,10 @@ export function makeVibrate(
  * ```ts
  * const { vibrating, start, stop } = createVibrate([200, 100, 200]);
  *
- * createEffect(() => {
- *   console.log("vibrating:", vibrating());
- * });
+ * createEffect(
+ *   () => vibrating(),
+ *   vibrating => console.log("vibrating:", vibrating),
+ * );
  * ```
  */
 export function createVibrate(

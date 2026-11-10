@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/jsx-tokenizer",
-  "version": "3.0.0-next.2",
+  "version": "3.0.0-next.4",
   "description": "A primitive to tokenize your components to enable custom parsing.",
   "author": "Vincent Van Dijck <vandijckv@gmail.com>",
   "contributors": [
@@ -54,7 +54,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -69,6 +69,6 @@
   },
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   }
 }

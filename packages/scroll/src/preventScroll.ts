@@ -206,6 +206,7 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
       setPreventScrollStack(stack => [...stack, id]);
       return () => setPreventScrollStack(stack => stack.filter(s => s !== id));
     },
+    { transparent: true },
   );
 
   // 2. Apply body overflow styles.
@@ -252,6 +253,7 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
         }
       };
     },
+    { transparent: true },
   );
 
   // 3. Install wheel/touch event listeners (only when this is the topmost instance).
@@ -331,5 +333,6 @@ export const createPreventScroll = (props: CreatePreventScrollProps = {}): void 
         document.removeEventListener("touchmove", maybePreventTouch);
       };
     },
+    { transparent: true },
   );
 };

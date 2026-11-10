@@ -1,4 +1,4 @@
-import { type Accessor, createMemo, createSignal, mapArray } from "solid-js";
+import { type Accessor, createMemo, mapArray } from "solid-js";
 import { type MaybeAccessor, asAccessor } from "@solid-primitives/utils";
 
 const $SET_ITEM = Symbol("set-item");
@@ -154,15 +154,20 @@ export function createMasonry<TSource>(
 export function createMasonry<T>(
   options: MasonryOptionsNoElements<T> | MasonryOptions<T, any>,
 ): Accessor<any[]> & { height: Accessor<number> } {
+  // The layout memo is declared after `mapped` (it reads it), yet every item's accessors
+  // subscribe to it. `mapArray` may run the mapping callback — and so `mapElement`, which can
+  // read those accessors — before `layout` is assigned, so the subscription is looked up lazily
+  // and skipped until it exists (reads in that window see the initial `0`s; later reads track).
+  // No signal — and so no write during a server render (`SERVER_WRITE`) — is needed for that wiring.
+  let layout: Accessor<number> | undefined;
   const { source, mapHeight, mapElement } = options,
-    [memo, setMemo] = createSignal<VoidFunction | undefined>(undefined, { ownedWrite: true }),
     mapped = mapArray<T, any>(
       source,
        
       (item: any, index: any) =>
         mapData(
           item,
-          () => memo()?.(),
+          () => void layout?.(),
           mapHeight,
           mapElement,
           mapElement && mapElement.length > 1 ? index : noopIndex,
@@ -173,42 +178,40 @@ export function createMasonry<T>(
       () => Array.from({ length: columns() }, (): ReturnType<typeof mapped> => []),
       { equals: (a, b) => a.length === b.length },
     ),
-    height = setMemo(() =>
-      createMemo(() => {
-        const items = mapped(),
-          columns = getColumns(),
-          heights = new Array(columns.length).fill(0);
+    layoutMemo: Accessor<number> = (layout = createMemo(() => {
+      const items = mapped(),
+        columns = getColumns(),
+        heights = new Array(columns.length).fill(0);
 
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i]!;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]!;
 
-          // find the shortest column
-          let col = 0;
-          for (let i = 0, record = Infinity; i < heights.length; i++)
-            if (heights[i]! < record) record = heights[(col = i)]!;
+        // find the shortest column
+        let col = 0;
+        for (let i = 0, record = Infinity; i < heights.length; i++)
+          if (heights[i]! < record) record = heights[(col = i)]!;
 
-          columns[col]!.push(item);
-          heights[col] += item.height();
-        }
-        const height = Math.max(...heights);
+        columns[col]!.push(item);
+        heights[col] += item.height();
+      }
+      const height = Math.max(...heights);
 
-        for (let colIndex = 0, order = 0; colIndex < columns.length; colIndex++) {
-          const col = columns[colIndex]!;
-          for (let i = 0; i < col.length; i++, order++)
-            col[i]![$SET_ITEM](
-              colIndex,
-              order,
-              i === col.length - 1 ? height - heights[colIndex]! : 0,
-            );
-          col.length = 0;
-        }
+      for (let colIndex = 0, order = 0; colIndex < columns.length; colIndex++) {
+        const col = columns[colIndex]!;
+        for (let i = 0; i < col.length; i++, order++)
+          col[i]![$SET_ITEM](
+            colIndex,
+            order,
+            i === col.length - 1 ? height - heights[colIndex]! : 0,
+          );
+        col.length = 0;
+      }
 
-        return height;
-      }),
-    ),
+      return height;
+    })),
     result = mapElement ? createMemo(() => mapped().map(i => i.element)) : mapped;
 
-  (result as any).height = height;
+  (result as any).height = layoutMemo;
 
   return result as any;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/virtual",
-  "version": "1.0.0-next.4",
+  "version": "1.0.0-next.6",
   "description": "A virtualized list component for performantly rendering lists with many elements",
   "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
   "contributors": [],
@@ -21,7 +21,7 @@
       "VirtualList"
     ],
     "category": "UI Patterns",
-    "gzip": 646
+    "gzip": 647
   },
   "keywords": [
     "solid",
@@ -50,7 +50,7 @@
     "entry": "src/**/*.{ts,tsx}"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
@@ -66,8 +66,8 @@
   },
   "devDependencies": {
     "@babel/core": "catalog:",
+    "@solidjs/babel-plugin": "catalog:",
     "@solidjs/web": "catalog:",
-    "babel-preset-solid": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   }
 }

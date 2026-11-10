@@ -314,6 +314,7 @@ describe("createDropzone", () => {
 
     const div = document.createElement("div");
     ref(div);
+    flush(); // effect attaches the listeners
 
     const withDataTransfer = (type: string) => {
       const event = new Event(type, { bubbles: true, cancelable: true });
@@ -349,6 +350,7 @@ describe("createDropzone", () => {
 
     const div = document.createElement("div");
     ref(div);
+    flush(); // effect attaches the listeners
 
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
@@ -380,6 +382,7 @@ describe("createDropzone", () => {
 
     const div = document.createElement("div");
     ref(div);
+    flush(); // effect attaches the listeners
 
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
@@ -405,6 +408,7 @@ describe("createDropzone", () => {
     const removeSpy = vi.spyOn(el1, "removeEventListener");
 
     ref(el1);
+    flush(); // effect attaches the listeners
     el1.dispatchEvent(new Event("dragenter"));
     flush();
     expect(isDragging()).toBe(true);
@@ -413,6 +417,7 @@ describe("createDropzone", () => {
     expect(isDragging()).toBe(false);
 
     ref(el2);
+    flush(); // effect attaches the listeners
     expect(removeSpy).toHaveBeenCalled();
 
     el1.dispatchEvent(new Event("dragenter"));
@@ -435,6 +440,7 @@ describe("createDropzone", () => {
 
     const div = document.createElement("div");
     ref(div);
+    flush(); // effect attaches the listeners
 
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
@@ -486,6 +492,7 @@ describe("dropzone", () => {
     }));
     const el = document.createElement("div");
     dz(el);
+    flush(); // effect attaches the listeners
 
     el.dispatchEvent(new Event("dragenter"));
     flush();
@@ -921,7 +928,7 @@ describe("createFileUploader — XHR", () => {
     const { xhr, triggerLoad } = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => xhr),
+      vi.fn(function () { return xhr; }),
     );
 
     const { upload, dispose } = createRoot(dispose => ({
@@ -941,7 +948,7 @@ describe("createFileUploader — XHR", () => {
     const mock = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
@@ -965,7 +972,7 @@ describe("createFileUploader — XHR", () => {
     mock.xhr.statusText = "Payload Too Large";
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
@@ -987,7 +994,7 @@ describe("createFileUploader — XHR", () => {
     const mock = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
@@ -1009,7 +1016,7 @@ describe("createFileUploader — XHR", () => {
     const mock = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, progress, dispose } = createRoot(dispose => ({
@@ -1031,7 +1038,7 @@ describe("createFileUploader — XHR", () => {
     const { xhr, triggerLoad } = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => xhr),
+      vi.fn(function () { return xhr; }),
     );
 
     const { upload, dispose } = createRoot(dispose => ({

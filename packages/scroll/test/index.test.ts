@@ -1,3 +1,4 @@
+import { renderHydrationRoundTrip } from "../../../scripts/test-utils/hydration-harness.ts";
 import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
@@ -266,4 +267,24 @@ describe("createPreventScroll", () => {
       dispose1();
       expect(document.documentElement.style.overflow).toBe("");
     }));
+});
+
+it("hydrates primitive output and its following sibling", async () => {
+  const result = await renderHydrationRoundTrip(
+    `
+    import { createPreventScroll } from "@solid-primitives/scroll";
+    function Child() { createPreventScroll({ enabled: false }); return <button ref={el => el.dataset.bound = "child"}>child</button>; }
+    export default function App() { return <><Child /><span ref={el => el.dataset.bound = "sibling"}>sibling</span></>; }
+  `,
+    import.meta.dirname,
+  );
+  try {
+    expect(result.consoleMessages).toEqual([]);
+    expect(result.container.querySelector("button")).toBe(result.serverNodes[0]);
+    expect(result.container.querySelector("span")).toBe(result.serverNodes[1]);
+    expect((result.serverNodes[0] as HTMLElement).dataset.bound).toBe("child");
+    expect((result.serverNodes[1] as HTMLElement).dataset.bound).toBe("sibling");
+  } finally {
+    result.cleanup();
+  }
 });

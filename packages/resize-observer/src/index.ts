@@ -1,6 +1,6 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
-import { createHydratableStaticStore, createStaticStore } from "@solid-primitives/static-store";
+import { createStaticStore } from "@solid-primitives/static-store";
 import {
   access,
   asArray,
@@ -10,7 +10,7 @@ import {
   noop,
   filterNonNullable,
 } from "@solid-primitives/utils";
-import { type Accessor, createEffect, onCleanup, sharedConfig } from "solid-js";
+import { type Accessor, createEffect, onSettled, onCleanup, sharedConfig } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 type ResizeObserverEntryGeneric<T extends Element> = ResizeObserverEntry & { readonly target: T };
@@ -98,6 +98,7 @@ export function createResizeObserver<T extends Element>(
       handleDiffArray(refs, prev, observe, unobserve);
       prev = refs;
     },
+    { transparent: true },
   );
 }
 
@@ -118,16 +119,20 @@ export function getWindowSize(): Size {
  * Creates a reactive store-like object of current width and height dimensions of window, page and screen.
  * @example
  * const size = createWindowSize();
- * createEffect(() => {
- *   console.log(size.width, size.height)
- * })
+ * createEffect(
+ *   () => [size.width, size.height],
+ *   ([width, height]) => console.log(width, height),
+ * );
  */
 export function createWindowSize(): Readonly<Size> {
-  if (isServer) {
-    return WINDOW_SIZE_FALLBACK;
-  }
-  const [size, setSize] = createHydratableStaticStore(WINDOW_SIZE_FALLBACK, getWindowSize);
-  makeEventListener(window, "resize", () => setSize(getWindowSize()));
+  const [size, setSize] = createStaticStore(
+    isServer || sharedConfig.hydrating ? WINDOW_SIZE_FALLBACK : getWindowSize(),
+  );
+  if (isServer || sharedConfig.hydrating)
+    onSettled(() => {
+      setSize(getWindowSize());
+    });
+  if (!isServer) makeEventListener(window, "resize", () => setSize(getWindowSize()));
   return size;
 }
 
@@ -138,9 +143,10 @@ export function createWindowSize(): Readonly<Size> {
  *
  * @example
  * const size = useWindowSize();
- * createEffect(() => {
- *   console.log(size.width, size.height)
- * })
+ * createEffect(
+ *   () => [size.width, size.height],
+ *   ([width, height]) => console.log(width, height),
+ * );
  */
 export const useWindowSize: typeof createWindowSize =
   /*#__PURE__*/ createHydratableSingletonRoot(createWindowSize);
@@ -173,9 +179,10 @@ export function getElementSize(target: Element | false | undefined | null): Null
  * @returns `{ width: number, height: number, clientWidth: number, clientHeight: number }`
  * @example
  * const size = createElementSize(document.body);
- * createEffect(() => {
- *   console.log(size.width, size.height, size.clientWidth, size.clientHeight)
- * })
+ * createEffect(
+ *   () => [size.width, size.height, size.clientWidth, size.clientHeight],
+ *   ([width, height, clientWidth, clientHeight]) => console.log(width, height, clientWidth, clientHeight),
+ * );
  */
 export function createElementSize(target: Element): Readonly<SizeWithClient>;
 export function createElementSize(
@@ -185,6 +192,9 @@ export function createElementSize(
   target: Accessor<Element | false | undefined | null> | Element,
 ): Readonly<NullableSize> {
   if (isServer) {
+    // Reserve the same hydration child id as the client-side target effect,
+    // without evaluating the accessor or touching browser APIs on the server.
+    if (typeof target === "function") createEffect(noop, noop);
     return ELEMENT_SIZE_FALLBACK;
   }
 

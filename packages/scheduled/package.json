@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scheduled",
-  "version": "2.0.0-next.2",
+  "version": "2.0.0-next.4",
   "description": "Primitives for creating scheduled — throttled or debounced — callbacks.",
   "contributors": [
     "David Di Biase <dave@solidjs.com>",
@@ -51,7 +51,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -68,7 +68,7 @@
     "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/timer": "workspace:^",
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   },
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",

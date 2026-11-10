@@ -146,4 +146,22 @@ describe("createMasonry", () => {
 
     dispose();
   });
+
+  test("mapElement may read item accessors eagerly", () => {
+    const { dispose, masonry } = createRoot(dispose => ({
+      dispose,
+      masonry: createMasonry({
+        source: () => [1, 2, 3, 4],
+        columns: 2,
+        mapHeight: i => i * 10,
+        mapElement: data => ({ height: data.height(), margin: data.margin(), order: data.order() }),
+      }),
+    }));
+    flush();
+
+    expect(masonry().map(e => e.height)).toEqual([10, 20, 30, 40]);
+    expect(masonry.height()).toBe(60);
+
+    dispose();
+  });
 });

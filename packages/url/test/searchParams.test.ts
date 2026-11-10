@@ -32,6 +32,7 @@ describe("ReactiveSearchParams", () => {
   // real bug.
   test(
     "behaves like URLSearchParams",
+    { retry: 3 },
     () => {
       const params = createSearchParams("foo=1&foo=2&bar=baz");
       expect(params).toBeInstanceOf(URLSearchParams);
@@ -39,7 +40,6 @@ describe("ReactiveSearchParams", () => {
       expect(params.getAll("foo")).toEqual(["1", "2"]);
       expect(params.toString()).toBe("foo=1&foo=2&bar=baz");
     },
-    { retry: 3 },
   );
 
   test("is granularly reactive per key", () =>

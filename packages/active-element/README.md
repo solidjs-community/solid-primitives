@@ -4,7 +4,7 @@
 
 # @solid-primitives/active-element
 
-[![size](https://img.shields.io/badge/size-544_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/active-element)
+[![size](https://img.shields.io/badge/size-543_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/active-element)
 [![size](https://img.shields.io/npm/v/@solid-primitives/active-element?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/active-element)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -136,17 +136,17 @@ function createFocusSignal(target: MaybeAccessor<Element>): Accessor<boolean>;
 
 ## `focus`
 
-A directive that notifies you when the element becomes active or inactive.
+A ref factory that notifies you when the element becomes active or inactive.
 
 ```tsx
 const [active, setActive] = createSignal(false)
-<input use:focus={setActive} />
+<input ref={focus(setActive)} />
 ```
 
 #### Definition
 
 ```ts
-Directive<(isActive: boolean) => void>;
+function focus(callback: (isActive: boolean) => void): (target: Element) => void;
 ```
 
 ## Changelog

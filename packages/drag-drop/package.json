@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/drag-drop",
-  "version": "0.1.0-next.0",
+  "version": "0.1.0-next.3",
   "description": "Composable drag-and-drop primitives.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
@@ -31,7 +31,7 @@
       "pointerWithin"
     ],
     "category": "UI Patterns",
-    "gzip": 3987
+    "gzip": 3971
   },
   "keywords": [
     "solid",
@@ -63,7 +63,7 @@
   },
   "typesVersions": {},
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   },
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",

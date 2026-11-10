@@ -19,11 +19,10 @@ export type EventProps<Names extends EventNames> = {
  *
  * const isMouseDown = createMemo(() => (events.mousedown?.ts ?? 0) > (events.mouseup?.ts ?? 1));
  *
- * createEffect(() => {
- *   if (isMouseDown()) {
- *     console.log(events.mousemove?.clientX, events.mousemove?.clientY);
- *   }
- * });
+ * createEffect(
+ *   () => (isMouseDown() ? events.mousemove : undefined),
+ *   e => e && console.log(e.clientX, e.clientY),
+ * );
  *
  * <div {...eventProps}>Click and drag on me</div>
  * ```

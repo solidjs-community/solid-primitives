@@ -55,11 +55,11 @@ export function getScrollPosition(target: Element | Window | undefined): Positio
  * // target will be window by default
  * const windowScroll = createScrollPosition();
  *
- * createEffect(() => {
- *   // returned object is a reactive store-like structure
- *   windowScroll.x; // => number
- *   windowScroll.y; // => number
- * });
+ * // returned object is a reactive store-like structure
+ * createEffect(
+ *   () => [windowScroll.x, windowScroll.y], // => number[]
+ *   ([x, y]) => console.log(x, y),
+ * );
  */
 export function createScrollPosition(
   target?: Accessor<Element | Window | undefined> | Element | Window,
@@ -130,9 +130,10 @@ export function createScrollPosition(
  *
  * @example
  * const scroll = useWindowScrollPosition();
- * createEffect(() => {
- *   console.log(scroll.x, scroll.y)
- * })
+ * createEffect(
+ *   () => [scroll.x, scroll.y],
+ *   ([x, y]) => console.log(x, y),
+ * );
  */
 export const useWindowScrollPosition: ReturnType<typeof createHydratableSingletonRoot> = /*#__PURE__*/ createHydratableSingletonRoot(() =>
   createScrollPosition(isServer ? () => undefined : window),

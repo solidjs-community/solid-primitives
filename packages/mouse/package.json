@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mouse",
-  "version": "4.0.0-next.3",
+  "version": "4.0.0-next.5",
   "description": "A collection of primitives that capture current mouse cursor position, and help to deal with common related usecases.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -17,7 +17,7 @@
       "createPositionToElement"
     ],
     "category": "Inputs",
-    "gzip": 1760
+    "gzip": 1751
   },
   "sideEffects": false,
   "private": false,
@@ -40,7 +40,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -57,7 +57,7 @@
   "devDependencies": {
     "@solid-primitives/raf": "workspace:^",
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",

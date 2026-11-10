@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/range",
-  "version": "1.0.0-next.3",
+  "version": "1.0.0-next.5",
   "description": "Control Flow Primitives for number ranges: createNumericRange, mapRange, indexRange, repeat, and their JSX component counterparts.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [],
@@ -55,7 +55,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

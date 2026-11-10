@@ -4,10 +4,10 @@ import {
   type Accessor,
   createEffect,
   createMemo,
-  createRenderEffect,
   createSignal,
   createStore,
   type Store,
+  untrack,
 } from "solid-js";
 import { DEFAULT_MESSAGES, HOUR, MINUTE } from "./variables.ts";
 import {
@@ -228,10 +228,13 @@ export function createCountdown(
   let difference: Accessor<number>;
   if (b !== undefined) difference = createTimeDifference(a, b)[0];
   else difference = a as Accessor<number>;
-  const [countdown, setCountdown] = createStore<Countdown>(getCountdown(difference()));
-  createRenderEffect(
-    () => difference(),
-    diff => setCountdown(() => getCountdown(diff)),
+  // A derived store recomputes from `difference()` on its own, so no setter ever runs —
+  // which also keeps it pure during a server render (`SERVER_WRITE`).
+  const [countdown] = createStore<Countdown>(
+    draft => {
+      Object.assign(draft, getCountdown(difference()));
+    },
+    getCountdown(untrack(difference)),
   );
   return countdown;
 }

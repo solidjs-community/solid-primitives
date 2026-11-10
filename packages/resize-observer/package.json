@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/resize-observer",
-  "version": "4.0.0-next.3",
+  "version": "4.0.0-next.7",
   "description": "Reactive primitives for observing resizing of HTML elements.",
   "author": "Moshe Udimar",
   "contributors": [
@@ -21,7 +21,7 @@
       "createElementSize"
     ],
     "category": "Display & Media",
-    "gzip": 1497
+    "gzip": 1503
   },
   "files": [
     "dist"
@@ -50,7 +50,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -69,6 +69,6 @@
   "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   }
 }
