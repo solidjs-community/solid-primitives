@@ -7,6 +7,12 @@
   },
   "references": [
     {
+      "path": "../rootless"
+    },
+    {
+      "path": "../set"
+    },
+    {
       "path": "../utils"
     }
   ],
