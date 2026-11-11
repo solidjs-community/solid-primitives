@@ -2,6 +2,8 @@ import { describe, test, expect, expectTypeOf } from "vitest";
 import {
   createContext,
   createRoot,
+  createSignal,
+  flush,
   type FlowComponent,
   type Element,
   untrack,
@@ -347,6 +349,149 @@ describe("MultiProvider", () => {
     expect(capture3).toBe(TEST_MESSAGE);
 
     unmount();
+  });
+
+  /** Renders `values` through MultiProvider and returns what `read` captured inside it. */
+  function captureInside<T>(values: any, read: () => T): T {
+    let capture!: T;
+    const unmount = render(
+      () => (
+        <MultiProvider values={values}>
+          {untrack(() => {
+            capture = read();
+            return "";
+          })}
+        </MultiProvider>
+      ),
+      document.createElement("div"),
+    );
+    unmount();
+    return capture;
+  }
+
+  test("passes props to providers from createContextProvider", () => {
+    expect(
+      captureInside(
+        [[TestProvider, { text: "Provided through MultiProvider" }]],
+        () => useTestContext().message,
+      ),
+    ).toBe("Provided through MultiProvider");
+  });
+
+  test("passes props to providers from createOptionalContextProvider and createLayeredContext", () => {
+    const [OptionalProvider, useOptional] = createOptionalContextProvider(
+      (props: { id: string }) => props.id,
+    );
+    const [ThemeProvider, useTheme] = createLayeredContext(
+      (props: { primary?: string }, parent) => ({
+        ...parent,
+        primary: props.primary ?? parent.primary,
+      }),
+      { primary: "blue", secondary: "gray" },
+    );
+
+    expect(
+      captureInside(
+        [
+          [OptionalProvider, { id: "user-1" }],
+          [ThemeProvider, { primary: "red" }],
+          [ThemeProvider, { primary: "green" }],
+        ],
+        () => ({ id: useOptional(), theme: useTheme() }),
+      ),
+    ).toEqual({ id: "user-1", theme: { primary: "green", secondary: "gray" } });
+  });
+
+  test("keeps object values as `value` for raw contexts", () => {
+    const ObjectContext = createContext<{ message: string }>();
+
+    expect(
+      captureInside([[ObjectContext, { message: "Object context" }]], () =>
+        useContext(ObjectContext),
+      ),
+    ).toEqual({ message: "Object context" });
+  });
+
+  test("a factory that reads `props.value` receives it via `{ value }`", () => {
+    // Before providers took props, `[Provider, x]` reached the factory as `props.value`.
+    const [ValueProvider, useValue] = createContextProvider(
+      (props: { value: string }) => props.value,
+    );
+
+    expect(captureInside([[ValueProvider, { value: "Wrapped" }]], useValue)).toBe("Wrapped");
+  });
+
+  test("keeps getters in provider props reactive", () => {
+    const [label, setLabel] = createSignal("first");
+    const [LabelProvider, useLabel] = createContextProvider(
+      (props: { label: string }) => () => props.label,
+    );
+
+    let read!: () => string;
+    const unmount = render(
+      () => (
+        <MultiProvider
+          values={[
+            [
+              LabelProvider,
+              {
+                get label() {
+                  return label();
+                },
+              },
+            ],
+          ]}
+        >
+          {untrack(() => {
+            read = useLabel();
+            return "";
+          })}
+        </MultiProvider>
+      ),
+      document.createElement("div"),
+    );
+
+    expect(read()).toBe("first");
+    setLabel("second");
+    flush();
+    expect(read()).toBe("second");
+    unmount();
+  });
+
+  test("type-checks each entry against its provider", () => {
+    const Ctx = createContext<string>();
+    const [PropsProvider] = createContextProvider((props: { initial: number }) => props.initial);
+    const [BranchProvider] = createContextProvider(
+      (props: { kind: "text"; text: string } | { kind: "count"; count: number }) => props.kind,
+    );
+    const Bound: FlowComponent = props => props.children;
+
+    // Type-only: never rendered.
+    const check = () => (
+      <>
+        <MultiProvider values={[[Ctx, "ok"], [PropsProvider, { initial: 1 }], Bound]}>
+          {""}
+        </MultiProvider>
+        {/* union props keep each branch's own required props */}
+        <MultiProvider
+          values={[
+            [BranchProvider, { kind: "text", text: "a" }],
+            [BranchProvider, { kind: "count", count: 1 }],
+          ]}
+        >
+          {""}
+        </MultiProvider>
+        {/* @ts-expect-error the selected "text" branch is missing its required `text` */}
+        <MultiProvider values={[[BranchProvider, { kind: "text" }]]}>{""}</MultiProvider>
+        {/* @ts-expect-error a created provider takes its props, not a bare value */}
+        <MultiProvider values={[[PropsProvider, 1]]}>{""}</MultiProvider>
+        {/* @ts-expect-error wrong prop type */}
+        <MultiProvider values={[[PropsProvider, { initial: "1" }]]}>{""}</MultiProvider>
+        {/* @ts-expect-error a raw context takes a value of its own type */}
+        <MultiProvider values={[[Ctx, 1]]}>{""}</MultiProvider>
+      </>
+    );
+    expectTypeOf(check).toBeFunction();
   });
 });
 
