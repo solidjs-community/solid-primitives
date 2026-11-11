@@ -461,6 +461,9 @@ describe("MultiProvider", () => {
   test("type-checks each entry against its provider", () => {
     const Ctx = createContext<string>();
     const [PropsProvider] = createContextProvider((props: { initial: number }) => props.initial);
+    const [BranchProvider] = createContextProvider(
+      (props: { kind: "text"; text: string } | { kind: "count"; count: number }) => props.kind,
+    );
     const Bound: FlowComponent = props => props.children;
 
     // Type-only: never rendered.
@@ -469,6 +472,17 @@ describe("MultiProvider", () => {
         <MultiProvider values={[[Ctx, "ok"], [PropsProvider, { initial: 1 }], Bound]}>
           {""}
         </MultiProvider>
+        {/* union props keep each branch's own required props */}
+        <MultiProvider
+          values={[
+            [BranchProvider, { kind: "text", text: "a" }],
+            [BranchProvider, { kind: "count", count: 1 }],
+          ]}
+        >
+          {""}
+        </MultiProvider>
+        {/* @ts-expect-error the selected "text" branch is missing its required `text` */}
+        <MultiProvider values={[[BranchProvider, { kind: "text" }]]}>{""}</MultiProvider>
         {/* @ts-expect-error a created provider takes its props, not a bare value */}
         <MultiProvider values={[[PropsProvider, 1]]}>{""}</MultiProvider>
         {/* @ts-expect-error wrong prop type */}

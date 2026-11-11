@@ -179,10 +179,13 @@ export function createLayeredContext<T, P extends ContextProviderProps>(
   ];
 }
 
+/** `Omit` applied to each union member, so branch-specific props of a union survive. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+
 /** Validates one `MultiProvider` entry: providers from this package pair with their props, others with a value. */
 type MultiProviderItem<T> = T extends readonly [infer Provider, unknown]
   ? Provider extends CreatedContextProvider<infer ProviderProps>
-    ? readonly [Provider, Omit<ProviderProps, "children">]
+    ? readonly [Provider, DistributiveOmit<ProviderProps, "children">]
     : Provider extends Context<infer Value>
       ? readonly [Provider, Value]
       : Provider extends ContextProviderComponent<infer Value>
