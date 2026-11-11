@@ -13,21 +13,18 @@ export function createInputComponent({ multiple = false, accept = "" }: FileUplo
   return element;
 }
 
+/**
+ * Converts a `FileList` (from an input or a drop) into `UploadFile` entries, each with an object
+ * URL for previews. Returns an empty array for `null`.
+ */
 export function transformFiles(files: FileList | null): UploadFile[] {
   if (!files) return [];
 
-  const parsed: UploadFile[] = [];
-  for (const idx in files) {
-    // SAFETY: w3c File API defines FileList item access to be valid from index 0 to `files.length - 1`
-    // https://w3c.github.io/FileAPI/#filelist-methods-params: "Supported property indices are the numbers in the range zero to one less than the number of File objects represented by the FileList object."
-    const file = files[Number(idx)]!;
-    parsed.push({
-      source: URL.createObjectURL(file),
-      name: file.name,
-      size: file.size,
-      file,
-    });
-  }
-
-  return parsed;
+  // iterate the FileList itself: `for...in` would also visit its `length` and `item` members
+  return Array.from(files, file => ({
+    source: URL.createObjectURL(file),
+    name: file.name,
+    size: file.size,
+    file,
+  }));
 }

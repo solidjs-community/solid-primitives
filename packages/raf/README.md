@@ -126,7 +126,7 @@ A primitive for executing multiple callbacks at once, intended for usage in conj
 ```ts
 function createCallbacksSet<T extends (...args: any) => void>(
   ...initialCallbacks: Array<T>
-): [callback: T, callbacksSet: ReactiveSet<T>];
+): [callback: (...args: Parameters<T>) => void, callbacksSet: ReactiveSet<T>];
 ```
 
 ## useGlobalRAF
@@ -138,11 +138,11 @@ Returns a factory function that works like `createRAF` with an additional parame
 ```ts
 import { useGlobalRAF } from "@solid-primitives/raf";
 
-const createScheduledLoop = useGlobalRAF();
-const [hasAddedManual, addManual, removeManual, isRunningManual] = createScheduledLoop(timeStamp =>
-  console.log("Time stamp is", timeStamp),
+const createGlobalRAFCallback = useGlobalRAF();
+const [hasAddedManual, addManual, removeManual, isRunningManual] = createGlobalRAFCallback(
+  timeStamp => console.log("Time stamp is", timeStamp),
 );
-const [hasAddedAuto, addAuto, removeAuto, isRunningAuto] = createScheduledLoop(
+const [hasAddedAuto, addAuto, removeAuto, isRunningAuto] = createGlobalRAFCallback(
   timeStamp => console.log("Time stamp is", timeStamp),
   true,
 );
@@ -165,15 +165,15 @@ isRunningManual(); // true
 ```ts
 import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
 
-const createScheduledLoop = useGlobalRAF();
+const createGlobalRAFCallback = useGlobalRAF();
 
-const [hasAddedLowFramerate, addLowFramerate, removeLowFramerate] = createScheduledLoop(
+const [hasAddedLowFramerate, addLowFramerate, removeLowFramerate] = createGlobalRAFCallback(
   targetFPS(() => {
     /* Low framerate loop, for example for video / webcam sampling where the framerate can be capped by external sources  */
   }, 30),
   true,
 );
-const [hasAddedHighFramerate, addHighFramerate, removeHighFramerate] = createScheduledLoop(
+const [hasAddedHighFramerate, addHighFramerate, removeHighFramerate] = createGlobalRAFCallback(
   targetFPS(() => {
     /* High framerate loop for an animation / drawing to a canvas */
   }, 60),
@@ -204,6 +204,8 @@ Only use this when you absolutely need to schedule animations on the same frame 
 ## createScheduledLoop
 
 A primitive for creating reactive interactions with external frameloop related functions (for example using [motion's frame util](https://motion.dev/docs/frame)) that are automatically disposed onCleanup.
+
+`schedule` is called once per `start()` and must keep running the callback every frame until it is cancelled, returning an ID (not `null` or `undefined`) that `cancel` accepts. A one-shot scheduler like `requestAnimationFrame` only runs the callback once; use `createRAF` for that.
 
 ```ts
 import { cancelFrame, frame } from "motion";
