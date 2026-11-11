@@ -29,7 +29,7 @@
       "makeObjectStorage"
     ],
     "category": "Browser APIs",
-    "gzip": 2289
+    "gzip": 2675
   },
   "files": [
     "dist"
