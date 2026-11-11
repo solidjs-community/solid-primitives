@@ -41,20 +41,15 @@ export class ReactiveSet<T> extends Set<T> {
     return this.values();
   }
 
-  override *values(): SetIterator<T> {
+  // Iteration methods track eagerly (when the iterator is created), not lazily on first `next()`.
+  override values(): SetIterator<T> {
     this.#triggers.track($KEYS);
-
-    for (const value of super.values()) {
-      yield value;
-    }
+    return super.values();
   }
 
-  override *entries(): SetIterator<[T, T]> {
+  override entries(): SetIterator<[T, T]> {
     this.#triggers.track($KEYS);
-
-    for (const entry of super.entries()) {
-      yield entry;
-    }
+    return super.entries();
   }
 
   override forEach(callbackfn: (value1: T, value2: T, set: Set<T>) => void, thisArg?: any): void {

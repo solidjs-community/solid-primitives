@@ -125,12 +125,49 @@ function createPresenceBase(
     },
   );
 
+  /**
+   * Ends the transition that is running when it is called (as of the last flush) now instead of
+   * waiting for its duration, which then only acts as a fallback. Like the timers above, it writes
+   * only the time-driven facts, stamped with the current generation. It does not know which
+   * transition the caller meant: a late call ends whatever transition is running by then, so
+   * callbacks that may outlive their transition use {@link bindDone}. Meant for the element's own
+   * `transitionend` / `animationend` handlers, which run outside any owner.
+   * @param event when given, events bubbling up from descendants are ignored
+   */
+  const done = (event?: Event) => {
+    // Ignore events bubbling up from descendants: their transitions are not the element's own.
+    if (event && event.currentTarget && event.target !== event.currentTarget) return;
+    const current = untrack(generation);
+    if (untrack(source)) {
+      if (untrack(hasEntered)) return;
+      setVisibleIn(current);
+      setEnteredIn(current);
+    } else if (untrack(exitedIn) !== current) {
+      setExitedIn(current);
+      onExited?.();
+    }
+  };
+
+  /**
+   * Returns a `done` bound to the transition running now (as of the last flush): once `source`
+   * has changed again, calling it does nothing, so a late callback of an obsolete animation cannot
+   * end a newer transition. Stamped with the generation like the timers above, nothing is written.
+   */
+  const bindDone = (): ((event?: Event) => void) => {
+    const boundTo = untrack(generation);
+    return event => {
+      if (untrack(generation) === boundTo) done(event);
+    };
+  };
+
   return {
     isMounted,
     isVisible,
     isAnimating,
     isEntering,
     isExiting,
+    done,
+    bindDone,
   };
 }
 
@@ -152,6 +189,26 @@ export type PresenceResult<TItem> = {
   isEntering: Accessor<boolean>;
   /** Is the component exiting currently? */
   isExiting: Accessor<boolean>;
+  /**
+   * Ends the current enter or exit transition right away instead of waiting for its duration, which
+   * then only acts as a fallback timeout. Pass it as an `onTransitionEnd` / `onAnimationEnd` handler,
+   * or call it yourself. Events bubbling up from descendants are ignored. Does nothing while no
+   * transition is running.
+   *
+   * It ends whichever transition is running when it is called: a late call (e.g. from a JS
+   * animation that was started for an earlier transition) ends the newer one. For callbacks that
+   * can outlive their transition, use {@link PresenceResult.bindDone}.
+   */
+  done: (event?: Event) => void;
+  /**
+   * Returns a `done` bound to the transition that is running now. Once the item has changed again,
+   * calling it does nothing, so a late completion callback of an obsolete animation cannot end the
+   * newer transition. Call it once the transition has started (e.g. where you start the animation,
+   * from an effect on `isEntering()` / `isExiting()`): it binds to the state as of the last flush, so
+   * a call made right after changing the item, before that change is flushed, binds to the previous
+   * transition and its callback is then ignored (the duration still ends the transition).
+   */
+  bindDone: () => (event?: Event) => void;
 };
 
 /**

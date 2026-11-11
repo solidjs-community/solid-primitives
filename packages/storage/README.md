@@ -43,7 +43,9 @@ type PersistedOptions<Type, StorageOptions> = {
   // JSON.parse is the default
   deserialize?: (value: string) => Type(value),
   // sync API (see below)
-  sync?: PersistenceSyncAPI
+  sync?: PersistenceSyncAPI,
+  // merge stored data onto the initial value instead of replacing it (see below)
+  merge?: boolean | ((stored: Type, initial: Type) => Type),
 };
 ```
 
@@ -64,6 +66,45 @@ onCleanup(dispose);
 ```
 
 Custom sync subscriptions can return an unsubscribe function, which `dispose` will call.
+
+### Keeping defaults for new keys with `merge`
+
+By default, a stored value replaces the initial value completely. If you later add keys to the initial value of a store
+(or an object in a signal), users with older persisted data would not get them. Use the `merge` option to apply the
+stored value on top of the initial value instead:
+
+```ts
+// Type
+merge?: boolean | ((stored: T, initial: T) => T);
+// Example
+// storage contains {"theme":"dark"} from an older version of the app
+const [settings, setSettings] = makePersisted(
+  createStore({ theme: "light", fontSize: 14 }),
+  { name: "settings", merge: true },
+);
+settings.fontSize; // 14 - the default is kept
+settings.theme; // "dark" - the stored value wins
+
+// custom merge, e.g. to fill in defaults for array items
+const [todos, setTodos] = makePersisted(createStore({ items: [] as Todo[] }), {
+  name: "todos",
+  merge: (stored, initial) => ({
+    ...initial,
+    ...stored,
+    items: stored.items.map(item => ({ done: false, ...item })),
+  }),
+});
+```
+
+- `merge: true` deep-merges plain objects; arrays and all other stored values replace the default as a whole, and keys
+  only present in the storage are kept
+- the merge is always done onto the initial value (captured when `makePersisted` is called), both for the initial load
+  and for values received from the `sync` API, so keys removed elsewhere are not resurrected from the current state
+- the merged defaults are not written to the storage until the next write, just like initial values
+- it works together with `hydrated` and asynchronous storages
+- if the initial value is still pending when `makePersisted` is called (an async `createSignal`, `createOptimistic` or
+  store), there are no defaults to merge onto: `merge: true` uses the stored data as is, and a merge function receives
+  `undefined` as `initial`
 
 ### Using `makePersisted` with Loading
 
@@ -204,8 +245,10 @@ const [mode, setMode] = makePersisted(createSignal("dark"), {
 ```
 
 If none of your storage APIs is asynchronous, the resulting API is synchronous, otherwise it is async. For the getItem
-operation, the first storage that returns a valid value will be the source of truth. So you need to await deletion and
-writing before you can rely on the result in case of asynchronous storages.
+operation, the first storage (in the order they were passed) that returns a valid value will be the source of truth,
+regardless of which storage responds first. A storage that rejects is skipped; only if no storage returns a value is the
+first rejection passed on. So you need to await deletion and writing before you can rely on the result in case of
+asynchronous storages.
 
 ### Sync API
 

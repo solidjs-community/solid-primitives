@@ -41,20 +41,21 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     return super.size;
   }
 
-  override *keys(): MapIterator<K> {
+  // Iteration methods track eagerly (when the iterator is created), not lazily on first `next()`.
+  override keys(): MapIterator<K> {
     this.#keyTriggers.track($OBJECT);
-    for (const key of super.keys()) yield key;
+    return super.keys();
   }
 
-  override *values(): MapIterator<V> {
+  override values(): MapIterator<V> {
     this.#valueTriggers.track($OBJECT);
-    for (const value of super.values()) yield value;
+    return super.values();
   }
 
-  override *entries(): MapIterator<[K, V]> {
+  override entries(): MapIterator<[K, V]> {
     this.#keyTriggers.track($OBJECT);
     this.#valueTriggers.track($OBJECT);
-    for (const entry of super.entries()) yield entry;
+    return super.entries();
   }
 
   override forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {

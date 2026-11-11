@@ -247,6 +247,33 @@ const t2 = i18n.translator(
 );
 ```
 
+### Source text as keys
+
+Instead of inventing a key for every string, you can use the source-language text itself as the key. `onMissingKey` receives the arguments passed to the translator, and `missingKeyAsTemplate` uses that to resolve the key itself as a template — so the source language needs no dictionary entries at all, and other languages' dictionaries are keyed by the source text.
+
+```ts
+// Type
+function missingKeyAsTemplate<O = string>(
+  resolveTemplate: TemplateResolver<O>,
+): MissingKeyHandler<O>;
+
+// Example
+const de = { "Hello {{ name }}!": "Hallo {{ name }}!" };
+
+const dict = (): Record<string, string> => (locale() === "de" ? de : {});
+
+const t = i18n.translator(
+  dict,
+  i18n.resolveTemplate,
+  i18n.missingKeyAsTemplate(i18n.resolveTemplate),
+);
+
+t("Hello {{ name }}!", { name: "John" }); // => 'Hello John!' (en), 'Hallo John!' (de)
+t("Not translated yet"); // => 'Not translated yet' in every locale
+```
+
+Like any `onMissingKey` handler, it only runs once the dictionary is loaded — while an async dictionary is still loading, the translation is `undefined`. Keys are matched exactly, so changing the source text means updating the key in every other dictionary. There's no automatic key extraction or hashing; collecting the strings into dictionaries is left to your own tooling.
+
 ### Modules
 
 Splitting the dictionary into multiple modules can be useful when you have a large dictionary and want to avoid loading the entire dictionary at once.

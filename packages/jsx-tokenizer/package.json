@@ -21,6 +21,7 @@
     "list": [
       "createTokenizer",
       "createToken",
+      "createObjectToken",
       "resolveTokens",
       "isToken"
     ],

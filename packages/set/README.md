@@ -33,7 +33,7 @@ pnpm add @solid-primitives/set
 
 ## `ReactiveSet`
 
-A drop-in reactive replacement for the built-in `Set` class. All reads — `has()`, `size`, iteration — are reactive. All writes — `add()`, `delete()`, `clear()` — notify only the affected subscribers.
+A drop-in reactive replacement for the built-in `Set` class. All reads — `has()`, `size`, iteration — are reactive. All writes — `add()`, `delete()`, `clear()` — notify only the affected subscribers. Iteration methods (`values()`, `keys()`, `entries()`, `[Symbol.iterator]()`) subscribe when called, not when the returned iterator is advanced.
 
 ```ts
 import { ReactiveSet } from "@solid-primitives/set";

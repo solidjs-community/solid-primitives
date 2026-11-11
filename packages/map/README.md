@@ -80,6 +80,8 @@ Reads are tracked at two independent granularities, so components only re-run fo
 | `values()`               | Any value changes, or any key is added/removed |
 | `entries()`, `forEach()` | Any key or value changes                       |
 
+**Iteration methods subscribe when called**, not when the returned iterator is advanced — an iterator created inside a tracking scope keeps the dependency even if it is consumed later.
+
 **Setting the same value is a no-op.** `map.set(k, map.get(k))` does not notify any subscribers.
 
 **`clear()` only notifies subscribers of keys that were in the map.** Observers of non-existent keys are not triggered.

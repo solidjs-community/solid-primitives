@@ -572,3 +572,111 @@ describe("ReactiveWeakMap", () => {
     });
   });
 });
+
+describe("ReactiveMap iterators track eagerly (#830)", () => {
+  const methods: Record<
+    string,
+    { create: (map: ReactiveMap<number, string>) => Iterator<unknown>; onValueChange: boolean }
+  > = {
+    keys: { create: map => map.keys(), onValueChange: false },
+    values: { create: map => map.values(), onValueChange: true },
+    entries: { create: map => map.entries(), onValueChange: true },
+    "[Symbol.iterator]": { create: map => map[Symbol.iterator](), onValueChange: true },
+  };
+
+  for (const [name, { create, onValueChange }] of Object.entries(methods)) {
+    test(`${name}() tracks when created, even if consumed later`, () => {
+      const map = new ReactiveMap([
+        [1, "a"],
+        [2, "b"],
+      ]);
+      const iterators: Iterator<unknown>[] = [];
+
+      const dispose = createRoot(dispose => {
+        createEffect(
+          () => {
+            // create the iterator but do not consume it inside the tracking scope
+            iterators.push(create(map));
+          },
+          () => {},
+        );
+        return dispose;
+      });
+      flush();
+      expect(iterators).toHaveLength(1);
+
+      map.set(3, "c");
+      flush();
+      expect(iterators, "re-ran after new key").toHaveLength(2);
+
+      // consuming the iterator later still yields the live contents
+      const consumed = [...{ [Symbol.iterator]: () => iterators[1]! }];
+      expect(consumed).toHaveLength(3);
+
+      map.set(1, "z");
+      flush();
+      expect(iterators, "value change").toHaveLength(onValueChange ? 3 : 2);
+
+      dispose();
+    });
+  }
+});
+
+describe("ReactiveMap iterator consumed in effect apply phase (#830)", () => {
+  test("compute returns entries() iterator, apply consumes it, re-runs on change", () => {
+    const map = new ReactiveMap<string, number>([["a", 1]]);
+    const seen: [string, number][][] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(
+        () => map.entries(),
+        it => {
+          seen.push([...{ [Symbol.iterator]: () => it }]);
+        },
+      );
+      return dispose;
+    });
+    flush();
+    expect(seen).toEqual([[["a", 1]]]);
+
+    map.set("a", 2);
+    flush();
+    map.set("b", 3);
+    flush();
+    map.delete("a");
+    flush();
+    expect(seen).toEqual([
+      [["a", 1]],
+      [["a", 2]],
+      [
+        ["a", 2],
+        ["b", 3],
+      ],
+      [["b", 3]],
+    ]);
+
+    dispose();
+  });
+
+  test("keys() created in compute does not re-run on value-only change", () => {
+    const map = new ReactiveMap<string, number>([["a", 1]]);
+    let runs = 0;
+    const dispose = createRoot(dispose => {
+      createEffect(
+        () => map.keys(),
+        () => {
+          runs++;
+        },
+      );
+      return dispose;
+    });
+    flush();
+    map.set("a", 2);
+    flush();
+    expect(runs).toBe(1);
+    map.set("b", 1);
+    flush();
+    expect(runs).toBe(2);
+    dispose();
+  });
+});
