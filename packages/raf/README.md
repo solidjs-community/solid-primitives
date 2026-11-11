@@ -128,7 +128,7 @@ Combines several callbacks into one. Use it with `createRAF` when several callba
 // Type
 function createCallbacksSet<T extends (...args: any) => void>(
   ...initialCallbacks: Array<T>
-): [callback: T, callbacksSet: ReactiveSet<T>];
+): [callback: (...args: Parameters<T>) => void, callbacksSet: ReactiveSet<T>];
 
 // Example
 import { createCallbacksSet, createRAF } from "@solid-primitives/raf";

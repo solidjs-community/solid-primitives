@@ -59,7 +59,7 @@ function createRAF(
  * @param initialCallbacks callbacks to start the set with
  * @returns a callback that calls every callback in the set with the same arguments, and the `ReactiveSet` holding them
  * ```ts
- * [callback: T, callbacksSet: ReactiveSet<T>]
+ * [callback: (...args: Parameters<T>) => void, callbacksSet: ReactiveSet<T>]
  * ```
  *
  * @example
@@ -69,10 +69,10 @@ function createRAF(
  */
 function createCallbacksSet<T extends (...args: any) => void>(
   ...initialCallbacks: Array<T>
-): [callback: T, callbacksSet: ReactiveSet<T>] {
+): [callback: (...args: Parameters<T>) => void, callbacksSet: ReactiveSet<T>] {
   const callbacksSet = new ReactiveSet(initialCallbacks);
 
-  return [((...args) => callbacksSet.forEach(callback => callback(...args))) as T, callbacksSet];
+  return [(...args) => callbacksSet.forEach(callback => callback(...args)), callbacksSet];
 }
 
 export type GlobalRAFCallbackFactory = (
