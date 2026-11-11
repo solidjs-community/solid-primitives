@@ -10,8 +10,9 @@ import {
 } from "solid-js";
 
 // Brands providers created by this package so `MultiProvider` can pass them props instead of a
-// `value`. `Symbol.for` keeps the brand recognisable across duplicate copies of this package.
-const $PROVIDER_PROPS: unique symbol = Symbol.for("@solid-primitives/context:provider-props");
+// `value`. A string key (not a `unique symbol`) keeps the brand identical across duplicate copies
+// of this package, both at runtime and in the emitted types.
+const $PROVIDER_PROPS = "@solid-primitives/context:provider-props";
 
 export type ContextProviderProps = {
   children?: Element;
