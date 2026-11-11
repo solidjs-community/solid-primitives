@@ -100,11 +100,14 @@ describe("targetFPS", () => {
 });
 
 describe("useGlobalRAF", () => {
-  // Note: All roots need to be disposed before each test due to the underlying reactive set not working properly if we don't
+  // Every test disposes its roots, so the `useGlobalRAF` singleton is torn down between tests
   beforeEach(() => {
     vi.useFakeTimers();
   });
-  afterEach(() => {
+  afterEach(async () => {
+    // `createSingletonRoot` disposes its root in a microtask
+    await Promise.resolve();
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
   it("(Manual start) global RAF singleton calls rafs with the same timestamp", () => {
@@ -197,7 +200,7 @@ describe("useGlobalRAF", () => {
     // Note on this test: For some reason, the raf is being called twice, once when started (but id doesn't invoke the callback for some strange reason) and once after the timers advance (and the callback is properly invoked).
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
-    createRoot(async dispose => {
+    createRoot(dispose => {
       const timestamps = new Set<number>();
       const createGlobalRAFCallback = useGlobalRAF();
       const callback1: Mock<FrameRequestCallback> = vi.fn(ts => timestamps.add(ts));
@@ -246,8 +249,10 @@ describe("useGlobalRAF", () => {
       expect(raf).toHaveBeenCalledTimes(4);
       expect(timestamps.size).toEqual(2);
       remove1();
+      // the other callback is still registered, so the loop keeps running
+      expect(caf).toHaveBeenCalledTimes(1);
       remove2();
-      await vi.waitUntil(() => caf.mock.calls.length >= 1);
+      // removing the last callback stops the loop synchronously
       expect(caf).toHaveBeenCalledTimes(2);
       dispose();
     });
@@ -256,7 +261,7 @@ describe("useGlobalRAF", () => {
     // Running the timer guarantees that the callback is properly tested for invokation
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
-    createRoot(() => {
+    createRoot(dispose => {
       const createGlobalRAFCallback = useGlobalRAF();
       const callback: Mock<FrameRequestCallback> = vi.fn();
       const [_added, _add, _remove, running, start, stop] = createGlobalRAFCallback(callback, true);
@@ -267,9 +272,11 @@ describe("useGlobalRAF", () => {
       vi.advanceTimersToNextFrame();
       stop();
       expect(running()).toBe(false);
-      expect(raf).toHaveBeenCalledTimes(1);
+      // one request from `start()`, one from the frame that ran
+      expect(raf).toHaveBeenCalledTimes(2);
       expect(caf).toHaveBeenCalledTimes(1);
       expect(callback).not.toHaveBeenCalled();
+      dispose();
     });
   });
   it("(All) frameloop dispose stops the execution and cancels all callbacks", () => {
@@ -278,7 +285,7 @@ describe("useGlobalRAF", () => {
     const caf = vi.spyOn(window, "cancelAnimationFrame");
 
     // Manual
-    createRoot(async dispose => {
+    createRoot(dispose => {
       const createGlobalRAFCallback = useGlobalRAF();
       const callback: Mock<FrameRequestCallback> = vi.fn();
       const [added, add, _remove, running, start, _stop] = createGlobalRAFCallback(callback);
@@ -296,8 +303,38 @@ describe("useGlobalRAF", () => {
       expect(callback).toHaveBeenCalledTimes(1);
       expect(raf).toHaveBeenCalledTimes(2);
       dispose();
-      await vi.waitUntil(() => caf.mock.calls.length >= 1);
+      // disposal stops the loop synchronously
       expect(caf).toHaveBeenCalledTimes(1);
+    });
+  });
+  it("keeps registrations of the same callback from different owners independent", () => {
+    const callback: Mock<FrameRequestCallback> = vi.fn();
+    createRoot(disposeOuter => {
+      const [, add1, , running] = useGlobalRAF()(callback, true);
+      createRoot(disposeInner => {
+        const [added2, add2] = useGlobalRAF()(callback, true);
+        add1();
+        add2();
+        // disposing one owner removes only its own registration
+        disposeInner();
+        expect(running()).toBe(true);
+        vi.advanceTimersToNextFrame();
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(added2()).toBe(false);
+      });
+      disposeOuter();
+      expect(running()).toBe(false);
+    });
+  });
+  it("doesn't stop a manually started loop when a callback that was never added is removed", () => {
+    createRoot(dispose => {
+      const createGlobalRAFCallback = useGlobalRAF();
+      const [, , , running, start] = createGlobalRAFCallback(() => {});
+      const [, , removeNeverAdded] = createGlobalRAFCallback(() => {});
+      start();
+      removeNeverAdded();
+      expect(running()).toBe(true);
+      dispose();
     });
   });
 });

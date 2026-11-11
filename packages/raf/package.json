@@ -19,7 +19,10 @@
     "list": [
       "createRAF",
       "createMs",
-      "targetFPS"
+      "targetFPS",
+      "createCallbacksSet",
+      "useGlobalRAF",
+      "createScheduledLoop"
     ],
     "category": "Animation"
   },
