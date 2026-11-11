@@ -16,11 +16,11 @@ export function createInputComponent({ multiple = false, accept = "" }: FileUplo
 export function transformFiles(files: FileList | null): UploadFile[] {
   if (!files) return [];
 
-  const parsed: UploadFile[] = []
+  const parsed: UploadFile[] = [];
   for (const idx in files) {
     // SAFETY: w3c File API defines FileList item access to be valid from index 0 to `files.length - 1`
     // https://w3c.github.io/FileAPI/#filelist-methods-params: "Supported property indices are the numbers in the range zero to one less than the number of File objects represented by the FileList object."
-    const file = files[Number(idx)]!
+    const file = files[Number(idx)]!;
     parsed.push({
       source: URL.createObjectURL(file),
       name: file.name,
