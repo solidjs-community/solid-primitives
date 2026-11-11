@@ -504,7 +504,7 @@ export function createRcMemo<T>(
             return {
               memo: createMemo(
                 prev => {
-                  let result = calc(prev);
+                  const result = calc(prev);
                   lastSeenValue = result;
                   return result;
                 },
@@ -519,7 +519,7 @@ export function createRcMemo<T>(
       } else {
         existing.refCount++;
       }
-      let existing2 = existing!;
+      const existing2 = existing!;
       onCleanup(() => {
         existing2.refCount--;
         if (existing2.refCount === 0) {

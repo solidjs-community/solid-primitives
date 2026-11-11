@@ -85,19 +85,21 @@ export function createUndoHistory(
 
   let ignoreNext = false;
 
+  // One slot per source, always the same length as `sources` — even when a
+  // source is paused (returns falsy) it keeps its `undefined` slot instead of
+  // being dropped, so entries never end up with mismatched lengths and index
+  // i always refers to the same source across every recorded entry.
+  type Setters = (VoidFunction | undefined)[];
+
   const limit = options?.limit ?? 100,
     sources = Array.isArray(source) ? source.map(s => createMemo(s)) : [source],
     clearIgnore = createMicrotask(() => (ignoreNext = false)),
-    history = createMemo<{ count: Signal<number>; list: VoidFunction[][] }>(
+    history = createMemo<{ count: Signal<number>; list: Setters[] }>(
       p => {
         // always track the sources
-        const setters: VoidFunction[] = [];
-        for (const s of sources) {
-          const setter = s();
-          if (setter) setters.push(setter);
-        }
+        const setters: Setters = sources.map(s => s() || undefined);
 
-        if (ignoreNext || !setters.length) {
+        if (ignoreNext || setters.every(s => s === undefined)) {
           ignoreNext = false;
           return p;
         }
@@ -125,8 +127,13 @@ export function createUndoHistory(
         prevSetters = h.list[newIndex + n]!,
         setters = h.list[newIndex]!;
       for (let i = 0; i < setters.length; i++) {
-        // only call the setter if the current value is different
-        if (setters[i] !== prevSetters[i]) setters[i]!();
+        // only call the setter if it was active on both sides of the move
+        // and the value actually differs — if a source was paused on either
+        // side we have no tracked value to compare against, so skip it
+        // rather than firing a spurious restore
+        const setter = setters[i],
+          prevSetter = prevSetters[i];
+        if (setter !== undefined && prevSetter !== undefined && setter !== prevSetter) setter();
       }
     };
 

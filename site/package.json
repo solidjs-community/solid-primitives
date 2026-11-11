@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/generate.ts",
+    "generate": "node --import=@nothing-but/node-resolve-ts --experimental-strip-types ./scripts/generate.ts",
     "dev": "vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",

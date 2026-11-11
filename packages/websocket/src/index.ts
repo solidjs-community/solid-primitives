@@ -103,6 +103,7 @@ export const makeReconnectingWS = (
   };
   let events: Parameters<WebSocket["addEventListener"]>[] = [["close", onClose]];
   const getWS = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- ws is undefined on the first call, TS just doesn't reflect that in its declared type
     ws?.removeEventListener("close", onClose);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (ws && ws.readyState < 2) ws.close();
