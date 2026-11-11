@@ -13,6 +13,10 @@ export function createInputComponent({ multiple = false, accept = "" }: FileUplo
   return element;
 }
 
+/**
+ * Converts a `FileList` (from an input or a drop) into `UploadFile` entries, each with an object
+ * URL for previews. Returns an empty array for `null`.
+ */
 export function transformFiles(files: FileList | null): UploadFile[] {
   if (!files) return [];
 
