@@ -1,5 +1,11 @@
 # @solid-primitives/upload
 
+## 0.1.6
+
+### Patch Changes
+
+- 04c31ee: `helper`: rework `transformFiles` internal function to remove unneeded checks
+
 ## 0.1.5
 
 ### Patch Changes
