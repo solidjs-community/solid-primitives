@@ -21,7 +21,7 @@
  */
 
 import { type Accessor, createEffect, onCleanup } from "solid-js";
-import { type MaybeAccessor, access, isServer, noop } from "@solid-primitives/utils";
+import { type MaybeAccessor, access, globalRegistry, isServer, noop } from "@solid-primitives/utils";
 
 // ---- ariaHideOutside / createHideOutside ----
 
@@ -40,11 +40,64 @@ export interface CreateHideOutsideOptions {
    * target containment (e.g. top-layer elements, live announcers). Optional.
    */
   alwaysVisibleSelector?: string;
+  /**
+   * Also set the `inert` attribute on hidden elements, in addition to `aria-hidden`.
+   * `aria-hidden` alone only affects the accessibility tree — the background stays focusable
+   * and clickable; `inert` additionally removes it from focus order, tab order, and pointer/
+   * text-selection interaction. *Default = `false`* (matches prior behavior).
+   */
+  inert?: MaybeAccessor<boolean>;
 }
 
-// Keeps a ref count of all hidden elements so nested usages don't fight.
-const refCountMap = new WeakMap<Element, number>();
-const observerStack: Array<{ observe(): void; disconnect(): void }> = [];
+// Keeps a ref count of all hidden/inerted elements so nested usages don't fight, and tracks
+// the stack of active observers. Uses globalRegistry (Symbol.for(...) on globalThis, not
+// module-scope bindings) so this stays correct even if the app's dependency graph ends up with
+// more than one copy of this package installed — module-scope state would otherwise be split
+// across copies (e.g. one copy's cleanup revealing content another copy still needs hidden).
+type HideOutsideRegistry = {
+  refCountMap: WeakMap<Element, number>;
+  inertRefCountMap: WeakMap<Element, number>;
+  observerStack: Array<{ observe(): void; disconnect(): void }>;
+};
+
+const getHideOutsideRegistry = (): HideOutsideRegistry =>
+  globalRegistry<HideOutsideRegistry>("@solid-primitives/interaction:hide-outside", () => ({
+    refCountMap: new WeakMap(),
+    inertRefCountMap: new WeakMap(),
+    observerStack: [],
+  }));
+
+/**
+ * Applies `apply` to `node` the first time it's touched (or observes that a pre-existing native
+ * state already covers it, in which case `node` is left alone entirely and untracked). Ref-counts
+ * nested calls; returns whether `node` is now managed by us (`false` means "not ours — untouched").
+ */
+function refCountedApply(
+  map: WeakMap<Element, number>,
+  tracked: Set<Element>,
+  node: Element,
+  alreadySet: boolean,
+  apply: () => void,
+): boolean {
+  const count = map.get(node) ?? 0;
+  if (alreadySet && count === 0) return false;
+  if (count === 0) apply();
+  map.set(node, count + 1);
+  tracked.add(node);
+  return true;
+}
+
+/** Reverts `unapply` once the last ref-counted hold on `node` in `map` is released. */
+function refCountedRelease(map: WeakMap<Element, number>, node: Element, unapply: () => void): void {
+  const count = map.get(node);
+  if (count == null) return;
+  if (count === 1) {
+    unapply();
+    map.delete(node);
+  } else {
+    map.set(node, count - 1);
+  }
+}
 
 /**
  * Hides all elements in the DOM outside the given `targets` from screen readers by setting
@@ -61,7 +114,8 @@ const observerStack: Array<{ observe(): void; disconnect(): void }> = [];
  * @param root - Root element to walk. Defaults to `document.body`.
  * @param alwaysVisibleSelector - Optional CSS selector for elements that must never be hidden
  *   (e.g. `"[aria-live]"` for live-region announcers or top-layer elements).
- * @returns A cleanup function that removes all `aria-hidden` attributes added by this call.
+ * @param inert - Also set the `inert` attribute on hidden elements. *Default = `false`*.
+ * @returns A cleanup function that removes all `aria-hidden`/`inert` changes added by this call.
  *
  * @example
  * ```ts
@@ -79,11 +133,14 @@ const observerStack: Array<{ observe(): void; disconnect(): void }> = [];
  */
 export function ariaHideOutside(
   targets: Element[],
-  root = document.body,
+  root: Element = document.body,
   alwaysVisibleSelector?: string,
+  inert = false,
 ): () => void {
+  const { refCountMap, inertRefCountMap, observerStack } = getHideOutsideRegistry();
   const visibleNodes = new Set<Element>(targets);
   const hiddenNodes = new Set<Element>();
+  const inertedNodes = new Set<Element>();
 
   const walk = (root: Element) => {
     if (alwaysVisibleSelector) {
@@ -117,22 +174,32 @@ export function ariaHideOutside(
     }
   };
 
+  // `inert` is only ever applied to nodes hide() actually manages (returns `true`) — a node
+  // left alone because it already carries an author-set aria-hidden must be left alone for
+  // `inert` too, for the same "not ours to manage" reason.
   const hide = (node: Element) => {
-    const refCount = refCountMap.get(node) ?? 0;
-    if (node.getAttribute("aria-hidden") === "true" && refCount === 0) return;
-    if (refCount === 0) node.setAttribute("aria-hidden", "true");
-    hiddenNodes.add(node);
-    refCountMap.set(node, refCount + 1);
+    const managed = refCountedApply(
+      refCountMap,
+      hiddenNodes,
+      node,
+      node.getAttribute("aria-hidden") === "true",
+      () => node.setAttribute("aria-hidden", "true"),
+    );
+    if (managed && inert && node instanceof HTMLElement) {
+      refCountedApply(inertRefCountMap, inertedNodes, node, node.inert, () => {
+        node.inert = true;
+      });
+    }
   };
 
   observerStack[observerStack.length - 1]?.disconnect();
 
   walk(root);
 
-  const observer = new MutationObserver((changes) => {
+  const observer = new MutationObserver(changes => {
     for (const change of changes) {
       if (change.type !== "childList" || change.addedNodes.length === 0) continue;
-      if (![...visibleNodes, ...hiddenNodes].some((node) => node.contains(change.target))) {
+      if (![...visibleNodes, ...hiddenNodes].some(node => node.contains(change.target))) {
         Array.from(change.removedNodes).forEach(node => {
           if (node instanceof Element) {
             visibleNodes.delete(node);
@@ -156,16 +223,12 @@ export function ariaHideOutside(
 
   return () => {
     observer.disconnect();
-    hiddenNodes.forEach(node => {
-      const count = refCountMap.get(node);
-      if (count == null) return;
-      if (count === 1) {
-        node.removeAttribute("aria-hidden");
-        refCountMap.delete(node);
-      } else {
-        refCountMap.set(node, count - 1);
-      }
-    });
+    hiddenNodes.forEach(node => refCountedRelease(refCountMap, node, () => node.removeAttribute("aria-hidden")));
+    inertedNodes.forEach(node =>
+      refCountedRelease(inertRefCountMap, node, () => {
+        (node as HTMLElement).inert = false;
+      }),
+    );
     if (wrapper === observerStack[observerStack.length - 1]) {
       observerStack.pop();
       observerStack[observerStack.length - 1]?.observe();
@@ -210,12 +273,92 @@ export function createHideOutside(options: CreateHideOutsideOptions): void {
       disabled: !!access(options.disabled),
       targets: access(options.targets),
       root: access(options.root),
+      inert: !!access(options.inert),
     }),
-    ({ disabled, targets, root }) => {
+    ({ disabled, targets, root, inert }) => {
       if (disabled) return;
-      return ariaHideOutside(targets, root, options.alwaysVisibleSelector);
+      return ariaHideOutside(targets, root, options.alwaysVisibleSelector, inert);
     },
   );
+}
+
+// Realm-independent type checks. `instanceof Element` / `instanceof ShadowRoot` compare against this
+// module's window, so they are always false for nodes created in another realm (e.g. an iframe's
+// document), which would silently disable outside detection there.
+
+const isElement = (node: unknown): node is Element =>
+  !!node && (node as Node).nodeType === Node.ELEMENT_NODE;
+
+/** The host of `node`'s shadow root, or `null` when `node` is not in a shadow tree. */
+function getShadowHost(node: Node): Element | null {
+  const root = node.getRootNode();
+  // A ShadowRoot is the only DocumentFragment with a `host`.
+  return root.nodeType === Node.DOCUMENT_FRAGMENT_NODE && isElement((root as ShadowRoot).host)
+    ? (root as ShadowRoot).host
+    : null;
+}
+
+/** Where an event originated, captured while the event is still dispatching. */
+type EventOrigin = {
+  /** The element the interaction actually happened on — inside any shadow trees it crossed. */
+  target: Element;
+  /** `composedPath()` at capture time; includes slot ancestry that a tree walk can't see. */
+  path: readonly EventTarget[];
+};
+
+/**
+ * Snapshot of where an event originated.
+ *
+ * `event.target` is retargeted at every shadow boundary the event crosses, so a listener on the
+ * document reports the outermost shadow *host* rather than the element that was interacted with.
+ * `composedPath()[0]` is that element; for an event that crosses no boundary the two are identical.
+ *
+ * Must be called synchronously during dispatch: `composedPath()` returns `[]` once dispatch ends,
+ * after which only the retargeted `event.target` remains.
+ */
+function getEventOrigin(event: Event): EventOrigin | null {
+  const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+  const target = path[0] ?? event.target;
+
+  return isElement(target) ? { target, path } : null;
+}
+
+/**
+ * `Node.prototype.contains`, but able to see through shadow boundaries.
+ *
+ * `contains` only walks the node tree it is called on, so it answers `false` for a `child` inside a
+ * shadow root — including `document.contains(elementInAShadowRoot)`. When this walk reaches the top
+ * of a shadow tree it continues from that tree's host. Slot assignment is not followed; callers that
+ * need flattened-tree containment should also consult the event's composed path.
+ */
+function containsComposed(parent: Node, child: Node | null): boolean {
+  let node: Node | null = child;
+
+  while (node) {
+    if (parent === node || parent.contains(node)) return true;
+
+    node = getShadowHost(node);
+  }
+
+  return false;
+}
+
+/**
+ * `target` as seen from `observer`'s node tree — the DOM's own retargeting algorithm.
+ *
+ * Climbs out of every shadow tree that does not also enclose `observer`, so encapsulated internals of
+ * a foreign component are reported as that component's host. For an `observer` in the document this
+ * is exactly the `event.target` a document listener sees; for an `observer` inside a shadow root,
+ * siblings in that same root are reported as themselves rather than as the outer host.
+ */
+function retarget(target: Element, observer: Node): Element {
+  let node = target;
+
+  for (;;) {
+    const host = getShadowHost(node);
+    if (!host || containsComposed(node.getRootNode(), observer)) return node;
+    node = host;
+  }
 }
 
 /** Detail payload carried by every outside-interaction `CustomEvent`. */
@@ -324,18 +467,45 @@ export function makeInteractOutside<T extends Element>(
   // setTimeout ensures we get the document after the element has been adopted into the real DOM.
   let ownerDoc: Document = el.ownerDocument;
 
-  const isEventOutside = (e: Event): boolean => {
-    const target = e.target as Element | null;
-    if (!(target instanceof Element)) return false;
-    if (!ownerDoc.contains(target)) return false;
-    if (el.contains(target)) return false;
-    return !(options.shouldExcludeElement?.(target) ?? false);
+  /**
+   * The element to report an outside interaction on, or `null` when the interaction is not outside
+   * (or `shouldExcludeElement` exempts it).
+   */
+  const getOutsideTarget = (origin: EventOrigin | null): Element | null => {
+    // `el` can be removed from the document by its owner (e.g. a `<Show>`
+    // unmounting a dismissable layer) before this instance's reactive owner
+    // gets around to calling the cleanup this function returns (listener
+    // removal is tied to `onCleanup`, which can lag a tick behind the DOM
+    // change that triggered it). Once `el` is disconnected there's nothing
+    // left to protect, and `el.contains(target)` would incorrectly read as
+    // "not contained" for every target — including ones legitimately inside
+    // a *new* instance that opened in that same window — misreporting them
+    // as outside interactions on this now-orphaned instance.
+    if (!el.isConnected || !origin) return null;
+    // Resolved through `composedPath()`, not `e.target`: these listeners are on the document, so an
+    // interaction inside a shadow tree reports that tree's host instead. `el` rendered inside a
+    // shadow root would see every one of its own clicks as the host — an ancestor, not a descendant
+    // — and read them as outside interactions, dismissing itself on pointerdown.
+    const { target, path } = origin;
+    if (!containsComposed(ownerDoc, target)) return null;
+    // The composed path also covers content slotted into `el`, which a tree walk can't reach.
+    if (path.includes(el) || containsComposed(el, target)) return null;
+    // Report the target as `el`'s own tree sees it. A sibling in `el`'s shadow root is itself, but a
+    // click inside a *foreign* web component (e.g. a trigger with its own shadow root) stays its
+    // host — the same element consumers received before shadow-aware resolution, so checks such as
+    // `trigger.contains(element)` in `shouldExcludeElement` keep matching.
+    const reported = retarget(target, el);
+    return options.shouldExcludeElement?.(reported) ? null : reported;
   };
 
   const onPointerDown = (e: PointerEvent) => {
+    // Resolved now, not in `handler`: for touch, `handler` runs on the following `click`, by which
+    // time this event has finished dispatching and `composedPath()` is empty.
+    const origin = getEventOrigin(e);
+
     const handler = () => {
-      const target = e.target as Element | null;
-      if (!target || !isEventOutside(e)) return;
+      const target = getOutsideTarget(origin);
+      if (!target) return;
 
       target.addEventListener(
         POINTER_DOWN_OUTSIDE_EVENT,
@@ -364,8 +534,8 @@ export function makeInteractOutside<T extends Element>(
   };
 
   const onFocusIn = (e: FocusEvent) => {
-    const target = e.target as Element | null;
-    if (!target || !isEventOutside(e)) return;
+    const target = getOutsideTarget(getEventOrigin(e));
+    if (!target) return;
 
     target.addEventListener(
       FOCUS_OUTSIDE_EVENT,
@@ -467,5 +637,6 @@ export function createInteractOutside<T extends Element>(
       if (disabled || !el) return;
       return makeInteractOutside(el, options);
     },
+    { transparent: true },
   );
 }

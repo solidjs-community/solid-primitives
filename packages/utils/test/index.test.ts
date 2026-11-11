@@ -1,6 +1,14 @@
+import { renderHydrationRoundTrip } from "../../../scripts/test-utils/hydration-harness.ts";
 import { describe, test, expect, assert, vi } from "vitest";
-import { createSignal, createStore, flush } from "solid-js";
-import { handleDiffArray, arrayEquals, createHydratableSignal, wrapSetter } from "../src/index.js";
+import { createEffect, createRoot, createSignal, createStore, flush } from "solid-js";
+import {
+  handleDiffArray,
+  arrayEquals,
+  createHydratableSignal,
+  createServerSafeSignal,
+  wrapSetter,
+  globalRegistry,
+} from "../src/index.js";
 
 describe("handleDiffArray", () => {
   test("handleAdded called for new array", () => {
@@ -104,6 +112,34 @@ describe("createHydratableSignal", () => {
   });
 });
 
+describe("globalRegistry", () => {
+  test("calls init exactly once and returns the same instance on subsequent calls", () => {
+    const init = vi.fn(() => ({ count: 0 }));
+    const key = `test:globalRegistry:${Math.random()}`;
+    const first = globalRegistry(key, init);
+    const second = globalRegistry(key, init);
+    expect(first).toBe(second);
+    expect(init).toHaveBeenCalledOnce();
+  });
+
+  test("survives a fresh call site sharing the same key — simulates duplicate installed copies", () => {
+    const key = `test:globalRegistry:duplicate-copy:${Math.random()}`;
+    // Simulates two separate module instances of the same package (e.g. a version-skewed
+    // duplicate dependency) each calling globalRegistry with the same key: both must observe
+    // the same mutations, matching real singleton semantics across copies.
+    const registryA = globalRegistry(key, () => ({ stack: [] as string[] }));
+    const registryB = globalRegistry(key, () => ({ stack: ["should never be used"] }));
+    registryA.stack.push("from-a");
+    expect(registryB.stack).toEqual(["from-a"]);
+  });
+
+  test("different keys get independent instances", () => {
+    const a = globalRegistry(`test:globalRegistry:a:${Math.random()}`, () => ({ value: 1 }));
+    const b = globalRegistry(`test:globalRegistry:b:${Math.random()}`, () => ({ value: 2 }));
+    expect(a).not.toBe(b);
+  });
+});
+
 describe("wrapSetter", () => {
   test("wraps a signal", () => {
     const wrapped = vi.fn((x) => x);
@@ -133,4 +169,47 @@ describe("wrapSetter", () => {
     expect(wrappedSignal[3]).toBe(modifiedSignal[3]);
     expect(wrappedSignal).toHaveLength(modifiedSignal.length);
   });
+});
+describe("createServerSafeSignal", () => {
+  test("is a real signal on the client", () => {
+    const [count, setCount] = createServerSafeSignal(0);
+    let seen: number | undefined;
+    const dispose = createRoot(d => {
+      createEffect(
+        () => count(),
+        v => {
+          seen = v;
+        },
+      );
+      return d;
+    });
+    flush();
+    expect(seen).toBe(0);
+
+    expect(setCount(c => c + 1)).toBe(1);
+    flush();
+    expect(count()).toBe(1);
+    expect(seen).toBe(1);
+    dispose();
+  });
+});
+
+test("hydrates primitive output and its following sibling", async () => {
+  const result = await renderHydrationRoundTrip(
+    `
+    import { createHydratableSignal } from "@solid-primitives/utils";
+    function Child() { createHydratableSignal(false, () => true); return <button ref={el => el.dataset.bound = "child"}>child</button>; }
+    export default function App() { return <><Child /><span ref={el => el.dataset.bound = "sibling"}>sibling</span></>; }
+  `,
+    import.meta.dirname,
+  );
+  try {
+    expect(result.consoleMessages).toEqual([]);
+    expect(result.container.querySelector("button")).toBe(result.serverNodes[0]);
+    expect(result.container.querySelector("span")).toBe(result.serverNodes[1]);
+    expect((result.serverNodes[0] as HTMLElement).dataset.bound).toBe("child");
+    expect((result.serverNodes[1] as HTMLElement).dataset.bound).toBe("sibling");
+  } finally {
+    result.cleanup();
+  }
 });

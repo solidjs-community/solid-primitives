@@ -23,8 +23,6 @@ yarn add @solid-primitives/event-dispatcher
 pnpm add @solid-primitives/event-dispatcher
 ```
 
-Requires `solid-js` and `@solidjs/web` as peer dependencies.
-
 ## How to use it
 
 ### Example: create and dispatch the event

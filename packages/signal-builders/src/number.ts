@@ -1,6 +1,6 @@
 import { access, accessArray, type MaybeAccessor } from "@solid-primitives/utils";
 import * as _ from "@solid-primitives/utils/immutable";
-import { type Accessor, createMemo } from "solid-js";
+import { type Accessor, type SourceAccessor, createMemo } from "solid-js";
 
 /**
  * Reactive `a + b + c + ...` — also concatenates strings when passed string values.
@@ -17,29 +17,29 @@ export function add(...a: MaybeAccessor<any>[]): Accessor<string | number> {
 }
 
 /** `a - b - c - ...` */
-export const substract = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]) =>
+export const substract = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]): SourceAccessor<number> =>
   createMemo(() => _.substract(access(a), ...accessArray(b)));
 
 /** `a * b * c * ...` */
-export const multiply = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]) =>
+export const multiply = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]): SourceAccessor<number> =>
   createMemo(() => _.multiply(access(a), ...accessArray(b)));
 
 /** `a / b / c / ...` */
-export const divide = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]) =>
+export const divide = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]): SourceAccessor<number> =>
   createMemo(() => _.divide(access(a), ...accessArray(b)));
 
 /** `a ** b ** c ** ...` */
-export const power = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]) =>
+export const power = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]): SourceAccessor<number> =>
   createMemo(() => _.power(access(a), ...accessArray(b)));
 
 /** Reactive `Math.round()`. */
-export const round = (a: MaybeAccessor<number>) => createMemo(() => Math.round(access(a)));
+export const round = (a: MaybeAccessor<number>): SourceAccessor<number> => createMemo(() => Math.round(access(a)));
 
 /** Reactive `Math.ceil()`. */
-export const ceil = (a: MaybeAccessor<number>) => createMemo(() => Math.ceil(access(a)));
+export const ceil = (a: MaybeAccessor<number>): SourceAccessor<number> => createMemo(() => Math.ceil(access(a)));
 
 /** Reactive `Math.floor()`. */
-export const floor = (a: MaybeAccessor<number>) => createMemo(() => Math.floor(access(a)));
+export const floor = (a: MaybeAccessor<number>): SourceAccessor<number> => createMemo(() => Math.floor(access(a)));
 
 /**
  * Reactively clamps a value between `min` and `max` (inclusive).
@@ -52,4 +52,4 @@ export const clamp = (
   value: MaybeAccessor<number>,
   min: MaybeAccessor<number>,
   max: MaybeAccessor<number>,
-) => createMemo(() => _.clamp(access(value), access(min), access(max)));
+): SourceAccessor<number> => createMemo(() => _.clamp(access(value), access(min), access(max)));

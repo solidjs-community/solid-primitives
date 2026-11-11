@@ -12,10 +12,10 @@
  * https://github.com/adobe/react-spectrum/blob/70e7caf1946c423bc9aa9cb0e50dbdbe953d239b/packages/@react-aria/label/src/useField.ts
  */
 
+import type { Context } from "solid-js";
 import {
   createContext,
   createEffect,
-  createMemo,
   createSignal,
   createUniqueId,
   useContext,
@@ -26,13 +26,13 @@ import type {
   CreateFormControlProps,
   FormControlContextValue,
   FormControlDataSet,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Solid context that carries the `FormControlContextValue` produced by `createFormControl`.
  * Provide it with `<FormControlContext value={ctx}>` and consume it with `useFormControl()`.
  */
-export const FormControlContext = createContext<FormControlContextValue | undefined>(undefined);
+export const FormControlContext: Context<FormControlContextValue | undefined> = createContext<FormControlContextValue | undefined>(undefined);
 
 /**
  * Reads `FormControlContext` from the nearest ancestor `<FormControlContext>` provider.
@@ -139,13 +139,16 @@ export function createFormControl(props: CreateFormControlProps): FormControlCon
     );
   };
 
-  const dataset = createMemo<FormControlDataSet>(() => ({
+  // Plain getter, not createMemo: the object is cheap to rebuild on every read, and a
+  // render-body compute-form memo would consume a hydration id in every consuming app —
+  // see the transform-boundary hydration hazard this pattern is designed to avoid.
+  const dataset = (): FormControlDataSet => ({
     "data-valid": access(props.validationState) === "valid" ? "" : undefined,
     "data-invalid": access(props.validationState) === "invalid" ? "" : undefined,
     "data-required": access(props.required) ? "" : undefined,
     "data-disabled": access(props.disabled) ? "" : undefined,
     "data-readonly": access(props.readOnly) ? "" : undefined,
-  }));
+  });
 
   return {
     name: () => access(props.name) ?? id(),
@@ -198,7 +201,14 @@ export function createFormControl(props: CreateFormControlProps): FormControlCon
  * };
  * ```
  */
-export function createFormControlInput(props: CreateFormControlInputProps = {}) {
+export function createFormControlInput(props: CreateFormControlInputProps = {}): {
+  fieldProps: {
+    id: () => string;
+    ariaLabel: () => string | undefined;
+    ariaLabelledBy: () => string | undefined;
+    ariaDescribedBy: () => string | undefined;
+  };
+} {
   const context = useFormControl();
 
   const id = () => access(props.id) ?? context.generateId("field");

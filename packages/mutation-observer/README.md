@@ -21,8 +21,6 @@ yarn add @solid-primitives/mutation-observer
 pnpm add @solid-primitives/mutation-observer
 ```
 
-**Requires** `solid-js` and `@solidjs/web` >= `2.0.0-beta.13` as peer dependencies.
-
 ## How to use it
 
 ### createMutationObserver

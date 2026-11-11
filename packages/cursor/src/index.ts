@@ -1,7 +1,7 @@
 import { type Accessor, createEffect, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
-import { type CursorProperty } from "./types.js";
+import { type CursorProperty } from "./types.ts";
 
 export type { CursorProperty };
 

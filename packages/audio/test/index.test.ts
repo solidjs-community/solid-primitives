@@ -9,8 +9,6 @@ const testPath =
 /** Yield to the microtask queue — used alongside flush() to drain Solid 2.0 effects. */
 const tick = () => Promise.resolve();
 
-// ── makeAudio ─────────────────────────────────────────────────────────────────
-
 describe("makeAudio", () => {
   it("returns a player and cleanup tuple", () => {
     const [player, cleanup] = makeAudio(testPath);
@@ -48,8 +46,6 @@ describe("makeAudio", () => {
   });
 });
 
-// ── makeAudioPlayer ───────────────────────────────────────────────────────────
-
 describe("makeAudioPlayer", () => {
   it("returns controls and cleanup tuple", () => {
     const [controls, cleanup] = makeAudioPlayer(testPath);
@@ -81,8 +77,6 @@ describe("makeAudioPlayer", () => {
     cleanup();
   });
 });
-
-// ── createAudio ───────────────────────────────────────────────────────────────
 
 describe("createAudio", () => {
   it("returns flat object with expected shape", () =>

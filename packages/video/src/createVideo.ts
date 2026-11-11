@@ -2,7 +2,7 @@ import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } f
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { createEventListenerMap } from "@solid-primitives/event-listener";
-import type { VideoEventHandlers, VideoOptions, VideoReturn, VideoSource } from "./types.js";
+import type { VideoEventHandlers, VideoOptions, VideoReturn, VideoSource } from "./types.ts";
 
 const NOT_SET: unique symbol = Symbol();
 

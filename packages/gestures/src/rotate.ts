@@ -1,5 +1,5 @@
 import { onCleanup } from "solid-js";
-import { registerPointerListener, getCenterOfTwoPoints } from "./core.js";
+import { registerPointerListener, getCenterOfTwoPoints } from "./core.ts";
 
 export type RotateProps = {
   callback: (rotation: number, center: { x: number; y: number }) => void;

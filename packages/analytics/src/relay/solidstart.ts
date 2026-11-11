@@ -1,5 +1,5 @@
-import type { AnyPayload, AnalyticsPlugin } from "../types.js";
-import { createServerPlugin } from "../relay.js";
+import type { AnyPayload, AnalyticsPlugin } from "../types.ts";
+import { createServerPlugin } from "../relay.ts";
 
 /**
  * Creates an analytics plugin that relays client events to a SolidStart server

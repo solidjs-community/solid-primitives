@@ -1,6 +1,9 @@
 import { defineConfig } from "vitest/config";
-import solidPlugin from "vite-plugin-solid";
+import solidPlugin from "@solidjs/vite-plugin";
 import * as utils from "../scripts/utils/index.js";
+
+// Packages still on solid-js 1.x, not yet migrated to Solid 2.0.
+const UNMIGRATED_PACKAGES = ["fetch", "immutable", "db-store", "graphql", "resource"];
 
 const package_name = utils.getPackageNameFromCWD();
 
@@ -17,11 +20,14 @@ export default defineConfig(({ mode }) => {
   // loads only server.test.ts file
   const testSSR = mode === "test:ssr" || mode === "ssr";
 
+  const conditions = testSSR
+    ? ["@solid-primitives/source", "node"]
+    : ["@solid-primitives/source", "browser", "development"];
+
   return {
     plugins: [
       solidPlugin({
-        // https://github.com/solidjs/solid-refresh/issues/29
-        hot: false,
+        refresh: false,
         // For testing SSR we need to do a SSR JSX transform
         solid: { generate: testSSR ? "ssr" : "dom", omitNestedClosingTags: false, moduleName: "@solidjs/web" },
       }),
@@ -31,16 +37,22 @@ export default defineConfig(({ mode }) => {
       isolate: false,
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
-      transformMode: {
-        web: [/\.[jt]sx$/],
-      },
+      // Solid ships separate dev/browser/server builds selected by resolve conditions;
+      // inline it so vitest resolves through vite (and those conditions) instead of node.
+      server: { deps: { inline: [/solid-js/, /@solidjs\//] } },
       ...(from_root
         ? // Testing all packages from root
           {
-            ...(testSSR && { include: ["packages/*/test/server.test.{ts,tsx}"] }),
+            ...(testSSR && {
+              include: ["packages/*/test/server.test.{ts,tsx}"],
+              exclude: UNMIGRATED_PACKAGES.map(name => `packages/${name}/test/server.test.{ts,tsx}`),
+            }),
             ...(!testSSR && {
               include: ["packages/*/test/*.test.{ts,tsx}"],
-              exclude: ["packages/*/test/server.test.{ts,tsx}"],
+              exclude: [
+                "packages/*/test/server.test.{ts,tsx}",
+                ...UNMIGRATED_PACKAGES.map(name => `packages/${name}/test/*.test.{ts,tsx}`),
+              ],
             }),
           }
         : // Testing a single package
@@ -56,9 +68,9 @@ export default defineConfig(({ mode }) => {
       alias: {
         "solid-js/web": "@solidjs/web",
       },
-      conditions: testSSR
-        ? ["@solid-primitives/source", "node"]
-        : ["@solid-primitives/source", "browser", "development"],
+      conditions,
     },
+    // inlined modules are evaluated through vite's SSR pipeline, which has its own conditions
+    ssr: { resolve: { conditions } },
   };
 });

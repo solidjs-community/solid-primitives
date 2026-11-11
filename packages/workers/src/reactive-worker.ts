@@ -8,7 +8,7 @@ import {
   type StoreSetter,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
-import type { BridgeMessage } from "./types.js";
+import type { BridgeMessage } from "./types.d.ts";
 
 /**
  * Creates a reactive worker bridge backed by Solid stores.

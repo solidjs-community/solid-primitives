@@ -1,7 +1,7 @@
 import { createComponent, createContext, useContext } from "solid-js";
 import type { Element } from "solid-js";
-import { createAnalytics } from "./analytics.js";
-import type { ReactiveAnalyticsControls, AnalyticsPlugin, AnalyticsOptions } from "./types.js";
+import { createAnalytics } from "./analytics.ts";
+import type { ReactiveAnalyticsControls, AnalyticsPlugin, AnalyticsOptions } from "./types.ts";
 
 const AnalyticsCtx = createContext<ReactiveAnalyticsControls>();
 

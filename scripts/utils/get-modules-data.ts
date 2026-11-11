@@ -1,7 +1,61 @@
 import path from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
-import { MODULE_PREFIX, PACKAGES_DIR, isNonNullable, log_info } from "./utils.js";
+import { MODULE_PREFIX, PACKAGES_DIR, ROOT_DIR, isNonNullable, log_info } from "./utils.js";
+
+// pnpm's `catalog:`/`catalog:<name>` version specifiers are placeholders in package.json —
+// the real version only lives in pnpm-workspace.yaml's `catalog`/`catalogs.<name>` maps. Resolve
+// them here so callers see the real version string instead of the literal "catalog:..." text.
+
+function extractYamlBlock(text: string, key: string): string | null {
+  const lines = text.split("\n");
+  const keyLineIndex = lines.findIndex(line => line.trim() === `${key}:`);
+  if (keyLineIndex === -1) return null;
+  const keyIndent = lines[keyLineIndex]!.match(/^\s*/)![0].length;
+  const blockLines: string[] = [];
+  for (let i = keyLineIndex + 1; i < lines.length; i++) {
+    const line = lines[i]!;
+    if (line.trim() === "") continue;
+    const indent = line.match(/^\s*/)![0].length;
+    if (indent <= keyIndent) break;
+    blockLines.push(line);
+  }
+  return blockLines.length > 0 ? blockLines.join("\n") : null;
+}
+
+function extractYamlValue(block: string, key: string): string | null {
+  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = block.match(new RegExp(`^\\s*['"]?${escapedKey}['"]?:\\s*(.+)$`, "m"));
+  return match ? match[1]!.trim().replace(/^['"]|['"]$/g, "") : null;
+}
+
+let workspaceYamlText: string | null | undefined;
+
+function resolveCatalogVersion(depName: string, catalogName: string): string | null {
+  if (workspaceYamlText === undefined) {
+    const workspacePath = path.join(ROOT_DIR, "pnpm-workspace.yaml");
+    workspaceYamlText = fs.existsSync(workspacePath)
+      ? fs.readFileSync(workspacePath, "utf8")
+      : null;
+  }
+  if (workspaceYamlText == null) return null;
+
+  if (catalogName === "") {
+    const catalogBlock = extractYamlBlock(workspaceYamlText, "catalog");
+    return catalogBlock ? extractYamlValue(catalogBlock, depName) : null;
+  }
+  const catalogsBlock = extractYamlBlock(workspaceYamlText, "catalogs");
+  if (!catalogsBlock) return null;
+  const namedBlock = extractYamlBlock(catalogsBlock, catalogName);
+  return namedBlock ? extractYamlValue(namedBlock, depName) : null;
+}
+
+function resolveVersionSpecifier(raw: string | undefined): string | null {
+  if (raw == null) return null;
+  const catalogMatch = raw.match(/^catalog:(.*)$/);
+  if (!catalogMatch) return raw;
+  return resolveCatalogVersion("solid-js", catalogMatch[1]!) ?? raw;
+}
 
 export type PackageJson = {
   name: string;
@@ -67,7 +121,9 @@ export async function getModuleData(name: string): Promise<ModuleData | Error> {
         pkg.peerDependencies?.["solid-js"],
         pkg.dependencies?.["solid-js"],
         pkg.devDependencies?.["solid-js"],
-      ].find(v => v != null && /^[\^~]?2\./.test(v)) ?? null,
+      ]
+        .map(resolveVersionSpecifier)
+        .find((v): v is string => v != null && /^[\^~]?2\./.test(v)) ?? null,
   };
 }
 

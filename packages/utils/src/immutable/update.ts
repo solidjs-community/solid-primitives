@@ -1,5 +1,5 @@
-import { withCopy } from "./copy.js";
-import { type ModifyValue } from "./types.js";
+import { withCopy } from "./copy.ts";
+import { type ModifyValue } from "./types.ts";
 
 export type UpdateSetter<O, K extends keyof O, V> = V | ((prev: O[K]) => V);
 

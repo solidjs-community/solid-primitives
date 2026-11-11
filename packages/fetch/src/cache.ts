@@ -1,7 +1,7 @@
 import { type ResourceOptions, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
-import { type RequestContext } from "./fetch.js";
-import { type RequestModifier, wrapFetcher } from "./modifiers.js";
+import { type RequestContext } from "./fetch.ts";
+import { type RequestModifier, wrapFetcher } from "./modifiers.ts";
 
 export type CacheEntry<T = any> = {
   ts: number;
@@ -21,6 +21,7 @@ export const defaultCacheOptions: CacheOptions = {
   cache: {},
 };
 
+/** Turns fetcher args (a `RequestInfo`/`RequestInit` pair) into a stable string key for cache lookups. */
 export const serializeRequest = <FetcherArgs extends any[]>(requestData: FetcherArgs): string =>
   JSON.stringify({
     ...(typeof requestData[0] === "string" ? { url: requestData[0] } : requestData[0]),
@@ -97,6 +98,14 @@ export const withCache: RequestModifier =
     });
   };
 
+/**
+ * Companion to `withCache`: automatically refetches once the current cache
+ * entry expires, instead of waiting for the next manual read. With a function
+ * `expires`, polls every `pollDelayMs` (or every animation frame if `0`) to
+ * detect expiry.
+ *
+ * @param pollDelayMs Polling interval in ms used when `expires` is a function. Defaults to 100.
+ */
 export const withRefetchOnExpiry: RequestModifier =
   <Result, FetcherArgs extends any[]>(pollDelayMs = 100) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
@@ -110,7 +119,7 @@ export const withRefetchOnExpiry: RequestModifier =
             setTimeout(() => requestContext.resource?.[1].refetch(), requestContext.expires + 10);
           } else if (typeof requestContext.expires === "function") {
             const delay: typeof setTimeout | ((fn: FrameRequestCallback, _ms: number) => number) =
-              pollDelayMs === 0 ? fn => requestAnimationFrame(fn) : setTimeout;
+              pollDelayMs === 0 ? (fn: FrameRequestCallback) => requestAnimationFrame(fn) : setTimeout;
             const poll = () => {
               if (requestContext.expires(cached)) {
                 requestContext.resource?.[1].refetch();
@@ -127,6 +136,14 @@ export const withRefetchOnExpiry: RequestModifier =
     requestContext.wrapResource();
   };
 
+/**
+ * Persists the `withCache` cache to a `Storage` (e.g. `localStorage`), loading
+ * any previously stored entries on setup and writing back after every cache update.
+ * Must be composed after `withCache` in the modifier chain.
+ *
+ * @param storage Storage to persist the cache to. Defaults to `localStorage`.
+ * @param key Key under which the cache is stored. Defaults to `"fetch-cache"`.
+ */
 export const withCacheStorage: RequestModifier =
   (storage: Storage = localStorage, key = "fetch-cache") =>
   requestContext => {

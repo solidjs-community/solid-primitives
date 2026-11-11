@@ -1,4 +1,4 @@
-import type { WorkerCallbacks, WorkerMessage } from "./types.js";
+import type { WorkerCallbacks, WorkerMessage } from "./types.d.ts";
 
 export const RPC: number = 1;
 

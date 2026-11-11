@@ -9,7 +9,7 @@ import {
   latest,
   refresh,
 } from "solid-js";
-import { makePersisted } from "../src/persisted.js";
+import { makePersisted, messageSync, multiplexSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
@@ -67,6 +67,7 @@ describe("makePersisted", () => {
       name: "test1",
     });
     setSignal("persisted");
+    flush();
     expect(mockStorage.getItem("test1")).toBe('"persisted"');
     expect(latest(signal)).toBe("persisted");
   });
@@ -78,10 +79,10 @@ describe("makePersisted", () => {
       set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
     };
     const [signal, setSignal] = makePersisted(
-      createOptimistic(() => DataServer.get()),
+      createRoot(() => createOptimistic(() => DataServer.get())),
       {
         storage: mockStorage,
-        name: "test1",
+        name: "test-optimistic",
         action: ([getter, setter]) => function*(next) {
           setter(next);
           yield DataServer.set(next);
@@ -89,15 +90,19 @@ describe("makePersisted", () => {
         }
       }
     );
+    // let the initial server fetch settle before the optimistic write
+    await new Promise(res => setTimeout(res, 0));
+    flush();
     await setSignal("persisted");
     flush();
-    expect(mockStorage.getItem("test1")).toBe('"persisted"');
+    expect(mockStorage.getItem("test-optimistic")).toBe('"persisted"');
     expect(latest(signal)).toBe("persisted")
   })
 
   it("reads the persisted value from a synchronous storage into the signal", () => {
     mockStorage.setItem("test2", '"persistence"');
     const [signal] = makePersisted(createSignal(), { storage: mockStorage, name: "test2" });
+    flush();
     expect(latest(signal)).toBe("persistence");
   });
 
@@ -107,9 +112,11 @@ describe("makePersisted", () => {
       name: "test3",
     });
     setSignal("test");
+    flush();
     expect(mockStorage.getItem("test3")).toBe('"test"');
     expect(latest(signal)).toBe("test");
     setSignal(undefined);
+    flush();
     expect(mockStorage.getItem("test3")).toBeNull();
   });
 
@@ -150,6 +157,7 @@ describe("makePersisted", () => {
       name: "test5",
     });
     setSignal("async");
+    flush();
     expect(latest(signal)).toBe("async");
     expect(await mockAsyncStorage.getItem("test5")).toBe('"async"');
   });
@@ -161,8 +169,10 @@ describe("makePersisted", () => {
       name: "test6",
     });
     await Promise.resolve();
+    flush();
     expect(latest(signal)).toBe("predefined");
     setSignal("overwritten");
+    flush();
     await Promise.resolve();
     expect(await mockAsyncStorage.getItem("test6")).toBe('"overwritten"');
   });
@@ -178,8 +188,10 @@ describe("makePersisted", () => {
       storage: slowMockAsyncStorage,
       name: "test7",
     });
+    flush();
     expect(latest(signal)).toBe("init");
     setSignal("overwritten");
+    flush();
     resolve("persisted");
     expect(latest(signal)).toBe("overwritten");
   });
@@ -193,5 +205,111 @@ describe("makePersisted", () => {
       name: "test8",
     });
     expect(init).toBe(promise);
+  });
+  
+  it("keeps early writes and explicitly disposes sync and deferred init", async () => {
+    mockStorage.setItem("cleanup", '"init"');
+    const [value, setValue, , dispose] = createRoot(disposeRoot => {
+      const persisted = makePersisted(createSignal("default"), {
+        storage: mockStorage,
+        name: "cleanup",
+        hydrated: true,
+        sync: multiplexSync(messageSync(window), storageSync),
+      });
+      disposeRoot();
+      return persisted;
+    });
+    const send = (newValue: string) => window.dispatchEvent(new MessageEvent("message", {
+      data: { key: "cleanup", newValue: JSON.stringify(newValue) },
+    }));
+    send("synced");
+    flush();
+    expect(value()).toBe("synced");
+    window.dispatchEvent(new StorageEvent("storage", { key: "cleanup", newValue: '"stored"' }));
+    flush();
+    expect(value()).toBe("stored");
+    setValue("user write");
+    const [cancelled, , , cancel] = makePersisted(createSignal("default"), {
+      storage: mockStorage,
+      name: "cleanup",
+      hydrated: true,
+    });
+    cancel();
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(value()).toBe("user write");
+    expect(cancelled()).toBe("default");
+    dispose();
+    send("ignored");
+    window.dispatchEvent(new StorageEvent("storage", { key: "cleanup", newValue: '"ignored"' }));
+    flush();
+    expect(value()).toBe("user write");
+  });
+  it("defers the initialization if the hydrated option is set", async () => {
+    const anotherMockStorage = { ...mockStorage };
+    anotherMockStorage.setItem("test18", '"init"');
+    const [signal, _setSignal] = makePersisted(
+      createSignal("default"), 
+      { storage: anotherMockStorage, name: "test18", hydrated: true }
+    );
+    flush();
+    expect(signal()).toBe("default");
+    await new Promise(r => setTimeout(r, 200));
+    flush();
+    expect(signal()).toBe("init"); 
+  });
+});
+
+describe("storageSync", () => {
+  it("receives messages", () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    storageSync[0](subscriber);
+    const event = new StorageEvent(
+      "storage",
+      { key: "test9", newValue: "received", timeStamp: Date.now(), url: "https://storage.solid-primitives.org" }
+    );
+    window.dispatchEvent(event);
+    flush();
+    expect(message()).toEqual(event);
+  });
+});
+
+describe("messageSync", () => {
+  it("sends and receives messages", async () => {
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = messageSync(window, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test10", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test10",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
+  });
+});
+
+describe("wsSync", () => {
+  it("sends and receives messages", async () => {
+    const mockWs = {
+      addEventListener: (name: string, handler: (ev: unknown) => void) => { 
+        expect(name).toBe("message");
+        mockWs.send = (data) => handler(new MessageEvent("message", { data }));
+      },
+    };
+    const [message, subscriber] = createSignal<PersistenceSyncData>();
+    const sync = wsSync(mockWs, true, "https://storage.solid-primitives.org");
+    sync[0](subscriber);
+    sync[1]("test11", "sent and received");
+    await new Promise(r => setTimeout(r, 100));
+    flush();
+    expect(message()).toEqual({
+      key: "test11",
+      newValue: "sent and received",
+      timeStamp: expect.any(Number),
+      url: "https://storage.solid-primitives.org",
+    });
   });
 });

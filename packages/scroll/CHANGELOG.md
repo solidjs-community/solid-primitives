@@ -1,5 +1,80 @@
 # @solid-primitives/scroll
 
+## 3.0.0-next.7
+
+### Patch Changes
+
+- dd165cd: Make client-only effects transparent to Solid 2 hydration and call hydratable helpers’ onSettled on both server and client so later nodes bind correctly.
+- Updated dependencies [dd165cd]
+  - @solid-primitives/event-listener@3.0.0-next.8
+  - @solid-primitives/utils@7.0.0-next.7
+  - @solid-primitives/static-store@1.0.0-next.5
+
+## 3.0.0-next.6
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/event-listener@3.0.0-next.7
+  - @solid-primitives/rootless@2.0.0-next.4
+  - @solid-primitives/static-store@1.0.0-next.4
+  - @solid-primitives/utils@7.0.0-next.6
+
+## 3.0.0-next.5
+
+### Patch Changes
+
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [7ee755d]
+- Updated dependencies [638c530]
+  - @solid-primitives/utils@7.0.0-next.5
+  - @solid-primitives/event-listener@3.0.0-next.6
+  - @solid-primitives/rootless@2.0.0-next.3
+  - @solid-primitives/static-store@1.0.0-next.3
+
+## 3.0.0-next.4
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/event-listener@3.0.0-next.3
+  - @solid-primitives/rootless@2.0.0-next.2
+  - @solid-primitives/static-store@1.0.0-next.2
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 3.0.0-next.3
+
+### Patch Changes
+
+- 855bc1b: `createPreventScroll` now locks scroll on `document.documentElement` instead of `<body>`. Locking `<body>` could break `position: sticky` elements, since sticky positioning is computed relative to the nearest scrolling ancestor — when that ancestor was `<body>` instead of the viewport, sticky children would unstick while scroll was prevented. Scrollbar-width, padding/margin compensation, and scroll-position restoration are all computed against `documentElement` now as well.
+
+## 3.0.0-next.2
+
+### Patch Changes
+
+- b7ef2f3: `createPreventScroll`'s active-instance stack and body-style ref-counts now live in a `globalRegistry` (keyed on `globalThis`, not module-scope bindings), so they stay correct even if the app's dependency graph ends up with more than one copy of this package installed — module-scope state would otherwise be split across copies, breaking the "topmost instance" ref-counting. Also replaced a hand-rolled `contains()` helper with the equivalent one already exported from `@solid-primitives/utils`. No API changes.
+- Updated dependencies [b7ef2f3]
+  - @solid-primitives/utils@7.0.0-next.3
+
+## 3.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/event-listener@3.0.0-next.2
+  - @solid-primitives/rootless@2.0.0-next.1
+  - @solid-primitives/static-store@1.0.0-next.1
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 3.0.0-next.0
 
 ### Major Changes
@@ -11,7 +86,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/scroll`
-
   - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
   - `onMount` replaced with `onSettled` for post-render position refresh
   - `sharedConfig.context` replaced with `sharedConfig.hydrating` for hydration detection

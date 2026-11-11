@@ -9,8 +9,6 @@ beforeEach(() => {
   });
 });
 
-// ── parseCookie ───────────────────────────────────────────────────────────────
-
 describe("parseCookie", () => {
   it("extracts a value by key", () => {
     expect(parseCookie("foo=bar", "foo")).toBe("bar");
@@ -29,16 +27,12 @@ describe("parseCookie", () => {
   });
 });
 
-// ── getCookiesString ──────────────────────────────────────────────────────────
-
 describe("getCookiesString", () => {
   it("returns document.cookie on the client", () => {
     document.cookie = "ck_test=hello";
     expect(getCookiesString()).toContain("ck_test=hello");
   });
 });
-
-// ── createServerCookie ────────────────────────────────────────────────────────
 
 describe("createServerCookie", () => {
   it("initializes signal from the current cookie value", () => {
@@ -163,8 +157,6 @@ describe("createServerCookie", () => {
     dispose();
   });
 });
-
-// ── createUserTheme ───────────────────────────────────────────────────────────
 
 describe("createUserTheme", () => {
   it("reads a stored theme from the cookie", () => {

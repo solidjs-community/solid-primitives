@@ -43,8 +43,6 @@ import {
 import { createRoot, createSignal, flush } from "solid-js";
 import { compare } from "@solid-primitives/utils";
 
-// ─── BOOLEAN ────────────────────────────────────────────────────────────────
-
 describe("toggle()", () => {
   it("flips the current value", () =>
     createRoot(dispose => {
@@ -62,8 +60,6 @@ describe("toggle()", () => {
       dispose();
     }));
 });
-
-// ─── CONVERT ────────────────────────────────────────────────────────────────
 
 describe("string()", () => {
   it("coerces a number to string", () =>
@@ -180,8 +176,6 @@ describe("join()", () => {
   });
 });
 
-// ─── STRING ─────────────────────────────────────────────────────────────────
-
 describe("lowercase()", () => {
   it("lowercases a string", () =>
     createRoot(dispose => {
@@ -291,8 +285,6 @@ describe("template`...`", () => {
     dispose();
   });
 });
-
-// ─── NUMBER ─────────────────────────────────────────────────────────────────
 
 describe("add()", () => {
   it("adds two numbers", () =>
@@ -543,8 +535,6 @@ describe("clamp()", () => {
     dispose();
   });
 });
-
-// ─── ARRAY ──────────────────────────────────────────────────────────────────
 
 describe("push()", () => {
   it("appends items to the array", () =>
@@ -919,8 +909,6 @@ describe("filterOutInstance()", () => {
     }));
 });
 
-// ─── OBJECT ─────────────────────────────────────────────────────────────────
-
 describe("omit()", () => {
   it("omits a single key", () =>
     createRoot(dispose => {
@@ -1045,8 +1033,6 @@ describe("merge()", () => {
     dispose();
   });
 });
-
-// ─── UPDATE ─────────────────────────────────────────────────────────────────
 
 describe("update()", () => {
   it("sets a top-level key to a plain value", () =>

@@ -9,11 +9,12 @@ describe("createTween", () => {
     expect(tweened()).toBe(42);
   });
 
-  test("returns the target signal on SSR", () => {
-    const [value, setValue] = createSignal(0);
+  test("returns the target signal itself on SSR", () => {
+    // Identity, not write-then-read: a signal write during a server render is
+    // deprecated (SERVER_WRITE), and the server never animates anyway.
+    const [value] = createSignal(0);
     const tweened = createTween(value, {});
+    expect(tweened).toBe(value);
     expect(tweened()).toBe(0);
-    setValue(100);
-    expect(tweened()).toBe(100);
   });
 });

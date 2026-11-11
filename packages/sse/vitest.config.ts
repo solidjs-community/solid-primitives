@@ -1,12 +1,12 @@
 import { defineConfig } from "vitest/config";
-import solidPlugin from "vite-plugin-solid";
+import solidPlugin from "@solidjs/vite-plugin";
 
 export default defineConfig(({ mode }) => {
   const testSSR = mode === "test:ssr" || mode === "ssr";
   return {
     plugins: [
       solidPlugin({
-        hot: false,
+        refresh: false,
         solid: { generate: testSSR ? "ssr" : "dom", omitNestedClosingTags: false },
       }),
     ],

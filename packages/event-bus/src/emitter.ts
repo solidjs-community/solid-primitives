@@ -1,5 +1,5 @@
 import { tryOnCleanup } from "@solid-primitives/utils";
-import { createEventBus, EventBusCore, type Listener } from "./eventBus.js";
+import { createEventBus, EventBusCore, type Listener } from "./eventBus.ts";
 
 export class EmitterCore<M extends Record<PropertyKey, any>> extends Map<
   keyof M,

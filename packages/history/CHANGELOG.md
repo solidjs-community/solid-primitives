@@ -1,5 +1,59 @@
 # @solid-primitives/history
 
+## 1.0.0-next.5
+
+### Patch Changes
+
+- 1b703e1: Fix undo/redo recording a bogus history entry on Solid 2.0.0-rc.14+, where optimistic writes made outside a parked transition are void. The "restoring" flag is now a plain flag consumed by the next recompute.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/utils@7.0.0-next.6
+
+## 1.0.0-next.4
+
+### Patch Changes
+
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [7ee755d]
+- Updated dependencies [638c530]
+  - @solid-primitives/utils@7.0.0-next.5
+
+## 1.0.0-next.3
+
+### Patch Changes
+
+- c061229: Fix two independent bugs in `createUndoHistory` that could each cause `undo`/`redo` to misfire — the second affects single-source usage too, not just multiple sources.
+
+  **Microtask race on the internal "ignore" flag.** The previous implementation suppressed re-recording a history entry during `undo`/`redo` with a flag (`ignoreNext`) reset via a separately-scheduled microtask (`createMicrotask`). Since Solid 2.0 batches signal writes into their own microtask-scheduled flush, the flag's reset microtask could resolve _before_ the write's own flush — so the restore triggered by `undo`/`redo` got recorded as a brand-new history entry instead of being suppressed, corrupting `canRedo`/`canUndo` bookkeeping. This reproduces with a single source and no multi-source setup at all. The rewrite replaces the flag with `createOptimistic`, whose revert is coordinated by Solid's own flush (it runs after the same flush's pending recomputes, not via an independent competing microtask), which structurally removes this race.
+
+  **Misaligned/spurious restores with multiple sources.** Separately, each history entry stored a compacted array of setters, dropping any paused source — so entries on either side of a pause/resume boundary could end up with different lengths, causing `undo`/`redo` to compare setters by the wrong array index and either restore the wrong source or spuriously re-fire one that hadn't actually changed. Entries now keep a fixed-length slot per source (`undefined` when paused), so index alignment is stable across every recorded entry.
+
+  Also fixes the `limit` option: the default silently became unbounded and `limit: 0` no longer meant zero retention. Restored the documented default of `100` and made trimming unconditional so `limit: 0` correctly retains no undo history.
+
+  Credit to @mesram, whose `createStore`/`createOptimistic`-based rewrite is the basis for this fix.
+
+## 1.0.0-next.2
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 1.0.0-next.0
 
 ### Major Changes
@@ -11,7 +65,6 @@
   **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
 
   ### `@solid-primitives/history`
-
   - `isServer` import moved from `solid-js/web` to `@solidjs/web`
   - `batch()` removed from `undo()` and `redo()` — Solid 2.0 batches signal updates automatically; call `flush()` before reading `canUndo()`/`canRedo()` in tests or non-reactive (non-render) contexts
   - Internal count signal uses `{ pureWrite: true }` for Solid 2.0 signal semantics

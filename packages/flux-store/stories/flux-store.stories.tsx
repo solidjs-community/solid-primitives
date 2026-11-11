@@ -38,8 +38,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: createFluxStore — derived state via getters ─────────────────────
-
 export const BudgetTracker = meta.story({
   name: "Getters derive from reactive state",
   parameters: {
@@ -100,8 +98,6 @@ export const BudgetTracker = meta.story({
     );
   },
 });
-
-// ── Story 2: createFluxStoreFactory — isolated instances ─────────────────────
 
 export const IsolatedInstances = meta.story({
   name: "Isolated instances from one factory",
@@ -225,8 +221,6 @@ export const IsolatedInstances = meta.story({
   },
 });
 
-// ── Story 3: createActions — wrapping functions to run untracked ──────────────
-
 export const UntrackWrappers = meta.story({
   name: "Wrapping setters as untracked actions",
   parameters: {
@@ -296,8 +290,6 @@ export const UntrackWrappers = meta.story({
     );
   },
 });
-
-// ── Story 4: createAction — single untracked function wrapper ─────────────────
 
 export const SingleActionWrapper = meta.story({
   name: "Single function wrapped as action",

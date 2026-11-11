@@ -1,5 +1,3 @@
-import type { JSX } from "@solidjs/web";
-
 export type EventListenerOptions = boolean | AddEventListenerOptions;
 
 export type TargetWithEventMap =
@@ -168,15 +166,3 @@ export type EventListenerDirectiveProps = [
   handler: (e: any) => void,
   options?: EventListenerOptions,
 ];
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      // directive types are very premissive to prevent type errors from incompatible types, since props cannot be generic
-      eventListener: EventListenerDirectiveProps;
-    }
-  }
-}
-
-// only here so the `JSX` import won't be shaken off the tree:
-export type E = JSX.Element;

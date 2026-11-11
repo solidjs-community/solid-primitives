@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/immutable",
   "version": "2.0.0-next.0",
-  "description": "Primitive for rectifying immutable values and dealing with immutability in Solid.",
+  "description": "Primitive for rectifying immutable values and dealing with immutability.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -20,7 +20,7 @@
       "createImmutable"
     ],
     "category": "Reactivity",
-    "gzip": 1799
+    "gzip": 1977
   },
   "keywords": [
     "solid",
@@ -45,9 +45,13 @@
     }
   },
   "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
-    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
+    "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -62,7 +66,7 @@
   "devDependencies": {
     "@reduxjs/toolkit": "^1.9.7",
     "redux": "^4.2.1",
-    "solid-js": "^1.9.7",
+    "solid-js": "^1.9.18",
     "solid-transition-group": "^0.2.3"
   }
 }

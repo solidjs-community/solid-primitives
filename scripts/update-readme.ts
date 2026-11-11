@@ -28,7 +28,6 @@ const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process";
 
 const categories: Record<string, PackageData[]> = {};
-const allPackageNames: string[] = [];
 
 (async () => {
   const modulesData = await utils.getModulesData();
@@ -43,7 +42,6 @@ const allPackageNames: string[] = [];
     }
 
     const packageName = `@solid-primitives/${module.name}`;
-    allPackageNames.push(packageName);
 
     const data = {} as PackageData;
 
@@ -115,24 +113,14 @@ const allPackageNames: string[] = [];
   const utilsGithubURL = `${githubURL}utils#`;
   const utilsRows: string[] = [];
   for (let i = 0; i < utilsList.length; i += COLS) {
-    const cells = utilsList.slice(i, i + COLS).map(fn => `[${fn}](${utilsGithubURL}${fn.toLowerCase()})`);
+    const cells = utilsList
+      .slice(i, i + COLS)
+      .map(fn => `[${fn}](${utilsGithubURL}${fn.toLowerCase()})`);
     while (cells.length < COLS) cells.push("");
     utilsRows.push(`|${cells.join("|")}|`);
   }
   const utilsTable = [`|${"  |".repeat(COLS)}`, `|${"---|".repeat(COLS)}`, ...utilsRows].join("\n");
   readme = utils.insertTextBetweenComments(readme, utilsTable, "INSERT-UTILS-TABLE");
-
-  // Update Combined Downloads Badge
-
-  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${allPackageNames.join(
-    ",",
-  )})](https://dash.deno.com/playground/combined-npm-downloads)`;
-
-  readme = utils.insertTextBetweenComments(
-    readme,
-    combinedDownloadsBadge,
-    "INSERT-NPM-DOWNLOADS-BADGE",
-  );
 
   writeFileSync(pathToREADME, readme);
 })();

@@ -82,7 +82,10 @@ export function registerPointerListener(
 export const DEFAULT_DELAY = 300;
 export const DEFAULT_MIN_SWIPE_DISTANCE = 60; // in pixels
 
-export function getCenterOfTwoPoints(node: HTMLElement, activeEvents: PointerEvent[]) {
+export function getCenterOfTwoPoints(node: HTMLElement, activeEvents: PointerEvent[]): {
+  x: number;
+  y: number;
+} {
   const rect = node.getBoundingClientRect();
   const xDistance = Math.abs(activeEvents[0]!.clientX - activeEvents[1]!.clientX);
   const yDistance = Math.abs(activeEvents[0]!.clientY - activeEvents[1]!.clientY);

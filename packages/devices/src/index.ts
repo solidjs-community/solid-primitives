@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onCleanup } from "solid-js";
+import { createMemo, createSignal, onCleanup, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
 
 /**
@@ -10,7 +10,7 @@ import { isServer } from "@solidjs/web";
  *
  * If the array does not contain a device of a certain kind, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
-export const createDevices = () => {
+export const createDevices = (): Accessor<MediaDeviceInfo[]> => {
   if (isServer) {
     return () => [] as MediaDeviceInfo[];
   }
@@ -36,7 +36,7 @@ const equalDeviceLists = (prev: MediaDeviceInfo[], next: MediaDeviceInfo[]) =>
  *
  * Without a device, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
-export const createMicrophones = () => {
+export const createMicrophones = (): Accessor<MediaDeviceInfo[]> => {
   if (isServer) {
     return () => [] as MediaDeviceInfo[];
   }
@@ -56,7 +56,7 @@ export const createMicrophones = () => {
  *
  * Microphone permissions automatically include speaker permissions. You can use the device id of the speaker to use the setSinkId-API of any audio tag.
  */
-export const createSpeakers = () => {
+export const createSpeakers = (): Accessor<MediaDeviceInfo[]> => {
   if (isServer) {
     return () => [] as MediaDeviceInfo[];
   }
@@ -76,7 +76,7 @@ export const createSpeakers = () => {
  *
  * Without a device, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
-export const createCameras = () => {
+export const createCameras = (): Accessor<MediaDeviceInfo[]> => {
   if (isServer) {
     return () => [] as MediaDeviceInfo[];
   }

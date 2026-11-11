@@ -1,6 +1,6 @@
 import { type Accessor, createRoot, onCleanup, untrack, DEV, createMemo } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
-import { abs, accessor, ceil, floor, min, type RangeProps, toFunction } from "./common.js";
+import { abs, accessor, ceil, floor, min, type RangeProps, toFunction } from "./common.ts";
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<Range>` control flow.
@@ -16,7 +16,10 @@ import { abs, accessor, ceil, floor, min, type RangeProps, toFunction } from "./
  * const [to, setTo] = createSignal(5)
  * const mapped = mapRange(() => 0, to, () => 0.5, number => {
  *    const [value, setValue] = createSignal(number);
- *    createEffect(() => {...})
+ *    createEffect(
+ *      () => value(),
+ *      value => {...},
+ *    )
  *    return value
  * })
  * mapped() // => [0, 0.5, 1, 1.5, 2...]

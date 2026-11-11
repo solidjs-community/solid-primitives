@@ -40,8 +40,6 @@ function permBadge(state: string): "success" | "error" | "warning" | "default" {
  *  Necessary because Chrome blocks Notification.requestPermission() inside iframes. */
 const openInTab = () => window.open(window.location.href, "_blank");
 
-// ─── Meta ─────────────────────────────────────────────────────────────────────
-
 const meta = preview.meta({
   title: "Browser APIs/Notification",
   tags: ["autodocs"],
@@ -56,8 +54,6 @@ const meta = preview.meta({
 });
 
 export default meta;
-
-// ─── createNotificationPermission ────────────────────────────────────────────
 
 export const PermissionFlow = meta.story({
   name: "Request & live permission state",
@@ -133,8 +129,6 @@ export const PermissionFlow = meta.story({
     );
   },
 });
-
-// ─── createNotification ───────────────────────────────────────────────────────
 
 export const ReactiveInstance = meta.story({
   name: "Reactive instance & events",
@@ -249,8 +243,6 @@ export const ReactiveInstance = meta.story({
     );
   },
 });
-
-// ─── makeNotification ─────────────────────────────────────────────────────────
 
 export const ImperativeAPI = meta.story({
   name: "Imperative show & close",

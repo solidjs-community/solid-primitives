@@ -4,8 +4,8 @@
  * Copyright (c) 2022 Kobalte Contributors — MIT License
  */
 
-import { type Accessor, createSignal, untrack } from "solid-js";
-import { accessWith } from "@solid-primitives/utils";
+import { type Accessor, type Signal, createSignal, untrack } from "solid-js";
+import { accessWith, isServer } from "@solid-primitives/utils";
 
 export interface CreateControllableSignalProps<T> {
   /** The value to be used in controlled mode. */
@@ -28,7 +28,7 @@ export interface CreateControllableSignalProps<T> {
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/controlled-signal
  */
-export function createControllableSignal<T>(props: CreateControllableSignalProps<T>) {
+export function createControllableSignal<T>(props: CreateControllableSignalProps<T>): Signal<T | undefined> {
   // Solid 2.0 function-form createSignal: a writable derived signal that tracks props.value
   // reactively. When props.value?.() is undefined (uncontrolled), no reactive dependency is
   // created from that read, so the fn never re-runs and _setValue overrides persist.
@@ -44,51 +44,61 @@ export function createControllableSignal<T>(props: CreateControllableSignalProps
     { ownedWrite: true },
   );
 
+  // A setter must not run during a server render (`SERVER_WRITE`), so on the server an
+  // uncontrolled write lands in a plain override instead. The signal itself is still created
+  // there: hydration ids are handed out per created primitive, and skipping it would
+  // misalign keys with the client.
+  let serverOverride: { value: T | undefined } | undefined;
+  const read: Accessor<T | undefined> = isServer
+    ? () => (serverOverride && props.value?.() === undefined ? serverOverride.value : value())
+    : value;
+
   const setValue = (next: Exclude<T, Function> | ((prev: T) => T)) => {
     untrack(() => {
-      const current = value() as T;
+      const current = read() as T;
       const nextValue = accessWith(next, current) as T;
 
       if (!Object.is(nextValue, current)) {
         if (props.value?.() === undefined) {
-          _setValue(nextValue as Exclude<T, Function>);
+          if (isServer) serverOverride = { value: nextValue };
+          else _setValue(nextValue as Exclude<T, Function>);
         }
         props.onChange?.(nextValue);
       }
     });
   };
 
-  return [value, setValue] as const;
+  return [read, setValue] as Signal<T | undefined>;
 }
 
 /**
  * Variant of {@link createControllableSignal} for boolean values.
  * Falls back to `false` when the value is `undefined`.
  */
-export function createControllableBooleanSignal(props: CreateControllableSignalProps<boolean>) {
+export function createControllableBooleanSignal(props: CreateControllableSignalProps<boolean>): Signal<boolean> {
   const [_value, setValue] = createControllableSignal(props);
   const value: Accessor<boolean> = () => _value() ?? false;
-  return [value, setValue] as const;
+  return [value, setValue] as Signal<boolean>;
 }
 
 /**
  * Variant of {@link createControllableSignal} for array values.
  * Falls back to `[]` when the value is `undefined`.
  */
-export function createControllableArraySignal<T>(props: CreateControllableSignalProps<Array<T>>) {
+export function createControllableArraySignal<T>(props: CreateControllableSignalProps<Array<T>>): Signal<Array<T>> {
   const [_value, setValue] = createControllableSignal(props);
   const value: Accessor<Array<T>> = () => _value() ?? [];
-  return [value, setValue] as const;
+  return [value, setValue] as Signal<Array<T>>;
 }
 
 /**
  * Variant of {@link createControllableSignal} for Set values.
  * Falls back to `new Set()` when the value is `undefined`.
  */
-export function createControllableSetSignal<T>(props: CreateControllableSignalProps<Set<T>>) {
+export function createControllableSetSignal<T>(props: CreateControllableSignalProps<Set<T>>): Signal<Set<T>> {
   const [_value, setValue] = createControllableSignal(props);
   const value: Accessor<Set<T>> = () => _value() ?? new Set();
-  return [value, setValue] as const;
+  return [value, setValue] as Signal<Set<T>>;
 }
 
 export interface CreateToggleStateProps {

@@ -1,63 +1,64 @@
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import solid from "@solidjs/vite-plugin";
+import { createSolidBase } from "@kobalte/solidbase/config";
+import defaultTheme from "@kobalte/solidbase/default-theme";
 import { defineConfig } from "vite";
-import { tanstackStart } from "@tanstack/solid-start/plugin/vite";
-import viteSolid from "vite-plugin-solid";
+import { sidebar } from "./src/generated/sidebar";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const packages = await (async () => {
-  try {
-    // @ts-ignore - generated file may not exist on a fresh checkout
-    return (await import("./src/_generated/packages.json", { with: { type: "json" } }))
-      .default as Array<{ name: string }>;
-  } catch {
-    throw new Error("No packages found. Did you run `pnpm generate`?");
-  }
-})();
-
-// A package only gets a prerendered `/playground/<name>` page if it has a
-// runnable dev harness at `packages/<name>/dev/index.tsx`. `filesystem` is
-// additionally excluded because its dev harness imports Node-only chokidar
-// (mirrors the glob exclusion in src/routes/playground/$name.tsx).
-const hasPlayground = (name: string) =>
-  name !== "filesystem" &&
-  existsSync(resolve(__dirname, "..", "packages", name, "dev", "index.tsx"));
-
-const prerenderPages = [
-  "/",
-  ...packages.flatMap(({ name }) => {
-    const paths = [`/package/${name}`];
-    if (hasPlayground(name)) paths.push(`/playground/${name}`);
-    return paths;
-  }),
-].map(path => ({ path, prerender: { enabled: true, crawlLinks: false } }));
+const solidBase = createSolidBase(defaultTheme);
 
 export default defineConfig({
-  resolve: {
-    // Use the source-code entry points of the workspace `@solid-primitives/*` packages
-    // instead of their published dist files (matches customConditions in tsconfig.json).
-    conditions: ["@solid-primitives/source"],
-    // Auto-reads `paths` from tsconfig.json — preserves `~/*` → `./src/*`.
-    tsconfigPaths: true,
-  },
-  build: {
-    sourcemap: true,
+  // SolidBase's theme depends on pinned @solid-primitives/*@next releases. Left external, the
+  // prerender worker would resolve `@solid-primitives/utils` up the tree to a different copy
+  // (the workspace's), so bundle them into the server build.
+  ssr: { noExternal: [/^@solid-primitives\//] },
+  // Solid's dev-only subpaths are otherwise discovered lazily at runtime. That makes Vite
+  // re-optimize mid-session and change the dependency hash, so SolidBase's modules end up
+  // loaded twice (two LocaleContexts: "useLocale must be called underneath a
+  // LocaleContextProvider"). Pre-bundle them all up front.
+  optimizeDeps: {
+    include: [
+      "solid-js",
+      "solid-js/attribution",
+      "solid-js/refresh",
+      "@solidjs/web",
+      "@solidjs/web/performance-tracks",
+      "@solidjs/signals",
+    ],
   },
   plugins: [
-    tanstackStart({
-      pages: prerenderPages,
-      // Custom client entry installs a dev-mode `console.warn` interceptor that
-      // batches the noisy "Unable to find DOM nodes for hydration key" warnings
-      // emitted by the primitives table.
-      client: { entry: "./src/client.tsx" },
-      prerender: {
-        enabled: true,
-        // README content contains relative/anchor links; avoid following them.
-        crawlLinks: false,
+    solidBase.plugin({
+      title: "Solid Primitives 2",
+      titleTemplate: ":title | Solid Primitives 2",
+      description: "High-quality reactive primitives for building applications in Solid2",
+      // Base/fallback src — app.css swaps the actual rendered image per data-theme.
+      logo: "/logo-light.png",
+      lastUpdated: false,
+      themeConfig: {
+        // We ship Geist ourselves via app.css instead of the theme's bundled fonts.
+        fonts: {
+          inter: false,
+          lexend: false,
+          jetbrainsMono: false,
+        },
+        socialLinks: {
+          github: "https://github.com/solidjs-community/solid-primitives",
+          discord: "https://discord.com/invite/solidjs",
+        },
+        nav: [
+          { text: "Guide", link: "/" },
+          { text: "Primitives", link: "/primitives" },
+          { text: "Philosophy", link: "/philosophy" },
+          { text: "JSR & NPM", link: "/jsr-npm" },
+          { text: "Contributors", link: "/contributors" },
+          { text: "Security", link: "/security" },
+          { text: "Migration", link: "/migration" },
+        ],
+        sidebar: {
+          "/": sidebar,
+        },
       },
     }),
-    viteSolid({ ssr: true }),
+    // start mode (SSR + static prerender into dist/client) replaces SolidStart + Nitro.
+    solid(solidBase.startConfig()),
   ],
 });

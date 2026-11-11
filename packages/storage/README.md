@@ -4,7 +4,7 @@
 
 # @solid-primitives/storage
 
-[![size](https://img.shields.io/badge/size-2.01_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)
+[![size](https://img.shields.io/badge/size-2.29_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)
 [![size](https://img.shields.io/npm/v/@solid-primitives/storage?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/storage)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -36,6 +36,8 @@ type PersistedOptions<Type, StorageOptions> = {
   storageOptions?: StorageOptions,
   // key in the storage API
   name?: "...",
+  // defer initialization in order to avoid hydration mismatches in SSR settings
+  hydrated?: true,
   // JSON.stringify is the default
   serialize?: (value: Type) => value.toString(),
   // JSON.parse is the default
@@ -52,21 +54,18 @@ type PersistedOptions<Type, StorageOptions> = {
 - setting a persisted signal to undefined or null will remove the item from the storage
 - to use `makePersisted` with other state management APIs, you need some adapter that will project your API to either
   the output of `createSignal` or `createStore`
+- using `makePersisted` in an SSR scenario where you have different values on the server and the client might lead to hydration mismatches; use the `hydrated` option to defer the initialization so both values are the same
 
-### Using `makePersisted` with resources
-
-Instead of wrapping the resource itself, it is far simpler to use the `storage` option of the resource to provide a
-persisted signal or [deep signal](../resource/#createdeepsignal):
+The fourth returned value is a `dispose` function. Call it to unsubscribe from sync events and cancel pending initialization. Cleanup is explicit; to tie it to a Solid owner, register it with `onCleanup`:
 
 ```ts
-const [resource] = createResource(fetcher, { storage: makePersisted(createSignal()) });
+const [value, setValue, init, dispose] = makePersisted(createSignal("initial"));
+onCleanup(dispose);
 ```
 
-If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being
-initialized from the storage before or after the fetcher resolved. If the initialization resolves after the fetcher, its
-result is discarded not to overwrite more current data.
+Custom sync subscriptions can return an unsubscribe function, which `dispose` will call.
 
-### Using `makePersisted` with Suspense
+### Using `makePersisted` with Loading
 
 In case you are using an asynchronous storage and want the initialisation mesh into Suspense instead of mixing it with Show, we provide the output of the initialisation as third part of the returned tuple:
 
@@ -75,11 +74,11 @@ const [state, setState, init] = makePersisted(createStore({}), {
   name: "state",
   storage: localForage,
 });
-// run the resource so it is triggered
-createResource(() => init)[0]();
+// run the memo so it hits the Loading boundary
+createMemo(() => init)();
 ```
 
-Now Suspense should be blocked until the initialisation is resolved.
+Now Loading should be blocked until the initialisation is resolved.
 
 ### Different storage APIs
 
@@ -125,7 +124,7 @@ const [state, setState] = makePersisted(createSignal(), {
 LocalForage uses indexedDB or WebSQL if available to greatly increase the size of what can be stored. Just drop it in as a storage (only supported in the client):
 
 ```ts
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import { makePersisted } from "@solid-primitives/storage";
 import localforage from "localforage";
 
@@ -290,10 +289,6 @@ you can add a `.withOptions` method:
 const customStorage = addWithOptionsMethod(storage_supporting_options);
 const boundCustomStorage = customStorage.withOptions(myOptions);
 ```
-
-## Demo
-
-[Live Demo](https://primitives.solidjs.community/playground/storage) - [Sources](https://github.com/solidjs-community/solid-primitives/tree/main/packages/storage/dev)
 
 ## Changelog
 

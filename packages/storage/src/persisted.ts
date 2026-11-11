@@ -51,8 +51,8 @@ export type PersistenceSyncData = {
 export type PersistenceSyncCallback = (data: PersistenceSyncData) => void;
 
 export type PersistenceSyncAPI = [
-  /** subscribes to sync */
-  subscribe: (subscriber: PersistenceSyncCallback) => void,
+  /** Subscribes to sync and optionally returns an unsubscribe function. */
+  subscribe: (subscriber: PersistenceSyncCallback) => void | (() => void),
   update: (key: string, value: string | null | undefined) => void,
 ];
 
@@ -65,6 +65,7 @@ export type PersistenceOptions<
   serialize?: (data: T) => string;
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
+  hydrated?: boolean;
   action?: (signal: S) => Parameters<typeof action>[0];
 } & (undefined extends O
   ? { storage?: SyncStorage | AsyncStorage }
@@ -73,7 +74,7 @@ export type PersistenceOptions<
       storageOptions?: O;
     });
 
-export type PersistedState<S, I = Promise<string> | string | null> = S extends [any, any] ? [...S, I] : never;
+export type PersistedState<S, I = Promise<string> | string | null> = S extends [any, any] ? [...S, I, () => void] : never;
 
 export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
 
@@ -138,7 +139,7 @@ export function makePersisted<
     (signal as any)[1] = action(actionFn) as unknown as S[1];
   }
   if (!storage) {
-    return [signal[0], signal[1], null] as unknown as PersistedState<S>;
+    return [signal[0], signal[1], null, () => {}] as unknown as PersistedState<S>;
   }
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
@@ -165,27 +166,31 @@ export function makePersisted<
         }
       };
   let unchanged = true;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
   if (init instanceof Promise) init.then(data => unchanged && data && set(data));
-  else if (init) set(init);
+  else if (init)
+    // in case of hydration mismatches due to the server lacking the same initial value,
+    // we want to defer the initialization by a short amount so the same state can be used
+    // during hydration
+    if (options.hydrated) {
+      timer = setTimeout(() => unchanged && set(init), 45);
+    } else set(init);
 
   const getter: () => T = isSignal ? (signal[0] as () => T) : () => snapshot(signal[0] as T);
 
-  if (typeof options.sync?.[0] === "function") {
-    options.sync[0]((data: PersistenceSyncData) => {
-      if (
-        data.key !== name ||
-        (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
-        data.newValue === serialize(untrack(getter))
-      ) {
-        return;
-      }
-      set(data.newValue as string);
-    });
-  }
+  const unsubscribe = options.sync?.[0]((data: PersistenceSyncData) => {
+    if (
+      data.key !== name ||
+      (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
+      data.newValue === serialize(untrack(getter))
+    ) {
+      return;
+    }
+    set(data.newValue as string);
+  });
 
-  const persist = () => {
-    const next = untrack(() => latest(getter));
+  const persistValue = (next: T | undefined) => {
     if (next == null) {
       storage.removeItem(name, storageOptions);
       options.sync?.[1](name, null);
@@ -195,15 +200,28 @@ export function makePersisted<
       options.sync?.[1](name, serialized);
     }
   };
+  const persist = () => persistValue(untrack(() => latest(getter)));
   return [
     signal[0], 
     (value: any) => untrack(() => {
       const output = signal[1](value);
-      persist();
+      // As of solid-js 2.0.0-rc.1 a signal write stays pending until the next flush, so
+      // reading it back through `getter` here would still report the *previous* value —
+      // which would persist stale data, or wipe the entry entirely when the previous
+      // value was nullish. A plain signal setter returns the value it just wrote, so
+      // persist that directly. Stores mutate in place and are still read back through
+      // `getter`, as are action-wrapped setters, whose value settles with the promise.
+      if (isSignal && !(output instanceof Promise)) persistValue(output as T);
+      else persist();
       unchanged = false;
       return output instanceof Promise ? output.then(async (result) => { await Promise.resolve(); persist(); return result; }, (err) => { persist(); throw err; }) : output;
     }),
     init,
+    () => {
+      unchanged = false;
+      clearTimeout(timer);
+      unsubscribe?.();
+    },
   ] as unknown as PersistedState<S>;
 }
 
@@ -213,8 +231,11 @@ export function makePersisted<
  * If you wish to use e.g. cookieStorage, you may use a different sync method
  */
 export const storageSync: PersistenceSyncAPI = [
-  (subscriber: PersistenceSyncCallback) =>
-    window.addEventListener("storage", ev => subscriber(ev as PersistenceSyncData)),
+  (subscriber: PersistenceSyncCallback) => {
+    const handler = (ev: StorageEvent) => subscriber(ev as PersistenceSyncData);
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  },
   () => {
     /*storage already sends events fulfilling the PersistenceSyncData<T> conditions*/
   },
@@ -223,14 +244,17 @@ export const storageSync: PersistenceSyncAPI = [
 /**
  * messageSync - synchronize over post message or broadcast channel API
  */
-export const messageSync = (channel: Window | BroadcastChannel = window): PersistenceSyncAPI => [
-  (subscriber: PersistenceSyncCallback) =>
-    channel.addEventListener("message", ev => {
+export const messageSync = (channel: Window | BroadcastChannel = window, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
+  (subscriber: PersistenceSyncCallback) => {
+    const handler = (ev: Event) => {
       subscriber((ev as MessageEvent).data);
-    }),
+    };
+    channel.addEventListener("message", handler);
+    return () => channel.removeEventListener("message", handler);
+  },
   (key, newValue) =>
     channel.postMessage(
-      { key, newValue, timeStamp: Date.now(), url: location.href },
+      { key, newValue, timeStamp: Date.now(), url },
       location.origin,
     ),
 ];
@@ -238,9 +262,9 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
 /**
  * wsSync - syncronize persisted storage via web socket
  */
-export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): PersistenceSyncAPI => [
-  (subscriber: PersistenceSyncCallback) =>
-    ws.addEventListener("message", (ev: MessageEvent) => {
+export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
+  (subscriber: PersistenceSyncCallback) => {
+    const handler = (ev: MessageEvent) => {
       try {
         const data = JSON.parse(ev.data);
         if (["key", "newValue", "timeStamp"].every(item => Object.hasOwn(data, item))) {
@@ -250,14 +274,17 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): Persistence
         // oxlint-disable-next-line no-console
         if (warnOnError) console.warn(e);
       }
-    }),
+    };
+    ws.addEventListener("message", handler);
+    return () => ws.removeEventListener("message", handler);
+  },
   (key, newValue) =>
     ws.send(
       JSON.stringify({
         key,
         newValue,
         timeStamp: +new Date(),
-        ...(globalThis.window ? { url: location.href } : {}),
+        ...(url ? { url } : {}),
       }),
     ),
 ];
@@ -270,6 +297,9 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): Persistence
  * ```
  */
 export const multiplexSync = (...syncAPIs: PersistenceSyncAPI[]): PersistenceSyncAPI => [
-  subscriber => syncAPIs.forEach(([subscribe]) => subscribe(subscriber)),
+  subscriber => {
+    const unsubscribers = syncAPIs.map(([subscribe]) => subscribe(subscriber));
+    return () => unsubscribers.forEach(unsubscribe => unsubscribe?.());
+  },
   (key, value) => syncAPIs.forEach(([_, updater]) => updater(key, value)),
 ];

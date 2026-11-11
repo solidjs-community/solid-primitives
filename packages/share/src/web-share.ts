@@ -17,7 +17,7 @@ import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
  * }
  * ```
  */
-export const makeWebShare = () => {
+export const makeWebShare = (): (data: ShareData) => Promise<void> => {
   const share = (data: ShareData) => {
     // Some browsers do not support `WebShare`, so sharing failed.
     // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition

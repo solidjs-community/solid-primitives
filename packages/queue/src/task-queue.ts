@@ -1,5 +1,5 @@
-import { createSignal, type Accessor } from "solid-js";
-import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
+import { type Accessor } from "solid-js";
+import { INTERNAL_OPTIONS, createServerSafeSignal } from "@solid-primitives/utils";
 
 /**
  * A unit of async work submitted to a task queue.
@@ -81,8 +81,9 @@ export function createTaskQueue<T>(): ReactiveTaskQueue<T> {
   // Plain array for synchronous access inside the drain loop — avoids the need
   // to read a signal and deal with batching when deciding what to execute next.
   const tasks: TaskEntry<T>[] = [];
-  const [size, setSize] = createSignal(0, INTERNAL_OPTIONS);
-  const [isActive, setIsActive] = createSignal(false, INTERNAL_OPTIONS);
+  // Tasks can run during a server render; a setter must not (`SERVER_WRITE`).
+  const [size, setSize] = createServerSafeSignal(0, INTERNAL_OPTIONS);
+  const [isActive, setIsActive] = createServerSafeSignal(false, INTERNAL_OPTIONS);
   let draining = false;
 
   // Runs tasks one at a time. A plain async function (not Solid's `action`)
@@ -153,8 +154,8 @@ export function createConcurrentTaskQueue<T>(concurrency: number): ReactiveConcu
     );
   }
   const pending: TaskEntry<T>[] = [];
-  const [size, setSize] = createSignal(0, INTERNAL_OPTIONS);
-  const [activeCount, setActiveCount] = createSignal(0, INTERNAL_OPTIONS);
+  const [size, setSize] = createServerSafeSignal(0, INTERNAL_OPTIONS);
+  const [activeCount, setActiveCount] = createServerSafeSignal(0, INTERNAL_OPTIONS);
   let running = 0;
 
   const runNext = () => {

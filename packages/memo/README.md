@@ -4,7 +4,7 @@
 
 # @solid-primitives/memo
 
-[![size](https://img.shields.io/badge/size-843_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/memo)
+[![size](https://img.shields.io/badge/size-845_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/memo)
 [![version](https://img.shields.io/npm/v/@solid-primitives/memo?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/memo)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -172,15 +172,15 @@ const double = createMemo(() => getDouble(count()));
 
 ## `createDebouncedMemo`
 
-**Removed in v2.** `createDebouncedMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) once that package is updated for Solid 2.0.
+**Removed in v2.** `createDebouncedMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/scheduled`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme).
 
 ## `createThrottledMemo`
 
-**Removed in v2.** `createThrottledMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) once that package is updated for Solid 2.0.
+**Removed in v2.** `createThrottledMemo` was deprecated in v1 and has been removed. Use `createScheduled` from [`@solid-primitives/scheduled`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme).
 
 ## `createAsyncMemo`
 
-**Removed in v2.** `createAsyncMemo` was deprecated in v1 (pointing to `createResource`) and has been removed. `createResource` does not exist in Solid 2.0. Async data fetching in Solid 2.0 can be handled with `createProjection` for store-based async state, or with a signal + `createEffect` for manual async management.
+**Removed in v2.** `createAsyncMemo` was deprecated in v1 (pointing to `createResource`) and has been removed. `createResource` does not exist in Solid 2.0 either: any computation can be async — `createMemo(() => fetchThing(id()))` — and readers wrap it in `<Loading>`. Use `createProjection` for store-shaped async state.
 
 ## `createPureReaction`
 

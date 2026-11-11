@@ -33,7 +33,7 @@ export class GraphQLError extends Error {
   constructor(
     message: string,
     public locations?: { line: number; column: number }[],
-    public extensions?: Record<string, any>,
+    public extensions?: Record<string, any> | undefined,
   ) {
     super(message);
   }
@@ -225,7 +225,7 @@ export function makeMultipartBody(query: string, variables: object): FormData {
 /**
  * Creates a GraphQL query string.
  */
-export const gql = (query: TemplateStringsArray, ...expressions: any[]) =>
+export const gql = (query: TemplateStringsArray, ...expressions: any[]): string =>
   query
     .map((s, i) => `${s}${expressions[i] ?? ""}`)
     .join("")

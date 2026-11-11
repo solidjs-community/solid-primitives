@@ -15,10 +15,12 @@ const triggerCacheOptions: SignalOptions<any> = { equals: false, ownedWrite: tru
  * @returns `[track function, dirty function]`
  * @example
  * const [track, dirty] = createTrigger()
- * createEffect(() => {
- *    track()
- *    ...
- * })
+ * createEffect(
+ *   () => track(),
+ *   () => {
+ *     ...
+ *   },
+ * )
  * // later
  * dirty()
  */
@@ -46,17 +48,17 @@ export class TriggerCache<T> {
     this.#map = new (mapConstructor as MapConstructor)();
   }
 
-  dirty(key: T) {
+  dirty(key: T): void {
     if (isServer) return;
     this.#map.get(key)?.$$();
   }
 
-  dirtyAll() {
+  dirtyAll(): void {
     if (isServer) return;
     for (const trigger of this.#map.values()) trigger.$$();
   }
 
-  track(key: T) {
+  track(key: T): void {
     if (!getObserver()) return;
     let trigger = this.#map.get(key);
     if (!trigger) {
@@ -87,10 +89,12 @@ export class TriggerCache<T> {
  * `dirtyAll` will mark all keys as dirty and trigger an update for all of them.
  * @example
  * const [track, dirty, dirtyAll] = createTriggerCache()
- * createEffect(() => {
- *    track(1)
- *    ...
- * })
+ * createEffect(
+ *   () => track(1),
+ *   () => {
+ *     ...
+ *   },
+ * )
  * // later
  * dirty(1)
  * // this won't cause an update:

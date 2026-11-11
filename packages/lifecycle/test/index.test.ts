@@ -16,12 +16,15 @@ describe("createIsMounted", () => {
     dispose();
   });
 
-  test("setIsMounted(true) is applied synchronously within the triggering flush", () => {
-    // Confirms that flush() inside onSettled is not needed: the write is already
-    // visible to subsequent onSettled callbacks registered in the same owner.
+  test("setIsMounted(true) lands by the end of the triggering flush", () => {
+    // As of solid-js 2.0.0-rc.1 the write is applied at the end of the settle pass
+    // rather than mid-pass, so a sibling onSettled registered in the same owner still
+    // reads the pre-write value. The write is nonetheless visible as soon as flush()
+    // returns, which is the contract consumers actually depend on.
     let readInLaterOnSettled: boolean | undefined;
+    let isMounted!: () => boolean;
     const dispose = createRoot(d => {
-      const isMounted = createIsMounted(); // registers onSettled #1: setIsMounted(true)
+      isMounted = createIsMounted();       // registers onSettled #1: setIsMounted(true)
       onSettled(() => {                    // registers onSettled #2
         readInLaterOnSettled = isMounted();
       });
@@ -29,7 +32,8 @@ describe("createIsMounted", () => {
     });
 
     flush();
-    expect(readInLaterOnSettled).toBe(true);
+    expect(readInLaterOnSettled, "sibling onSettled reads the pre-write value").toBe(false);
+    expect(isMounted(), "the write is visible once flush() returns").toBe(true);
     dispose();
   });
 });

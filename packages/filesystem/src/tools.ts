@@ -1,9 +1,9 @@
 import { createEffect, createRoot } from "solid-js";
-import type { AsyncFileSystem, SyncFileSystem, FileSystemAdapter, DirEntries } from "./types.js";
+import type { AsyncFileSystem, SyncFileSystem, FileSystemAdapter, DirEntries } from "./types.ts";
 
-export const getParentDir = (path: string) => path.split("/").slice(0, -1).join("/") || "/";
+export const getParentDir = (path: string): string => path.split("/").slice(0, -1).join("/") || "/";
 
-export const getItemName = (path: string) => path.split("/").at(-1);
+export const getItemName = (path: string): string | undefined => path.split("/").at(-1);
 
 export const limitPath =
   (basePath: string) =>

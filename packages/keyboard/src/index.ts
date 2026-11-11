@@ -55,18 +55,19 @@ function isEditableTarget(target: EventTarget | null): boolean {
  * ```ts
  * const event = useKeyDownEvent();
  *
- * createEffect(() => {
- *   const e = event();
- *   console.log(e) // => KeyboardEvent | null
- *
- *   if (e) {
- *     console.log(e.key) // => "Q" | "ALT" | ...
- *     e.preventDefault();
- *   }
- * })
+ * createEffect(
+ *   () => event(), // => KeyboardEvent | null
+ *   e => {
+ *     console.log(e);
+ *     if (e) {
+ *       console.log(e.key); // => "Q" | "ALT" | ...
+ *       e.preventDefault();
+ *     }
+ *   },
+ * );
  * ```
  */
-export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
+export const useKeyDownEvent: ReturnType<typeof createSingletonRoot<Accessor<KeyboardEvent | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -99,12 +100,13 @@ export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<Keyboa
  * @example
  * ```ts
  * const keys = useKeyDownList();
- * createEffect(() => {
- *    console.log(keys()) // => ["ALT", "CONTROL", "Q", "A"]
- * })
+ * createEffect(
+ *   () => keys(), // => ["ALT", "CONTROL", "Q", "A"]
+ *   keys => console.log(keys),
+ * );
  * ```
  */
-export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
+export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<string[]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
   if (isServer) {
     return () => [];
   }
@@ -179,12 +181,13 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[
  * @example
  * ```ts
  * const key = useCurrentlyHeldKey();
- * createEffect(() => {
- *    console.log(key()) // => "Q" | "ALT" | ... or null
- * })
+ * createEffect(
+ *   () => key(), // => "Q" | "ALT" | ... or null
+ *   key => console.log(key),
+ * );
  * ```
  */
-export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
+export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor<string | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
   () => {
     if (isServer) {
       return () => null;
@@ -219,12 +222,13 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<st
  * @example
  * ```ts
  * const sequence = useKeyDownSequence();
- * createEffect(() => {
- *    console.log(sequence()) // => string[][]
- * })
+ * createEffect(
+ *   () => sequence(), // => string[][]
+ *   sequence => console.log(sequence),
+ * );
  * ```
  */
-export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
+export const useKeyDownSequence: ReturnType<typeof createSingletonRoot<Accessor<string[][]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
   if (isServer) {
     return () => [];
   }
@@ -256,9 +260,10 @@ export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<str
  * @example
  * ```ts
  * const isHeld = createKeyHold("ALT");
- * createEffect(() => {
- *    console.log(isHeld()) // => boolean
- * })
+ * createEffect(
+ *   () => isHeld(), // => boolean
+ *   held => console.log(held),
+ * );
  * ```
  */
 export function createKeyHold(
@@ -497,5 +502,6 @@ export function createKeyDown(
       document.addEventListener("keydown", handler);
       return () => document.removeEventListener("keydown", handler);
     },
+    { transparent: true },
   );
 }

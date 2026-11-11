@@ -1,6 +1,6 @@
 import { getRequestEvent, isServer, type RequestEvent } from "@solidjs/web";
-import { type SyncStorageWithOptions } from "./index.js";
-import { addWithOptionsMethod, addClearMethod } from "./tools.js";
+import { type SyncStorageWithOptions } from "./index.ts";
+import { addWithOptionsMethod, addClearMethod } from "./tools.ts";
 
 export type CookieOptions =
   | (CookieProperties & {

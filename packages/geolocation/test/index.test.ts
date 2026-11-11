@@ -12,8 +12,6 @@ import {
   createWithinRadius,
 } from "../src/index.js";
 
-// ── makeGeolocation ───────────────────────────────────────────────────────────
-
 describe("makeGeolocation", () => {
   it("resolves coordinates without a Solid owner", async () => {
     const [query, cleanup] = makeGeolocation();
@@ -45,8 +43,6 @@ describe("makeGeolocation", () => {
   });
 });
 
-// ── makeGeolocationWatcher ────────────────────────────────────────────────────
-
 describe("makeGeolocationWatcher", () => {
   it("starts watching and provides initial location without a Solid owner", () => {
     const [store, cleanup] = makeGeolocationWatcher();
@@ -63,8 +59,6 @@ describe("makeGeolocationWatcher", () => {
     clearWatch.mockRestore();
   });
 });
-
-// ── createGeolocation ─────────────────────────────────────────────────────────
 
 describe("createGeolocation", () => {
   it("resolves coordinates via async accessor", () =>
@@ -124,8 +118,6 @@ describe("createGeolocation", () => {
     }));
 });
 
-// ── createGeolocation — initialLocation ──────────────────────────────────────
-
 describe("createGeolocation — initialLocation (client)", () => {
   it("initialLocation is ignored on the client — GPS is still queried", () =>
     createRoot(async dispose => {
@@ -137,8 +129,6 @@ describe("createGeolocation — initialLocation (client)", () => {
       dispose();
     }));
 });
-
-// ── createGeolocationWatcher ──────────────────────────────────────────────────
 
 describe("createGeolocationWatcher", () => {
   it("location and error are signal accessors", () =>
@@ -239,8 +229,6 @@ describe("createGeolocationWatcher", () => {
     }));
 });
 
-// ── createDistance ────────────────────────────────────────────────────────────
-
 describe("createDistance", () => {
   it("returns null before first GPS fix", () =>
     createRoot(dispose => {
@@ -302,8 +290,6 @@ describe("createDistance", () => {
       dispose();
     }));
 });
-
-// ── createWithinRadius ────────────────────────────────────────────────────────
 
 describe("createWithinRadius", () => {
   it("returns false before first GPS fix", () =>

@@ -1,5 +1,10 @@
-import { createSignal } from "solid-js";
-import { tryOnCleanup, INTERNAL_OPTIONS, isServer, createIdGenerator } from "@solid-primitives/utils";
+import {
+  tryOnCleanup,
+  INTERNAL_OPTIONS,
+  isServer,
+  createIdGenerator,
+  createServerSafeSignal,
+} from "@solid-primitives/utils";
 import { makeQueue } from "@solid-primitives/queue";
 import type {
   AnyPayload,
@@ -13,7 +18,7 @@ import type {
   PagePayload,
   TrackPayload,
   IdentifyPayload,
-} from "./types.js";
+} from "./types.ts";
 
 
 
@@ -245,7 +250,8 @@ export function createAnalytics(
   options: AnalyticsOptions = {},
 ): ReactiveAnalyticsControls {
   // ownedWrite: true because dispatch() may be called inside createRoot scope in tests.
-  const [pendingCount, setPendingCount] = createSignal(0, INTERNAL_OPTIONS);
+  // A plain box on the server: dispatch() can run during SSR and must not write a signal there.
+  const [pendingCount, setPendingCount] = createServerSafeSignal(0, INTERNAL_OPTIONS);
   const [controls, cleanup] = makeAnalytics(plugins, options, setPendingCount);
   tryOnCleanup(cleanup);
   return { ...controls, pendingCount };

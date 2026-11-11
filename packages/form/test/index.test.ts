@@ -1,8 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
-import { createRoot, createSignal, flush } from "solid-js";
+import { createEffect, createRoot, createSignal, flush, OBSERVE } from "solid-js";
+import { attribution } from "solid-js/attribution";
 import { createForm, createFormResetListener, toFormData } from "../src/index.js";
-
-// ─── Inline validators used across tests ──────────────────────────────────────
 
 const isEmail = (v: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email";
@@ -12,8 +11,6 @@ const minLength = (n: number) => (v: string) =>
 
 const hasUppercase = (v: string) =>
   /[A-Z]/.test(v) ? null : "Must contain an uppercase letter";
-
-// ─── Field signals ────────────────────────────────────────────────────────────
 
 describe("field signals", () => {
   it("initializes field values from config", () => {
@@ -55,8 +52,6 @@ describe("field signals", () => {
   });
 });
 
-// ─── Validation ───────────────────────────────────────────────────────────────
-
 describe("validation", () => {
   it("returns null error for valid field", () => {
     createRoot(dispose => {
@@ -75,7 +70,10 @@ describe("validation", () => {
         fields: { email: { initial: "not-an-email", validate: isEmail } },
       });
 
-      expect(form.fields.email.error()).toBe("Invalid email");
+      // Pristine field, so "change" mode's display gate hides it from error() - errors()
+      // (never gated by validateOn) is what this test actually means to exercise: does the
+      // validator run and report correctly.
+      expect(form.errors().email).toBe("Invalid email");
       dispose();
     });
   });
@@ -88,7 +86,7 @@ describe("validation", () => {
         },
       });
 
-      expect(form.fields.password.error()).toBe("Minimum 8 characters");
+      expect(form.errors().password).toBe("Minimum 8 characters");
 
       form.fields.password.setValue("abcdefgh");
       flush();
@@ -108,7 +106,7 @@ describe("validation", () => {
         fields: { email: { initial: "", validate: isEmail } },
       });
 
-      expect(form.fields.email.error()).toBe("Invalid email");
+      expect(form.errors().email).toBe("Invalid email");
 
       form.fields.email.setValue("user@example.com");
       flush();
@@ -127,8 +125,6 @@ describe("validation", () => {
     });
   });
 });
-
-// ─── Derived form state ───────────────────────────────────────────────────────
 
 describe("dirty", () => {
   it("is false initially", () => {
@@ -253,8 +249,6 @@ describe("values", () => {
     });
   });
 });
-
-// ─── Reset ────────────────────────────────────────────────────────────────────
 
 describe("reset", () => {
   it("restores all fields to initial values and clears touched", () => {
@@ -388,8 +382,6 @@ describe("reset", () => {
     });
   });
 });
-
-// ─── Submit ───────────────────────────────────────────────────────────────────
 
 describe("submit", () => {
   it("calls onSubmit with current values when valid", async () => {
@@ -570,8 +562,6 @@ describe("submit", () => {
   });
 });
 
-// ─── submitted flag ───────────────────────────────────────────────────────────
-
 describe("submitted", () => {
   it("starts false", () => {
     createRoot(dispose => {
@@ -622,16 +612,24 @@ describe("submitted", () => {
   });
 });
 
-// ─── validateOn ───────────────────────────────────────────────────────────────
-
 describe("validateOn", () => {
-  it("change (default): error() shows immediately", () => {
+  it("change (default): error() is null until the field is dirtied", () => {
     createRoot(dispose => {
       const form = createForm({
         fields: { email: { initial: "", validate: isEmail } },
       });
 
+      // Invalid from the start (empty fails isEmail), but untouched - shouldn't render errored.
+      expect(form.fields.email.error()).toBe(null);
+
+      form.fields.email.setValue("not-an-email");
+      flush();
       expect(form.fields.email.error()).toBe("Invalid email");
+
+      // Setting it back to the initial value un-dirties it - error hides again.
+      form.fields.email.setValue("");
+      flush();
+      expect(form.fields.email.error()).toBe(null);
       dispose();
     });
   });
@@ -744,8 +742,6 @@ describe("validateOn", () => {
   });
 });
 
-// ─── Async validators ─────────────────────────────────────────────────────────
-
 describe("async validators", () => {
   it("pending becomes true while an async validator is in flight", () => {
     createRoot(dispose => {
@@ -784,7 +780,10 @@ describe("async validators", () => {
     flush();
     await new Promise(r => setTimeout(r, 20));
     flush();
-    expect(form.fields.email.error()).toBe("Email already taken");
+    // Field is untouched/pristine (never dirtied via setValue), so the "change"-mode display
+    // gate hides it from error() - but the validator genuinely ran and found it invalid, which
+    // errors() (never gated by validateOn) confirms.
+    expect(form.errors().email).toBe("Email already taken");
     expect(form.fields.email.pending()).toBe(false);
   });
 
@@ -803,8 +802,9 @@ describe("async validators", () => {
       }),
     );
 
-    // Sync validator fires immediately
-    expect(form.fields.email.error()).toBe("Invalid email");
+    // Sync validator fires immediately - checked via errors() since the field is still
+    // pristine and "change" mode's display gate hides it from error() until dirtied.
+    expect(form.errors().email).toBe("Invalid email");
 
     form.fields.email.setValue("taken@example.com");
     flush();
@@ -852,8 +852,9 @@ describe("async validators", () => {
       });
 
       flush();
-      // isEmail("") fails synchronously — async validator must not run
-      expect(form.fields.email.error()).toBe("Invalid email");
+      // isEmail("") fails synchronously — async validator must not run. Checked via errors()
+      // since the field is pristine and "change" mode's display gate hides it from error().
+      expect(form.errors().email).toBe("Invalid email");
       expect(form.fields.email.pending()).toBe(false);
       expect(form.pending()).toBe(false);
       dispose();
@@ -935,8 +936,6 @@ describe("async validators", () => {
     expect(asyncValidator).toHaveBeenCalledTimes(1);
   });
 });
-
-// ─── Bind ─────────────────────────────────────────────────────────────────────
 
 describe("bind", () => {
   it("sets initial input value from signal", () => {
@@ -1112,8 +1111,6 @@ describe("bind", () => {
   });
 });
 
-// ─── Form-level validate ──────────────────────────────────────────────────────
-
 describe("validate", () => {
   it("returns null when the cross-field rule passes", () => {
     createRoot(dispose => {
@@ -1247,8 +1244,6 @@ describe("validate", () => {
   });
 });
 
-// ─── toFormData ───────────────────────────────────────────────────────────────
-
 describe("toFormData", () => {
   it("returns a FormData with all current field values", () => {
     createRoot(dispose => {
@@ -1293,8 +1288,6 @@ describe("toFormData", () => {
   });
 });
 
-// ─── formData ─────────────────────────────────────────────────────────────────
-
 describe("formData", () => {
   it("returns FormData with all current field values", () => {
     createRoot(dispose => {
@@ -1324,8 +1317,6 @@ describe("formData", () => {
     });
   });
 });
-
-// ─── setValues ───────────────────────────────────────────────────────────────
 
 describe("setValues", () => {
   it("updates multiple fields at once", () => {
@@ -1397,8 +1388,6 @@ describe("setValues", () => {
     });
   });
 });
-
-// ─── setError ────────────────────────────────────────────────────────────────
 
 describe("setError", () => {
   it("field.setError sets an external error visible via error()", () => {
@@ -1494,6 +1483,9 @@ describe("setError", () => {
         fields: { email: { initial: "bad", validate: isEmail } },
       });
 
+      // Dirty the field (still invalid) so the validator error is actually displayed under
+      // "change" mode's dirty gate - otherwise there'd be nothing to take priority over yet.
+      form.fields.email.setValue("still-bad");
       form.fields.email.setError("Server error");
       flush();
       // Client-side validator error wins — shown first
@@ -1502,8 +1494,6 @@ describe("setError", () => {
     });
   });
 });
-
-// ─── validate() reactive invalidation ────────────────────────────────────────
 
 describe("validate reactive invalidation", () => {
   it("valid() reflects a new cross-field rule added after it was first read", () => {
@@ -1528,8 +1518,6 @@ describe("validate reactive invalidation", () => {
     });
   });
 });
-
-// ─── bind with textarea ───────────────────────────────────────────────────────
 
 describe("bind with textarea", () => {
   it("sets initial value on a textarea", () => {
@@ -1562,8 +1550,6 @@ describe("bind with textarea", () => {
     });
   });
 });
-
-// ─── bind with select ────────────────────────────────────────────────────────
 
 describe("bind with select", () => {
   function makeSelect(...values: string[]): HTMLSelectElement {
@@ -1623,8 +1609,6 @@ describe("bind with select", () => {
   });
 });
 
-// ─── Form ref ─────────────────────────────────────────────────────────────────
-
 describe("form ref", () => {
   it("intercepts submit event and prevents default", async () => {
     let submitPromise: Promise<void>;
@@ -1656,8 +1640,6 @@ describe("form ref", () => {
     dispose();
   });
 });
-
-// ─── createFormResetListener ──────────────────────────────────────────────────
 
 describe("createFormResetListener", () => {
   const makeForm = () => {
@@ -1879,5 +1861,232 @@ describe("createFormResetListener", () => {
 
     dispose();
     cleanup(form);
+  });
+});
+
+describe("async validation state is derived in the same flush", () => {
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+  const slowOk = async (v: string) => {
+    await sleep(15);
+    return v === "taken@example.com" ? "Email already taken" : null;
+  };
+
+  it("never shows valid() while an async validator for the current value is outstanding", async () => {
+    const frames: { value: string; pending: boolean; valid: boolean }[] = [];
+    let form!: ReturnType<typeof createForm<any>>;
+    const dispose = createRoot(d => {
+      form = createForm({
+        fields: { email: { initial: "", validate: [isEmail, slowOk] } },
+      }) as any;
+      createEffect(
+        () => ({
+          value: form.fields.email.value() as string,
+          pending: form.fields.email.pending(),
+          valid: form.valid(),
+        }),
+        f => {
+          frames.push(f);
+        },
+      );
+      return d;
+    });
+    flush();
+    form.fields.email.setValue("ok@example.com");
+    flush();
+    // First committed frame for the new value: async validator not run yet, must be pending.
+    const first = frames.find(f => f.value === "ok@example.com")!;
+    expect(first.pending).toBe(true);
+    expect(first.valid).toBe(false);
+
+    await sleep(40);
+    flush();
+    expect(form.fields.email.pending()).toBe(false);
+    expect(form.valid()).toBe(true);
+
+    form.fields.email.setValue("taken@example.com");
+    flush();
+    const second = frames.filter(f => f.value === "taken@example.com")[0]!;
+    expect(second.pending).toBe(true);
+    expect(second.valid).toBe(false);
+    await sleep(40);
+    flush();
+    expect(form.errors().email).toBe("Email already taken");
+
+    // No frame ever claimed valid for a value whose async result was still outstanding.
+    for (const f of frames) {
+      if (f.valid) expect(f.pending).toBe(false);
+    }
+    expect(frames.filter(f => f.valid && f.value === "taken@example.com")).toEqual([]);
+    dispose();
+  });
+
+  it("pending is true from mount while the initial async validation is outstanding", async () => {
+    let form!: ReturnType<typeof createForm<any>>;
+    const dispose = createRoot(d => {
+      form = createForm({
+        fields: {
+          email: { initial: "a@b.co", validate: slowOk },
+          plain: { initial: "" },
+          syncOnly: { initial: "x", validate: minLength(1) },
+        },
+      }) as any;
+      return d;
+    });
+    expect(form.fields.email.pending()).toBe(true);
+    expect(form.fields.plain.pending()).toBe(false);
+    expect(form.fields.syncOnly.pending()).toBe(false);
+    expect(form.valid()).toBe(false);
+    flush();
+    await sleep(40);
+    flush();
+    expect(form.fields.email.pending()).toBe(false);
+    expect(form.valid()).toBe(true);
+    dispose();
+  });
+
+  it("keeps the previous async error visible while the next validation is in flight", async () => {
+    const frames: { value: string; error: string | null; pending: boolean; valid: boolean }[] = [];
+    let form!: ReturnType<typeof createForm<any>>;
+    const dispose = createRoot(d => {
+      form = createForm({
+        fields: { email: { initial: "", validate: [isEmail, slowOk] } },
+      }) as any;
+      createEffect(
+        () => ({
+          value: form.fields.email.value() as string,
+          error: form.fields.email.error() as string | null,
+          pending: form.fields.email.pending(),
+          valid: form.valid(),
+        }),
+        f => {
+          frames.push(f);
+        },
+      );
+      return d;
+    });
+    flush();
+    const edit = async (v: string) => {
+      form.fields.email.setValue(v);
+      flush();
+      await sleep(40);
+      flush();
+    };
+    await edit("taken@example.com");
+    expect(form.fields.email.error()).toBe("Email already taken");
+
+    // edit: previous async error stays until the new result arrives, but state is not torn
+    frames.length = 0;
+    form.fields.email.setValue("other@example.com");
+    flush();
+    expect(frames).toEqual([
+      { value: "other@example.com", error: "Email already taken", pending: true, valid: false },
+    ]);
+    await sleep(40);
+    flush();
+    expect(form.fields.email.error()).toBeNull();
+    expect(form.valid()).toBe(true);
+
+    // a sync error clears the async error and it does not resurface when the sync error clears
+    await edit("taken@example.com");
+    expect(form.fields.email.error()).toBe("Email already taken");
+    form.fields.email.setValue("bad");
+    flush();
+    expect(form.fields.email.error()).toBe("Invalid email");
+    form.fields.email.setValue("another@example.com");
+    flush();
+    expect(form.fields.email.error()).toBeNull();
+    expect(form.fields.email.pending()).toBe(true);
+    await sleep(40);
+    flush();
+    expect(form.valid()).toBe(true);
+    dispose();
+  });
+
+  it("a sync error discards an async result still in flight for the previous value", async () => {
+    let form!: ReturnType<typeof createForm<any>>;
+    const dispose = createRoot(d => {
+      form = createForm({
+        fields: {
+          email: { initial: "", validate: [isEmail, async () => (await sleep(15), "late error")] },
+        },
+      }) as any;
+      return d;
+    });
+    flush();
+    form.fields.email.setValue("ok@example.com");
+    flush();
+    expect(form.fields.email.pending()).toBe(true);
+    form.fields.email.setValue("bad");
+    flush();
+    expect(form.fields.email.pending()).toBe(false);
+    await sleep(40);
+    flush();
+    expect(form.errors().email).toBe("Invalid email");
+    // back to a valid-looking value: re-validated, not served from the old result
+    form.fields.email.setValue("ok@example.com");
+    flush();
+    expect(form.fields.email.pending()).toBe(true);
+    expect(form.valid()).toBe(false);
+    await sleep(40);
+    flush();
+    expect(form.errors().email).toBe("late error");
+    dispose();
+  });
+
+  it("a value change mid-flight discards the older result; disposing with a validator in flight is safe", async () => {
+    let form!: ReturnType<typeof createForm<any>>;
+    const dispose = createRoot(d => {
+      form = createForm({
+        fields: {
+          u: {
+            initial: "a",
+            validate: async (v: string) => (
+              await sleep(v === "a" ? 30 : 5),
+              v === "a" ? "old" : null
+            ),
+          },
+        },
+      }) as any;
+      return d;
+    });
+    flush();
+    form.fields.u.setValue("b");
+    flush();
+    await sleep(50);
+    flush();
+    expect(form.errors().u).toBeUndefined();
+    expect(form.fields.u.pending()).toBe(false);
+    form.fields.u.setValue("c");
+    flush();
+    dispose();
+    await sleep(30);
+    flush();
+  });
+
+  it("emits no effect-feedback diagnostics over several edits", async () => {
+    const release = attribution.enable();
+    const cap = OBSERVE!.diagnostics.capture();
+    let form!: ReturnType<typeof createForm<any>>;
+    const dispose = createRoot(d => {
+      form = createForm({
+        fields: { email: { initial: "", validate: [isEmail, slowOk] } },
+      }) as any;
+      createEffect(
+        () => [form.fields.email.pending(), form.valid(), form.fields.email.error()],
+        () => {},
+      );
+      return d;
+    });
+    flush();
+    for (const v of ["a@b.co", "bad", "c@d.co", "taken@example.com", "e@f.co", "", "g@h.co"]) {
+      form.fields.email.setValue(v);
+      flush();
+      await sleep(25);
+      flush();
+    }
+    const codes = cap.stop().map(e => e.code);
+    release();
+    dispose();
+    expect(codes.filter(c => c.startsWith("EFFECT_"))).toEqual([]);
   });
 });

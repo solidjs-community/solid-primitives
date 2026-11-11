@@ -49,7 +49,7 @@ export function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (O
 }
 
 /** @deprecated Renamed to `createSubRoot` */
-export const createBranch = createSubRoot;
+export const createBranch: typeof createSubRoot = createSubRoot;
 
 /**
  * A wrapper for creating callbacks with `runWithOwner`.
@@ -61,7 +61,10 @@ export const createBranch = createSubRoot;
  *
  * @example
  * const handleClick = createCallback(() => {
- *    createEffect(() => {})
+ *    createEffect(
+ *      () => count(),
+ *      count => console.log(count),
+ *    )
  * })
  */
 export const createCallback = <T extends AnyFunction>(
@@ -78,7 +81,10 @@ export const createCallback = <T extends AnyFunction>(
  * @example
  * ```ts
  * const dispose = createDisposable(dispose => {
- *    createEffect(() => {...})
+ *    createEffect(
+ *      () => count(),
+ *      count => {...},
+ *    )
  * });
  * // dispose later (if not, will dispose automatically)
  * dispose()
@@ -147,7 +153,7 @@ export function createSingletonRoot<T>(
 }
 
 /** @deprecated Renamed to `createSingletonRoot` */
-export const createSharedRoot = createSingletonRoot;
+export const createSharedRoot: typeof createSingletonRoot = createSingletonRoot;
 
 /**
  * @warning Experimental API - there might be a better way so solve singletons with SSR and hydration.
@@ -217,11 +223,14 @@ export type RootPoolFunction<TArg, TResult> = (
  * const useCounter = createRootPool((arg, active, dispose) => {
  *   const [count, setCount] = createSignal(arg())
  *
- *   createEffect(() => {
- *     if (!active()) return
- *     // so some side effect
- *     console.log("count", count())
- *   })
+ *   createEffect(
+ *     () => (active() ? count() : undefined),
+ *     count => {
+ *       if (count === undefined) return
+ *       // do some side effect
+ *       console.log("count", count)
+ *     },
+ *   )
  *
  *   return <button onClick={() => setCount(count() + 1)}>Count: {count()}</button>
  * })

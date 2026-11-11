@@ -1,10 +1,10 @@
-import { type CookieOptions, cookieStorage } from "./cookies.js";
+import { type CookieOptions, cookieStorage } from "./cookies.ts";
 import {
   addClearMethod,
   addWithOptionsMethod,
   multiplexStorage,
   makeObjectStorage,
-} from "./tools.js";
+} from "./tools.ts";
 import {
   type SyncStorage,
   type SyncStorageWithOptions,
@@ -19,7 +19,7 @@ import {
   storageSync,
   messageSync,
   wsSync,
-} from "./persisted.js";
+} from "./persisted.ts";
 export {
   type CookieOptions,
   cookieStorage,

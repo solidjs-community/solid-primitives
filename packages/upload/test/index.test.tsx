@@ -11,8 +11,6 @@ import {
 import { transformFiles } from "../src/helpers.js";
 import type { UploadFile } from "../src/types.js";
 
-// ── jsdom polyfills ───────────────────────────────────────────────────────────
-
 beforeAll(() => {
   // jsdom does not implement createObjectURL
   vi.stubGlobal("URL", { createObjectURL: (f: File) => `blob:${f.name}` });
@@ -38,8 +36,6 @@ function dispatchChange(input: HTMLInputElement, files: FileList) {
   input.dispatchEvent(event);
 }
 
-// ── transformFiles ────────────────────────────────────────────────────────────
-
 describe("transformFiles", () => {
   it("returns empty array for null input", () => {
     expect(transformFiles(null)).toEqual([]);
@@ -61,8 +57,6 @@ describe("transformFiles", () => {
     expect(result.map(f => f.name)).toEqual(["a.png", "b.jpg"]);
   });
 });
-
-// ── createFilePicker ────────────────────────────────────────────────────────
 
 describe("createFilePicker", () => {
   it("initialises with empty file list, no error, and isLoading=false", () => {
@@ -256,8 +250,6 @@ describe("createFilePicker", () => {
   });
 });
 
-// ── createDropzone ────────────────────────────────────────────────────────────
-
 describe("createDropzone", () => {
   it("initialises with empty files, no error, isLoading=false, and isDragging=false", () => {
     const { files, error, isLoading, isDragging, dispose } = createRoot(dispose => ({
@@ -297,12 +289,9 @@ describe("createDropzone", () => {
       const dispose = createRoot(dispose => {
         createDropzone({
           onDrop: vi.fn(),
-          onDragStart: vi.fn(),
           onDragEnter: vi.fn(),
-          onDragEnd: vi.fn(),
           onDragLeave: vi.fn(),
           onDragOver: vi.fn(),
-          onDrag: vi.fn(),
         });
         return dispose;
       });
@@ -310,13 +299,48 @@ describe("createDropzone", () => {
     }).not.toThrow();
   });
 
+  it("onDragEnter/onDragLeave/onDragOver receive the raw DragEvent, not UploadFile[]", () => {
+    // dataTransfer.files is always empty during movement events in real browsers —
+    // these callbacks get the event itself so consumers can read dataTransfer.items/.types.
+    let enterArg: unknown, leaveArg: unknown, overArg: unknown;
+    const { ref, dispose } = createRoot(dispose => ({
+      ...createDropzone({
+        onDragEnter: e => { enterArg = e; },
+        onDragLeave: e => { leaveArg = e; },
+        onDragOver: e => { overArg = e; },
+      }),
+      dispose,
+    }));
+
+    const div = document.createElement("div");
+    ref(div);
+    flush(); // effect attaches the listeners
+
+    const withDataTransfer = (type: string) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { files: makeFileList() }, configurable: true });
+      return event;
+    };
+
+    const enterEvent = withDataTransfer("dragenter");
+    div.dispatchEvent(enterEvent);
+    const overEvent = withDataTransfer("dragover");
+    div.dispatchEvent(overEvent);
+    const leaveEvent = withDataTransfer("dragleave");
+    div.dispatchEvent(leaveEvent);
+
+    expect(enterArg).toBe(enterEvent);
+    expect(overArg).toBe(overEvent);
+    expect(leaveArg).toBe(leaveEvent);
+    expect(Array.isArray(enterArg)).toBe(false);
+
+    dispose();
+  });
+
   it("isLoading is true while onDrop callback is pending, false after it resolves", async () => {
     let resolve!: () => void;
-    const blocker = new Promise<void>(r => {
-      resolve = r;
-    });
+    const blocker = new Promise<void>(r => { resolve = r; });
 
-    // Capture isLoading via closure — onDrop is passed before the primitive returns
     let getIsLoading!: () => boolean;
     const { ref, dispose } = createRoot(dispose => {
       const dz = createDropzone({ onDrop: () => blocker });
@@ -326,6 +350,7 @@ describe("createDropzone", () => {
 
     const div = document.createElement("div");
     ref(div);
+    flush(); // effect attaches the listeners
 
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
@@ -333,13 +358,13 @@ describe("createDropzone", () => {
       configurable: true,
     });
     div.dispatchEvent(dropEvent);
-    await Promise.resolve(); // flush setIsLoading(true)
+    await Promise.resolve();
 
     expect(getIsLoading()).toBe(true);
 
     resolve();
     await blocker;
-    await Promise.resolve(); // flush setIsLoading(false) from finally
+    await Promise.resolve();
 
     expect(getIsLoading()).toBe(false);
     dispose();
@@ -357,6 +382,7 @@ describe("createDropzone", () => {
 
     const div = document.createElement("div");
     ref(div);
+    flush(); // effect attaches the listeners
 
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
@@ -382,6 +408,7 @@ describe("createDropzone", () => {
     const removeSpy = vi.spyOn(el1, "removeEventListener");
 
     ref(el1);
+    flush(); // effect attaches the listeners
     el1.dispatchEvent(new Event("dragenter"));
     flush();
     expect(isDragging()).toBe(true);
@@ -389,16 +416,14 @@ describe("createDropzone", () => {
     flush();
     expect(isDragging()).toBe(false);
 
-    // Re-assign — el1 listeners should be removed, el2 should become active
     ref(el2);
+    flush(); // effect attaches the listeners
     expect(removeSpy).toHaveBeenCalled();
 
-    // el1 events no longer affect state
     el1.dispatchEvent(new Event("dragenter"));
     flush();
     expect(isDragging()).toBe(false);
 
-    // el2 events now drive state
     el2.dispatchEvent(new Event("dragenter"));
     flush();
     expect(isDragging()).toBe(true);
@@ -409,18 +434,14 @@ describe("createDropzone", () => {
   it("error() captures a thrown onDrop callback", async () => {
     const boom = new Error("drop failed");
     const { error, ref, dispose } = createRoot(dispose => ({
-      ...createDropzone({
-        onDrop: async () => {
-          throw boom;
-        },
-      }),
+      ...createDropzone({ onDrop: async () => { throw boom; } }),
       dispose,
     }));
 
     const div = document.createElement("div");
     ref(div);
+    flush(); // effect attaches the listeners
 
-    // jsdom does not implement DragEvent — dispatch a plain Event with stubbed dataTransfer
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
     Object.defineProperty(dropEvent, "dataTransfer", {
       value: { files: makeFileList(makeFile()) },
@@ -435,8 +456,6 @@ describe("createDropzone", () => {
     dispose();
   });
 });
-
-// ── dropzone ref callback factory ────────────────────────────────────────────
 
 describe("dropzone", () => {
   it("returns a callable ref with state properties attached", () => {
@@ -473,6 +492,7 @@ describe("dropzone", () => {
     }));
     const el = document.createElement("div");
     dz(el);
+    flush(); // effect attaches the listeners
 
     el.dispatchEvent(new Event("dragenter"));
     flush();
@@ -485,8 +505,6 @@ describe("dropzone", () => {
     dispose();
   });
 });
-
-// ── fileUploader ref callback ─────────────────────────────────────────────────
 
 describe("fileUploader", () => {
   it("returns a function (ref callback)", () => {
@@ -562,8 +580,6 @@ describe("fileUploader", () => {
     dispose();
   });
 });
-
-// ── createFileUploader ──────────────────────────────────────────────────────────
 
 // Builds a minimal UploadFile without needing a real picker
 function makeUploadFile(name = "test.png"): UploadFile {
@@ -873,8 +889,6 @@ describe("createFileUploader", () => {
   });
 });
 
-// ── createFileUploader — XHR path ───────────────────────────────────────────────
-
 function makeMockXhr() {
   const uploadListeners: Record<string, (e: ProgressEvent) => void> = {};
   const xhrListeners: Record<string, (e: Event) => void> = {};
@@ -914,7 +928,7 @@ describe("createFileUploader — XHR", () => {
     const { xhr, triggerLoad } = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => xhr),
+      vi.fn(function () { return xhr; }),
     );
 
     const { upload, dispose } = createRoot(dispose => ({
@@ -934,7 +948,7 @@ describe("createFileUploader — XHR", () => {
     const mock = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
@@ -958,7 +972,7 @@ describe("createFileUploader — XHR", () => {
     mock.xhr.statusText = "Payload Too Large";
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
@@ -980,7 +994,7 @@ describe("createFileUploader — XHR", () => {
     const mock = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, status, files, dispose } = createRoot(dispose => ({
@@ -1002,7 +1016,7 @@ describe("createFileUploader — XHR", () => {
     const mock = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => mock.xhr),
+      vi.fn(function () { return mock.xhr; }),
     );
 
     const { upload, progress, dispose } = createRoot(dispose => ({
@@ -1024,7 +1038,7 @@ describe("createFileUploader — XHR", () => {
     const { xhr, triggerLoad } = makeMockXhr();
     vi.stubGlobal(
       "XMLHttpRequest",
-      vi.fn(() => xhr),
+      vi.fn(function () { return xhr; }),
     );
 
     const { upload, dispose } = createRoot(dispose => ({

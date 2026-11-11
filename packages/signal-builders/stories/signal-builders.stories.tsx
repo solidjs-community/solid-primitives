@@ -48,8 +48,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Array pipeline ───────────────────────────────────────────────────
-
 export const ArrayPipeline = meta.story({
   name: "Sort & filter pipeline",
   parameters: {
@@ -120,8 +118,6 @@ export const ArrayPipeline = meta.story({
   },
 });
 
-// ── Story 2: String pipeline ──────────────────────────────────────────────────
-
 export const StringPipeline = meta.story({
   name: "Name badge formatter",
   parameters: {
@@ -152,8 +148,6 @@ export const StringPipeline = meta.story({
     );
   },
 });
-
-// ── Story 3: Number pipeline ──────────────────────────────────────────────────
 
 export const NumberPipeline = meta.story({
   name: "Price calculator",
@@ -236,8 +230,6 @@ export const NumberPipeline = meta.story({
   },
 });
 
-// ── Story 4: Object pipeline ──────────────────────────────────────────────────
-
 export const ObjectPipeline = meta.story({
   name: "Profile update chain",
   parameters: {
@@ -282,8 +274,6 @@ export const ObjectPipeline = meta.story({
     );
   },
 });
-
-// ── Story 5: Cross-category chain ─────────────────────────────────────────────
 
 export const ConvertAndCompute = meta.story({
   name: "Text input → clamped score",

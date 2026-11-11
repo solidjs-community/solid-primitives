@@ -41,14 +41,10 @@ export function makeMediaQueryListener(
  * console.log(isSmall());
  * ```
  */
-export function createMediaQuery(query: string, serverFallback = false) {
-  if (isServer) {
-    return () => serverFallback;
-  }
-  const mql = window.matchMedia(query);
-  const [state, setState] = createHydratableSignal(serverFallback, () => mql.matches);
-  const update = () => setState(mql.matches);
-  makeEventListener(mql, "change", update);
+export function createMediaQuery(query: string, serverFallback = false): Accessor<boolean> {
+  const mql = isServer ? undefined : window.matchMedia(query);
+  const [state, setState] = createHydratableSignal(serverFallback, () => mql!.matches);
+  if (mql) makeEventListener(mql, "change", () => setState(mql.matches));
   return state;
 }
 
@@ -60,11 +56,12 @@ export function createMediaQuery(query: string, serverFallback = false) {
  * @returns a boolean signal
  * @example
  * const prefersDark = usePrefersDark();
- * createEffect(() => {
- *    prefersDark() // => boolean
- * });
+ * createEffect(
+ *   () => prefersDark(), // => boolean
+ *   dark => console.log(dark),
+ * );
  */
-export function createPrefersDark(serverFallback?: boolean) {
+export function createPrefersDark(serverFallback?: boolean): Accessor<boolean> {
   return createMediaQuery("(prefers-color-scheme: dark)", serverFallback);
 }
 
@@ -76,9 +73,10 @@ export function createPrefersDark(serverFallback?: boolean) {
  * @returns a boolean signal
  * @example
  * const prefersDark = usePrefersDark();
- * createEffect(() => {
- *    prefersDark() // => boolean
- * });
+ * createEffect(
+ *   () => prefersDark(), // => boolean
+ *   dark => console.log(dark),
+ * );
  */
 export const usePrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createHydratableSingletonRoot(
   createPrefersDark.bind(void 0, false),
@@ -136,25 +134,32 @@ export function createBreakpoints<T extends Breakpoints>(
     { enumerable: false, get: () => Object.keys(breakpoints).pop() },
   );
 
-  // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (isServer || !window.matchMedia) return fallback;
-
   const { mediaFeature = "min-width", watchChange = true } = options;
 
-  const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
-    const matches = {} as Record<keyof T, boolean>;
-
-    entries(breakpoints).forEach(([token, width]: [t: keyof T, w: string]) => {
-      const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
-      matches[token] = mql.matches;
-      if (watchChange)
-        makeEventListener(mql, "change", (e: MediaQueryListEvent) =>
-          setMatches(token, e.matches as any),
+  const mqls =
+    // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    isServer || !window.matchMedia
+      ? undefined
+      : entries(breakpoints).map(
+          ([token, width]: [t: keyof T, w: string]) =>
+            [token, window.matchMedia(`(${mediaFeature}: ${width})`)] as const,
         );
-    });
 
+  const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
+    if (!mqls) return fallback;
+    const matches = {} as Record<keyof T, boolean>;
+    for (const [token, mql] of mqls) matches[token] = mql.matches;
     return matches as Matches<T>;
   });
+
+  if (!mqls) return fallback;
+
+  // registered here rather than in the hydration onSettled, where cleanup is forbidden
+  if (watchChange)
+    for (const [token, mql] of mqls)
+      makeEventListener(mql, "change", (e: MediaQueryListEvent) =>
+        setMatches(token, e.matches as any),
+      );
 
   return Object.defineProperty(matches, "key", {
     enumerable: false,

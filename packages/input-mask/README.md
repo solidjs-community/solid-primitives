@@ -200,8 +200,7 @@ return <Field
       </label>
       <input
         {...field.props}
-        class="form-control"
-        classList={{ 'is-invalid': field.helpers.error }}
+        class={["form-control", { 'is-invalid': field.helpers.error }]}
         onInput={ev => (inputMask(ev), field.props.onInput.?(ev))}
       />
       <Show when={field.helpers.error}>

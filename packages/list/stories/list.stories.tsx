@@ -28,8 +28,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ── Story 1: Index tracks position ────────────────────────────────────────────
-
 export const IndexOnReorder = meta.story({
   name: "Index tracks position",
   parameters: {
@@ -108,8 +106,6 @@ export const IndexOnReorder = meta.story({
     );
   },
 });
-
-// ── Story 2: Value updates in place ───────────────────────────────────────────
 
 export const ValueInPlace = meta.story({
   name: "Value updates in place",
@@ -193,8 +189,6 @@ export const ValueInPlace = meta.story({
   },
 });
 
-// ── Story 3: Fallback when empty ──────────────────────────────────────────────
-
 export const FallbackOnEmpty = meta.story({
   name: "Fallback when empty",
   parameters: {
@@ -262,8 +256,6 @@ export const FallbackOnEmpty = meta.story({
     );
   },
 });
-
-// ── Story 4: listArray programmatic mapper ────────────────────────────────────
 
 export const ListArrayMapper = meta.story({
   name: "listArray — programmatic mapper",

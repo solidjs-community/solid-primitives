@@ -1,0 +1,56 @@
+name: JSR validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - next
+  workflow_dispatch:
+
+jobs:
+  jsr:
+    name: Validate JSR workspace
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install Dependencies
+        run: pnpm i
+
+      - name: Install Deno dependencies
+        run: |
+          if [ -f deno.lock ]; then
+            deno ci
+          else
+            deno install
+          fi
+
+      - name: Format check
+        run: deno task jsr:fmt
+
+      - name: Check deno.jsonc/package.json version sync
+        run: pnpm jsr:sync-versions:check
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Publish dry run with full type checks
+        run: deno publish --dry-run --check --allow-slow-types

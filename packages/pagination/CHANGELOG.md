@@ -1,5 +1,88 @@
 # @solid-primitives/pagination
 
+## 1.0.0-next.10
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/utils@7.0.0-next.6
+
+## 1.0.0-next.9
+
+### Patch Changes
+
+- 7ee755d: Stop writing signals during server renders, and ship ref-factory forms of the remaining `use:`-shaped directives.
+
+  Solid 2 (`2.0.0-rc.1`+) flags a signal or store setter that runs during a server render (`SERVER_WRITE`): the write lands as inert data today and will throw in a later release. Eight primitives still did this:
+
+  - `@solid-primitives/utils`: new `createServerSafeSignal(value, options)` — `createSignal` on the client; on the server the signal is still created (so hydration ids stay aligned) but reads and writes go to a plain box. For primitives that hold interactive state with no async source.
+  - `@solid-primitives/analytics`, `@solid-primitives/list-state`, `@solid-primitives/queue`, and `createInfiniteScroll` in `@solid-primitives/pagination`: internal state uses `createServerSafeSignal`.
+  - `@solid-primitives/controlled-signal`: on the server an uncontrolled write lands in a plain override instead of the signal; reads and `onChange` behave as before.
+  - `@solid-primitives/date`: `createCountdown` is now a derived store (`createStore(fn, seed)`) instead of a render effect writing into one — the shape upstream prescribes.
+  - `@solid-primitives/masonry`: the one-shot signal that wired items to the layout memo is a plain variable.
+  - `@solid-primitives/pagination`: `createPagination` no longer reads its options at the top level of the calling component (`STRICT_READ_UNTRACKED`).
+  - `@solid-primitives/tween`: the effect's apply phase reads the current value with `untrack` (`STRICT_READ_UNTRACKED`).
+
+  `@solid-primitives/event-listener` and `@solid-primitives/pointer`: `eventListener`, `pointerPosition` and `pointerHover` now return a ref callback when called with props alone — `<button ref={eventListener(["click", onClick])} />`, `<div ref={pointerHover(setHovering)} />` — matching the `ref` directive shape Solid 2 replaced `use:` with. The two-argument `(el, props)` form still works.
+
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [7ee755d]
+- Updated dependencies [638c530]
+  - @solid-primitives/utils@7.0.0-next.5
+
+## 1.0.0-next.8
+
+### Patch Changes
+
+- a47cf15: Republish only, no functional changes. `event-listener@3.0.0-next.4` and `pagination@1.0.0-next.7` were accidentally published to npm with an unresolved pnpm workspace-catalog protocol string (`"catalog:peer"`) left in `peerDependencies`, instead of a resolved semver range. npm and yarn have no concept of the `catalog:` protocol, so installing either of those exact versions fails with `EUNSUPPORTEDPROTOCOL`. This release republishes both packages with `peerDependencies` correctly resolved (e.g. `"solid-js": "^2.0.0-rc.0"`). If you're on `event-listener@3.0.0-next.4` or `pagination@1.0.0-next.7`, upgrade to this version or later.
+
+## 1.0.0-next.7
+
+### Minor Changes
+
+- 97e7cf8: pagination: new ellipsis pattern
+
+## 1.0.0-next.6
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 1.0.0-next.5
+
+### Patch Changes
+
+- 3762864: Removed a leftover `declare module "solid-js"` global JSX augmentation (and its associated unused `_E` type alias) from `createInfiniteScroll`. It was left over from an earlier `use:` directive-based implementation that was replaced by the current plain ref-callback API (`loader: (el: Element) => void`) — nothing in the package referenced it anymore. JSR's publish step rejects packages that modify global types, which was blocking `deno publish` for this package. No API or behavior changes.
+
+## 1.0.0-next.4
+
+### Minor Changes
+
+- 830248b: add `initialPageCount` option to `createInfiniteScroll`, letting SSR request pages up front (for SEO/perceived speed) instead of always starting empty on the server
+
+## 1.0.0-next.3
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/utils@7.0.0-next.2
+
+## 1.0.0-next.2
+
+### Patch Changes
+
+- 71c6bc2: fix keyboard focus loss
+
 ## 1.0.0-next.1
 
 ### Minor Changes

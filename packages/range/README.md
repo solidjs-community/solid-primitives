@@ -29,8 +29,6 @@ yarn add @solid-primitives/range
 pnpm add @solid-primitives/range
 ```
 
-Requires `solid-js` and `@solidjs/web` v2.0.0-beta.13 or later as peer dependencies.
-
 ## `createNumericRange`
 
 Reactively generates an array of numbers for the given range. Mirrors the `range()` API from Python — one argument gives `[0, to)`, two or three give `[from, to)` with an optional step.
@@ -334,10 +332,6 @@ function IndexRange<T>(
   },
 ): Accessor<T[]>;
 ```
-
-## Demo
-
-Codesandbox: https://codesandbox.io/s/solid-primitives-range-demo-y3sc5c?file=/index.tsx
 
 ## Possible improvements
 

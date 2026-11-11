@@ -1,12 +1,21 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "resolveJsonModule": true,
-    "types": ["vite/client", "node"],
-    "baseUrl": "./",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@solidjs/web",
+    "allowJs": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "isolatedModules": true,
     "paths": {
       "~/*": ["./src/*"]
     }
   },
-  "include": ["./src", "./scripts", "./vite.config.ts"]
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["dist", "node_modules"]
 }

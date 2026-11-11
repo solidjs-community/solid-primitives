@@ -1,6 +1,8 @@
+import { renderHydrationRoundTrip } from "../../../scripts/test-utils/hydration-harness.ts";
 import { dispatchFakeEvent, event_target } from "./setup.js";
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal, flush, onSettled } from "solid-js";
+import { createRoot, createSignal, flush, OBSERVE } from "solid-js";
+import { attribution } from "solid-js/attribution";
 import {
   createEventListener,
   createEventSignal,
@@ -75,6 +77,43 @@ describe("makeEventListenerStack", () => {
       expect(capturedEvent).toBe(undefined);
       dispose();
     }));
+});
+
+describe("makeEventListenerStack ownership", () => {
+  test("disposing the owner clears listeners added to the stack after setup (outside the owner)", () => {
+    // makeEventListener only registers its own cleanup under the owner active at listen() time,
+    // so a listener added later (e.g. from an event handler) is removed solely by the stack's own cleanup.
+    const target = new EventTarget();
+    let hits = 0;
+    let dispose!: VoidFunction;
+    let listen!: ReturnType<typeof makeEventListenerStack<{ test: Event }>>[0];
+    createRoot(d => {
+      dispose = d;
+      [listen] = makeEventListenerStack<{ test: Event }>(target);
+    });
+    listen("test", () => hits++);
+    target.dispatchEvent(new Event("test"));
+    expect(hits).toBe(1);
+    dispose();
+    target.dispatchEvent(new Event("test"));
+    expect(hits).toBe(1);
+  });
+
+  test("does not warn when called without an owner and clear() works", () => {
+    const release = attribution.enable();
+    const cap = OBSERVE!.diagnostics.capture();
+    let hits = 0;
+    const [listen, clear] = makeEventListenerStack<{ test: Event }>(event_target);
+    listen("test", () => hits++);
+    dispatchFakeEvent("test", new Event("test"));
+    expect(hits).toBe(1);
+    clear();
+    dispatchFakeEvent("test", new Event("test"));
+    expect(hits).toBe(1);
+    const codes = cap.stop().map(e => e.code);
+    release();
+    expect(codes).not.toContain("NO_OWNER_CLEANUP");
+  });
 });
 
 describe("createEventListener", () => {
@@ -172,40 +211,44 @@ describe("createEventListener", () => {
     dispose();
   });
 
-  test("disposing on cleanup", () =>
-    createRoot(dispose => {
-      const testEvent = new Event("test3");
-      let count = 0;
+  test("disposing on cleanup", () => {
+    const testEvent = new Event("test3");
+    let count = 0;
+    const dispose = createRoot(dispose => {
       createEventListener<{ test3: Event }>(event_target, "test3", () => {
         count++;
       });
+      return dispose;
+    });
 
-      onSettled(() => {
-        dispatchFakeEvent("test3", testEvent);
-        expect(count, "captured count on mount should be 1").toBe(1);
+    flush(); // run effect phase → adds the listener
+    dispatchFakeEvent("test3", testEvent);
+    expect(count, "captured count on mount should be 1").toBe(1);
 
-        dispose();
+    dispose();
 
-        dispatchFakeEvent("test3", testEvent);
-        expect(count, "captured count after disposing should still be 1").toBe(1);
-      });
-    }));
+    dispatchFakeEvent("test3", testEvent);
+    expect(count, "captured count after disposing should still be 1").toBe(1);
+  });
 });
 
 describe("createEventSignal", () => {
-  test("return autoupdating signal", () =>
-    createRoot(dispose => {
-      const testEvent = new Event("sig_test");
-      const lastEvent = createEventSignal<{ sig_test: Event }>(event_target, "sig_test");
+  test("return autoupdating signal", () => {
+    const testEvent = new Event("sig_test");
+    let lastEvent!: () => Event | undefined;
+    const dispose = createRoot(dispose => {
+      lastEvent = createEventSignal<{ sig_test: Event }>(event_target, "sig_test");
       expect(lastEvent, "returned value is an accessor").toBeTypeOf("function");
       expect(lastEvent(), "returned value is undefined").toBeTypeOf("undefined");
+      return dispose;
+    });
 
-      onSettled(() => {
-        dispatchFakeEvent("sig_test", testEvent);
-        expect(lastEvent()).toBe(testEvent);
-        dispose();
-      });
-    }));
+    flush(); // run effect phase → adds the listener
+    dispatchFakeEvent("sig_test", testEvent);
+    flush(); // apply the signal write made by the handler
+    expect(lastEvent()).toBe(testEvent);
+    dispose();
+  });
 });
 
 describe("eventListener directive", () => {
@@ -240,4 +283,24 @@ describe("eventListener directive", () => {
     expect(captured2.length).toBe(1);
     dispose();
   });
+});
+
+test("hydrates primitive output and its following sibling", async () => {
+  const result = await renderHydrationRoundTrip(
+    `
+    import { eventListener, createEventListenerMap } from "@solid-primitives/event-listener";
+    function Child() { eventListener(["click", () => {}]); createEventListenerMap(() => document, { click: () => {}, keydown: () => {}, focus: undefined }); return <button ref={el => el.dataset.bound = "child"}>child</button>; }
+    export default function App() { return <><Child /><span ref={el => el.dataset.bound = "sibling"}>sibling</span></>; }
+  `,
+    import.meta.dirname,
+  );
+  try {
+    expect(result.consoleMessages).toEqual([]);
+    expect(result.container.querySelector("button")).toBe(result.serverNodes[0]);
+    expect(result.container.querySelector("span")).toBe(result.serverNodes[1]);
+    expect((result.serverNodes[0] as HTMLElement).dataset.bound).toBe("child");
+    expect((result.serverNodes[1] as HTMLElement).dataset.bound).toBe("sibling");
+  } finally {
+    result.cleanup();
+  }
 });

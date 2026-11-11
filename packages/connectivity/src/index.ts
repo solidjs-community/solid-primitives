@@ -55,7 +55,7 @@ export type NetworkInformationReturn = {
 };
 
 // Network Information API — not in TypeScript's standard lib.dom.d.ts
-interface NetworkInformationConnection extends EventTarget {
+export interface NetworkInformationConnection extends EventTarget {
   readonly downlink: number;
   readonly downlinkMax?: number;
   readonly effectiveType: EffectiveConnectionType;
@@ -64,16 +64,15 @@ interface NetworkInformationConnection extends EventTarget {
   readonly type?: ConnectionType;
 }
 
-declare global {
-  interface Navigator {
-    readonly connection?: NetworkInformationConnection;
-  }
-}
+// Not a `declare global` augmentation — kept local so this stays a plain module
+// (global augmentations block JSR's public-API type check). Cast `navigator` to
+// this at each call site instead.
+type NavigatorWithConnection = Navigator & { readonly connection?: NetworkInformationConnection };
 
 // --- Helpers ---
 
 function readNetworkState(): NetworkState {
-  const conn = navigator.connection;
+  const conn = (navigator as NavigatorWithConnection | undefined)?.connection;
   return {
     online: navigator.onLine,
     downlink: conn?.downlink,
@@ -131,7 +130,7 @@ export function makeNetworkInformation(callback: (state: NetworkState) => void):
   const fire = () => callback(readNetworkState());
   const clear1 = makeEventListener(window, "online", fire);
   const clear2 = makeEventListener(window, "offline", fire);
-  const conn = navigator.connection;
+  const conn = (navigator as NavigatorWithConnection).connection;
   const clear3 = conn ? makeEventListener(conn, "change", fire) : noop;
   return () => {
     clear1();

@@ -77,9 +77,10 @@ export function makeVibrate(
  * ```ts
  * const { vibrating, start, stop } = createVibrate([200, 100, 200]);
  *
- * createEffect(() => {
- *   console.log("vibrating:", vibrating());
- * });
+ * createEffect(
+ *   () => vibrating(),
+ *   vibrating => console.log("vibrating:", vibrating),
+ * );
  * ```
  */
 export function createVibrate(
@@ -149,8 +150,6 @@ export function createVibrate(
 
   return { vibrating, start, stop, supported };
 }
-
-// ─── Pulse / frequency primitives ────────────────────────────────────────────
 
 // Duration of a single repeating chunk sent to navigator.vibrate.
 // The setInterval fires at the same cadence so patterns join seamlessly.

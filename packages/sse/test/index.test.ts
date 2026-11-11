@@ -11,8 +11,6 @@ beforeEach(() => {
 });
 afterAll(() => vi.useRealTimers());
 
-// ── makeSSE ───────────────────────────────────────────────────────────────────
-
 describe("makeSSE", () => {
   it("creates an EventSource in CONNECTING state", () => {
     const [source, cleanup] = makeSSE("https://example.com/events");
@@ -68,8 +66,6 @@ describe("makeSSE", () => {
     expect(() => cleanup()).not.toThrow();
   });
 });
-
-// ── createSSE ─────────────────────────────────────────────────────────────────
 
 describe("createSSE", () => {
   it("starts in CONNECTING state", () =>
@@ -323,8 +319,6 @@ describe("createSSE", () => {
       }),
     ));
 });
-
-// ── createSSEStream ───────────────────────────────────────────────────────────
 
 describe("createSSEStream", () => {
   it("data throws NotReadyError before first message arrives", () =>

@@ -155,6 +155,19 @@ const [count, setCount, data] = wrapSetter(
 );
 ```
 
+## createServerSafeSignal
+
+`createSignal` on the client; a plain mutable box on the server.
+
+Solid 2 flags a setter that runs during a server render (`SERVER_WRITE` — the write is inert today and throws in a later release): server render is pure, state enters through async sources. Primitives that hold _interactive_ state (a cursor, a toggle, a controlled value) have no async source, so on the server they keep a plain value instead. Reads and updater-form writes behave the same within a request; nothing touches the reactive graph. The signal is still _created_ on the server so hydration ids stay aligned with the client — it is just never read or written there.
+
+```ts
+import { createServerSafeSignal } from "@solid-primitives/utils";
+
+const [cursor, setCursor] = createServerSafeSignal<string | undefined>(undefined);
+setCursor("b"); // a signal write in the browser, a plain assignment on the server
+```
+
 ## Color utilities
 
 Multi-format color parsing, conversion, and accessibility naming — available as a separate subpath so you only pay for what you use.

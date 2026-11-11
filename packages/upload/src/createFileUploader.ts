@@ -7,7 +7,7 @@ import type {
   UploadFile,
   UploadProgress,
   UploadStatus,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Primitive for uploading files with per-file and aggregate reactive state.

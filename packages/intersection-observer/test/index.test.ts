@@ -1,4 +1,4 @@
-import { createRoot, createSignal, flush } from "solid-js";
+import { createRoot, createSignal, flush, NotReadyError } from "solid-js";
 import { describe, test, expect, beforeEach } from "vitest";
 
 import {
@@ -318,7 +318,12 @@ describe("createIntersectionObserver", () => {
 
       flush(); // let the element effect observe div
 
-      expect(() => isVisible(div), "should throw NotReadyError before first IO").toThrow();
+      // Asserting the class specifically (not just "throws something") matters here:
+      // a lookalike NotReadyError class that isn't `instanceof` the real solid-js one
+      // wouldn't be recognized by <Loading> boundaries and would crash rendering instead.
+      expect(() => isVisible(div), "should throw the real NotReadyError before first IO").toThrow(
+        NotReadyError,
+      );
 
       instance.__TEST__onChange({ isIntersecting: true });
       flush();
@@ -622,8 +627,8 @@ describe("createVisibilityObserver", () => {
 
       expect(
         () => isVisible(),
-        "should throw NotReadyError before first observation",
-      ).toThrow();
+        "should throw the real NotReadyError before first observation",
+      ).toThrow(NotReadyError);
 
       const isVisibleFalse = createVisibilityObserver(div, { initialValue: false });
       expect(isVisibleFalse(), "should return false with initialValue: false").toBe(false);

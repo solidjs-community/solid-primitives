@@ -34,8 +34,6 @@ const meta = preview.meta({
 
 export default meta;
 
-// ─── Story 1: Key-level reactivity ──────────────────────────────────────────
-
 const FRUITS = ["apple", "banana", "cherry", "dragonfruit", "elderberry", "fig"];
 
 export const KeyLevelReactivity = meta.story({
@@ -85,8 +83,6 @@ export const KeyLevelReactivity = meta.story({
     );
   },
 });
-
-// ─── Story 2: Set algebra ────────────────────────────────────────────────────
 
 const NUMS = [1, 2, 3, 4, 5, 6, 7, 8];
 const numBtnStyle = {
@@ -218,8 +214,6 @@ export const SetAlgebra = meta.story({
     );
   },
 });
-
-// ─── Story 3: WeakSet object membership ─────────────────────────────────────
 
 type User = { name: string };
 const ALICE: User = { name: "Alice" };

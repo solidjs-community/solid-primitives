@@ -1,13 +1,11 @@
 import { describe, test, expect, vi, beforeAll, afterAll, beforeEach } from "vitest";
-import { createRoot, createSignal, flush, onCleanup } from "solid-js";
+import { createEffect, createRoot, createSignal, flush, isPending, onCleanup } from "solid-js";
 import {
   isNotificationSupported,
   makeNotification,
   createNotification,
   createNotificationPermission,
 } from "../src/index.js";
-
-// ── Mock Notification API ─────────────────────────────────────────────────────
 
 class MockNotification {
   static permission: NotificationPermission = "granted";
@@ -53,8 +51,6 @@ class MockNotification {
   }
 }
 
-// ── Mock Permissions API ──────────────────────────────────────────────────────
-
 const mockPermStatus = {
   state: "granted" as PermissionState,
   _listeners: [] as (() => void)[],
@@ -70,8 +66,6 @@ const mockPermStatus = {
     this._listeners.forEach(fn => fn());
   },
 };
-
-// ── Global setup ──────────────────────────────────────────────────────────────
 
 beforeAll(() => {
   Object.defineProperty(window, "Notification", {
@@ -99,15 +93,11 @@ beforeEach(() => {
   mockPermStatus._listeners = [];
 });
 
-// ── isNotificationSupported ───────────────────────────────────────────────────
-
 describe("isNotificationSupported", () => {
   test("returns true when Notification is available", () => {
     expect(isNotificationSupported()).toBe(true);
   });
 });
-
-// ── makeNotification ──────────────────────────────────────────────────────────
 
 describe("makeNotification", () => {
   test("show creates a Notification with the given title", () => {
@@ -179,8 +169,6 @@ describe("makeNotification", () => {
     expect(instance.close).toHaveBeenCalled();
   });
 });
-
-// ── createNotification ────────────────────────────────────────────────────────
 
 describe("createNotification", () => {
   test("initial state: notification is null, supported is true", () => {
@@ -331,8 +319,6 @@ describe("createNotification", () => {
     dispose();
   });
 
-  // ── Event callbacks ─────────────────────────────────────────────────────────
-
   test("onClick fires when click event is dispatched", () => {
     const onClick = vi.fn();
 
@@ -428,8 +414,6 @@ describe("createNotification", () => {
     dispose();
   });
 });
-
-// ── createNotificationPermission ──────────────────────────────────────────────
 
 describe("createNotificationPermission", () => {
   test("permission starts as unknown before query resolves", () => {
@@ -532,6 +516,42 @@ describe("createNotificationPermission", () => {
     await promise;
     flush();
     expect(pending()).toBe(false);
+
+    dispose();
+  });
+
+  test("isPending(permission) reads true while requestPermission is in flight (affects())", async () => {
+    let resolve!: (v: NotificationPermission) => void;
+    MockNotification.requestPermission.mockImplementation(
+      () => new Promise<NotificationPermission>(r => (resolve = r)),
+    );
+
+    // isPending must be read inside a genuinely tracked scope (an effect/JSX) to give
+    // reliable results — a bare top-level `isPending(fn)` call outside any computation
+    // does not exercise the same code path and can report stale/incorrect values.
+    const log: boolean[] = [];
+    const { requestPermission, dispose } = createRoot(dispose => {
+      const { permission, requestPermission } = createNotificationPermission();
+      createEffect(
+        () => isPending(permission),
+        p => {
+          log.push(p);
+        },
+      );
+      return { requestPermission, dispose };
+    });
+
+    flush();
+    expect(log).toEqual([false]);
+
+    const promise = requestPermission();
+    flush();
+    expect(log).toEqual([false, true]);
+
+    resolve("granted");
+    await promise;
+    flush();
+    expect(log.at(-1)).toBe(false);
 
     dispose();
   });

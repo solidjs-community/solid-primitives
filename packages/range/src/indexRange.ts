@@ -10,7 +10,7 @@ import {
 } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
 import { INTERNAL_OPTIONS } from "@solid-primitives/utils";
-import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./common.js";
+import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./common.ts";
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<IndexRange>` control flow.
@@ -26,7 +26,10 @@ import { abs, ceil, min, type RangeProps, sign, toFunction, accessor } from "./c
  * const [to, setTo] = createSignal(5)
  * const mapped = indexRange(() => 0, to, () => 0.5, number => {
  *    const [value, setValue] = createSignal(number());
- *    createEffect(() => handleNewNumber(number()))
+ *    createEffect(
+ *      () => number(),
+ *      handleNewNumber,
+ *    )
  *    return value
  * })
  * mapped() // => [0, 0.5, 1, 1.5, 2...]

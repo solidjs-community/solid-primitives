@@ -1,11 +1,11 @@
 import { access, type MaybeAccessor } from "@solid-primitives/utils";
-import { type Accessor, createMemo } from "solid-js";
+import { type Accessor, type SourceAccessor, createMemo } from "solid-js";
 
 /** Reactive `String.prototype.toLowerCase()`. */
-export const lowercase = (string: Accessor<string>) => createMemo(() => string().toLowerCase());
+export const lowercase = (string: Accessor<string>): SourceAccessor<string> => createMemo(() => string().toLowerCase());
 
 /** Reactive `String.prototype.toUpperCase()`. */
-export const uppercase = (string: Accessor<string>) => createMemo(() => string().toUpperCase());
+export const uppercase = (string: Accessor<string>): SourceAccessor<string> => createMemo(() => string().toUpperCase());
 
 /**
  * Reactively capitalizes a string — uppercases the first character, lowercases the rest.
@@ -13,7 +13,7 @@ export const uppercase = (string: Accessor<string>) => createMemo(() => string()
  * const [s, setS] = createSignal("hELLO wORLD");
  * capitalize(s)(); // => "Hello world"
  */
-export const capitalize = (string: Accessor<string>) =>
+export const capitalize = (string: Accessor<string>): SourceAccessor<string> =>
   createMemo(() => { const s = string(); return s.length === 0 ? s : s[0]!.toUpperCase() + s.substring(1).toLowerCase(); });
 
 /**
@@ -27,7 +27,7 @@ export const substring = (
   string: MaybeAccessor<string>,
   start: MaybeAccessor<number>,
   end?: MaybeAccessor<number>,
-) => createMemo(() => access(string).substring(access(start), access(end)));
+): SourceAccessor<string> => createMemo(() => access(string).substring(access(start), access(end)));
 
 /**
  * Reactive tagged template literal — interpolated values can be signals or plain values.

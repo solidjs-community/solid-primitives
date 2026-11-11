@@ -4,7 +4,7 @@
 
 # @solid-primitives/lifecycle
 
-[![size](https://img.shields.io/badge/size-289_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/lifecycle)
+[![size](https://img.shields.io/badge/size-297_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/lifecycle)
 [![version](https://img.shields.io/npm/v/@solid-primitives/lifecycle?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/lifecycle)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -30,7 +30,7 @@ pnpm add @solid-primitives/lifecycle
 
 Returns a boolean signal indicating whether the component is mounted or not.
 
-It's a simple wrapper around `createSignal` and `onMount`,
+It's a simple wrapper around `createSignal` and `onSettled`,
 but it can make your code feel more declarative - especially when used with `createMemo`.
 
 ```tsx
@@ -93,14 +93,14 @@ export const ClientOnly: FlowComponent = props => {
 
 ## `onElementConnect`
 
-`onMount` is a common lifecycle hook that is used to perform side-effects when the component is mounted.
+`onSettled` is a common lifecycle hook that is used to perform side-effects when the component is mounted.
 However, it is not certain that the elements are actually connected to the DOM when the mount callback is called.
 
 > **Note** If that's the case, it might be a sign that you are executing components that are not visible to the users my mistake.
 >
 > And if this is something intentional, you probably already have a way to hook into the actual DOM rendering.
 >
-> If you are not sure, you can use `onElementConnect` instead of `onMount` to make sure that you are caling your callback when the elements are connected to the DOM.
+> If you are not sure, you can use `onElementConnect` instead of `onSettled` to make sure that you are caling your callback when the elements are connected to the DOM.
 
 ```tsx
 <div
@@ -108,7 +108,7 @@ However, it is not certain that the elements are actually connected to the DOM w
     // often false, but will be true during hydration
     el.isConnected;
 
-    onMount(() => {
+    onSettled(() => {
       // often true, but will be false if the executed component is not actually getting rendered
       el.isConnected;
     });

@@ -1,6 +1,6 @@
 import { onCleanup, createMemo } from "solid-js";
-import type { Accessor } from "solid-js";
-import type { ReadableStream as NodeReadableStream } from "stream/web"
+import type { Accessor, SourceAccessor } from "solid-js";
+import type { ReadableStream as NodeReadableStream } from "node:stream/web"
 
 const chained = new Map<() => AbortSignal, (() => void)[]>();
 
@@ -14,7 +14,7 @@ const chained = new Map<() => AbortSignal, (() => void)[]>();
  * const streamed = createMemo(fromStream(() => getStream()));
  * ```
  */
-export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream) {
+export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream): (...args: Args) => AsyncGenerator<string, void, unknown> {
   return async function*(...args: Args) {
     let parts = '', decoder;
     const source = await fetcher(...args);
@@ -65,7 +65,7 @@ const closeJSONPart = (json: string) =>
  * const streamed = createMemo(fromJSONStream(() => getStream()));
  * ```
  */
-export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream) {
+export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream): (...args: Args) => AsyncGenerator<any, void, unknown> {
   const wrappedFetcher = fromStream(fetcher);
   return async function*(...args: Args) {
     for await (const data of wrappedFetcher(...args)) {
@@ -249,7 +249,7 @@ function toArray(item: any) {
  *
  * Objects and Arrays are re-created on each operation, but the values will be left untouched, so `<For>` should work fine.
  */
-export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initialValue?: I, memoOptions?: Parameters<typeof createMemo<{} | R | I | R[] | I[] | undefined>>[1]) {
+export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initialValue?: I, memoOptions?: Parameters<typeof createMemo<{} | R | I | R[] | I[] | undefined>>[1]): SourceAccessor<I | R | {} | R[] | I[] | undefined> {
   return createMemo<I | R | {} | R[] | I[] | undefined>((previous = initialValue) => {
     const current = res();
     return current == null && previous == null

@@ -3,17 +3,16 @@ import {
   type MaybeAccessor,
   access,
   asArray,
-  type Directive,
   tryOnCleanup,
 } from "@solid-primitives/utils";
-import { type Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
+import { type Accessor, createEffect, createOwner, createRenderEffect, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
 import type {
   EventListenerDirectiveProps,
   EventMapOf,
   TargetWithEventMap,
   EventListenerOptions,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Creates an event listener, that will be automatically disposed on cleanup.
@@ -59,8 +58,8 @@ export function makeEventListener(
   handler: (event: Event) => void,
   options?: EventListenerOptions,
 ): VoidFunction {
-  target.addEventListener(type, handler, options);
-  return tryOnCleanup(target.removeEventListener.bind(target, type, handler, options));
+  target?.addEventListener?.(type, handler, options);
+  return tryOnCleanup(target?.removeEventListener?.bind(target, type, handler, options));
 }
 
 /**
@@ -108,7 +107,14 @@ export function createEventListener(
   handler: (event: Event) => void,
   options?: EventListenerOptions,
 ): void {
-  if (isServer) return;
+  if (isServer) {
+    // The client mints one tracked-effect owner (createEffect/createRenderEffect
+    // below). Mint a matching owner on the server so the parent's hydration-id
+    // child counter stays aligned; otherwise every sibling after this listener
+    // shifts its hydration id by one (Solid 2 rc strict id alignment).
+    createOwner();
+    return;
+  }
 
   type State = { els: EventTarget[]; types: string[] };
 
@@ -155,9 +161,10 @@ export function createEventListener(
  * @example
  * const lastEvent = createEventSignal(el, 'click', { passive: true })
  *
- * createEffect(() => {
- *    console.log(lastEvent())
- * })
+ * createEffect(
+ *   () => lastEvent(),
+ *   event => console.log(event),
+ * );
  */
 
 // DOM Events
@@ -195,19 +202,61 @@ export function createEventSignal(
 }
 
 /**
- * Directive Usage. Creates an event listener, that will be automatically disposed on cleanup.
+ * Ref factory (directive) form. Creates an event listener on the element it is applied to,
+ * disposed with the calling component. Props may be an accessor to swap handlers on the fly.
  *
- * @param props [eventType, handler, options]
+ * @param props `[eventType, handler, options]`, or an accessor returning it
+ * @returns a ref callback
  *
  * @example
- * <button use:eventListener={["click", () => {...}]}>Click me!</button>
+ * <button ref={eventListener(["click", () => {...}])}>Click me!</button>
+ * // reactive props — the listener is re-attached when they change
+ * <button ref={eventListener(() => ["click", handler()])}>Click me!</button>
  */
-export const eventListener: Directive<EventListenerDirectiveProps> = (target, props) => {
-  createEffect(props, ([type, handler, options]) => {
-    target.addEventListener(type, handler, options);
-    return () => target.removeEventListener(type, handler, options);
+export function eventListener(
+  props: MaybeAccessor<EventListenerDirectiveProps>,
+): (target: EventTarget) => void;
+/**
+ * Directive form kept from 1.x (`use:eventListener`). Prefer the ref-factory form.
+ *
+ * @param target element to listen on
+ * @param props accessor returning `[eventType, handler, options]`
+ */
+export function eventListener(
+  target: EventTarget,
+  props: Accessor<EventListenerDirectiveProps>,
+): void;
+export function eventListener(
+  a: EventTarget | MaybeAccessor<EventListenerDirectiveProps>,
+  b?: Accessor<EventListenerDirectiveProps>,
+): ((target: EventTarget) => void) | void {
+  if (b !== undefined) {
+    const target = a as EventTarget;
+    createEffect(b, ([type, handler, options]) => {
+      target.addEventListener(type, handler, options);
+      return () => target.removeEventListener(type, handler, options);
+    });
+    return;
+  }
+  if (isServer) return () => {};
+  // Setup phase (owned): the effect is created here, in the calling component, so it is
+  // disposed with it. The ref callback below runs unowned and only captures the element.
+  const [target, setTarget] = createSignal<EventTarget | undefined>(undefined, {
+    ownedWrite: true,
   });
-};
+  createEffect(
+    () => [target(), access(a as MaybeAccessor<EventListenerDirectiveProps>)] as const,
+    ([el, [type, handler, options]]) => {
+      if (!el) return;
+      el.addEventListener(type, handler, options);
+      return () => el.removeEventListener(type, handler, options);
+    },
+    { transparent: true },
+  );
+  return (el: EventTarget) => {
+    setTarget(el);
+  };
+}
 
 // // /* TypeCheck */
 // const mouseHandler = (e: MouseEvent) => {};

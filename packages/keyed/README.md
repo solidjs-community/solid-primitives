@@ -4,7 +4,7 @@
 
 # @solid-primitives/keyed
 
-[![size](https://img.shields.io/badge/size-981_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/keyed)
+[![size](https://img.shields.io/badge/size-979_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/keyed)
 [![version](https://img.shields.io/npm/v/@solid-primitives/keyed?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/keyed)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -54,13 +54,9 @@ const mapped = keyArray(
   source,
   model => model.id,
   (model, index) => {
-    const [name, setName] = createSignal(model().name);
-    const [description, setDescription] = createSignal(model().description);
-
-    createComputed(() => {
-      setName(model().name);
-      setDescription(model().description);
-    });
+    // writable derived signals: follow the model, and can still be overridden locally
+    const [name, setName] = createSignal(() => model().name);
+    const [description, setDescription] = createSignal(() => model().description);
 
     return {
       id: model.id,

@@ -1,5 +1,71 @@
 # @solid-primitives/focus
 
+## 1.0.0-next.6
+
+### Patch Changes
+
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- Updated dependencies [1b703e1]
+  - @solid-primitives/event-listener@3.0.0-next.7
+  - @solid-primitives/utils@7.0.0-next.6
+
+## 1.0.0-next.5
+
+### Patch Changes
+
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [7ee755d]
+- Updated dependencies [638c530]
+  - @solid-primitives/utils@7.0.0-next.5
+  - @solid-primitives/event-listener@3.0.0-next.6
+
+## 1.0.0-next.4
+
+### Patch Changes
+
+- Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- Updated dependencies
+  - @solid-primitives/event-listener@3.0.0-next.3
+  - @solid-primitives/utils@7.0.0-next.4
+
+## 1.0.0-next.3
+
+### Minor Changes
+
+- 53d9fee: Add `createFocusGroup` — creates a focus group for moving focus imperatively (`focusNext`/`focusPrevious`/`focusFirst`/`focusLast`) between the focusable/tabbable elements of a container, with arrow-key/Home/End/Tab keyboard navigation enabled by default (a `keydown` listener attached to the group's ref, removed on ref change or disposal). Useful for building menus, listboxes, toolbars, and other composite widgets that need roving-tabindex-style navigation.
+
+  Options split into two groups: `from`, `tabbable`, `wrap`, and `accept` are traversal options that can be passed per-method-call or as defaults (the second argument to `createFocusGroup`); `orientation`, `textDirection`, `handleTab`, and `keyboardNavigation` are group-level keyboard options read only from those defaults.
+
+  Radio button groups are handled per native semantics: with `tabbable: true`, only one `<input type="radio">` per same-`name` group is tabbable at a time (the checked one, or the first if none is checked), matching browser roving-tabindex behavior for radio groups.
+
+## 1.0.0-next.2
+
+### Minor Changes
+
+- b7ef2f3: Add `createFocusRestore` — saves the currently focused element while active and restores focus to it once deactivated, without trapping focus or managing tab order. For non-modal surfaces (Popover, Tooltip, Menu) that should return focus to their trigger on close but must not intercept Tab navigation while open; for modal dialogs needing both behaviors, use `createFocusTrap`'s existing `restoreFocus` option instead.
+
+  Also fixed a stale-closure race shared between `createFocusTrap` and the new `createFocusRestore`: the restore target used to be read from a mutable outer variable inside a deferred `afterPaint` callback, so a fast reactivate-before-restore-fires cycle could restore focus to the wrong element. Both primitives now share one internal helper that captures the target synchronously at deactivation time.
+
+### Patch Changes
+
+- Updated dependencies [b7ef2f3]
+  - @solid-primitives/utils@7.0.0-next.3
+
+## 1.0.0-next.1
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- Updated dependencies [50e36c9]
+  - @solid-primitives/event-listener@3.0.0-next.2
+  - @solid-primitives/utils@7.0.0-next.2
+
 ## 1.0.0-next.0
 
 ### Major Changes

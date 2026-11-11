@@ -1,6 +1,6 @@
 import { drop, filterOut, push } from "@solid-primitives/utils/immutable";
 import { type Accessor, createSignal, type Setter } from "solid-js";
-import { createEventBus, type Emit, type Listen } from "./eventBus.js";
+import { createEventBus, type Emit, type Listen } from "./eventBus.ts";
 
 export type EventStackPayload<E, V = E> = {
   readonly event: V;

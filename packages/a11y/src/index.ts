@@ -3,16 +3,16 @@ export {
   createFormControlInput,
   FormControlContext,
   useFormControl,
-} from "./form-control.js";
+} from "./form-control.ts";
 
 export type {
   CreateFormControlProps,
   CreateFormControlInputProps,
   FormControlDataSet,
   FormControlContextValue,
-} from "./types.js";
+} from "./types.ts";
 
-export { makeAnnounce, createAnnounce } from "./announce.js";
-export type { Announce, AnnouncePoliteness } from "./announce.js";
+export { makeAnnounce, createAnnounce } from "./announce.ts";
+export type { Announce, AnnouncePoliteness } from "./announce.ts";
 
-export { createReducedMotion } from "./reduced-motion.js";
+export { createReducedMotion } from "./reduced-motion.ts";
