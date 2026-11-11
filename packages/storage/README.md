@@ -102,6 +102,9 @@ const [todos, setTodos] = makePersisted(createStore({ items: [] as Todo[] }), {
   and for values received from the `sync` API, so keys removed elsewhere are not resurrected from the current state
 - the merged defaults are not written to the storage until the next write, just like initial values
 - it works together with `hydrated` and asynchronous storages
+- if the initial value is still pending when `makePersisted` is called (an async `createSignal`, `createOptimistic` or
+  store), there are no defaults to merge onto: `merge: true` uses the stored data as is, and a merge function receives
+  `undefined` as `initial`
 
 ### Using `makePersisted` with Loading
 

@@ -865,6 +865,109 @@ describe("createPresence done()", () => {
     expect(presence.isVisible()).toBe(true);
     dispose();
   });
+
+  // A JS animation's completion callback can arrive after the transition it was started for has
+  // been superseded. `done` would end whatever runs by then; `bindDone()` ends only its own.
+  it("ends the exit with a bindDone() callback obtained from an effect on isExiting()", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    let finish: ((event?: Event) => void) | undefined;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      createEffect(
+        () => presence.isExiting(),
+        exiting => {
+          if (exiting) finish = presence.bindDone();
+        },
+      );
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    expect(finish).toBeDefined();
+    await Promise.resolve();
+    finish!();
+    flush();
+    expect(presence.isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("ignores a bindDone() callback of a cancelled exit once a newer exit runs", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    const finishFirstExit = presence.bindDone();
+    setShouldRender(true);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    setShouldRender(false);
+    flush();
+    expect(presence.isExiting()).toBe(true);
+    // the first exit's animation completes late
+    finishFirstExit();
+    flush();
+    expect(presence.isMounted()).toBe(true);
+    expect(presence.isExiting()).toBe(true);
+    // a callback bound to the running exit ends it
+    presence.bindDone()();
+    flush();
+    expect(presence.isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("ignores a bindDone() callback of a cancelled exit during the enter that cancelled it", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    const finishExit = presence.bindDone();
+    setShouldRender(true);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(presence.isEntering()).toBe(true);
+    finishExit();
+    flush();
+    expect(presence.isEntering()).toBe(true);
+    expect(presence.isAnimating()).toBe(true);
+    dispose();
+  });
+
+  it("ignores a bindDone() callback of the previous item's exit once the next item enters", async () => {
+    const [item, setItem] = createSignal<string | undefined>("foo");
+    let presence!: ReturnType<typeof createPresence<string>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(item, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setItem("bar");
+    flush();
+    const finishExit = presence.bindDone();
+    finishExit();
+    flush();
+    await Promise.resolve();
+    flush();
+    expect(presence.mountedItem()).toBe("bar");
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(presence.isEntering()).toBe(true);
+    // called again late (e.g. a second completion of the same animation)
+    finishExit();
+    flush();
+    expect(presence.isEntering()).toBe(true);
+    dispose();
+  });
 });
 
 // https://github.com/solidjs-community/solid-primitives/issues/1082

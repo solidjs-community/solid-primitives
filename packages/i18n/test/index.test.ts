@@ -213,6 +213,28 @@ describe("source text as key", () => {
     expect(t("Hi {{ name }}", { name: node })).toEqual(["Hi ", node, ""]);
   });
 
+  test("inherited Object.prototype names are treated as missing keys", () => {
+    const t = i18n.translator(
+      () => ({}) as Record<string, string>,
+      i18n.resolveTemplate,
+      i18n.missingKeyAsTemplate(i18n.resolveTemplate),
+    );
+    for (const key of ["toString", "constructor", "hasOwnProperty", "valueOf", "__proto__"]) {
+      expect(t(key)).toBe(key);
+    }
+    const flat = i18n.flatten({ a: { b: "nested" } });
+    const t2 = i18n.translator(() => flat, i18n.resolveTemplate);
+    expect(t2("a.b")).toBe("nested");
+    expect(t2("a.toString" as any)).toBeUndefined();
+    expect(t2("toString" as any)).toBeUndefined();
+    // own keys that shadow prototype names still resolve
+    const t3 = i18n.translator(() => ({ toString: "To string" }), i18n.resolveTemplate);
+    expect(t3("toString")).toBe("To string");
+    // a null dictionary (e.g. from untyped JS) must not throw, as with the previous `?.` lookup
+    const t4 = i18n.translator(() => null as any, i18n.resolveTemplate);
+    expect(t4("toString" as any)).toBeUndefined();
+  });
+
   test("fallback updates reactively when the locale changes", () => {
     const [locale, setLocale] = createSignal<"en" | "de">("en");
     const t = i18n.translator(

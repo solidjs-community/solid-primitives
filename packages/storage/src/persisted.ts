@@ -1,5 +1,5 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV } from "solid-js";
+import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV, NotReadyError } from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
 export type SyncStorage = {
@@ -71,7 +71,9 @@ export type PersistenceOptions<
    * initial value later keep their defaults when older persisted data is loaded. `true` deep-merges
    * plain objects (arrays and other values from the storage replace the default as a whole); a
    * function receives the deserialized stored value and the initial value and returns the value
-   * to use. Applies to the initial load and to incoming sync data.
+   * to use. Applies to the initial load and to incoming sync data. If the initial value is still
+   * pending (an async signal or store that has not produced its first value), there are no defaults:
+   * `true` uses the stored value as is and a function receives `undefined` as `initial`.
    */
   merge?: boolean | ((stored: T, initial: T) => T);
   action?: (signal: S) => Parameters<typeof action>[0];
@@ -189,10 +191,17 @@ export function makePersisted<
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
   const init = storage.getItem(name, storageOptions);
   const isSignal = typeof signal[0] === "function";
-  // capture the initial value before any stored data is applied, so it can serve as defaults
-  const initial: T | undefined = options.merge
-    ? clonePlain(isSignal ? untrack(signal[0] as () => T) : snapshot(signal[0] as T))
-    : undefined;
+  // capture the initial value before any stored data is applied, so it can serve as defaults;
+  // an async signal or store that has not produced its first value yet throws NotReadyError
+  // here - it has no defaults, so stored data is then used as is (`initial` stays undefined)
+  let initial: T | undefined;
+  if (options.merge) {
+    try {
+      initial = clonePlain(isSignal ? untrack(signal[0] as () => T) : snapshot(signal[0] as T));
+    } catch (e) {
+      if (!(e instanceof NotReadyError)) throw e;
+    }
+  }
   const merge: ((stored: T) => T) | undefined = !options.merge
     ? undefined
     : typeof options.merge === "function"

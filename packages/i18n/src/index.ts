@@ -5,6 +5,8 @@ export type BaseRecordDict = { readonly [K: string | number]: unknown };
 export type BaseArrayDict = readonly unknown[];
 export type BaseDict = BaseRecordDict | BaseArrayDict;
 
+const hasOwn = Object.prototype.hasOwnProperty;
+
 const isDict = (value: unknown): value is BaseDict =>
   value != null &&
   ((value = Object.getPrototypeOf(value)), value === Array.prototype || value === Object.prototype);
@@ -376,6 +378,7 @@ export const missingKeyAsTemplate =
  * If the dictionary exists but has no value at {@link path}, {@link onMissingKey} is called (if provided)
  * and its result is returned. By default (no {@link onMissingKey}), a missing key resolves to `undefined`,
  * same as when the dictionary itself isn't available yet.
+ * Only the dictionary's own keys are looked up — inherited names like `"toString"` count as missing.
  *
  * Otherwise it will return the value as is.
  *
@@ -422,7 +425,10 @@ export function translator<T extends BaseRecordDict>(
     if (path[0] === ".") path = path.slice(1);
 
     const currentDict = dict();
-    const value = currentDict?.[path];
+    // Only own keys count: inherited names like "toString" or "constructor" are treated as
+    // missing, since keys (especially source-text keys) can be arbitrary strings.
+    const value =
+      currentDict != null && hasOwn.call(currentDict, path) ? currentDict[path] : undefined;
 
     switch (typeof value) {
       case "function":

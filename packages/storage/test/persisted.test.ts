@@ -438,6 +438,55 @@ describe("makePersisted", () => {
       flush();
       expect(mockStorage.getItem("merge13")).toBe(JSON.stringify({ a: 3, b: 4 }));
     });
+
+    it("persists an optimistic signal whose initial value is still pending", async () => {
+      const DataServer = {
+        data: "server",
+        get: () => Promise.resolve(DataServer.data),
+        set: (next: string) => new Promise(res => setTimeout(() => res((DataServer.data = next)), 50)),
+      };
+      const [signal, setSignal] = makePersisted(
+        createRoot(() => createOptimistic(() => DataServer.get())),
+        {
+          storage: mockStorage,
+          name: "merge14",
+          merge: true,
+          action: ([getter, setter]) =>
+            function* (next) {
+              setter(next);
+              yield DataServer.set(next);
+              refresh(getter);
+            },
+        },
+      );
+      await new Promise(res => setTimeout(res, 0));
+      flush();
+      await setSignal("persisted");
+      flush();
+      expect(mockStorage.getItem("merge14")).toBe('"persisted"');
+      expect(latest(signal)).toBe("persisted");
+    });
+
+    it("uses stored data as is when the initial value is still pending", () => {
+      mockStorage.setItem("merge15", JSON.stringify({ a: 2 }));
+      let initial: unknown = "not called";
+      const persisted = makePersisted(
+        createRoot(() => createSignal(() => Promise.resolve({ a: 1, b: 1 }))),
+        { storage: mockStorage, name: "merge15", merge: true },
+      );
+      expect(persisted).toHaveLength(4);
+      const [, , init] = makePersisted(
+        createRoot(() => createSignal(() => Promise.resolve({ a: 1, b: 1 }))),
+        {
+          storage: mockStorage,
+          name: "merge15",
+          merge: (stored, defaults) => ((initial = defaults), stored),
+        },
+      );
+      expect(init).toBe(JSON.stringify({ a: 2 }));
+      // there are no defaults yet, so the merge function receives `undefined` as initial value
+      expect(initial).toBeUndefined();
+    });
   });
 
   it("defers the initialization if the hydrated option is set", async () => {
