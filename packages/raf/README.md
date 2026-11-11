@@ -169,6 +169,7 @@ function useGlobalRAF(): (
 ];
 
 // Example
+import { flush } from "solid-js";
 import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
 
 const createGlobalRAFCallback = useGlobalRAF();
@@ -190,6 +191,8 @@ const [hasDraw, addDraw, removeDraw, running] = createGlobalRAFCallback(
 
 addSampler();
 addDraw();
+// `running()` updates once the write is flushed (tracked reads update automatically)
+flush();
 running(); // true, both run in the same frame
 ```
 
@@ -199,7 +202,7 @@ running(); // true, both run in the same frame
 
 Drives an external frameloop scheduler (for example [motion's `frame`](https://motion.dev/docs/frame)) with the same `[running, start, stop]` shape as `createRAF`. The loop is stopped on cleanup.
 
-`schedule` receives the callback and must return an ID (not `null` or `undefined`) that `cancel` accepts. motion's `frame.render` returns nothing and `cancelFrame` takes the callback itself, so return the callback as the ID:
+`schedule` receives the callback and must keep running it every frame until cancelled, returning an ID (not `null` or `undefined`) that `cancel` accepts. It is called once per `start()`, so a one-shot scheduler like `requestAnimationFrame` only runs the callback once; use `createRAF` for that. motion's `frame.render` returns nothing and `cancelFrame` takes the callback itself, so return the callback as the ID:
 
 ```ts
 // Type

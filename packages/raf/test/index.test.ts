@@ -113,9 +113,10 @@ describe("createCallbacksSet", () => {
 
 describe("createScheduledLoop", () => {
   it("schedules and cancels with the given functions", () => {
-    const schedule = vi.fn((cb: FrameRequestCallback) => requestAnimationFrame(cb));
-    const cancel = vi.fn((id: number) => cancelAnimationFrame(id));
-    const callback = vi.fn<FrameRequestCallback>();
+    // a self-repeating scheduler, as `createScheduledLoop` expects
+    const schedule = vi.fn((cb: VoidFunction) => setInterval(cb, 16));
+    const cancel = vi.fn((id: ReturnType<typeof setInterval>) => clearInterval(id));
+    const callback = vi.fn();
     const [running, start, stop] = root(() => createScheduledLoop(schedule, cancel)(callback));
     expect(running()).toBe(false);
     // nothing to cancel before the first start
@@ -128,13 +129,17 @@ describe("createScheduledLoop", () => {
     // already running: not scheduled again
     start();
     expect(schedule).toHaveBeenCalledTimes(1);
-    vi.advanceTimersToNextFrame();
-    expect(callback).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(48);
+    expect(callback).toHaveBeenCalledTimes(3);
+    // the scheduler repeats the callback; it is not scheduled again per frame
+    expect(schedule).toHaveBeenCalledTimes(1);
     stop();
     flush();
     expect(running()).toBe(false);
     expect(cancel).toHaveBeenCalledTimes(1);
     expect(cancel).toHaveBeenCalledWith(schedule.mock.results[0]!.value);
+    vi.advanceTimersByTime(48);
+    expect(callback).toHaveBeenCalledTimes(3);
   });
 
   it("cancels on dispose", () => {
@@ -263,6 +268,24 @@ describe("useGlobalRAF", () => {
     removeNeverAdded();
     flush();
     expect(running()).toBe(true);
+  });
+
+  it("keeps registrations of the same callback from different owners independent", () => {
+    const callback = vi.fn<FrameRequestCallback>();
+    const [, add1, remove1, running] = root(() => useGlobalRAF()(callback, true));
+    const [added2, add2, remove2] = root(() => useGlobalRAF()(callback, true));
+    add1();
+    add2();
+    remove1();
+    expect(added2()).toBe(true);
+    flush();
+    expect(running()).toBe(true);
+    vi.advanceTimersToNextFrame();
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    remove2();
+    flush();
+    expect(running()).toBe(false);
   });
 
   it("accepts an accessor for startWhenAdded", () => {

@@ -116,18 +116,21 @@ const useGlobalRAF: () => GlobalRAFCallbackFactory =
       callback: FrameRequestCallback,
       startWhenAdded: MaybeAccessor<boolean> = false,
     ) {
-      const added = () => callbacksSet.has(callback);
+      // a separate entry per call, so registering the same `callback` from two owners doesn't let
+      // one owner's `remove` (or cleanup) unregister the other
+      const entry: FrameRequestCallback = timeStamp => callback(timeStamp);
+      const added = () => callbacksSet.has(entry);
       // `start`/`stop` are no-ops when already started/stopped, so don't check `running()`: its
       // value is stale until the next flush. Untracked so a tracking caller doesn't subscribe to
       // the set it is writing
       const add = () =>
         untrack(() => {
-          callbacksSet.add(callback);
+          callbacksSet.add(entry);
           if (access(startWhenAdded)) start();
         });
       const remove = () =>
         untrack(() => {
-          if (callbacksSet.delete(callback) && callbacksSet.size === 0) stop();
+          if (callbacksSet.delete(entry) && callbacksSet.size === 0) stop();
         });
 
       onCleanup(remove);
@@ -140,7 +143,7 @@ const useGlobalRAF: () => GlobalRAFCallbackFactory =
  * with the same `[running, start, stop]` shape as `createRAF`. The loop is stopped on cleanup.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createScheduledLoop
- * @param schedule Receives the callback and schedules it, returning the ID that `cancel` needs. Must not return `null` or `undefined`.
+ * @param schedule Receives the callback and schedules it to run every frame until cancelled, returning the ID that `cancel` needs. Must not return `null` or `undefined`. It is called once per `start()`, so a one-shot scheduler such as `requestAnimationFrame` only runs the callback once; use `createRAF` for that.
  * @param cancel Cancels the scheduled callback using the ID returned by `schedule`.
  * @returns a function that receives a callback and returns
  * ```ts
