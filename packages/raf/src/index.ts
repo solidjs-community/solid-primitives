@@ -1,4 +1,6 @@
-import { type MaybeAccessor, noop } from "@solid-primitives/utils";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
+import { ReactiveSet } from "@solid-primitives/set";
+import { access, type MaybeAccessor, noop } from "@solid-primitives/utils";
 import { createSignal, createMemo, untrack, type Accessor, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
 
@@ -23,26 +25,171 @@ function createRAF(
     return [() => false, noop, noop];
   }
   const [running, setRunning] = createSignal(false, { ownedWrite: true });
-  let requestID = 0;
+  let requestID: number | null = null;
 
   const loop: FrameRequestCallback = timeStamp => {
     requestID = requestAnimationFrame(loop);
     callback(timeStamp);
   };
   const start = () => {
-    // untracked: a tracking caller (e.g. `createMs` called in a memo) must not subscribe to the
-    // signal it is about to write, or it would re-run forever
-    if (untrack(running)) return;
+    // check the request, not `running()`: a signal write stays pending until the next flush, so
+    // two `start()` calls in the same tick would both see `false` and start two loops. Reading
+    // no signal also keeps a tracking caller (e.g. `createMs` in a memo) from subscribing to it
+    if (requestID !== null) return;
     setRunning(true);
     requestID = requestAnimationFrame(loop);
   };
   const stop = () => {
     setRunning(false);
-    cancelAnimationFrame(requestID);
+    // only cancel a request that was actually made (`0` used to stand for "none")
+    if (requestID !== null) {
+      cancelAnimationFrame(requestID);
+      requestID = null;
+    }
   };
 
   onCleanup(stop);
   return [running, start, stop];
+}
+
+/**
+ * A primitive for executing multiple callbacks at once, intended for usage in conjunction with primitives like `createRAF`.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet
+ * @param initialCallbacks callbacks to start the set with
+ * @returns a callback that calls every callback in the set with the same arguments, and the `ReactiveSet` holding them
+ * ```ts
+ * [callback: T, callbacksSet: ReactiveSet<T>]
+ * ```
+ *
+ * @example
+ * const [callback, callbacks] = createCallbacksSet<FrameRequestCallback>();
+ * const [running, start, stop] = createRAF(callback);
+ * callbacks.add(ts => el.style.opacity = ...);
+ */
+function createCallbacksSet<T extends (...args: any) => void>(
+  ...initialCallbacks: Array<T>
+): [callback: T, callbacksSet: ReactiveSet<T>] {
+  const callbacksSet = new ReactiveSet(initialCallbacks);
+
+  return [((...args) => callbacksSet.forEach(callback => callback(...args))) as T, callbacksSet];
+}
+
+export type GlobalRAFCallbackFactory = (
+  callback: FrameRequestCallback,
+  startWhenAdded?: MaybeAccessor<boolean>,
+) => [
+  added: Accessor<boolean>,
+  add: VoidFunction,
+  remove: VoidFunction,
+  running: Accessor<boolean>,
+  start: VoidFunction,
+  stop: VoidFunction,
+];
+
+/**
+ * Returns a factory for callbacks that share one global `requestAnimationFrame` loop, so they all
+ * run in the same frame with the same timestamp. The loop lives in a singleton root.
+ *
+ * Each call returns `[added, add, remove, running, start, stop]`: the first three control whether
+ * the callback is in the shared loop, the last three control the shared loop itself.
+ * Pass `startWhenAdded` to start the loop when the callback is added. The loop stops when the last
+ * callback is removed. Callbacks are removed on cleanup.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#useGlobalRAF
+ *
+ * @example
+ * const createGlobalRAFCallback = useGlobalRAF();
+ * const [added, add, remove, running, start, stop] = createGlobalRAFCallback(
+ *   targetFPS(() => el.style.transform = "translateX(...)", 60),
+ *   true,
+ * );
+ */
+const useGlobalRAF: () => GlobalRAFCallbackFactory =
+  createHydratableSingletonRoot<GlobalRAFCallbackFactory>(() => {
+    if (isServer) return () => [() => false, noop, noop, () => false, noop, noop];
+
+    const [callback, callbacksSet] = createCallbacksSet<FrameRequestCallback>();
+    const [running, start, stop] = createRAF(callback);
+
+    return function createGlobalRAFCallback(
+      callback: FrameRequestCallback,
+      startWhenAdded: MaybeAccessor<boolean> = false,
+    ) {
+      const added = () => callbacksSet.has(callback);
+      // `start`/`stop` are no-ops when already started/stopped, so don't check `running()`: its
+      // value is stale until the next flush. Untracked so a tracking caller doesn't subscribe to
+      // the set it is writing
+      const add = () =>
+        untrack(() => {
+          callbacksSet.add(callback);
+          if (access(startWhenAdded)) start();
+        });
+      const remove = () =>
+        untrack(() => {
+          if (callbacksSet.delete(callback) && callbacksSet.size === 0) stop();
+        });
+
+      onCleanup(remove);
+      return [added, add, remove, running, start, stop];
+    };
+  });
+
+/**
+ * A primitive for driving an external frameloop scheduler (for example [motion's `frame`](https://motion.dev/docs/frame))
+ * with the same `[running, start, stop]` shape as `createRAF`. The loop is stopped on cleanup.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createScheduledLoop
+ * @param schedule Receives the callback and schedules it, returning the ID that `cancel` needs. Must not return `null` or `undefined`.
+ * @param cancel Cancels the scheduled callback using the ID returned by `schedule`.
+ * @returns a function that receives a callback and returns
+ * ```ts
+ * [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction]
+ * ```
+ *
+ * @example
+ * import { cancelFrame, frame } from "motion";
+ *
+ * // motion's `frame.render` returns nothing and `cancelFrame` takes the callback itself,
+ * // so return the callback as the request ID
+ * const createMotionFrameRender = createScheduledLoop(
+ *   callback => (frame.render(callback, true), callback),
+ *   cancelFrame,
+ * );
+ * const [running, start, stop] = createMotionFrameRender(
+ *   data => (element.style.transform = "translateX(...)"),
+ * );
+ */
+function createScheduledLoop<
+  RequestID extends NonNullable<unknown>,
+  Callback extends (...args: Array<any>) => any,
+>(
+  schedule: (callback: Callback) => RequestID,
+  cancel: (requestID: RequestID) => void,
+): (callback: Callback) => [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction] {
+  return (callback: Callback) => {
+    if (isServer) {
+      return [() => false, noop, noop];
+    }
+    const [running, setRunning] = createSignal(false, { ownedWrite: true });
+    let requestID: RequestID | null = null;
+
+    const start = () => {
+      if (requestID !== null) return;
+      setRunning(true);
+      requestID = schedule(callback);
+    };
+    const stop = () => {
+      setRunning(false);
+      if (requestID !== null) {
+        cancel(requestID);
+        requestID = null;
+      }
+    };
+
+    onCleanup(stop);
+    return [running, start, stop];
+  };
 }
 
 /**
@@ -136,4 +283,12 @@ function createMs(fps: MaybeAccessor<number>, limit?: MaybeAccessor<number>): Ms
   return Object.assign(ms, { reset, running, start, stop });
 }
 
-export { createMs, createRAF, createRAF as default, targetFPS };
+export {
+  createCallbacksSet,
+  createMs,
+  createRAF,
+  createRAF as default,
+  createScheduledLoop,
+  targetFPS,
+  useGlobalRAF,
+};
