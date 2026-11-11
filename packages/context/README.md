@@ -147,7 +147,8 @@ It will work exactly like nesting multiple providers as separate components, but
 
 ### How to use it
 
-`MultiProvider` takes only a single `values` with a key-value pair of the context and the value to provide.
+`MultiProvider` takes a single `values` array. Contexts and custom provider components are paired with the value to provide.
+Providers created by `createContextProvider`, `createOptionalContextProvider` or `createLayeredContext` are paired with their **props** instead, exactly as if you nested them directly, so providers with any prop shape compose without a wrapper component.
 
 > **Note**
 > Values list is evaluated in order, so the context values will be provided in the same way as if you were nesting the providers.
@@ -159,11 +160,13 @@ import { MultiProvider } from "@solid-primitives/context";
 <FooContext value={"foo"}>
   <BarContext value={"bar"}>
     <BazContext value={"baz"}>
-      <MyCustomProviderComponent value={"hello-world"}>
-        <BoundContextProvider>
-          <App />
-        </BoundContextProvider>
-      </MyCustomProviderComponent>
+      <CounterProvider initial={1} label="primary">
+        <MyCustomProviderComponent value={"hello-world"}>
+          <BoundContextProvider>
+            <App />
+          </BoundContextProvider>
+        </MyCustomProviderComponent>
+      </CounterProvider>
     </BazContext>
   </BarContext>
 </FooContext>;
@@ -174,6 +177,8 @@ import { MultiProvider } from "@solid-primitives/context";
     [FooContext, "foo"],
     [BarContext, "bar"],
     [BazContext, "baz"],
+    // providers from createContextProvider (and friends) receive the same props as when nested
+    [CounterProvider, { initial: 1, label: "primary" }],
     // you can also provide a component, the value will be passed to a `value` prop
     [MyCustomProviderComponent, "hello-world"],
     // if you have a provider that doesn't accept a `value` prop, you can just pass a function
@@ -186,6 +191,9 @@ import { MultiProvider } from "@solid-primitives/context";
 
 > **Warning**
 > Components and values passed to `MultiProvider` will be evaluated only once, so make sure that the structure is static. If it isn't, please use nested provider components instead.
+
+> **Note**
+> Before 2.0, a `[Provider, value]` pair for a provider created by `createContextProvider` reached its factory as `props.value`. Those providers now receive props, so wrap the value to keep that shape: `[Provider, { value }]`. Getters in the props object stay reactive.
 
 ## `ContextConsumer`
 

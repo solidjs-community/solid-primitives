@@ -1,6 +1,7 @@
 import {
   createContext,
   createComponent,
+  merge,
   useContext,
   type Element,
   type Context,
@@ -8,12 +9,31 @@ import {
   type FlowComponent,
 } from "solid-js";
 
+// Brands providers created by this package so `MultiProvider` can pass them props instead of a
+// `value`. `Symbol.for` keeps the brand recognisable across duplicate copies of this package.
+const $PROVIDER_PROPS: unique symbol = Symbol.for("@solid-primitives/context:provider-props");
+
 export type ContextProviderProps = {
   children?: Element;
 } & Record<string, unknown>;
 export type ContextProvider<T extends ContextProviderProps> = (
   props: { children: Element } & T,
 ) => Element;
+/**
+ * A {@link ContextProvider} created by this package's provider factories. `MultiProvider` passes
+ * these their props (`[Provider, props]`) rather than a `value`.
+ */
+export type CreatedContextProvider<T extends ContextProviderProps> = ContextProvider<T> & {
+  readonly [$PROVIDER_PROPS]: true;
+};
+
+function brandProvider<P extends ContextProviderProps>(
+  provider: ContextProvider<P>,
+): CreatedContextProvider<P> {
+  return Object.defineProperty(provider, $PROVIDER_PROPS, {
+    value: true,
+  }) as CreatedContextProvider<P>;
+}
 
 /**
  * Options shared by context provider factories.
@@ -52,17 +72,17 @@ export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
   defaults?: T,
   options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => Exclude<T, undefined>] {
+): [provider: CreatedContextProvider<P>, useContext: () => Exclude<T, undefined>] {
   const ctx = createContext<Exclude<T, undefined>>(defaults as Exclude<T, undefined>, options);
   return [
-    props => {
+    brandProvider<P>(props => {
       return createComponent(ctx, {
         value: factoryFn(props) as Exclude<T, undefined>,
         get children() {
           return props.children;
         },
       });
-    },
+    }),
     () => useContext(ctx),
   ];
 }
@@ -90,10 +110,10 @@ export function createOptionalContextProvider<T, P extends ContextProviderProps>
   factoryFn: (props: P) => T,
   defaults?: T,
   options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T | undefined] {
+): [provider: CreatedContextProvider<P>, useContext: () => T | undefined] {
   const ctx = createContext<T | typeof $EMPTY>(defaults === undefined ? $EMPTY : defaults, options);
   return [
-    props => {
+    brandProvider<P>(props => {
       const value = factoryFn(props);
       return createComponent(ctx, {
         value: value === undefined ? $EMPTY : value,
@@ -101,7 +121,7 @@ export function createOptionalContextProvider<T, P extends ContextProviderProps>
           return props.children;
         },
       });
-    },
+    }),
     () => {
       const value = useContext(ctx);
       return value === $EMPTY ? undefined : value;
@@ -142,10 +162,10 @@ export function createLayeredContext<T, P extends ContextProviderProps>(
   factoryFn: (props: P, parent: T) => T,
   defaults: T,
   options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T] {
+): [provider: CreatedContextProvider<P>, useContext: () => T] {
   const ctx = createContext<T>(defaults, options);
   return [
-    props => {
+    brandProvider<P>(props => {
       const parent = useContext(ctx);
       return createComponent(ctx, {
         value: factoryFn(props, parent),
@@ -153,10 +173,23 @@ export function createLayeredContext<T, P extends ContextProviderProps>(
           return props.children;
         },
       });
-    },
+    }),
     () => useContext(ctx),
   ];
 }
+
+/** Validates one `MultiProvider` entry: providers from this package pair with their props, others with a value. */
+type MultiProviderItem<T> = T extends readonly [infer Provider, unknown]
+  ? Provider extends CreatedContextProvider<infer ProviderProps>
+    ? readonly [Provider, Omit<ProviderProps, "children">]
+    : Provider extends Context<infer Value>
+      ? readonly [Provider, Value]
+      : Provider extends ContextProviderComponent<infer Value>
+        ? readonly [Provider, Value]
+        : never
+  : T extends FlowComponent
+    ? T
+    : never;
 
 /*
 
@@ -171,35 +204,33 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
 /**
  * A component that allows you to provide multiple contexts at once. It will work exactly like nesting multiple providers as separate components, but it will save you from the nesting.
  *
- * @param values Array of tuples of `[ContextProviderComponent, value]` or `[Context, value]` or bound `ContextProviderComponent` (that doesn't take a `value` property).
+ * @param values Array of `[Context, value]` or `[ContextProviderComponent, value]` tuples,
+ * `[Provider, props]` tuples for providers created by `createContextProvider`,
+ * `createOptionalContextProvider` or `createLayeredContext`, or bound provider components.
  *
  * @example
  * ```tsx
  * // before
  * <CounterCtx value={1}>
  *   <NameCtx value="John">
- *     <App/>
+ *     <ThemeProvider primary="red">
+ *       <App/>
+ *     </ThemeProvider>
  *   </NameCtx>
  * </CounterCtx>
  *
  * // after
  * <MultiProvider values={[
  *  [CounterCtx, 1],
- *  [NameCtx, "John"]
+ *  [NameCtx, "John"],
+ *  [ThemeProvider, { primary: "red" }]
  * ]}>
  *  <App/>
  * </MultiProvider>
  * ```
  */
-export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props: {
-  values: {
-    [K in keyof T]:
-      | readonly [
-          Context<T[K]> | ContextProviderComponent<T[K]>,
-          [T[K]][T extends unknown ? 0 : never],
-        ]
-      | FlowComponent;
-  };
+export function MultiProvider<const T extends readonly unknown[]>(props: {
+  values: T & { [K in keyof T]: MultiProviderItem<T[K]> };
   children: Element;
 }): Element {
   const { values } = props;
@@ -208,14 +239,18 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
 
     if (!item) return props.children;
 
-    const ctxProps: { value?: any; children: Element } = {
+    let ctxProps: { value?: any; children: Element } = {
       get children() {
         return fn(i + 1);
       },
     };
     if (Array.isArray(item)) {
-      ctxProps.value = item[1];
-      item = item[0];
+      const [provider, valueOrProps] = item;
+      item = provider;
+      // Providers from this package take their own props, exactly as when nested directly. `merge`
+      // keeps any getters in those props reactive; `children` always comes from `ctxProps`.
+      if ($PROVIDER_PROPS in provider) ctxProps = merge(valueOrProps, ctxProps);
+      else ctxProps.value = valueOrProps;
     }
 
     return createComponent(item, ctxProps);
