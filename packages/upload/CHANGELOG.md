@@ -1,5 +1,11 @@
 # @solid-primitives/upload
 
+## 0.1.7
+
+### Patch Changes
+
+- 9864461: Fix `transformFiles` throwing for every `FileList`. Iterating with `for...in` also visited the list's `length` and `item` members, so file pickers and drop zones crashed.
+
 ## 0.1.6
 
 ### Patch Changes
