@@ -1,5 +1,13 @@
 # @solid-primitives/raf
 
+## 4.0.0-next.6
+
+### Patch Changes
+
+- 790b4de: Correct the `createScheduledLoop` motion example: `frame.render` returns the scheduled callback, so it can be passed to `cancelFrame` directly.
+- Updated dependencies [790b4de]
+  - @solid-primitives/set@1.0.0-next.5
+
 ## 4.0.0-next.5
 
 ### Minor Changes
