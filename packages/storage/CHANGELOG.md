@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 4.4.1
+
+### Patch Changes
+
+- cb1b61e: fix: restore `makePersisted` generic type inference under TypeScript 5+/7. Calling `makePersisted(createSignal("hello"), { name, storage: localStorage })` previously fell back to `T = unknown` and errored with `TS2769`. The public overloads now extract `T` from `S` via `SignalType<S>` (as in 4.3.5).
+
 ## 4.4.0
 
 ### Minor Changes
