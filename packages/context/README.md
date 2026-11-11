@@ -201,7 +201,10 @@ Note that this component solely serves as syntactic sugar and doesn't provide an
 * A `use...()` function returned by `createContextProvider` or an inline function that returns the context's value: `() => useContext(MyContext)`.
 * A raw SolidJS context returned by `createContext()`.
 
-In case the context's value is `undefined` (e.g. by using `createOptionalContextProvider`), a fallback element specified in the `fallback` prop is rendered instead. If the context is not provided at all, the component will throw an error.
+In case the context's value is `undefined` (e.g. by using `createOptionalContextProvider`), a fallback element specified in the `fallback` prop is rendered instead. Without a `fallback`, nothing is rendered.
+
+> **Note**
+> `fallback` cannot suppress errors for required contexts. If a required context (a raw `createContext()` without a default, or a `useContext` function from `createContextProvider` without defaults) is not provided, `useContext` throws a `ContextNotFoundError` before `fallback` is considered. Use `createOptionalContextProvider` when a missing provider should render the fallback.
 
 ```tsx
 import { createContextProvider, ContextConsumer } from "@solid-primitives/context";

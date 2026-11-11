@@ -1,5 +1,12 @@
 import { describe, test, expect, expectTypeOf } from "vitest";
-import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
+import {
+  createContext,
+  createRoot,
+  type FlowComponent,
+  type Element,
+  untrack,
+  useContext,
+} from "solid-js";
 import { render } from "@solidjs/web";
 import {
   createContextProvider,
@@ -490,5 +497,46 @@ describe("ContextConsumer", () => {
         document.createElement("div")
       )
     ).toThrow();
+  });
+
+  // Solid doesn't export `ContextNotFoundError`; take its class from a bare `useContext` miss.
+  const getContextNotFoundError = () => {
+    try {
+      createRoot(() => useContext(createContext<string>()));
+    } catch (error) {
+      return (error as Error).constructor as new (...args: any[]) => Error;
+    }
+    throw new Error("expected useContext to throw for a missing context");
+  };
+
+  test("fallback does not suppress ContextNotFoundError for a missing required context", () => {
+    const ContextNotFoundError = getContextNotFoundError();
+    const [, useRequired] = createContextProvider(() => ({ value: 1 }));
+    const RawContext = createContext<string>();
+
+    for (const provider of [useRequired, RawContext] as const) {
+      expect(() =>
+        render(
+          () => (
+            <ContextConsumer provider={provider as () => unknown} fallback={() => "Fallback"}>
+              {value => value as any}
+            </ContextConsumer>
+          ),
+          document.createElement("div"),
+        ),
+      ).toThrow(ContextNotFoundError);
+    }
+  });
+
+  test("renders nothing when an optional context is undefined and no fallback is given", () => {
+    const [, useOptional] = createOptionalContextProvider((props: { value?: string }) => props.value);
+    const container = document.createElement("div");
+    const unmount = render(
+      () => <ContextConsumer provider={useOptional}>{value => value as any}</ContextConsumer>,
+      container,
+    );
+
+    expect(container.innerHTML).toBe("");
+    unmount();
   });
 });
