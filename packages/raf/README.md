@@ -124,7 +124,9 @@ A primitive for executing multiple callbacks at once, intended for usage in conj
 #### Definition
 
 ```ts
-function createCallbacksSet<T extends (...args: any) => void>(...initialCallbacks: Array<T>): [callback: T, callbacksSet: ReactiveSet<T>]
+function createCallbacksSet<T extends (...args: any) => void>(
+  ...initialCallbacks: Array<T>
+): [callback: T, callbacksSet: ReactiveSet<T>];
 ```
 
 ## useGlobalRAF
@@ -136,26 +138,26 @@ Returns a factory function that works like `createRAF` with an additional parame
 ```ts
 import { useGlobalRAF } from "@solid-primitives/raf";
 
-const createScheduledLoop = useGlobalRAF()
-const [hasAddedManual, addManual, removeManual, isRunningManual] = createScheduledLoop(
-  timeStamp => console.log("Time stamp is", timeStamp)
+const createScheduledLoop = useGlobalRAF();
+const [hasAddedManual, addManual, removeManual, isRunningManual] = createScheduledLoop(timeStamp =>
+  console.log("Time stamp is", timeStamp),
 );
 const [hasAddedAuto, addAuto, removeAuto, isRunningAuto] = createScheduledLoop(
   timeStamp => console.log("Time stamp is", timeStamp),
-  true
+  true,
 );
 
-hasAddedManual() // false
-addManual()
-hasAddedManual() // true
-isRunningManual() // false
+hasAddedManual(); // false
+addManual();
+hasAddedManual(); // true
+isRunningManual(); // false
 
-hasAddedAuto() // false
-addAuto()
-hasAddedAuto() // true
+hasAddedAuto(); // false
+addAuto();
+hasAddedAuto(); // true
 // Both are running on the same global loop
-isRunningAuto() // true
-isRunningManual() // true
+isRunningAuto(); // true
+isRunningManual(); // true
 ```
 
 #### Example
@@ -163,38 +165,35 @@ isRunningManual() // true
 ```ts
 import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
 
-const createScheduledLoop = useGlobalRAF()
+const createScheduledLoop = useGlobalRAF();
 
 const [hasAddedLowFramerate, addLowFramerate, removeLowFramerate] = createScheduledLoop(
-  targetFPS(
-    () => {
-      /* Low framerate loop, for example for video / webcam sampling where the framerate can be capped by external sources  */
-    },
-    30
-  ),
-  true
+  targetFPS(() => {
+    /* Low framerate loop, for example for video / webcam sampling where the framerate can be capped by external sources  */
+  }, 30),
+  true,
 );
 const [hasAddedHighFramerate, addHighFramerate, removeHighFramerate] = createScheduledLoop(
-  targetFPS(
-    () => {
-      /* High framerate loop for an animation / drawing to a canvas */
-    },
-    60
-  ),
-  true
+  targetFPS(() => {
+    /* High framerate loop for an animation / drawing to a canvas */
+  }, 60),
+  true,
 );
 ```
 
 #### Definition
 
 ```ts
-function useGlobalRAF(): (callback: FrameRequestCallback, startWhenAdded?: MaybeAccessor<boolean>) => [
-  added: Accessor<boolean>, 
-  add: VoidFunction,     
+function useGlobalRAF(): (
+  callback: FrameRequestCallback,
+  startWhenAdded?: MaybeAccessor<boolean>,
+) => [
+  added: Accessor<boolean>,
+  add: VoidFunction,
   remove: VoidFunction,
-  running: Accessor<boolean>, 
-  start: VoidFunction, 
-  stop: VoidFunction
+  running: Accessor<boolean>,
+  start: VoidFunction,
+  stop: VoidFunction,
 ];
 ```
 
@@ -214,7 +213,7 @@ const createMotionFrameRender = createScheduledLoop(
   cancelFrame,
 );
 const [running, start, stop] = createMotionFrameRender(
-   data => element.style.transform = "translateX(...)"
+  data => (element.style.transform = "translateX(...)"),
 );
 
 // Alternative syntax (for a single execution in place):
@@ -223,9 +222,7 @@ import { cancelFrame, frame } from "motion";
 const [running, start, stop] = createScheduledLoop(
   callback => frame.render(callback, true),
   cancelFrame,
-)(
-   data => element.style.transform = "translateX(...)"
-);
+)(data => (element.style.transform = "translateX(...)"));
 ```
 
 #### Definition
@@ -237,7 +234,7 @@ function createScheduledLoop<
 >(
   schedule: (callback: Callback) => RequestID,
   cancel: (requestID: RequestID) => void,
-): (callback: Callback) => [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction]
+): (callback: Callback) => [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
 ```
 
 ## Demo
