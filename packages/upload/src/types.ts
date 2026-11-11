@@ -48,10 +48,7 @@ export interface Dropzone<T extends HTMLElement = HTMLElement> {
  */
 export interface DropzoneOptions {
   onDrop?: UserCallback;
-  onDragStart?: UserCallback;
   onDragEnter?: UserCallback;
-  onDragEnd?: UserCallback;
   onDragLeave?: UserCallback;
   onDragOver?: UserCallback;
-  onDrag?: UserCallback;
 }
