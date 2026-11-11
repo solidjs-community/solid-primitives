@@ -201,22 +201,23 @@ Note that this component solely serves as syntactic sugar and doesn't provide an
 * A `use...()` function returned by `createContextProvider` or an inline function that returns the context's value: `() => useContext(MyContext)`.
 * A raw SolidJS context returned by `createContext()`.
 
-In case the context's value is `undefined` (e.g. by using `createOptionalContextProvider`), a fallback element specified in the `fallback` prop is rendered instead. Without a `fallback`, nothing is rendered.
+When an optional context's value is `undefined` (e.g. a `useContext` function from `createOptionalContextProvider`), a fallback element specified in the `fallback` prop is rendered instead. Without a `fallback`, nothing is rendered.
 
 > **Note**
-> `fallback` cannot suppress errors for required contexts. If a required context (a raw `createContext()` without a default, or a `useContext` function from `createContextProvider` without defaults) is not provided, `useContext` throws a `ContextNotFoundError` before `fallback` is considered. Use `createOptionalContextProvider` when a missing provider should render the fallback.
+> `fallback` cannot suppress errors for required contexts. If a required context (a raw `createContext()` without a default, or a `useContext` function from `createContextProvider` without defaults) is not provided, or is provided with `undefined`, `useContext` throws a `ContextNotFoundError` before `fallback` is considered. Use `createOptionalContextProvider` when a missing provider should render the fallback.
 
 ```tsx
-import { createContextProvider, ContextConsumer } from "@solid-primitives/context";
+import { createOptionalContextProvider, ContextConsumer } from "@solid-primitives/context";
 
-// Create a context provider
-const [CounterProvider, useCounter] = createContextProvider(() => {
+// Create an optional context provider (its `useContext` returns `undefined` when missing)
+const [CounterProvider, useCounter] = createOptionalContextProvider(() => {
   const [count, setCount] = createSignal(0);
   const increment = () => setCount(count() + 1);
   return { count, increment };
 });
 
-// Provide and consume the context within same JSX block
+// Provide and consume the context within same JSX block;
+// `fallback` renders if this subtree is ever used without `<CounterProvider>`
 return (
   <CounterProvider>
     <ContextConsumer provider={useCounter} fallback={() => (

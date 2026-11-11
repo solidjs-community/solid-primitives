@@ -245,7 +245,7 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  *
  * Please note that this prop is not reactive.
  *
- * @param fallback Optional fallback element to render when the context's value is `undefined`. Can be a function or an element. Note that the component still throws a `ContextNotFoundError` if a required context is not provided, regardless of the fallback.
+ * @param fallback Optional fallback element to render when the context's value is `undefined`. Can be a function or an element. Note that the component still throws a `ContextNotFoundError` if a required context is not provided (or is provided with `undefined`), regardless of the fallback.
  *
  * @example
  * with `createContextProvider`:
@@ -302,7 +302,8 @@ export function ContextConsumer<T>(props: {
   fallback?: (() => Element) | Element,
   provider: (() => T | undefined) | Context<T>,
 }): Element {
-  // A missing required context throws `ContextNotFoundError` from `useContext` (or from the
+  // A required context that is missing (or provided with `undefined`, which Solid treats the same)
+  // throws `ContextNotFoundError` from `useContext` (or from the
   // `use...()` hook) right here, before `fallback` is consulted; `fallback` is deliberately not a
   // catch. Only providers that resolve to `undefined` without throwing (optional hooks) reach the
   // fallback branch below, and without a `fallback` they render nothing, like `<Show>`.
