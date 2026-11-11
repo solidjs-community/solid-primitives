@@ -87,6 +87,11 @@ const firstValueInOrder = async (results: unknown[]): Promise<any> => {
   return null;
 };
 
+/**
+ * Calls `method` on every storage. With `first`, returns the first storage's valid value
+ * (see `firstValueInOrder` when any storage is async); otherwise returns all results.
+ * Returns a promise if any storage returned one.
+ */
 const callStorageMethod = (
   storages: (Storage | AsyncStorage)[],
   method: string,

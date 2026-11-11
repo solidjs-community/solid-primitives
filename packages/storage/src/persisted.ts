@@ -86,6 +86,7 @@ export type PersistedState<S, I = Promise<string> | string | null> = S extends [
 
 export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
 
+/** Whether `value` is a plain object (an object literal or one created with `Object.create(null)`). */
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   if (value === null || typeof value !== "object") return false;
   const proto = Object.getPrototypeOf(value);
@@ -95,6 +96,10 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
 const setOwn = (target: Record<string, unknown>, key: string, value: unknown) =>
   Object.defineProperty(target, key, { value, enumerable: true, writable: true, configurable: true });
 
+/**
+ * Deep-copies arrays and plain objects; any other value is returned as is. Keys are written as
+ * own properties, so a stored `__proto__` key can't change the copy's prototype.
+ */
 const clonePlain = <T>(value: T): T => {
   if (Array.isArray(value)) return value.map(clonePlain) as T;
   if (!isPlainObject(value)) return value;
@@ -193,6 +198,7 @@ export function makePersisted<
     : typeof options.merge === "function"
       ? (stored: T) => (options.merge as (stored: T, initial: T) => T)(stored, clonePlain(initial as T))
       : (stored: T) => mergeDefaults(initial, stored) as T;
+  /** Deserializes stored data and, when `merge` is set, merges it onto the initial value. */
   const read = (data: string): T => {
     const value = deserialize(data);
     return merge ? merge(value) : value;

@@ -125,11 +125,14 @@ function createPresenceBase(
     },
   );
 
-  // Ends the running enter or exit transition now instead of waiting for its duration, which then
-  // only acts as a fallback. Like the timers above, it writes only the time-driven facts, stamped
-  // with the generation it was called in, so a call that comes in after `source` changed again
-  // cannot end the newer transition. Meant for event handlers (`transitionend` / `animationend`),
-  // which run outside any owner.
+  /**
+   * Ends the running enter or exit transition now instead of waiting for its duration, which then
+   * only acts as a fallback. Like the timers above, it writes only the time-driven facts, stamped
+   * with the generation it was called in, so a call that comes in after `source` changed again
+   * cannot end the newer transition. Meant for event handlers (`transitionend` / `animationend`),
+   * which run outside any owner.
+   * @param event when given, events bubbling up from descendants are ignored
+   */
   const done = (event?: Event) => {
     // Ignore events bubbling up from descendants: their transitions are not the element's own.
     if (event && event.currentTarget && event.target !== event.currentTarget) return;

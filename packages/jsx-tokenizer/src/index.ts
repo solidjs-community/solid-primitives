@@ -184,12 +184,21 @@ export function createObjectToken<P extends object, T>(
   return comp;
 }
 
+/**
+ * Returns the tokenizer id of a token, or `undefined` if `value` isn't one.
+ * Function tokens carry the id as a property; object tokens are looked up in the `WeakMap`.
+ */
 function getTokenSymbol(value: unknown): symbol | undefined {
   if (typeof value === "function") return (value as any)[$TOKENIZER];
   if (value !== null && typeof value === "object") return objectTokens.get(value);
   return undefined;
 }
 
+/**
+ * Walks a JSX value (calling zero-argument functions and descending into arrays) and pushes
+ * every token whose tokenizer id is in `symbols` onto `resolved`. When `addElements` is set,
+ * non-matching values are pushed as well. Returns `resolved`.
+ */
 function getResolvedTokens(
   resolved: unknown[],
   value: unknown,
