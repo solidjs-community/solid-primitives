@@ -1,4 +1,4 @@
-import "./fsaccess-mock.js";
+import { createFromObject } from "./fsaccess-mock.js";
 
 import { describe, test, expect, vi } from "vitest";
 import {
@@ -381,6 +381,23 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
 
     fs.rm("/data/subdir");
     dispose();
+  });
+
+  test("works with a given directory handle when showDirectoryPicker is missing", async () => {
+    // e.g. the OPFS root in Firefox or Safari, which have no directory picker
+    const picker = (globalThis as any).showDirectoryPicker;
+    delete (globalThis as any).showDirectoryPicker;
+    try {
+      const handle = createFromObject({
+        notes: { "a.txt": "a" },
+      }) as unknown as FileSystemDirectoryHandle;
+      const adapter = await makeWebAccessFileSystem({ webkitEntry: handle });
+      expect(adapter).not.toBeNull();
+      expect(await adapter!.readdir("/")).toEqual(["notes"]);
+      expect(await makeWebAccessFileSystem()).toBeNull();
+    } finally {
+      (globalThis as any).showDirectoryPicker = picker;
+    }
   });
 
   describe("fallbacks", () => {

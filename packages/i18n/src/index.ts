@@ -321,8 +321,11 @@ export type NullableTranslator<T extends BaseRecordDict, O = string> = <K extend
  * Called when a lookup finds the dictionary itself but not the requested {@link path} within it —
  * i.e. a genuinely missing translation, as opposed to the dictionary not being loaded yet.
  * Its return value is used as the translation result.
+ *
+ * Receives the same arguments that were passed to the translator after the path, so a handler can
+ * resolve the path itself as a template — e.g. when using source text as keys, see {@link missingKeyAsTemplate}.
  */
-export type MissingKeyHandler<O = string> = (path: string) => O | undefined;
+export type MissingKeyHandler<O = string> = (path: string, ...args: any[]) => O | undefined;
 
 /**
  * A {@link MissingKeyHandler} that returns the requested path itself, e.g. `"food.meat"`,
@@ -334,6 +337,34 @@ export type MissingKeyHandler<O = string> = (path: string) => O | undefined;
  * ```
  */
 export const missingKeyAsPath: MissingKeyHandler<any> = path => path;
+
+/**
+ * Creates a {@link MissingKeyHandler} that resolves the requested path itself as a template with
+ * the arguments passed to the translator.
+ *
+ * Useful when the source-language text is used as the key (`t("Hello {{ name }}!", { name })`):
+ * the source text doubles as the fallback, so the source language needs no dictionary entries,
+ * and other languages' dictionaries are keyed by that same text.
+ *
+ * @param resolveTemplate The template resolver to apply to the path. Usually the same one passed to {@link translator}.
+ *
+ * @example
+ * ```ts
+ * const de = { "Hello {{ name }}!": "Hallo {{ name }}!" };
+ *
+ * const t = i18n.translator(
+ *   (): Record<string, string> => (locale() === "de" ? de : {}),
+ *   i18n.resolveTemplate,
+ *   i18n.missingKeyAsTemplate(i18n.resolveTemplate),
+ * );
+ *
+ * t("Hello {{ name }}!", { name: "John" }); // => "Hello John!" (en), "Hallo John!" (de)
+ * ```
+ */
+export const missingKeyAsTemplate =
+  <O = string>(resolveTemplate: TemplateResolver<O>): MissingKeyHandler<O> =>
+  (path, args?: BaseTemplateArgs) =>
+    (resolveTemplate as (template: string, args?: BaseTemplateArgs) => O)(path, args);
 
 /**
  * Create a translator function that will resolve the path in the dictionary and return the value.
@@ -350,7 +381,7 @@ export const missingKeyAsPath: MissingKeyHandler<any> = path => path;
  *
  * @param dict A function that returns the dictionary to use for translation. Will be called on each translation.
  * @param resolveTemplate A function that will resolve the template. Defaults to {@link identityResolveTemplate}.
- * @param onMissingKey Called with the requested path when the dictionary exists but has no value there.
+ * @param onMissingKey Called with the requested path (and the translator's arguments) when the dictionary exists but has no value there.
  * Use {@link missingKeyAsPath} to fall back to the path itself, or provide a custom handler,
  * e.g. to log/report missing translations.
  *
@@ -399,7 +430,7 @@ export function translator<T extends BaseRecordDict>(
       case "string":
         return resolveTemplate(value, args[0]);
       case "undefined":
-        return currentDict !== undefined && onMissingKey ? onMissingKey(path) : value;
+        return currentDict !== undefined && onMissingKey ? onMissingKey(path, ...args) : value;
       default:
         return value;
     }

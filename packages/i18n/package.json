@@ -23,6 +23,7 @@
       "resolveRichTemplate",
       "richText",
       "translator",
+      "missingKeyAsTemplate",
       "scopedTranslator",
       "chainedTranslator"
     ],

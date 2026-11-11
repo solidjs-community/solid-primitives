@@ -8,6 +8,7 @@ import {
   flush,
   latest,
   refresh,
+  snapshot,
 } from "solid-js";
 import { makePersisted, messageSync, multiplexSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
@@ -245,6 +246,200 @@ describe("makePersisted", () => {
     flush();
     expect(value()).toBe("user write");
   });
+  describe("merge option", () => {
+    it("replaces the whole store shape by default (#748)", () => {
+      mockStorage.setItem("merge1", JSON.stringify({ a: 2 }));
+      const [store] = makePersisted(createStore<{ a: number; b?: number }>({ a: 1, b: 1 }), {
+        storage: mockStorage,
+        name: "merge1",
+      });
+      flush();
+      expect(store).toEqual({ a: 2 });
+    });
+
+    it("keeps defaults for keys missing in the stored store data", () => {
+      mockStorage.setItem("merge2", JSON.stringify({ a: 2 }));
+      const [store, setStore] = makePersisted(createStore({ a: 1, b: 1 }), {
+        storage: mockStorage,
+        name: "merge2",
+        merge: true,
+      });
+      flush();
+      expect(store).toEqual({ a: 2, b: 1 });
+      // merged defaults are not persisted until the next write
+      expect(mockStorage.getItem("merge2")).toBe(JSON.stringify({ a: 2 }));
+      setStore(s => { s.b = 3; });
+      flush();
+      expect(mockStorage.getItem("merge2")).toBe(JSON.stringify({ a: 2, b: 3 }));
+    });
+
+    it("deep-merges nested objects and replaces arrays", () => {
+      mockStorage.setItem(
+        "merge3",
+        JSON.stringify({ nested: { x: 2, extra: true }, list: [3], removed: { y: 1 } }),
+      );
+      const [store] = makePersisted(
+        createStore<Record<string, any>>({
+          nested: { x: 1, y: 1, deeper: { z: 1 } },
+          list: [1, 2],
+          added: "default",
+          removed: 5,
+        }),
+        { storage: mockStorage, name: "merge3", merge: true },
+      );
+      flush();
+      expect(store).toEqual({
+        nested: { x: 2, y: 1, deeper: { z: 1 }, extra: true },
+        list: [3],
+        added: "default",
+        removed: { y: 1 },
+      });
+    });
+
+    it("merges object values of signals and keeps primitives as stored", () => {
+      mockStorage.setItem("merge4", JSON.stringify({ a: 2 }));
+      const [signal] = makePersisted(createSignal({ a: 1, b: 1 }), {
+        storage: mockStorage,
+        name: "merge4",
+        merge: true,
+      });
+      flush();
+      expect(signal()).toEqual({ a: 2, b: 1 });
+      mockStorage.setItem("merge5", '"stored"');
+      const [primitive] = makePersisted(createSignal("default"), {
+        storage: mockStorage,
+        name: "merge5",
+        merge: true,
+      });
+      flush();
+      expect(primitive()).toBe("stored");
+    });
+
+    it("accepts a custom merge function", () => {
+      mockStorage.setItem("merge6", JSON.stringify({ items: [{ id: 1 }] }));
+      const [store] = makePersisted(createStore({ items: [] as { id: number; done?: boolean }[] }), {
+        storage: mockStorage,
+        name: "merge6",
+        merge: (stored, initial) => ({
+          ...initial,
+          ...stored,
+          items: stored.items.map(item => ({ done: false, ...item })),
+        }),
+      });
+      flush();
+      expect(store).toEqual({ items: [{ id: 1, done: false }] });
+    });
+
+    it("merges asynchronously loaded data onto the initial value", async () => {
+      await mockAsyncStorage.setItem("merge7", JSON.stringify({ a: 2 }));
+      const [store] = makePersisted(createStore({ a: 1, b: 1 }), {
+        storage: mockAsyncStorage,
+        name: "merge7",
+        merge: true,
+      });
+      await Promise.resolve();
+      flush();
+      expect(store).toEqual({ a: 2, b: 1 });
+    });
+
+    it("merges onto the initial value with the hydrated option", async () => {
+      const anotherMockStorage = { ...mockStorage };
+      anotherMockStorage.setItem("merge8", JSON.stringify({ a: 2 }));
+      const [store] = makePersisted(createStore({ a: 1, b: 1 }), {
+        storage: anotherMockStorage,
+        name: "merge8",
+        hydrated: true,
+        merge: true,
+      });
+      flush();
+      expect(store).toEqual({ a: 1, b: 1 });
+      await new Promise(r => setTimeout(r, 100));
+      flush();
+      expect(store).toEqual({ a: 2, b: 1 });
+    });
+
+    it("merges synced data onto the initial value, not onto the current state", () => {
+      const [store, , , dispose] = makePersisted(createStore<Record<string, number>>({ a: 1, b: 1 }), {
+        storage: mockStorage,
+        name: "merge9",
+        merge: true,
+        sync: messageSync(window),
+      });
+      const send = (newValue: unknown) => window.dispatchEvent(new MessageEvent("message", {
+        data: { key: "merge9", newValue: JSON.stringify(newValue) },
+      }));
+      send({ a: 2, c: 3 });
+      flush();
+      expect(store).toEqual({ a: 2, b: 1, c: 3 });
+      send({ a: 4 });
+      flush();
+      expect(store).toEqual({ a: 4, b: 1 });
+      dispose();
+    });
+
+    it("keeps the captured defaults isolated from later store writes", () => {
+      mockStorage.setItem("merge10", JSON.stringify({ a: 2 }));
+      const [store, setStore, , dispose] = makePersisted(
+        createStore({ a: 1, nested: { x: 1 }, list: [1] }),
+        { storage: mockStorage, name: "merge10", merge: true, sync: messageSync(window) },
+      );
+      flush();
+      setStore(s => {
+        s.nested.x = 99;
+        s.list.push(2);
+      });
+      flush();
+      expect(store).toEqual({ a: 2, nested: { x: 99 }, list: [1, 2] });
+      window.dispatchEvent(new MessageEvent("message", {
+        data: { key: "merge10", newValue: JSON.stringify({ a: 3 }) },
+      }));
+      flush();
+      expect(store).toEqual({ a: 3, nested: { x: 1 }, list: [1] });
+      dispose();
+    });
+
+    it("does not let a stored __proto__ key change prototypes", () => {
+      mockStorage.setItem("merge11", '{"__proto__":{"polluted":true},"nested":{"__proto__":{"x":1}}}');
+      const [store] = makePersisted(createStore<Record<string, any>>({ a: 1, nested: { y: 1 } }), {
+        storage: mockStorage,
+        name: "merge11",
+        merge: true,
+      });
+      flush();
+      expect(({} as any).polluted).toBeUndefined();
+      expect(Object.getPrototypeOf(snapshot(store).nested)).toBe(Object.prototype);
+      expect(store.a).toBe(1);
+      expect(store.nested.y).toBe(1);
+      expect(store.polluted).toBeUndefined();
+    });
+
+    it("lets a stored null replace an object default", () => {
+      mockStorage.setItem("merge12", JSON.stringify({ a: null }));
+      const [store] = makePersisted(createStore<{ a: { x: number } | null; b: number }>({ a: { x: 1 }, b: 1 }), {
+        storage: mockStorage,
+        name: "merge12",
+        merge: true,
+      });
+      flush();
+      expect(store).toEqual({ a: null, b: 1 });
+    });
+
+    it("persists signal writes normally with merge enabled", () => {
+      mockStorage.setItem("merge13", JSON.stringify({ a: 2 }));
+      const [signal, setSignal] = makePersisted(createSignal({ a: 1, b: 1 }), {
+        storage: mockStorage,
+        name: "merge13",
+        merge: true,
+      });
+      flush();
+      expect(signal()).toEqual({ a: 2, b: 1 });
+      expect(mockStorage.getItem("merge13")).toBe(JSON.stringify({ a: 2 }));
+      setSignal({ a: 3, b: 4 });
+      flush();
+      expect(mockStorage.getItem("merge13")).toBe(JSON.stringify({ a: 3, b: 4 }));
+    });
+  });
+
   it("defers the initialization if the hydrated option is set", async () => {
     const anotherMockStorage = { ...mockStorage };
     anotherMockStorage.setItem("test18", '"init"');

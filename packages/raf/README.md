@@ -202,7 +202,7 @@ running(); // true, both run in the same frame
 
 Drives an external frameloop scheduler (for example [motion's `frame`](https://motion.dev/docs/frame)) with the same `[running, start, stop]` shape as `createRAF`. The loop is stopped on cleanup.
 
-`schedule` receives the callback and must keep running it every frame until cancelled, returning an ID (not `null` or `undefined`) that `cancel` accepts. It is called once per `start()`, so a one-shot scheduler like `requestAnimationFrame` only runs the callback once; use `createRAF` for that. motion's `frame.render` returns nothing and `cancelFrame` takes the callback itself, so return the callback as the ID:
+`schedule` receives the callback and must keep running it every frame until cancelled, returning an ID (not `null` or `undefined`) that `cancel` accepts. It is called once per `start()`, so a one-shot scheduler like `requestAnimationFrame` only runs the callback once; use `createRAF` for that. motion's `frame.render` returns the callback it scheduled, which is what `cancelFrame` takes:
 
 ```ts
 // Type
@@ -219,7 +219,7 @@ import { createScheduledLoop } from "@solid-primitives/raf";
 import { cancelFrame, frame } from "motion";
 
 const createMotionFrameRender = createScheduledLoop(
-  callback => (frame.render(callback, true), callback),
+  callback => frame.render(callback, true),
   cancelFrame,
 );
 const [running, start, stop] = createMotionFrameRender(

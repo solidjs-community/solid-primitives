@@ -140,6 +140,104 @@ describe("translator", () => {
   });
 });
 
+describe("source text as key", () => {
+  const deDict = {
+    "Hello {{ name }}!": "Hallo {{ name }}!",
+    "Goodbye!": "Auf Wiedersehen!",
+  };
+
+  test("onMissingKey receives the translator arguments", () => {
+    const calls: unknown[][] = [];
+    const t = i18n.translator(
+      () => ({}) as Record<string, string>,
+      i18n.resolveTemplate,
+      (...args) => {
+        calls.push(args);
+        return undefined;
+      },
+    );
+    t("missing {{ x }}", { x: 1 });
+    t("missing");
+    expect(calls).toEqual([["missing {{ x }}", { x: 1 }], ["missing"]]);
+  });
+
+  test("missingKeyAsTemplate falls back to the resolved key", () => {
+    const [locale, setLocale] = createSignal<"en" | "de">("en");
+    const dict = (): Record<string, string> => (locale() === "de" ? deDict : {});
+    const t = i18n.translator(
+      dict,
+      i18n.resolveTemplate,
+      i18n.missingKeyAsTemplate(i18n.resolveTemplate),
+    );
+
+    expect(t("Hello {{ name }}!", { name: "John" })).toBe("Hello John!");
+    expect(t("Goodbye!")).toBe("Goodbye!");
+    expect(t("Untranslated {{ n }}", { n: 3 })).toBe("Untranslated 3");
+
+    setLocale("de");
+    flush();
+    expect(t("Hello {{ name }}!", { name: "John" })).toBe("Hallo John!");
+    expect(t("Goodbye!")).toBe("Auf Wiedersehen!");
+    expect(t("Untranslated {{ n }}", { n: 3 })).toBe("Untranslated 3");
+  });
+
+  test("missingKeyAsTemplate still resolves to undefined while the dict is unavailable", () => {
+    const t = i18n.translator(
+      () => undefined as Record<string, string> | undefined,
+      i18n.resolveTemplate,
+      i18n.missingKeyAsTemplate(i18n.resolveTemplate),
+    );
+    expect(t("Hello {{ name }}!", { name: "John" })).toBeUndefined();
+  });
+
+  test("existing single-argument handlers keep working", () => {
+    const handler = (path: string): string => `?${path}`;
+    const t = i18n.translator(() => ({}) as Record<string, string>, i18n.resolveTemplate, handler);
+    expect(t("a {{ x }}", { x: 1 })).toBe("?a {{ x }}");
+    const t2 = i18n.translator(
+      () => ({}) as Record<string, string>,
+      i18n.resolveTemplate,
+      i18n.missingKeyAsPath,
+    );
+    expect(t2("a {{ x }}", { x: 1 })).toBe("a {{ x }}");
+  });
+
+  test("missingKeyAsTemplate works with resolveRichTemplate", () => {
+    const t = i18n.translator(
+      () => ({}) as Record<string, string>,
+      i18n.resolveRichTemplate,
+      i18n.missingKeyAsTemplate(i18n.resolveRichTemplate),
+    );
+    expect(t("Hi {{ name }}", { name: "John" })).toBe("Hi John");
+    const node = { rich: true } as any;
+    expect(t("Hi {{ name }}", { name: node })).toEqual(["Hi ", node, ""]);
+  });
+
+  test("fallback updates reactively when the locale changes", () => {
+    const [locale, setLocale] = createSignal<"en" | "de">("en");
+    const t = i18n.translator(
+      (): Record<string, string> => (locale() === "de" ? deDict : {}),
+      i18n.resolveTemplate,
+      i18n.missingKeyAsTemplate(i18n.resolveTemplate),
+    );
+    const results: string[] = [];
+    const dispose = createRoot(dispose => {
+      createEffect(
+        () => t("Hello {{ name }}!", { name: "John" }),
+        value => {
+          results.push(value);
+        },
+      );
+      return dispose;
+    });
+    flush();
+    setLocale("de");
+    flush();
+    expect(results).toEqual(["Hello John!", "Hallo John!"]);
+    dispose();
+  });
+});
+
 describe("scopedTranslator", () => {
   let flatDict = i18n.flatten(enDict);
 

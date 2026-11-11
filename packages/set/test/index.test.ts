@@ -500,3 +500,103 @@ describe("readonlySet", () => {
     expect(ro.size).toBe(3);
   });
 });
+
+describe("ReactiveSet iterators track eagerly (#830)", () => {
+  const methods: Record<string, (set: ReactiveSet<number>) => Iterator<unknown>> = {
+    keys: set => set.keys(),
+    values: set => set.values(),
+    entries: set => set.entries(),
+    "[Symbol.iterator]": set => set[Symbol.iterator](),
+  };
+
+  for (const [name, create] of Object.entries(methods)) {
+    test(`${name}() tracks when created, even if consumed later`, () => {
+      const set = new ReactiveSet([1, 2]);
+      const iterators: Iterator<unknown>[] = [];
+
+      const dispose = createRoot(dispose => {
+        createEffect(
+          () => {
+            // create the iterator but do not consume it inside the tracking scope
+            iterators.push(create(set));
+          },
+          () => {},
+        );
+        return dispose;
+      });
+      flush();
+      expect(iterators).toHaveLength(1);
+
+      set.add(3);
+      flush();
+      expect(iterators, "re-ran after add").toHaveLength(2);
+
+      // consuming the iterator later still yields the live contents
+      const consumed = [...{ [Symbol.iterator]: () => iterators[1]! }];
+      expect(consumed).toHaveLength(3);
+
+      set.delete(1);
+      flush();
+      expect(iterators, "re-ran after delete").toHaveLength(3);
+
+      dispose();
+    });
+  }
+});
+
+describe("ReactiveSet iterator consumed in effect apply phase (#830)", () => {
+  test("compute returns values() iterator, apply consumes it, re-runs on change", () => {
+    const set = new ReactiveSet([1, 2]);
+    const seen: number[][] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(
+        () => set.values(),
+        it => {
+          seen.push([...{ [Symbol.iterator]: () => it }]);
+        },
+      );
+      return dispose;
+    });
+    flush();
+    expect(seen).toEqual([[1, 2]]);
+
+    set.add(3);
+    flush();
+    expect(seen).toEqual([
+      [1, 2],
+      [1, 2, 3],
+    ]);
+
+    set.clear();
+    flush();
+    expect(seen).toEqual([[1, 2], [1, 2, 3], []]);
+
+    dispose();
+  });
+
+  test("for..of inside a memo still tracks and yields live values", () => {
+    const set = new ReactiveSet<number>();
+    const results: number[] = [];
+    const dispose = createRoot(dispose => {
+      createEffect(
+        () => {
+          let sum = 0;
+          for (const v of set) sum += v;
+          return sum;
+        },
+        sum => {
+          results.push(sum);
+        },
+      );
+      return dispose;
+    });
+    flush();
+    set.add(2);
+    flush();
+    set.add(5);
+    flush();
+    expect(results).toEqual([0, 2, 7]);
+    dispose();
+  });
+});

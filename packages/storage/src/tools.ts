@@ -61,6 +61,32 @@ export const addWithOptionsMethod = <
   return storage as S & { withOptions: (options: O) => W };
 };
 
+/**
+ * Resolves the results of multiple storages in storage order and returns the first
+ * valid (truthy) value, so the earliest storage with a value is the source of truth
+ * regardless of which storage answers first. All storages are queried in parallel;
+ * the result is available once every storage before the winning one has settled.
+ * A rejecting storage is skipped like one without a value; if no storage provides
+ * a value and at least one rejected, the first rejection (in storage order) is rethrown.
+ */
+const firstValueInOrder = async (results: unknown[]): Promise<any> => {
+  // attach handlers eagerly so later rejections are never reported as unhandled
+  const settled = results.map(result =>
+    Promise.resolve(result).then(
+      value => ({ value }),
+      (reason: unknown) => ({ reason, rejected: true as const }),
+    ),
+  );
+  let error: { reason: unknown } | undefined;
+  for (const pending of settled) {
+    const outcome = await pending;
+    if ("rejected" in outcome) error ??= outcome;
+    else if (outcome.value) return outcome.value;
+  }
+  if (error) throw error.reason;
+  return null;
+};
+
 const callStorageMethod = (
   storages: (Storage | AsyncStorage)[],
   method: string,
@@ -73,7 +99,7 @@ const callStorageMethod = (
   );
   return isAsync
     ? first
-      ? Promise.race(results)
+      ? firstValueInOrder(results)
       : Promise.all(results)
     : first
       ? results.filter(Boolean)[0]

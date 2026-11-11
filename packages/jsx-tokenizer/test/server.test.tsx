@@ -1,6 +1,6 @@
 import { renderToString } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
-import { createTokenizer, createToken, resolveTokens } from "../src/index.js";
+import { createObjectToken, createTokenizer, createToken, resolveTokens } from "../src/index.js";
 
 describe("jsx-tokenizer", () => {
   const parser1 = createTokenizer<{
@@ -44,5 +44,21 @@ describe("jsx-tokenizer", () => {
 
     expect(rendered1).toBe("<div>foo</div>");
     expect(rendered2).toBe("<div>bar</div>");
+  });
+
+  it("should resolve object tokens", () => {
+    const parser3 = createTokenizer<{ text: string }>();
+    const ObjToken = createObjectToken(parser3, (props: { text: string }) => ({
+      text: props.text,
+    }));
+
+    const tokens = resolveTokens(parser3, () => (
+      <>
+        <ObjToken text="foo" />
+        <ObjToken text="bar" />
+      </>
+    ));
+
+    expect(tokens().map(t => t.data.text)).toEqual(["foo", "bar"]);
   });
 });

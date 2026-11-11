@@ -153,10 +153,9 @@ const useGlobalRAF: () => GlobalRAFCallbackFactory =
  * @example
  * import { cancelFrame, frame } from "motion";
  *
- * // motion's `frame.render` returns nothing and `cancelFrame` takes the callback itself,
- * // so return the callback as the request ID
+ * // motion's `frame.render` returns the callback it scheduled, which is what `cancelFrame` takes
  * const createMotionFrameRender = createScheduledLoop(
- *   callback => (frame.render(callback, true), callback),
+ *   callback => frame.render(callback, true),
  *   cancelFrame,
  * );
  * const [running, start, stop] = createMotionFrameRender(

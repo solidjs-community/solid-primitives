@@ -161,6 +161,38 @@ const ThirdExample = () => {
 };
 ```
 
+### Ending transitions on `transitionend` / `animationend`
+
+By default a transition is considered over once its duration has passed. If the duration lives in CSS, or the animation is driven by JavaScript, you can end the current enter or exit transition yourself with `done`. Hand it to the element's `onTransitionEnd` / `onAnimationEnd`, or call it when your animation finishes. The duration then only acts as a fallback timeout, in case the event never fires (for example when the transition is cancelled or `prefers-reduced-motion` turns it off).
+
+```ts
+// Type
+done: (event?: Event) => void;
+
+// Example
+const [open, setOpen] = createSignal(false);
+const presence = createPresence(open, {
+  // fallback in case no transitionend event arrives
+  transitionDuration: 1000,
+});
+
+<Show when={presence.isMounted()}>
+  <div
+    class={{ panel: true, visible: presence.isVisible() }}
+    onTransitionEnd={presence.done}
+    onAnimationEnd={presence.done}
+  >
+    The transition is over as soon as the element's own transition is.
+  </div>
+</Show>;
+```
+
+- When given an event, `done` ignores it unless it was fired by the element the handler is attached to, so transitions of descendants bubbling up don't end the transition early.
+- `transitionend` fires once per transitioned property. If several properties transition with different durations, filter for the longest one: `onTransitionEnd={e => e.propertyName === "transform" && presence.done(e)}`.
+- Calling `done` while no transition is running does nothing, and a call that comes in after the item changed again does not end the newer transition.
+- When the item is swapped, `done` ends the exit of the old item, after which the new item mounts and enters as usual.
+- Call it from event handlers or other callbacks, not from inside a component body, memo or effect.
+
 ### `createPresence` options API
 
 ```ts
@@ -193,6 +225,8 @@ type PresenceResult<TItem> = {
   isEntering: Accessor<boolean>;
   /** Is the component exiting currently? */
   isExiting: Accessor<boolean>;
+  /** Ends the current enter or exit transition now; the duration then only acts as a fallback. */
+  done: (event?: Event) => void;
 };
 ```
 

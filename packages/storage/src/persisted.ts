@@ -66,6 +66,14 @@ export type PersistenceOptions<
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
   hydrated?: boolean;
+  /**
+   * Merge the stored value onto the initial value instead of replacing it, so keys added to the
+   * initial value later keep their defaults when older persisted data is loaded. `true` deep-merges
+   * plain objects (arrays and other values from the storage replace the default as a whole); a
+   * function receives the deserialized stored value and the initial value and returns the value
+   * to use. Applies to the initial load and to incoming sync data.
+   */
+  merge?: boolean | ((stored: T, initial: T) => T);
   action?: (signal: S) => Parameters<typeof action>[0];
 } & (undefined extends O
   ? { storage?: SyncStorage | AsyncStorage }
@@ -78,6 +86,35 @@ export type PersistedState<S, I = Promise<string> | string | null> = S extends [
 
 export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
 
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (value === null || typeof value !== "object") return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+};
+
+const setOwn = (target: Record<string, unknown>, key: string, value: unknown) =>
+  Object.defineProperty(target, key, { value, enumerable: true, writable: true, configurable: true });
+
+const clonePlain = <T>(value: T): T => {
+  if (Array.isArray(value)) return value.map(clonePlain) as T;
+  if (!isPlainObject(value)) return value;
+  const result: Record<string, unknown> = {};
+  for (const key of Object.keys(value)) setOwn(result, key, clonePlain(value[key]));
+  return result as T;
+};
+
+/**
+ * Deep-merges plain objects from `stored` onto `defaults`; any other stored value
+ * (including arrays) replaces the default. Returns a fresh copy of `defaults`' plain objects.
+ */
+const mergeDefaults = (defaults: unknown, stored: unknown): unknown => {
+  if (!isPlainObject(defaults) || !isPlainObject(stored)) return stored;
+  const result = clonePlain(defaults);
+  for (const key of Object.keys(stored))
+    setOwn(result, key, Object.hasOwn(defaults, key) ? mergeDefaults(defaults[key], stored[key]) : stored[key]);
+  return result;
+};
+
 /**
  * Persists a signal, store or similar API
  * ```ts
@@ -88,6 +125,7 @@ export type StoreTuple<T> = [Store<T>, StoreSetter<T>];
  *   name: "solid-data",      // optional
  *   serialize: (value: string) => value, // optional
  *   deserialize: (data: string) => data, // optional
+ *   merge: true, // optional, deep-merge stored data onto the initial value
  *   action: (setter: Setter<T>) => Setter<T> // optional, to be put inside action
  * };
  * ```
@@ -146,10 +184,23 @@ export function makePersisted<
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
   const init = storage.getItem(name, storageOptions);
   const isSignal = typeof signal[0] === "function";
+  // capture the initial value before any stored data is applied, so it can serve as defaults
+  const initial: T | undefined = options.merge
+    ? clonePlain(isSignal ? untrack(signal[0] as () => T) : snapshot(signal[0] as T))
+    : undefined;
+  const merge: ((stored: T) => T) | undefined = !options.merge
+    ? undefined
+    : typeof options.merge === "function"
+      ? (stored: T) => (options.merge as (stored: T, initial: T) => T)(stored, clonePlain(initial as T))
+      : (stored: T) => mergeDefaults(initial, stored) as T;
+  const read = (data: string): T => {
+    const value = deserialize(data);
+    return merge ? merge(value) : value;
+  };
   const set = isSignal
     ? (data: string) => {
         try {
-          const value = deserialize(data);
+          const value = read(data);
           (signal[1] as any)(() => value);
         } catch (e) {
           // oxlint-disable-next-line no-console
@@ -158,7 +209,7 @@ export function makePersisted<
       }
     : (data: string) => {
         try {
-          const value = deserialize(data);
+          const value = read(data);
           (signal[1] as any)(reconcile(value, () => true));
         } catch (e) {
           // oxlint-disable-next-line no-console

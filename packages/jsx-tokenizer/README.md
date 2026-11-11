@@ -14,6 +14,7 @@ This pattern is very useful when you want to use JSX to create a declarative API
 
 - [`createTokenizer`](#createtokenizer) — Creates a JSX Tokenizer that can be used to create multiple token components with the same id.
 - [`createToken`](#createtoken) — Creates a token component for passing custom data through JSX structure.
+- [`createObjectToken`](#createobjecttoken) — Creates a token component whose tokens survive Solid's `children()` helper and context providers.
 - [`resolveTokens`](#resolvetokens) — Resolves passed JSX structure, searching for tokens with the given tokenizer id.
 - [`isToken`](#istoken) — Checks if passed value is a token created by the corresponding jsx-tokenizer.
 
@@ -141,6 +142,54 @@ function Tabs<T>(props: { children: (Tab: Component<{ value: T }>) => JSX.Elemen
   )}
 </Tabs>;
 ```
+
+## `createObjectToken`
+
+Creates a token component like [`createToken`](#createtoken), but the token element is a plain `{ data }` object instead of a function.
+
+Tokens created by `createToken` are functions, so anything that resolves children before you do — Solid's `children()` helper, a context provider, a transition group — calls them as if they were elements (rendering their fallback, or nothing with a warning) and they can't be found by `resolveTokens` anymore. Object tokens aren't functions, so they pass through that resolution untouched and can still be parsed afterwards.
+
+It takes the same `tokenizer` and `tokenData` parameters as `createToken`, but no `render` fallback. Both kinds of tokens can share a tokenizer and are resolved by the same `resolveTokens` and `isToken` calls.
+
+```ts
+// Type
+function createObjectToken<TProps extends object, TData>(
+  tokenizer: JSXTokenizer<TData>,
+  tokenData: (props: TProps) => TData,
+): TokenComponent<TProps, TData>;
+function createObjectToken<TData extends object>(tokenizer?: JSXTokenizer<TData>): TokenComponent<TData>;
+function createObjectToken<TProps extends object, TData>(
+  tokenData: (props: TProps) => TData,
+): TokenComponent<TProps, TData>;
+
+// Example
+import { createObjectToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
+import { children } from "solid-js";
+
+const Item = createObjectToken((props: { label: string }) => ({ label: props.label }));
+
+function List(props: { children: JSX.Element }) {
+  // children() (or a context provider) keeps object tokens as they are
+  const resolved = children(() => props.children);
+  const tokens = resolveTokens(Item, resolved);
+  return (
+    <ul>
+      <For each={tokens()}>{token => <li>{token.data.label}</li>}</For>
+    </ul>
+  );
+}
+
+<List>
+  <ThemeContext value="dark">
+    <Item label="a" />
+    <Item label="b" />
+  </ThemeContext>
+</List>;
+```
+
+The `tokenData` function runs when the token component is created, under its JSX owner, so it can read contexts provided between the parent and the token.
+
+> **Note:** object tokens can't be rendered. Never insert them into JSX (e.g. `<>{tokens()}</>`) — a lone object token is skipped with an `UNRECOGNIZED_INSERT_VALUE` warning in development, but an object token mixed with other elements makes the DOM insertion throw. Use `createToken` with a `render` fallback if the tokens need to be renderable.
 
 ## `resolveTokens`
 

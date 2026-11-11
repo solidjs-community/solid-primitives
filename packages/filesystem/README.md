@@ -129,6 +129,16 @@ const Item = (props: { path: string; fs: SyncFileSystem | AsyncFileSystem }) => 
 };
 ```
 
+### Using `makeWebAccessFileSystem` with the origin private file system
+
+Pass the OPFS root as `webkitEntry`. This works in browsers without `showDirectoryPicker`, such as Firefox and Safari. Writing files uses `FileSystemFileHandle.createWritable()`, which Safari only supports from version 26; in older Safari versions, `writeFile` fails while the other operations work.
+
+```ts
+const fs = createFileSystem(
+  await makeWebAccessFileSystem({ webkitEntry: await navigator.storage.getDirectory() }),
+);
+```
+
 ### Using `makeWebAccessFileSystem` with a `webkitdirectory` input
 
 The previous `<Item>` component can also be used in combination with a file input with the `webkitdirectory` attribute set:
