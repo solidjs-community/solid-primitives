@@ -120,6 +120,113 @@ function createMs(
 };
 ```
 
+## createCallbacksSet
+
+Combines several callbacks into one. Use it with `createRAF` when several callbacks should run in the same `requestAnimationFrame` and share its timestamp. Callbacks live in a [`ReactiveSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#ReactiveSet), so you can add and remove them at any time.
+
+```ts
+// Type
+function createCallbacksSet<T extends (...args: any) => void>(
+  ...initialCallbacks: Array<T>
+): [callback: (...args: Parameters<T>) => void, callbacksSet: ReactiveSet<T>];
+
+// Example
+import { createCallbacksSet, createRAF } from "@solid-primitives/raf";
+
+const [callback, callbacks] = createCallbacksSet<FrameRequestCallback>();
+const [running, start, stop] = createRAF(callback);
+
+const move: FrameRequestCallback = ts => (el.style.transform = `translateX(${ts / 10}px)`);
+callbacks.add(move);
+start();
+// later
+callbacks.delete(move);
+```
+
+## useGlobalRAF
+
+Returns a factory for callbacks that share one global `requestAnimationFrame` loop, so they all run in the same frame with the same timestamp. The loop is a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot), combined with [`createCallbacksSet`](#createcallbacksset).
+
+Each call returns `[added, add, remove, running, start, stop]`:
+
+- `added`, `add`, `remove` control whether this callback is in the shared loop. It is removed on cleanup.
+- `running`, `start`, `stop` control the shared loop itself, like `createRAF`.
+
+Pass `startWhenAdded` (a boolean or accessor) to start the loop when the callback is added. The loop stops when the last callback is removed.
+
+```ts
+// Type
+function useGlobalRAF(): (
+  callback: FrameRequestCallback,
+  startWhenAdded?: MaybeAccessor<boolean>,
+) => [
+  added: Accessor<boolean>,
+  add: VoidFunction,
+  remove: VoidFunction,
+  running: Accessor<boolean>,
+  start: VoidFunction,
+  stop: VoidFunction,
+];
+
+// Example
+import { flush } from "solid-js";
+import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
+
+const createGlobalRAFCallback = useGlobalRAF();
+
+// Low frame rate, e.g. sampling a webcam
+const [hasSampler, addSampler, removeSampler] = createGlobalRAFCallback(
+  targetFPS(() => {
+    /* ... */
+  }, 30),
+  true,
+);
+// High frame rate, e.g. drawing to a canvas
+const [hasDraw, addDraw, removeDraw, running] = createGlobalRAFCallback(
+  targetFPS(() => {
+    /* ... */
+  }, 60),
+  true,
+);
+
+addSampler();
+addDraw();
+// `running()` updates once the write is flushed (tracked reads update automatically)
+flush();
+running(); // true, both run in the same frame
+```
+
+> **Warning** Only use this when callbacks must run in the same frame, and keep each callback short: all of them share one frame's budget. To control several separate loops, use `createCallbacksSet` with your own `createRAF` instead.
+
+## createScheduledLoop
+
+Drives an external frameloop scheduler (for example [motion's `frame`](https://motion.dev/docs/frame)) with the same `[running, start, stop]` shape as `createRAF`. The loop is stopped on cleanup.
+
+`schedule` receives the callback and must keep running it every frame until cancelled, returning an ID (not `null` or `undefined`) that `cancel` accepts. It is called once per `start()`, so a one-shot scheduler like `requestAnimationFrame` only runs the callback once; use `createRAF` for that. motion's `frame.render` returns nothing and `cancelFrame` takes the callback itself, so return the callback as the ID:
+
+```ts
+// Type
+function createScheduledLoop<
+  RequestID extends NonNullable<unknown>,
+  Callback extends (...args: Array<any>) => any,
+>(
+  schedule: (callback: Callback) => RequestID,
+  cancel: (requestID: RequestID) => void,
+): (callback: Callback) => [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
+
+// Example
+import { createScheduledLoop } from "@solid-primitives/raf";
+import { cancelFrame, frame } from "motion";
+
+const createMotionFrameRender = createScheduledLoop(
+  callback => (frame.render(callback, true), callback),
+  cancelFrame,
+);
+const [running, start, stop] = createMotionFrameRender(
+  data => (element.style.transform = "translateX(...)"),
+);
+```
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
