@@ -17,6 +17,7 @@ import IconRiGithub from "~icons/ri/github-fill";
 import IconRiDiscord from "~icons/ri/discord-fill";
 import { totalPackages, categoryPrimitiveCounts } from "../generated/counts";
 import { projectStats } from "../generated/stats";
+import { ProjectStats } from "../components/ProjectStats";
 
 <div class="pl-hero">
   <div class="pl-hero-content">
@@ -37,38 +38,7 @@ import { projectStats } from "../generated/stats";
   <img class="pl-hero-cube" src="/logo-wire.png" alt="" width="320" height="320" />
 </div>
 
-{projectStats && (
-  <div class="pl-stats">
-    <a
-      class="pl-stat"
-      href="https://www.npmjs.com/org/solid-primitives"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div class="pl-stat-value">{projectStats.npmDownloadsLastMonthFormatted}</div>
-      <div class="pl-stat-label">npm downloads / month</div>
-    </a>
-    <a
-      class="pl-stat"
-      href="https://github.com/solidjs-community/solid-primitives/issues"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div class="pl-stat-value">{projectStats.openIssues}</div>
-      <div class="pl-stat-label">open issues</div>
-    </a>
-    <a
-      class="pl-stat"
-      href="https://github.com/solidjs-community/solid-primitives/pulls"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div class="pl-stat-value">{projectStats.openPullRequests}</div>
-      <div class="pl-stat-label">open pull requests</div>
-    </a>
-    <div class="pl-stats-updated">Last updated {projectStats.generatedAt}</div>
-  </div>
-)}
+<ProjectStats initial={projectStats} />
 
 <div class="pl-strip">
   <div class="pl-strip-header">

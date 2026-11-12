@@ -9,9 +9,16 @@ const solidBase = createSolidBase(defaultTheme);
 
 const SITE_URL = "https://primitives2.solidjs.community";
 
-// Crawlers need absolute og:image URLs. `SITE_ORIGIN` overrides the production origin, e.g. for a
-// preview deploy whose image endpoint lives elsewhere.
-const SITE_ORIGIN = (process.env.SITE_ORIGIN ?? SITE_URL).replace(/\/$/, "");
+// Crawlers need absolute og:image URLs. Netlify deploy previews / branch deploys use their own
+// address (`DEPLOY_PRIME_URL`), so their cards come from their own `/_server`; production uses the
+// canonical domain. `SITE_ORIGIN` overrides both (e.g. `vite preview` on localhost).
+const SITE_ORIGIN = (
+  process.env.SITE_ORIGIN ??
+  (process.env.CONTEXT && process.env.CONTEXT !== "production"
+    ? process.env.DEPLOY_PRIME_URL
+    : undefined) ??
+  SITE_URL
+).replace(/\/$/, "");
 
 export default defineConfig({
   define: {
@@ -74,7 +81,7 @@ export default defineConfig({
     }),
     // start mode (SSR + static prerender into dist/client) replaces SolidStart + Nitro.
     // Pages stay prerendered; `serverFunctions` keeps dist/server so its `{ fetch }` handler can
-    // serve the OG image endpoint (`/_server`).
+    // serve the OG image endpoint (`/_server`) — netlify/functions/server.mjs.
     solid(solidBase.startConfig({ serverFunctions: true })),
   ],
 });

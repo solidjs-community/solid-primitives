@@ -2,3 +2,14 @@
   base = "/"
   publish = "site/dist/client"
   command = "pnpm build && pnpm -dir site run deploy"
+
+# `/_server/*` (OG images + live homepage stats) runs the site's server bundle in a function;
+# everything else is the static prerender above.
+[functions]
+  directory = "site/netlify/functions"
+  # Node File Trace keeps files where they are instead of re-bundling them, so @vercel/og can still
+  # load its resvg/yoga wasm and fallback font relative to its own module.
+  node_bundler = "nft"
+  # Belt and braces for the server bundle's lazily imported route chunks. JS only: dist/server also
+  # holds a copy of public/ (multi-MB PNGs) that the function never reads.
+  included_files = ["site/dist/server/**/*.js"]
