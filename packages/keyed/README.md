@@ -32,6 +32,44 @@ pnpm add @solid-primitives/keyed
 
 Reactively maps an array by specified key with a callback function - underlying helper for the [`<Key>`](#key) control flow.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { keyArray } from "@solid-primitives/keyed";
+
+type Todo = { id: number; title: string };
+
+function Demo() {
+  let nextId = 3;
+  const [todos, setTodos] = createSignal<Todo[]>([
+    { id: 1, title: "Read" },
+    { id: 2, title: "Write" },
+  ]);
+  const rows = createMemo(
+    keyArray(
+      todos,
+      todo => todo.id,
+      (todo, index) => (
+        <li>
+          #{index()} {todo().title} <input placeholder="note (kept on reorder)" />
+        </li>
+      ),
+    ),
+  );
+  return (
+    <>
+      <button onClick={() => setTodos(t => [...t].reverse())}>Reverse</button>
+      <button onClick={() => setTodos(t => [{ id: nextId, title: `Task ${nextId++}` }, ...t])}>
+        Add
+      </button>
+      <ul>{rows()}</ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 #### Import
@@ -84,6 +122,38 @@ Creates a list of elements by mapping items by provided key. Similar to Solid's 
 
 But changing the value does not rerender the element, only where the value is being used.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { Key } from "@solid-primitives/keyed";
+
+function Demo() {
+  const [items, setItems] = createSignal([
+    { id: 1, name: "Alpha" },
+    { id: 2, name: "Beta" },
+    { id: 3, name: "Gamma" },
+  ]);
+  return (
+    <>
+      <button onClick={() => setItems(i => [...i].reverse())}>Reverse</button>
+      <Key each={items()} by="id" fallback={<p>No items</p>}>
+        {(item, index) => {
+          const [clicks, setClicks] = createSignal(0);
+          return (
+            <div>
+              {index()}. {item().name}{" "}
+              <button onClick={() => setClicks(c => c + 1)}>clicks: {clicks()}</button>
+            </div>
+          );
+        }}
+      </Key>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 #### Import
@@ -124,6 +194,37 @@ Second argument of the map function is an index signal.
 
 Creates a list of elements by mapping object entries. Similar to Solid's `<For>` and `<Index>`, but here, render function takes three arguments, and both value and index arguments are signals.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { Entries } from "@solid-primitives/keyed";
+
+function Demo() {
+  const [scores, setScores] = createSignal<Record<string, number>>({ Alice: 87, Bob: 42 });
+  const randomize = () =>
+    setScores(s =>
+      Object.fromEntries(Object.keys(s).map(k => [k, Math.round(Math.random() * 100)])),
+    );
+  return (
+    <>
+      <button onClick={randomize}>Randomize</button>
+      <button onClick={() => setScores(s => ({ ...s, [`P${Object.keys(s).length + 1}`]: 50 }))}>
+        Add player
+      </button>
+      <Entries of={scores()} fallback={<p>No players</p>}>
+        {(name, score, index) => (
+          <div>
+            {index()}. {name}: {score()}
+          </div>
+        )}
+      </Entries>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```tsx
@@ -155,6 +256,37 @@ Third argument of the map function is an index signal.
 ## `<MapEntries>`
 
 Creates a list of elements by mapping Map entries. Similar to Solid's `<For>` and `<Index>`, but here, render function takes three arguments, and both value and index arguments are signals.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { MapEntries } from "@solid-primitives/keyed";
+
+function Demo() {
+  const [stock, setStock] = createSignal(
+    new Map([
+      ["apples", 3],
+      ["pears", 5],
+    ]),
+  );
+  const restock = (fruit: string) => setStock(m => new Map(m).set(fruit, (m.get(fruit) ?? 0) + 1));
+  return (
+    <>
+      <button onClick={() => restock("apples")}>+1 apples</button>
+      <button onClick={() => restock("plums")}>+1 plums</button>
+      <MapEntries of={stock()} fallback={<p>Empty</p>}>
+        {(fruit, count, index) => (
+          <div>
+            {index()}. {fruit}: {count()}
+          </div>
+        )}
+      </MapEntries>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -191,6 +323,40 @@ Third argument of the map function is an index signal.
 ## `<SetValues>`
 
 Creates a list of elements by mapping Set values. Similar to Solid's `<For>` and `<Index>`, but here, render function takes two arguments, the value and the index argument as a signal.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { SetValues } from "@solid-primitives/keyed";
+
+const TAGS = ["solid", "typescript", "vite", "vitest"];
+
+function Demo() {
+  const [selected, setSelected] = createSignal(new Set(["solid"]));
+  const toggle = (tag: string) =>
+    setSelected(s => {
+      const next = new Set(s);
+      if (!next.delete(tag)) next.add(tag);
+      return next;
+    });
+  return (
+    <>
+      <For each={TAGS}>{tag => <button onClick={() => toggle(tag)}>{tag}</button>}</For>
+      <ul>
+        <SetValues of={selected()} fallback={<li>none</li>}>
+          {(tag, index) => (
+            <li>
+              {index()}. {tag}
+            </li>
+          )}
+        </SetValues>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

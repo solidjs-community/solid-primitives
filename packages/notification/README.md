@@ -34,6 +34,27 @@ pnpm add @solid-primitives/notification
 
 Returns `true` when the Notifications API is available. Always `false` on the server.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { isNotificationSupported } from "@solid-primitives/notification";
+
+function Demo() {
+  const [checked, setChecked] = createSignal<boolean | null>(null);
+  return (
+    <>
+      <button onClick={() => setChecked(isNotificationSupported())}>Check support</button>
+      <p>
+        Notifications API:{" "}
+        {checked() === null ? "not checked" : checked() ? "supported" : "unsupported"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { isNotificationSupported } from "@solid-primitives/notification";
 

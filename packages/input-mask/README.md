@@ -100,6 +100,29 @@ return (
 
 In most cases you'll want to use `onInput` and `onPaste`.
 
+### createInputMask
+
+Returns an event handler that masks the value of the input it is attached to and returns the masked value.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createInputMask } from "@solid-primitives/input-mask";
+
+function Demo() {
+  const [value, setValue] = createSignal("");
+  const mask = createInputMask("(999) 999-9999");
+  return (
+    <>
+      <input placeholder="(555) 123-4567" onInput={e => setValue(mask(e))} />
+      <p>value: {value()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ## Showing the pattern during input
 
 The placeholder attribute is nice, but it cannot show the pattern during input. In order to rectify this shortcoming, this package has a `createMaskPattern` export:
@@ -148,6 +171,39 @@ label[data-mask-pattern]::after {
 ```
 
 As you can see, this function requires an empty label as `previousElementSibling` to the input field, which will be automatically given two attributes, `data-mask-value` and `data-mask-pattern`, which can be used to display the pattern over the input. This label must be formatted so that its content will match the text in the adjacent input; use a transparent border and padding to achieve this effect. You need not use an inline style; you can also use your favorite way to deploy the CSS (e.g. tailwind or solid-styled).
+
+### createMaskPattern
+
+Wraps an input mask handler and exposes the masked value and the remaining pattern as data attributes on the preceding label.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createInputMask, createMaskPattern } from "@solid-primitives/input-mask";
+
+const css = `
+  input, label[data-mask-value] {
+    font: 16px/1.2 monospace;
+    padding: 4px;
+    border: 1px solid #888;
+  }
+  label[data-mask-value] { position: absolute; border-color: transparent; pointer-events: none; }
+  label[data-mask-value]::before { content: attr(data-mask-value); color: transparent; }
+  label[data-mask-pattern]::after { content: attr(data-mask-pattern); opacity: 0.5; }
+`;
+
+function Demo() {
+  const handler = createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD");
+  return (
+    <div>
+      <style>{css}</style>
+      <label />
+      <input placeholder="YYYY-MM-DD" onInput={handler} />
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ## Usage with form handling libraries
 

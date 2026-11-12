@@ -32,6 +32,34 @@ pnpm add @solid-primitives/vibrate
 
 Returns `true` when the [Vibration API](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API) is available. Useful for conditionally rendering haptic UI or showing fallback content.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { isVibrationSupported } from "@solid-primitives/vibrate";
+
+function Demo() {
+  const [checked, setChecked] = createSignal<boolean>();
+  return (
+    <>
+      <button onClick={() => setChecked(isVibrationSupported())}>Check support</button>
+      <p>
+        {checked() === undefined
+          ? "Not checked yet"
+          : checked()
+            ? "Vibration API available"
+            : "Vibration API not available"}
+      </p>
+      <p>
+        "Available" only means navigator.vibrate exists — it may still be blocked (e.g. in this
+        iframe).
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { isVibrationSupported } from "@solid-primitives/vibrate";
 
@@ -43,6 +71,35 @@ if (isVibrationSupported()) {
 ## `makeVibrate`
 
 A non-reactive building block. Wraps `navigator.vibrate` with an optional repeating interval and returns `[start, stop]`. No Solid lifecycle dependency — both functions are no-ops when the API is unavailable.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { isVibrationSupported, makeVibrate } from "@solid-primitives/vibrate";
+
+function Demo() {
+  const [active, setActive] = createSignal(false);
+  const [start, stop] = makeVibrate([100, 50, 100, 50, 300], { interval: 1000 });
+  const toggle = () => {
+    if (active()) stop();
+    else start();
+    setActive(a => !a);
+  };
+  return (
+    <>
+      <button onClick={toggle}>{active() ? "Stop" : "Start"} repeating vibration</button>
+      <p>{active() ? "Active" : "Stopped"}</p>
+      <p>
+        {isVibrationSupported()
+          ? "No buzz? Vibration may be blocked in this iframe — try on an Android device."
+          : "Vibration API not available — start/stop are no-ops."}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { makeVibrate } from "@solid-primitives/vibrate";
@@ -61,6 +118,35 @@ stop();
 ## `createVibrate`
 
 A reactive primitive tied to the current reactive owner. Returns `{ vibrating, start, stop, supported }`. Cleans up automatically on owner disposal.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createVibrate } from "@solid-primitives/vibrate";
+
+function Demo() {
+  const [pattern, setPattern] = createSignal<number | number[]>([200, 100, 200]);
+  const { vibrating, start, stop, supported } = createVibrate(pattern, { interval: 1000 });
+  return (
+    <>
+      <button onClick={() => (vibrating() ? stop() : start())}>
+        {vibrating() ? "Stop" : "Start"}
+      </button>
+      <button onClick={() => setPattern([50, 30, 50, 30, 50])}>Short taps</button>
+      <button onClick={() => setPattern(400)}>Long buzz</button>
+      <p>pattern: {JSON.stringify(pattern())}</p>
+      <p>{vibrating() ? "Vibrating" : "Idle"}</p>
+      <p>
+        {supported
+          ? "No buzz? Vibration may be blocked in this iframe — try on an Android device."
+          : "Vibration API not available — controls are no-ops."}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 When `pattern` is a reactive accessor and changes **while vibrating**, vibration restarts with the new pattern automatically.
 
@@ -102,6 +188,46 @@ stop(); // cancels interval + active vibration
 
 Converts a frequency in Hz and an optional duty cycle into a single-cycle `[onMs, offMs]` vibration pattern. Useful for previewing what `makePulse` / `createPulse` will produce.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { frequencyToPattern } from "@solid-primitives/vibrate";
+
+function Demo() {
+  const [hz, setHz] = createSignal(2);
+  const [duty, setDuty] = createSignal(0.5);
+  return (
+    <>
+      <label>
+        {hz()} Hz
+        <input
+          type="range"
+          min="0.5"
+          max="20"
+          step="0.5"
+          value={hz()}
+          onInput={e => setHz(+e.currentTarget.value)}
+        />
+      </label>
+      <label>
+        duty {duty()}
+        <input
+          type="range"
+          min="0.1"
+          max="0.9"
+          step="0.1"
+          value={duty()}
+          onInput={e => setDuty(+e.currentTarget.value)}
+        />
+      </label>
+      <p>[on, off] = {JSON.stringify(frequencyToPattern(hz(), duty()))} ms</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { frequencyToPattern } from "@solid-primitives/vibrate";
 
@@ -112,6 +238,41 @@ frequencyToPattern(4, 0.25); // ~[63, 188] — 4 Hz, short tap
 ## `makePulse`
 
 Non-reactive pulse helper. Vibrates continuously at `hz` cycles per second. No Solid lifecycle dependency; both functions are no-ops when the API is unavailable.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { isVibrationSupported, makePulse } from "@solid-primitives/vibrate";
+
+function Demo() {
+  const [held, setHeld] = createSignal(false);
+  const [start, stop] = makePulse(4); // 4 taps per second
+  // Note: a touch pointerdown isn't user activation, so the very first hold may not buzz.
+  const press = () => {
+    start();
+    setHeld(true);
+  };
+  const release = () => {
+    stop();
+    setHeld(false);
+  };
+  return (
+    <>
+      <button onPointerDown={press} onPointerUp={release} onPointerLeave={release}>
+        Hold to pulse at 4 Hz
+      </button>
+      <p>{held() ? "Pulsing" : "Idle"}</p>
+      <p>
+        {isVibrationSupported()
+          ? "No buzz? Vibration may be blocked in this iframe — try on an Android device."
+          : "Vibration API not available — start/stop are no-ops."}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { makePulse } from "@solid-primitives/vibrate";
@@ -124,6 +285,41 @@ button.addEventListener("pointerup", stop);
 ## `createPulse`
 
 Reactive pulse primitive tied to the current reactive owner. Returns `{ pulsing, start, stop, supported }`. Accepts a reactive `hz` accessor — changing the frequency while pulsing restarts the vibration immediately at the new rhythm.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createPulse } from "@solid-primitives/vibrate";
+
+function Demo() {
+  const [hz, setHz] = createSignal(2);
+  const { pulsing, start, stop, supported } = createPulse(hz);
+  return (
+    <>
+      <button onClick={() => (pulsing() ? stop() : start())}>{pulsing() ? "Stop" : "Pulse"}</button>
+      <label>
+        {hz()} Hz
+        <input
+          type="range"
+          min="0.5"
+          max="20"
+          step="0.5"
+          value={hz()}
+          onInput={e => setHz(+e.currentTarget.value)}
+        />
+      </label>
+      <p>{pulsing() ? "Pulsing — drag the slider to change the rhythm" : "Idle"}</p>
+      <p>
+        {supported
+          ? "No buzz? Vibration may be blocked in this iframe — try on an Android device."
+          : "Vibration API not available — controls are no-ops."}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createPulse } from "@solid-primitives/vibrate";

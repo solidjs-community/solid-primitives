@@ -23,6 +23,35 @@ pnpm add @solid-primitives/script-loader
 
 ## How to use it
 
+### createScriptLoader
+
+Appends a script (by URL or inline source) to `document.head` and removes it when the owner is disposed.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createScriptLoader } from "@solid-primitives/script-loader";
+
+function Demo() {
+  const [status, setStatus] = createSignal("loading...");
+  createScriptLoader({
+    src: "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js",
+    onLoad: () => setStatus("loaded"),
+    onError: () => setStatus("failed to load"),
+  });
+  return (
+    <>
+      <p>canvas-confetti: {status()}</p>
+      <button disabled={status() !== "loaded"} onClick={() => (window as any).confetti()}>
+        Confetti!
+      </button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 createScriptLoader expects a props object with a `src` property. All the other props will be spread to the script element.
 
 The `src` prop is required and will be used to set the `src` or `textContent` attribute. It can be a string or an accessor.

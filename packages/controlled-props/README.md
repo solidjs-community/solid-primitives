@@ -25,6 +25,43 @@ pnpm add @solid-primitives/controlled-props
 
 Primitive that provides controllable props signals like knobs/controls for simple component testing.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createControlledProp } from "@solid-primitives/controlled-props";
+
+function Demo() {
+  const [bold, , BoldField] = createControlledProp("bold", false);
+  const [size, , SizeField] = createControlledProp("size", {
+    initialValue: 16,
+    min: 10,
+    max: 40,
+    type: "range",
+  });
+  const [color, , ColorField] = createControlledProp("color", {
+    initialValue: "teal",
+    options: ["teal", "tomato", "orchid"],
+  });
+  return (
+    <>
+      <BoldField />
+      <SizeField />
+      <ColorField />
+      <p
+        style={{
+          "font-weight": bold() ? "bold" : "normal",
+          "font-size": `${size()}px`,
+          color: color(),
+        }}
+      >
+        Hello controlled props
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 You can either create a single prop:

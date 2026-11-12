@@ -174,6 +174,81 @@ function fixUnclosedVoidTags(markdown: string): string {
     .join("\n");
 }
 
+/**
+ * READMEs mark runnable examples with a ` ```tsx repl ` fence. GitHub, npm and Storybook ignore
+ * the `repl` meta and render a plain code block. Here each one becomes a SolidBase `:::repl`
+ * container with an extra `import_map.json` tab.
+ *
+ * The import map is required, not decorative. solid-repl resolves an unmapped
+ * `@solid-primitives/x` to `esm.sh/@solid-primitives/x`, which is the `latest` dist-tag (the
+ * Solid 1.x release while the repo is in prerelease mode). Pinning each imported primitive to
+ * `PRERELEASE_TAG` keeps the examples on the same release line as the docs. `external=` stops
+ * esm.sh bundling its own copy of Solid, which would break reactivity across the boundary.
+ */
+function toReplBlocks(markdown: string): string {
+  const lines = markdown.split("\n");
+  const out: string[] = [];
+  const fenceOpenRe = /^(`{3,})\s*(\S*)\s*(.*)$/;
+  const primitiveImportRe = /from\s+["'](@solid-primitives\/[a-z0-9-]+(?:\/[a-z0-9-./]+)?)["']/g;
+  const versionSuffix = PRERELEASE_TAG ? `@${PRERELEASE_TAG}` : "";
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    const open = line.match(fenceOpenRe);
+    if (!open) {
+      out.push(line);
+      continue;
+    }
+
+    const [, ticks, lang, meta] = open as unknown as [string, string, string, string];
+    // Find the matching close: a line of at least as many backticks and nothing else.
+    let end = i + 1;
+    while (end < lines.length && !new RegExp(`^${ticks}\`*\\s*$`).test(lines[end]!)) end++;
+    const body = lines.slice(i + 1, end);
+
+    const metaWords = meta.split(/\s+/).filter(Boolean);
+    const isRepl = (lang === "tsx" || lang === "ts") && metaWords.includes("repl");
+    if (!isRepl) {
+      // Copy the whole fence verbatim so its contents are never mistaken for a fence opener.
+      out.push(...lines.slice(i, end + 1));
+      i = end;
+      continue;
+    }
+
+    const code = body.join("\n");
+    const specifiers = [...new Set([...code.matchAll(primitiveImportRe)].map(m => m[1]!))].sort();
+    const imports = Object.fromEntries(
+      specifiers.map(spec => {
+        const [, pkg, subpath = ""] = spec.match(/^(@solid-primitives\/[a-z0-9-]+)(\/.*)?$/)!;
+        return [
+          spec,
+          `https://esm.sh/${pkg}${versionSuffix}${subpath}?external=solid-js,@solidjs/web,solid-js/internal&dev`,
+        ];
+      }),
+    );
+    const remainingMeta = metaWords.filter(w => w !== "repl").join(" ");
+
+    out.push(
+      ":::repl{layout=horizontal}",
+      `${ticks}${lang}${remainingMeta ? ` ${remainingMeta}` : ""}`,
+      ...body,
+      ticks,
+    );
+    if (specifiers.length > 0) {
+      out.push(
+        "",
+        `${ticks}json title="import_map.json"`,
+        JSON.stringify({ imports, pinned: specifiers }, null, 2),
+        ticks,
+      );
+    }
+    out.push(":::");
+    i = end;
+  }
+
+  return out.join("\n");
+}
+
 function cleanReadme(readme: string, name: string): string {
   return readme
     // remove heading-1
@@ -308,10 +383,23 @@ ${readme}
 `;
 }
 
-function frontmatter(title: string): string {
+function frontmatter(title: string, module?: ModuleData): string {
   // The built-in "last updated" is based on git history of this generated file, which is
   // gitignored and regenerated — so it's meaningless. We render our own in the meta table instead.
-  return `---\ntitle: ${title}\nlastUpdated: false\n---\n\n`;
+  const lines = [`title: ${title}`, "lastUpdated: false"];
+  // Package metadata for the head: SolidBase uses `description` for <meta name="description">,
+  // and src/components/OpenGraph.tsx builds the per-package OG card from the rest.
+  // JSON.stringify output is valid YAML, so descriptions with colons/quotes stay intact.
+  if (module) {
+    lines.push(
+      `description: ${JSON.stringify(module.description)}`,
+      `package: ${JSON.stringify(module.name)}`,
+      `category: ${JSON.stringify(module.primitive!.category)}`,
+      `stage: ${module.primitive!.stage}`,
+      `primitives: ${module.primitive!.list.length}`,
+    );
+  }
+  return `---\n${lines.join("\n")}\n---\n\n`;
 }
 
 type SidebarItem = { title: string; link: string };
@@ -343,9 +431,9 @@ async function main() {
   for (const module of modules) {
     const readmePath = path.join(packagesDir, module.name, "README.md");
     const rawReadme = await fsp.readFile(readmePath, "utf8");
-    const cleaned = fixUnclosedVoidTags(cleanReadme(rawReadme, module.name));
+    const cleaned = toReplBlocks(fixUnclosedVoidTags(cleanReadme(rawReadme, module.name)));
     const lastUpdated = getPackageLastUpdated(module.name);
-    const page = frontmatter(getDisplayName(module.name)) + buildPageBody(module, cleaned, lastUpdated);
+    const page = frontmatter(getDisplayName(module.name), module) + buildPageBody(module, cleaned, lastUpdated);
 
     await fsp.writeFile(path.join(routesDir, `${module.name}.mdx`), page);
 

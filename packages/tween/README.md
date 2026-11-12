@@ -37,6 +37,35 @@ setValue(100);
 // tweenedValue will now smoothly transition from 0 to 100 over 500 ms
 ```
 
+## createTween
+
+Returns an accessor that animates toward the target value every time it changes.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createTween } from "@solid-primitives/tween";
+
+function Demo() {
+  const [target, setTarget] = createSignal(0);
+  const tweened = createTween(target, {
+    duration: 800,
+    ease: t => 0.5 - Math.cos(Math.PI * t) / 2,
+  });
+  return (
+    <>
+      <button onClick={() => setTarget(target() === 0 ? 100 : 0)}>Toggle 0 / 100</button>
+      <p>
+        target: {target()}, tweened: {Math.round(tweened())}
+      </p>
+      <div style={{ width: `${tweened() * 2}px`, height: "20px", background: "tomato" }} />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ## Definition
 
 ```ts

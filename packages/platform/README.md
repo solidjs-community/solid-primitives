@@ -43,6 +43,41 @@ if (isWebKit) {
 
 ## List of variables
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+// namespace import only to list every flag; import named flags in real code
+import * as platform from "@solid-primitives/platform";
+
+function Demo() {
+  const [onlyTrue, setOnlyTrue] = createSignal(false);
+  const flags = () => Object.entries(platform).filter(([, value]) => !onlyTrue() || value);
+  return (
+    <>
+      <label>
+        <input
+          type="checkbox"
+          checked={onlyTrue()}
+          onChange={e => setOnlyTrue(e.currentTarget.checked)}
+        />
+        only show true
+      </label>
+      <ul>
+        <For each={flags()}>
+          {([name, value]) => (
+            <li>
+              {name}: <strong>{String(value)}</strong>
+            </li>
+          )}
+        </For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### Device
 
 - `isAndroid` — Is Android Device

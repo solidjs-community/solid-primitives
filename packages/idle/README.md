@@ -23,6 +23,43 @@ yarn add @solid-primitives/idle
 pnpm add @solid-primitives/idle
 ```
 
+## createIdleTimer
+
+Tracks the user's activity and reports when they enter the prompt phase and then become idle.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createIdleTimer } from "@solid-primitives/idle";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const add = (msg: string) => setLog(l => [msg, ...l].slice(0, 5));
+  const { isIdle, isPrompted, reset, triggerIdle } = createIdleTimer({
+    idleTimeout: 3_000,
+    promptTimeout: 3_000,
+    onPrompt: () => add("onPrompt"),
+    onIdle: () => add("onIdle"),
+    onActive: evt => add(`onActive (${evt.type})`),
+  });
+  return (
+    <>
+      <p>Hold still: prompt after 3 s, idle after 3 more.</p>
+      <p>status: {isIdle() ? "idle" : isPrompted() ? "prompted" : "active"}</p>
+      <button onClick={reset}>I'm here (reset)</button>
+      <button onClick={triggerIdle}>Go idle now</button>
+      <ul>
+        <For each={log()} keyed={false}>
+          {msg => <li>{msg()}</li>}
+        </For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ## How to use it
 
 `createIdleTimer` provides different accessors and methods to observe the user's idle status and react to its changing.

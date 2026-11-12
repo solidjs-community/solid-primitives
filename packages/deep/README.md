@@ -58,6 +58,41 @@ pnpm add @solid-primitives/deep
 
 Tracks all properties of a store by iterating over them recursively.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal, createStore } from "solid-js";
+import { trackDeep } from "@solid-primitives/deep";
+
+function Demo() {
+  const [user, setUser] = createStore({ name: "Alice", address: { city: "Paris" } });
+  const [prefs, setPrefs] = createStore({ dark: false });
+  const [runs, setRuns] = createSignal(0);
+
+  // one effect tracks every nested property of both stores
+  createEffect(
+    () => trackDeep({ user, prefs }),
+    () => {
+      setRuns(n => n + 1);
+    },
+  );
+
+  return (
+    <>
+      <input
+        value={user.address.city}
+        onInput={e => setUser(s => void (s.address.city = e.currentTarget.value))}
+      />
+      <button onClick={() => setPrefs(s => void (s.dark = !s.dark))}>
+        dark: {String(prefs.dark)}
+      </button>
+      <p>effect runs: {runs()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 It's a slightly more performant alternative to tracing a store with `JSON.stringify`, that won't throw when encountering circular references or `BigInt` values.
 
 Since it iterates over all properties of a store, it's not recommended to use this on large stores under rapid updates.
@@ -116,6 +151,42 @@ createEffect(
 
 A much more performant alternative to `trackDeep` that is utilizing memoization and specific store implementations of solid stores.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal, createStore, For } from "solid-js";
+import { trackStore } from "@solid-primitives/deep";
+
+function Demo() {
+  const [cart, setCart] = createStore({ items: [{ name: "Widget", qty: 1 }] });
+  const [runs, setRuns] = createSignal(0);
+
+  createEffect(
+    () => trackStore(cart),
+    () => {
+      setRuns(n => n + 1);
+    },
+  );
+
+  return (
+    <>
+      <For each={cart.items}>
+        {(item, i) => (
+          <button onClick={() => setCart(s => void s.items[i()]!.qty++)}>
+            {item.name} × {item.qty}
+          </button>
+        )}
+      </For>
+      <button onClick={() => setCart(s => void s.items.push({ name: "Gadget", qty: 1 }))}>
+        Add item
+      </button>
+      <p>effect runs: {runs()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 You should consider using this instead of other tracking methods, for large stores, stores that are updated rapidly or tracked in many effects.
 
 ### How to use it
@@ -138,6 +209,38 @@ createEffect(
 ## `captureStoreUpdates`
 
 Creates a function for tracking and capturing updates to a store.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal, createStore } from "solid-js";
+import { captureStoreUpdates } from "@solid-primitives/deep";
+
+function Demo() {
+  const [state, setState] = createStore({ todos: [{ title: "Design", done: false }] });
+  const getDelta = captureStoreUpdates(state);
+  const [log, setLog] = createSignal<string[]>([]);
+
+  // the first entry (path []) is the initial snapshot of the whole store
+  createEffect(getDelta, updates => {
+    const lines = updates.map(u => `[${u.path.join(", ")}] → ${JSON.stringify(u.value)}`);
+    setLog(prev => [...lines, ...prev]);
+  });
+
+  return (
+    <>
+      <button onClick={() => setState(s => void (s.todos[0]!.done = !s.todos[0]!.done))}>
+        Toggle first
+      </button>
+      <button onClick={() => setState(s => void s.todos.push({ title: "Ship", done: false }))}>
+        Add todo
+      </button>
+      <pre>{log().join("\n")}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 It could be useful for implementing [undo/redo functionality](https://primitives.solidjs.community/package/history) or for turning a store into a immutable stream of updates.
 

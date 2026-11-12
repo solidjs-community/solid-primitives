@@ -85,6 +85,29 @@ function makeFocusListener(
 
 Provides reactive signal of `document.activeElement`. Check which element is currently focused.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createActiveElement } from "@solid-primitives/active-element";
+
+function Demo() {
+  const activeEl = createActiveElement();
+  const label = () => {
+    const el = activeEl();
+    return el ? `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}` : "none";
+  };
+  return (
+    <>
+      <input id="first" placeholder="First name" />
+      <input id="last" placeholder="Last name" />
+      <button id="action">Button (Tab to it in Safari)</button>
+      <p>active element: {label()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 #### How to use it
 
 ```ts

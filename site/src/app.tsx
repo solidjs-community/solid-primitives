@@ -2,6 +2,7 @@ import { pageRoutes } from "virtual:file-routes";
 import { SolidBaseRoot } from "@kobalte/solidbase/client";
 import { createRouter } from "@solidjs/router";
 import { fileRoutes } from "@solidjs/router/fs";
+import { SiteOpenGraph } from "./components/OpenGraph";
 import "./app.css";
 
 const Router = createRouter({
@@ -12,5 +13,15 @@ const Router = createRouter({
 });
 
 export default function App() {
-  return <Router>{props => <SolidBaseRoot>{props.children}</SolidBaseRoot>}</Router>;
+  return (
+    <Router>
+      {props => (
+        <SolidBaseRoot>
+          {/* Inside SolidBaseRoot: it reads the current page's frontmatter. */}
+          <SiteOpenGraph />
+          {props.children}
+        </SolidBaseRoot>
+      )}
+    </Router>
+  );
 }

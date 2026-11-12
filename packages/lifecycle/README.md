@@ -33,6 +33,37 @@ Returns a boolean signal indicating whether the component is mounted or not.
 It's a simple wrapper around `createSignal` and `onSettled`,
 but it can make your code feel more declarative - especially when used with `createMemo`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal, Show } from "solid-js";
+import { createIsMounted } from "@solid-primitives/lifecycle";
+
+function Measured() {
+  let ref!: HTMLDivElement;
+  const isMounted = createIsMounted();
+  const width = createMemo(() => (isMounted() ? ref.offsetWidth : 0));
+  return (
+    <div ref={ref}>
+      isMounted: {String(isMounted())}, width: {width()}px
+    </div>
+  );
+}
+
+function Demo() {
+  const [show, setShow] = createSignal(true);
+  return (
+    <>
+      <button onClick={() => setShow(v => !v)}>{show() ? "Unmount" : "Remount"}</button>
+      <Show when={show()}>
+        <Measured />
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import { createIsMounted } from "@solid-primitives/lifecycle";
 
@@ -46,6 +77,25 @@ let ref: HTMLElement;
 ## `isHydrated`
 
 A signal accessor indicating if the owner is done hydrating.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo } from "solid-js";
+import { isHydrated } from "@solid-primitives/lifecycle";
+
+function Demo() {
+  // always true in client-only rendering; false during SSR / while hydrating
+  const clientOnly = createMemo(() => isHydrated() && <p>window width: {window.innerWidth}px</p>);
+  return (
+    <>
+      <p>isHydrated: {String(isHydrated())}</p>
+      {clientOnly()}
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 - `false` during SSR (always)
 - `false` on the client if the component evaluation is during a hydration process.
@@ -92,6 +142,28 @@ export const ClientOnly: FlowComponent = props => {
 ```
 
 ## `onElementConnect`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { onElementConnect } from "@solid-primitives/lifecycle";
+
+function Demo() {
+  const [show, setShow] = createSignal(true);
+  const [connects, setConnects] = createSignal(0);
+  return (
+    <>
+      <button onClick={() => setShow(v => !v)}>{show() ? "Unmount" : "Remount"}</button>
+      <p>connected {connects()} times</p>
+      <Show when={show()}>
+        <div ref={el => onElementConnect(el, () => setConnects(n => n + 1))}>Connected element</div>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 `onSettled` is a common lifecycle hook that is used to perform side-effects when the component is mounted.
 However, it is not certain that the elements are actually connected to the DOM when the mount callback is called.

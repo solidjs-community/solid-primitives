@@ -67,6 +67,37 @@ dispose();
 
 Create resize observer instance, listening for changes to size of reactive element targets array.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createResizeObserver } from "@solid-primitives/resize-observer";
+
+function Demo() {
+  const [el, setEl] = createSignal<HTMLDivElement>();
+  const [size, setSize] = createSignal("");
+  createResizeObserver(el, ({ width, height }) => setSize(`${width} x ${height}`));
+  return (
+    <>
+      <div
+        ref={setEl}
+        style={{
+          resize: "both",
+          overflow: "auto",
+          width: "200px",
+          height: "100px",
+          border: "1px solid",
+        }}
+      >
+        Drag my corner
+      </div>
+      <p>size: {size()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Disposes automatically itself with it's parent reactive owner.
 
 ### How to use it
@@ -106,6 +137,22 @@ setTargets(prev => [...prev, element]);
 
 Creates a reactive store-like object of current width and height dimensions of the browser window.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createWindowSize } from "@solid-primitives/resize-observer";
+
+function Demo() {
+  const size = createWindowSize();
+  return (
+    <p>
+      window: {size.width} x {size.height} (resize the window)
+    </p>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -143,6 +190,30 @@ If you want a reactive interface for media-queries, please checkout [the media p
 ## `createElementSize`
 
 Creates a reactive store-like object of current width/height and clientWidth/clientHeight dimensions of html element.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createElementSize } from "@solid-primitives/resize-observer";
+
+function Demo() {
+  const [el, setEl] = createSignal<HTMLTextAreaElement>();
+  const size = createElementSize(el);
+  return (
+    <>
+      <textarea ref={setEl}>Resize me</textarea>
+      <p>
+        width: {Math.round(size.width ?? 0)}, height: {Math.round(size.height ?? 0)}
+      </p>
+      <p>
+        clientWidth: {size.clientWidth}, clientHeight: {size.clientHeight}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 It uses `ResizeObserver` under the hood—to observe when the element size changes. `width`/`height` come from `getBoundingClientRect` (border-box, affected by CSS transforms); `clientWidth`/`clientHeight` come from the element's `clientWidth`/`clientHeight` properties (padding-box, excludes border/scrollbar, unaffected by CSS transforms).
 

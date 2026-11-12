@@ -33,6 +33,35 @@ yarn add @solid-primitives/refs
 
 Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { mergeRefs, type Ref } from "@solid-primitives/refs";
+
+function TextInput(props: { ref?: Ref<HTMLInputElement> }) {
+  let local!: HTMLInputElement;
+  // the local ref selects the text on focus, props.ref is forwarded to the parent
+  return (
+    <input
+      ref={mergeRefs(props.ref, el => (local = el))}
+      value="Hello refs"
+      onFocus={() => local.select()}
+    />
+  );
+}
+
+function Demo() {
+  let input!: HTMLInputElement;
+  return (
+    <>
+      <TextInput ref={input} />
+      <button onClick={() => input.focus()}>Focus input</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```tsx
@@ -59,6 +88,46 @@ let ref: HTMLButtonElement | undefined;
 ## `resolveElements`
 
 Utility for resolving recursively nested JSX children to a single element or an array of elements using a predicate.
+
+```tsx repl
+import { render, type JSX } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { resolveElements } from "@solid-primitives/refs";
+
+function Tags(props: { children: JSX.Element }) {
+  const els = resolveElements(() => props.children);
+  return (
+    <div>
+      <p>
+        elements:{" "}
+        {els
+          .toArray()
+          .map(el => el.localName)
+          .join(", ")}
+      </p>
+      {els()}
+    </div>
+  );
+}
+
+function Demo() {
+  const [extra, setExtra] = createSignal(false);
+  return (
+    <>
+      <button onClick={() => setExtra(v => !v)}>Toggle &lt;u&gt;</button>
+      <Tags>
+        <b>bold </b>
+        <i>italic </i>
+        <Show when={extra()}>
+          <u>underline</u>
+        </Show>
+      </Tags>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -109,6 +178,43 @@ On the client it uses `instanceof Element` check, on the server it checks for th
 
 Utility for resolving recursively nested JSX children in search of the first element that matches a predicate.
 
+```tsx repl
+import { render, type JSX } from "@solidjs/web";
+import { children, createSignal, Show } from "solid-js";
+import { resolveFirst } from "@solid-primitives/refs";
+
+const isHeading = (el: unknown): el is HTMLHeadingElement => el instanceof HTMLHeadingElement;
+
+function Card(props: { children: JSX.Element }) {
+  const resolved = children(() => props.children);
+  const title = resolveFirst(resolved, isHeading);
+  return (
+    <section>
+      <p>first heading: {title()?.textContent ?? "none"}</p>
+      {resolved()}
+    </section>
+  );
+}
+
+function Demo() {
+  const [intro, setIntro] = createSignal(false);
+  return (
+    <>
+      <button onClick={() => setIntro(v => !v)}>Toggle intro</button>
+      <Card>
+        <Show when={intro()}>
+          <h3>Intro</h3>
+        </Show>
+        <p>Some text</p>
+        <h3>Details</h3>
+      </Card>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 `resolveFirst` matches the API of [`resolveElements`](#resolveelements) but returns only the first element that matches the predicate.
@@ -132,6 +238,30 @@ function Button(props: ParentProps) {
 
 Get up-to-date reference to a single child element.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { Ref } from "@solid-primitives/refs";
+
+function Demo() {
+  const [bold, setBold] = createSignal(true);
+  const [el, setEl] = createSignal<Element | undefined>();
+  return (
+    <>
+      <button onClick={() => setBold(v => !v)}>Toggle</button>
+      <p>current ref: &lt;{el()?.localName ?? "undefined"}&gt;</p>
+      <Ref ref={setEl}>
+        <Show when={bold()} fallback={<i>italic</i>}>
+          <b>bold</b>
+        </Show>
+      </Ref>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 `<Ref>` accepts only a `ref` property for getting the current element or `undefined`, and requires `children` to be passed in.
@@ -147,6 +277,34 @@ const [ref, setRef] = createSignal<Element | undefined>();
 ## `<Refs>`
 
 Get up-to-date references of the multiple children elements.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { Refs } from "@solid-primitives/refs";
+
+function Demo() {
+  const [items, setItems] = createSignal(["a", "b"]);
+  const [els, setEls] = createSignal<Element[]>([]);
+  return (
+    <>
+      <button onClick={() => setItems(l => [...l, String.fromCharCode(97 + l.length)])}>Add</button>
+      <button onClick={() => setItems(l => l.slice(0, -1))}>Remove</button>
+      <p>
+        {els().length} elements:{" "}
+        {els()
+          .map(el => el.textContent)
+          .join(", ")}
+      </p>
+      <Refs ref={setEls}>
+        <For each={items()}>{item => <span>{item}</span>}</For>
+      </Refs>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

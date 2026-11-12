@@ -27,6 +27,30 @@ yarn add @solid-primitives/destructure
 
 Spreads an reactive object _(store or props)_ or a reactive object signal into a tuple/map of signals for each object key.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { destructure } from "@solid-primitives/destructure";
+
+function Demo() {
+  const [user, setUser] = createSignal({ name: "John", age: 36 });
+  const { name, age } = destructure(user);
+  // only re-runs when `name` changes — not when `age` does
+  let runs = 0;
+  const greeting = createMemo(() => `Hello ${name()}! (computed ${++runs}x)`);
+  return (
+    <>
+      <input value={name()} onInput={e => setUser(u => ({ ...u, name: e.currentTarget.value }))} />
+      <button onClick={() => setUser(u => ({ ...u, age: u.age + 1 }))}>Birthday</button>
+      <p>{greeting()}</p>
+      <p>age: {age()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 #### Import
 
 ```ts

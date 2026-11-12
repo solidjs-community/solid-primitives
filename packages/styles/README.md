@@ -27,6 +27,32 @@ pnpm add @solid-primitives/styles
 
 Creates a reactive signal with value of the current rem size in pixels, and tracks it's changes.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createRemSize } from "@solid-primitives/styles";
+
+function Demo() {
+  const remSize = createRemSize();
+  return (
+    <>
+      <label>
+        Root font-size:{" "}
+        <input
+          type="range"
+          min="8"
+          max="32"
+          value={remSize()}
+          onInput={e => (document.documentElement.style.fontSize = `${e.currentTarget.value}px`)}
+        />
+      </label>
+      <p>1rem = {remSize()}px</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 It takes no arguments and returns a number signal.

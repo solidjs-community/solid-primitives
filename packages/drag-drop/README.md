@@ -31,6 +31,39 @@ pnpm add @solid-primitives/drag-drop
 
 Non-reactive base. Attaches pointer listeners to an element. No Solid owner required.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onSettled } from "solid-js";
+import { makeDraggable } from "@solid-primitives/drag-drop";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  const [last, setLast] = createSignal("drag the box");
+  onSettled(() =>
+    makeDraggable(box, {
+      onMove: d => (box.style.transform = `translate(${d.x}px, ${d.y}px)`),
+      onEnd: d => {
+        box.style.transform = "";
+        setLast(`released at dx ${d.x}, dy ${d.y}`);
+      },
+    }),
+  );
+  return (
+    <>
+      <div
+        ref={box}
+        style={{ width: "80px", padding: "16px", background: "plum", "touch-action": "none" }}
+      >
+        drag me
+      </div>
+      <p>{last()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 > **Note:** When pairing with `makeDroppable`, apply `pointer-events: none` to the dragged element during the drag so that `pointerenter`/`pointerleave` can reach the underlying drop targets. The context-based `createDroppable` uses rect collision and is not affected.
 
 ```ts
@@ -53,6 +86,54 @@ cleanup();
 
 Non-reactive base. Marks an element as a drop target for pointer-event drags.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onSettled } from "solid-js";
+import { makeDraggable, makeDroppable } from "@solid-primitives/drag-drop";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  let zone!: HTMLDivElement;
+  let dragging = false;
+  const [status, setStatus] = createSignal("idle");
+  onSettled(() => {
+    const stopDrag = makeDraggable(box, {
+      onStart: () => {
+        dragging = true;
+        box.style.pointerEvents = "none";
+      },
+      onMove: d => (box.style.transform = `translate(${d.x}px, ${d.y}px)`),
+      onEnd: () => {
+        dragging = false;
+        box.style.pointerEvents = "";
+        box.style.transform = "";
+      },
+    });
+    const stopDrop = makeDroppable(zone, {
+      onEnter: () => dragging && setStatus("over"),
+      onLeave: () => setStatus("idle"),
+      onDrop: () => dragging && setStatus("dropped!"),
+    });
+    return () => (stopDrag(), stopDrop());
+  });
+  return (
+    <>
+      <div
+        ref={box}
+        style={{ width: "60px", padding: "12px", background: "plum", "touch-action": "none" }}
+      >
+        drag
+      </div>
+      <div ref={zone} style={{ "margin-top": "40px", padding: "30px", border: "2px dashed" }}>
+        drop zone: {status()}
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 > **Note:** Requires `pointer-events: none` on the dragged element during the drag — otherwise the dragged element intercepts `pointerenter`/`pointerleave` before they reach this element.
 
 ```ts
@@ -67,6 +148,39 @@ const cleanup = makeDroppable(el, {
 
 Non-reactive base for OS/browser native drag events (e.g. file drops). Handles the `dragenter`/`dragleave` depth problem with child elements automatically.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onSettled } from "solid-js";
+import { makeNativeDroppable } from "@solid-primitives/drag-drop";
+
+function Demo() {
+  let zone!: HTMLDivElement;
+  const [status, setStatus] = createSignal("drop a file or the text below");
+  onSettled(() =>
+    makeNativeDroppable(zone, {
+      onEnter: () => setStatus("release to drop"),
+      onLeave: () => setStatus("left the zone"),
+      onDrop: e => {
+        const files = Array.from(e.dataTransfer?.files ?? [], f => f.name);
+        setStatus(`dropped: ${files.join(", ") || e.dataTransfer?.getData("text/plain")}`);
+      },
+    }),
+  );
+  return (
+    <>
+      <span draggable="true" onDragStart={e => e.dataTransfer?.setData("text/plain", "hello")}>
+        drag this text
+      </span>
+      <div ref={zone} style={{ "margin-top": "12px", padding: "30px", border: "2px dashed" }}>
+        {status()}
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const cleanup = makeNativeDroppable(el, {
   accept: e => e.dataTransfer?.types.includes("Files") ?? false,
@@ -78,6 +192,32 @@ const cleanup = makeNativeDroppable(el, {
 ### `createDraggable`
 
 Reactive draggable. Attach via `ref`. Works standalone or inside a `createDragContext` provider.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createDraggable } from "@solid-primitives/drag-drop";
+
+function Demo() {
+  const drag = createDraggable("card", undefined, { draggingStyle: { opacity: "0.6" } });
+  const t = () => drag.transform() ?? { x: 0, y: 0 };
+  return (
+    <div
+      ref={drag.ref}
+      style={{
+        width: "140px",
+        padding: "16px",
+        background: "plum",
+        "touch-action": "none",
+        transform: `translate(${t().x}px, ${t().y}px)`,
+      }}
+    >
+      {drag.isDragging() ? `x ${t().x}, y ${t().y}` : "drag me (or Space + arrows)"}
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Uses `setPointerCapture` internally so the drag is never stuck if the pointer leaves the viewport. If the page scrolls mid-drag, `transform` is corrected for the scroll delta so the element stays glued to the pointer instead of drifting.
 
@@ -115,6 +255,57 @@ const drag = createDraggable("card-1", myData, {
 
 Reactive drop target. Requires a `createDragContext` ancestor to coordinate collision detection — using it without one leaves `isOver`/`active` permanently `false`/`null` and logs a dev-mode warning, since it usually means a missing `<Provider>`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createDragContext, createDraggable, createDroppable } from "@solid-primitives/drag-drop";
+
+function Content() {
+  const [accepting, setAccepting] = createSignal(true);
+  const drag = createDraggable("chip");
+  const drop = createDroppable("zone", undefined, { accept: () => accepting() });
+  const t = () => drag.transform() ?? { x: 0, y: 0 };
+  return (
+    <>
+      <label>
+        <input
+          type="checkbox"
+          checked={accepting()}
+          onChange={e => setAccepting(e.target.checked)}
+        />
+        accept drops
+      </label>
+      <div ref={drop.ref} style={{ margin: "12px 0 40px", padding: "30px", border: "2px dashed" }}>
+        {drop.isOver() ? `release to drop ${drop.active()?.id}` : "drop here"}
+      </div>
+      <div
+        ref={drag.ref}
+        style={{
+          width: "60px",
+          padding: "12px",
+          background: "plum",
+          "touch-action": "none",
+          transform: `translate(${t().x}px, ${t().y}px)`,
+        }}
+      >
+        chip
+      </div>
+    </>
+  );
+}
+
+function Demo() {
+  const ctx = createDragContext();
+  return (
+    <ctx.Provider>
+      <Content />
+    </ctx.Provider>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 const drop = createDroppable("zone-1", zoneData, {
   class: "border-2 border-dashed border-transparent",
@@ -139,6 +330,33 @@ const drop = createDroppable("zone-1", zoneData, {
 
 Reactive native drop zone. Tracks `isOver` state via HTML5 drag events.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createNativeDroppable } from "@solid-primitives/drag-drop";
+
+function Demo() {
+  const [files, setFiles] = createSignal<string[]>([]);
+  const drop = createNativeDroppable({
+    accept: e => e.dataTransfer?.types.includes("Files") ?? false,
+    onDrop: e => setFiles(Array.from(e.dataTransfer?.files ?? [], f => f.name)),
+  });
+  return (
+    <>
+      <div
+        ref={drop.ref}
+        style={{ padding: "40px", border: "2px dashed", background: drop.isOver() ? "#eef" : "" }}
+      >
+        {drop.isOver() ? "release to drop" : "drag files here"}
+      </div>
+      <p>dropped: {files().join(", ") || "none"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 const drop = createNativeDroppable({
   accept: e => e.dataTransfer?.types.includes("Files") ?? false,
@@ -153,6 +371,66 @@ const drop = createNativeDroppable({
 ### `createDragContext`
 
 Coordinates draggables and droppables. Provide it as a context via `ctx.Provider`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createDragContext, createDraggable, createDroppable } from "@solid-primitives/drag-drop";
+
+function Zone(props: { id: string }) {
+  const drop = createDroppable(props.id);
+  return (
+    <div
+      ref={drop.ref}
+      style={{ padding: "24px", border: "2px dashed", background: drop.isOver() ? "#dfd" : "" }}
+    >
+      {props.id}
+    </div>
+  );
+}
+
+function Chip() {
+  const drag = createDraggable("chip");
+  const t = () => drag.transform() ?? { x: 0, y: 0 };
+  return (
+    <div
+      ref={drag.ref}
+      style={{
+        width: "60px",
+        padding: "12px",
+        background: "plum",
+        "touch-action": "none",
+        transform: `translate(${t().x}px, ${t().y}px)`,
+      }}
+    >
+      chip
+    </div>
+  );
+}
+
+function Demo() {
+  const [log, setLog] = createSignal("drag the chip onto a zone");
+  const ctx = createDragContext({
+    onDragEnd: (item, over) => setLog(`dropped ${item.id} on ${over?.id ?? "nothing"}`),
+    onDragCancel: item => setLog(`cancelled ${item.id}`),
+  });
+  return (
+    <ctx.Provider>
+      <div style={{ display: "flex", gap: "16px", "margin-bottom": "40px" }}>
+        <Zone id="left" />
+        <Zone id="right" />
+      </div>
+      <Chip />
+      <p>
+        active: {ctx.active()?.id ?? "-"} / over: {ctx.over()?.id ?? "-"}
+      </p>
+      <p>{log()}</p>
+    </ctx.Provider>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Droppable rects are snapshotted once at drag start — `getBoundingClientRect` is never called during `pointermove`. Collision checks run at display rate (rAF-throttled) and only write reactive state when the hovered zone actually changes. `createDraggable`'s `isDragging` and `createDroppable`'s `isOver` are backed by `createProjection`, so in a list of many draggables/droppables, a drag start/end or hover change only notifies the specific items whose state actually flipped — not every item in the list.
 
@@ -191,6 +469,49 @@ const ctx = createDragContext({
 ### `createSortable`
 
 Combines `createDraggable` and `createDroppable` on the same element. When another item is dragged over it, `isActiveDropzone()` is true. The active draggable is never its own drop target.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { arrayMove, createDragContext, createSortable } from "@solid-primitives/drag-drop";
+
+function Demo() {
+  const [items, setItems] = createSignal(["Apple", "Banana", "Cherry", "Date"]);
+  const ctx = createDragContext({
+    onDragEnd: (dragged, over) => {
+      if (!over) return;
+      setItems(list =>
+        arrayMove(list, list.indexOf(dragged.id as string), list.indexOf(over.id as string)),
+      );
+    },
+  });
+  return (
+    <ctx.Provider>
+      <For each={items()}>
+        {item => {
+          const s = createSortable(item);
+          const t = () => s.transform() ?? { x: 0, y: 0 };
+          return (
+            <div
+              ref={s.ref}
+              style={{
+                padding: "8px",
+                "touch-action": "none",
+                border: s.isActiveDropzone() ? "2px dashed blue" : "2px solid transparent",
+                transform: `translate(${t().x}px, ${t().y}px)`,
+              }}
+            >
+              {item}
+            </div>
+          );
+        }}
+      </For>
+    </ctx.Provider>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 <For each={items()}>
@@ -233,6 +554,162 @@ const myDetector: CollisionDetector = (draggable, droppables, pointer) => {
   // Return the id of the winning droppable, or null
   return droppables[0]?.id ?? null;
 };
+```
+
+### `closestCenter`
+
+Picks the droppable whose center is nearest to the pointer — always returns a winner while any droppable exists.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { closestCenter, type DroppableRect } from "@solid-primitives/drag-drop";
+
+// 100x100 boxes: A spans x 0-100, B 150-250, C 300-400
+const box = (id: string, left: number): DroppableRect => ({
+  id,
+  rect: { left, top: 0, x: left, y: 0, width: 100, height: 100, right: left + 100, bottom: 100 },
+});
+const zones = [box("A", 0), box("B", 150), box("C", 300)];
+
+function Demo() {
+  const [x, setX] = createSignal(50);
+  // the dragged box is 100x100 and centered on the pointer
+  const winner = () => closestCenter(box("drag", x() - 50), zones, { x: x(), y: 50 });
+  return (
+    <>
+      <input
+        type="range"
+        min="-150"
+        max="550"
+        value={x()}
+        onInput={e => setX(e.target.valueAsNumber)}
+      />
+      <p>
+        pointer x = {x()} → closestCenter picks: {winner() ?? "none"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### `closestCorners`
+
+Picks the droppable with the corner nearest to the pointer.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { closestCenter, closestCorners, type DroppableRect } from "@solid-primitives/drag-drop";
+
+// a wide box A spans x 0-300, a narrow box B spans x 350-400
+const box = (id: string, left: number, width: number): DroppableRect => ({
+  id,
+  rect: { left, top: 0, x: left, y: 0, width, height: 100, right: left + width, bottom: 100 },
+});
+const zones = [box("A", 0, 300), box("B", 350, 50)];
+
+function Demo() {
+  const [x, setX] = createSignal(320);
+  const pointer = () => ({ x: x(), y: 50 });
+  const drag = () => box("drag", x() - 25, 50);
+  return (
+    <>
+      <input
+        type="range"
+        min="0"
+        max="450"
+        value={x()}
+        onInput={e => setX(e.target.valueAsNumber)}
+      />
+      <p>pointer x = {x()}</p>
+      <p>closestCorners picks: {closestCorners(drag(), zones, pointer()) ?? "none"}</p>
+      <p>closestCenter picks: {closestCenter(drag(), zones, pointer()) ?? "none"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### `rectIntersection`
+
+Picks the droppable with the largest overlap with the dragged element's rect; `null` when nothing overlaps.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { rectIntersection, type DroppableRect } from "@solid-primitives/drag-drop";
+
+// 100x100 boxes: A spans x 0-100, B 150-250, C 300-400
+const box = (id: string, left: number): DroppableRect => ({
+  id,
+  rect: { left, top: 0, x: left, y: 0, width: 100, height: 100, right: left + 100, bottom: 100 },
+});
+const zones = [box("A", 0), box("B", 150), box("C", 300)];
+
+function Demo() {
+  const [x, setX] = createSignal(50);
+  // the dragged box is 100x100 and centered on the pointer
+  const winner = () => rectIntersection(box("drag", x() - 50), zones, { x: x(), y: 50 });
+  return (
+    <>
+      <input
+        type="range"
+        min="-150"
+        max="550"
+        value={x()}
+        onInput={e => setX(e.target.valueAsNumber)}
+      />
+      <p>
+        pointer x = {x()} → rectIntersection picks: {winner() ?? "none"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### `pointerWithin`
+
+Picks the topmost droppable whose rect contains the pointer; `null` in the gaps. This is the default.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { pointerWithin, type DroppableRect } from "@solid-primitives/drag-drop";
+
+// 100x100 boxes: A spans x 0-100, B 150-250, C 300-400
+const box = (id: string, left: number): DroppableRect => ({
+  id,
+  rect: { left, top: 0, x: left, y: 0, width: 100, height: 100, right: left + 100, bottom: 100 },
+});
+const zones = [box("A", 0), box("B", 150), box("C", 300)];
+
+function Demo() {
+  const [x, setX] = createSignal(50);
+  // the dragged box is 100x100 and centered on the pointer
+  const winner = () => pointerWithin(box("drag", x() - 50), zones, { x: x(), y: 50 });
+  return (
+    <>
+      <input
+        type="range"
+        min="-150"
+        max="550"
+        value={x()}
+        onInput={e => setX(e.target.valueAsNumber)}
+      />
+      <p>
+        pointer x = {x()} → pointerWithin picks: {winner() ?? "none"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
 ```
 
 ## `arrayMove`

@@ -28,6 +28,29 @@ pnpm add @solid-primitives/trigger
 
 Set listeners in reactive computations and then trigger them when you want.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo } from "solid-js";
+import { createTrigger } from "@solid-primitives/trigger";
+
+function Demo() {
+  const [track, dirty] = createTrigger();
+  let count = 0;
+  const runs = createMemo(() => {
+    track();
+    return ++count;
+  });
+  return (
+    <>
+      <button onClick={() => dirty()}>dirty()</button>
+      <p>memo evaluations: {runs()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -47,6 +70,37 @@ dirty();
 ## `createTriggerCache`
 
 Creates a cache of triggers that can be used to mark dirty only specific keys.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, For } from "solid-js";
+import { createTriggerCache } from "@solid-primitives/trigger";
+
+function Demo() {
+  const [track, dirty, dirtyAll] = createTriggerCache<number>();
+  return (
+    <>
+      <ul>
+        <For each={[1, 2, 3]}>
+          {key => {
+            let count = 0;
+            const runs = createMemo(() => (track(key), ++count));
+            return (
+              <li>
+                key {key}: {runs()} evaluations{" "}
+                <button onClick={() => dirty(key)}>dirty({key})</button>
+              </li>
+            );
+          }}
+        </For>
+      </ul>
+      <button onClick={() => dirtyAll()}>dirtyAll()</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Cache is a `Map` or `WeakMap` depending on the `mapConstructor` argument. (default: `Map`)
 

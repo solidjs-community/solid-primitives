@@ -30,6 +30,38 @@ pnpm add @solid-primitives/props
 
 A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/HTML attributes.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { combineProps } from "@solid-primitives/props";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const [primary, setPrimary] = createSignal(true);
+  const push = (msg: string) => setLog(l => [...l, msg]);
+  const combined = combineProps(
+    { class: "btn", style: { padding: "8px 16px" }, onClick: () => push("base onClick") },
+    {
+      get class() {
+        return primary() ? "primary" : "secondary";
+      },
+      style: { "font-weight": "bold" },
+      onClick: () => push("user onClick"),
+    },
+  );
+  return (
+    <>
+      <button {...combined}>Click me</button>
+      <button onClick={() => setPrimary(p => !p)}>Toggle variant</button>
+      <p>class: "{combined.class}"</p>
+      <p>log: {log().join(", ")}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Event handlers _(onClick, onclick, onMouseMove, onSomething)_, and refs _(props.ref)_ are chained.
 
 `class`, `className`, and `style` are combined.
@@ -116,6 +148,31 @@ styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
 
 Chains multiple event handlers into a single handler that calls each in order. Handlers that are `null`, `undefined`, or `false` are silently skipped.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { combineHandlers } from "@solid-primitives/props";
+
+function CountingButton(props: { onClick?: (e: MouseEvent) => void }) {
+  const [clicks, setClicks] = createSignal(0);
+  const internal = () => setClicks(c => c + 1);
+  return <button onClick={combineHandlers(internal, props.onClick)}>internal: {clicks()}</button>;
+}
+
+function Demo() {
+  const [parentClicks, setParentClicks] = createSignal(0);
+  return (
+    <>
+      <CountingButton onClick={() => setParentClicks(c => c + 1)} />
+      <CountingButton />
+      <p>parent handler calls: {parentClicks()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 When used inline in JSX, reads from Solid's reactive props proxy are tracked through the render context automatically — no explicit signal unwrapping is needed. For a standalone signal holding a handler, read it before passing (`handler()`) or wrap the whole call in a `createMemo`.
 
 ```tsx
@@ -136,6 +193,27 @@ Conditional handlers can be passed inline — `null`/`false` entries are skipped
 ## `filterProps`
 
 A helper that creates a new props object with only the property names that match the predicate.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { filterProps } from "@solid-primitives/props";
+
+function Demo() {
+  const [prefix, setPrefix] = createSignal("data-");
+  const props = { id: "box", "data-id": "1", "data-role": "card", "aria-label": "box" };
+  const filtered = filterProps(props, key => key.startsWith(prefix()));
+  return (
+    <>
+      <button onClick={() => setPrefix("data-")}>data-*</button>
+      <button onClick={() => setPrefix("aria-")}>aria-*</button>
+      <pre>{JSON.stringify({ ...filtered }, null, 2)}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 An alternative primitive to Solid's `omit` that splits props lazily (per-read) — the predicate is not evaluated upfront, so the set of included keys can change dynamically.
 
@@ -182,6 +260,42 @@ const MyComponent = props => {
 ## `partitionProps`
 
 Splits a props object into two reactive views: one containing only the keys that match the predicate, and one containing the rest. Both views are lazy proxies — the predicate runs per property read, not eagerly.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { partitionProps } from "@solid-primitives/props";
+
+type BadgeProps = { label: string; color: string; title?: string; id?: string };
+
+function Badge(props: BadgeProps) {
+  const [own, html] = partitionProps(props, key => key === "label" || key === "color");
+  return (
+    <span {...html} style={{ color: own.color }}>
+      {own.label} (forwarded: {Object.keys(html).join(", ")})
+    </span>
+  );
+}
+
+function Demo() {
+  const [ok, setOk] = createSignal(true);
+  return (
+    <>
+      <button onClick={() => setOk(v => !v)}>Toggle status</button>
+      <p>
+        <Badge
+          label={ok() ? "Passing" : "Failing"}
+          color={ok() ? "green" : "red"}
+          title="Hover me"
+          id="ci"
+        />
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { partitionProps } from "@solid-primitives/props";

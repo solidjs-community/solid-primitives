@@ -65,6 +65,39 @@ function makeIntersectionObserver(
 
 ## `createIntersectionObserver`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
+
+function Demo() {
+  const [targets, setTargets] = createSignal<Element[]>([]);
+  const [entries] = createIntersectionObserver(targets, { threshold: 0.5 });
+  const visible = () =>
+    entries.filter(e => e.isIntersecting).map(e => (e.target as HTMLElement).dataset.n);
+  return (
+    <>
+      <p style={{ position: "sticky", top: 0, background: "white" }}>
+        Visible: {visible().join(", ") || "none"} (scroll the boxes)
+      </p>
+      <For each={[1, 2, 3, 4, 5, 6]}>
+        {n => (
+          <div
+            ref={el => setTargets(prev => [...prev, el])}
+            data-n={n}
+            style={{ height: "150px", border: "1px solid gray", margin: "8px 0" }}
+          >
+            Box {n}
+          </div>
+        )}
+      </For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Returns a tuple of:
 
 - A **store array** of `IntersectionObserverEntry` objects — one slot per element, updated in place when that element's intersection state changes. Reading `entries[i].isIntersecting` only re-runs the computation that reads slot `i`.
@@ -102,6 +135,40 @@ function createIntersectionObserver(
 ```
 
 ## `createViewportObserver`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createViewportObserver } from "@solid-primitives/intersection-observer";
+
+function Demo() {
+  const [visible, setVisible] = createSignal<number[]>([]);
+  const [add] = createViewportObserver({ threshold: 0.5 });
+  return (
+    <>
+      <p style={{ position: "sticky", top: 0, background: "white" }}>
+        Visible: {visible().join(", ") || "none"} (scroll the boxes)
+      </p>
+      <For each={[1, 2, 3, 4, 5, 6]}>
+        {n => (
+          <div
+            ref={add(e => {
+              setVisible(v =>
+                e.isIntersecting ? [...v, n].sort((a, b) => a - b) : v.filter(x => x !== n),
+              );
+            })}
+            style={{ height: "150px", border: "1px solid gray", margin: "8px 0" }}
+          >
+            Box {n}
+          </div>
+        )}
+      </For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 This primitive comes with a number of flexible options. You can specify a callback at the root with an array of elements or individual callbacks for individual elements.
 
@@ -142,6 +209,31 @@ function createViewportObserver(
 ## `createVisibilityObserver`
 
 Creates a reactive signal that changes when a single element's visibility changes. Takes the element to observe directly — the previous curried factory pattern has been removed.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
+
+function Demo() {
+  const [el, setEl] = createSignal<HTMLDivElement>();
+  const visible = createVisibilityObserver(el, { threshold: 0.5, initialValue: false });
+  return (
+    <>
+      <p style={{ position: "sticky", top: 0, background: "white" }}>
+        Target is {visible() ? "visible" : "hidden"}
+      </p>
+      <div style={{ height: "120vh" }}>Scroll down…</div>
+      <div ref={setEl} style={{ height: "100px", background: visible() ? "lightgreen" : "salmon" }}>
+        Target
+      </div>
+      <div style={{ height: "120vh" }} />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 The element may be a reactive accessor (`() => el`) or a plain DOM element. Passing a falsy accessor value removes the element from the observer.
 

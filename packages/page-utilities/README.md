@@ -30,6 +30,28 @@ pnpm add @solid-primitives/page-utilities
 
 Returns a reactive boolean signal reflecting the [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) — `true` when the page is visible, `false` when hidden or in a prerender state. On the server it always returns `true`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal } from "solid-js";
+import { createPageVisibility } from "@solid-primitives/page-utilities";
+
+function Demo() {
+  const visible = createPageVisibility();
+  const [hiddenCount, setHiddenCount] = createSignal(0);
+  createEffect(visible, v => {
+    if (!v) setHiddenCount(n => n + 1);
+  });
+  return (
+    <>
+      <p>page is {visible() ? "visible" : "hidden"}</p>
+      <p>hidden {hiddenCount()} times — switch tabs and come back</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createPageVisibility } from "@solid-primitives/page-utilities";
 
@@ -49,6 +71,32 @@ function createPageVisibility(): Accessor<boolean>;
 ## `usePageVisibility`
 
 A [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) version of `createPageVisibility`. The underlying event listener and signal are shared across all callers, making it more efficient when used in multiple places simultaneously.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { usePageVisibility } from "@solid-primitives/page-utilities";
+
+function Status(props: { name: string }) {
+  const visible = usePageVisibility(); // shared listener across all callers
+  return (
+    <p>
+      {props.name}: {visible() ? "visible" : "hidden"}
+    </p>
+  );
+}
+
+function Demo() {
+  return (
+    <>
+      <Status name="Component A" />
+      <Status name="Component B" />
+      <p>Switch tabs and come back — both share one signal.</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { usePageVisibility } from "@solid-primitives/page-utilities";
@@ -70,6 +118,40 @@ const usePageVisibility: () => Accessor<boolean>;
 
 Intercepts the browser's [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) event to show a confirmation dialog when the user attempts to close the tab, refresh, or navigate away. Returns a cleanup function to remove the listener.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makePageLeave } from "@solid-primitives/page-utilities";
+
+function Demo() {
+  const [active, setActive] = createSignal(false);
+  let cleanup: VoidFunction | undefined;
+  const toggle = () => {
+    if (cleanup) {
+      cleanup();
+      cleanup = undefined;
+    } else {
+      cleanup = makePageLeave();
+    }
+    setActive(!!cleanup);
+  };
+  onCleanup(() => cleanup?.());
+  return (
+    <>
+      <button onClick={toggle}>{active() ? "Remove guard" : "Add guard"}</button>
+      <p>
+        guard{" "}
+        {active()
+          ? "active — leaving or refreshing asks for confirmation (may be suppressed in the sandboxed preview)"
+          : "inactive"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makePageLeave } from "@solid-primitives/page-utilities";
 
@@ -88,6 +170,35 @@ function makePageLeave(): VoidFunction;
 ## `createPageLeaveBlocker`
 
 Reactive version of `makePageLeave`. Accepts an optional `enabled` parameter — a static boolean or a reactive signal — to toggle prevention on and off. Defaults to `true`. Automatically removes the listener when the reactive owner is disposed. No-ops on the server.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createPageLeaveBlocker } from "@solid-primitives/page-utilities";
+
+function Demo() {
+  const [draft, setDraft] = createSignal("");
+  const isDirty = () => draft() !== "";
+  createPageLeaveBlocker(isDirty);
+  return (
+    <>
+      <input
+        value={draft()}
+        onInput={e => setDraft(e.currentTarget.value)}
+        placeholder="Type to block leaving…"
+      />
+      <button onClick={() => setDraft("")}>Discard</button>
+      <p>
+        {isDirty()
+          ? "Unsaved changes — leaving asks for confirmation (may be suppressed in the preview)"
+          : "Nothing to lose"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createPageLeaveBlocker } from "@solid-primitives/page-utilities";

@@ -25,6 +25,35 @@ pnpm add @solid-primitives/mutation-observer
 
 ### createMutationObserver
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createMutationObserver } from "@solid-primitives/mutation-observer";
+
+function Demo() {
+  const [items, setItems] = createSignal([1, 2, 3]);
+  const [log, setLog] = createSignal<string[]>([]);
+  const [add] = createMutationObserver([], { childList: true }, records => {
+    for (const r of records) {
+      const msg = `+${r.addedNodes.length} / -${r.removedNodes.length} nodes`;
+      setLog(l => [msg, ...l].slice(0, 5));
+    }
+  });
+  return (
+    <>
+      <button onClick={() => setItems(i => [...i, i.length + 1])}>Add child</button>
+      <button onClick={() => setItems(i => i.slice(0, -1))}>Remove last</button>
+      <ul ref={add}>
+        <For each={items()}>{id => <li>Item {id}</li>}</For>
+      </ul>
+      <pre>{log().join("\n") || "Click a button to mutate the list"}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
 

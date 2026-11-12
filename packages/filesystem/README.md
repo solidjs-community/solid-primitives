@@ -129,6 +129,183 @@ const Item = (props: { path: string; fs: SyncFileSystem | AsyncFileSystem }) => 
 };
 ```
 
+### createFileSystem
+
+Wraps any adapter in the matching reactive layer (sync, async or a promise of an async adapter).
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createFileSystem, makeVirtualFileSystem } from "@solid-primitives/filesystem";
+
+function Demo() {
+  const fs = createFileSystem(makeVirtualFileSystem({ "readme.md": "# Hello" }));
+  let n = 0;
+  return (
+    <>
+      <button onClick={() => fs.writeFile(`/note-${++n}.txt`, `note ${n}`)}>Add file</button>
+      <ul>
+        <For each={fs.readdir("/") ?? []}>{name => <li>{name}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### createSyncFileSystem
+
+Adds a reactive layer to a synchronous adapter; reads return signal values that update on writes.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSyncFileSystem, makeVirtualFileSystem } from "@solid-primitives/filesystem";
+
+function Demo() {
+  const fs = createSyncFileSystem(makeVirtualFileSystem({ "hello.txt": "Hello!" }));
+  return (
+    <>
+      <input
+        value={fs.readFile("/hello.txt") ?? ""}
+        onInput={e => fs.writeFile("/hello.txt", e.currentTarget.value)}
+      />
+      <p>/hello.txt: {fs.readFile("/hello.txt")}</p>
+      <p>type: {String(fs.getType("/hello.txt"))}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### createAsyncFileSystem
+
+Adds a reactive layer to an asynchronous adapter; reads are `undefined` until their promise resolves.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import {
+  createAsyncFileSystem,
+  makeVirtualFileSystem,
+  type AsyncFileSystemAdapter,
+} from "@solid-primitives/filesystem";
+
+// a virtual file system with 500ms of artificial latency
+const vfs = makeVirtualFileSystem({ "a.txt": "A" });
+const later = <T,>(fn: () => T) => new Promise<T>(r => setTimeout(() => r(fn()), 500));
+const slowAdapter: AsyncFileSystemAdapter = {
+  async: true,
+  getType: p => later(() => vfs.getType(p)),
+  mkdir: p => later(() => vfs.mkdir(p)),
+  readdir: p => later(() => vfs.readdir(p)),
+  readFile: p => later(() => vfs.readFile(p)),
+  rm: p => later(() => vfs.rm(p)),
+  writeFile: (p, data) => later(() => vfs.writeFile(p, data)),
+};
+
+function Demo() {
+  const fs = createAsyncFileSystem(slowAdapter);
+  let n = 0;
+  return (
+    <>
+      <button onClick={() => fs.writeFile(`/file-${++n}.txt`, "")}>Add file</button>
+      <p>/: {fs.readdir("/")?.join(", ") ?? "loading…"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### makeNoFileSystem
+
+A synchronous no-op adapter: nothing is stored, every path is missing and files read as `""`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeNoFileSystem } from "@solid-primitives/filesystem";
+
+function Demo() {
+  const fs = makeNoFileSystem();
+  const [path, setPath] = createSignal("/a.txt");
+  return (
+    <>
+      <input value={path()} onInput={e => setPath(e.currentTarget.value)} />
+      <button onClick={() => fs.writeFile(path(), "ignored")}>Write file</button>
+      <p>type: {String(fs.getType(path()))}</p>
+      <p>content: "{fs.readFile(path())}"</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### makeNoAsyncFileSystem
+
+The asynchronous counterpart of `makeNoFileSystem`: every method resolves to an empty result.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFileSystem, makeNoAsyncFileSystem } from "@solid-primitives/filesystem";
+
+function Demo() {
+  const adapter = makeNoAsyncFileSystem();
+  const fs = createFileSystem(adapter);
+  const [writes, setWrites] = createSignal(0);
+  const write = async () => {
+    await adapter.writeFile("/a.txt", "x");
+    setWrites(n => n + 1);
+    fs.readdir("/", true); // re-read from the adapter
+    fs.readFile("/a.txt", true);
+  };
+  return (
+    <>
+      <button onClick={write}>Write /a.txt ({writes()})</button>
+      <p>entries in /: {fs.readdir("/")?.length ?? "loading…"}</p>
+      <p>/a.txt: "{fs.readFile("/a.txt") ?? "loading…"}"</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### makeVirtualFileSystem
+
+An in-memory synchronous adapter built from a nested object, optionally persisted to a `Storage`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeVirtualFileSystem } from "@solid-primitives/filesystem";
+
+function Demo() {
+  const vfs = makeVirtualFileSystem({
+    src: { "index.ts": "export const answer = 42;", lib: {} },
+    "README.md": "# Project",
+  });
+  const [path, setPath] = createSignal("/src");
+  const view = () => {
+    const type = vfs.getType(path());
+    if (type === "dir") return vfs.readdir(path()).join(", ");
+    return type === "file" ? vfs.readFile(path()) : "(not found)";
+  };
+  return (
+    <>
+      <input value={path()} onInput={e => setPath(e.currentTarget.value)} />
+      <p>type: {String(vfs.getType(path()))}</p>
+      <pre>{view()}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### Using `makeWebAccessFileSystem` with the origin private file system
 
 Pass the OPFS root as `webkitEntry`. This works in browsers without `showDirectoryPicker`, such as Firefox and Safari. Writing files uses `FileSystemFileHandle.createWritable()`, which Safari only supports from version 26; in older Safari versions, `writeFile` fails while the other operations work.
@@ -168,6 +345,32 @@ return (
 ### rsync
 
 In some cases, you might need to move data from one file system (or adapter) to another one. In order to do so, this package comes with a rsync utility:
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFileSystem, makeVirtualFileSystem, rsync } from "@solid-primitives/filesystem";
+
+function Demo() {
+  const src = makeVirtualFileSystem({ "a.txt": "A", docs: { "b.md": "# B" } });
+  const dest = createFileSystem(makeVirtualFileSystem({}));
+  const [status, setStatus] = createSignal("idle");
+  const sync = () =>
+    rsync(src, "/", dest, "/").then(
+      () => setStatus("done"),
+      e => setStatus(`failed: ${e}`),
+    );
+  return (
+    <>
+      <button onClick={sync}>rsync src → dest</button>
+      <p>status: {status()}</p>
+      <p>dest /: {dest.readdir("/")?.join(", ") || "(empty)"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 rsync(srcFs, srcPath, destFs, destPath): Promise<void>;

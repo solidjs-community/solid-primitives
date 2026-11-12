@@ -28,6 +28,47 @@ pnpm add @solid-primitives/share
 
 ## `createSocialShare`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import {
+  createSocialShare,
+  BLUESKY,
+  EMAIL,
+  REDDIT,
+  X,
+  type Network,
+} from "@solid-primitives/share";
+
+function Demo() {
+  const [title, setTitle] = createSignal("Solid Primitives");
+  const [last, setLast] = createSignal("none");
+  const { share } = createSocialShare(() => ({
+    url: "https://primitives.solidjs.community",
+    title: title(),
+    description: "High-quality primitives for Solid",
+  }));
+  const open = (name: string, network: Network) => {
+    share(network);
+    setLast(name);
+  };
+  return (
+    <>
+      <input value={title()} onInput={e => setTitle(e.currentTarget.value)} />
+      <div>
+        <button onClick={() => open("X", X)}>X</button>
+        <button onClick={() => open("Bluesky", BLUESKY)}>Bluesky</button>
+        <button onClick={() => open("Reddit", REDDIT)}>Reddit</button>
+        <button onClick={() => open("Email", EMAIL)}>Email</button>
+      </div>
+      <p>last share popup: {last()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -133,6 +174,33 @@ A portion of this primitive was built from https://github.com/nicolasbeauvais/vu
 
 A simple non-reactive base primitive wrapping the [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API). Returns a `share` function that rejects with a descriptive message if the browser does not support sharing or file sharing.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeWebShare } from "@solid-primitives/share";
+
+function Demo() {
+  const share = makeWebShare();
+  const [result, setResult] = createSignal("not shared yet");
+  const onShare = async () => {
+    try {
+      await share({ url: "https://primitives.solidjs.community", title: "Solid Primitives" });
+      setResult("shared!");
+    } catch (e) {
+      setResult(`failed: ${String(e)}`);
+    }
+  };
+  return (
+    <>
+      <button onClick={onShare}>Share</button>
+      <p>{result()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -150,6 +218,34 @@ try {
 ## `createWebShare`
 
 A reactive, action-based primitive for the [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API). Call `share` imperatively on a user gesture and observe the result via reactive accessors.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { Show } from "solid-js";
+import { createWebShare } from "@solid-primitives/share";
+
+function Demo() {
+  const { share, pending, status, message } = createWebShare();
+  return (
+    <>
+      <button
+        disabled={pending()}
+        onClick={() =>
+          share({ url: "https://primitives.solidjs.community", title: "Solid Primitives" })
+        }
+      >
+        {pending() ? "Sharing..." : "Share"}
+      </button>
+      <p>status: {status() === undefined ? "idle" : status() ? "shared" : "failed"}</p>
+      <Show when={status() === false}>
+        <p>Share failed: {message()}</p>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

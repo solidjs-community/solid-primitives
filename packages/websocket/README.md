@@ -47,6 +47,32 @@ pnpm add @solid-primitives/websocket
 
 Sets up a WebSocket with a buffered send queue. Messages sent before the connection opens are queued and flushed on `open`. Does **not** close on cleanup — use `createWS` for that.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For, onCleanup } from "solid-js";
+import { makeWS } from "@solid-primitives/websocket";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  // sends made before the socket opens are queued and flushed on "open"
+  const ws = makeWS("wss://echo.websocket.org");
+  ws.send("queued before open");
+  ws.addEventListener("message", e => setLog(l => [...l, String(e.data)]));
+  onCleanup(() => ws.close()); // makeWS never closes on its own
+
+  return (
+    <>
+      <button onClick={() => ws.send(`hello at ${new Date().toLocaleTimeString()}`)}>Send</button>
+      <ul>
+        <For each={log()}>{msg => <li>{msg}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const ws = makeWS("ws://localhost:5000");
 createEffect(
@@ -60,6 +86,38 @@ onCleanup(() => ws.close());
 
 Same as `makeWS`, but registers `ws.close()` with `onCleanup`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createWS } from "@solid-primitives/websocket";
+
+function Socket() {
+  const [last, setLast] = createSignal("–");
+  const ws = createWS("wss://echo.websocket.org"); // closed when this component unmounts
+  ws.addEventListener("message", e => setLast(String(e.data)));
+  return (
+    <>
+      <button onClick={() => ws.send("hi")}>Send "hi"</button>
+      <p>last echo: {last()}</p>
+    </>
+  );
+}
+
+function Demo() {
+  const [mounted, setMounted] = createSignal(true);
+  return (
+    <>
+      <button onClick={() => setMounted(m => !m)}>{mounted() ? "Unmount" : "Mount"}</button>
+      <Show when={mounted()}>
+        <Socket />
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const ws = createWS("ws://localhost:5000");
 createEffect(
@@ -72,6 +130,28 @@ createEffect(
 
 Returns a reactive `Accessor<0 | 1 | 2 | 3>` tracking the WebSocket's `readyState`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createWS, createWSState } from "@solid-primitives/websocket";
+
+const labels = ["Connecting", "Open", "Closing", "Closed"] as const;
+
+function Demo() {
+  const ws = createWS("wss://echo.websocket.org");
+  const state = createWSState(ws);
+  return (
+    <>
+      <p>Status: {labels[state()]}</p>
+      <button onClick={() => ws.close()} disabled={state() > 1}>
+        Close
+      </button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const ws = createWS("ws://localhost:5000");
 const state = createWSState(ws);
@@ -83,6 +163,27 @@ return <p>Status: {labels[state()]}</p>;
 ### `createWSMessage`
 
 Returns a reactive `Accessor<T | undefined>` that holds the **most recently received** message. Starts as `undefined`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createWS, createWSMessage } from "@solid-primitives/websocket";
+
+function Demo() {
+  const [text, setText] = createSignal("hello");
+  const ws = createWS("wss://echo.websocket.org");
+  const message = createWSMessage<string>(ws);
+  return (
+    <>
+      <input value={text()} onInput={e => setText(e.currentTarget.value)} />
+      <button onClick={() => ws.send(text())}>Send</button>
+      <p>Last message: {message() ?? "(none yet)"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const ws = createWS("ws://localhost:5000");
@@ -97,6 +198,31 @@ return <p>Last message: {message()}</p>;
 
 Returns a `WebSocket`-shaped proxy that transparently opens a new underlying connection whenever the server closes it involuntarily.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeReconnectingWS } from "@solid-primitives/websocket";
+
+function Demo() {
+  const [opens, setOpens] = createSignal(0);
+  const ws = makeReconnectingWS("wss://echo.websocket.org", undefined, { delay: 1000 });
+  // listeners are re-attached to every new underlying connection
+  ws.addEventListener("open", () => setOpens(n => n + 1));
+  onCleanup(() => ws.close()); // a deliberate close stops reconnecting
+
+  return (
+    <>
+      {/* simulate a dropped connection: reconnects automatically after `delay` */}
+      <button onClick={() => ws.dispatchEvent(new CloseEvent("close"))}>Drop connection</button>
+      <button onClick={() => ws.reconnect()}>Reconnect now</button>
+      <p>connections opened: {opens()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const ws = makeReconnectingWS("ws://localhost:5000", undefined, { delay: 3000, retries: Infinity });
 createEffect(
@@ -110,9 +236,48 @@ onCleanup(() => ws.close());
 
 Same as `makeReconnectingWS`, but closes on owner disposal.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createReconnectingWS, createWSMessage } from "@solid-primitives/websocket";
+
+function Demo() {
+  const ws = createReconnectingWS("wss://echo.websocket.org");
+  const message = createWSMessage<string>(ws); // keeps working across reconnects
+  return (
+    <>
+      <button onClick={() => ws.send(new Date().toLocaleTimeString())}>Send</button>
+      <button onClick={() => ws.reconnect()}>Reconnect</button>
+      <p>Last message: {message() ?? "(none yet)"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### `makeHeartbeatWS`
 
 Wraps a `ReconnectingWebSocket` to send a periodic heartbeat. If no response arrives within `wait` ms the connection is force-reconnected.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createReconnectingWS, makeHeartbeatWS } from "@solid-primitives/websocket";
+
+function Demo() {
+  const [beats, setBeats] = createSignal(0);
+  // the echo server answers every "ping"; without a reply within `wait` ms it reconnects
+  const ws = makeHeartbeatWS(createReconnectingWS("wss://echo.websocket.org"), {
+    message: "ping",
+    interval: 2000,
+    wait: 3000,
+  });
+  ws.addEventListener("message", e => e.data === "ping" && setBeats(n => n + 1));
+  return <p>heartbeats answered: {beats()}</p>;
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const ws = makeHeartbeatWS(createReconnectingWS("ws://localhost:5000"), {
@@ -129,6 +294,35 @@ const ws = makeHeartbeatWS(createReconnectingWS("ws://localhost:5000"), {
 These three primitives leverage Solid's async reactivity — `createMemo` with `AsyncIterable`, `<Loading>` boundaries, `isPending`, and `latest` — to provide a more powerful and correct model for WebSocket data.
 
 ### `wsMessageIterable`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, For, Loading } from "solid-js";
+import { createWS, wsMessageIterable } from "@solid-primitives/websocket";
+
+function Demo() {
+  const ws = createWS("wss://echo.websocket.org");
+  const messages = createMemo(async function* () {
+    const all: string[] = [];
+    for await (const msg of wsMessageIterable<string>(ws)) {
+      all.push(msg);
+      yield [...all];
+    }
+  });
+  return (
+    <>
+      <button onClick={() => ["a", "b", "c"].forEach(m => ws.send(m))}>Send burst a, b, c</button>
+      <Loading fallback={<p>Waiting for the first message…</p>}>
+        <ul>
+          <For each={messages()}>{msg => <li>{msg}</li>}</For>
+        </ul>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 function wsMessageIterable<T = string>(ws: WebSocket): AsyncIterable<T>;
@@ -150,6 +344,29 @@ Works correctly with `makeReconnectingWS` — event listeners are re-attached to
 **Why this doesn't drop messages:** Unlike `createWSMessage`, each yielded value triggers its own reactive flush. Messages that arrive while an earlier one is being processed are buffered and drained in order, so no message is skipped.
 
 ### `createWSData`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Loading } from "solid-js";
+import { createWS, createWSData } from "@solid-primitives/websocket";
+
+function Demo() {
+  const [text, setText] = createSignal("hello");
+  const ws = createWS("wss://echo.websocket.org");
+  const shout = createWSData<string>(ws, { transform: msg => msg.toUpperCase() });
+  return (
+    <>
+      <input value={text()} onInput={e => setText(e.currentTarget.value)} />
+      <button onClick={() => ws.send(text())}>Send</button>
+      <Loading fallback={<p>Waiting for the first message…</p>}>
+        <p>Latest (transformed): {shout()}</p>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 function createWSData<T = string, U = T>(
@@ -185,6 +402,34 @@ Comparison with `createWSMessage`:
 | Best for                                 | Simple last-value display | State-source WS, real-time feeds |
 
 ### `createWSStore`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createWS, createWSStore } from "@solid-primitives/websocket";
+
+function Demo() {
+  const ws = createWS("wss://echo.websocket.org");
+  // note: echo.websocket.org sends a greeting on connect, which is counted too
+  const [state, setState] = createWSStore(ws, {
+    initial: { count: 0, last: "" },
+    patch(draft, msg: string) {
+      draft.count++;
+      draft.last = msg;
+    },
+  });
+  return (
+    <>
+      <button onClick={() => ws.send("hi")}>Send</button>
+      <button onClick={() => setState(s => void (s.count = 0))}>Reset count</button>
+      <p>
+        {state.count} messages, last: {state.last}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 function createWSStore<S extends object, T = string>(

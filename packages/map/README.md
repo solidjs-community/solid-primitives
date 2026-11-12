@@ -28,6 +28,45 @@ pnpm add @solid-primitives/map
 
 A reactive `Map`. Read methods subscribe to reactive updates when called inside a tracking scope (JSX, `createMemo`, `createEffect` compute). Write methods notify only the subscribers affected by the change.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { ReactiveMap } from "@solid-primitives/map";
+
+function Demo() {
+  const scores = new ReactiveMap<string, number>([
+    ["Alice", 0],
+    ["Bob", 0],
+  ]);
+  const [name, setName] = createSignal("");
+  return (
+    <>
+      <input value={name()} onInput={e => setName(e.currentTarget.value)} placeholder="name" />
+      <button
+        onClick={() => {
+          if (name() && !scores.has(name())) scores.set(name(), 0);
+          setName("");
+        }}
+      >
+        Add
+      </button>
+      <p>size: {scores.size}</p>
+      <For each={[...scores.keys()]}>
+        {key => (
+          <p>
+            {key}: {scores.get(key)}{" "}
+            <button onClick={() => scores.set(key, (scores.get(key) ?? 0) + 1)}>+1</button>
+            <button onClick={() => scores.delete(key)}>remove</button>
+          </p>
+        )}
+      </For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### Usage
 
 ```tsx
@@ -104,6 +143,29 @@ map.set("John", { age: 35 });
 ## `ReactiveWeakMap`
 
 A reactive `WeakMap`. Same per-key tracking as `ReactiveMap` for `has(key)` and `get(key)`, but keys must be object references.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { ReactiveWeakMap } from "@solid-primitives/map";
+
+const items = [{ label: "Apples" }, { label: "Bananas" }, { label: "Cherries" }];
+
+function Demo() {
+  const checked = new ReactiveWeakMap<(typeof items)[number], boolean>();
+  return (
+    <For each={items}>
+      {item => (
+        <button onClick={() => checked.set(item, !checked.get(item))}>
+          {checked.get(item) ? "✓" : "○"} {item.label}
+        </button>
+      )}
+    </For>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Does not support `size`, `clear()`, or any iteration method — these are absent on the native `WeakMap` to allow keys to be garbage-collected when no other reference exists.
 

@@ -29,6 +29,38 @@ pnpm add @solid-primitives/transition-group
 Create an element transition interface for switching between single elements.
 It can be used to implement own transition effect, or a custom `<Transition>`-like component.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { createSwitchTransition } from "@solid-primitives/transition-group";
+
+function Demo() {
+  const [count, setCount] = createSignal(1);
+  // a fresh element per value, so the transition sees a new source
+  const current = createMemo(() => {
+    const n = count();
+    return (<p>Element {n}</p>) as HTMLElement;
+  });
+  const rendered = createSwitchTransition(current, {
+    mode: "out-in",
+    onEnter(el, done) {
+      queueMicrotask(() => el.animate([{ opacity: 0 }, { opacity: 1 }], 300).finished.then(done));
+    },
+    onExit(el, done) {
+      el.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(done);
+    },
+  });
+  return (
+    <>
+      <button onClick={() => setCount(n => n + 1)}>Next</button>
+      {rendered()}
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 It will observe the source and return a signal with array of elements to be rendered (current one and exiting ones).
@@ -107,6 +139,42 @@ return createSwitchTransition(resolved, {
 
 Create an element list transition interface for changes to the list of elements.
 It can be used to implement own transition effect, or a custom `<TransitionGroup>`-like component.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createListTransition } from "@solid-primitives/transition-group";
+
+function Demo() {
+  let nextId = 4;
+  const [items, setItems] = createSignal([1, 2, 3]);
+  const remove = (id: number) => setItems(list => list.filter(i => i !== id));
+  // cache one element per item so unchanged items keep their identity
+  const cache = new Map<number, HTMLElement>();
+  const getEl = (id: number) => {
+    const el = cache.get(id) ?? ((<li onClick={() => remove(id)}>Item {id}</li>) as HTMLElement);
+    cache.set(id, el);
+    return el;
+  };
+  const rendered = createListTransition(() => items().map(getEl), {
+    onChange({ added, removed, finishRemoved }) {
+      queueMicrotask(() => added.forEach(el => el.animate([{ opacity: 0 }, { opacity: 1 }], 300)));
+      if (!removed.length) return;
+      const exits = removed.map(el => el.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished);
+      Promise.all(exits).then(() => finishRemoved(removed));
+    },
+  });
+  return (
+    <>
+      <button onClick={() => setItems(list => [...list, nextId++])}>Add item</button>
+      <p>Click an item to remove it.</p>
+      <ul>{rendered()}</ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

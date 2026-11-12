@@ -36,6 +36,38 @@ pnpm add @solid-primitives/presence
 
 ### `createPresence` boolean example
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createPresence } from "@solid-primitives/presence";
+
+function Demo() {
+  const [show, setShow] = createSignal(true);
+  const { isMounted, isVisible, isExiting } = createPresence(show, { transitionDuration: 500 });
+  return (
+    <>
+      <button onClick={() => setShow(v => !v)}>{show() ? "Hide" : "Show"}</button>
+      <p>
+        mounted: {String(isMounted())}, exiting: {String(isExiting())}
+      </p>
+      <Show when={isMounted()}>
+        <div
+          style={{
+            transition: "all 500ms ease",
+            opacity: isVisible() ? "1" : "0",
+            transform: isVisible() ? "translateY(0)" : "translateY(-12px)",
+          }}
+        >
+          I animate in and out!
+        </div>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 const FirstExample = () => {
   const [showStuff, setShowStuff] = createSignal(true);

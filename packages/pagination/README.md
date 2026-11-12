@@ -30,6 +30,32 @@ pnpm add @solid-primitives/pagination
 
 Provides an array with the properties to fill your pagination with and a page setter/getter.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createPagination } from "@solid-primitives/pagination";
+
+function Demo() {
+  const [ellipsis, setEllipsis] = createSignal(false);
+  const [paginationProps, page] = createPagination(() => ({
+    pages: 20,
+    maxPages: 7,
+    showEllipsis: ellipsis(),
+  }));
+  return (
+    <>
+      <nav style={{ display: "flex", gap: "4px" }}>
+        <For each={paginationProps()}>{props => <button {...props} />}</For>
+      </nav>
+      <p>Current page: {page()}</p>
+      <button onClick={() => setEllipsis(e => !e)}>Ellipsis: {ellipsis() ? "on" : "off"}</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -151,6 +177,36 @@ In this mode, the first and last page are always present, and while the `maxPage
 
 It is a common requirement to put multiple items on a single page, which exactly is what `createSegment` is for.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createPagination, createSegment } from "@solid-primitives/pagination";
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+function Demo() {
+  const [limit, setLimit] = createSignal(5);
+  const [paginationProps, page] = createPagination(() => ({
+    pages: Math.ceil(items.length / limit()),
+    maxPages: 5,
+  }));
+  const segment = createSegment(items, limit, page);
+  return (
+    <>
+      <button onClick={() => setLimit(l => (l === 5 ? 10 : 5))}>Items per page: {limit()}</button>
+      <ul>
+        <For each={segment()}>{item => <li>{item}</li>}</For>
+      </ul>
+      <nav style={{ display: "flex", gap: "4px" }}>
+        <For each={paginationProps()}>{props => <button {...props} />}</For>
+      </nav>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 const segment = createSegment(items, limit, page);
 
@@ -162,6 +218,40 @@ return <For each={segment()}>{item => <Item item={item} />}</For>;
 - `page` is an accessor with the number or the segment page, starting with 1
 
 ## `createInfiniteScroll`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For, Loading, Show } from "solid-js";
+import { createInfiniteScroll } from "@solid-primitives/pagination";
+
+// fake API: 5 pages of 10 items, then an empty page signals the end
+const fetcher = (page: number) =>
+  new Promise<string[]>(resolve => {
+    const items = Array.from({ length: 10 }, (_, i) => `Item ${page * 10 + i + 1}`);
+    setTimeout(() => resolve(page < 5 ? items : []), 500);
+  });
+
+function Demo() {
+  const [pages, setEl, { pageCount, end }] = createInfiniteScroll(fetcher);
+  return (
+    <div style={{ height: "200px", overflow: "auto", border: "1px solid #ccc" }}>
+      <p>Pages requested: {pageCount()}</p>
+      <For each={pages()}>
+        {page => (
+          <Loading fallback={<p>Loading…</p>}>
+            <For each={page.content()}>{item => <p>{item}</p>}</For>
+          </Loading>
+        )}
+      </For>
+      <Show when={!end()} fallback={<p>No more items</p>}>
+        <div ref={setEl} style={{ height: "1px" }} />
+      </Show>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. The sentinel-based auto-loading is browser-only, but fetching itself isn't: pass `initialPageCount` to request pages during SSR too, so the first page(s) are present in the server-rendered HTML for SEO and perceived speed.
 

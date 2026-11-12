@@ -32,6 +32,26 @@ pnpm add @solid-primitives/scheduled
 
 Creates a callback that is debounced and cancellable. The debounced callback is called on **trailing** edge.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { debounce } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [value, setValue] = createSignal("");
+  const update = debounce((text: string) => setValue(text), 500);
+  return (
+    <>
+      <input placeholder="Type something…" onInput={e => update(e.currentTarget.value)} />
+      <button onClick={() => update.clear()}>Cancel</button>
+      <p>debounced: {value()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 The timeout will be automatically cleared on root dispose.
 
 ### How to use it
@@ -48,6 +68,35 @@ trigger.clear(); // clears a timeout in progress
 
 Creates a callback that is throttled and cancellable. The throttled callback is called on **trailing** edge.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { throttle } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [clicks, setClicks] = createSignal(0);
+  const [fires, setFires] = createSignal(0);
+  const trigger = throttle(() => setFires(n => n + 1), 1000);
+  return (
+    <>
+      <button
+        onClick={() => {
+          setClicks(n => n + 1);
+          trigger();
+        }}
+      >
+        Click rapidly
+      </button>
+      <p>
+        clicks: {clicks()} / callback fires: {fires()}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 The timeout will be automatically cleared on root dispose.
 
 ### How to use it
@@ -63,6 +112,37 @@ trigger.clear(); // clears a timeout in progress
 ## `scheduleIdle`
 
 Creates a callback throttled using `window.requestIdleCallback()`. ([MDN reference](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback))
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { scheduleIdle } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [moves, setMoves] = createSignal(0);
+  const [idleRuns, setIdleRuns] = createSignal(0);
+  const [pos, setPos] = createSignal("");
+  const update = scheduleIdle((x: number, y: number) => {
+    setIdleRuns(n => n + 1);
+    setPos(`${x}, ${y}`);
+  }, 250);
+  return (
+    <div
+      style={{ height: "150px", border: "1px solid gray" }}
+      onPointerMove={e => {
+        setMoves(n => n + 1);
+        update(e.clientX, e.clientY);
+      }}
+    >
+      <p>pointer moves: {moves()}</p>
+      <p>idle updates: {idleRuns()}</p>
+      <p>last idle position: {pos()}</p>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 The throttled callback is called on **trailing** edge.
 
@@ -88,6 +168,32 @@ trigger.clear(); // clears a timeout in progress
 
 Creates a scheduled and cancellable callback that will be called on **leading** edge.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { leading, debounce } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const trigger = leading(
+    debounce,
+    () => setLog(l => [new Date().toLocaleTimeString(), ...l].slice(0, 5)),
+    1000,
+  );
+  return (
+    <>
+      <button onClick={() => trigger()}>Click rapidly</button>
+      <p>Fires on the first click, then again only after 1s of no clicks.</p>
+      <ul>
+        <For each={log()}>{t => <li>{t}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 The timeout will be automatically cleared on root dispose.
 
 ### How to use it
@@ -112,6 +218,32 @@ trigger.clear(); // clears a timeout in progress
 
 Creates a scheduled and cancellable callback that will be called on **leading** edge for the first call, and **trailing** edge thereafter.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { leadingAndTrailing, throttle } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const trigger = leadingAndTrailing(
+    throttle,
+    (n: number) => setLog(l => [`click #${n}`, ...l].slice(0, 5)),
+    1000,
+  );
+  let clicks = 0;
+  return (
+    <>
+      <button onClick={() => trigger(++clicks)}>Click rapidly</button>
+      <ul>
+        <For each={log()}>{t => <li>{t}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 The timeout will be automatically cleared on root dispose.
 
 ### How to use it
@@ -135,6 +267,30 @@ trigger.clear(); // clears a timeout in progress
 ## `createScheduled`
 
 Creates a signal used for scheduling execution of solid computations by tracking.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { createScheduled, debounce } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const scheduled = createScheduled(fn => debounce(fn, 800));
+  const debouncedCount = createMemo((prev?: number) => {
+    const value = count();
+    return scheduled() ? value : (prev ?? 0);
+  });
+  return (
+    <>
+      <button onClick={() => setCount(n => n + 1)}>Increment</button>
+      <p>count: {count()}</p>
+      <p>debounced count: {debouncedCount()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

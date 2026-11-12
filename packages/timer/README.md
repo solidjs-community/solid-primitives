@@ -31,6 +31,36 @@ pnpm add @solid-primitives/timer
 
 ### makeTimer
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeTimer } from "@solid-primitives/timer";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const [running, setRunning] = createSignal(false);
+  let clear: VoidFunction | undefined;
+  const toggle = () => {
+    if (running()) {
+      clear?.();
+      setRunning(false);
+    } else {
+      clear = makeTimer(() => setCount(c => c + 1), 500, setInterval);
+      setRunning(true);
+    }
+  };
+  onCleanup(() => clear?.());
+  return (
+    <>
+      <button onClick={toggle}>{running() ? "Stop" : "Start"}</button>
+      <p>ticks: {count()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Creates a timer ([setTimeout](https://developer.mozilla.org/en-US/docs/Web/API/setTimeout) or [setInterval](https://developer.mozilla.org/en-US/docs/Web/API/setInterval)) and returns a function to clear it. This is a base primitive with no reactive lifecycle integration — the caller is responsible for cleanup.
 
 To tie cleanup to a reactive scope, pass the returned function to `onCleanup`:
@@ -49,6 +79,30 @@ onCleanup(makeTimer(() => console.log("tick"), 1000, setInterval));
 ```
 
 ### createTimer
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createTimer } from "@solid-primitives/timer";
+
+function Demo() {
+  const [delay, setDelay] = createSignal<number | false>(1000);
+  const [count, setCount] = createSignal(0);
+  createTimer(() => setCount(c => c + 1), delay, setInterval);
+  return (
+    <>
+      <button onClick={() => setDelay(250)}>250ms</button>
+      <button onClick={() => setDelay(1000)}>1000ms</button>
+      <button onClick={() => setDelay(false)}>Pause</button>
+      <p>
+        ticks: {count()} (delay: {delay() === false ? "paused" : `${delay()}ms`})
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 A reactive timer whose delay can be a static number or a reactive accessor. When the delay accessor returns `false`, the timer is disabled. Automatically cleans up when the reactive scope is disposed.
 
@@ -81,6 +135,29 @@ setPaused(false); // resume
 
 Similar to `createTimer` with `setInterval`, but the delay is only read between executions rather than reactively. This means a delay change takes effect after the current interval completes.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createTimeoutLoop } from "@solid-primitives/timer";
+
+function Demo() {
+  const [delay, setDelay] = createSignal(2000);
+  const [count, setCount] = createSignal(0);
+  createTimeoutLoop(() => setCount(c => c + 1), delay);
+  return (
+    <>
+      <button onClick={() => setDelay(250)}>250ms</button>
+      <button onClick={() => setDelay(2000)}>2000ms</button>
+      <p>
+        ticks: {count()} (next delay: {delay()}ms, applied after the current tick)
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createSignal } from "solid-js";
 import { createTimeoutLoop } from "@solid-primitives/timer";
@@ -98,6 +175,27 @@ setDelay(500); // takes effect after the current interval fires
 ### createPolled
 
 Polls a function periodically and returns an accessor to its latest return value. The function is called immediately on creation, then after each interval. If the polling function reads reactive signals, the accessor also updates when those signals change.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createPolled } from "@solid-primitives/timer";
+
+function Demo() {
+  const [delay, setDelay] = createSignal<number | false>(1000);
+  const time = createPolled(() => new Date().toLocaleTimeString(), delay);
+  return (
+    <>
+      <button onClick={() => setDelay(d => (d === false ? 1000 : false))}>
+        {delay() === false ? "Resume" : "Pause"}
+      </button>
+      <p>The time is: {time()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { createSignal } from "solid-js";
@@ -120,6 +218,27 @@ setDelay(500);
 ### createIntervalCounter
 
 A counter that starts at `0` and increments by one each interval. Accepts a static or reactive delay.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createIntervalCounter } from "@solid-primitives/timer";
+
+function Demo() {
+  const [delay, setDelay] = createSignal<number | false>(1000);
+  const count = createIntervalCounter(delay);
+  return (
+    <>
+      <button onClick={() => setDelay(100)}>100ms</button>
+      <button onClick={() => setDelay(1000)}>1000ms</button>
+      <button onClick={() => setDelay(false)}>Pause</button>
+      <p>count: {count()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { createSignal } from "solid-js";

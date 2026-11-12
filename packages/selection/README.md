@@ -25,6 +25,41 @@ pnpm add @solid-primitives/selection
 
 ## Usage
 
+### createSelection
+
+Reactively reads and sets the cursor position / selection in inputs, textareas and contentEditable elements.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSelection } from "@solid-primitives/selection";
+
+function Demo() {
+  let editor!: HTMLDivElement;
+  const [selection, setSelection] = createSelection();
+  return (
+    <>
+      <div
+        ref={el => (editor = el)}
+        contenteditable
+        style={{ border: "1px solid #ccc", padding: "4px" }}
+      >
+        Hello, <b>World</b>!
+      </div>
+      <button onClick={() => setSelection([editor, 7, 12])}>Select "World"</button>
+      <button onClick={() => setSelection([editor, 13, 13])}>Cursor to end</button>
+      <button onClick={() => setSelection([null, NaN, NaN])}>Clear</button>
+      <p>
+        {selection()[0]
+          ? `${selection()[0]!.tagName.toLowerCase()}: ${selection()[1]}–${selection()[2]}`
+          : "nothing selected"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 The format of the getter output and setter input is `HTMLSelection`, consisting of a tuple of the node in which the selection happens and a start and end offset within the text content. The offsets count from zero, so `1` would be the second character.
 
 ```ts

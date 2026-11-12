@@ -1,4 +1,5 @@
 import solid from "@solidjs/vite-plugin";
+import { vitePlugin as ogp } from "@solidjs/ogp/unplugin";
 import { createSolidBase } from "@kobalte/solidbase/config";
 import defaultTheme from "@kobalte/solidbase/default-theme";
 import { defineConfig } from "vite";
@@ -6,7 +7,16 @@ import { sidebar } from "./src/generated/sidebar";
 
 const solidBase = createSolidBase(defaultTheme);
 
+const SITE_URL = "https://primitives2.solidjs.community";
+
+// Crawlers need absolute og:image URLs. `SITE_ORIGIN` overrides the production origin, e.g. for a
+// preview deploy whose image endpoint lives elsewhere.
+const SITE_ORIGIN = (process.env.SITE_ORIGIN ?? SITE_URL).replace(/\/$/, "");
+
 export default defineConfig({
+  define: {
+    __SITE_ORIGIN__: JSON.stringify(SITE_ORIGIN),
+  },
   // SolidBase's theme depends on pinned @solid-primitives/*@next releases. Left external, the
   // prerender worker would resolve `@solid-primitives/utils` up the tree to a different copy
   // (the workspace's), so bundle them into the server build.
@@ -26,10 +36,14 @@ export default defineConfig({
     ],
   },
   plugins: [
+    // Compiles <DynamicImage> (src/components/OpenGraph.tsx) into GET server functions that
+    // render the OG card PNGs on request. `enforce: "pre"`, but listed first to make that explicit.
+    ogp(),
     solidBase.plugin({
       title: "Solid Primitives 2",
       titleTemplate: ":title | Solid Primitives 2",
       description: "High-quality reactive primitives for building applications in Solid2",
+      siteUrl: SITE_URL,
       // Base/fallback src — app.css swaps the actual rendered image per data-theme.
       logo: "/logo-light.png",
       lastUpdated: false,
@@ -59,6 +73,8 @@ export default defineConfig({
       },
     }),
     // start mode (SSR + static prerender into dist/client) replaces SolidStart + Nitro.
-    solid(solidBase.startConfig()),
+    // Pages stay prerendered; `serverFunctions` keeps dist/server so its `{ fetch }` handler can
+    // serve the OG image endpoint (`/_server`).
+    solid(solidBase.startConfig({ serverFunctions: true })),
   ],
 });

@@ -84,6 +84,37 @@ Creates one element per slot (index) and keeps elements fixed to their position.
 
 ## Recycle `List`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { List } from "@solid-primitives/list";
+
+function Demo() {
+  const [items, setItems] = createSignal(["alice", "bob", "carol"]);
+  let created = 0;
+  return (
+    <>
+      <button onClick={() => setItems(a => (a.length ? [...a.slice(1), a[0]!] : a))}>Rotate</button>
+      <button onClick={() => setItems(a => a.map(s => s.toUpperCase()))}>Uppercase</button>
+      <button onClick={() => setItems(a => [...a, `user${a.length + 1}`])}>Add</button>
+      <button onClick={() => setItems([])}>Clear</button>
+      <List recycle each={items()} fallback={<p>No items.</p>}>
+        {(item, index) => {
+          const id = ++created;
+          return (
+            <div>
+              #{index() + 1} — {item()} (element {id})
+            </div>
+          );
+        }}
+      </List>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import { List } from "@solid-primitives/list";
 
@@ -134,6 +165,34 @@ Note that when `keyed: false` there won't be any reordering, so index doesn't ne
 ## `listArray`
 
 `listArray` is the reactive array mapper that backs `<List>`. Use it directly when you need the same reconciliation behaviour outside of JSX — inside a store derivation, a custom hook, or alongside other reactive primitives.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { listArray } from "@solid-primitives/list";
+
+function Demo() {
+  const [items, setItems] = createSignal(["alpha", "beta", "gamma"]);
+  let seq = 0;
+  const rows = listArray(
+    items,
+    (item, index) => {
+      const id = ++seq;
+      return () => `[id:${id}] ${index() + 1}. ${item()}`;
+    },
+    { recycle: true },
+  );
+  return (
+    <>
+      <button onClick={() => setItems(a => [...a.slice(1), a[0]!])}>Rotate</button>
+      <button onClick={() => setItems(a => [...a, `item-${a.length + 1}`])}>Add</button>
+      <For each={rows()}>{row => <div>{row()}</div>}</For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { listArray } from "@solid-primitives/list";

@@ -32,6 +32,28 @@ Requires `solid-js` `^2.0.0-beta.10`.
 
 Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createEventBus } from "@solid-primitives/event-bus";
+
+function Demo() {
+  const bus = createEventBus<boolean>();
+  const [lightOn, setLightOn] = createSignal(false);
+  // the light only knows about the bus, not the switch
+  bus.listen(setLightOn);
+
+  return (
+    <>
+      <button onClick={() => bus.emit(!lightOn())}>Toggle switch</button>
+      <p>light: {lightOn() ? "ON" : "OFF"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -56,6 +78,34 @@ unsub();
 ## `createEmitter`
 
 Creates an emitter with which you can listen to and emit various events.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createEmitter } from "@solid-primitives/event-bus";
+
+function Demo() {
+  const emitter = createEmitter<{ greet: string; count: number }>();
+  const [log, setLog] = createSignal<string[]>([]);
+  const push = (msg: string) => setLog(prev => [msg, ...prev].slice(0, 5));
+
+  emitter.on("greet", name => push(`Hello, ${name}!`));
+  emitter.on("count", n => push(`Count: ${n}`));
+
+  let count = 0;
+  return (
+    <>
+      <button onClick={() => emitter.emit("greet", "world")}>Greet</button>
+      <button onClick={() => emitter.emit("count", ++count)}>Count</button>
+      <ul>
+        <For each={log()}>{entry => <li>{entry}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -119,6 +169,44 @@ emitter.listen(e => {
 ## `createEventHub`
 
 Provides helpers for using a group of event buses.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createEventHub } from "@solid-primitives/event-bus";
+
+function Demo() {
+  const hub = createEventHub(bus => ({
+    spin: bus<number>(),
+    reset: bus<void>(),
+  }));
+  const [angle, setAngle] = createSignal(0);
+  const [last, setLast] = createSignal("none");
+
+  hub.on("spin", deg => setAngle(a => a + deg));
+  hub.reset.listen(() => setAngle(0));
+  // global listener - receives events from every channel
+  hub.listen(e => setLast(`${e.name}(${e.details ?? ""})`));
+
+  return (
+    <>
+      <button onClick={() => hub.emit("spin", 45)}>Spin +45°</button>
+      <button onClick={() => hub.emit("reset")}>Reset</button>
+      <div
+        style={{
+          width: "60px",
+          height: "60px",
+          background: "orange",
+          transform: `rotate(${angle()}deg)`,
+        }}
+      />
+      <p>last event: {last()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Can be used with `createEventBus`, `createEventStack` or any emitter that has the same api.
 
@@ -192,6 +280,40 @@ hub.myBus.value();
 ## `createEventStack`
 
 Extends [`createEmitter`](#createemitter). Provides the emitted events in a list/history form, with tools to manage it.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createEventStack } from "@solid-primitives/event-bus";
+
+function Demo() {
+  const stack = createEventStack<string, { text: string }>({
+    toValue: text => ({ text }),
+    length: 5,
+  });
+  const [draft, setDraft] = createSignal("Hello");
+
+  return (
+    <>
+      <input value={draft()} onInput={e => setDraft(e.currentTarget.value)} />
+      <button onClick={() => stack.emit(draft())}>Send</button>
+      {/* stack.clear() removes listeners, not items — reset the value instead */}
+      <button onClick={() => stack.setValue([])}>Clear</button>
+      <ul>
+        <For each={stack.value()}>
+          {item => (
+            <li>
+              {item.text} <button onClick={() => stack.remove(item)}>×</button>
+            </li>
+          )}
+        </For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

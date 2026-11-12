@@ -29,6 +29,30 @@ pnpm add @solid-primitives/audio
 
 A foundational non-reactive primitive that creates a raw `HTMLAudioElement` with optional event handlers. No Solid owner required.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeAudio } from "@solid-primitives/audio";
+
+function Demo() {
+  const [playing, setPlaying] = createSignal(false);
+  const src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+  const [player, cleanup] = makeAudio(src, {
+    playing: () => setPlaying(true),
+    pause: () => setPlaying(false),
+    ended: () => setPlaying(false),
+  });
+  onCleanup(cleanup);
+  return (
+    <button onClick={() => (playing() ? player.pause() : player.play()?.catch(() => {}))}>
+      {playing() ? "Pause" : "Play"}
+    </button>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [player, cleanup] = makeAudio("example.mp3");
 // later:
@@ -47,6 +71,38 @@ function makeAudio(
 ### makeAudioPlayer
 
 Wraps `makeAudio` with simple playback controls. No Solid owner required.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeAudioPlayer } from "@solid-primitives/audio";
+
+function Demo() {
+  const [time, setTime] = createSignal(0);
+  const [volume, setVolume] = createSignal(1);
+  const [controls, cleanup] = makeAudioPlayer(
+    "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    {
+      timeupdate: () => setTime(controls.player.currentTime),
+      volumechange: () => setVolume(controls.player.volume),
+    },
+  );
+  onCleanup(cleanup);
+  return (
+    <>
+      <button onClick={() => controls.play()?.catch(() => {})}>Play</button>
+      <button onClick={controls.pause}>Pause</button>
+      <button onClick={() => controls.seek(60)}>Seek to 1:00</button>
+      <button onClick={() => controls.setVolume(volume() < 1 ? 1 : 0.2)}>Toggle volume</button>
+      <p>
+        time: {time().toFixed(1)}s, volume: {Math.round(volume() * 100)}%
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const [{ play, pause, seek, setVolume, player }, cleanup] = makeAudioPlayer("example.mp3");
@@ -81,6 +137,49 @@ The `seek` function uses `fastSeek` on [supporting browsers](https://caniuse.com
 ### createAudio
 
 A reactive audio primitive. Returns a flat object with writable signal accessors for `playing` and `volume`, a reactive `currentTime`, and an async `duration` that suspends until audio metadata is loaded — integrating with `<Suspense>` / `<Loading>`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Loading } from "solid-js";
+import { createAudio } from "@solid-primitives/audio";
+
+const url = (n: number) => `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`;
+
+function Demo() {
+  const [track, setTrack] = createSignal(1);
+  const audio = createAudio(() => url(track()));
+  return (
+    <>
+      <button onClick={() => audio.setPlaying(!audio.playing())}>
+        {audio.playing() ? "Pause" : "Play"}
+      </button>
+      <button
+        onClick={() => {
+          audio.setPlaying(false);
+          setTrack(n => (n % 3) + 1);
+        }}
+      >
+        Next track ({track()})
+      </button>
+      <input
+        type="range"
+        min={0}
+        max={1}
+        step={0.05}
+        value={audio.volume()}
+        onInput={e => audio.setVolume(e.currentTarget.valueAsNumber)}
+      />
+      <Loading fallback={<p>Loading…</p>}>
+        <p>
+          {audio.currentTime().toFixed(1)}s / {audio.duration().toFixed(1)}s
+        </p>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const audio = createAudio("example.mp3");

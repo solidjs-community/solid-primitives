@@ -32,6 +32,28 @@ pnpm add @solid-primitives/media
 
 Attaches a MediaQuery listener to window, listeneing to changes to provided query
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeMediaQueryListener } from "@solid-primitives/media";
+
+function Demo() {
+  const mql = window.matchMedia("(max-width: 767px)");
+  const [small, setSmall] = createSignal(mql.matches);
+  makeMediaQueryListener(mql, e => setSmall(e.matches));
+  return (
+    <>
+      <p>Resize the preview to cross 767px.</p>
+      <p>
+        {mql.media}: {small() ? "matches" : "no match"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeMediaQueryListener } from "@solid-primitives/media";
 
@@ -45,6 +67,25 @@ clear();
 ## `createMediaQuery`
 
 Creates a very simple and straightforward media query monitor.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMediaQuery } from "@solid-primitives/media";
+
+function Demo() {
+  const isSmall = createMediaQuery("(max-width: 767px)");
+  const isLandscape = createMediaQuery("(orientation: landscape)");
+  return (
+    <>
+      <p>Resize the preview to see the values update.</p>
+      <p>max-width 767px: {isSmall() ? "yes" : "no"}</p>
+      <p>landscape: {isLandscape() ? "yes" : "no"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createMediaQuery } from "@solid-primitives/media";
@@ -67,6 +108,26 @@ console.log(isSmall());
 ## `createBreakpoints`
 
 Creates a multi-breakpoint monitor to make responsive components easily.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createBreakpoints } from "@solid-primitives/media";
+
+function Demo() {
+  const matches = createBreakpoints({ sm: "640px", lg: "1024px", xl: "1280px" });
+  return (
+    <>
+      <p>Resize the preview to see the breakpoints change.</p>
+      <p>
+        sm: {String(matches.sm)} | lg: {String(matches.lg)} | xl: {String(matches.xl)}
+      </p>
+      <p>largest match: {matches.key ?? "none"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { createBreakpoints } from "@solid-primitives/media";
@@ -187,6 +248,29 @@ prefersDark();
 ### `usePrefersDark`
 
 This primitive provides a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) variant that will reuse the same signal and media query across the whole application.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { usePrefersDark } from "@solid-primitives/media";
+
+function Badge() {
+  const prefersDark = usePrefersDark(); // shared signal, single media query
+  return <span>{prefersDark() ? "dark" : "light"}</span>;
+}
+
+function Demo() {
+  return (
+    <>
+      <p>Toggle your OS color scheme to see both badges update.</p>
+      <p>
+        Header: <Badge /> / Footer: <Badge />
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { usePrefersDark } from "@solid-primitives/media";

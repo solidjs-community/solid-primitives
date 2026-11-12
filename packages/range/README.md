@@ -31,6 +31,32 @@ pnpm add @solid-primitives/range
 
 ## `createNumericRange`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createNumericRange } from "@solid-primitives/range";
+
+function Demo() {
+  const [to, setTo] = createSignal(5);
+  const nums = createNumericRange(0, to, 2);
+  return (
+    <>
+      <input
+        type="range"
+        min="0"
+        max="20"
+        value={to()}
+        onInput={e => setTo(+e.currentTarget.value)}
+      />
+      <p>createNumericRange(0, {to()}, 2):</p>
+      <For each={nums()}>{n => <span>{n} </span>}</For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Reactively generates an array of numbers for the given range. Mirrors the `range()` API from Python — one argument gives `[0, to)`, two or three give `[from, to)` with an optional step.
 
 All arguments accept either a plain number or a reactive accessor. Pairs naturally with Solid 2.0's built-in `<For>`.
@@ -66,6 +92,32 @@ function createNumericRange(
 
 Reactively maps a number range of specified length with a callback function - underlying helper for the `<Repeat>` control flow.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { repeat } from "@solid-primitives/range";
+
+function Demo() {
+  const [count, setCount] = createSignal(3);
+  const items = createMemo(
+    repeat(count, i => (
+      <li>
+        item {i} (created at {new Date().toLocaleTimeString()})
+      </li>
+    )),
+  );
+  return (
+    <>
+      <button onClick={() => setCount(n => n + 1)}>Add</button>
+      <button onClick={() => setCount(n => Math.max(n - 1, 0))}>Remove</button>
+      <ul>{items()}</ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [length, setLength] = createSignal(10);
 const mapped = repeat(length, index => {
@@ -93,6 +145,27 @@ function repeat<T>(
 ```
 
 ## `<Repeat>`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { Repeat } from "@solid-primitives/range";
+
+function Demo() {
+  const [times, setTimes] = createSignal(3);
+  return (
+    <>
+      <button onClick={() => setTimes(n => n + 1)}>Add</button>
+      <button onClick={() => setTimes(n => Math.max(n - 1, 0))}>Remove</button>
+      <Repeat times={times()} fallback={<p>no items</p>}>
+        {i => <div>★ {i}</div>}
+      </Repeat>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 > **Deprecated** — Solid 2.0 ships a built-in `<Repeat>` in `@solidjs/web`. Migrate to that:
 >
@@ -144,6 +217,34 @@ function Repeat<T>(props: {
 ```
 
 ## `mapRange`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { mapRange } from "@solid-primitives/range";
+
+function Demo() {
+  const [to, setTo] = createSignal(2);
+  const items = createMemo(
+    mapRange(
+      () => 0,
+      to,
+      () => 0.5,
+      n => <li>{n}</li>,
+    ),
+  );
+  return (
+    <>
+      <p>mapRange(0, {to()}, 0.5)</p>
+      <button onClick={() => setTo(n => n + 1)}>+1</button>
+      <button onClick={() => setTo(n => n - 1)}>-1</button>
+      <ul>{items()}</ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Reactively maps a number range of specified `start`, `to` and `step`, with a callback function - underlying helper for the [`<Range>`](#range) control flow.
 
@@ -241,6 +342,32 @@ function Range<T>(
 
 ## `indexRange`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { indexRange } from "@solid-primitives/range";
+
+function Demo() {
+  const [start, setStart] = createSignal(0);
+  const items = createMemo(
+    indexRange(
+      start,
+      () => start() + 5,
+      () => 1,
+      n => <li>{n()}</li>,
+    ),
+  );
+  return (
+    <>
+      <button onClick={() => setStart(n => n + 1)}>Shift range (start: {start()})</button>
+      <ul>{items()}</ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Primitive for mapping a number range of specified `start`, `to` and `step`, while keeping previous elements of the same index. Underlying helper for the [`<IndexRange>`](#indexrange-1) control flow.
 
 All `start`, `to` and `step` arguments are accessors, and changing them will cause the mapped array to be recalculated, mapping new items appended at the end of the range.
@@ -281,6 +408,32 @@ function indexRange<T>(
 ```
 
 ## `<IndexRange>`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { IndexRange } from "@solid-primitives/range";
+
+function Demo() {
+  const [to, setTo] = createSignal(3);
+  return (
+    <>
+      <input
+        type="number"
+        min="0"
+        max="20"
+        value={to()}
+        onInput={e => setTo(Math.min(+e.currentTarget.value, 20))}
+      />
+      <IndexRange start={0} to={to()} step={1} fallback={<p>empty range</p>}>
+        {n => <div>row {n()}</div>}
+      </IndexRange>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Control Flow Component for displaying a number range of elements, where elements receive a number value as signal, by mapping a number range of specified `start`, `to`, and `step`.
 

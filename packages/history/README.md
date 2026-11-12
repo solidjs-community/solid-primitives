@@ -25,6 +25,34 @@ pnpm add @solid-primitives/history
 
 Creates an undo history from a reactive source for going back and forth between state snapshots.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createUndoHistory } from "@solid-primitives/history";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const history = createUndoHistory(() => {
+    const v = count();
+    return () => setCount(v);
+  });
+  return (
+    <>
+      <p>count: {count()}</p>
+      <button onClick={() => setCount(n => n + 1)}>+1</button>
+      <button disabled={!history.canUndo()} onClick={history.undo}>
+        Undo
+      </button>
+      <button disabled={!history.canRedo()} onClick={history.redo}>
+        Redo
+      </button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 `createUndoHistory` takes two arguments:

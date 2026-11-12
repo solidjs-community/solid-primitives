@@ -27,6 +27,44 @@ pnpm add @solid-primitives/form
 
 Creates a reactive form with per-field signals, derived validity state, and helpers for binding fields to DOM inputs.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createForm } from "@solid-primitives/form";
+
+const isEmail = (v: string) => (/^\S+@\S+\.\S+$/.test(v) ? null : "Invalid email");
+const minLength = (n: number) => (v: string) => (v.length < n ? `Min ${n} chars` : null);
+
+function Demo() {
+  const [result, setResult] = createSignal("");
+  const form = createForm({
+    fields: {
+      email: { initial: "", validate: isEmail },
+      password: { initial: "", validate: minLength(8) },
+    },
+    validateOn: "blur",
+    onSubmit: async values => {
+      await new Promise(r => setTimeout(r, 500));
+      setResult(`Signed in as ${values.email}`);
+    },
+  });
+  return (
+    <form ref={form.ref}>
+      <input ref={form.bind("email")} type="email" placeholder="Email" />
+      <p>{form.fields.email.error()}</p>
+      <input ref={form.bind("password")} type="password" placeholder="Password" />
+      <p>{form.fields.password.error()}</p>
+      <button type="submit" disabled={!form.valid() || form.submitting()}>
+        {form.submitting() ? "Signing in…" : "Sign in"}
+      </button>
+      <p>{result()}</p>
+    </form>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import { createForm } from "@solid-primitives/form";
 
@@ -302,6 +340,29 @@ const form = createForm({
 
 A standalone helper that converts a plain values object into a `FormData` instance. Useful when passing form data to Solid Router actions or server functions that expect `FormData`:
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { toFormData } from "@solid-primitives/form";
+
+function Demo() {
+  const [name, setName] = createSignal("Ada");
+  const [subscribed, setSubscribed] = createSignal(false);
+  const entries = () => [...toFormData({ name: name(), subscribed: subscribed(), age: 36 })];
+  return (
+    <>
+      <input value={name()} onInput={e => setName(e.currentTarget.value)} />
+      <label>
+        <input type="checkbox" onChange={e => setSubscribed(e.currentTarget.checked)} /> subscribed
+      </label>
+      <pre>{JSON.stringify(entries())}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createForm, toFormData } from "@solid-primitives/form";
 import { action, useAction } from "@solidjs/router";
@@ -550,6 +611,42 @@ Builds the ARIA accessibility graph for a labeled form field: a stable ID, regis
 
 This is a low-level primitive aimed at headless component libraries (such as [Kobalte](https://kobalte.dev)). If you are building a component that wraps a label + input + helper text, `createFormControl` handles the ARIA wiring so you don't have to manage IDs manually.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { createFormControl } from "@solid-primitives/form";
+
+function Demo() {
+  const [value, setValue] = createSignal("");
+  const invalid = () => !value().includes("@");
+  const ctx = createFormControl({
+    id: "email",
+    required: true,
+    validationState: () => (invalid() ? "invalid" : "valid"),
+  });
+  onCleanup(ctx.registerLabel("email-label"));
+  onCleanup(ctx.registerField("email-field"));
+  onCleanup(ctx.registerDescription("email-desc"));
+  return (
+    <div {...ctx.dataset()}>
+      <label id="email-label" for="email-field">
+        Email
+      </label>{" "}
+      <input
+        id="email-field"
+        onInput={e => setValue(e.currentTarget.value)}
+        aria-labelledby={ctx.getAriaLabelledBy("email-field", undefined, undefined)}
+        aria-describedby={ctx.getAriaDescribedBy(undefined)}
+      />
+      <p id="email-desc">{invalid() ? "Enter a valid email address." : "Looks good!"}</p>
+      <pre>{JSON.stringify(ctx.dataset())}</pre>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import {
   createFormControl,
@@ -676,6 +773,51 @@ All props accept either a plain value or a reactive accessor `() => value`, so t
 
 Reads from `FormControlContext` (must be called inside a `<FormControlContext>`) and returns a `fieldProps` object for the actual input element. Uses `createEffect` to register/deregister the field's ID reactively.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import {
+  createFormControl,
+  createFormControlInput,
+  FormControlContext,
+  useFormControl,
+} from "@solid-primitives/form";
+
+function Input() {
+  const { fieldProps } = createFormControlInput({ "aria-label": "Username" });
+  return (
+    <>
+      <input
+        id={fieldProps.id()}
+        aria-label={fieldProps.ariaLabel()}
+        aria-labelledby={fieldProps.ariaLabelledBy()}
+      />
+      <pre>aria-labelledby="{fieldProps.ariaLabelledBy() ?? ""}"</pre>
+    </>
+  );
+}
+
+function Label() {
+  const ctx = useFormControl();
+  const id = ctx.generateId("label");
+  onCleanup(ctx.registerLabel(id));
+  return <label id={id}>Username</label>;
+}
+
+function Demo() {
+  const [showLabel, setShowLabel] = createSignal(true);
+  return (
+    <FormControlContext value={createFormControl({ id: "user" })}>
+      <button onClick={() => setShowLabel(s => !s)}>Toggle label</button>
+      <div>{showLabel() && <Label />}</div>
+      <Input />
+    </FormControlContext>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 **Props**
 
 | Prop               | Type                    | Description                                                                 |
@@ -701,6 +843,36 @@ Reads from `FormControlContext` (must be called inside a `<FormControlContext>`)
 ### `FormControlContext` + `useFormControl()`
 
 `FormControlContext` is a standard Solid context. Provide a value from `createFormControl` and consume it in any descendant:
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFormControl, FormControlContext, useFormControl } from "@solid-primitives/form";
+
+function Status() {
+  const ctx = useFormControl();
+  return (
+    <p {...ctx.dataset()}>
+      {ctx.name()} is {ctx.isDisabled() ? "disabled" : "enabled"}
+      {ctx.isRequired() ? " and required" : ""}
+    </p>
+  );
+}
+
+function Demo() {
+  const [disabled, setDisabled] = createSignal(false);
+  const [required, setRequired] = createSignal(false);
+  return (
+    <FormControlContext value={createFormControl({ id: "newsletter", disabled, required })}>
+      <button onClick={() => setDisabled(d => !d)}>Toggle disabled</button>
+      <button onClick={() => setRequired(r => !r)}>Toggle required</button>
+      <Status />
+    </FormControlContext>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 const ctx = createFormControl({ id: "my-field" });
@@ -784,6 +956,33 @@ type FormControlContextValue = {
 ## `createFormResetListener`
 
 Listens for the `reset` event on the closest ancestor `<form>` element and calls the given handler. Useful for form controls that need to restore their default value when the surrounding form is reset.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFormResetListener } from "@solid-primitives/form";
+
+function Counter() {
+  const [el, setEl] = createSignal<HTMLElement>();
+  const [count, setCount] = createSignal(0);
+  createFormResetListener(el, () => setCount(0));
+  return (
+    <button type="button" ref={setEl} onClick={() => setCount(c => c + 1)}>
+      Clicked {count()} times
+    </button>
+  );
+}
+
+function Demo() {
+  return (
+    <form>
+      <Counter /> <button type="reset">Reset form</button>
+    </form>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 The element accessor is reactive — when it changes, the old listener is automatically removed and a new one is attached to the form closest to the new element.
 

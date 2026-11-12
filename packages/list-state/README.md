@@ -39,6 +39,40 @@ pnpm add @solid-primitives/list-state
 
 A reactive primitive for single-select list navigation. Returns an `active` signal for the currently selected item and an `onKeyDown` handler for keyboard events.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createListState } from "@solid-primitives/list-state";
+
+const items = ["Apple", "Banana", "Cherry", "Dragonfruit"];
+
+function Demo() {
+  const { active, setActive, onKeyDown } = createListState({ items, initialActive: items[0] });
+  return (
+    <>
+      <p>Click the list, then use ↑ / ↓ / Home / End.</p>
+      <ul role="listbox" tabindex={0} onKeyDown={onKeyDown}>
+        <For each={items}>
+          {item => (
+            <li
+              role="option"
+              aria-selected={active() === item ? "true" : "false"}
+              onClick={() => setActive(item)}
+              style={{ "font-weight": active() === item ? "bold" : "normal" }}
+            >
+              {item}
+            </li>
+          )}
+        </For>
+      </ul>
+      <p>active: {active() ?? "none"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createListState } from "@solid-primitives/list-state";
 import { createSignal } from "solid-js";
@@ -126,6 +160,47 @@ interface ListStateReturn<T> {
 ## `createMultiSelectListState`
 
 A reactive primitive for multi-select list navigation with range selection. Maintains three separate states: `cursor` (focused item), `active` (range of focused items), and `selected` (user-selected items).
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createMultiSelectListState } from "@solid-primitives/list-state";
+
+const items = ["index.ts", "package.json", "README.md", "LICENSE"];
+
+function Demo() {
+  const { cursor, active, selected, setCursorActive, toggleSelected, onKeyDown } =
+    createMultiSelectListState({ items });
+  return (
+    <>
+      <p>Click an item, then Shift+↑ / ↓ to select a range. Double-click toggles.</p>
+      <ul role="listbox" aria-multiselectable="true" tabindex={0} onKeyDown={onKeyDown}>
+        <For each={items}>
+          {item => (
+            <li
+              role="option"
+              aria-selected={selected().includes(item) ? "true" : "false"}
+              onClick={() => setCursorActive(item)}
+              onDblClick={() => toggleSelected(item)}
+              style={{
+                "font-weight": cursor() === item ? "bold" : "normal",
+                "user-select": "none",
+                background: active().includes(item) ? "#e0e7ff" : "transparent",
+              }}
+            >
+              {selected().includes(item) ? "✓ " : ""}
+              {item}
+            </li>
+          )}
+        </For>
+      </ul>
+      <p>selected: {selected().join(", ") || "none"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createMultiSelectListState } from "@solid-primitives/list-state";

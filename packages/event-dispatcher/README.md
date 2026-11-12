@@ -49,6 +49,43 @@ function ChildComponent(props: Props) {
 
 `createEventDispatcher` takes one argument, the component's `props`, and returns an event dispatcher function. `props` must be passed as they are, without changing or spreading spreading them, in order to maintain their reactivity.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createEventDispatcher } from "@solid-primitives/event-dispatcher";
+
+function Stepper(props: { onAdjust: (evt: CustomEvent<number>) => void }) {
+  const dispatch = createEventDispatcher(props);
+  const [blocked, setBlocked] = createSignal(false);
+  // dispatch() returns false when the handler called preventDefault()
+  const adjust = (by: number) => setBlocked(!dispatch("adjust", by, { cancelable: true }));
+  return (
+    <>
+      <button onClick={() => adjust(1)}>+1</button>
+      <button onClick={() => adjust(-1)}>-1</button>
+      {blocked() && <span> blocked by parent</span>}
+    </>
+  );
+}
+
+function Demo() {
+  const [total, setTotal] = createSignal(0);
+  return (
+    <>
+      <Stepper
+        onAdjust={evt => {
+          if (total() + evt.detail < 0) evt.preventDefault();
+          else setTotal(t => t + evt.detail);
+        }}
+      />
+      <p>total (never below 0): {total()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### `dispatch` and the created custom event
 
 The resulting event dispatcher is named by convention `dispatch`, and will create a DOM custom event (`CustomEvent<T>`) and call the associated event handler. It takes 3 arguments:

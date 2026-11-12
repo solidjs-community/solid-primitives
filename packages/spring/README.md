@@ -41,6 +41,29 @@ pnpm add @solid-primitives/spring
 
 ### `createSpring`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSpring } from "@solid-primitives/spring";
+
+function Demo() {
+  const [value, setValue, { isAnimating }] = createSpring(0, { stiffness: 0.1, damping: 0.4 });
+  let target = 0;
+  return (
+    <>
+      <button onClick={() => setValue((target = target ? 0 : 100))}>Toggle 0 / 100</button>
+      <div style={{ width: "200px", height: "12px", background: "#eee", overflow: "hidden" }}>
+        <div style={{ width: `${value() * 2}px`, height: "100%", background: "tomato" }} />
+      </div>
+      <p>
+        value: {value().toFixed(1)} {isAnimating() ? "(animating)" : ""}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createSpring } from "@solid-primitives/spring";
 
@@ -121,6 +144,32 @@ const [value, setValue] = createSpring(0, () => ({
 ### `createDerivedSpring`
 
 Follows an existing accessor automatically — no need to wire up an effect manually.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createDerivedSpring } from "@solid-primitives/spring";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const springCount = createDerivedSpring(count, { stiffness: 0.05 });
+  return (
+    <>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={count()}
+        onInput={e => setCount(+e.currentTarget.value)}
+      />
+      <p>target: {count()}</p>
+      <p>spring: {springCount().toFixed(1)}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createSignal } from "solid-js";

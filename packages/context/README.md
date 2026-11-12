@@ -34,6 +34,37 @@ Requires `solid-js@^2.0.0-beta.13` and `@solidjs/web@^2.0.0-beta.13`.
 
 Create the Context Provider component and useContext function with types inferred from the factory function.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createContextProvider } from "@solid-primitives/context";
+
+const [CounterProvider, useCounter] = createContextProvider((props: { initial: number }) => {
+  const [count, setCount] = createSignal(props.initial);
+  return { count, increment: () => setCount(n => n + 1) };
+});
+
+function Counter(props: { label: string }) {
+  const { count, increment } = useCounter();
+  return (
+    <button onClick={increment}>
+      {props.label}: {count()}
+    </button>
+  );
+}
+
+function Demo() {
+  return (
+    <CounterProvider initial={1}>
+      <Counter label="A" />
+      <Counter label="B (same counter)" />
+    </CounterProvider>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 Given a factory function, `createContextProvider` creates a SolidJS Context and returns both a Provider component for setting the context, and a useContext helper for getting the context. The factory function gets called when the provider component gets executed; all `props` of the provider component get passed into the factory function, and what it returns will be available in the contexts for all the underlying components. The types of the provider props and context are inferred from the factory function.
@@ -95,6 +126,37 @@ const [ThemeProvider, useTheme] = createContextProvider(() => createTheme(), def
 
 Like `createContextProvider`, but the `useContext` function returns `undefined` when the context is missing or when the provider value is `undefined`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createOptionalContextProvider } from "@solid-primitives/context";
+
+const [GroupProvider, useGroup] = createOptionalContextProvider((props: { id: string }) => ({
+  groupId: props.id,
+}));
+
+function Item() {
+  const group = useGroup();
+  return <p>{group ? `In group "${group.groupId}"` : "No group (undefined, no throw)"}</p>;
+}
+
+function Demo() {
+  const [grouped, setGrouped] = createSignal(true);
+  return (
+    <>
+      <button onClick={() => setGrouped(g => !g)}>Toggle provider</button>
+      <Show when={grouped()} fallback={<Item />}>
+        <GroupProvider id="admins">
+          <Item />
+        </GroupProvider>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import { createOptionalContextProvider } from "@solid-primitives/context";
 
@@ -113,6 +175,49 @@ An optional `name` can be passed as the third argument.
 ## `createLayeredContext`
 
 Like `createContextProvider`, but each provider in the tree _extends_ the parent context value rather than replacing it entirely. The factory function receives the nearest parent's context value as its second argument.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createLayeredContext } from "@solid-primitives/context";
+
+const [ThemeProvider, useTheme] = createLayeredContext(
+  (props: { color?: string }, parent) => ({
+    get color() {
+      return props.color ?? parent.color;
+    },
+  }),
+  { color: "blue" },
+);
+
+function Label(props: { text: string }) {
+  const theme = useTheme();
+  return (
+    <p style={{ color: theme.color }}>
+      {props.text}: {theme.color}
+    </p>
+  );
+}
+
+function Demo() {
+  const [color, setColor] = createSignal("red");
+  const toggle = () => setColor(c => (c === "red" ? "purple" : "red"));
+  return (
+    <>
+      <button onClick={toggle}>Toggle root color</button>
+      <ThemeProvider color={color()}>
+        <Label text="Root" />
+        <ThemeProvider>
+          <Label text="Nested (inherits)" />
+        </ThemeProvider>
+      </ThemeProvider>
+      <Label text="Outside (default)" />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 This is useful for incremental overrides such as themes, permissions layers, or i18n patches where a child provider should inherit what it does not explicitly change.
 
@@ -142,6 +247,44 @@ const [ThemeProvider, useTheme] = createLayeredContext(
 ## `MultiProvider`
 
 A component that allows you to provide multiple contexts at once.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createContext, createSignal, useContext } from "solid-js";
+import { createContextProvider, MultiProvider } from "@solid-primitives/context";
+
+const NameContext = createContext("anonymous");
+
+const [CounterProvider, useCounter] = createContextProvider((props: { initial: number }) => {
+  const [count, setCount] = createSignal(props.initial);
+  return { count, increment: () => setCount(n => n + 1) };
+});
+
+function Greeting() {
+  const name = useContext(NameContext);
+  const { count, increment } = useCounter();
+  return (
+    <button onClick={increment}>
+      {name} clicked {count()} times
+    </button>
+  );
+}
+
+function Demo() {
+  return (
+    <MultiProvider
+      values={[
+        [NameContext, "Ada"],
+        [CounterProvider, { initial: 5 }],
+      ]}
+    >
+      <Greeting />
+    </MultiProvider>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 It will work exactly like nesting multiple providers as separate components, but it will save you from the nesting.
 

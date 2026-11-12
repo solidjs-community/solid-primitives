@@ -29,6 +29,36 @@ Programmatically sends messages to screen readers via ARIA live regions. Two vis
 `<div>` elements are appended to `document.body` — one `aria-live="polite"`, one
 `aria-live="assertive"` — and removed on cleanup.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createAnnounce } from "@solid-primitives/a11y";
+
+function Demo() {
+  const announce = createAnnounce();
+  const [count, setCount] = createSignal(0);
+  const [last, setLast] = createSignal("none");
+  const say = (message: string, politeness: "polite" | "assertive" = "polite") => {
+    announce(message, politeness);
+    setLast(`${politeness}: ${message}`);
+  };
+  const add = () => {
+    const next = count() + 1;
+    setCount(next);
+    say(`${next} items in cart`);
+  };
+  return (
+    <>
+      <button onClick={add}>Add to cart</button>
+      <button onClick={() => say("Payment failed", "assertive")}>Fail (assertive)</button>
+      <p>Last announcement: {last()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createAnnounce } from "@solid-primitives/a11y";
 ```
@@ -58,6 +88,46 @@ announce("Session expired. Please sign in again.", "assertive");
 
 Non-reactive base. Returns `[announce, cleanup]` so you can use it outside a Solid component — useful for notification services or stores.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For, Show } from "solid-js";
+import { makeAnnounce } from "@solid-primitives/a11y";
+
+// Created outside any component, e.g. in a notification service
+const [announce, cleanup] = makeAnnounce();
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const [removed, setRemoved] = createSignal(false);
+  const notify = (message: string) => {
+    announce(message);
+    setLog(prev => [...prev, message]);
+  };
+  const remove = () => {
+    cleanup();
+    setRemoved(true);
+  };
+  return (
+    <>
+      <button disabled={removed()} onClick={() => notify(`File ${log().length + 1} downloaded`)}>
+        Download
+      </button>
+      <button disabled={removed()} onClick={remove}>
+        Remove live regions
+      </button>
+      <Show when={removed()}>
+        <p>Live regions removed — announcements are disabled.</p>
+      </Show>
+      <ul>
+        <For each={log()}>{message => <li>{message}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeAnnounce } from "@solid-primitives/a11y";
 
@@ -83,6 +153,34 @@ type AnnouncePoliteness = "polite" | "assertive";
 
 Returns a reactive accessor that reflects the user's `prefers-reduced-motion` system preference.
 Updates automatically when the OS setting changes. Returns `false` on the server (SSR-safe).
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createReducedMotion } from "@solid-primitives/a11y";
+
+function Demo() {
+  const prefersReduced = createReducedMotion();
+  const [moved, setMoved] = createSignal(false);
+  return (
+    <>
+      <p>prefers-reduced-motion: {prefersReduced() ? "reduce" : "no-preference"}</p>
+      <button onClick={() => setMoved(m => !m)}>Move</button>
+      <div
+        style={{
+          width: "40px",
+          height: "40px",
+          background: "teal",
+          transform: moved() ? "translateX(200px)" : "none",
+          transition: prefersReduced() ? "none" : "transform 0.6s ease",
+        }}
+      />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createReducedMotion } from "@solid-primitives/a11y";
@@ -127,6 +225,41 @@ function createReducedMotion(): Accessor<boolean>;
 ## `createFormControl`
 
 Creates the ARIA context for a labeled field group. Returns a `FormControlContextValue` directly — usable standalone or passed to `<FormControlContext>` so sub-components can consume it via `useFormControl()`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { createFormControl } from "@solid-primitives/a11y";
+
+function Demo() {
+  const [value, setValue] = createSignal("");
+  const invalid = () => !value().includes("@");
+  const ctx = createFormControl({
+    id: "email",
+    required: true,
+    validationState: () => (invalid() ? "invalid" : "valid"),
+  });
+  onCleanup(ctx.registerLabel("email-label"));
+  onCleanup(ctx.registerDescription("email-desc"));
+  return (
+    <div {...ctx.dataset()}>
+      <label id="email-label">Email</label>
+      <input
+        id="email-field"
+        value={value()}
+        onInput={e => setValue(e.currentTarget.value)}
+        aria-labelledby={ctx.getAriaLabelledBy("email-field", undefined, undefined)}
+        aria-describedby={ctx.getAriaDescribedBy(undefined)}
+        aria-invalid={ctx.validationState() === "invalid" ? "true" : undefined}
+      />
+      <p id="email-desc">{invalid() ? "Enter a valid email address." : "Looks good!"}</p>
+      <pre>{JSON.stringify(ctx.dataset())}</pre>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import {
@@ -295,6 +428,54 @@ All props accept either a plain value or a reactive accessor `() => value`, so t
 
 Reads from `FormControlContext` (must be called inside a `<FormControlContext>`) and returns computed ARIA props for the actual input element. Uses a split `createEffect` to register and deregister the field's ID reactively.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup, Show } from "solid-js";
+import {
+  createFormControl,
+  createFormControlInput,
+  FormControlContext,
+  useFormControl,
+} from "@solid-primitives/a11y";
+
+function Input() {
+  const { fieldProps } = createFormControlInput({ "aria-label": "Username" });
+  return (
+    <>
+      <input
+        id={fieldProps.id()}
+        aria-label={fieldProps.ariaLabel()}
+        aria-labelledby={fieldProps.ariaLabelledBy()}
+        aria-describedby={fieldProps.ariaDescribedBy()}
+      />
+      <pre>aria-labelledby="{fieldProps.ariaLabelledBy()}"</pre>
+    </>
+  );
+}
+
+function Label() {
+  const ctx = useFormControl();
+  const id = ctx.generateId("label");
+  onCleanup(ctx.registerLabel(id));
+  return <label id={id}>Username</label>;
+}
+
+function Demo() {
+  const [showLabel, setShowLabel] = createSignal(true);
+  return (
+    <FormControlContext value={createFormControl({ id: "user" })}>
+      <button onClick={() => setShowLabel(s => !s)}>Toggle label</button>
+      <Show when={showLabel()}>
+        <Label />
+      </Show>
+      <Input />
+    </FormControlContext>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### Props
 
 | Prop               | Type                    | Description                                                                 |
@@ -346,6 +527,36 @@ const TextFieldInput = (props: { placeholder?: string }) => {
 ## `FormControlContext` + `useFormControl()`
 
 `FormControlContext` is a standard Solid context. Provide a value from `createFormControl` and consume it in any descendant with `useFormControl()`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFormControl, FormControlContext, useFormControl } from "@solid-primitives/a11y";
+
+function Status() {
+  const ctx = useFormControl();
+  return (
+    <p>
+      {ctx.name()} is {ctx.isDisabled() ? "disabled" : "enabled"}
+    </p>
+  );
+}
+
+function Demo() {
+  const [disabled, setDisabled] = createSignal(false);
+  const ctx = createFormControl({ id: "newsletter", disabled });
+  return (
+    <>
+      <button onClick={() => setDisabled(d => !d)}>Toggle disabled</button>
+      <FormControlContext value={ctx}>
+        <Status />
+      </FormControlContext>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 // Provider
