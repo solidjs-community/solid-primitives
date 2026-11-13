@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createEffect, createRoot, createSignal, flush, refresh } from "solid-js";
-import { createReactiveMap, createReactiveSet } from "../../src/index.js";
+import { createReactiveMap, createReactiveSet } from "../src/index.js";
 
 const disposers: (() => void)[] = [];
 function root<T>(fn: () => T): T {

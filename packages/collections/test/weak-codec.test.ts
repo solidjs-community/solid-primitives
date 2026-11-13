@@ -7,7 +7,7 @@ import {
   getLocalHeaderScript,
 } from "@solidjs/web/serialization";
 import { WeakCollectionTokenPlugin } from "@solid-primitives/collections/serialization";
-import { createWeakCollectionToken, isWeakCollectionToken } from "../../src/weak-token.js";
+import { createWeakCollectionToken, isWeakCollectionToken } from "../src/weak-token.js";
 
 function source() {
   const key = { tag: "shared" };

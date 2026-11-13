@@ -1,6 +1,6 @@
 import { performance } from "node:perf_hooks";
 import { createRoot, createEffect, createSignal, flush } from "solid-js";
-import { createReactiveMap, createReactiveSet } from "../../src/index.js";
+import { createReactiveMap, createReactiveSet } from "../src/index.js";
 
 const options = { time: 250, warmupTime: 100 };
 const cases: { suite: string; name: string; fn: () => unknown; options: typeof options }[] = [];

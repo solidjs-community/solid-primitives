@@ -12,12 +12,12 @@ import {
   kinds,
 } from "./fixtures/collections.js";
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
-async function expectView(container: Element, read: () => string, expected: string) {
+async function expectView(container: Element, read: () => string, expected: string, phase: string) {
   await vi.waitFor(
     () => {
       flush();
-      expect(read()).toBe(expected);
-      expect(container.textContent).toBe(expected + "after");
+      expect(read(), phase).toBe(expected);
+      expect(container.textContent, phase).toBe(expected + "after");
     },
     { timeout: 1500, interval: 10 },
   );
@@ -119,6 +119,7 @@ describe("real SSR to collection hydration", () => {
               container,
               current.read,
               streamed ? "true:10:true:true:2:true" : "true:0:true:true:1:false",
+              "hydrated",
             );
             expect(container.querySelector("section")).toBe(section);
             expect(container.querySelector("b")).toBe(sibling);
@@ -130,9 +131,10 @@ describe("real SSR to collection hydration", () => {
               container,
               current.read,
               streamed ? "true:11:true:true:2:true" : "true:1:true:true:1:false",
+              "updated",
             );
             await current.refresh();
-            await expectView(container, current.read, updated);
+            await expectView(container, current.read, updated, "refreshed");
             expect(warn).not.toHaveBeenCalled();
           } finally {
             dispose?.();
@@ -173,15 +175,15 @@ describe("real Set hydration", () => {
             await sleep(10);
             flush();
             if (mode === "streamed" && artifact.rest) apply(container, artifact.rest, false);
-            await expectView(container, currentSet.read, "true:true:true:5:true:true");
+            await expectView(container, currentSet.read, "true:true:true:5:true:true", "hydrated");
             expect(container.querySelector("section")).toBe(section);
             expect(container.querySelector("b")).toBe(sibling);
             await checkLocalEdits(currentSet.set, optimistic);
             currentSet.update();
             flush();
-            await expectView(container, currentSet.read, "true:true:true:5:true:true");
+            await expectView(container, currentSet.read, "true:true:true:5:true:true", "updated");
             await currentSet.refresh();
-            await expectView(container, currentSet.read, "true:true:true:5:true:true");
+            await expectView(container, currentSet.read, "true:true:true:5:true:true", "refreshed");
             expect(warn).not.toHaveBeenCalled();
           } finally {
             dispose?.();

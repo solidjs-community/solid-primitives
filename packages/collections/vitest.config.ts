@@ -1,9 +1,7 @@
 import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
-import { createRequire } from "node:module";
 import { transformAsync } from "@babel/core";
-const require = createRequire(import.meta.url);
-const babelSolid = require("babel-preset-solid");
+import babelSolid from "@solidjs/babel-plugin";
 export default defineConfig(({ mode }) => ({
   root: fileURLToPath(new URL("./", import.meta.url)),
   plugins: [
@@ -16,7 +14,7 @@ export default defineConfig(({ mode }) => ({
           filename: id,
           configFile: false,
           babelrc: false,
-          presets: [
+          plugins: [
             [
               babelSolid,
               {
@@ -45,20 +43,20 @@ export default defineConfig(({ mode }) => ({
     include:
       mode === "ssr"
         ? [
-            "test/integration/collections-server.test.ts",
-            "test/integration/collections-shallow-server.test.ts",
-            "test/integration/collections-render.test.tsx",
-            "test/integration/weak-render.test.tsx",
+            "test/collections-server.test.ts",
+            "test/collections-shallow-server.test.ts",
+            "test/collections-render.test.tsx",
+            "test/weak-render.test.tsx",
           ]
-        : ["test/integration/*.test.{ts,tsx}"],
+        : ["test/*.test.{ts,tsx}"],
     exclude:
       mode === "ssr"
         ? []
         : [
-            "test/integration/collections-server.test.ts",
-            "test/integration/collections-shallow-server.test.ts",
-            "test/integration/collections-render.test.tsx",
-            "test/integration/weak-render.test.tsx",
+            "test/collections-server.test.ts",
+            "test/collections-shallow-server.test.ts",
+            "test/collections-render.test.tsx",
+            "test/weak-render.test.tsx",
           ],
     // Resolve runtime exports with this suite's client/server conditions.
     server: { deps: { inline: ["solid-js", "@solidjs/signals", "@solidjs/web"] } },

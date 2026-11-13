@@ -9,7 +9,7 @@ import {
   isPending,
   latest,
 } from "@solidjs/signals";
-import { createReactiveWeakMap, createReactiveWeakSet } from "../../../src/weak.js";
+import { createReactiveWeakMap, createReactiveWeakSet } from "../../src/weak.js";
 
 const disposers: (() => void)[] = [];
 function root<T>(fn: () => T): T {

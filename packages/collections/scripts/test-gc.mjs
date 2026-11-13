@@ -12,7 +12,7 @@ for (const dev of [true, false]) {
   for (const suite of ["collections", "weak-collections"]) {
     const outfile = `${cache}/${suite}-${dev ? "development" : "production"}.mjs`;
     await build({
-      entryPoints: [path(`../test/integration/gc/${suite}.test.ts`)],
+      entryPoints: [path(`../test/gc/${suite}.test.ts`)],
       outfile,
       bundle: true,
       platform: "node",

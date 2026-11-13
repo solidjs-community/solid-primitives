@@ -1,5 +1,5 @@
 import { createMemo, createSignal, Loading, refresh, untrack } from "solid-js";
-import { createReactiveWeakMap, createReactiveWeakSet } from "../../../src/weak.js";
+import { createReactiveWeakMap, createReactiveWeakSet } from "../../src/weak.js";
 
 export let current: { read(): string; update(): void; refresh(): Promise<unknown> };
 export let calls = 0;

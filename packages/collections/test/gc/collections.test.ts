@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createRoot, createSignal, flush } from "solid-js";
-import { createReactiveMap, createReactiveSet } from "../../../src/index.js";
+import { createReactiveMap, createReactiveSet } from "../../src/index.js";
 
 async function collect() {
   for (let i = 0; i < 12; i++) {

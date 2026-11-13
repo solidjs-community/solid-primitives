@@ -6,8 +6,8 @@ import {
   Loading,
   refresh,
 } from "solid-js";
-import { createReactiveMap } from "../../../src/index.js";
-import { createReactiveSet } from "../../../src/index.js";
+import { createReactiveMap } from "../../src/index.js";
+import { createReactiveSet } from "../../src/index.js";
 export const kinds = ["promise", "stream", "loading", "client", "hybrid", "store-hybrid"] as const;
 export type Kind = (typeof kinds)[number];
 type Key = { tag: string } | string;

@@ -312,22 +312,30 @@ describe("reactive collection factories", () => {
     expect(set.isDisjointFrom(new Set([3]))).toBe(true);
   });
 
-  it("supports synchronous draft mutation and manual-write precedence", () => {
-    const [value, setValue] = createSignal(1);
-    const map = root(() =>
-      createReactiveMap<string, number>(draft => {
-        draft.set("a", value());
-      }),
-    );
-    expect(map.get("a")).toBe(1);
-    setValue(2);
-    map.set("a", 10);
-    flush();
-    expect(map.get("a")).toBe(10);
-    setValue(3);
-    flush();
-    expect(map.get("a")).toBe(3);
-  });
+  it.each([false, true])(
+    "applies manual writes before same-flush derivations, writeFirst=%s",
+    writeFirst => {
+      const [value, setValue] = createSignal(1);
+      const map = root(() =>
+        createReactiveMap<string, number>(draft => {
+          draft.set("a", value());
+        }),
+      );
+      expect(map.get("a")).toBe(1);
+      if (writeFirst) map.set("a", 10);
+      setValue(2);
+      if (!writeFirst) map.set("a", 10);
+      flush();
+      // Solid reruns the derivation after applying writes, in either call order.
+      expect(map.get("a")).toBe(2);
+      map.set("a", 10);
+      flush();
+      expect(map.get("a")).toBe(10);
+      setValue(3);
+      flush();
+      expect(map.get("a")).toBe(3);
+    },
+  );
 
   it("propagates computation errors through collection reads and recovers", () => {
     const [fail, setFail] = createSignal(false);

@@ -2,11 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": { "isolatedDeclarations": false, "noEmit": true, "types": ["node"] },
   "include": [
-    "test/integration/collections.type-tests.ts",
-    "test/integration/collections-derived.test.ts",
-    "test/integration/collections-order.test.ts",
-    "test/integration/collections.bench.ts",
-    "test/integration/gc/collections.test.ts",
-    "test/integration/gc/weak-collections.test.ts"
+    "test/collections.type-tests.ts",
+    "test/collections-derived.test.ts",
+    "test/collections-order.test.ts",
+    "test/collections.bench.ts",
+    "test/gc/collections.test.ts",
+    "test/gc/weak-collections.test.ts"
   ]
 }

@@ -10,7 +10,7 @@ const cache = path("../node_modules/.cache/collections-bench/");
 await mkdir(cache, { recursive: true });
 const outfile = `${cache}/production.mjs`;
 await build({
-  entryPoints: [path("../test/integration/collections.bench.ts")],
+  entryPoints: [path("../test/collections.bench.ts")],
   outfile,
   bundle: true,
   platform: "node",

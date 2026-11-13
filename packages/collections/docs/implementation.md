@@ -25,6 +25,7 @@ The implementation uses public Solid APIs. Private node inspections and projecti
 
 ## Behavioral boundaries
 
+- When a source changes in the same batch as a manual edit, Solid runs the compute after applying the edit. The compute decides whether to preserve or replace that value. A standalone manual edit does not rerun the compute.
 - Optimistic value edits to independent Map keys settle independently. Structural edits can settle together through Solid's shared key-set node.
 - Iterators do not rewind on optimistic rollback. Order-changing replacements act as a new insertion generation.
 - The facade has empty native internal storage. Use `new Map(map)` / `new Set(set)` with native intrinsics, structured cloning, or serializers that bypass instance methods.
@@ -35,6 +36,8 @@ The implementation uses public Solid APIs. Private node inspections and projecti
 
 Install the workspace dependencies before running the package checks. Runtime tests, type checking, and Storybook use the installed Solid packages.
 
+The workspace applies a temporary [patch to `@solidjs/web@2.0.0-rc.21`](../../../patches/@solidjs__web@2.0.0-rc.21.patch). Its server serialization walker otherwise clones cyclic plain-object graphs even when no values need rewriting, breaking object-key identity shared with separately serialized sources. The patch preserves untouched graphs in all three server builds (development, production, and observe). Remove it when a Solid release fixes this behavior; the hydration suites cover cyclic values, shared keys, and the equivalent direct-store control.
+
 From this package directory:
 
 ```sh
@@ -44,7 +47,7 @@ pnpm lint
 pnpm build
 ```
 
-`test` runs server rendering before client hydration, then strong and weak lifetime suites in separate development/production processes with real GC. A failed server run prevents consumption of stale fixtures. The shared test runner discovers `test/*.test.*`; keeping this suite under `test/integration` lets the package runner select the right compiler/runtime conditions, generate fresh SSR fixtures before hydration, and enable GC for lifetime checks. Generated bundles and hydration fixtures stay under the ignored `node_modules/.cache` directory.
+`test` runs server rendering before client hydration, then strong and weak lifetime suites in separate development/production processes with real GC. A failed server run prevents consumption of stale fixtures. Tests live directly under `test/`, with shared render fixtures in `test/fixtures/` and lifetime suites in `test/gc/`. The shared test runner explicitly excludes this package so its package runner can select the right compiler/runtime conditions, generate fresh SSR fixtures before hydration, and enable GC for lifetime checks. Generated bundles and hydration fixtures stay under the ignored `node_modules/.cache` directory.
 
 Coverage includes lazy node allocation/release, raw identity, native collection behavior and live iteration, deterministic differential tests with mixed keys and batched writes, signed-zero/NaN value equality, replacement order, errors, refresh, async supersession/disposal, held truth, optimistic rollback, shared serialized identities, structural edits after hydration, and strong/weak key/value lifetime.
 
