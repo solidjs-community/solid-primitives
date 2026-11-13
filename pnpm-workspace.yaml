@@ -2,10 +2,6 @@ packages:
   - packages/*
   - site
 
-patchedDependencies:
-  # Preserve shared hydration keys when an rc.21 serialization graph contains a cycle.
-  '@solidjs/web@2.0.0-rc.21': patches/@solidjs__web@2.0.0-rc.21.patch
-
 overrides:
   react: 19.2.7
   react-dom: 19.2.7

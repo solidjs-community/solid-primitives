@@ -36,7 +36,7 @@ The implementation uses public Solid APIs. Private node inspections and projecti
 
 Install the workspace dependencies before running the package checks. Runtime tests, type checking, and Storybook use the installed Solid packages.
 
-The workspace applies a temporary [patch to `@solidjs/web@2.0.0-rc.21`](../../../patches/@solidjs__web@2.0.0-rc.21.patch). Its server serialization walker otherwise clones cyclic plain-object graphs even when no values need rewriting, breaking object-key identity shared with separately serialized sources. The patch preserves untouched graphs in all three server builds (development, production, and observe). Remove it when a Solid release fixes this behavior; the hydration suites cover cyclic values, shared keys, and the equivalent direct-store control.
+Some hydration cases currently fail on unmodified `@solidjs/web@2.0.0-rc.21` because server serialization can clone cyclic graphs and lose shared object-key identity. These tests remain enabled to track the upstream behavior, including the equivalent direct-store control.
 
 From this package directory:
 

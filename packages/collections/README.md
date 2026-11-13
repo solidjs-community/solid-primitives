@@ -197,6 +197,4 @@ Hydration preserves shared serializable key identities. Shared decoding referenc
 
 ## Development
 
-On `@solidjs/web@2.0.0-rc.21`, hydrating cyclic values with shared object keys requires the [workspace's serialization patch](../../patches/@solidjs__web@2.0.0-rc.21.patch). It preserves references that the unpatched server walker would clone.
-
 Tests, build configuration, and implementation notes live in this package. See the [validation guide](./docs/implementation.md#validation) and [weak storage/SSR notes](./docs/weak.md).
