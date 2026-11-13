@@ -28,6 +28,30 @@ pnpm add @solid-primitives/static-store
 
 Creates read-only object that is shallowly reactive — only reactive on its first level and for the enumerable properties specified in the initial value — and a setter. It behaves similarly to createStore, but with limited features to keep it simple and performant. Designed to be used for reactive objects with static keys and dynamic values, like reactive Event State, location, etc.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createStaticStore } from "@solid-primitives/static-store";
+
+function Demo() {
+  const [size, setSize] = createStaticStore({ width: 120, height: 60 });
+  return (
+    <>
+      <button onClick={() => setSize("width", w => w + 20)}>Width +</button>
+      <button onClick={() => setSize({ height: size.height + 20 })}>Height +</button>
+      <button onClick={() => setSize(p => ({ width: p.height, height: p.width }))}>Swap</button>
+      <div
+        style={{ width: `${size.width}px`, height: `${size.height}px`, background: "#6366f1" }}
+      />
+      <p>
+        {size.width} × {size.height}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 It takes a single argument - an initial value. It returns a tuple with the store object and a setter function.
@@ -58,6 +82,31 @@ setSize("new-property", "value");
 ## `createDerivedStaticStore`
 
 A derived version of the [`createStaticStore`](#createstaticstore). It will use the update function to derive the value of the store. It will only update when the dependencies of the update function change.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createDerivedStaticStore } from "@solid-primitives/static-store";
+
+function Demo() {
+  const [source, setSource] = createSignal({ width: 120, height: 60 });
+  const size = createDerivedStaticStore(source);
+  return (
+    <>
+      <button onClick={() => setSource(p => ({ ...p, width: p.width + 20 }))}>Width +</button>
+      <button onClick={() => setSource(p => ({ ...p, height: p.height + 20 }))}>Height +</button>
+      <div
+        style={{ width: `${size.width}px`, height: `${size.height}px`, background: "#f97316" }}
+      />
+      <p>
+        {size.width} × {size.height}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

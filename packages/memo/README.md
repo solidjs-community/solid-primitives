@@ -33,6 +33,27 @@ yarn add @solid-primitives/memo
 
 A combined memo of multiple sources, last updated source will be the value of the returned signal.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createLatest } from "@solid-primitives/memo";
+
+function Demo() {
+  const [count, setCount] = createSignal(1);
+  const [text, setText] = createSignal("hello");
+  const latest = createLatest([count, text]);
+  return (
+    <>
+      <button onClick={() => setCount(n => n + 1)}>count: {count()}</button>
+      <input value={text()} onInput={e => setText(e.currentTarget.value)} />
+      <p>last updated: {latest()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 `createLatest` takes two arguments:
@@ -59,6 +80,31 @@ lastUpdated(); // => 4
 
 A combined memo of multiple sources, returns the values of sources updated in the last tick.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { createLatestMany } from "@solid-primitives/memo";
+
+function Demo() {
+  const [a, setA] = createSignal(0);
+  const [b, setB] = createSignal(0);
+  const sum = createMemo(() => a() + b());
+  const updated = createLatestMany([a, b, sum]);
+  return (
+    <>
+      <button onClick={() => setA(n => n + 1)}>a++</button>
+      <button onClick={() => setB(n => n + 1)}>b++</button>
+      <p>
+        a: {a()}, b: {b()}, sum: {sum()}
+      </p>
+      <p>updated in last tick: {JSON.stringify(updated())}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 `createLatestMany` takes two arguments:
@@ -84,6 +130,26 @@ lastUpdated(); // => [4]
 ## `createWritableMemo`
 
 Solid's `createMemo` which value can be overwritten by a setter.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createWritableMemo } from "@solid-primitives/memo";
+
+function Demo() {
+  const [count, setCount] = createSignal(1);
+  const [result, setResult] = createWritableMemo(() => count() * 2);
+  return (
+    <>
+      <button onClick={() => setCount(n => n + 1)}>count: {count()}</button>
+      <button onClick={() => setResult(99)}>override to 99</button>
+      <p>result (count × 2, or override): {result()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -126,6 +192,30 @@ const Child: Component<{ selectedId: string }> = props => {
 ## `createLazyMemo`
 
 Lazily evaluated `createMemo`. Will run the calculation only if is being listened to.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createLazyMemo } from "@solid-primitives/memo";
+
+function Demo() {
+  const [count, setCount] = createSignal(1);
+  const [visible, setVisible] = createSignal(false);
+  let runs = 0; // plain counter; it updates on screen together with double()
+  const double = createLazyMemo(() => (runs++, count() * 2));
+  return (
+    <>
+      <button onClick={() => setCount(n => n + 1)}>count: {count()}</button>
+      <button onClick={() => setVisible(v => !v)}>{visible() ? "Hide" : "Show"} double</button>
+      <Show when={visible()}>
+        <p>{`double: ${double()} (calculated ${runs} times)`}</p>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 It may be useful for memos that aren't being listened to all the time, to reduce performance cost of wastefull computations.
 
@@ -186,6 +276,35 @@ const double = createMemo(() => getDouble(count()));
 
 Solid's [`createReaction`](#https://www.solidjs.com/docs/latest/api#createreaction) that is based on pure computation _(runs before render, and is non-batching)_
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createPureReaction } from "@solid-primitives/memo";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const [armed, setArmed] = createSignal(false);
+  const [hits, setHits] = createSignal(0);
+  const track = createPureReaction(() => {
+    setArmed(false);
+    setHits(n => n + 1);
+  });
+  const arm = () => {
+    track(count);
+    setArmed(true);
+  };
+  return (
+    <>
+      <button onClick={arm}>{armed() ? "Armed" : "Track count"}</button>
+      <button onClick={() => setCount(n => n + 1)}>count: {count()}</button>
+      <p>reaction fired {hits()} times (re-track after each change)</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 It's usage exactly matches the original. The only difference is in when the callback is being executed, the normal createReaction runs it after render, similar to how effects work, while the createPureReaction is more like createComputed.
@@ -211,6 +330,34 @@ function createPureReaction(onInvalidate: Fn, options?: EffectOptions): (trackin
 ## `createMemoCache`
 
 Custom, lazily-evaluated, cached memo. The caching is based on a `key`, it has to be declared up-front as a reactive source, or passed to the signal access function.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createMemoCache } from "@solid-primitives/memo";
+
+function Demo() {
+  const [n, setN] = createSignal(10);
+  const computed: number[] = [];
+  const fib = createMemoCache(n, key => {
+    computed.push(key);
+    let [a, b] = [0, 1];
+    for (let i = 0; i < key; i++) [a, b] = [b, a + b];
+    return a;
+  });
+  return (
+    <>
+      {[5, 10, 20].map(k => (
+        <button onClick={() => setN(k)}>fib({k})</button>
+      ))}
+      {/* `computed` is a plain array; it re-renders because it shares this expression with fib() */}
+      <p>{`fib(${n()}) = ${fib()}, computed keys: ${computed.join(", ")}`}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### how to use it
 
@@ -283,6 +430,34 @@ type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
 ## `createReducer`
 
 Primitive for updating signal in a predictable way. SolidJS equivalent of React's [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer).
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createReducer } from "@solid-primitives/memo";
+
+type Action = "increment" | "decrement" | "double" | "reset";
+
+const reducer = (count: number, action: Action) => {
+  if (action === "increment") return count + 1;
+  if (action === "decrement") return count - 1;
+  if (action === "double") return count * 2;
+  return 0;
+};
+
+function Demo() {
+  const [count, dispatch] = createReducer(reducer, 1);
+  return (
+    <>
+      <p>count: {count()}</p>
+      {(["increment", "decrement", "double", "reset"] as const).map(action => (
+        <button onClick={() => dispatch(action)}>{action}</button>
+      ))}
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### When to use it
 

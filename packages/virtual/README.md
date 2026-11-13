@@ -28,6 +28,39 @@ pnpm add @solid-primitives/virtual
 
 `createVirtualList` is a headless utility for constructing your own virtualized list components with maximum flexibility.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createVirtualList } from "@solid-primitives/virtual";
+
+const items = Array.from({ length: 10_000 }, (_, i) => `Row ${i + 1}`);
+
+function Demo() {
+  const [virtual, onScroll] = createVirtualList({ items, rootHeight: 200, rowHeight: 24 });
+  return (
+    <>
+      <p>
+        rendered {virtual().firstIndex + 1}-{(virtual().lastIndex ?? -1) + 1} of {items.length}
+      </p>
+      <div
+        style={{ overflow: "auto", height: "200px", border: "1px solid #ccc" }}
+        onScroll={onScroll}
+      >
+        <div style={{ position: "relative", height: `${virtual().containerHeight}px` }}>
+          <div style={{ position: "absolute", top: `${virtual().viewerTop}px` }}>
+            <For each={virtual().visibleItems} keyed={false}>
+              {item => <div style={{ height: "24px" }}>{item()}</div>}
+            </For>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 `virtual` is an accessor returning `{ containerHeight, viewerTop, visibleItems, firstIndex, lastIndex }` — call it to read the current values. When rendering `visibleItems` with `<For>`, pass `keyed={false}` so each item is provided as an `Accessor` (`<For>` defaults to `keyed={true}`, which passes raw values instead).
 
 - `firstIndex` is the index (into the original `items` list) of the first rendered item.
@@ -93,6 +126,28 @@ function MyComp(): JSX.Element {
 ### `<VirtualList />`
 
 `<VirtualList />` is a basic, unstyled virtual list component you can drop into projects without modification.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { VirtualList } from "@solid-primitives/virtual";
+
+function Demo() {
+  const [count, setCount] = createSignal(1_000);
+  const items = () => Array.from({ length: count() }, (_, i) => i + 1);
+  return (
+    <>
+      <button onClick={() => setCount(n => n + 1_000)}>Add 1,000 ({count()} items)</button>
+      <button onClick={() => setCount(0)}>Clear</button>
+      <VirtualList each={items()} rootHeight={200} rowHeight={24} fallback={<p>No items</p>}>
+        {item => <div style={{ height: "24px" }}>Item #{item()}</div>}
+      </VirtualList>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 <VirtualList

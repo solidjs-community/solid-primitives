@@ -31,6 +31,26 @@ pnpm add @solid-primitives/focus
 
 ## `autofocus`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { autofocus } from "@solid-primitives/focus";
+
+function Demo() {
+  const [mounted, setMounted] = createSignal(true);
+  return (
+    <>
+      <button onClick={() => setMounted(m => !m)}>{mounted() ? "Unmount" : "Remount"}</button>
+      <Show when={mounted()}>
+        <input ref={autofocus()} autofocus placeholder="Focused on every mount" />
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 `autofocus` is a ref callback factory. It uses the native `autofocus` attribute to determine whether to focus the element.
@@ -58,6 +78,32 @@ To conditionally enable autofocus, control the `autofocus` attribute directly �
 
 `createAutofocus` reactively autofocuses an element passed in as a signal.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createAutofocus } from "@solid-primitives/focus";
+
+function Field() {
+  const [ref, setRef] = createSignal<HTMLInputElement>();
+  createAutofocus(ref);
+  return <input ref={setRef} placeholder="Focused via signal ref" />;
+}
+
+function Demo() {
+  const [mounted, setMounted] = createSignal(true);
+  return (
+    <>
+      <button onClick={() => setMounted(m => !m)}>{mounted() ? "Unmount" : "Remount"}</button>
+      <Show when={mounted()}>
+        <Field />
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import { createAutofocus } from "@solid-primitives/focus";
 
@@ -79,6 +125,33 @@ createAutofocus(ref);
 `createFocusTrap` traps keyboard focus inside a given DOM element, cycling through focusable children on Tab / Shift+Tab. It uses a `MutationObserver` to stay up to date with DOM changes and restores focus to the previously focused element when deactivated.
 
 > Ported from [solid-focus-trap](https://github.com/corvudev/corvu/tree/main/packages/solid-focus-trap) by [Jasmin Noetzli (GiyoMoon)](https://github.com/GiyoMoon), adapted for Solid.js 2.0.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createFocusTrap } from "@solid-primitives/focus";
+
+function Demo() {
+  const [open, setOpen] = createSignal(false);
+  const [trapRef, setTrapRef] = createSignal<HTMLElement>();
+  createFocusTrap({ element: trapRef, enabled: open });
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)}>Open dialog</button>
+      <div ref={setTrapRef} style={{ border: "1px solid #ccc", padding: "1rem" }}>
+        <Show when={open()} fallback={<p>Dialog closed.</p>}>
+          <p>Tab / Shift+Tab stay inside this box.</p>
+          <input placeholder="Name" />
+          <button onClick={() => setOpen(false)}>Close</button>
+        </Show>
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -155,6 +228,31 @@ createFocusTrap({
 
 ## `createFocusRestore`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createFocusRestore } from "@solid-primitives/focus";
+
+function Demo() {
+  const [open, setOpen] = createSignal(false);
+  createFocusRestore({ enabled: open });
+
+  return (
+    <>
+      <button onClick={() => setOpen(o => !o)}>Toggle popover</button>
+      <Show when={open()}>
+        <div role="dialog" style={{ border: "1px solid #ccc", padding: "1rem" }}>
+          <input placeholder="Focus me, then press Close" />
+          <button onClick={() => setOpen(false)}>Close (focus returns to where it was)</button>
+        </div>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 `createFocusRestore` saves the currently focused element while active and restores focus to it once deactivated — without trapping focus or managing tab order. Use it for non-modal surfaces (Popover, Tooltip, Menu) that should return focus to their trigger on close but must not intercept Tab navigation while open. For modal dialogs that need both behaviors, use [`createFocusTrap`](#createfocustrap)'s `restoreFocus` option instead.
 
 ### How to use it
@@ -183,6 +281,31 @@ const Popover: Component<{ open: boolean }> = props => {
 | `onFinalFocus`      | `(event: Event) => void`           | —                          | Callback when focus restores. Call `event.preventDefault()` to cancel. |
 
 ## `createFocusGroup`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFocusGroup } from "@solid-primitives/focus";
+
+function Demo() {
+  const [ref, setRef] = createSignal<HTMLElement>();
+  const group = createFocusGroup(ref, () => ({ wrap: true }));
+
+  return (
+    <>
+      <div ref={setRef} role="menu" style={{ display: "flex", "flex-direction": "column" }}>
+        <button role="menuitem">One</button>
+        <button role="menuitem">Two</button>
+        <button role="menuitem">Three</button>
+      </div>
+      <p>Focus an item and use the arrow keys, Home / End — or:</p>
+      <button onClick={() => group.focusFirst()}>Focus first item</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 `createFocusGroup` creates a [FocusGroup](#focusgroup) that moves focus between the focusable elements of a container — e.g. arrow-key navigation in a menu, listbox or toolbar. It walks the DOM with a `TreeWalker`, either restricting itself to tabbable elements or considering everything focusable. Keyboard navigation (arrow keys, Home/End, Tab) is enabled by default: the `keydown` listener is attached to the focus group ref automatically.
 
@@ -264,6 +387,57 @@ group.focusNext({ tabbable: false }); // overrides the default for this call onl
 | `textDirection`      | `MaybeAccessor<TextDirection>` | `"ltr"`      | The text direction of the focus group (`"ltr"` or `"rtl"`).          |
 | `handleTab`          | `MaybeAccessor<boolean>`       | `true`       | Whether tab key presses should be handled.                           |
 | `keyboardNavigation` | `MaybeAccessor<boolean>`       | `true`       | Whether the `keydown` listener is attached to the ref.               |
+
+## `makeFocusListener`
+
+`makeFocusListener` imperatively attaches `focus` and `blur` listeners to an element and returns a function that removes them.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { makeFocusListener } from "@solid-primitives/focus";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const track = (name: string) => (el: HTMLInputElement) =>
+    makeFocusListener(el, focused => setLog(l => [`${name}: ${focused ? "focus" : "blur"}`, ...l]));
+
+  return (
+    <>
+      <input ref={track("A")} placeholder="Input A" />
+      <input ref={track("B")} placeholder="Input B" />
+      <ul>
+        <For each={log().slice(0, 5)}>{entry => <li>{entry}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+## `createFocusSignal`
+
+`createFocusSignal` returns a boolean signal that tracks whether an element is focused.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createFocusSignal } from "@solid-primitives/focus";
+
+function Demo() {
+  let input!: HTMLInputElement;
+  const isFocused = createFocusSignal(() => input);
+
+  return (
+    <>
+      <input ref={input} placeholder="Click to focus" />
+      <p>{isFocused() ? "focused" : "blurred"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ## Credits
 

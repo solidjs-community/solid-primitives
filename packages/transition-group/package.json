@@ -21,7 +21,7 @@
       "createListTransition"
     ],
     "category": "Animation",
-    "gzip": 1231
+    "gzip": 1252
   },
   "keywords": [
     "solid",
@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   },
   "typesVersions": {}
 }

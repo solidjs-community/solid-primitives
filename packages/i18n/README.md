@@ -4,7 +4,7 @@
 
 # @solid-primitives/i18n
 
-[![size](https://img.shields.io/badge/size-1.09_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/i18n)
+[![size](https://img.shields.io/badge/size-1.13_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/i18n)
 [![size](https://img.shields.io/npm/v/@solid-primitives/i18n?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/i18n)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -54,6 +54,37 @@ const fr_dict: Dict = {
 ```
 
 When using large dictionary files, JSON files are [faster to load](https://www.youtube.com/watch?v=ff4fgQxPaO0). Additionally, we recommend keeping a flat JSON structure so you don't need to flatten the object on the client for best performance.
+
+#### flatten
+
+Flattens a nested dictionary so every nested value is also available under a dot-separated path.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { flatten } from "@solid-primitives/i18n";
+
+const flat = flatten({
+  hello: "hello",
+  food: { meat: "meat", fruit: { apple: "apple", pear: "pear" } },
+});
+
+function Demo() {
+  const [key, setKey] = createSignal<keyof typeof flat>("food.fruit");
+  return (
+    <>
+      <select value={key()} onChange={e => setKey(e.currentTarget.value as keyof typeof flat)}>
+        {Object.keys(flat).map(k => (
+          <option>{k}</option>
+        ))}
+      </select>
+      <pre>{JSON.stringify(flat[key()], null, 2)}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### Dynamic loading
 
@@ -149,9 +180,61 @@ const dict = createMemo(() => i18n.flatten(dictionaries[locale()]));
 const t = i18n.translator(dict);
 ```
 
+#### translator
+
+Creates a `t()` function that resolves paths in a reactive dictionary, re-running when the dictionary changes.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { flatten, resolveTemplate, translator } from "@solid-primitives/i18n";
+
+const dicts = {
+  en: { hello: "Hello, {{ name }}!", food: { meat: "meat" } },
+  fr: { hello: "Bonjour, {{ name }} !", food: { meat: "viande" } },
+};
+
+function Demo() {
+  const [locale, setLocale] = createSignal<keyof typeof dicts>("en");
+  const dict = createMemo(() => flatten(dicts[locale()]));
+  const t = translator(dict, resolveTemplate);
+  return (
+    <>
+      <button onClick={() => setLocale(l => (l === "en" ? "fr" : "en"))}>locale: {locale()}</button>
+      <p>{t("hello", { name: "John" })}</p>
+      <p>{t("food.meat")}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### Templates
 
 Templates are strings that can contain placeholders. Placeholders are defined with double curly braces `{{ placeholder }}`.
+
+#### resolveTemplate
+
+Replaces `{{ placeholder }}` occurrences in a string with the provided values.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { resolveTemplate } from "@solid-primitives/i18n";
+
+function Demo() {
+  const [name, setName] = createSignal("John");
+  return (
+    <>
+      <input value={name()} onInput={e => setName(e.currentTarget.value)} />
+      <p>{resolveTemplate("hello {{ name }}, how are you?", { name: name() })}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Templates can be resolved by calling `resolveTemplate` function. e.g.
 
@@ -195,7 +278,34 @@ t("forMoreInfo", <a href="/info">click here</a>);
 t("seeGuidelines", text => <a href="/guidelines">{text}</a>, "the guidelines");
 ```
 
+#### resolveRichTemplate
+
 For dictionaries loaded from JSON (translated strings, no functions allowed), use `resolveRichTemplate` in place of `resolveTemplate` to allow JSX values in `{{ placeholder }}` substitutions:
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { resolveRichTemplate, translator } from "@solid-primitives/i18n";
+
+const dict = { info: "For more information, {{ clickHere }}." };
+
+function Demo() {
+  const [clicks, setClicks] = createSignal(0);
+  const t = translator(() => dict, resolveRichTemplate);
+  return (
+    <>
+      <p>
+        {t("info", {
+          clickHere: <button onClick={() => setClicks(n => n + 1)}>click here</button>,
+        })}
+      </p>
+      <p>clicks: {clicks()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 const dict = {
@@ -207,7 +317,37 @@ const t = i18n.translator(() => dict, i18n.resolveRichTemplate);
 t("forMoreInfo", { clickHere: <a href="/info">click here</a> }); // => JSX.Element
 ```
 
+#### richText
+
 To wrap part of a translated string in a component, e.g. `<guidelines>the guidelines</guidelines>`, resolve `{{ }}` variables first with `resolveTemplate`, then pass the result through `richText` to map `<tag>` markup to a renderer:
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { resolveTemplate, richText, translator } from "@solid-primitives/i18n";
+
+const dict = {
+  terms: "Hi {{ name }}, please read our <terms>Terms</terms> and <privacy>Privacy</privacy>.",
+};
+
+function Demo() {
+  const [opened, setOpened] = createSignal("nothing");
+  const t = translator(() => dict, resolveTemplate);
+  return (
+    <>
+      <p>
+        {richText(t("terms", { name: "John" }), {
+          terms: text => <button onClick={() => setOpened("terms")}>{text}</button>,
+          privacy: text => <button onClick={() => setOpened("privacy")}>{text}</button>,
+        })}
+      </p>
+      <p>opened: {opened()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 const dict = {
@@ -246,6 +386,63 @@ const t2 = i18n.translator(
   },
 );
 ```
+
+### Source text as keys
+
+Instead of inventing a key for every string, you can use the source-language text itself as the key. `onMissingKey` receives the arguments passed to the translator, and `missingKeyAsTemplate` uses that to resolve the key itself as a template — so the source language needs no dictionary entries at all, and other languages' dictionaries are keyed by the source text.
+
+#### missingKeyAsTemplate
+
+A missing-key handler that resolves the key itself as a template.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { missingKeyAsTemplate, resolveTemplate, translator } from "@solid-primitives/i18n";
+
+const de: Record<string, string> = { "Hello {{ name }}!": "Hallo {{ name }}!" };
+
+function Demo() {
+  const [locale, setLocale] = createSignal<"en" | "de">("en");
+  const t = translator(
+    (): Record<string, string> => (locale() === "de" ? de : {}),
+    resolveTemplate,
+    missingKeyAsTemplate(resolveTemplate),
+  );
+  return (
+    <>
+      <button onClick={() => setLocale(l => (l === "en" ? "de" : "en"))}>locale: {locale()}</button>
+      <p>{t("Hello {{ name }}!", { name: "John" })}</p>
+      <p>{t("Not translated yet")}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+```ts
+// Type
+function missingKeyAsTemplate<O = string>(
+  resolveTemplate: TemplateResolver<O>,
+): MissingKeyHandler<O>;
+
+// Example
+const de = { "Hello {{ name }}!": "Hallo {{ name }}!" };
+
+const dict = (): Record<string, string> => (locale() === "de" ? de : {});
+
+const t = i18n.translator(
+  dict,
+  i18n.resolveTemplate,
+  i18n.missingKeyAsTemplate(i18n.resolveTemplate),
+);
+
+t("Hello {{ name }}!", { name: "John" }); // => 'Hello John!' (en), 'Hallo John!' (de)
+t("Not translated yet"); // => 'Not translated yet' in every locale
+```
+
+Like any `onMissingKey` handler, it only runs once the dictionary is loaded — while an async dictionary is still loading, the translation is `undefined`. Keys are matched exactly, so changing the source text means updating the key in every other dictionary. There's no automatic key extraction or hashing; collecting the strings into dictionaries is left to your own tooling.
 
 ### Modules
 
@@ -301,7 +498,38 @@ t("common.welcome"); // => 'Welcome from common translations!'
 t("login.welcome"); // => 'Welcome from login translations!'
 ```
 
+#### scopedTranslator
+
 To scope an existing translator to a module, you can use `scopedTranslator`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { flatten, resolveTemplate, scopedTranslator, translator } from "@solid-primitives/i18n";
+
+const dict = flatten({
+  nav: { home: "Home", about: "About" },
+  auth: { welcome: "Welcome, {{ user }}!" },
+});
+
+function Demo() {
+  const [user, setUser] = createSignal("Alice");
+  const t = translator(() => dict, resolveTemplate);
+  const nav = scopedTranslator(t, "nav");
+  const auth = scopedTranslator(t, "auth");
+  return (
+    <>
+      <input value={user()} onInput={e => setUser(e.currentTarget.value)} />
+      <p>
+        {nav("home")} | {nav("about")}
+      </p>
+      <p>{auth("welcome", { user: user() })}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const dict = {
@@ -322,7 +550,37 @@ loginT("username"); // => 'User name'
 
 String paths passesd to the translator don't allow for taking advantage of TypeScript's "Go to definition", and "Find all references", "Rename" features.
 
+#### chainedTranslator
+
 If you prefer to use nested objects instead of dot notation, you can use `chainedTranslator` helper.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { chainedTranslator, flatten, resolveTemplate, translator } from "@solid-primitives/i18n";
+
+const dict = {
+  greetings: { hello: "hello {{ name }}!", hi: "hi!" },
+  goodbye: (name: string) => `goodbye ${name}!`,
+};
+const flatDict = flatten(dict);
+
+function Demo() {
+  const [name, setName] = createSignal("John");
+  const t = translator(() => flatDict, resolveTemplate);
+  const chained = chainedTranslator(dict, t);
+  return (
+    <>
+      <input value={name()} onInput={e => setName(e.currentTarget.value)} />
+      <p>{chained.greetings.hello({ name: name() })}</p>
+      <p>{chained.greetings.hi()}</p>
+      <p>{chained.goodbye(name())}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 It takes a dictionary _(not flattened)_ to map it's shape and a translator function for resolving the translations.
 

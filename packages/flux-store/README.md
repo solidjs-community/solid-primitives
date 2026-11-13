@@ -30,6 +30,42 @@ pnpm add @solid-primitives/flux-store
 
 Creates a `FluxStore` — a Solid store that separates reads (`getters`) from writes (`actions`).
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createFluxStore } from "@solid-primitives/flux-store";
+
+function Demo() {
+  const counter = createFluxStore(
+    { value: 5 },
+    {
+      getters: state => ({ count: () => state.value }),
+      actions: setState => ({
+        increment(by = 1) {
+          setState(s => {
+            s.value += by;
+          });
+        },
+        reset() {
+          setState(s => {
+            s.value = 0;
+          });
+        },
+      }),
+    },
+  );
+  return (
+    <>
+      <button onClick={() => counter.actions.increment()}>+1</button>
+      <button onClick={() => counter.actions.increment(5)}>+5</button>
+      <button onClick={() => counter.actions.reset()}>Reset</button>
+      <p>count: {counter.getters.count()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 `createFluxStore` takes two arguments:
@@ -75,6 +111,38 @@ counterStore.getters.count(); // => 0
 
 Creates a reusable factory function that produces independent `FluxStore` instances from the same schema, with an optional initial-state override per instance.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createFluxStoreFactory } from "@solid-primitives/flux-store";
+
+const createToggleStore = createFluxStoreFactory(
+  { value: false },
+  {
+    getters: state => ({ isOn: () => state.value }),
+    actions: setState => ({
+      toggle() {
+        setState(s => {
+          s.value = !s.value;
+        });
+      },
+    }),
+  },
+);
+
+function Demo() {
+  const a = createToggleStore({ value: true });
+  const b = createToggleStore();
+  return (
+    <>
+      <button onClick={() => a.actions.toggle()}>A: {a.getters.isOn() ? "on" : "off"}</button>
+      <button onClick={() => b.actions.toggle()}>B: {b.getters.isOn() ? "on" : "off"}</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -119,6 +187,29 @@ const store2 = createToggleStore(defaults => ({ ...defaults, value: true }));
 
 Wraps each function in a record with `createAction` and returns a new object of the same shape. Useful for applying the untracked wrapper to a batch of functions at once.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createActions } from "@solid-primitives/flux-store";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const actions = createActions({
+    increment: () => setCount(c => c + 1),
+    reset: () => setCount(0),
+  });
+  return (
+    <>
+      <button onClick={actions.increment}>+1</button>
+      <button onClick={actions.reset}>Reset</button>
+      <p>count: {count()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createActions } from "@solid-primitives/flux-store";
 
@@ -131,6 +222,28 @@ const actions = createActions({
 ## `createAction`
 
 Wraps a single function so its body runs inside `untrack` — reactive reads inside will not register dependencies and writes will not throw inside owned scopes.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createAction } from "@solid-primitives/flux-store";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const [step, setStep] = createSignal(1);
+  // step() is read untracked inside the action
+  const increment = createAction(() => setCount(c => c + step()));
+  return (
+    <>
+      <input type="number" value={1} onInput={e => setStep(Number(e.currentTarget.value) || 0)} />
+      <button onClick={() => increment()}>Add step</button>
+      <p>count: {count()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createAction } from "@solid-primitives/flux-store";

@@ -4,6 +4,7 @@ import fsp from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getModulesData, type ModuleData } from "../../scripts/utils/index.js";
+import { fetchProjectStats, type ProjectStats } from "../src/lib/project-stats.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,71 +16,14 @@ const routesDir = path.join(siteDir, "src", "routes");
 const generatedDir = path.join(siteDir, "src", "generated");
 
 const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
-const GITHUB_API_REPO = "solidjs-community/solid-primitives";
 
-/** Repo-wide GitHub issue/PR counts and aggregate npm download volume — shown in the
- *  homepage stats block. Fetched at build time so the client never needs its own API
- *  calls (and doesn't need a GitHub/npm token). Any failure here just omits the stats
- *  block rather than failing the whole build — this data is a nice-to-have, not content. */
-async function getProjectStats(moduleNames: string[]): Promise<{
-  npmDownloadsLastMonth: number;
-  npmDownloadsLastMonthFormatted: string;
-  openIssues: number;
-  openPullRequests: number;
-  generatedAt: string;
-} | null> {
+/** Build-time copy of the homepage stats (see src/lib/project-stats.ts). The homepage refreshes
+ *  them at runtime through `/_server`; this copy is what's prerendered and what stays on screen
+ *  when no server answers. Any failure here just omits the stats block rather than failing the
+ *  whole build — this data is a nice-to-have, not content. */
+async function getProjectStats(moduleNames: string[]): Promise<ProjectStats | null> {
   try {
-    const [issuesJson, prsJson] = await Promise.all([
-      fetch(
-        `https://api.github.com/search/issues?q=${encodeURIComponent(`repo:${GITHUB_API_REPO} type:issue state:open`)}`,
-      ).then(res => res.json()),
-      fetch(
-        `https://api.github.com/search/issues?q=${encodeURIComponent(`repo:${GITHUB_API_REPO} type:pr state:open`)}`,
-      ).then(res => res.json()),
-    ]);
-    const openIssues = issuesJson.total_count;
-    const openPullRequests = prsJson.total_count;
-    if (typeof openIssues !== "number" || typeof openPullRequests !== "number") {
-      throw new Error("Unexpected GitHub search API response shape");
-    }
-
-    // npm's bulk downloads endpoint doesn't support scoped packages, so each package
-    // needs its own request — fetch in small concurrent batches to stay polite.
-    let npmDownloadsLastMonth = 0;
-    const BATCH_SIZE = 10;
-    for (let i = 0; i < moduleNames.length; i += BATCH_SIZE) {
-      const batch = moduleNames.slice(i, i + BATCH_SIZE);
-      const batchDownloads = await Promise.all(
-        batch.map(async name => {
-          try {
-            const json = await fetch(
-              `https://api.npmjs.org/downloads/point/last-month/@solid-primitives/${name}`,
-            ).then(res => res.json());
-            return typeof json.downloads === "number" ? json.downloads : 0;
-          } catch {
-            return 0;
-          }
-        }),
-      );
-      npmDownloadsLastMonth += batchDownloads.reduce((sum, n) => sum + n, 0);
-    }
-
-    // Pre-format here (not in the MDX component) — the MDX compiler's CSS-extraction
-    // pass chokes on non-trivial JS (object literals, type annotations) in the
-    // frontmatter scope, so the homepage should only ever interpolate plain values.
-    const npmDownloadsLastMonthFormatted = new Intl.NumberFormat("en-US", {
-      notation: "compact",
-    }).format(npmDownloadsLastMonth);
-
-    const generatedAt = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date());
-
-    return {
-      npmDownloadsLastMonth,
-      npmDownloadsLastMonthFormatted,
-      openIssues,
-      openPullRequests,
-      generatedAt,
-    };
+    return await fetchProjectStats(moduleNames);
   } catch (err) {
     // oxlint-disable-next-line no-console
     console.warn(`\nCouldn't fetch project stats (GitHub/npm) — skipping stats block: ${err}\n`);
@@ -174,25 +118,102 @@ function fixUnclosedVoidTags(markdown: string): string {
     .join("\n");
 }
 
+/**
+ * READMEs mark runnable examples with a ` ```tsx repl ` fence. GitHub, npm and Storybook ignore
+ * the `repl` meta and render a plain code block. Here each one becomes a SolidBase `:::repl`
+ * container with an extra `import_map.json` tab.
+ *
+ * The import map is required, not decorative. solid-repl resolves an unmapped
+ * `@solid-primitives/x` to `esm.sh/@solid-primitives/x`, which is the `latest` dist-tag (the
+ * Solid 1.x release while the repo is in prerelease mode). Pinning each imported primitive to
+ * `PRERELEASE_TAG` keeps the examples on the same release line as the docs. `external=` stops
+ * esm.sh bundling its own copy of Solid, which would break reactivity across the boundary.
+ */
+function toReplBlocks(markdown: string): string {
+  const lines = markdown.split("\n");
+  const out: string[] = [];
+  const fenceOpenRe = /^(`{3,})\s*(\S*)\s*(.*)$/;
+  const primitiveImportRe = /from\s+["'](@solid-primitives\/[a-z0-9-]+(?:\/[a-z0-9-./]+)?)["']/g;
+  const versionSuffix = PRERELEASE_TAG ? `@${PRERELEASE_TAG}` : "";
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    const open = line.match(fenceOpenRe);
+    if (!open) {
+      out.push(line);
+      continue;
+    }
+
+    const [, ticks, lang, meta] = open as unknown as [string, string, string, string];
+    // Find the matching close: a line of at least as many backticks and nothing else.
+    let end = i + 1;
+    while (end < lines.length && !new RegExp(`^${ticks}\`*\\s*$`).test(lines[end]!)) end++;
+    const body = lines.slice(i + 1, end);
+
+    const metaWords = meta.split(/\s+/).filter(Boolean);
+    const isRepl = (lang === "tsx" || lang === "ts") && metaWords.includes("repl");
+    if (!isRepl) {
+      // Copy the whole fence verbatim so its contents are never mistaken for a fence opener.
+      out.push(...lines.slice(i, end + 1));
+      i = end;
+      continue;
+    }
+
+    const code = body.join("\n");
+    const specifiers = [...new Set([...code.matchAll(primitiveImportRe)].map(m => m[1]!))].sort();
+    const imports = Object.fromEntries(
+      specifiers.map(spec => {
+        const [, pkg, subpath = ""] = spec.match(/^(@solid-primitives\/[a-z0-9-]+)(\/.*)?$/)!;
+        return [
+          spec,
+          `https://esm.sh/${pkg}${versionSuffix}${subpath}?external=solid-js,@solidjs/web,solid-js/internal&dev`,
+        ];
+      }),
+    );
+    const remainingMeta = metaWords.filter(w => w !== "repl").join(" ");
+
+    out.push(
+      ":::repl{layout=horizontal}",
+      `${ticks}${lang}${remainingMeta ? ` ${remainingMeta}` : ""}`,
+      ...body,
+      ticks,
+    );
+    if (specifiers.length > 0) {
+      out.push(
+        "",
+        `${ticks}json title="import_map.json"`,
+        JSON.stringify({ imports, pinned: specifiers }, null, 2),
+        ticks,
+      );
+    }
+    out.push(":::");
+    i = end;
+  }
+
+  return out.join("\n");
+}
+
 function cleanReadme(readme: string, name: string): string {
-  return readme
-    // remove heading-1
-    .replace(/^#\s+.+\n*/m, "")
-    // remove the solid banner image block
-    .replace(
-      /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>\n*/,
-      "",
-    )
-    // remove badge lines (size/version/stage/lerna/tested-with-vitest etc.)
-    .replace(/^\[!\[.+\]\(.+\)\]\(.+\)\n*/gm, "")
-    // point relative CHANGELOG links at GitHub
-    .replace(
-      /(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i,
-      (_, p1) => `${p1}(${GITHUB_REPO}/blob/main/packages/${name}/CHANGELOG.md)`,
-    )
-    // drop the Installation section — we render a consistent one ourselves
-    .replace(/##\s+installation[\r\n]+```[^`]*```\n*/gi, "")
-    .trim();
+  return (
+    readme
+      // remove heading-1
+      .replace(/^#\s+.+\n*/m, "")
+      // remove the solid banner image block
+      .replace(
+        /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>\n*/,
+        "",
+      )
+      // remove badge lines (size/version/stage/lerna/tested-with-vitest etc.)
+      .replace(/^\[!\[.+\]\(.+\)\]\(.+\)\n*/gm, "")
+      // point relative CHANGELOG links at GitHub
+      .replace(
+        /(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i,
+        (_, p1) => `${p1}(${GITHUB_REPO}/blob/main/packages/${name}/CHANGELOG.md)`,
+      )
+      // drop the Installation section — we render a consistent one ourselves
+      .replace(/##\s+installation[\r\n]+```[^`]*```\n*/gi, "")
+      .trim()
+  );
 }
 
 const STORYBOOK_URL = "https://primitives2-storybook.solidjs.community";
@@ -247,18 +268,21 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
 /** The package's own last commit date in the monorepo — not the generated file's (nonexistent) git history. */
 function getPackageLastUpdated(name: string): string | null {
   try {
-    const iso = execFileSync(
-      "git",
-      ["log", "-1", "--format=%aI", "--", `packages/${name}`],
-      { cwd: rootDir, encoding: "utf8" },
-    ).trim();
+    const iso = execFileSync("git", ["log", "-1", "--format=%aI", "--", `packages/${name}`], {
+      cwd: rootDir,
+      encoding: "utf8",
+    }).trim();
     return iso ? dateFormatter.format(new Date(iso)) : null;
   } catch {
     return null;
   }
 }
 
-function buildMetaTable(module: ModuleData, lastUpdated: string | null, storyId: string | null): string {
+function buildMetaTable(
+  module: ModuleData,
+  lastUpdated: string | null,
+  storyId: string | null,
+): string {
   const stage = module.primitive!.stage;
   const version = PRERELEASE_TAG ? `${module.version} (${PRERELEASE_TAG})` : module.version;
   const headers = ["Stage", "Category", "Version", "Last Updated"];
@@ -308,10 +332,23 @@ ${readme}
 `;
 }
 
-function frontmatter(title: string): string {
+function frontmatter(title: string, module?: ModuleData): string {
   // The built-in "last updated" is based on git history of this generated file, which is
   // gitignored and regenerated — so it's meaningless. We render our own in the meta table instead.
-  return `---\ntitle: ${title}\nlastUpdated: false\n---\n\n`;
+  const lines = [`title: ${title}`, "lastUpdated: false"];
+  // Package metadata for the head: SolidBase uses `description` for <meta name="description">,
+  // and src/components/OpenGraph.tsx builds the per-package OG card from the rest.
+  // JSON.stringify output is valid YAML, so descriptions with colons/quotes stay intact.
+  if (module) {
+    lines.push(
+      `description: ${JSON.stringify(module.description)}`,
+      `package: ${JSON.stringify(module.name)}`,
+      `category: ${JSON.stringify(module.primitive!.category)}`,
+      `stage: ${module.primitive!.stage}`,
+      `primitives: ${module.primitive!.list.length}`,
+    );
+  }
+  return `---\n${lines.join("\n")}\n---\n\n`;
 }
 
 type SidebarItem = { title: string; link: string };
@@ -343,9 +380,11 @@ async function main() {
   for (const module of modules) {
     const readmePath = path.join(packagesDir, module.name, "README.md");
     const rawReadme = await fsp.readFile(readmePath, "utf8");
-    const cleaned = fixUnclosedVoidTags(cleanReadme(rawReadme, module.name));
+    const cleaned = toReplBlocks(fixUnclosedVoidTags(cleanReadme(rawReadme, module.name)));
     const lastUpdated = getPackageLastUpdated(module.name);
-    const page = frontmatter(getDisplayName(module.name)) + buildPageBody(module, cleaned, lastUpdated);
+    const page =
+      frontmatter(getDisplayName(module.name), module) +
+      buildPageBody(module, cleaned, lastUpdated);
 
     await fsp.writeFile(path.join(routesDir, `${module.name}.mdx`), page);
 
@@ -381,7 +420,16 @@ async function main() {
   await fsp.writeFile(
     path.join(generatedDir, "stats.ts"),
     `// Generated by site/scripts/generate.ts — do not edit by hand.\n` +
-      `export const projectStats = ${JSON.stringify(stats, null, 2)} as const;\n`,
+      `import type { ProjectStats } from "../lib/project-stats";\n` +
+      // Typed rather than `as const`: a failed fetch writes `null`, and `null as const` doesn't compile.
+      `export const projectStats: ProjectStats | null = ${JSON.stringify(stats, null, 2)};\n`,
+  );
+  // For the runtime stats refresh (src/lib/stats.server.ts). Its own module so the homepage's
+  // client bundle, which imports stats.ts, doesn't carry the list.
+  await fsp.writeFile(
+    path.join(generatedDir, "packages.ts"),
+    `// Generated by site/scripts/generate.ts — do not edit by hand.\n` +
+      `export const packageNames: readonly string[] = ${JSON.stringify(modules.map(m => m.name))};\n`,
   );
 
   const sidebar: SidebarGroup[] = categories.map(category => ({
@@ -413,7 +461,9 @@ async function main() {
   );
 
   // oxlint-disable-next-line no-console
-  console.log(`\nGenerated ${modules.length} package pages across ${categories.length} categories.\n`);
+  console.log(
+    `\nGenerated ${modules.length} package pages across ${categories.length} categories.\n`,
+  );
 }
 
 main();

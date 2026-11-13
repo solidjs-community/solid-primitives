@@ -31,6 +31,36 @@ pnpm add @solid-primitives/pointer
 
 Setups event listeners for pointer events, that will get automatically removed on cleanup
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createPointerListeners } from "@solid-primitives/pointer";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  const [last, setLast] = createSignal("none");
+  const log = (type: string) => (e: PointerEvent) =>
+    setLast(`${type} (${Math.round(e.offsetX)}, ${Math.round(e.offsetY)})`);
+  createPointerListeners({
+    target: () => box,
+    onEnter: log("enter"),
+    onDown: log("down"),
+    onUp: log("up"),
+    onLeave: log("leave"),
+  });
+  return (
+    <>
+      <div ref={box} style={{ width: "240px", height: "120px", background: "#e0e7ff" }}>
+        Interact here
+      </div>
+      <p>last event: {last()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### Import
 
 ```ts
@@ -62,6 +92,39 @@ createPointerListeners({
 ## `createPerPointerListeners`
 
 Setup pointer event listeners, while following the pointers individually, from when they appear, until they're gone.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createPerPointerListeners } from "@solid-primitives/pointer";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  const [status, setStatus] = createSignal("press and drag inside the box");
+  createPerPointerListeners({
+    target: () => box,
+    // onDown runs inside an owned root: only register handlers here, write signals in them
+    onDown(e, onMove, onUp) {
+      const start = { x: e.x, y: e.y };
+      onMove(m =>
+        setStatus(`dragged by (${Math.round(m.x - start.x)}, ${Math.round(m.y - start.y)})`),
+      );
+      onUp(() => setStatus(`pointer ${e.pointerId} released`));
+    },
+  });
+  return (
+    <>
+      <div
+        ref={box}
+        style={{ width: "240px", height: "120px", background: "#e0e7ff", "touch-action": "none" }}
+      />
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### Import
 
@@ -114,6 +177,25 @@ createPerPointerListeners({
 
 Returns a signal with autoupdating Pointer position.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createPointerPosition } from "@solid-primitives/pointer";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  const pos = createPointerPosition({ target: () => box });
+  return (
+    <div ref={box} style={{ width: "240px", height: "120px", background: "#e0e7ff" }}>
+      {pos().isActive
+        ? `${pos().pointerType} at (${Math.round(pos().x)}, ${Math.round(pos().y)})`
+        : "Move pointer here"}
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### Import
 
 ```ts
@@ -159,6 +241,37 @@ const [hovering, setHovering] = createSignal(false);
 ## `createPointerList`
 
 Provides a signal of current pointers on screen.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createPointerList } from "@solid-primitives/pointer";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  const pointers = createPointerList({ target: () => box });
+  return (
+    <>
+      <div
+        ref={box}
+        style={{ width: "240px", height: "120px", background: "#e0e7ff", "touch-action": "none" }}
+      >
+        {pointers().length} pointer(s) here
+      </div>
+      <For each={pointers()} fallback={<p>no pointers</p>}>
+        {p => (
+          <p>
+            #{p().pointerId} ({Math.round(p().x)}, {Math.round(p().y)}){" "}
+            {p().isDown ? "down" : "hover"}
+          </p>
+        )}
+      </For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### Import
 

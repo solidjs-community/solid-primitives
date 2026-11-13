@@ -1,12 +1,23 @@
-import { children, createRoot, createSignal, flush, Show } from "solid-js";
-import { describe, expect, it } from "vitest";
 import {
+  children,
+  createContext,
+  createRoot,
+  createSignal,
+  flush,
+  For,
+  Show,
+  useContext,
+} from "solid-js";
+import { render } from "@solidjs/web";
+import { describe, expect, it, vi } from "vitest";
+import {
+  createObjectToken,
   createTokenizer,
   createToken,
   isToken,
-  JSXTokenizerData,
+  type JSXTokenizerData,
   resolveTokens,
-  TokenElement,
+  type TokenElement,
 } from "../src/index.js";
 
 describe("jsx-tokenizer", () => {
@@ -224,6 +235,231 @@ describe("jsx-tokenizer", () => {
       expect(tokens()[0]!.data.props.text).toBe("foo");
       expect(tokens()[1]!.data.type).toBe("my-token");
       expect(tokens()[1]!.data.props.text).toBe("bar");
+    });
+  });
+
+  describe("createObjectToken", () => {
+    const tokenizer = createTokenizer<{ text: string }>();
+    const ObjToken = createObjectToken(tokenizer, (props: { text: string }) => ({
+      text: props.text,
+    }));
+
+    it("resolves object tokens with resolveTokens", () => {
+      createRoot(dispose => {
+        const tokens = resolveTokens(
+          tokenizer,
+          () => (
+            <>
+              <div />
+              <ObjToken text="foo" />
+              <MyToken1 text="ignored" />
+              <ObjToken text="bar" />
+            </>
+          ),
+          { includeJSXElements: true },
+        );
+
+        expect(tokens()).toHaveLength(4);
+        expect(tokens()[0]).toBeInstanceOf(HTMLDivElement);
+        expect(isToken(tokenizer, tokens()[1])).toBe(true);
+        expect((tokens()[1] as TokenElement<{ text: string }>).data.text).toBe("foo");
+        // function tokens of other tokenizers are rendered (no fallback => "")
+        expect(tokens()[2]).toBe("");
+        expect((tokens()[3] as TokenElement<{ text: string }>).data.text).toBe("bar");
+
+        dispose();
+      });
+    });
+
+    it("survives children() resolution", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      createRoot(dispose => {
+        const resolved = children(() => (
+          <>
+            <ObjToken text="foo" />
+            <ObjToken text="bar" />
+          </>
+        ));
+        const tokens = resolveTokens(tokenizer, resolved);
+
+        expect(tokens()).toHaveLength(2);
+        expect(tokens()[0]!.data.text).toBe("foo");
+        expect(tokens()[1]!.data.text).toBe("bar");
+        expect(resolved.toArray().every(el => isToken(tokenizer, el))).toBe(true);
+
+        dispose();
+      });
+      expect(warn).not.toHaveBeenCalled();
+      warn.mockRestore();
+    });
+
+    it("can be passed through a context provider", () => {
+      const Ctx = createContext("default");
+      const CtxToken = createObjectToken(tokenizer, (_: {}) => ({ text: useContext(Ctx) }));
+
+      createRoot(dispose => {
+        const tokens = resolveTokens(tokenizer, () => (
+          <Ctx value="provided">
+            <CtxToken />
+            <ObjToken text="foo" />
+          </Ctx>
+        ));
+
+        expect(tokens()).toHaveLength(2);
+        expect(tokens()[0]!.data.text).toBe("provided");
+        expect(tokens()[1]!.data.text).toBe("foo");
+
+        dispose();
+      });
+    });
+
+    it("handles reactive children", () => {
+      const [show, setShow] = createSignal(true);
+
+      const { tokens, dispose } = createRoot(dispose => ({
+        tokens: resolveTokens(tokenizer, () => (
+          <>
+            <Show when={show()}>
+              <ObjToken text="foo" />
+            </Show>
+            <ObjToken text="bar" />
+          </>
+        )),
+        dispose,
+      }));
+
+      expect(tokens()).toHaveLength(2);
+
+      setShow(false);
+      flush();
+      expect(tokens()).toHaveLength(1);
+      expect(tokens()[0]!.data.text).toBe("bar");
+
+      dispose();
+    });
+
+    it("uses props as data and can be created without a tokenizer", () => {
+      const Standalone = createObjectToken<{ id: number }>();
+
+      createRoot(dispose => {
+        const tokens = resolveTokens([Standalone, tokenizer], () => (
+          <>
+            <Standalone id={1} />
+            <ObjToken text="foo" />
+          </>
+        ));
+
+        expect(tokens()).toHaveLength(2);
+        expect(isToken(Standalone, tokens()[0])).toBe(true);
+        expect((tokens()[0] as TokenElement<{ id: number }>).data.id).toBe(1);
+        expect(isToken(Standalone, tokens()[1])).toBe(false);
+
+        dispose();
+      });
+    });
+
+    it("can be mixed with function tokens of the same tokenizer", () => {
+      const FnToken = createToken(tokenizer, (props: { text: string }) => ({ text: props.text }));
+
+      createRoot(dispose => {
+        const tokens = resolveTokens(tokenizer, () => (
+          <>
+            <FnToken text="fn" />
+            <ObjToken text="obj" />
+          </>
+        ));
+
+        expect(tokens().map(t => t.data.text)).toEqual(["fn", "obj"]);
+
+        dispose();
+      });
+    });
+
+    it("is skipped (with a dev warning) when inserted alone into the DOM", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const container = document.createElement("div");
+      const dispose = render(() => <ObjToken text="foo" />, container);
+      flush();
+      expect(container.innerHTML).toBe("");
+      expect(warn.mock.calls.some(args => String(args[0]).includes("UNRECOGNIZED_INSERT_VALUE"))).toBe(true);
+      dispose();
+      warn.mockRestore();
+    });
+
+    it("isToken rejects non-token values and object tokens of other tokenizers", () => {
+      expect(isToken(tokenizer, null)).toBe(false);
+      expect(isToken(tokenizer, {})).toBe(false);
+      expect(isToken(tokenizer, { data: { text: "x" } })).toBe(false);
+      expect(isToken(tokenizer, 5)).toBe(false);
+      expect(isToken(tokenizer, () => 1)).toBe(false);
+
+      const Other = createObjectToken<{ a: number }>();
+      createRoot(dispose => {
+        const el = <Other a={1} />;
+        expect(isToken(Other, el)).toBe(true);
+        expect(isToken(tokenizer, el)).toBe(false);
+        dispose();
+      });
+    });
+
+    it("leaves out object tokens of other tokenizers", () => {
+      const Other = createObjectToken<{ a: number }>();
+      createRoot(dispose => {
+        const tokens = resolveTokens(tokenizer, () => (
+          <>
+            <Other a={1} />
+            <ObjToken text="foo" />
+          </>
+        ));
+        expect(tokens().map(t => t.data.text)).toEqual(["foo"]);
+        dispose();
+      });
+    });
+
+    it("stays reactive through a provider resolved with children()", () => {
+      const Ctx = createContext("default");
+      const CtxToken = createObjectToken(tokenizer, (_: {}) => ({ text: useContext(Ctx) }));
+      const [list, setList] = createSignal(["a", "b"]);
+      const [show, setShow] = createSignal(true);
+
+      const { tokens, dispose } = createRoot(dispose => {
+        const resolved = children(() => (
+          <Ctx value="provided">
+            <For each={list()}>{text => <ObjToken text={text} />}</For>
+            <Show when={show()}>
+              <CtxToken />
+            </Show>
+          </Ctx>
+        ));
+        return { tokens: resolveTokens(tokenizer, resolved), dispose };
+      });
+
+      expect(tokens().map(t => t.data.text)).toEqual(["a", "b", "provided"]);
+
+      setList(["c"]);
+      setShow(false);
+      flush();
+      expect(tokens().map(t => t.data.text)).toEqual(["c"]);
+
+      dispose();
+    });
+
+    it("survives a provider where a function token of the same tokenizer is rendered away", () => {
+      const Ctx = createContext("default");
+      const FnToken = createToken(tokenizer, (props: { text: string }) => ({ text: props.text }));
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      createRoot(dispose => {
+        const tokens = resolveTokens(tokenizer, () => (
+          <Ctx value="provided">
+            <FnToken text="fn" />
+            <ObjToken text="obj" />
+          </Ctx>
+        ));
+        expect(tokens().map(t => t.data.text)).toEqual(["obj"]);
+        dispose();
+      });
+      warn.mockRestore();
     });
   });
 });

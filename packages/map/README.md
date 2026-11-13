@@ -4,7 +4,7 @@
 
 # @solid-primitives/map
 
-[![size](https://img.shields.io/badge/size-747_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/map)
+[![size](https://img.shields.io/badge/size-732_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/map)
 [![version](https://img.shields.io/npm/v/@solid-primitives/map?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/map)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -29,6 +29,45 @@ pnpm add @solid-primitives/map
 ## `ReactiveMap`
 
 A reactive `Map`. Read methods subscribe to reactive updates when called inside a tracking scope (JSX, `createMemo`, `createEffect` compute). Write methods notify only the subscribers affected by the change.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { ReactiveMap } from "@solid-primitives/map";
+
+function Demo() {
+  const scores = new ReactiveMap<string, number>([
+    ["Alice", 0],
+    ["Bob", 0],
+  ]);
+  const [name, setName] = createSignal("");
+  return (
+    <>
+      <input value={name()} onInput={e => setName(e.currentTarget.value)} placeholder="name" />
+      <button
+        onClick={() => {
+          if (name() && !scores.has(name())) scores.set(name(), 0);
+          setName("");
+        }}
+      >
+        Add
+      </button>
+      <p>size: {scores.size}</p>
+      <For each={[...scores.keys()]}>
+        {key => (
+          <p>
+            {key}: {scores.get(key)}{" "}
+            <button onClick={() => scores.set(key, (scores.get(key) ?? 0) + 1)}>+1</button>
+            <button onClick={() => scores.delete(key)}>remove</button>
+          </p>
+        )}
+      </For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### Usage
 
@@ -82,6 +121,8 @@ Reads are tracked at two independent granularities, so components only re-run fo
 | `values()`               | Any value changes, or any key is added/removed |
 | `entries()`, `forEach()` | Any key or value changes                       |
 
+**Iteration methods subscribe when called**, not when the returned iterator is advanced — an iterator created inside a tracking scope keeps the dependency even if it is consumed later.
+
 **Setting the same value is a no-op.** `map.set(k, map.get(k))` does not notify any subscribers.
 
 **`clear()` only notifies subscribers of keys that were in the map.** Observers of non-existent keys are not triggered.
@@ -104,6 +145,29 @@ map.set("John", { age: 35 });
 ## `ReactiveWeakMap`
 
 A reactive `WeakMap`. Same per-key tracking as `ReactiveMap` for `has(key)` and `get(key)`, but keys must be object references.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { ReactiveWeakMap } from "@solid-primitives/map";
+
+const items = [{ label: "Apples" }, { label: "Bananas" }, { label: "Cherries" }];
+
+function Demo() {
+  const checked = new ReactiveWeakMap<(typeof items)[number], boolean>();
+  return (
+    <For each={items}>
+      {item => (
+        <button onClick={() => checked.set(item, !checked.get(item))}>
+          {checked.get(item) ? "✓" : "○"} {item.label}
+        </button>
+      )}
+    </For>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Does not support `size`, `clear()`, or any iteration method — these are absent on the native `WeakMap` to allow keys to be garbage-collected when no other reference exists.
 

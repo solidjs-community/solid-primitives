@@ -63,6 +63,37 @@ The package follows the standard `make*` / `create*` pattern:
 
 The base primitive. Returns `[controls, cleanup]`. Use this at module level or anywhere Solid's owner tree is unavailable.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For, onCleanup } from "solid-js";
+import { makeAnalytics } from "@solid-primitives/analytics";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const [analytics, cleanup] = makeAnalytics([
+    {
+      name: "logger",
+      page: ({ payload }) => void setLog(l => [...l, `page ${payload.properties.title}`]),
+      track: ({ payload }) => void setLog(l => [...l, `track ${payload.event}`]),
+      identify: ({ payload }) => void setLog(l => [...l, `identify ${payload.userId}`]),
+    },
+  ]);
+  onCleanup(cleanup);
+  return (
+    <>
+      <button onClick={() => analytics.page({ title: "Home" })}>page</button>
+      <button onClick={() => analytics.track("signup", { plan: "pro" })}>track</button>
+      <button onClick={() => analytics.identify("user-1")}>identify</button>
+      <ul>
+        <For each={log()}>{entry => <li>{entry}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeAnalytics } from "@solid-primitives/analytics";
 import googleAnalytics from "@analytics/google-analytics";
@@ -86,6 +117,36 @@ cleanup();
 Reactive wrapper built on `makeAnalytics`. Disposes automatically when the owning scope is destroyed. Exposes a reactive signal:
 
 - `pendingCount: Accessor<number>` — number of events waiting in the queue (non-zero while plugins are still initializing)
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createAnalytics } from "@solid-primitives/analytics";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  let loaded = false; // stand-in for a provider script that hasn't loaded yet
+  const analytics = createAnalytics([
+    {
+      name: "slow-logger",
+      loaded: () => loaded,
+      track: ({ payload }) => void setLog(l => [...l, payload.event]),
+    },
+  ]);
+  return (
+    <>
+      <button onClick={() => analytics.track("cta_click")}>track</button>
+      <button onClick={() => (loaded = true)}>load provider script</button>
+      <p>pendingCount: {analytics.pendingCount()}</p>
+      <ul>
+        <For each={log()}>{event => <li>{event}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { createAnalytics } from "@solid-primitives/analytics";
@@ -116,6 +177,41 @@ function Root() {
 
 The easiest way to share analytics across a component tree. Wrap your app once; call `useAnalytics()` in any descendant.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { AnalyticsProvider, useAnalytics, type AnalyticsPlugin } from "@solid-primitives/analytics";
+
+const [count, setCount] = createSignal(0);
+const [last, setLast] = createSignal("none");
+const logger: AnalyticsPlugin = {
+  name: "logger",
+  track: ({ payload }) => {
+    setCount(n => n + 1);
+    setLast(payload.event);
+  },
+};
+
+function TrackButton(props: { event: string }) {
+  const analytics = useAnalytics(); // same instance in every descendant
+  return <button onClick={() => analytics.track(props.event)}>{props.event}</button>;
+}
+
+function Demo() {
+  return (
+    <AnalyticsProvider plugins={[logger]}>
+      <TrackButton event="hero_cta" />
+      <TrackButton event="add_to_cart" />
+      <p>
+        events received by the shared instance: {count()} (last: {last()})
+      </p>
+    </AnalyticsProvider>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import { AnalyticsProvider, useAnalytics } from "@solid-primitives/analytics";
 import googleAnalytics from "@analytics/google-analytics";
@@ -145,8 +241,84 @@ function BuyButton() {
 `makeAnalyticsGuard` / `createAnalyticsGuard` pause navigation until all in-flight plugin dispatches complete, preventing events from being lost when users navigate away before async network calls finish.
 
 Both guards:
+
 - Show a browser confirmation dialog on hard navigation (tab close, URL bar, page refresh) via [`makePageLeave`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/page-utilities) from `@solid-primitives/page-utilities`
 - Return an `onBeforeLeave` handler compatible with SolidJS Router's `useBeforeLeave` for soft navigation
+
+### `makeAnalyticsGuard`
+
+Non-reactive guard returning `[onBeforeLeave, cleanup]`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeAnalytics, makeAnalyticsGuard } from "@solid-primitives/analytics";
+
+function Demo() {
+  const [status, setStatus] = createSignal("idle");
+  const slowPlugin = { name: "slow", track: () => new Promise<void>(r => setTimeout(r, 1500)) };
+  const [analytics, cleanupAnalytics] = makeAnalytics([slowPlugin]);
+  const [onBeforeLeave, cleanupGuard] = makeAnalyticsGuard(analytics);
+  onCleanup(cleanupGuard);
+  onCleanup(cleanupAnalytics);
+
+  const navigate = () => {
+    analytics.track("checkout_click");
+    setStatus("waiting for analytics to drain…");
+    // stand-in for a router's BeforeLeaveEvent
+    onBeforeLeave({
+      defaultPrevented: false,
+      preventDefault: () => {},
+      retry: () => setStatus("navigated"),
+    });
+  };
+  return (
+    <>
+      <button onClick={navigate}>Go to checkout</button>
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+### `createAnalyticsGuard`
+
+Reactive guard returning `onBeforeLeave`; the `beforeunload` listener is removed when the owner disposes.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createAnalytics, createAnalyticsGuard } from "@solid-primitives/analytics";
+
+function Demo() {
+  const [status, setStatus] = createSignal("idle");
+  const slowPlugin = { name: "slow", track: () => new Promise<void>(r => setTimeout(r, 1500)) };
+  const analytics = createAnalytics([slowPlugin]);
+  // also blocks tab close / reload with a confirmation dialog while mounted
+  const onBeforeLeave = createAnalyticsGuard(analytics);
+
+  const navigate = () => {
+    analytics.track("checkout_click");
+    setStatus("waiting for analytics to drain…");
+    // with @solidjs/router you would pass onBeforeLeave to useBeforeLeave instead
+    onBeforeLeave({
+      defaultPrevented: false,
+      preventDefault: () => {},
+      retry: () => setStatus("navigated"),
+    });
+  };
+  return (
+    <>
+      <button onClick={navigate}>Go to checkout</button>
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### With SolidJS Router
 
@@ -178,6 +350,7 @@ cleanup(); // call when tearing down
 ### How it works
 
 For **soft navigation** (SolidJS Router), when `onBeforeLeave` fires:
+
 1. Navigation is paused via `event.preventDefault()`
 2. `analytics.drain()` waits for all in-flight plugin dispatches to settle
 3. Navigation resumes via `event.retry(true)`
@@ -195,6 +368,32 @@ browser → createServerPlugin → your server function → GA / Mixpanel / Segm
 ```
 
 ### `createServerPlugin`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createAnalytics, type AnyPayload } from "@solid-primitives/analytics";
+import { createServerPlugin } from "@solid-primitives/analytics/relay";
+
+function Demo() {
+  const [received, setReceived] = createSignal("nothing yet");
+  // stand-in for a server function ("use server" / createServerFn)
+  const relayEvent = async (payload: AnyPayload) => {
+    await new Promise(r => setTimeout(r, 300));
+    setReceived(JSON.stringify(payload, null, 2));
+  };
+  const analytics = createAnalytics([createServerPlugin(relayEvent, { events: ["track"] })]);
+  return (
+    <>
+      <button onClick={() => analytics.track("purchase", { orderId: "123" })}>track</button>
+      <button onClick={() => analytics.page()}>page (not relayed)</button>
+      <pre>server received: {received()}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createServerPlugin } from "@solid-primitives/analytics/relay";

@@ -29,6 +29,32 @@ pnpm add @solid-primitives/scroll
 
 Reactive primitive providing a store-like object with current scroll position of specified target.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createScrollPosition } from "@solid-primitives/scroll";
+
+function Demo() {
+  const [box, setBox] = createSignal<HTMLDivElement>();
+  const scroll = createScrollPosition(box);
+  return (
+    <>
+      <div
+        ref={setBox}
+        style={{ width: "240px", height: "120px", overflow: "auto", border: "1px solid" }}
+      >
+        <div style={{ width: "600px", height: "400px" }}>Scroll me</div>
+      </div>
+      <p>
+        x: {Math.round(scroll.x)}, y: {Math.round(scroll.y)}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -100,6 +126,25 @@ y(); // => number
 
 Returns a reactive object with current window scroll position.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { useWindowScrollPosition, type Position } from "@solid-primitives/scroll";
+
+function Demo() {
+  // cast needed: the export is currently typed as returning `unknown`
+  const scroll = useWindowScrollPosition() as Position;
+  return (
+    <div style={{ height: "300vh" }}>
+      <p style={{ position: "fixed", top: "8px" }}>
+        window x: {Math.round(scroll.x)}, y: {Math.round(scroll.y)}
+      </p>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 `useWindowScrollPosition` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive, hence the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
 
 ```ts
@@ -122,6 +167,29 @@ Get an `{ x: number, y: number }` object of element/window scroll position.
 ## `createPreventScroll`
 
 Prevents scrolling outside of the given element by intercepting `wheel` and `touchmove` events and optionally hiding the `<body>` scrollbar.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createPreventScroll } from "@solid-primitives/scroll";
+
+function Demo() {
+  const [locked, setLocked] = createSignal(false);
+  const [panel, setPanel] = createSignal<HTMLDivElement>();
+  createPreventScroll({ element: panel, enabled: locked });
+  return (
+    <div style={{ height: "300vh" }}>
+      <button onClick={() => setLocked(l => !l)}>{locked() ? "Unlock" : "Lock"} page scroll</button>
+      <p>Page scroll is {locked() ? "locked (only the box scrolls)" : "free"}.</p>
+      <div ref={setPanel} style={{ height: "100px", overflow: "auto", border: "1px solid" }}>
+        <div style={{ height: "400px" }}>Scrollable box</div>
+      </div>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Adapted from [solid-prevent-scroll](https://github.com/corvudev/corvu/tree/main/packages/solid-prevent-scroll) by [Jasmin Noetzli (GiyoMoon)](https://github.com/GiyoMoon), part of the [corvu](https://corvu.dev) project, which is itself inspired by [react-remove-scroll](https://github.com/theKashey/react-remove-scroll) by Anton Korzunov. Adapted for Solid 2.0 and solid-primitives conventions.
 

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/form",
-  "version": "1.0.0-next.5",
+  "version": "1.0.0-next.6",
   "description": "Reactive form primitive with per-field signals, sync/async validation, validateOn control, and DOM binding.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [],
@@ -23,7 +23,7 @@
       "useFormControl"
     ],
     "category": "UI Patterns",
-    "gzip": 2640
+    "gzip": 2731
   },
   "keywords": [
     "solid",
@@ -59,7 +59,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -72,6 +72,6 @@
   "typesVersions": {},
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:peer"
   }
 }

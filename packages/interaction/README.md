@@ -1,7 +1,7 @@
 # @solid-primitives/interaction
 
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
-[![size](https://img.shields.io/badge/size-1.77_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/interaction)
+[![size](https://img.shields.io/badge/size-1.98_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/interaction)
 [![version](https://img.shields.io/npm/v/@solid-primitives/interaction?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/interaction)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -19,6 +19,40 @@ pnpm add @solid-primitives/interaction
 ```
 
 ## `makeInteractOutside`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeInteractOutside } from "@solid-primitives/interaction";
+
+function Demo() {
+  const [status, setStatus] = createSignal("Not listening");
+  let box!: HTMLDivElement;
+  let cleanup: (() => void) | undefined;
+  onCleanup(() => cleanup?.());
+
+  const attach = () => {
+    cleanup?.(); // the returned function removes the listeners
+    cleanup = makeInteractOutside(box, {
+      onPointerDownOutside: () => setStatus("Pointer down outside"),
+      onFocusOutside: () => setStatus("Focus moved outside"),
+    });
+    setStatus("Listening — click or tab outside the box");
+  };
+
+  return (
+    <>
+      <div ref={box} style={{ border: "1px solid", padding: "1rem" }}>
+        <button onClick={attach}>Attach</button>
+        <p>{status()}</p>
+      </div>
+      <input placeholder="Focus me (outside)" />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 function makeInteractOutside<T extends Element>(
@@ -42,6 +76,38 @@ cleanup();
 
 ## `interactOutside`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { interactOutside } from "@solid-primitives/interaction";
+
+function Demo() {
+  const [open, setOpen] = createSignal(false);
+  let trigger!: HTMLButtonElement;
+
+  return (
+    <>
+      <button ref={trigger} onClick={() => setOpen(o => !o)}>
+        {open() ? "Close" : "Open"} dropdown
+      </button>
+      <Show when={open()}>
+        <div
+          ref={interactOutside({
+            onInteractOutside: () => setOpen(false),
+            shouldExcludeElement: el => trigger.contains(el),
+          })}
+          style={{ border: "1px solid", padding: "1rem", width: "200px" }}
+        >
+          Click anywhere outside to dismiss.
+        </div>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 function interactOutside(options: MakeInteractOutsideOptions): (el: Element) => void;
 ```
@@ -64,6 +130,43 @@ function Popover() {
 ```
 
 ## `createInteractOutside`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createInteractOutside } from "@solid-primitives/interaction";
+
+function Demo() {
+  const [open, setOpen] = createSignal(false);
+  const [popover, setPopover] = createSignal<HTMLDivElement>();
+  let trigger!: HTMLButtonElement;
+
+  createInteractOutside(
+    {
+      disabled: () => !open(),
+      onInteractOutside: () => setOpen(false),
+      shouldExcludeElement: el => trigger.contains(el),
+    },
+    popover,
+  );
+
+  return (
+    <>
+      <button ref={trigger} onClick={() => setOpen(o => !o)}>
+        {open() ? "Close" : "Open"} popover
+      </button>
+      <div
+        ref={setPopover}
+        style={{ display: open() ? "block" : "none", border: "1px solid", padding: "1rem" }}
+      >
+        Click or focus outside this box to close it.
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 function createInteractOutside<T extends Element>(
@@ -246,6 +349,41 @@ cleanup();
 
 ## `ariaHideOutside`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { ariaHideOutside } from "@solid-primitives/interaction";
+
+function Demo() {
+  const [hiding, setHiding] = createSignal(false);
+  let root!: HTMLDivElement;
+  let dialog!: HTMLDivElement;
+  let cleanup: (() => void) | undefined;
+  onCleanup(() => cleanup?.());
+
+  const toggle = () => {
+    cleanup = cleanup ? void cleanup() : ariaHideOutside([dialog], root);
+    setHiding(!!cleanup);
+  };
+
+  return (
+    <>
+      <style>{"[aria-hidden='true'] { opacity: 0.3; }"}</style>
+      <button onClick={toggle}>{hiding() ? "Restore" : "Hide outside dialog"}</button>
+      <div ref={root}>
+        <p>Background paragraph</p>
+        <div ref={dialog} style={{ border: "1px solid", padding: "0.5rem" }}>
+          Dialog (stays visible)
+        </div>
+        <p>Another background paragraph</p>
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 function ariaHideOutside(
   targets: Element[],
@@ -274,6 +412,41 @@ const cleanup = ariaHideOutside([dialogEl], document.body, "[aria-live]");
 ```
 
 ## `createHideOutside`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createHideOutside } from "@solid-primitives/interaction";
+
+function Demo() {
+  const [open, setOpen] = createSignal(false);
+  const [root, setRoot] = createSignal<HTMLDivElement>();
+  const [dialog, setDialog] = createSignal<HTMLDivElement>();
+
+  createHideOutside({
+    targets: () => (dialog() ? [dialog()!] : []),
+    root,
+    disabled: () => !open(),
+    inert: true,
+  });
+
+  return (
+    <>
+      <style>{"[aria-hidden='true'] { opacity: 0.3; }"}</style>
+      <button onClick={() => setOpen(o => !o)}>{open() ? "Close" : "Open"} dialog</button>
+      <div ref={setRoot}>
+        <p>Background content (hidden + inert while open)</p>
+        <input placeholder="Not focusable while open" />
+        <div ref={setDialog} role="dialog" style={{ border: "1px solid", padding: "0.5rem" }}>
+          Dialog content
+        </div>
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 function createHideOutside(options: CreateHideOutsideOptions): void;

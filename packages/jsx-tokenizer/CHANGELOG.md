@@ -1,5 +1,11 @@
 # @solid-primitives/jsx-tokenizer
 
+## 3.0.0-next.5
+
+### Minor Changes
+
+- 790b4de: Add `createObjectToken` (#399): an opt-in token component whose element is a plain `{ data }` object instead of a function. Object tokens survive Solid's `children()` helper and components that resolve their children (such as context providers), so the resolved children can still be parsed with `resolveTokens` / `isToken`. Existing `createToken` tokens are unchanged.
+
 ## 3.0.0-next.4
 
 ### Patch Changes

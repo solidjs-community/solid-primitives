@@ -131,6 +131,74 @@ export function createToken<P extends object, T>(
   return comp;
 }
 
+/** @internal identifies object tokens created by {@link createObjectToken} without adding properties to them */
+const objectTokens: WeakMap<object, symbol> = new WeakMap();
+
+/**
+ * Creates an object token component for passing custom data through JSX structure.
+ *
+ * Works like {@link createToken}, but the token element is a plain object (`{ data }`) instead of a function.
+ * Because it is not a function, it survives being resolved by Solid's `children()` helper, context providers,
+ * and any other component that resolves its children — so the resolved children can still be parsed with
+ * {@link resolveTokens} or {@link isToken}.
+ *
+ * Object tokens cannot render a fallback. If one ends up being inserted into the DOM, Solid skips it
+ * (and warns in development).
+ *
+ * @param tokenizer identity object returned by {@link createTokenizer} or other {@link TokenComponent}. _(If not passed, a new tokenizer id will be created.)_
+ * @param tokenData function that returns the data of the token. _(if one isn't passed, props will be used as data)_
+ * @returns a token component ({@link TokenComponent}) that can be used as a normal component in JSX.
+ */
+export function createObjectToken<TProps extends object, TData>(
+  tokenizer: JSXTokenizer<TData>,
+  tokenData: NoInfer<(props: TProps) => TData>,
+): TokenComponent<TProps, TData>;
+
+export function createObjectToken<TData extends object>(
+  tokenizer: JSXTokenizer<TData>,
+  tokenData?: undefined,
+): TokenComponent<TData>;
+
+export function createObjectToken<TProps extends object, TData>(
+  tokenData: (props: TProps) => TData,
+): TokenComponent<TProps, TData>;
+
+export function createObjectToken<TData extends object>(
+  tokenData?: undefined,
+): TokenComponent<TData>;
+
+export function createObjectToken<P extends object, T>(
+  ...args: [a?: any, b?: any]
+): TokenComponent<P, T> {
+  const symbol =
+    (args[0]?.[$TOKENIZER] ? (args.shift()[$TOKENIZER] as symbol) : undefined) ??
+    Symbol(!isServer && DEV ? args[0]?.name || "jsx-token" : "");
+
+  const comp = ((props: P) => {
+    const token = { data: args[0] ? args[0](props) : props };
+    objectTokens.set(token, symbol);
+    return token as unknown as JSX.Element;
+  }) as TokenComponent<P, T>;
+  comp[$TOKENIZER] = symbol;
+
+  return comp;
+}
+
+/**
+ * Returns the tokenizer id of a token, or `undefined` if `value` isn't one.
+ * Function tokens carry the id as a property; object tokens are looked up in the `WeakMap`.
+ */
+function getTokenSymbol(value: unknown): symbol | undefined {
+  if (typeof value === "function") return (value as any)[$TOKENIZER];
+  if (value !== null && typeof value === "object") return objectTokens.get(value);
+  return undefined;
+}
+
+/**
+ * Walks a JSX value (calling zero-argument functions and descending into arrays) and pushes
+ * every token whose tokenizer id is in `symbols` onto `resolved`. When `addElements` is set,
+ * non-matching values are pushed as well. Returns `resolved`.
+ */
 function getResolvedTokens(
   resolved: unknown[],
   value: unknown,
@@ -146,6 +214,10 @@ function getResolvedTokens(
   else if (Array.isArray(value))
     for (let i = 0; i < value.length; i++)
       getResolvedTokens(resolved, value[i], symbols, addElements);
+  // object token
+  else if (value !== null && typeof value === "object" && objectTokens.has(value)) {
+    if (addElements || symbols.has(objectTokens.get(value)!)) resolved.push(value);
+  }
   // other element
   else if (addElements) resolved.push(value);
   else if (!isServer && DEV && value)
@@ -227,8 +299,8 @@ export function isToken<T>(
   parsers: Many<JSXTokenizer<T>>,
   value: unknown | TokenElement<T>,
 ): value is TokenElement<T> {
-  if (typeof value !== "function" || !($TOKENIZER in value)) return false;
-  const symbol = value[$TOKENIZER];
+  const symbol = getTokenSymbol(value);
+  if (!symbol) return false;
   return Array.isArray(parsers)
     ? parsers.some(p => p[$TOKENIZER] === symbol)
     : parsers[$TOKENIZER] === symbol;

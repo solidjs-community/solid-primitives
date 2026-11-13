@@ -27,6 +27,32 @@ yarn add @solid-primitives/mutable
 
 ## `createMutable`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createMutable } from "@solid-primitives/mutable";
+
+function Demo() {
+  const state = createMutable({ user: { name: "Alice" }, tags: ["solid", "proxy"] });
+  const swapName = () => {
+    state.user.name = state.user.name === "Alice" ? "Bob" : "Alice";
+  };
+  return (
+    <>
+      <p>user: {state.user.name}</p>
+      <button onClick={swapName}>Swap name</button>
+      <button onClick={() => state.tags.push(`tag${state.tags.length}`)}>Push tag</button>
+      <button onClick={() => state.tags.pop()}>Pop tag</button>
+      <ul>
+        <For each={state.tags}>{tag => <li>{tag}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createMutable } from "@solid-primitives/mutable";
 
@@ -91,6 +117,29 @@ flush(); // applies update, re-runs effect
 ```
 
 ## `modifyMutable`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMutable, modifyMutable } from "@solid-primitives/mutable";
+
+function Demo() {
+  const state = createMutable({ user: { firstName: "John", lastName: "Smith" } });
+  const swap = () =>
+    modifyMutable(state.user, u => {
+      [u.firstName, u.lastName] = u.firstName === "John" ? ["Jake", "Johnson"] : ["John", "Smith"];
+    });
+  return (
+    <>
+      <p>
+        {state.user.firstName} {state.user.lastName}
+      </p>
+      <button onClick={swap}>Swap user</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { modifyMutable } from "@solid-primitives/mutable";

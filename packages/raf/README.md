@@ -4,7 +4,7 @@
 
 # @solid-primitives/raf
 
-[![size](https://img.shields.io/badge/size-546_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/raf)
+[![size](https://img.shields.io/badge/size-1.37_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/raf)
 [![size](https://img.shields.io/npm/v/@solid-primitives/raf?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/raf)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -27,6 +27,33 @@ pnpm add @solid-primitives/raf
 ## `createRAF`
 
 A primitive creating reactive `window.requestAnimationFrame`, that is automatically disposed onCleanup.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createRAF } from "@solid-primitives/raf";
+
+function Demo() {
+  const [angle, setAngle] = createSignal(0);
+  const [running, start, stop] = createRAF(() => setAngle(a => (a + 2) % 360));
+  return (
+    <>
+      <button onClick={() => (running() ? stop() : start())}>{running() ? "Stop" : "Start"}</button>
+      <div
+        style={{
+          width: "50px",
+          height: "50px",
+          margin: "20px",
+          background: "tomato",
+          transform: `rotate(${angle()}deg)`,
+        }}
+      />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 It takes a `callback` argument that will run on every frame.
 
@@ -58,6 +85,36 @@ To respect clients refresh rate, timeStamp should be used to calculate how much 
 
 A primitive for wrapping `window.requestAnimationFrame` callback function to limit the execution of the callback to specified number of FPS.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createRAF, targetFPS } from "@solid-primitives/raf";
+
+function Demo() {
+  const [fps, setFps] = createSignal(10);
+  const [ticks, setTicks] = createSignal(0);
+  const [running, start, stop] = createRAF(targetFPS(() => setTicks(n => n + 1), fps));
+  return (
+    <>
+      <button onClick={() => (running() ? stop() : start())}>{running() ? "Stop" : "Start"}</button>
+      <label>
+        target fps: {fps()}
+        <input
+          type="range"
+          min="1"
+          max="60"
+          value={fps()}
+          onInput={e => setFps(+e.currentTarget.value)}
+        />
+      </label>
+      <p>callbacks: {ticks()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Keep in mind that limiting FPS is achieved by not executing a callback if the frames are above defined limit. This can lead to not consistant frame duration.
 
 The `targetFPS` primitive takes two arguments:
@@ -87,6 +144,28 @@ function targetFPS(
 ```
 
 ## createMs
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMs } from "@solid-primitives/raf";
+
+function Demo() {
+  const ms = createMs(30);
+  return (
+    <>
+      <button onClick={() => (ms.running() ? ms.stop() : ms.start())}>
+        {ms.running() ? "Stop" : "Start"}
+      </button>
+      <button onClick={() => ms.reset()}>Reset</button>
+      <p>{Math.round(ms())} ms</p>
+      <div style={{ height: "10px", background: "tomato", width: `${(ms() / 20) % 300}px` }} />
+      <small>Stop freezes the display; time keeps counting. Reset applies on the next frame.</small>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Using createRAF and targetFPS to create a signal giving the passed milliseconds since it was called with a configurable frame rate, with some added methods for more control:
 
@@ -118,6 +197,197 @@ function createMs(
   start: () => void;
   stop: () => void;
 };
+```
+
+## createCallbacksSet
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createCallbacksSet, createRAF } from "@solid-primitives/raf";
+
+function Demo() {
+  const [a, setA] = createSignal(0);
+  const [b, setB] = createSignal(0);
+  const countA: FrameRequestCallback = () => setA(n => n + 1);
+  const countB: FrameRequestCallback = () => setB(n => n + 1);
+  const [callback, callbacks] = createCallbacksSet(countA);
+  const [running, start, stop] = createRAF(callback);
+  const toggleB = () => (callbacks.has(countB) ? callbacks.delete(countB) : callbacks.add(countB));
+  return (
+    <>
+      <button onClick={() => (running() ? stop() : start())}>{running() ? "Stop" : "Start"}</button>
+      <button onClick={toggleB}>{callbacks.has(countB) ? "Remove B" : "Add B"}</button>
+      <p>
+        A: {a()} | B: {b()} | callbacks in set: {callbacks.size}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+Combines several callbacks into one. Use it with `createRAF` when several callbacks should run in the same `requestAnimationFrame` and share its timestamp. Callbacks live in a [`ReactiveSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#ReactiveSet), so you can add and remove them at any time.
+
+```ts
+// Type
+function createCallbacksSet<T extends (...args: any) => void>(
+  ...initialCallbacks: Array<T>
+): [callback: (...args: Parameters<T>) => void, callbacksSet: ReactiveSet<T>];
+
+// Example
+import { createCallbacksSet, createRAF } from "@solid-primitives/raf";
+
+const [callback, callbacks] = createCallbacksSet<FrameRequestCallback>();
+const [running, start, stop] = createRAF(callback);
+
+const move: FrameRequestCallback = ts => (el.style.transform = `translateX(${ts / 10}px)`);
+callbacks.add(move);
+start();
+// later
+callbacks.delete(move);
+```
+
+## useGlobalRAF
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
+
+function Demo() {
+  const createGlobalRAFCallback = useGlobalRAF();
+  const [slow, setSlow] = createSignal(0);
+  const [fast, setFast] = createSignal(0);
+  const [slowAdded, addSlow, removeSlow, running] = createGlobalRAFCallback(
+    targetFPS(() => setSlow(n => n + 1), 5),
+    true,
+  );
+  const [fastAdded, addFast, removeFast] = createGlobalRAFCallback(() => setFast(n => n + 1), true);
+  return (
+    <>
+      <button onClick={() => (slowAdded() ? removeSlow() : addSlow())}>
+        {slowAdded() ? "Remove" : "Add"} 5fps
+      </button>
+      <button onClick={() => (fastAdded() ? removeFast() : addFast())}>
+        {fastAdded() ? "Remove" : "Add"} every frame
+      </button>
+      <p>
+        5fps: {slow()} | every frame: {fast()} | shared loop running: {String(running())}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+Returns a factory for callbacks that share one global `requestAnimationFrame` loop, so they all run in the same frame with the same timestamp. The loop is a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot), combined with [`createCallbacksSet`](#createcallbacksset).
+
+Each call returns `[added, add, remove, running, start, stop]`:
+
+- `added`, `add`, `remove` control whether this callback is in the shared loop. It is removed on cleanup.
+- `running`, `start`, `stop` control the shared loop itself, like `createRAF`.
+
+Pass `startWhenAdded` (a boolean or accessor) to start the loop when the callback is added. The loop stops when the last callback is removed.
+
+```ts
+// Type
+function useGlobalRAF(): (
+  callback: FrameRequestCallback,
+  startWhenAdded?: MaybeAccessor<boolean>,
+) => [
+  added: Accessor<boolean>,
+  add: VoidFunction,
+  remove: VoidFunction,
+  running: Accessor<boolean>,
+  start: VoidFunction,
+  stop: VoidFunction,
+];
+
+// Example
+import { flush } from "solid-js";
+import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
+
+const createGlobalRAFCallback = useGlobalRAF();
+
+// Low frame rate, e.g. sampling a webcam
+const [hasSampler, addSampler, removeSampler] = createGlobalRAFCallback(
+  targetFPS(() => {
+    /* ... */
+  }, 30),
+  true,
+);
+// High frame rate, e.g. drawing to a canvas
+const [hasDraw, addDraw, removeDraw, running] = createGlobalRAFCallback(
+  targetFPS(() => {
+    /* ... */
+  }, 60),
+  true,
+);
+
+addSampler();
+addDraw();
+// `running()` updates once the write is flushed (tracked reads update automatically)
+flush();
+running(); // true, both run in the same frame
+```
+
+> **Warning** Only use this when callbacks must run in the same frame, and keep each callback short: all of them share one frame's budget. To control several separate loops, use `createCallbacksSet` with your own `createRAF` instead.
+
+## createScheduledLoop
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createScheduledLoop } from "@solid-primitives/raf";
+
+// any scheduler that repeats until cancelled works; here a 100ms interval
+const createIntervalLoop = createScheduledLoop(
+  (callback: () => void) => window.setInterval(callback, 100),
+  id => window.clearInterval(id),
+);
+
+function Demo() {
+  const [ticks, setTicks] = createSignal(0);
+  const [running, start, stop] = createIntervalLoop(() => setTicks(n => n + 1));
+  return (
+    <>
+      <button onClick={() => (running() ? stop() : start())}>{running() ? "Stop" : "Start"}</button>
+      <p>ticks: {ticks()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+Drives an external frameloop scheduler (for example [motion's `frame`](https://motion.dev/docs/frame)) with the same `[running, start, stop]` shape as `createRAF`. The loop is stopped on cleanup.
+
+`schedule` receives the callback and must keep running it every frame until cancelled, returning an ID (not `null` or `undefined`) that `cancel` accepts. It is called once per `start()`, so a one-shot scheduler like `requestAnimationFrame` only runs the callback once; use `createRAF` for that. motion's `frame.render` returns the callback it scheduled, which is what `cancelFrame` takes:
+
+```ts
+// Type
+function createScheduledLoop<
+  RequestID extends NonNullable<unknown>,
+  Callback extends (...args: Array<any>) => any,
+>(
+  schedule: (callback: Callback) => RequestID,
+  cancel: (requestID: RequestID) => void,
+): (callback: Callback) => [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
+
+// Example
+import { createScheduledLoop } from "@solid-primitives/raf";
+import { cancelFrame, frame } from "motion";
+
+const createMotionFrameRender = createScheduledLoop(
+  callback => frame.render(callback, true),
+  cancelFrame,
+);
+const [running, start, stop] = createMotionFrameRender(
+  data => (element.style.transform = "translateX(...)"),
+);
 ```
 
 ## Changelog

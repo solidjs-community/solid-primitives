@@ -37,6 +37,26 @@ Creates a reactive `window.location` state. The state updates whenever the locat
 via back/forward navigation, a `#hash` change, or `history.pushState`/`replaceState` — and can be
 modified using the provided setter methods.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createLocationState } from "@solid-primitives/url";
+
+function Demo() {
+  const [location, { push, replace }] = createLocationState();
+  return (
+    <>
+      <button onClick={() => push("hash", "section-1")}>push #section-1</button>
+      <button onClick={() => push({ search: "?page=2" })}>push ?page=2</button>
+      <button onClick={() => replace({ search: "", hash: "" })}>reset</button>
+      <p>search: {location.search || "(empty)"}</p>
+      <p>hash: {location.hash || "(empty)"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createLocationState } from "@solid-primitives/url";
 
@@ -78,6 +98,30 @@ setLocationFallback("http://example.com");
 const [state] = createLocationState();
 ```
 
+#### `setLocationFallback`
+
+Sets the global server fallback; in the browser it's a no-op and the real `window.location` is used.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createLocationState, setLocationFallback } from "@solid-primitives/url";
+
+// only used during SSR — in the browser the real location wins
+setLocationFallback("https://example.com/from-fallback");
+
+function Demo() {
+  const [location, { push }] = createLocationState();
+  return (
+    <>
+      <button onClick={() => push("hash", `n${Date.now() % 1000}`)}>push random hash</button>
+      <p>href: {location.href}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ## `useSharedLocationState`
 
 Reuses a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot)
@@ -85,6 +129,29 @@ Reuses a [singleton root](https://github.com/solidjs-community/solid-primitives/
 `createLocationState` to avoid recreating signals, computations, and event listeners for every
 consumer. Its interface is the same, minus the `fallback` argument — use `setLocationFallback`
 instead.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { useSharedLocationState } from "@solid-primitives/url";
+
+function HashLabel() {
+  const [location] = useSharedLocationState();
+  return <p>hash: {location.hash || "(empty)"}</p>;
+}
+
+function Demo() {
+  const [, { push }] = useSharedLocationState();
+  return (
+    <>
+      <button onClick={() => push("hash", `n${Date.now() % 1000}`)}>push random hash</button>
+      <HashLabel />
+      <HashLabel />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const [state, { push }] = useSharedLocationState();
@@ -94,6 +161,27 @@ const [state, { push }] = useSharedLocationState();
 
 A non-reactive utility to push, replace, or navigate to a new href.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createLocationState, updateLocation } from "@solid-primitives/url";
+
+// Resolve against the current href so it also works inside sandboxed iframes.
+const withHash = (hash: string) => new URL(hash, window.location.href).href;
+
+function Demo() {
+  const [location] = createLocationState();
+  return (
+    <>
+      <button onClick={() => updateLocation(withHash("#foo"), "push")}>push #foo</button>
+      <button onClick={() => updateLocation(withHash("#bar"), "replace")}>replace with #bar</button>
+      <p>hash: {location.hash || "(empty)"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 updateLocation("http://example.com?foo=bar", "push");
 ```
@@ -101,6 +189,25 @@ updateLocation("http://example.com?foo=bar", "push");
 ## `createURL`
 
 Creates an instance of [`ReactiveURL`](#reactiveurl).
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createURL } from "@solid-primitives/url";
+
+function Demo() {
+  const url = createURL("https://shop.example.com/products?sort=price");
+  return (
+    <>
+      <button onClick={() => (url.pathname = "/cart")}>go to /cart</button>
+      <button onClick={() => (url.hash = "reviews")}>set hash</button>
+      <p>href: {url.href}</p>
+      <p>pathname: {url.pathname}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createURL } from "@solid-primitives/url";
@@ -116,6 +223,26 @@ createEffect(() => console.log(url.href));
 An object providing reactive setters and getters for managing a URL — same interface as the
 native `URL` class, but every getter is granularly reactive, causing updates only when its value
 has actually changed.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { ReactiveURL } from "@solid-primitives/url";
+
+function Demo() {
+  const url = new ReactiveURL("https://shop.example.com/products?category=shoes");
+  const { searchParams } = url;
+  return (
+    <>
+      <button onClick={() => (url.search = "?category=boots")}>set url.search</button>
+      <button onClick={() => searchParams.set("category", "sandals")}>set searchParams</button>
+      <p>search: {url.search}</p>
+      <p>category: {searchParams.get("category")}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 `ReactiveURL` does **not** extend `URL`, so `x instanceof URL` won't hold. As a reactive
 structure, it should be instantiated under a reactive root (e.g. inside `createRoot` or a
@@ -148,6 +275,25 @@ searchParams.set("foo", "baz"); // updates url.search to "?foo=baz"
 
 Provides a `URL` instance as a reactive store.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createURLRecord } from "@solid-primitives/url";
+
+function Demo() {
+  const [url, setURL] = createURLRecord("https://example.com/docs");
+  return (
+    <>
+      <button onClick={() => setURL("hash", `h${Date.now() % 1000}`)}>set hash</button>
+      <button onClick={() => setURL({ pathname: "/blog", hash: "" })}>go to /blog</button>
+      <p>href: {url.href}</p>
+      <p>pathname: {url.pathname}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createURLRecord } from "@solid-primitives/url";
 
@@ -161,6 +307,26 @@ url.hash; // => "#heading1"
 
 Creates an instance of [`ReactiveSearchParams`](#reactivesearchparams).
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSearchParams } from "@solid-primitives/url";
+
+function Demo() {
+  const params = createSearchParams("q=solid&page=1");
+  return (
+    <>
+      <input value={params.get("q") ?? ""} onInput={e => params.set("q", e.currentTarget.value)} />
+      <button onClick={() => params.set("page", String(Number(params.get("page")) + 1))}>
+        next page
+      </button>
+      <p>?{params.toString()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const params = createSearchParams("foo=1&foo=2&bar=baz");
 ```
@@ -169,6 +335,27 @@ const params = createSearchParams("foo=1&foo=2&bar=baz");
 
 A reactive version of the `URLSearchParams` class. Every read method is granular — it causes an
 update only when the value it read has actually changed.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { ReactiveSearchParams } from "@solid-primitives/url";
+
+function Demo() {
+  const params = new ReactiveSearchParams("foo=1&foo=2&bar=baz");
+  return (
+    <>
+      <button onClick={() => params.append("foo", String(params.getAll("foo").length + 1))}>
+        append foo
+      </button>
+      <button onClick={() => params.delete("foo")}>delete foo</button>
+      <p>getAll("foo"): {params.getAll("foo").join(", ") || "(none)"}</p>
+      <p>has("bar"): {String(params.has("bar"))}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 `ReactiveSearchParams` extends `URLSearchParams`, so `x instanceof URLSearchParams` holds. As a
 reactive structure, it should be instantiated under a reactive root.
@@ -183,6 +370,26 @@ params.append("foo", "3");
 
 Provides a reactive record reflecting `window.location.search`, updating whenever the browser's
 search params change, along with setter methods to update them.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createLocationSearchParams } from "@solid-primitives/url";
+
+function Demo() {
+  const [params, { push }] = createLocationSearchParams();
+  return (
+    <>
+      <button onClick={() => push("tab", "overview")}>overview</button>
+      <button onClick={() => push("tab", "details")}>details</button>
+      <button onClick={() => push("tab", "reviews")}>reviews</button>
+      <button onClick={() => push({})}>clear</button>
+      <p>params.tab: {params.tab ?? "(none)"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createLocationSearchParams } from "@solid-primitives/url";
@@ -207,6 +414,29 @@ Options:
 
 Reuses a shared-root `createLocationSearchParams`, or creates one if one isn't active.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { useSharedLocationSearchParams } from "@solid-primitives/url";
+
+function PageLabel() {
+  const [params] = useSharedLocationSearchParams();
+  return <p>page: {params.page ?? "1"}</p>;
+}
+
+function Demo() {
+  const [, { push }] = useSharedLocationSearchParams();
+  return (
+    <>
+      <button onClick={() => push("page", p => String(Number(p ?? "1") + 1))}>next page</button>
+      <PageLabel />
+      <PageLabel />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [params, { push }] = useSharedLocationSearchParams();
 ```
@@ -215,6 +445,24 @@ const [params, { push }] = useSharedLocationSearchParams();
 
 A non-reactive helper turning a `URLSearchParams` instance (or a search string) into a plain
 record — a single value for names that appear once, an array of values for names that repeat.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { getSearchParamsRecord } from "@solid-primitives/url";
+
+function Demo() {
+  const [query, setQuery] = createSignal("?foo=bar&tag=a&tag=b");
+  return (
+    <>
+      <input value={query()} onInput={e => setQuery(e.currentTarget.value)} />
+      <pre>{JSON.stringify(getSearchParamsRecord(query()), null, 2)}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { getSearchParamsRecord } from "@solid-primitives/url";

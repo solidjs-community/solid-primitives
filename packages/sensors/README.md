@@ -4,7 +4,7 @@
 
 # @solid-primitives/sensors
 
-[![size](https://img.shields.io/badge/size-1.34_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/sensors)
+[![size](https://img.shields.io/badge/size-1.36_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/sensors)
 [![size](https://img.shields.io/npm/v/@solid-primitives/sensors?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/sensors)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -269,6 +269,32 @@ Uses the [Battery Status API](https://developer.mozilla.org/en-US/docs/Web/API/B
 
 Subscribes to the Battery API and calls `onChange` immediately with the current reading, then again on every battery change event. Returns a synchronous cleanup function — safe to use with `onCleanup` even though the API initializes asynchronously.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeBattery } from "@solid-primitives/sensors";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const stop = makeBattery(({ level, charging }) =>
+    setLog(l => [...l, `${Math.round(level * 100)}% ${charging ? "charging" : "on battery"}`]),
+  );
+  onCleanup(stop);
+  return (
+    <>
+      <p>{"getBattery" in navigator ? "Battery events:" : "Battery API unsupported here"}</p>
+      <ul>
+        {log().map(entry => (
+          <li>{entry}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeBattery } from "@solid-primitives/sensors";
 
@@ -298,6 +324,30 @@ type BatteryReading = {
 ### `createBattery`
 
 Returns a reactive accessor for battery status. Starts as `undefined` until the Battery API resolves. Subscribe to any of the four properties to track specific changes.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { Show } from "solid-js";
+import { createBattery } from "@solid-primitives/sensors";
+
+function Demo() {
+  const battery = createBattery();
+  return (
+    <Show when={battery()} fallback={<p>Battery API unavailable (or still loading)</p>}>
+      {b => (
+        <>
+          <progress max={1} value={b().level} />
+          <p>
+            {Math.round(b().level * 100)}% — {b().charging ? "charging" : "discharging"}
+          </p>
+        </>
+      )}
+    </Show>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createBattery } from "@solid-primitives/sensors";

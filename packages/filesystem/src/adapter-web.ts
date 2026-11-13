@@ -11,14 +11,15 @@ import type { AsyncFileSystemAdapter, DirEntries } from "./types.ts";
 export const makeWebAccessFileSystem = async (
   options?: DirectoryPickerOptions | { webkitEntry: FileSystemDirectoryHandle } | undefined,
 ): Promise<AsyncFileSystemAdapter | null> => {
-  if (isServer || typeof globalThis.showDirectoryPicker !== "function") {
+  const webkitEntry = options && "webkitEntry" in options ? options.webkitEntry : undefined;
+  // a given directory handle (e.g. the OPFS root from `navigator.storage.getDirectory()`) works
+  // without `showDirectoryPicker`, which Firefox and Safari don't have
+  if (isServer || (!webkitEntry && typeof globalThis.showDirectoryPicker !== "function")) {
     return null;
   }
 
   const handle =
-    options && "webkitEntry" in options
-      ? options.webkitEntry
-      : await globalThis.showDirectoryPicker(options);
+    webkitEntry ?? (await globalThis.showDirectoryPicker(options as DirectoryPickerOptions));
 
   const walk = async (
     path: string,
@@ -71,7 +72,7 @@ export const makeWebAccessFileSystem = async (
               new Error(
                 `attempt to create directory "${path}" failed - "${parts
                   .slice(0, index)
-                  .join("/")} is a file`,
+                  .join("/")}" is a file`,
               ),
             )
           : handle.getDirectoryHandle(part, { create: true }),

@@ -27,6 +27,33 @@ pnpm add @solid-primitives/bounds
 
 Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the DOM.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createElementBounds } from "@solid-primitives/bounds";
+
+function Demo() {
+  const [width, setWidth] = createSignal(160);
+  let ref!: HTMLDivElement;
+  const bounds = createElementBounds(() => ref);
+  return (
+    <>
+      <input
+        type="range"
+        min="80"
+        max="300"
+        value={width()}
+        onInput={e => setWidth(+e.currentTarget.value)}
+      />
+      <div ref={ref} style={{ width: `${width()}px`, height: "80px", background: "orange" }} />
+      <pre>{JSON.stringify(bounds, null, 2)}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createElementBounds } from "@solid-primitives/bounds";
 

@@ -35,6 +35,45 @@ pnpm add @solid-primitives/workers
 
 Spawn a worker from an object of self-contained functions. Each method becomes a typed async RPC call on the returned worker object. The worker is automatically terminated when the reactive owner is disposed.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createWorker } from "@solid-primitives/workers";
+
+// Serialized into the worker: must be self-contained (no closures, no imports)
+function fib(n: number): number {
+  return n < 2 ? n : fib(n - 1) + fib(n - 2);
+}
+
+function Demo() {
+  const [worker] = createWorker({ fib });
+  const [n, setN] = createSignal(35);
+  const [result, setResult] = createSignal("—");
+  const run = () => {
+    setResult("computing in worker…");
+    worker.fib(n()).then(
+      r => setResult(String(r)),
+      e => setResult(`error: ${e}`),
+    );
+  };
+  return (
+    <>
+      <input
+        type="number"
+        min="1"
+        max="40"
+        value={n()}
+        onInput={e => setN(Math.min(40, Math.max(1, e.currentTarget.valueAsNumber || 1)))}
+      />
+      <button onClick={run}>Compute fib(n)</button>
+      <p>{result()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [worker] = createWorker({
   add(a: number, b: number) {
@@ -125,6 +164,51 @@ const [w] = createWorker({
 
 Like `createWorker`, but distributes calls across `concurrency` workers using round-robin scheduling. The round-robin index is captured at method-access time, so storing a reference to a method and calling it later dispatches to the expected worker.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createWorkerPool } from "@solid-primitives/workers";
+
+function fib(n: number): number {
+  return n < 2 ? n : fib(n - 1) + fib(n - 2);
+}
+
+function Demo() {
+  const [pool] = createWorkerPool(3, { fib });
+  const inputs = [28, 30, 32, 34, 36];
+  const [results, setResults] = createSignal<string[]>([]);
+  const [pending, setPending] = createSignal(0);
+  const runAll = () => {
+    setResults(inputs.map(() => "…"));
+    setPending(inputs.length);
+    inputs.forEach((n, i) =>
+      pool
+        .fib(n)
+        .then(r => setResults(prev => prev.map((v, j) => (j === i ? String(r) : v))))
+        .finally(() => setPending(p => p - 1)),
+    );
+  };
+  return (
+    <>
+      <button disabled={pending() > 0} onClick={runAll}>
+        Run {inputs.length} tasks on 3 workers
+      </button>
+      <ul>
+        <For each={results()} keyed={false}>
+          {(r, i) => (
+            <li>
+              fib({inputs[i]}) = {r()}
+            </li>
+          )}
+        </For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [pool] = createWorkerPool(4, {
   add(a: number, b: number) {
@@ -160,6 +244,34 @@ function createWorkerPool<T extends Record<string, Function>>(
 
 A reactive async query that re-runs whenever reactive inputs inside `fn` change. Built on Solid's async `createMemo`, so it integrates with `<Loading>` for suspense-aware rendering. Returns `undefined` until the first resolution (on the server, always `undefined`).
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, isPending, Loading } from "solid-js";
+import { createWorker, createWorkerQuery } from "@solid-primitives/workers";
+
+function square(n: number): Promise<number> {
+  return new Promise(resolve => setTimeout(() => resolve(n * n), 500));
+}
+
+function Demo() {
+  const [worker] = createWorker({ square });
+  const [n, setN] = createSignal(4);
+  const result = createWorkerQuery(() => worker.square(n()));
+  return (
+    <>
+      <button onClick={() => setN(v => v + 1)}>n = {n()}</button>
+      <Loading fallback={<p>calculating…</p>}>
+        <p>
+          n² = {result()} {isPending(() => result()) && "(refreshing…)"}
+        </p>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 When inputs change before a previous call resolves, the previous call is **automatically aborted** if it returned a `CancellablePromise` — no stale results reach the accessor.
 
 ```ts
@@ -191,6 +303,39 @@ Errors thrown by the worker promise propagate to the nearest `<Errored>` boundar
 ### `createReactiveWorker` + `workerScope`
 
 A full reactive bridge between the main thread and a **module worker** using Solid stores. Input changes on the main thread are automatically forwarded to the worker; output changes written inside the worker propagate back — all reactively.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { onCleanup } from "solid-js";
+import { createReactiveWorker } from "@solid-primitives/workers";
+
+// Normally a module file using `workerScope` (see below). Inlined here as a tiny
+// hand-written worker speaking the same bridge protocol so the demo is self-contained.
+const workerSource = `let inputs = {};
+onmessage = ({ data }) => {
+  if (data.type === "init") inputs = data.inputs;
+  if (data.type === "input") inputs[data.key] = data.value;
+  postMessage({ type: "outputs", snapshot: { squared: inputs.n * inputs.n } });
+};`;
+
+function Demo() {
+  const workerUrl = URL.createObjectURL(new Blob([workerSource], { type: "text/javascript" }));
+  onCleanup(() => URL.revokeObjectURL(workerUrl));
+  const { inputs, setInputs, outputs, error } = createReactiveWorker(workerUrl, {
+    inputs: { n: 3 },
+    outputs: { squared: 0 },
+  });
+  return (
+    <>
+      <button onClick={() => setInputs(s => void s.n++)}>n = {inputs.n}</button>
+      <p>squared in worker: {outputs.squared}</p>
+      {error() && <p>worker error: {error()!.message}</p>}
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 #### Main thread
 

@@ -1,5 +1,5 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV } from "solid-js";
+import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV, NotReadyError } from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
 export type SyncStorage = {
@@ -66,6 +66,16 @@ export type PersistenceOptions<
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
   hydrated?: boolean;
+  /**
+   * Merge the stored value onto the initial value instead of replacing it, so keys added to the
+   * initial value later keep their defaults when older persisted data is loaded. `true` deep-merges
+   * plain objects (arrays and other values from the storage replace the default as a whole); a
+   * function receives the deserialized stored value and the initial value and returns the value
+   * to use. Applies to the initial load and to incoming sync data. If the initial value is still
+   * pending (an async signal or store that has not produced its first value), there are no defaults:
+   * `true` uses the stored value as is and a function receives `undefined` as `initial`.
+   */
+  merge?: boolean | ((stored: T, initial: T) => T);
   action?: (signal: S) => Parameters<typeof action>[0];
 } & (undefined extends O
   ? { storage?: SyncStorage | AsyncStorage }
@@ -78,6 +88,40 @@ export type PersistedState<S, I = Promise<string> | string | null> = S extends [
 
 export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
 
+/** Whether `value` is a plain object (an object literal or one created with `Object.create(null)`). */
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (value === null || typeof value !== "object") return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+};
+
+const setOwn = (target: Record<string, unknown>, key: string, value: unknown) =>
+  Object.defineProperty(target, key, { value, enumerable: true, writable: true, configurable: true });
+
+/**
+ * Deep-copies arrays and plain objects; any other value is returned as is. Keys are written as
+ * own properties, so a stored `__proto__` key can't change the copy's prototype.
+ */
+const clonePlain = <T>(value: T): T => {
+  if (Array.isArray(value)) return value.map(clonePlain) as T;
+  if (!isPlainObject(value)) return value;
+  const result: Record<string, unknown> = {};
+  for (const key of Object.keys(value)) setOwn(result, key, clonePlain(value[key]));
+  return result as T;
+};
+
+/**
+ * Deep-merges plain objects from `stored` onto `defaults`; any other stored value
+ * (including arrays) replaces the default. Returns a fresh copy of `defaults`' plain objects.
+ */
+const mergeDefaults = (defaults: unknown, stored: unknown): unknown => {
+  if (!isPlainObject(defaults) || !isPlainObject(stored)) return stored;
+  const result = clonePlain(defaults);
+  for (const key of Object.keys(stored))
+    setOwn(result, key, Object.hasOwn(defaults, key) ? mergeDefaults(defaults[key], stored[key]) : stored[key]);
+  return result;
+};
+
 /**
  * Persists a signal, store or similar API
  * ```ts
@@ -88,6 +132,7 @@ export type StoreTuple<T> = [Store<T>, StoreSetter<T>];
  *   name: "solid-data",      // optional
  *   serialize: (value: string) => value, // optional
  *   deserialize: (data: string) => data, // optional
+ *   merge: true, // optional, deep-merge stored data onto the initial value
  *   action: (setter: Setter<T>) => Setter<T> // optional, to be put inside action
  * };
  * ```
@@ -146,10 +191,31 @@ export function makePersisted<
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
   const init = storage.getItem(name, storageOptions);
   const isSignal = typeof signal[0] === "function";
+  // capture the initial value before any stored data is applied, so it can serve as defaults;
+  // an async signal or store that has not produced its first value yet throws NotReadyError
+  // here - it has no defaults, so stored data is then used as is (`initial` stays undefined)
+  let initial: T | undefined;
+  if (options.merge) {
+    try {
+      initial = clonePlain(isSignal ? untrack(signal[0] as () => T) : snapshot(signal[0] as T));
+    } catch (e) {
+      if (!(e instanceof NotReadyError)) throw e;
+    }
+  }
+  const merge: ((stored: T) => T) | undefined = !options.merge
+    ? undefined
+    : typeof options.merge === "function"
+      ? (stored: T) => (options.merge as (stored: T, initial: T) => T)(stored, clonePlain(initial as T))
+      : (stored: T) => mergeDefaults(initial, stored) as T;
+  /** Deserializes stored data and, when `merge` is set, merges it onto the initial value. */
+  const read = (data: string): T => {
+    const value = deserialize(data);
+    return merge ? merge(value) : value;
+  };
   const set = isSignal
     ? (data: string) => {
         try {
-          const value = deserialize(data);
+          const value = read(data);
           (signal[1] as any)(() => value);
         } catch (e) {
           // oxlint-disable-next-line no-console
@@ -158,7 +224,7 @@ export function makePersisted<
       }
     : (data: string) => {
         try {
-          const value = deserialize(data);
+          const value = read(data);
           (signal[1] as any)(reconcile(value, () => true));
         } catch (e) {
           // oxlint-disable-next-line no-console

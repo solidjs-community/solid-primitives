@@ -1,11 +1,21 @@
 import { describe, test, expect, expectTypeOf } from "vitest";
-import { createContext, type FlowComponent, type Element, untrack, useContext } from "solid-js";
+import {
+  createContext,
+  createRoot,
+  createSignal,
+  flush,
+  type FlowComponent,
+  type Element,
+  untrack,
+  useContext,
+} from "solid-js";
 import { render } from "@solidjs/web";
 import {
   createContextProvider,
   createOptionalContextProvider,
   createLayeredContext,
   MultiProvider,
+  ContextConsumer,
 } from "../src/index.js";
 
 type TestContextValue = {
@@ -338,6 +348,340 @@ describe("MultiProvider", () => {
     expect(capture2).toBe("World");
     expect(capture3).toBe(TEST_MESSAGE);
 
+    unmount();
+  });
+
+  /** Renders `values` through MultiProvider and returns what `read` captured inside it. */
+  function captureInside<T>(values: any, read: () => T): T {
+    let capture!: T;
+    const unmount = render(
+      () => (
+        <MultiProvider values={values}>
+          {untrack(() => {
+            capture = read();
+            return "";
+          })}
+        </MultiProvider>
+      ),
+      document.createElement("div"),
+    );
+    unmount();
+    return capture;
+  }
+
+  test("passes props to providers from createContextProvider", () => {
+    expect(
+      captureInside(
+        [[TestProvider, { text: "Provided through MultiProvider" }]],
+        () => useTestContext().message,
+      ),
+    ).toBe("Provided through MultiProvider");
+  });
+
+  test("passes props to providers from createOptionalContextProvider and createLayeredContext", () => {
+    const [OptionalProvider, useOptional] = createOptionalContextProvider(
+      (props: { id: string }) => props.id,
+    );
+    const [ThemeProvider, useTheme] = createLayeredContext(
+      (props: { primary?: string }, parent) => ({
+        ...parent,
+        primary: props.primary ?? parent.primary,
+      }),
+      { primary: "blue", secondary: "gray" },
+    );
+
+    expect(
+      captureInside(
+        [
+          [OptionalProvider, { id: "user-1" }],
+          [ThemeProvider, { primary: "red" }],
+          [ThemeProvider, { primary: "green" }],
+        ],
+        () => ({ id: useOptional(), theme: useTheme() }),
+      ),
+    ).toEqual({ id: "user-1", theme: { primary: "green", secondary: "gray" } });
+  });
+
+  test("keeps object values as `value` for raw contexts", () => {
+    const ObjectContext = createContext<{ message: string }>();
+
+    expect(
+      captureInside([[ObjectContext, { message: "Object context" }]], () =>
+        useContext(ObjectContext),
+      ),
+    ).toEqual({ message: "Object context" });
+  });
+
+  test("a factory that reads `props.value` receives it via `{ value }`", () => {
+    // Before providers took props, `[Provider, x]` reached the factory as `props.value`.
+    const [ValueProvider, useValue] = createContextProvider(
+      (props: { value: string }) => props.value,
+    );
+
+    expect(captureInside([[ValueProvider, { value: "Wrapped" }]], useValue)).toBe("Wrapped");
+  });
+
+  test("keeps getters in provider props reactive", () => {
+    const [label, setLabel] = createSignal("first");
+    const [LabelProvider, useLabel] = createContextProvider(
+      (props: { label: string }) => () => props.label,
+    );
+
+    let read!: () => string;
+    const unmount = render(
+      () => (
+        <MultiProvider
+          values={[
+            [
+              LabelProvider,
+              {
+                get label() {
+                  return label();
+                },
+              },
+            ],
+          ]}
+        >
+          {untrack(() => {
+            read = useLabel();
+            return "";
+          })}
+        </MultiProvider>
+      ),
+      document.createElement("div"),
+    );
+
+    expect(read()).toBe("first");
+    setLabel("second");
+    flush();
+    expect(read()).toBe("second");
+    unmount();
+  });
+
+  test("type-checks each entry against its provider", () => {
+    const Ctx = createContext<string>();
+    const [PropsProvider] = createContextProvider((props: { initial: number }) => props.initial);
+    const [BranchProvider] = createContextProvider(
+      (props: { kind: "text"; text: string } | { kind: "count"; count: number }) => props.kind,
+    );
+    const Bound: FlowComponent = props => props.children;
+
+    // Type-only: never rendered.
+    const check = () => (
+      <>
+        <MultiProvider values={[[Ctx, "ok"], [PropsProvider, { initial: 1 }], Bound]}>
+          {""}
+        </MultiProvider>
+        {/* union props keep each branch's own required props */}
+        <MultiProvider
+          values={[
+            [BranchProvider, { kind: "text", text: "a" }],
+            [BranchProvider, { kind: "count", count: 1 }],
+          ]}
+        >
+          {""}
+        </MultiProvider>
+        {/* @ts-expect-error the selected "text" branch is missing its required `text` */}
+        <MultiProvider values={[[BranchProvider, { kind: "text" }]]}>{""}</MultiProvider>
+        {/* @ts-expect-error a created provider takes its props, not a bare value */}
+        <MultiProvider values={[[PropsProvider, 1]]}>{""}</MultiProvider>
+        {/* @ts-expect-error wrong prop type */}
+        <MultiProvider values={[[PropsProvider, { initial: "1" }]]}>{""}</MultiProvider>
+        {/* @ts-expect-error a raw context takes a value of its own type */}
+        <MultiProvider values={[[Ctx, 1]]}>{""}</MultiProvider>
+      </>
+    );
+    expectTypeOf(check).toBeFunction();
+  });
+});
+
+describe("ContextConsumer", () => {
+  test("consumes a context directly", () => {
+    const Context = createContext<string>("Default");
+
+    let capture;
+    const unmount = render(
+      () => (
+        <Context value="Actual">
+          <ContextConsumer provider={Context}>
+            {value => (
+              capture = value
+            )}
+          </ContextConsumer>
+        </Context>
+      ),
+      document.createElement("div")
+    );
+
+    expect(capture).toBe("Actual");
+
+    unmount();
+  });
+
+  test("consumes a context via global use-function", () => {
+    const Context = createContext<string>("Default");
+
+    let capture;
+    const unmount = render(
+      () => (
+        <Context value="Actual">
+          <ContextConsumer provider={() => useContext(Context)}>
+            {value => (
+              capture = value
+            )}
+          </ContextConsumer>
+        </Context>
+      ),
+      document.createElement("div")
+    );
+
+    expect(capture).toBe("Actual");
+
+    unmount();
+  });
+
+  test("consumes a context via its use-function from `createContextProvider`", () => {
+    const [Provider, useContext] = createContextProvider(
+      (props: { value: string }) => props.value,
+      "Default");
+
+    let capture;
+    const unmount = render(
+      () => (
+        <Provider value="Actual">
+          <ContextConsumer provider={useContext}>
+            {value => (
+              capture = value
+            )}
+          </ContextConsumer>
+        </Provider>
+      ),
+      document.createElement("div")
+    );
+
+    expect(capture).toBe("Actual");
+
+    unmount();
+  });
+
+  test("consumes a context directly without providing context (default value)", () => {
+    const Context = createContext<string>("Default");
+
+    let capture;
+    const unmount = render(
+      () => (
+        <ContextConsumer provider={Context}>
+          {value => (
+            capture = value
+          )}
+        </ContextConsumer>
+      ),
+      document.createElement("div")
+    );
+
+    expect(capture).toBe("Default");
+
+    unmount();
+  });
+
+  test("consumes a context via its use-function from `createContextProvider` without provider (default value)", () => {
+    const [, useContext] = createContextProvider(
+      (props: { value: string }) => props.value,
+      "Default"
+    );
+
+    let capture;
+    const unmount2 = render(
+      () => (
+        <ContextConsumer provider={useContext}>
+          {value => (
+            capture = value
+          )}
+        </ContextConsumer>
+      ),
+      document.createElement("div")
+    );
+
+    expect(capture).toBe("Default");
+
+    unmount2();
+  });
+
+  test("renders fallback prop when context is undefined", () => {
+    const [, useOptional] = createOptionalContextProvider((props: { value?: string }) => props.value);
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const unmount3 = render(
+      () => (
+        <ContextConsumer provider={useOptional} fallback={() => "Fallback"}>
+          {value => (
+            value as any
+          )}
+        </ContextConsumer>
+      ),
+      container,
+    );
+
+    expect(container.innerHTML).toBe("Fallback");
+
+    unmount3();
+    document.body.removeChild(container);
+  });
+
+  test("throws when provider absent and no fallback", () => {
+    const [, useRequired] = createContextProvider(() => ({ value: 1 }));
+    expect(() =>
+      render(
+        () => (
+          <ContextConsumer provider={useRequired}>
+            {value => (
+              value as any
+            )}
+          </ContextConsumer>
+        ),
+        document.createElement("div")
+      )
+    ).toThrow();
+  });
+
+  // Solid doesn't export `ContextNotFoundError`; take its class from a bare `useContext` miss.
+  const getContextNotFoundError = () => {
+    try {
+      createRoot(() => useContext(createContext<string>()));
+    } catch (error) {
+      return (error as Error).constructor as new (...args: any[]) => Error;
+    }
+    throw new Error("expected useContext to throw for a missing context");
+  };
+
+  test("fallback does not suppress ContextNotFoundError for a missing required context", () => {
+    const ContextNotFoundError = getContextNotFoundError();
+    const [, useRequired] = createContextProvider(() => ({ value: 1 }));
+    const RawContext = createContext<string>();
+
+    for (const provider of [useRequired, RawContext] as const) {
+      expect(() =>
+        render(
+          () => (
+            <ContextConsumer provider={provider as () => unknown} fallback={() => "Fallback"}>
+              {value => value as any}
+            </ContextConsumer>
+          ),
+          document.createElement("div"),
+        ),
+      ).toThrow(ContextNotFoundError);
+    }
+  });
+
+  test("renders nothing when an optional context is undefined and no fallback is given", () => {
+    const [, useOptional] = createOptionalContextProvider((props: { value?: string }) => props.value);
+    const container = document.createElement("div");
+    const unmount = render(
+      () => <ContextConsumer provider={useOptional}>{value => value as any}</ContextConsumer>,
+      container,
+    );
+
+    expect(container.innerHTML).toBe("");
     unmount();
   });
 });

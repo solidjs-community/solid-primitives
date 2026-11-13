@@ -24,6 +24,48 @@ pnpm add @solid-primitives/state-machine
 
 ## How to use it
 
+### createMachine
+
+Creates a reactive state machine whose state callbacks own their reactive computations.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup, type Accessor } from "solid-js";
+import { createMachine } from "@solid-primitives/state-machine";
+
+function Demo() {
+  const state = createMachine<{
+    idle: { to: "running" };
+    running: { value: Accessor<number>; to: "idle" };
+  }>({
+    initial: "idle",
+    states: {
+      idle: () => undefined,
+      running() {
+        // owned by this state: disposed when the machine leaves "running"
+        const [count, setCount] = createSignal(0);
+        const id = setInterval(() => setCount(c => c + 1), 100);
+        onCleanup(() => clearInterval(id));
+        return count;
+      },
+    },
+  });
+
+  return (
+    <>
+      <p>
+        state: {state.type} | count: {state.type === "running" ? state.value() : 0}
+      </p>
+      <button onClick={() => (state.type === "idle" ? state.to.running() : state.to.idle())}>
+        {state.type === "idle" ? "Start" : "Stop"}
+      </button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 `createMachine` is a simple primitive for creating a reactive state machine. It takes a configuration object with the following properties:
 
 - `initial` - The initial state of the machine.

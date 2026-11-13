@@ -30,6 +30,35 @@ pnpm add @solid-primitives/broadcast-channel
 
 Creates a new [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance for cross-tab communication.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup, For } from "solid-js";
+import { makeBroadcastChannel } from "@solid-primitives/broadcast-channel";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const { onMessage, postMessage } = makeBroadcastChannel<string>("repl-make");
+  onMessage(({ data }) => setLog(l => [...l, data]));
+
+  // Stands in for another tab: echoes back original pings only (never echoes an echo)
+  const otherTab = new BroadcastChannel("repl-make");
+  otherTab.onmessage = e => {
+    if (!e.data.startsWith("echo:")) otherTab.postMessage(`echo: ${e.data}`);
+  };
+  onCleanup(() => otherTab.close());
+
+  let sent = 0;
+  return (
+    <>
+      <button onClick={() => postMessage(`ping ${++sent}`)}>Post message</button>
+      <For each={log()}>{entry => <div>{entry}</div>}</For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 The channel name is used to identify the channel. If a channel with the same name already exists, it will be returned instead of creating a new one.
 
 Channel attempt closing the channel when the on owner cleanup. If there are multiple connected instances, the channel will not be closed until the last owner is removed.
@@ -98,6 +127,31 @@ const App = () => {
 ### `createBroadcastChannel`
 
 Provedes the same functionality as [`makeBroadcastChannel`](#makebroadcastchannel) but instead of returning `onMessage` function, it returns a `message` signal accessor that updates when postMessage is fired from other contexts.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { createBroadcastChannel } from "@solid-primitives/broadcast-channel";
+
+function Demo() {
+  const [draft, setDraft] = createSignal("hello");
+  const { message } = createBroadcastChannel<string>("repl-create");
+
+  // Stands in for another tab posting to the same channel
+  const otherTab = new BroadcastChannel("repl-create");
+  onCleanup(() => otherTab.close());
+
+  return (
+    <>
+      <input value={draft()} onInput={e => setDraft(e.currentTarget.value)} />
+      <button onClick={() => otherTab.postMessage(draft())}>Post from other tab</button>
+      <p>message(): {message() ?? "null"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const { postMessage } = createBroadcastChannel("test_channel");

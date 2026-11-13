@@ -4,7 +4,7 @@
 
 # @solid-primitives/mouse
 
-[![size](https://img.shields.io/badge/size-1.76_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mouse)
+[![size](https://img.shields.io/badge/size-1.75_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mouse)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mouse?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mouse)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -40,6 +40,30 @@ yarn add @solid-primitives/mouse
 ## `createMousePosition`
 
 Attaches event listeners to provided target, providing a reactive up-to-date position of the cursor on the page.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createMousePosition } from "@solid-primitives/mouse";
+
+function Demo() {
+  const [el, setEl] = createSignal<HTMLDivElement>();
+  const pos = createMousePosition(() => el()!);
+  return (
+    <>
+      <div
+        ref={setEl}
+        style={{ width: "240px", height: "120px", background: pos.isInside ? "#6366f1" : "#ddd" }}
+      />
+      <p>
+        x: {Math.round(pos.x)}, y: {Math.round(pos.y)}, inside: {String(pos.isInside)}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 #### Usage
 
@@ -94,6 +118,31 @@ function createMousePosition(
 ## `createPositionToElement`
 
 Provides an autoupdating position relative to an element based on provided page position.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMousePosition, createPositionToElement } from "@solid-primitives/mouse";
+
+function Demo() {
+  let ref!: HTMLDivElement;
+  const mouse = createMousePosition(window);
+  const relative = createPositionToElement(
+    () => ref,
+    () => mouse,
+  );
+  return (
+    <>
+      <div ref={ref} style={{ width: "240px", height: "120px", border: "1px solid #999" }} />
+      <p>
+        relative x: {Math.round(relative.x)}, y: {Math.round(relative.y)}, inside:{" "}
+        {String(relative.isInside)}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 #### Usage
 

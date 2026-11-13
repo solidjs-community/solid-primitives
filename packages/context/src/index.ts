@@ -1,6 +1,7 @@
 import {
   createContext,
   createComponent,
+  merge,
   useContext,
   type Element,
   type Context,
@@ -8,12 +9,32 @@ import {
   type FlowComponent,
 } from "solid-js";
 
+// Brands providers created by this package so `MultiProvider` can pass them props instead of a
+// `value`. A string key (not a `unique symbol`) keeps the brand identical across duplicate copies
+// of this package, both at runtime and in the emitted types.
+const $PROVIDER_PROPS = "@solid-primitives/context:provider-props";
+
 export type ContextProviderProps = {
   children?: Element;
 } & Record<string, unknown>;
 export type ContextProvider<T extends ContextProviderProps> = (
   props: { children: Element } & T,
 ) => Element;
+/**
+ * A {@link ContextProvider} created by this package's provider factories. `MultiProvider` passes
+ * these their props (`[Provider, props]`) rather than a `value`.
+ */
+export type CreatedContextProvider<T extends ContextProviderProps> = ContextProvider<T> & {
+  readonly [$PROVIDER_PROPS]: true;
+};
+
+function brandProvider<P extends ContextProviderProps>(
+  provider: ContextProvider<P>,
+): CreatedContextProvider<P> {
+  return Object.defineProperty(provider, $PROVIDER_PROPS, {
+    value: true,
+  }) as CreatedContextProvider<P>;
+}
 
 /**
  * Options shared by context provider factories.
@@ -52,17 +73,17 @@ export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
   defaults?: T,
   options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => Exclude<T, undefined>] {
+): [provider: CreatedContextProvider<P>, useContext: () => Exclude<T, undefined>] {
   const ctx = createContext<Exclude<T, undefined>>(defaults as Exclude<T, undefined>, options);
   return [
-    props => {
+    brandProvider<P>(props => {
       return createComponent(ctx, {
         value: factoryFn(props) as Exclude<T, undefined>,
         get children() {
           return props.children;
         },
       });
-    },
+    }),
     () => useContext(ctx),
   ];
 }
@@ -90,10 +111,10 @@ export function createOptionalContextProvider<T, P extends ContextProviderProps>
   factoryFn: (props: P) => T,
   defaults?: T,
   options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T | undefined] {
+): [provider: CreatedContextProvider<P>, useContext: () => T | undefined] {
   const ctx = createContext<T | typeof $EMPTY>(defaults === undefined ? $EMPTY : defaults, options);
   return [
-    props => {
+    brandProvider<P>(props => {
       const value = factoryFn(props);
       return createComponent(ctx, {
         value: value === undefined ? $EMPTY : value,
@@ -101,7 +122,7 @@ export function createOptionalContextProvider<T, P extends ContextProviderProps>
           return props.children;
         },
       });
-    },
+    }),
     () => {
       const value = useContext(ctx);
       return value === $EMPTY ? undefined : value;
@@ -142,10 +163,10 @@ export function createLayeredContext<T, P extends ContextProviderProps>(
   factoryFn: (props: P, parent: T) => T,
   defaults: T,
   options?: ContextProviderOptions,
-): [provider: ContextProvider<P>, useContext: () => T] {
+): [provider: CreatedContextProvider<P>, useContext: () => T] {
   const ctx = createContext<T>(defaults, options);
   return [
-    props => {
+    brandProvider<P>(props => {
       const parent = useContext(ctx);
       return createComponent(ctx, {
         value: factoryFn(props, parent),
@@ -153,10 +174,26 @@ export function createLayeredContext<T, P extends ContextProviderProps>(
           return props.children;
         },
       });
-    },
+    }),
     () => useContext(ctx),
   ];
 }
+
+/** `Omit` applied to each union member, so branch-specific props of a union survive. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+
+/** Validates one `MultiProvider` entry: providers from this package pair with their props, others with a value. */
+type MultiProviderItem<T> = T extends readonly [infer Provider, unknown]
+  ? Provider extends CreatedContextProvider<infer ProviderProps>
+    ? readonly [Provider, DistributiveOmit<ProviderProps, "children">]
+    : Provider extends Context<infer Value>
+      ? readonly [Provider, Value]
+      : Provider extends ContextProviderComponent<infer Value>
+        ? readonly [Provider, Value]
+        : never
+  : T extends FlowComponent
+    ? T
+    : never;
 
 /*
 
@@ -171,35 +208,33 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
 /**
  * A component that allows you to provide multiple contexts at once. It will work exactly like nesting multiple providers as separate components, but it will save you from the nesting.
  *
- * @param values Array of tuples of `[ContextProviderComponent, value]` or `[Context, value]` or bound `ContextProviderComponent` (that doesn't take a `value` property).
+ * @param values Array of `[Context, value]` or `[ContextProviderComponent, value]` tuples,
+ * `[Provider, props]` tuples for providers created by `createContextProvider`,
+ * `createOptionalContextProvider` or `createLayeredContext`, or bound provider components.
  *
  * @example
  * ```tsx
  * // before
  * <CounterCtx value={1}>
  *   <NameCtx value="John">
- *     <App/>
+ *     <ThemeProvider primary="red">
+ *       <App/>
+ *     </ThemeProvider>
  *   </NameCtx>
  * </CounterCtx>
  *
  * // after
  * <MultiProvider values={[
  *  [CounterCtx, 1],
- *  [NameCtx, "John"]
+ *  [NameCtx, "John"],
+ *  [ThemeProvider, { primary: "red" }]
  * ]}>
  *  <App/>
  * </MultiProvider>
  * ```
  */
-export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props: {
-  values: {
-    [K in keyof T]:
-      | readonly [
-          Context<T[K]> | ContextProviderComponent<T[K]>,
-          [T[K]][T extends unknown ? 0 : never],
-        ]
-      | FlowComponent;
-  };
+export function MultiProvider<const T extends readonly unknown[]>(props: {
+  values: T & { [K in keyof T]: MultiProviderItem<T[K]> };
   children: Element;
 }): Element {
   const { values } = props;
@@ -208,17 +243,120 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
 
     if (!item) return props.children;
 
-    const ctxProps: { value?: any; children: Element } = {
+    let ctxProps: { value?: any; children: Element } = {
       get children() {
         return fn(i + 1);
       },
     };
     if (Array.isArray(item)) {
-      ctxProps.value = item[1];
-      item = item[0];
+      const [provider, valueOrProps] = item;
+      item = provider;
+      // Providers from this package take their own props, exactly as when nested directly. `merge`
+      // keeps any getters in those props reactive; `children` always comes from `ctxProps`.
+      if ($PROVIDER_PROPS in provider) ctxProps = merge(valueOrProps, ctxProps);
+      else ctxProps.value = valueOrProps;
     }
 
     return createComponent(item, ctxProps);
   };
   return fn(0);
+}
+
+/**
+ * A component that allows you to consume a context without extracting the children into a separate function.
+ * This is particularly useful when the context needs to be used within the same JSX where it is provided.
+ *
+ * The `ContextConsumer` component is equivalent to the following code and solely exists as syntactic sugar:
+ *
+ * ```tsx
+ * <CounterProvider>
+ *   {untrack(() => {
+ *     const context = useContext(counterContext); // or useCounter()
+ *     return children(context);
+ *   })}
+ * </CounterProvider>
+ * ```
+ *
+ * @param provider Either one of the following:
+ *  - A function that returns the context value. Preferably the `use...()` function returned by `createContextProvider()`.
+ *  - The context itself returned by `createContext()`.
+ *  - An inline function that returns the context's value.
+ *
+ * Please note that this prop is not reactive.
+ *
+ * @param fallback Optional fallback element to render when the context's value is `undefined`. Can be a function or an element. Note that the component still throws a `ContextNotFoundError` if a required context is not provided (or is provided with `undefined`), regardless of the fallback.
+ *
+ * @example
+ * with `createContextProvider`:
+ * ```tsx
+ * // create the context
+ * const [CounterProvider, useCounter] = createContextProvider(...)
+ *
+ * // provide and use the context
+ * <CounterProvider count={1}>
+ *   <ContextConsumer provider={useCounter}>
+ *     {({ count }) => (
+ *       <div>Count: {count()}</div>
+ *     )}
+ *   </ContextConsumer>
+ * </CounterProvider>
+ * ```
+ *
+ * @example
+ * with `createOptionalContextProvider` (and `fallback`):
+ * ```tsx
+ * // create the optional context
+ * const [OptionalCounterProvider, useOptionalCounter] = createOptionalContextProvider(...)
+ *
+ * // provide and use the context
+ * <OptionalCounterProvider>
+ *   <ContextConsumer provider={useOptionalCounter} fallback={() => (
+ *       <div>No counter provided</div>
+ *     )}>
+ *     {({ count }) => (
+ *       <div>Count: {count()}</div>
+ *     )}
+ *   </ContextConsumer>
+ * </OptionalCounterProvider>
+ * ```
+ *
+ * @example
+ * with `createContext`:
+ * ```tsx
+ * // create the context
+ * const CounterContext = createContext(...);
+ *
+ * // provide and use the context
+ * <CounterContext value={{ count: 1 }}>
+ *   <ContextConsumer provider={CounterContext}>
+ *     {({ count }) => (
+ *       <div>Count: {count}</div>
+ *     )}
+ *   </ContextConsumer>
+ * </CounterContext>
+ * ```
+ */
+export function ContextConsumer<T>(props: {
+  children: (value: T) => Element,
+  fallback?: (() => Element) | Element,
+  provider: (() => T | undefined) | Context<T>,
+}): Element {
+  // A required context that is missing (or provided with `undefined`, which Solid treats the same)
+  // throws `ContextNotFoundError` from `useContext` (or from the
+  // `use...()` hook) right here, before `fallback` is consulted; `fallback` is deliberately not a
+  // catch. Only providers that resolve to `undefined` without throwing (optional hooks) reach the
+  // fallback branch below, and without a `fallback` they render nothing, like `<Show>`.
+  let context: T | undefined;
+  if (props.provider.length === 0) {
+    context = props.provider(undefined!) as T | undefined;
+  } else {
+    context = useContext(props.provider as Context<T>);
+  }
+  if (context === undefined) {
+    if (typeof props.fallback === "function") {
+      return props.fallback?.();
+    }
+    return props.fallback;
+  }
+  return props.children(context);
 }

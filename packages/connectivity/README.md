@@ -53,6 +53,23 @@ function makeConnectivityListener(callback: (isOnline: boolean) => void): VoidFu
 
 A signal representing the browser's interpretation of whether it is on- or offline.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createConnectivitySignal } from "@solid-primitives/connectivity";
+
+function Demo() {
+  const isOnline = createConnectivitySignal();
+  return (
+    <>
+      <p style={{ color: isOnline() ? "green" : "red" }}>{isOnline() ? "Online" : "Offline"}</p>
+      <small>Toggle via DevTools → Network → Offline</small>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createConnectivitySignal } from "@solid-primitives/connectivity";
 

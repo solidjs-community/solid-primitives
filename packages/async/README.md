@@ -31,6 +31,46 @@ pnpm add @solid-primitives/async
 
 Turns a function returning a [Web Stream API `ReadableStream`](https://streams.spec.whatwg.org/#rs-class) (optionally wrapped in a `Promise`), or a streaming `Response`, into an async generator that buffers the stream and yields the accumulated text after every chunk. Node's `stream/web` `ReadableStream` is also accepted — useful during streaming SSR, since a plain (non-streaming) SSR pass only ever reads the final value anyway.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal, Loading } from "solid-js";
+import { fromStream } from "@solid-primitives/async";
+
+// a ReadableStream that emits one word every 300ms
+const wordStream = () => {
+  const words = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr".split(" ");
+  return new ReadableStream<string>({
+    pull: controller =>
+      new Promise<void>(resolve =>
+        setTimeout(() => {
+          const word = words.shift();
+          if (word) controller.enqueue(word + " ");
+          else controller.close();
+          resolve();
+        }, 300),
+      ),
+  });
+};
+
+function Demo() {
+  const [run, setRun] = createSignal(0);
+  const text = createMemo(() => {
+    run();
+    return fromStream(wordStream)();
+  });
+  return (
+    <>
+      <button onClick={() => setRun(n => n + 1)}>Restart stream</button>
+      <Loading fallback={<p>Waiting for first chunk…</p>}>
+        <p>{text()}</p>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 // definition (ReadableStream includes Node's `stream/web` variant)
 fromStream<Args extends any[]>(
@@ -57,6 +97,56 @@ and so on. Usual HTTP packets can transmit ~1.4kb including headers, so expect m
 ## `fromJSONStream`
 
 The same as `fromStream`, but it auto-closes a partial JSON string on every chunk so it parses successfully even mid-object, instead of buffering plain text.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal, For, Loading } from "solid-js";
+import { fromJSONStream } from "@solid-primitives/async";
+
+const names = ["fromStream", "fromJSONStream", "makeAbortable", "makeRetrying"];
+const json = JSON.stringify(names.map(name => ({ name, package: "@solid-primitives/async" })));
+
+// a ReadableStream that emits the JSON text in 8-character chunks
+const chunkedStream = () => {
+  let pos = 0;
+  return new ReadableStream<string>({
+    pull: controller =>
+      new Promise<void>(resolve =>
+        setTimeout(() => {
+          if (pos < json.length) controller.enqueue(json.slice(pos, (pos += 8)));
+          else controller.close();
+          resolve();
+        }, 100),
+      ),
+  });
+};
+
+function Demo() {
+  const [run, setRun] = createSignal(0);
+  const items = createMemo(() => {
+    run();
+    return fromJSONStream(chunkedStream)();
+  });
+  return (
+    <>
+      <button onClick={() => setRun(n => n + 1)}>Restart stream</button>
+      <Loading fallback={<p>Waiting for parsable JSON…</p>}>
+        <ul>
+          <For each={items()}>
+            {item => (
+              <li>
+                {item.name} {item.package}
+              </li>
+            )}
+          </For>
+        </ul>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 // definition (ReadableStream includes Node's `stream/web` variant)
@@ -123,9 +213,83 @@ onCleanup(abort);
 - if `chainTo` is set to another `makeAbortable`/`createAbortable` signal accessor, this signal aborts whenever that parent signal does (for any reason — manual `abort()`, `timeout`, or an `autoAbort`'d retry) — handy for cascading an abort down a chain of dependent requests
 - `filterAbortError(err)` returns `undefined` for errors whose `.name` is `"AbortError"` (what `fetch` rejects with when its signal aborts) and re-throws everything else, so you can `.catch(filterAbortError)` without swallowing real failures
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal, isPending, Loading, onCleanup } from "solid-js";
+import { makeAbortable } from "@solid-primitives/async";
+
+const fruits = ["apple", "apricot", "banana", "blueberry", "cherry", "grape", "mango", "melon"];
+
+// a slow, abortable fake search request
+const search = (query: string, signal: AbortSignal) =>
+  new Promise<string[]>((resolve, reject) => {
+    const timer = setTimeout(() => resolve(fruits.filter(f => f.includes(query))), 800);
+    signal.addEventListener("abort", () => {
+      clearTimeout(timer);
+      reject(new DOMException("aborted", "AbortError"));
+    });
+  });
+
+function Demo() {
+  const [query, setQuery] = createSignal("");
+  const [signal, abort, filterAbortError] = makeAbortable();
+  onCleanup(abort);
+  // every keystroke aborts the previous, still pending request
+  const results = createMemo(() => search(query(), signal()).catch(filterAbortError));
+  return (
+    <>
+      <input value={query()} onInput={e => setQuery(e.currentTarget.value)} placeholder="Search…" />
+      <button onClick={() => abort()}>Abort</button>
+      <Loading fallback={<p>Searching…</p>}>
+        <p>
+          {results()?.join(", ") || "no matches"}
+          {isPending(() => results()) && " (searching…)"}
+        </p>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ## `createAbortable`
 
 Takes the same options and returns the same tuple as `makeAbortable`, but also aborts the current signal automatically `onCleanup` — so it must be called within a reactive (owned) scope.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal, Loading } from "solid-js";
+import { createAbortable } from "@solid-primitives/async";
+
+// a fake request that takes `ms` milliseconds unless aborted
+const request = (ms: number, signal: AbortSignal) =>
+  new Promise<string>((resolve, reject) => {
+    const timer = setTimeout(() => resolve(`done after ${ms}ms`), ms);
+    signal.addEventListener("abort", () => {
+      clearTimeout(timer);
+      reject(new DOMException("aborted", "AbortError"));
+    });
+  });
+
+function Demo() {
+  const [req, setReq] = createSignal({ ms: 500 });
+  // aborts after 1s, and automatically when Demo is disposed
+  const [signal, , filterAbortError] = createAbortable({ timeout: 1000 });
+  const result = createMemo(() => request(req().ms, signal()).catch(filterAbortError));
+  return (
+    <>
+      <button onClick={() => setReq({ ms: 500 })}>Fast request (500ms)</button>
+      <button onClick={() => setReq({ ms: 2000 })}>Slow request (2000ms)</button>
+      <Loading fallback={<p>Requesting…</p>}>
+        <p>{result() ?? "aborted by 1s timeout"}</p>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const [signal, abort, filterAbortError] = createAbortable();
@@ -152,9 +316,64 @@ const fetcher: () => AsyncGenerator<any, void, unknown> = makeRetrying(
 
 If you want to retry for an infinite number of times, you can set `options.retries` to `Infinity`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal, isPending, Loading } from "solid-js";
+import { makeRetrying } from "@solid-primitives/async";
+
+function Demo() {
+  const [run, setRun] = createSignal(0);
+  const result = createMemo(() => {
+    run();
+    let attempts = 0;
+    // fails twice, then succeeds — retried every 500ms
+    const flaky = () =>
+      ++attempts < 3
+        ? Promise.reject(new Error("flaky"))
+        : Promise.resolve(`succeeded on attempt ${attempts}`);
+    return makeRetrying(flaky, { delay: 500 })();
+  });
+  return (
+    <>
+      <button onClick={() => setRun(n => n + 1)}>Fetch again</button>
+      <Loading fallback={<p>Retrying…</p>}>
+        <p>
+          {result()}
+          {isPending(() => result()) && " (retrying…)"}
+        </p>
+      </Loading>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ## `createAggregated`
 
 Aggregates every value emitted by an accessor into a growing memo, instead of replacing the previous value with each update:
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createAggregated } from "@solid-primitives/async";
+
+function Demo() {
+  const [page, setPage] = createSignal(1);
+  // every new page number is appended instead of replacing the previous one
+  const pages = createAggregated(page, [] as number[]);
+  return (
+    <>
+      <button onClick={() => setPage(p => p + 1)}>Load next page</button>
+      <ul>
+        <For each={pages() as number[]}>{p => <li>Page {p}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 // definition

@@ -30,6 +30,38 @@ This mirrors the [controlled/uncontrolled pattern](https://react.dev/learn/shari
 
 ### `createControllableSignal`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { type Accessor, createSignal } from "solid-js";
+import { createControllableSignal } from "@solid-primitives/controlled-signal";
+
+function Counter(props: { value?: Accessor<number>; onChange?: (v: number) => void }) {
+  const [count, setCount] = createControllableSignal<number>({
+    value: props.value,
+    defaultValue: () => 0,
+    onChange: props.onChange,
+  });
+  return <button onClick={() => setCount(n => (n ?? 0) + 1)}>count: {count()}</button>;
+}
+
+function Demo() {
+  const [external, setExternal] = createSignal(10);
+  return (
+    <>
+      <p>
+        Uncontrolled: <Counter />
+      </p>
+      <p>
+        Controlled: <Counter value={external} onChange={setExternal} />{" "}
+        <button onClick={() => setExternal(0)}>parent reset</button> parent value: {external()}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createControllableSignal } from "@solid-primitives/controlled-signal";
 
@@ -75,6 +107,23 @@ setValue(true);
 
 Variant of `createControllableSignal` for `boolean` values. Returns `false` instead of `undefined` when unset.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createControllableBooleanSignal } from "@solid-primitives/controlled-signal";
+
+function Demo() {
+  const [open, setOpen] = createControllableBooleanSignal({});
+  return (
+    <>
+      <button onClick={() => setOpen(o => !o)}>{open() ? "Close" : "Open"}</button>
+      <p>open: {String(open())}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [open, setOpen] = createControllableBooleanSignal({
   defaultValue: () => false,
@@ -86,6 +135,29 @@ const [open, setOpen] = createControllableBooleanSignal({
 ### `createControllableArraySignal`
 
 Variant for `Array<T>` values. Returns `[]` instead of `undefined` when unset.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createControllableArraySignal } from "@solid-primitives/controlled-signal";
+
+function Demo() {
+  const [items, setItems] = createControllableArraySignal<string>({
+    defaultValue: () => ["a", "b"],
+  });
+  return (
+    <>
+      <button onClick={() => setItems(prev => [...prev, `item ${prev.length + 1}`])}>Add</button>
+      <button onClick={() => setItems([])}>Clear</button>
+      <ul>
+        <For each={items()}>{item => <li>{item}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const [items, setItems] = createControllableArraySignal<string>({
@@ -101,6 +173,39 @@ setItems(prev => [...prev, "c"]);
 
 Variant for `Set<T>` values. Returns `new Set()` instead of `undefined` when unset.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createControllableSetSignal } from "@solid-primitives/controlled-signal";
+
+function Demo() {
+  const [selected, setSelected] = createControllableSetSignal<string>({
+    defaultValue: () => new Set(["Solid"]),
+  });
+  const toggle = (fw: string) =>
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (!next.delete(fw)) next.add(fw);
+      return next;
+    });
+  return (
+    <>
+      <For each={["React", "Solid", "Vue", "Svelte"]}>
+        {fw => (
+          <label>
+            <input type="checkbox" checked={selected().has(fw)} onChange={() => toggle(fw)} />
+            {fw}
+          </label>
+        )}
+      </For>
+      <p>selected: {[...selected()].join(", ") || "(none)"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [selected, setSelected] = createControllableSetSignal<number>({
   defaultValue: () => new Set([1, 2]),
@@ -114,6 +219,26 @@ setSelected(prev => new Set([...prev, 3]));
 ### `createToggleState`
 
 Controllable state for toggle components — checkboxes, switches, toggle buttons — built on top of `createControllableBooleanSignal`. Adapted from [Kobalte's `createToggleState`](https://github.com/kobaltedev/kobalte/tree/main/packages/core/src/primitives/create-toggle-state).
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createToggleState } from "@solid-primitives/controlled-signal";
+
+function Demo() {
+  const [disabled, setDisabled] = createSignal(false);
+  const state = createToggleState({ defaultIsSelected: () => false, isDisabled: disabled });
+  return (
+    <>
+      <button onClick={() => state.toggle()}>{state.isSelected() ? "ON" : "OFF"}</button>
+      <button onClick={() => setDisabled(d => !d)}>{disabled() ? "Enable" : "Disable"}</button>
+      <p>disabled: {String(disabled())} (toggle clicks are ignored while disabled)</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createToggleState } from "@solid-primitives/controlled-signal";

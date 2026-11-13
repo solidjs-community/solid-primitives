@@ -27,6 +27,47 @@ pnpm add @solid-primitives/masonry
 
 Calculates reactive masonry layout data from a reactive source array.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createMasonry } from "@solid-primitives/masonry";
+
+function Demo() {
+  const [items, setItems] = createSignal([3, 1, 2, 4, 1, 3, 2, 1]);
+  const [columns, setColumns] = createSignal(3);
+  const masonry = createMasonry({
+    source: items,
+    columns,
+    mapHeight: n => n * 30,
+    mapElement: data => (
+      <div
+        style={{
+          height: `${data.height()}px`,
+          "margin-bottom": `${data.margin()}px`,
+          order: data.order(),
+          width: `${100 / columns()}%`,
+          background: `hsl(${data.column() * 90}, 60%, 70%)`,
+        }}
+      >
+        {data.source}
+      </div>
+    ),
+  });
+  const add = () => setItems(a => [...a, Math.ceil(Math.random() * 4)]);
+  return (
+    <>
+      <button onClick={add}>Add item</button>
+      <button onClick={() => setColumns(c => (c === 3 ? 2 : 3))}>Columns: {columns()}</button>
+      <div style={{ display: "flex", "flex-flow": "column wrap", height: `${masonry.height()}px` }}>
+        {masonry()}
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 It splits the items into columns and calculates the order based on the height of each item.
 
 The masonary is expected to be rendered in a flex container with `flex-direction: column`, `flex-wrap: wrap` and limited height

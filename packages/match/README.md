@@ -25,6 +25,39 @@ pnpm add @solid-primitives/match
 
 Control-flow component for matching discriminated union (tagged union) members.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { MatchTag } from "@solid-primitives/match";
+
+type Shape = { type: "circle"; radius: number } | { type: "rect"; width: number; height: number };
+
+function Demo() {
+  const [shape, setShape] = createSignal<Shape | null>(null);
+  return (
+    <>
+      <button onClick={() => setShape(null)}>none</button>
+      <button onClick={() => setShape({ type: "circle", radius: 40 })}>circle</button>
+      <button onClick={() => setShape({ type: "rect", width: 80, height: 50 })}>rect</button>
+      <MatchTag
+        on={shape()}
+        case={{
+          circle: v => <p>Circle with radius {v().radius}px</p>,
+          rect: v => (
+            <p>
+              Rectangle {v().width} × {v().height}px
+            </p>
+          ),
+        }}
+        fallback={<p>No shape selected</p>}
+      />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```tsx
@@ -104,6 +137,36 @@ Provide a fallback element when no match is found or the value is `null`/`undefi
 ## `MatchValue`
 
 Control-flow component for matching union literals.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { MatchValue } from "@solid-primitives/match";
+
+type Status = "idle" | "loading" | "success" | "error";
+
+function Demo() {
+  const [status, setStatus] = createSignal<Status>("idle");
+  return (
+    <>
+      <For each={["idle", "loading", "success", "error"] as const}>
+        {s => <button onClick={() => setStatus(s)}>{s}</button>}
+      </For>
+      <MatchValue
+        on={status()}
+        case={{
+          idle: () => <p>Waiting</p>,
+          loading: () => <p>Fetching data…</p>,
+          success: () => <p>Data loaded successfully</p>,
+          error: () => <p>Request failed</p>,
+        }}
+      />
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

@@ -32,6 +32,31 @@ pnpm add @solid-primitives/cursor
 
 Sets a cursor on the body element immediately and returns a cleanup function that restores the previous value. No reactive owner required.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeBodyCursor } from "@solid-primitives/cursor";
+
+function Demo() {
+  const [loading, setLoading] = createSignal(false);
+  const simulate = () => {
+    setLoading(true);
+    const restore = makeBodyCursor("wait");
+    setTimeout(() => {
+      restore();
+      setLoading(false);
+    }, 2000);
+  };
+  return (
+    <button onClick={simulate} disabled={loading()}>
+      {loading() ? "Loading… (cursor: wait)" : "Simulate async operation"}
+    </button>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeBodyCursor } from "@solid-primitives/cursor";
 
@@ -45,6 +70,37 @@ restore();
 
 Sets a cursor on a specific element immediately and returns a cleanup function that restores the previous value. No reactive owner required.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeElementCursor } from "@solid-primitives/cursor";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  let restore: VoidFunction | undefined;
+  const [blocked, setBlocked] = createSignal(false);
+  const toggle = () => {
+    if (restore) {
+      restore();
+      restore = undefined;
+    } else {
+      restore = makeElementCursor(box, "not-allowed");
+    }
+    setBlocked(!!restore);
+  };
+  return (
+    <>
+      <button onClick={toggle}>{blocked() ? "Restore cursor" : "Block box"}</button>
+      <div ref={box} style={{ padding: "2rem", border: "1px solid #ccc", "margin-top": "8px" }}>
+        Hover me — cursor: {blocked() ? "not-allowed" : "default"}
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeElementCursor } from "@solid-primitives/cursor";
 
@@ -57,6 +113,28 @@ restore();
 ## `createBodyCursor`
 
 Sets a cursor on the body element reactively. The cursor is removed when the owner is disposed or when the signal returns a falsy value.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createBodyCursor, type CursorProperty } from "@solid-primitives/cursor";
+
+function Demo() {
+  const [cursor, setCursor] = createSignal<CursorProperty | false>(false);
+  createBodyCursor(cursor);
+  const cursors: CursorProperty[] = ["pointer", "crosshair", "help", "wait", "zoom-in"];
+  return (
+    <>
+      <For each={cursors}>
+        {c => <button onClick={() => setCursor(p => (p === c ? false : c))}>{c}</button>}
+      </For>
+      <p>body cursor: {cursor() || "(none)"} — move the pointer anywhere</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createBodyCursor } from "@solid-primitives/cursor";
@@ -73,6 +151,32 @@ setCursor("help");
 
 Sets a cursor on a specific element reactively. Accepts an element or a signal returning one — returning a falsy value unsets the cursor.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createElementCursor, type CursorProperty } from "@solid-primitives/cursor";
+
+function Demo() {
+  const [el, setEl] = createSignal<HTMLElement>();
+  const [enabled, setEnabled] = createSignal(true);
+  const [cursor, setCursor] = createSignal<CursorProperty>("pointer");
+  createElementCursor(() => enabled() && el(), cursor);
+  return (
+    <>
+      <button onClick={() => setEnabled(e => !e)}>{enabled() ? "Disable" : "Enable"}</button>
+      <button onClick={() => setCursor(c => (c === "pointer" ? "crosshair" : "pointer"))}>
+        Switch cursor
+      </button>
+      <div ref={setEl} style={{ padding: "2rem", border: "1px solid #ccc", "margin-top": "8px" }}>
+        Hover me — cursor: {enabled() ? cursor() : "(default)"}
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createElementCursor } from "@solid-primitives/cursor";
 
@@ -88,6 +192,24 @@ setCursor("help");
 ## `createDragCursor`
 
 Shows `"grab"` on a target element and switches to `"grabbing"` on the body during a pointer drag. Setting `"grabbing"` on the body ensures the cursor renders correctly everywhere during drag, not just over the target element.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createDragCursor } from "@solid-primitives/cursor";
+
+function Demo() {
+  const [el, setEl] = createSignal<HTMLElement>();
+  createDragCursor(el);
+  return (
+    <div ref={setEl} style={{ padding: "1rem", border: "1px solid #ccc", "user-select": "none" }}>
+      Hover to see "grab", press and hold to see "grabbing" everywhere
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createDragCursor } from "@solid-primitives/cursor";
@@ -108,6 +230,31 @@ createDragCursor(el, { grab: "crosshair", grabbing: "move" });
 ## `cursorRef`
 
 A ref factory for setting a cursor inline in JSX. Accepts a static cursor value or a reactive signal. The cursor is removed when the component unmounts.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { cursorRef, type CursorProperty } from "@solid-primitives/cursor";
+
+function Demo() {
+  const [cursor, setCursor] = createSignal<CursorProperty>("zoom-in");
+  return (
+    <>
+      <div ref={cursorRef("pointer")} style={{ padding: "1rem", border: "1px solid #ccc" }}>
+        Static: pointer
+      </div>
+      <button onClick={() => setCursor(c => (c === "zoom-in" ? "zoom-out" : "zoom-in"))}>
+        Toggle
+      </button>
+      <div ref={cursorRef(cursor)} style={{ padding: "1rem", border: "1px solid #ccc" }}>
+        Reactive: {cursor()}
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { cursorRef } from "@solid-primitives/cursor";

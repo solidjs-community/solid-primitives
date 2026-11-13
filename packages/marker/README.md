@@ -23,6 +23,32 @@ pnpm add @solid-primitives/marker
 
 Requires `solid-js` `^2.0.0-beta.10`.
 
+## createMarker
+
+Creates a function that splits a string into plain text and mapped regex matches.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo, createSignal } from "solid-js";
+import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
+
+const TEXT = "The quick brown fox jumps over the lazy dog.";
+
+function Demo() {
+  const [search, setSearch] = createSignal("fox dog");
+  const regex = createMemo(() => makeSearchRegex(search()));
+  const highlight = createMarker(text => <mark>{text()}</mark>);
+  return (
+    <>
+      <input value={search()} onInput={e => setSearch(e.currentTarget.value)} />
+      <p>{highlight(TEXT, regex())}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ## How to use it
 
 `createMarker` creates a function for marking parts of a string that match a regex. Each match will be mapped by `mapMatch` callback and returned as an array of strings and mapped values.

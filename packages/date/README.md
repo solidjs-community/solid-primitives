@@ -36,6 +36,25 @@ pnpm add @solid-primitives/date
 
 Creates a reactive `Date` signal.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createDate } from "@solid-primitives/date";
+
+function Demo() {
+  const [date, setDate] = createDate(new Date());
+  return (
+    <>
+      <p>{date().toLocaleString()}</p>
+      <button onClick={() => setDate(prev => prev.getTime() - 86_400_000)}>-1 day</button>
+      <button onClick={() => setDate(prev => prev.getTime() + 86_400_000)}>+1 day</button>
+      <button onClick={() => setDate("2020-01-11T00:00")}>Jan 11, 2020</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [date, setDate] = createDate(1641408329089);
 
@@ -53,6 +72,28 @@ setTimestamp(1341708325070); // will update the date
 ### `createDateNow`
 
 Creates an autoupdating and reactive `new Date()`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createDateNow } from "@solid-primitives/date";
+
+function Demo() {
+  const [ms, setMs] = createSignal<number | false>(1000);
+  const [now, update] = createDateNow(ms);
+  return (
+    <>
+      <p>{now().toLocaleTimeString()}</p>
+      <button onClick={() => setMs(i => (i === false ? 1000 : false))}>
+        {ms() === false ? "Resume" : "Pause"}
+      </button>
+      <button onClick={update}>Update now</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createDateNow } from "@solid-primitives/date";
@@ -75,6 +116,37 @@ update();
 
 Provides a reactive time difference _(in ms)_ signal.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createTimeDifference } from "@solid-primitives/date";
+
+function Demo() {
+  const [from, setFrom] = createSignal("2024-01-01");
+  const [to, setTo] = createSignal("2024-12-31");
+  const [diff] = createTimeDifference(from, to);
+  return (
+    <>
+      <input
+        type="date"
+        value={from()}
+        onInput={e => e.currentTarget.value && setFrom(e.currentTarget.value)}
+      />
+      <input
+        type="date"
+        value={to()}
+        onInput={e => e.currentTarget.value && setTo(e.currentTarget.value)}
+      />
+      <p>
+        {diff()} ms ({Math.round(diff() / 86_400_000)} days)
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 // the arguments can be reactive
 const [target, setTarget] = createSignal(1641408329089);
@@ -87,6 +159,26 @@ to(); // T: Date
 ### `createTimeDifferenceFromNow`
 
 Provides a autoupdating, reactive time difference _(in ms)_ from **now** as a signal.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createTimeDifferenceFromNow } from "@solid-primitives/date";
+
+function Demo() {
+  const [target, setTarget] = createSignal(Date.now() + 60_000);
+  const [diff, { now }] = createTimeDifferenceFromNow(target, 1000);
+  return (
+    <>
+      <p>now: {now().toLocaleTimeString()}</p>
+      <p>target is {Math.round(diff() / 1000)}s away</p>
+      <button onClick={() => setTarget(Date.now() + 60_000)}>Target: in 1 minute</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const [target, setTarget] = createSignal(1641408329089);
@@ -104,6 +196,28 @@ createTimeDifferenceFromNow(target, diff => (diff > 100000 ? 30000 : 1000));
 ### `createTimeAgo`
 
 Provides a reactive, formatted date difference in relation to now.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createTimeAgo } from "@solid-primitives/date";
+
+function Demo() {
+  const [offset, setOffset] = createSignal(-5 * 60_000);
+  const [timeago] = createTimeAgo(() => Date.now() + offset(), { interval: 1000 });
+  return (
+    <>
+      <p>{timeago()}</p>
+      <button onClick={() => setOffset(-30_000)}>30s ago</button>
+      <button onClick={() => setOffset(-5 * 60_000)}>5 min ago</button>
+      <button onClick={() => setOffset(-3 * 86_400_000)}>3 days ago</button>
+      <button onClick={() => setOffset(2 * 3_600_000)}>in 2 hours</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createTimeAgo, createDate } from "@solid-primitives/date";
@@ -133,6 +247,32 @@ const [timeago] = createTimeAgo(1577836800000, {
 
 Provides a reactive broken down time remaining Store.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createCountdown } from "@solid-primitives/date";
+
+function Demo() {
+  const [to, setTo] = createSignal("2030-01-01T00:00");
+  const countdown = createCountdown("2029-12-24T18:30", to);
+  return (
+    <>
+      <p>from 2029-12-24 18:30 to</p>
+      <input
+        type="datetime-local"
+        value={to()}
+        onInput={e => e.currentTarget.value && setTo(e.currentTarget.value)}
+      />
+      <p>
+        {countdown.days}d {countdown.hours}h {countdown.minutes}m {countdown.seconds}s
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [to, setTo] = createSignal(1641408329089);
 const countdown = createCountdown("2020 1 11", to);
@@ -145,6 +285,30 @@ countdown.seconds; // e.g. 48
 ### `createCountdownFromNow`
 
 Provides a reactive, autoupdating _(from **now**)_, broken down "time remaining" as a Store.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createCountdownFromNow } from "@solid-primitives/date";
+
+function Demo() {
+  const [target, setTarget] = createSignal(Date.now() + 90_000);
+  const [countdown, { now }] = createCountdownFromNow(target);
+  return (
+    <>
+      <p>
+        {now().getTime() >= target()
+          ? "done!"
+          : `${countdown.days}d ${countdown.hours}h ${countdown.minutes}m ${countdown.seconds}s`}
+      </p>
+      <button onClick={() => setTarget(Date.now() + 90_000)}>Restart (90s)</button>
+      <button onClick={() => setTarget(Date.now() + 86_400_000)}>Tomorrow</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 // target date may be reactive

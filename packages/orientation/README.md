@@ -26,6 +26,49 @@ pnpm add @solid-primitives/orientation
 
 ## `makeOrientation`
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For, onCleanup, Show } from "solid-js";
+import { makeOrientation, type OrientationState } from "@solid-primitives/orientation";
+
+function Demo() {
+  const [events, setEvents] = createSignal<OrientationState[]>([]);
+  const [listening, setListening] = createSignal(false);
+  let cleanup: VoidFunction | undefined;
+
+  const toggle = () => {
+    if (cleanup) {
+      cleanup();
+      cleanup = undefined;
+    } else {
+      cleanup = makeOrientation(state => setEvents(prev => [state, ...prev].slice(0, 5)));
+    }
+    setListening(!!cleanup);
+  };
+  onCleanup(() => cleanup?.());
+
+  return (
+    <>
+      <button onClick={toggle}>{listening() ? "Stop listener" : "Start listener"}</button>
+      <Show when={listening() && !events().length}>
+        <p>Listening — rotate your device</p>
+      </Show>
+      <ul>
+        <For each={events()}>
+          {e => (
+            <li>
+              {e.angle}° {e.type}
+            </li>
+          )}
+        </For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 A non-reactive base primitive. Attaches a listener for screen orientation changes and returns a cleanup function. The callback fires on every subsequent change but **not** on mount — use `createOrientation` if you need the initial value reactively.
 
 Uses `screen.orientation` when available, falling back to the legacy `orientationchange` event on `window`.
@@ -43,6 +86,34 @@ cleanup();
 ```
 
 ## `createOrientation`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createOrientation } from "@solid-primitives/orientation";
+
+function Demo() {
+  const { angle, type } = createOrientation();
+  return (
+    <>
+      <div
+        style={{
+          width: "40px",
+          height: "70px",
+          border: "3px solid",
+          "border-radius": "8px",
+          transform: `rotate(${-angle()}deg)`,
+        }}
+      />
+      <p>
+        angle: {angle()}° — type: {type()}
+      </p>
+      <p>Rotate your device (or use DevTools device emulation) to update.</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 A reactive primitive that tracks the screen orientation. Returns `angle` and `type` signal accessors, initialized to the current orientation and updated on every change. Automatically removes the event listener on cleanup.
 

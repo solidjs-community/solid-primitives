@@ -32,6 +32,42 @@ pnpm add @solid-primitives/fullscreen
 
 Non-reactive base primitive. No Solid lifecycle dependency — safe to use outside components.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeFullscreen } from "@solid-primitives/fullscreen";
+
+function Demo() {
+  const [error, setError] = createSignal("");
+  let enter: (() => Promise<void>) | undefined;
+  let exit: (() => Promise<void>) | undefined;
+  const run = (fn?: () => Promise<void>) => {
+    setError("");
+    fn?.().catch((e: Error) => setError(e.message));
+  };
+  return (
+    <>
+      <div
+        ref={el => {
+          [enter, exit] = makeFullscreen(el);
+        }}
+        style={{ padding: "1rem", background: "#eee" }}
+      >
+        <button disabled={!document.fullscreenEnabled} onClick={() => run(enter)}>
+          Enter fullscreen
+        </button>
+        <button disabled={!document.fullscreenEnabled} onClick={() => run(exit)}>
+          Exit fullscreen
+        </button>
+      </div>
+      <p>{document.fullscreenEnabled ? error() : "Fullscreen is not available here"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [enter, exit] = makeFullscreen(element, options?: FullscreenOptions);
 ```
@@ -48,6 +84,35 @@ button.addEventListener("click", enter);
 ### `createFullscreen`
 
 Reactive primitive that binds `enter`/`exit` to an element and tracks fullscreen state via the `fullscreenchange` event.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFullscreen } from "@solid-primitives/fullscreen";
+
+function Demo() {
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+  const [error, setError] = createSignal("");
+  const { enter, exit, isActive } = createFullscreen(ref);
+  return (
+    <div ref={el => setRef(el)} style={{ padding: "1rem", background: "#eee" }}>
+      <p>isActive: {String(isActive())}</p>
+      <button
+        disabled={!document.fullscreenEnabled}
+        onClick={() => {
+          setError("");
+          (isActive() ? exit() : enter()).catch((e: Error) => setError(e.message));
+        }}
+      >
+        {isActive() ? "Exit" : "Enter"} fullscreen
+      </button>
+      <p>{document.fullscreenEnabled ? error() : "Fullscreen is not available here"}</p>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const { enter, exit, isActive } = createFullscreen(
@@ -94,6 +159,33 @@ const { enter } = createFullscreen(ref, { exitOnCleanup: false, navigationUI: "h
 ### `fullscreen` (ref directive factory)
 
 A ref factory that wires click-to-toggle fullscreen onto any element. Clicking enters fullscreen; clicking again exits. Must be called inside a reactive owner (component body or `createRoot`).
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { fullscreen } from "@solid-primitives/fullscreen";
+
+function Demo() {
+  const [error, setError] = createSignal("");
+  const attach = fullscreen();
+  return (
+    <div
+      ref={el => {
+        // only attach where fullscreen is allowed (sandboxed iframes, iPhone Safari lack it)
+        if (document.fullscreenEnabled) attach(el);
+        el.addEventListener("fullscreenerror", () => setError("Fullscreen was blocked"));
+        el.addEventListener("fullscreenchange", () => setError(""));
+      }}
+      style={{ padding: "2rem", background: "#eee", cursor: "pointer" }}
+    >
+      Click to toggle fullscreen
+      <p>{document.fullscreenEnabled ? error() : "Fullscreen is not available here"}</p>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const attach = fullscreen(options?: FullscreenOptions);

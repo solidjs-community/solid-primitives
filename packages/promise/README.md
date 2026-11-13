@@ -34,6 +34,32 @@ pnpm add @solid-primitives/promise
 
 Creates a promise that resolves _(or rejects)_ after given time.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { promiseTimeout } from "@solid-primitives/promise";
+
+function Demo() {
+  const [status, setStatus] = createSignal("idle");
+  const start = (reject: boolean) => {
+    setStatus("waiting 1s...");
+    promiseTimeout(1000, reject, "timed out").then(
+      () => setStatus("resolved"),
+      e => setStatus(`rejected: ${e}`),
+    );
+  };
+  return (
+    <>
+      <button onClick={() => start(false)}>Resolve after 1s</button>
+      <button onClick={() => start(true)}>Reject after 1s</button>
+      <p>status: {status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -52,6 +78,30 @@ try {
 
 Combination of `Promise.race()` and `promiseTimeout`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { promiseTimeout, raceTimeout } from "@solid-primitives/promise";
+
+function Demo() {
+  const [result, setResult] = createSignal("idle");
+  const race = (ms: number) => {
+    setResult(`racing ${ms} ms of work against a 1000 ms timeout...`);
+    const work = promiseTimeout(ms).then(() => "work finished first");
+    raceTimeout(work, 1000, true, "timeout won").then(setResult, setResult);
+  };
+  return (
+    <>
+      <button onClick={() => race(500)}>race(500)</button>
+      <button onClick={() => race(1500)}>race(1500)</button>
+      <p>result: {result()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -69,6 +119,29 @@ try {
 ## `until`
 
 Promised one-time watch for changes. Await a reactive condition.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { until } from "@solid-primitives/promise";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const [status, setStatus] = createSignal("waiting for count >= 5");
+  until(() => count() >= 5 && count()).then(
+    v => setStatus(`resolved with ${v}`),
+    () => {},
+  );
+  return (
+    <>
+      <button onClick={() => setCount(c => c + 1)}>count: {count()}</button>
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -141,6 +214,31 @@ promise.dispose();
 
 Resolves when **all** reactive conditions are simultaneously truthy — the reactive equivalent of `Promise.all`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { untilAll } from "@solid-primitives/promise";
+
+function Demo() {
+  const [auth, setAuth] = createSignal(false);
+  const [config, setConfig] = createSignal(false);
+  const [status, setStatus] = createSignal("waiting for both");
+  untilAll([auth, config]).then(
+    () => setStatus("all conditions met"),
+    () => {},
+  );
+  return (
+    <>
+      <button onClick={() => setAuth(v => !v)}>auth: {String(auth())}</button>
+      <button onClick={() => setConfig(v => !v)}>config: {String(config())}</button>
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Resolves with an array of each condition's truthy value, in the same order as the input. Rejects if the parent owner is disposed before all conditions are met. An empty conditions array resolves immediately with `[]`.
 
 ### How to use it
@@ -178,6 +276,31 @@ p.dispose();
 
 Resolves when **any** reactive condition becomes truthy — the reactive equivalent of `Promise.any`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { untilAny } from "@solid-primitives/promise";
+
+function Demo() {
+  const [a, setA] = createSignal(false);
+  const [b, setB] = createSignal(false);
+  const [winner, setWinner] = createSignal("waiting...");
+  untilAny([() => a() && "A", () => b() && "B"]).then(
+    v => setWinner(`${v} won`),
+    () => {},
+  );
+  return (
+    <>
+      <button onClick={() => setA(true)}>Trigger A</button>
+      <button onClick={() => setB(true)}>Trigger B</button>
+      <p>{winner()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Resolves with the first truthy value encountered. Rejects if the parent owner is disposed before any condition is met. An empty conditions array produces a promise that never resolves (mirrors `Promise.race([])`).
 
 ### How to use it
@@ -204,6 +327,39 @@ const first = await untilAny([
 ## `retry`
 
 Calls an async function up to `times` attempts, retrying on failure. Optionally waits `delay` ms between attempts, or uses a function for dynamic (e.g. exponential) backoff.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { retry } from "@solid-primitives/promise";
+
+function Demo() {
+  const [log, setLog] = createSignal<string[]>([]);
+  const run = () => {
+    setLog([]);
+    let attempt = 0;
+    retry(
+      async () => {
+        attempt++;
+        if (Math.random() < 0.7) {
+          setLog(l => [...l, `attempt ${attempt}: failed`]);
+          throw new Error("flaky");
+        }
+        setLog(l => [...l, `attempt ${attempt}: success`]);
+      },
+      { times: 5, delay: 300 },
+    ).catch(() => setLog(l => [...l, "gave up after 5 attempts"]));
+  };
+  return (
+    <>
+      <button onClick={run}>Run flaky task (70% failure)</button>
+      <pre>{log().join("\n")}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -240,6 +396,29 @@ const data = createMemo(async () =>
 ## `changed`
 
 A resolver for `until` that resolves when the source changes a given number of times.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { changed, until } from "@solid-primitives/promise";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const [status, setStatus] = createSignal("waiting for 3 changes");
+  until(changed(count, 3)).then(
+    () => setStatus("count changed 3 times"),
+    () => {},
+  );
+  return (
+    <>
+      <button onClick={() => setCount(c => c + 1)}>count: {count()}</button>
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { until, changed } from "@solid-primitives/promise";

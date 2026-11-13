@@ -32,6 +32,36 @@ pnpm add @solid-primitives/upload
 
 Opens the OS file-picker dialog when called and exposes the selected files, loading state, and any callback error as reactive signals.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { For, Show } from "solid-js";
+import { createFilePicker } from "@solid-primitives/upload";
+
+function Demo() {
+  const { files, selectFiles, removeFile, clearFiles } = createFilePicker({ multiple: true });
+  return (
+    <>
+      <button onClick={() => selectFiles()}>Pick files</button>
+      <button onClick={clearFiles}>Clear</button>
+      <Show when={files().length > 0} fallback={<p>No files selected</p>}>
+        <ul>
+          <For each={files()}>
+            {file => (
+              <li>
+                {file.name} ({file.size} bytes){" "}
+                <button onClick={() => removeFile(file.name)}>x</button>
+              </li>
+            )}
+          </For>
+        </ul>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createFilePicker } from "@solid-primitives/upload";
 
@@ -101,6 +131,52 @@ const { upload, files, progress, status } = createFileUploader(fileSender("/api/
 
 Uploads files with reactive per-file and aggregate progress, status, and error tracking. Each file in a batch gets its own parallel request. The transport is passed in explicitly — use the bundled `fileSender` factory for XHR, or supply your own. Keeping them separate lets bundlers tree-shake `fileSender` when it is not needed.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createFilePicker, createFileUploader, type SendFunction } from "@solid-primitives/upload";
+
+// Simulated transport: reports progress every 100ms for 2s
+const fakeSend: SendFunction = (file, onProgress, signal) =>
+  new Promise((resolve, reject) => {
+    let step = 0;
+    const id = setInterval(() => {
+      step++;
+      onProgress({ loaded: step * 5, total: 100, percentage: step * 5 });
+      if (step < 20) return;
+      clearInterval(id);
+      resolve(file.name);
+    }, 100);
+    signal.addEventListener("abort", () => {
+      clearInterval(id);
+      reject(new DOMException("Upload aborted", "AbortError"));
+    });
+  });
+
+function Demo() {
+  const { selectFiles } = createFilePicker({ multiple: true });
+  const { upload, files, progress, status, abort } = createFileUploader(fakeSend);
+  return (
+    <>
+      <button onClick={() => selectFiles(fs => void upload(fs))}>Pick & upload</button>
+      <button onClick={abort}>Abort</button>
+      <p>
+        {status()} — {progress().percentage}%
+      </p>
+      <For each={files}>
+        {f => (
+          <p>
+            {f.file.name}: {f.status} {f.progress.percentage}%
+          </p>
+        )}
+      </For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { createFileUploader, fileSender } from "@solid-primitives/upload";
 
@@ -157,6 +233,31 @@ Read `files[i]` directly in JSX for fine-grained per-file reactivity — only th
 
 Factory that creates a `SendFunction` backed by XHR. Imported separately so it can be tree-shaken when unused.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { Show } from "solid-js";
+import { createFilePicker, createFileUploader, fileSender } from "@solid-primitives/upload";
+
+function Demo() {
+  const { selectFiles } = createFilePicker();
+  const { upload, files, progress, status } = createFileUploader(
+    fileSender("https://jsonplaceholder.typicode.com/posts", { fieldName: "attachment" }),
+  );
+  return (
+    <>
+      <button onClick={() => selectFiles(fs => void upload(fs))}>Pick & upload</button>
+      <p>
+        {status()} — {progress().percentage}%
+      </p>
+      <Show when={files[0]?.error}>{err => <p>Error: {String(err())}</p>}</Show>
+      <Show when={files[0]?.response}>{res => <pre>{JSON.stringify(res(), null, 2)}</pre>}</Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { fileSender } from "@solid-primitives/upload";
 
@@ -194,6 +295,37 @@ const { upload, progress, status } = createFileUploader(async (file, onProgress,
 
 A ref callback factory for wiring an existing `<input type="file">` element into your own reactive state. Use this when you want full control over the input element's markup (e.g. for custom styling).
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { fileUploader, type UploadFile } from "@solid-primitives/upload";
+
+function Demo() {
+  const [files, setFiles] = createSignal<UploadFile[]>([]);
+  const [count, setCount] = createSignal(0);
+  return (
+    <>
+      <input
+        type="file"
+        multiple
+        ref={fileUploader({
+          userCallback: fs => {
+            setCount(n => n + fs.length);
+          },
+          setFiles,
+        })}
+      />
+      <p>Total files chosen so far: {count()}</p>
+      <ul>
+        <For each={files()}>{file => <li>{file.name}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```tsx
 import { fileUploader } from "@solid-primitives/upload";
 import { createSignal } from "solid-js";
@@ -229,6 +361,34 @@ If `onError` is omitted, a rejection from `userCallback` propagates as an unhand
 ## `createDropzone`
 
 A reactive drag-and-drop zone. Attach it to any element via the `ref` callback and respond to drag lifecycle events. Implemented on top of `createNativeDroppable` from `@solid-primitives/drag-drop` — the depth-counter logic, `isOver` tracking, and element cleanup are all handled by the underlying primitive.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { createDropzone } from "@solid-primitives/upload";
+
+function Demo() {
+  const { ref, files, isDragging, clearFiles } = createDropzone();
+  return (
+    <>
+      <div
+        ref={ref}
+        style={{
+          padding: "2rem",
+          border: "2px dashed #999",
+          background: isDragging() ? "lightblue" : "transparent",
+        }}
+      >
+        {isDragging() ? "Release to drop" : "Drag files from your desktop here"}
+      </div>
+      <button onClick={clearFiles}>Clear</button>
+      <For each={files()}>{file => <p>{file.name}</p>}</For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { createDropzone, createFileUploader, fileSender } from "@solid-primitives/upload";
@@ -284,6 +444,39 @@ Only `onDrop` receives `UploadFile[]` — the browser only exposes real `File` o
 ## `dropzone`
 
 A ref callback factory variant of `createDropzone`. Returns a single value that is both the ref callback and the reactive state object — use it directly as a `ref` while reading `.files`, `.isDragging`, etc. from the same reference. Mirrors the `fileUploader` pattern.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { dropzone } from "@solid-primitives/upload";
+
+function Demo() {
+  const [drops, setDrops] = createSignal(0);
+  const dz = dropzone({
+    onDrop: () => {
+      setDrops(n => n + 1);
+    },
+  });
+  return (
+    <>
+      <div
+        ref={dz}
+        style={{
+          padding: "2rem",
+          border: "2px dashed #999",
+          background: dz.isDragging() ? "lightblue" : "transparent",
+        }}
+      >
+        {dz.isDragging() ? "Release to drop" : "Drop files here"}
+      </div>
+      <p>Drops: {drops()}</p>
+      <For each={dz.files()}>{file => <p>{file.name}</p>}</For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { dropzone, createFileUploader, fileSender } from "@solid-primitives/upload";

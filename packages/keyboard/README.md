@@ -34,6 +34,26 @@ yarn add @solid-primitives/keyboard
 
 Provides a signal with the last keydown event.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal } from "solid-js";
+import { useKeyDownEvent } from "@solid-primitives/keyboard";
+
+function Demo() {
+  const event = useKeyDownEvent();
+  const [last, setLast] = createSignal("none");
+  createEffect(
+    () => event(),
+    e => {
+      if (e) setLast(`${e.key} (code: ${e.code})`);
+    },
+  );
+  return <p>Click here, then press a key. Last keydown: {last()}</p>;
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
@@ -60,6 +80,28 @@ createEffect(() => {
 
 Provides a signal with the list of currently held keys, ordered from least recent to most recent.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { useKeyDownList } from "@solid-primitives/keyboard";
+
+function Demo() {
+  const keys = useKeyDownList();
+  return (
+    <>
+      <p>Click here, then hold some keys:</p>
+      <p>
+        <For each={keys()} fallback="(none)">
+          {key => <kbd>{key} </kbd>}
+        </For>
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
@@ -82,6 +124,18 @@ createEffect(() => {
 
 Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { useCurrentlyHeldKey } from "@solid-primitives/keyboard";
+
+function Demo() {
+  const key = useCurrentlyHeldKey();
+  return <p>Click here, then hold a single key. Held: {key() ?? "(none)"}</p>;
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
@@ -101,6 +155,28 @@ createEffect(() => {
 ## `useKeyDownSequence`
 
 Provides a signal with a sequence of currently held keys, as they were pressed down and up.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { For } from "solid-js";
+import { useKeyDownSequence } from "@solid-primitives/keyboard";
+
+function Demo() {
+  const sequence = useKeyDownSequence();
+  return (
+    <>
+      <p>Click here, then hold Shift, add Alt, then Q:</p>
+      <ol>
+        <For each={sequence()} fallback={<li>(none)</li>}>
+          {step => <li>{step.join(" + ")}</li>}
+        </For>
+      </ol>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
@@ -125,6 +201,22 @@ createEffect(() => {
 
 Provides a `boolean` signal indicating if provided key is currently being held down.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createKeyHold } from "@solid-primitives/keyboard";
+
+function Demo() {
+  const holding = createKeyHold("Shift", { preventDefault: false });
+  return (
+    <p style={{ background: holding() ? "gold" : "transparent" }}>
+      Click here, then hold Shift (alone): {holding() ? "YES" : "NO"}
+    </p>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 Holding multiple keys at the same time will return `false` — holding only the specified one will return `true`.
 
 ### How to use it
@@ -146,6 +238,20 @@ const pressing = createKeyHold("Alt", { preventDefault: false });
 ## `createShortcut`
 
 Creates a keyboard shortcut observer. The provided callback will be called when the specified keys are pressed.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createShortcut } from "@solid-primitives/keyboard";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  createShortcut(["Control", "K"], () => setCount(n => n + 1), { requireReset: true });
+  return <p>Click here, then press Ctrl+K. Triggered {count()} times.</p>;
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

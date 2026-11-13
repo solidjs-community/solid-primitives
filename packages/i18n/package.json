@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "3.0.0-next.6",
+  "version": "3.0.0-next.7",
   "description": "Library of primitives for providing internationalization support.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "contributors": [
@@ -23,11 +23,12 @@
       "resolveRichTemplate",
       "richText",
       "translator",
+      "missingKeyAsTemplate",
       "scopedTranslator",
       "chainedTranslator"
     ],
     "category": "Utilities",
-    "gzip": 1094
+    "gzip": 1131
   },
   "files": [
     "dist"
@@ -51,7 +52,7 @@
     "outDir": "dist"
   },
   "scripts": {
-    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
@@ -70,7 +71,7 @@
   },
   "devDependencies": {
     "@solidjs/web": "catalog:",
-    "solid-js": "catalog:",
+    "solid-js": "catalog:peer",
     "tsdown": "catalog:",
     "unplugin-solid": "catalog:"
   }

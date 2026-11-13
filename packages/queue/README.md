@@ -33,6 +33,37 @@ pnpm add @solid-primitives/queue
 
 Creates a plain, non-reactive FIFO queue.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makeQueue } from "@solid-primitives/queue";
+
+function Demo() {
+  const q = makeQueue([1, 2, 3]);
+  let next = 4;
+  // makeQueue is not reactive — snapshot it into a signal after each mutation
+  const snapshot = () => `first: ${q.first ?? "—"}, last: ${q.last ?? "—"}, size: ${q.size}`;
+  const [state, setState] = createSignal(snapshot());
+  const add = () => {
+    q.add(next++);
+    setState(snapshot());
+  };
+  const remove = () => {
+    q.remove();
+    setState(snapshot());
+  };
+  return (
+    <>
+      <button onClick={add}>Add</button>
+      <button onClick={remove}>Remove</button>
+      <p>{state()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeQueue } from "@solid-primitives/queue";
 
@@ -69,6 +100,38 @@ function makeQueue<T>(initialValues?: T[]): Queue<T>;
 ```
 
 ## `createQueue`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createQueue } from "@solid-primitives/queue";
+
+function Demo() {
+  const { queue, first, size, isEmpty, add, remove, clear } = createQueue(["a", "b", "c"]);
+  const [input, setInput] = createSignal("");
+  const addInput = () => {
+    if (!input()) return;
+    add(input());
+    setInput("");
+  };
+  return (
+    <>
+      <input value={input()} onInput={e => setInput(e.currentTarget.value)} />
+      <button onClick={addInput}>Add</button>
+      <button onClick={remove} disabled={isEmpty()}>
+        Dequeue
+      </button>
+      <button onClick={clear}>Clear</button>
+      <p>queue: {queue().join(", ")}</p>
+      <p>
+        next: {first() ?? "—"} · size: {size()}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Creates a reactive FIFO queue. All accessor properties establish reactive dependencies when read inside a tracking scope (JSX, `createMemo`, `createEffect`, etc.).
 
@@ -122,6 +185,38 @@ function createQueue<T>(initialValues?: T[]): ReactiveQueue<T>;
 
 Modifies an existing queue in place so that every `add` call maintains comparator-sorted order. Returns the same queue object with its `add` method patched; `remove()` always returns the highest-priority item (smallest by the comparator).
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { makePriorityQueue, makeQueue } from "@solid-primitives/queue";
+
+function Demo() {
+  const cmp = (a: number, b: number) => a - b;
+  const q = makePriorityQueue(makeQueue<number>(), cmp);
+  // non-reactive queue — snapshot it into a signal after each mutation
+  const [state, setState] = createSignal("empty");
+  const update = () =>
+    setState(q.isEmpty ? "empty" : `min: ${q.first}, max: ${q.last}, size: ${q.size}`);
+  const addRandom = () => {
+    q.add(Math.floor(Math.random() * 100));
+    update();
+  };
+  const removeMin = () => {
+    q.remove();
+    update();
+  };
+  return (
+    <>
+      <button onClick={addRandom}>Add random</button>
+      <button onClick={removeMin}>Remove min</button>
+      <p>{state()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeQueue, makePriorityQueue } from "@solid-primitives/queue";
 
@@ -146,6 +241,30 @@ function makePriorityQueue<T, Q extends Queue<T>>(q: Q, comparator: (a: T, b: T)
 ## `createPriorityQueue`
 
 Creates a reactive priority queue. All accessor properties establish reactive dependencies. Mutations are batched; call `flush()` in tests before reading reactive values.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createPriorityQueue } from "@solid-primitives/queue";
+
+function Demo() {
+  const { queue, first, isEmpty, add, remove } = createPriorityQueue<number>(
+    (a, b) => a - b,
+    [5, 2, 8],
+  );
+  return (
+    <>
+      <button onClick={() => add(Math.floor(Math.random() * 10))}>Add random</button>
+      <button onClick={remove} disabled={isEmpty()}>
+        Remove min
+      </button>
+      <p>queue: {queue().join(", ")}</p>
+      <p>next: {first() ?? "—"}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createPriorityQueue } from "@solid-primitives/queue";
@@ -178,6 +297,35 @@ function createPriorityQueue<T>(
 - `queue()` returns items in priority order (lowest comparator value first).
 
 ## `createTaskQueue`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createTaskQueue } from "@solid-primitives/queue";
+
+function Demo() {
+  const { enqueue, size, active } = createTaskQueue<string>();
+  const [done, setDone] = createSignal<string[]>([]);
+  let id = 0;
+  const addTask = () => {
+    const label = `task-${++id}`;
+    enqueue(() => new Promise<string>(r => setTimeout(() => r(label), 1000))).then(result =>
+      setDone(prev => [...prev, result]),
+    );
+  };
+  return (
+    <>
+      <button onClick={addTask}>Enqueue 1s task</button>
+      <p>
+        active: {String(active())} · waiting: {size()}
+      </p>
+      <p>done: {done().join(", ")}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Creates a reactive queue that runs async tasks one at a time in FIFO order.
 
@@ -232,6 +380,37 @@ function createTaskQueue<T>(): ReactiveTaskQueue<T>;
 - All tasks share the same return type `T`. For heterogeneous task types use `createTaskQueue<unknown>()`.
 
 ## `createConcurrentTaskQueue`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createConcurrentTaskQueue } from "@solid-primitives/queue";
+
+function Demo() {
+  const { enqueue, size, active } = createConcurrentTaskQueue<string>(2);
+  const [done, setDone] = createSignal<string[]>([]);
+  let id = 0;
+  const addBatch = () => {
+    for (let i = 0; i < 5; i++) {
+      const label = `task-${++id}`;
+      enqueue(() => new Promise<string>(r => setTimeout(() => r(label), 1000))).then(result =>
+        setDone(prev => [...prev, result]),
+      );
+    }
+  };
+  return (
+    <>
+      <button onClick={addBatch}>Enqueue 5 tasks (max 2 at once)</button>
+      <p>
+        active: {active()} · waiting: {size()}
+      </p>
+      <p>done: {done().join(", ")}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Creates a reactive task queue that runs up to `concurrency` tasks at a time. Tasks beyond the limit wait until a slot opens.
 

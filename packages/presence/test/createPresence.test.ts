@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
-import { type Accessor, createRoot, createSignal, flush } from "solid-js";
+import {
+  type Accessor,
+  createEffect,
+  createMemo,
+  createRoot,
+  createSignal,
+  flush,
+  OBSERVE,
+} from "solid-js";
+import { attribution } from "solid-js/attribution";
 import { createPresence } from "../src/index.js";
 
 beforeAll(() => {
@@ -213,5 +222,837 @@ describe("createPresence", () => {
     expect(isEntering()).toBe(false);
     expect(isExiting()).toBe(false);
     dispose();
+  });
+
+  it("keeps showing the latest item when the item changes again during the exit", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 150;
+
+    let mountedItem!: Accessor<Data | undefined>;
+    const dispose = createRoot(d => {
+      ({ mountedItem } = createPresence(data, { transitionDuration }));
+      return d;
+    });
+
+    setData("bar");
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration / 2);
+    // still exiting "foo": the swap only happens once the exit has finished
+    expect(mountedItem()).toBe("foo");
+    setData("baz");
+    flush();
+    expect(mountedItem()).toBe("foo");
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(mountedItem()).toBe("baz");
+    dispose();
+  });
+
+  it("unmounts when the item is cleared and mounts the next item afterwards", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 150;
+
+    let mountedItem!: Accessor<Data | undefined>;
+    let isMounted!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ mountedItem, isMounted } = createPresence(data, { transitionDuration }));
+      return d;
+    });
+
+    expect(isMounted()).toBe(true);
+    setData(undefined);
+    flush();
+    expect(isMounted()).toBe(true);
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(isMounted()).toBe(false);
+
+    setData("baz");
+    flush();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(mountedItem()).toBe("baz");
+    expect(isMounted()).toBe(true);
+    dispose();
+  });
+
+  it("cancels the exit when the item comes back before the exit has finished", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 150;
+
+    let mountedItem!: Accessor<Data | undefined>;
+    let isMounted!: Accessor<boolean>;
+    let isExiting!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ mountedItem, isMounted, isExiting } = createPresence(data, { transitionDuration }));
+      return d;
+    });
+
+    setData(undefined);
+    flush();
+    expect(isExiting()).toBe(true);
+    await vi.advanceTimersByTimeAsync(transitionDuration / 2);
+    setData("foo");
+    flush();
+    expect(isExiting()).toBe(false);
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    // the old exit timer must not unmount it afterwards
+    expect(isMounted()).toBe(true);
+    expect(mountedItem()).toBe("foo");
+    dispose();
+  });
+
+  it("never becomes visible when it is hidden again before the first frame", async () => {
+    const [shouldRender, setShouldRender] = createSignal(false);
+    const transitionDuration = 150;
+
+    let isMounted!: Accessor<boolean>;
+    let isVisible!: Accessor<boolean>;
+    const visibleStates: boolean[] = [];
+    const dispose = createRoot(d => {
+      ({ isMounted, isVisible } = createPresence(shouldRender, { transitionDuration }));
+      return d;
+    });
+
+    setShouldRender(true);
+    flush();
+    expect(isMounted()).toBe(true);
+    expect(isVisible()).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    visibleStates.push(isVisible());
+    setShouldRender(false);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    visibleStates.push(isVisible());
+    expect(visibleStates).toEqual([false, false]);
+    expect(isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("unmounts the old item before it mounts the next one", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 150;
+
+    // what a consumer renders from: the committed values after every flush
+    const committed: Array<[boolean, Data | undefined]> = [];
+    let mountedItem!: Accessor<Data | undefined>;
+    const dispose = createRoot(d => {
+      let isMounted!: Accessor<boolean>;
+      ({ isMounted, mountedItem } = createPresence(data, { transitionDuration }));
+      createEffect(
+        () => [isMounted(), mountedItem()] as const,
+        ([mounted, item]) => void committed.push([mounted, item]),
+      );
+      return d;
+    });
+    flush();
+
+    setData("bar");
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(mountedItem()).toBe("bar");
+    // `<Show when={isMounted()}>` has to see the gap, otherwise it patches the old subtree in
+    // place instead of disposing it and creating a fresh one for the new item
+    const mountedStates = committed.map(([mounted]) => mounted);
+    const gap = mountedStates.indexOf(false);
+    expect(gap).toBeGreaterThan(0);
+    expect(committed[gap - 1]).toEqual([true, "foo"]);
+    expect(mountedStates.lastIndexOf(true)).toBeGreaterThan(gap);
+    expect(committed.at(-1)).toEqual([true, "bar"]);
+    dispose();
+  });
+
+  it("does not let an exit that was cancelled cut a later exit short", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 150;
+
+    let mountedItem!: Accessor<Data | undefined>;
+    let isExiting!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ mountedItem, isExiting } = createPresence(data, { transitionDuration }));
+      return d;
+    });
+
+    setData("bar"); // the first exit would finish at 150ms
+    flush();
+    await vi.advanceTimersByTimeAsync(50);
+    setData("foo"); // cancels it
+    flush();
+    await vi.advanceTimersByTimeAsync(50);
+    setData("baz"); // second exit, finishes at 250ms
+    flush();
+    await vi.advanceTimersByTimeAsync(80); // 180ms: past the cancelled timer
+    expect(mountedItem()).toBe("foo");
+    expect(isExiting()).toBe(true);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(mountedItem()).toBe("baz");
+    dispose();
+  });
+
+  it("starts invisible again when it is shown again after a full exit", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 150;
+
+    let isMounted!: Accessor<boolean>;
+    let isVisible!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ isMounted, isVisible } = createPresence(data, { transitionDuration }));
+      return d;
+    });
+
+    expect(isVisible()).toBe(true);
+    setData(undefined);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(isMounted()).toBe(false);
+
+    setData("foo");
+    flush();
+    // visible only on the next frame, so that CSS transitions have a start state to leave from
+    expect(isMounted()).toBe(true);
+    expect(isVisible()).toBe(false);
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(isVisible()).toBe(true);
+    dispose();
+  });
+
+  it("starts invisible and becomes visible on the next frame with initialEnter", async () => {
+    const [shouldRender] = createSignal(true);
+    let isVisible!: Accessor<boolean>;
+    let isMounted!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ isVisible, isMounted } = createPresence(shouldRender, {
+        transitionDuration: 50,
+        initialEnter: true,
+      }));
+      return d;
+    });
+
+    flush();
+    expect(isMounted()).toBe(true);
+    expect(isVisible()).toBe(false);
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(isVisible()).toBe(true);
+    dispose();
+  });
+
+  it("stays unmounted, invisible and idle for an item that is initially undefined", async () => {
+    let isMounted!: Accessor<boolean>;
+    let isVisible!: Accessor<boolean>;
+    let isAnimating!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ isMounted, isVisible, isAnimating } = createPresence<Data>(() => undefined, {
+        transitionDuration: 50,
+      }));
+      return d;
+    });
+
+    flush();
+    await vi.advanceTimersByTimeAsync(200);
+    expect(isMounted()).toBe(false);
+    expect(isVisible()).toBe(false);
+    expect(isAnimating()).toBe(false);
+    dispose();
+  });
+
+  it("mounts the latest item when it is written in the same task as the exit finishing", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const transitionDuration = 100;
+
+    const mounted: Array<Data | undefined> = [];
+    let mountedItem!: Accessor<Data | undefined>;
+    const dispose = createRoot(d => {
+      ({ mountedItem } = createPresence(data, { transitionDuration }));
+      createEffect(mountedItem, item => void mounted.push(item));
+      return d;
+    });
+    flush();
+
+    setData("bar");
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration - 1);
+    setData("baz"); // not flushed yet when the exit timer fires
+    vi.advanceTimersByTime(1);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(mountedItem()).toBe("baz");
+    // "bar" was superseded before it was ever mounted
+    expect(mounted).not.toContain("bar");
+    dispose();
+  });
+
+  it("does not throw from the exit timer when the item has errored in the meantime", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const [broken, setBroken] = createSignal(false);
+    const transitionDuration = 100;
+
+    let mountedItem!: Accessor<Data | undefined>;
+    const dispose = createRoot(d => {
+      const item = createMemo(() => {
+        if (broken()) throw new Error("item failed");
+        return data();
+      });
+      ({ mountedItem } = createPresence(item, { transitionDuration }));
+      return d;
+    });
+
+    setData("bar");
+    flush();
+    setBroken(true);
+    flush();
+    let thrown: unknown;
+    try {
+      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+      flush();
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeUndefined();
+    expect(mountedItem()).toBe("foo");
+    try {
+      dispose();
+    } catch {}
+  });
+
+  it("keeps working after the item has errored while the exit timer was pending", async () => {
+    const [data, setData] = createSignal<Data>("foo");
+    const [broken, setBroken] = createSignal(false);
+    const transitionDuration = 100;
+
+    let mountedItem!: Accessor<Data | undefined>;
+    const dispose = createRoot(d => {
+      const item = createMemo(() => {
+        if (broken()) throw new Error("item failed");
+        return data();
+      });
+      ({ mountedItem } = createPresence(item, { transitionDuration }));
+      return d;
+    });
+
+    setData("bar");
+    flush();
+    setBroken(true);
+    flush();
+    try {
+      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+      flush();
+    } catch {}
+    // an error escaping the exit timer would halt the reactive system for good
+    setBroken(false);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    flush();
+    expect(mountedItem()).toBe("bar");
+    try {
+      dispose();
+    } catch {}
+  });
+
+  it("waits for a pending item instead of mounting its stale value", async () => {
+    const [source, setSource] = createSignal("foo");
+    const transitionDuration = 100;
+
+    const mounted: Array<string | undefined> = [];
+    let mountedItem!: Accessor<string | undefined>;
+    const dispose = createRoot(d => {
+      // "c" takes a while to arrive; until then the memo keeps its previous value
+      const item = createMemo(() => {
+        const value = source();
+        return value === "c"
+          ? new Promise<string>(resolve => setTimeout(() => resolve(value), 300))
+          : value;
+      });
+      ({ mountedItem } = createPresence(item, { transitionDuration }));
+      createEffect(mountedItem, value => void mounted.push(value));
+      return d;
+    });
+    flush();
+
+    setSource("bar"); // starts the exit of "foo"
+    flush();
+    await vi.advanceTimersByTimeAsync(50);
+    setSource("c"); // still pending when the exit finishes at 100ms
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset + 300);
+    flush();
+    expect(mountedItem()).toBe("c");
+    expect(mounted).not.toContain("bar");
+    dispose();
+  });
+
+  it("does not leave timers or animation frames behind when it is disposed", async () => {
+    for (const [initial, change, elapsed] of [
+      [true, false, 5], // mid exit
+      [false, true, 5], // entering, the first frame is still pending
+      [false, true, 40], // entering, the frame has passed and the enter timer is running
+    ] as const) {
+      const [shouldRender, setShouldRender] = createSignal(initial);
+      const dispose = createRoot(d => {
+        createPresence(shouldRender, { transitionDuration: 150 });
+        return d;
+      });
+      flush();
+      setShouldRender(change);
+      flush();
+      await vi.advanceTimersByTimeAsync(elapsed);
+      dispose();
+      expect(vi.getTimerCount()).toBe(0);
+    }
+  });
+
+  it("keeps function items as they are instead of calling them", async () => {
+    // e.g. components: a signal would call a function it is given, so these must never be called
+    const callFoo = vi.fn(() => "foo");
+    const callBar = vi.fn(() => "bar");
+    const Foo = () => callFoo();
+    const Bar = () => callBar();
+    const [Item, setItem] = createSignal<(() => string) | undefined>(() => Foo);
+    const transitionDuration = 100;
+
+    let mountedItem!: Accessor<(() => string) | undefined>;
+    let isMounted!: Accessor<boolean>;
+    const dispose = createRoot(d => {
+      ({ mountedItem, isMounted } = createPresence(Item, { transitionDuration }));
+      return d;
+    });
+    flush();
+
+    expect(isMounted()).toBe(true);
+    expect(mountedItem()).toBe(Foo);
+    setItem(() => Bar);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(mountedItem()).toBe(Bar);
+    setItem(undefined);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
+    expect(isMounted()).toBe(false);
+    expect(callFoo).not.toHaveBeenCalled();
+    expect(callBar).not.toHaveBeenCalled();
+    dispose();
+  });
+});
+
+// https://github.com/solidjs-community/solid-primitives/issues/466
+describe("createPresence done()", () => {
+  // the duration only acts as a fallback when `done` is used
+  const fallback = 10_000;
+
+  it("ends the exit when done() is called, before the duration is over", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    expect(presence.isExiting()).toBe(true);
+    expect(presence.isMounted()).toBe(true);
+    presence.done();
+    flush();
+    expect(presence.isMounted()).toBe(false);
+    expect(presence.isAnimating()).toBe(false);
+    // the fallback timer firing later changes nothing
+    await vi.advanceTimersByTimeAsync(fallback + transitionTimeOffset);
+    flush();
+    expect(presence.isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("ends the enter when done() is called, before the duration is over", async () => {
+    const [shouldRender, setShouldRender] = createSignal(false);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(true);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(presence.isVisible()).toBe(true);
+    expect(presence.isEntering()).toBe(true);
+    presence.done();
+    flush();
+    expect(presence.isEntering()).toBe(false);
+    expect(presence.isAnimating()).toBe(false);
+    expect(presence.isVisible()).toBe(true);
+    dispose();
+  });
+
+  it("makes the element visible when done() ends the enter before the first frame", () => {
+    const [shouldRender, setShouldRender] = createSignal(false);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(true);
+    flush();
+    expect(presence.isVisible()).toBe(false);
+    presence.done();
+    flush();
+    expect(presence.isVisible()).toBe(true);
+    expect(presence.isEntering()).toBe(false);
+    dispose();
+  });
+
+  it("still ends the transition after the duration when done() is never called", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: 100 });
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    await vi.advanceTimersByTimeAsync(100 + transitionTimeOffset);
+    expect(presence.isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("does nothing while no transition is running", () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    presence.done();
+    flush();
+    expect(presence.isMounted()).toBe(true);
+    expect(presence.isVisible()).toBe(true);
+    expect(presence.isAnimating()).toBe(false);
+    // a later exit is not cut short by the earlier call
+    setShouldRender(false);
+    flush();
+    expect(presence.isExiting()).toBe(true);
+    expect(presence.isMounted()).toBe(true);
+    dispose();
+  });
+
+  it("does not let a done() for an earlier exit end the enter that cancelled it", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    // the exit's transitionend is dispatched in the same task as the item coming back
+    setShouldRender(true);
+    presence.done();
+    flush();
+    expect(presence.isMounted()).toBe(true);
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(presence.isEntering()).toBe(true);
+    dispose();
+  });
+
+  it("swaps to the next item once done() ends the exit of the current one", async () => {
+    const [item, setItem] = createSignal<string | undefined>("foo");
+    let presence!: ReturnType<typeof createPresence<string>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(item, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setItem("bar");
+    flush();
+    expect(presence.mountedItem()).toBe("foo");
+    expect(presence.isExiting()).toBe(true);
+    presence.done();
+    flush();
+    // the old item is unmounted for one flush before the next one mounts
+    expect(presence.isMounted()).toBe(false);
+    // the swap is landed right after that flush (as with the exit timer, through `onFlush`)
+    await Promise.resolve();
+    flush();
+    expect(presence.mountedItem()).toBe("bar");
+    expect(presence.isMounted()).toBe(true);
+    expect(presence.isEntering()).toBe(true);
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    presence.done();
+    flush();
+    expect(presence.isAnimating()).toBe(false);
+    expect(presence.isVisible()).toBe(true);
+    dispose();
+  });
+
+  it("ends the transition from the element's own transitionend / animationend, not a descendant's", () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    const el = document.createElement("div");
+    const child = el.appendChild(document.createElement("span"));
+    el.addEventListener("transitionend", presence.done);
+    el.addEventListener("animationend", presence.done);
+    flush();
+    setShouldRender(false);
+    flush();
+    child.dispatchEvent(new Event("transitionend", { bubbles: true }));
+    flush();
+    expect(presence.isMounted()).toBe(true);
+    el.dispatchEvent(new Event("animationend", { bubbles: true }));
+    flush();
+    expect(presence.isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("swaps only once when done() is called twice for the same exit", async () => {
+    const [item, setItem] = createSignal<string | undefined>("foo");
+    let presence!: ReturnType<typeof createPresence<string>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(item, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setItem("bar");
+    flush();
+    presence.done();
+    presence.done();
+    flush();
+    await Promise.resolve();
+    flush();
+    expect(presence.mountedItem()).toBe("bar");
+    expect(presence.isMounted()).toBe(true);
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    // the second call did not end the enter of the next item
+    expect(presence.isVisible()).toBe(true);
+    expect(presence.isEntering()).toBe(true);
+    dispose();
+  });
+
+  it("mounts the latest item when it changes again right after done() ended the exit", async () => {
+    const [item, setItem] = createSignal<string | undefined>("foo");
+    let presence!: ReturnType<typeof createPresence<string>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(item, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setItem("bar");
+    flush();
+    presence.done();
+    setItem("baz");
+    flush();
+    await Promise.resolve();
+    flush();
+    expect(presence.mountedItem()).toBe("baz");
+    expect(presence.isMounted()).toBe(true);
+    dispose();
+  });
+
+  it("ends the initial enter with initialEnter", () => {
+    const [item] = createSignal<string | undefined>("foo");
+    let presence!: ReturnType<typeof createPresence<string>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(item, { transitionDuration: fallback, initialEnter: true });
+      return d;
+    });
+    flush();
+    expect(presence.isEntering()).toBe(true);
+    presence.done();
+    flush();
+    expect(presence.isEntering()).toBe(false);
+    expect(presence.isVisible()).toBe(true);
+    dispose();
+  });
+
+  // A JS animation's completion callback can arrive after the transition it was started for has
+  // been superseded. `done` would end whatever runs by then; `bindDone()` ends only its own.
+  it("ends the exit with a bindDone() callback obtained from an effect on isExiting()", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    let finish: ((event?: Event) => void) | undefined;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      createEffect(
+        () => presence.isExiting(),
+        exiting => {
+          if (exiting) finish = presence.bindDone();
+        },
+      );
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    expect(finish).toBeDefined();
+    await Promise.resolve();
+    finish!();
+    flush();
+    expect(presence.isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("ignores a bindDone() callback of a cancelled exit once a newer exit runs", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    const finishFirstExit = presence.bindDone();
+    setShouldRender(true);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    setShouldRender(false);
+    flush();
+    expect(presence.isExiting()).toBe(true);
+    // the first exit's animation completes late
+    finishFirstExit();
+    flush();
+    expect(presence.isMounted()).toBe(true);
+    expect(presence.isExiting()).toBe(true);
+    // a callback bound to the running exit ends it
+    presence.bindDone()();
+    flush();
+    expect(presence.isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("ignores a bindDone() callback of a cancelled exit during the enter that cancelled it", async () => {
+    const [shouldRender, setShouldRender] = createSignal(true);
+    let presence!: ReturnType<typeof createPresence<boolean>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(shouldRender, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setShouldRender(false);
+    flush();
+    const finishExit = presence.bindDone();
+    setShouldRender(true);
+    flush();
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(presence.isEntering()).toBe(true);
+    finishExit();
+    flush();
+    expect(presence.isEntering()).toBe(true);
+    expect(presence.isAnimating()).toBe(true);
+    dispose();
+  });
+
+  it("ignores a bindDone() callback of the previous item's exit once the next item enters", async () => {
+    const [item, setItem] = createSignal<string | undefined>("foo");
+    let presence!: ReturnType<typeof createPresence<string>>;
+    const dispose = createRoot(d => {
+      presence = createPresence(item, { transitionDuration: fallback });
+      return d;
+    });
+    flush();
+    setItem("bar");
+    flush();
+    const finishExit = presence.bindDone();
+    finishExit();
+    flush();
+    await Promise.resolve();
+    flush();
+    expect(presence.mountedItem()).toBe("bar");
+    await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+    expect(presence.isEntering()).toBe(true);
+    // called again late (e.g. a second completion of the same animation)
+    finishExit();
+    flush();
+    expect(presence.isEntering()).toBe(true);
+    dispose();
+  });
+});
+
+// https://github.com/solidjs-community/solid-primitives/issues/1082
+// The sync effect in `createPresence` used to track `mountedItem()` while also writing it, and
+// `isMounted()`, which is derived from the `shouldBeMounted` signal it writes. Solid 2 reports
+// that as EFFECT_WRITES_OWN_SOURCE / EFFECT_RELAY_TEAR (the effect re-ran because of its own write).
+// These detectors only run while attribution is enabled; findings are read from the diagnostics
+// channel, which lives on `OBSERVE.diagnostics` (not on `DEV`).
+describe("createPresence reactivity diagnostics", () => {
+  const withDiagnostics = async (scenario: () => Promise<void> | void) => {
+    const release = attribution.enable();
+    const capture = OBSERVE!.diagnostics.capture();
+    try {
+      await scenario();
+    } finally {
+      release();
+    }
+    return capture.stop().map(event => event.code as string);
+  };
+
+  const feedbackLoops = (codes: string[]) =>
+    codes.filter(code => code === "EFFECT_WRITES_OWN_SOURCE" || code === "EFFECT_RELAY_TEAR");
+
+  // The detectors need a few runs before they report, so every scenario goes through several cycles.
+  it("does not feed its own writes back into itself when opening and closing", async () => {
+    // the shape Kobalte's Popover uses
+    const [forceMount] = createSignal(false);
+    const [open, setOpen] = createSignal(false);
+    const codes = await withDiagnostics(async () => {
+      const dispose = createRoot(d => {
+        createPresence(() => forceMount() || open() || undefined, { transitionDuration: 0 });
+        return d;
+      });
+      flush();
+      for (const next of [true, false, true, false, true, false]) {
+        setOpen(next);
+        flush();
+        await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+        flush();
+      }
+      dispose();
+    });
+    expect(feedbackLoops(codes)).toEqual([]);
+  });
+
+  it("does not feed its own writes back into itself when swapping or clearing the item", async () => {
+    const [item, setItem] = createSignal<string | undefined>("foo");
+    const codes = await withDiagnostics(async () => {
+      const dispose = createRoot(d => {
+        createPresence(item, { transitionDuration: 50 });
+        return d;
+      });
+      flush();
+      for (const next of ["bar", "baz", undefined, "foo", "bar", undefined]) {
+        setItem(next);
+        flush();
+        await vi.advanceTimersByTimeAsync(200);
+        flush();
+      }
+      dispose();
+    });
+    expect(feedbackLoops(codes)).toEqual([]);
+  });
+
+  it("does not feed its own writes back into itself when transitions are ended with done()", async () => {
+    const [item, setItem] = createSignal<string | undefined>("foo");
+    const codes = await withDiagnostics(async () => {
+      let presence!: ReturnType<typeof createPresence<string>>;
+      const dispose = createRoot(d => {
+        presence = createPresence(item, { transitionDuration: 10_000 });
+        return d;
+      });
+      flush();
+      for (const next of ["bar", "baz", undefined, "foo", "bar", undefined]) {
+        setItem(next);
+        flush();
+        presence.done(); // ends the exit
+        flush();
+        flush();
+        await vi.advanceTimersByTimeAsync(transitionTimeOffset);
+        presence.done(); // ends the enter
+        flush();
+      }
+      dispose();
+    });
+    expect(feedbackLoops(codes)).toEqual([]);
   });
 });

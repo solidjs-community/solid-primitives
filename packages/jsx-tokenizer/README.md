@@ -14,6 +14,7 @@ This pattern is very useful when you want to use JSX to create a declarative API
 
 - [`createTokenizer`](#createtokenizer) — Creates a JSX Tokenizer that can be used to create multiple token components with the same id.
 - [`createToken`](#createtoken) — Creates a token component for passing custom data through JSX structure.
+- [`createObjectToken`](#createobjecttoken) — Creates a token component whose tokens survive Solid's `children()` helper and context providers.
 - [`resolveTokens`](#resolvetokens) — Resolves passed JSX structure, searching for tokens with the given tokenizer id.
 - [`isToken`](#istoken) — Checks if passed value is a token created by the corresponding jsx-tokenizer.
 
@@ -30,6 +31,56 @@ yarn add @solid-primitives/jsx-tokenizer
 ## `createTokenizer`
 
 Creates a JSX Tokenizer that can be used to create multiple token components with the same id and resolve their data from the JSX Element structure.
+
+```tsx repl
+import { render, type JSX } from "@solidjs/web";
+import { createSignal, For, Show } from "solid-js";
+import { createTokenizer, createToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
+
+type Food = { kind: "fruit" | "veg"; name: string };
+const FoodTokenizer = createTokenizer<Food>({ name: "food" });
+const Fruit = createToken(FoodTokenizer, (props: { name: string }) => ({
+  kind: "fruit",
+  name: props.name,
+}));
+const Veg = createToken(FoodTokenizer, (props: { name: string }) => ({
+  kind: "veg",
+  name: props.name,
+}));
+
+function Basket(props: { children: JSX.Element }) {
+  const tokens = resolveTokens(FoodTokenizer, () => props.children);
+  return (
+    <ul>
+      <For each={tokens()}>
+        {token => (
+          <li>
+            {token.data.kind}: {token.data.name}
+          </li>
+        )}
+      </For>
+    </ul>
+  );
+}
+
+function Demo() {
+  const [more, setMore] = createSignal(false);
+  return (
+    <>
+      <button onClick={() => setMore(m => !m)}>{more() ? "Remove" : "Add"} carrot</button>
+      <Basket>
+        <Fruit name="apple" />
+        <Veg name="leek" />
+        <Show when={more()}>
+          <Veg name="carrot" />
+        </Show>
+      </Basket>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -67,6 +118,40 @@ function ParentComponent(props) {
 ## `createToken`
 
 Creates a token component for passing custom data through JSX structure.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
+
+// no tokenizer passed: the token component is its own tokenizer
+const Crumb = createToken(
+  (props: { label: string }) => props.label,
+  props => <em>{props.label}</em>, // fallback when rendered outside resolveTokens
+);
+
+function Demo() {
+  const [path, setPath] = createSignal(["Home", "Docs"]);
+  const crumbs = resolveTokens(Crumb, () => (
+    <For each={path()}>{label => <Crumb label={label} />}</For>
+  ));
+  return (
+    <>
+      <button onClick={() => setPath(p => [...p, `Page ${p.length}`])}>Go deeper</button>
+      <p>
+        {crumbs()
+          .map(token => token.data)
+          .join(" / ")}
+      </p>
+      <p>
+        Rendered directly: <Crumb label="fallback" />
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 The token component can be used as a normal component in JSX.
 
@@ -142,9 +227,134 @@ function Tabs<T>(props: { children: (Tab: Component<{ value: T }>) => JSX.Elemen
 </Tabs>;
 ```
 
+## `createObjectToken`
+
+Creates a token component like [`createToken`](#createtoken), but the token element is a plain `{ data }` object instead of a function.
+
+```tsx repl
+import { render, type JSX } from "@solidjs/web";
+import { children, createContext, createSignal, For, useContext } from "solid-js";
+import { createObjectToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
+
+const Prefix = createContext("-");
+// tokenData runs under the token's JSX owner, so it can read contexts
+const Item = createObjectToken(
+  (props: { label: string }) => `${useContext(Prefix)} ${props.label}`,
+);
+
+function List(props: { children: JSX.Element }) {
+  // object tokens survive children() (and context providers) untouched
+  const resolved = children(() => props.children);
+  const tokens = resolveTokens(Item, resolved);
+  return (
+    <ul>
+      <For each={tokens()}>{token => <li>{token.data}</li>}</For>
+    </ul>
+  );
+}
+
+function Demo() {
+  const [count, setCount] = createSignal(2);
+  return (
+    <>
+      <button onClick={() => setCount(c => c + 1)}>Add item</button>
+      <List>
+        <Prefix value="*">
+          <For each={Array.from({ length: count() }, (_, i) => i + 1)}>
+            {n => <Item label={`item ${n}`} />}
+          </For>
+        </Prefix>
+      </List>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+Tokens created by `createToken` are functions, so anything that resolves children before you do — Solid's `children()` helper, a context provider, a transition group — calls them as if they were elements (rendering their fallback, or nothing with a warning) and they can't be found by `resolveTokens` anymore. Object tokens aren't functions, so they pass through that resolution untouched and can still be parsed afterwards.
+
+It takes the same `tokenizer` and `tokenData` parameters as `createToken`, but no `render` fallback. Both kinds of tokens can share a tokenizer and are resolved by the same `resolveTokens` and `isToken` calls.
+
+```ts
+// Type
+function createObjectToken<TProps extends object, TData>(
+  tokenizer: JSXTokenizer<TData>,
+  tokenData: (props: TProps) => TData,
+): TokenComponent<TProps, TData>;
+function createObjectToken<TData extends object>(tokenizer?: JSXTokenizer<TData>): TokenComponent<TData>;
+function createObjectToken<TProps extends object, TData>(
+  tokenData: (props: TProps) => TData,
+): TokenComponent<TProps, TData>;
+
+// Example
+import { createObjectToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
+import { children } from "solid-js";
+
+const Item = createObjectToken((props: { label: string }) => ({ label: props.label }));
+
+function List(props: { children: JSX.Element }) {
+  // children() (or a context provider) keeps object tokens as they are
+  const resolved = children(() => props.children);
+  const tokens = resolveTokens(Item, resolved);
+  return (
+    <ul>
+      <For each={tokens()}>{token => <li>{token.data.label}</li>}</For>
+    </ul>
+  );
+}
+
+<List>
+  <ThemeContext value="dark">
+    <Item label="a" />
+    <Item label="b" />
+  </ThemeContext>
+</List>;
+```
+
+The `tokenData` function runs when the token component is created, under its JSX owner, so it can read contexts provided between the parent and the token.
+
+> **Note:** object tokens can't be rendered. Never insert them into JSX (e.g. `<>{tokens()}</>`) — a lone object token is skipped with an `UNRECOGNIZED_INSERT_VALUE` warning in development, but an object token mixed with other elements makes the DOM insertion throw. Use `createToken` with a `render` fallback if the tokens need to be renderable.
+
 ## `resolveTokens`
 
 A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children). Resolves passed JSX structure, searching for tokens with the given tokenizer id.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
+
+const Action = createToken((props: { label: string }) => props.label);
+const Divider = createToken(() => "---");
+
+function Demo() {
+  const [admin, setAdmin] = createSignal(false);
+  // resolve two token families in one pass, without rendering the children
+  const tokens = resolveTokens([Action, Divider], () => (
+    <>
+      <Action label="Open" />
+      <Action label="Save" />
+      <Show when={admin()}>
+        <Divider />
+        <Action label="Delete" />
+      </Show>
+    </>
+  ));
+  return (
+    <>
+      <button onClick={() => setAdmin(a => !a)}>Toggle admin</button>
+      <pre>
+        {tokens()
+          .map(token => token.data)
+          .join("\n")}
+      </pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -279,6 +489,39 @@ function App() {
 ## `isToken`
 
 A function to validate if a value is a token created by the corresponding jsx-tokenizer.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
+import { createToken, isToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
+
+const Note = createToken((props: { text: string }) => props.text);
+
+function Demo() {
+  const [notes, setNotes] = createSignal(["first"]);
+  const items = resolveTokens(
+    Note,
+    () => (
+      <>
+        <p>Plain paragraph</p>
+        <For each={notes()}>{text => <Note text={text} />}</For>
+        <p>Another paragraph</p>
+      </>
+    ),
+    { includeJSXElements: true },
+  );
+  return (
+    <>
+      <button onClick={() => setNotes(ns => [...ns, `note ${ns.length + 1}`])}>Add note</button>
+      <For each={items()}>
+        {item => (isToken(Note, item) ? <strong>Token: {item.data}</strong> : <>{item}</>)}
+      </For>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

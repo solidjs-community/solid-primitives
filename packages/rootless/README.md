@@ -33,6 +33,44 @@ yarn add @solid-primitives/rootless
 
 Creates a reactive **root branch**, that will be automatically disposed when it's owner does.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal, getOwner } from "solid-js";
+import { createSubRoot } from "@solid-primitives/rootless";
+
+function Demo() {
+  const owner = getOwner();
+  const [count, setCount] = createSignal(0);
+  const [log, setLog] = createSignal<string[]>([]);
+  let disposeSub: VoidFunction | undefined;
+
+  const start = () => {
+    disposeSub?.();
+    disposeSub = createSubRoot(dispose => {
+      createEffect(count, n => {
+        setLog(l => [...l, `sub-root saw ${n}`]);
+      });
+      return dispose;
+    }, owner);
+  };
+  const stop = () => {
+    disposeSub?.();
+    disposeSub = undefined;
+  };
+
+  return (
+    <>
+      <button onClick={start}>Start sub-root</button>
+      <button onClick={() => setCount(n => n + 1)}>Increment ({count()})</button>
+      <button onClick={stop}>Dispose sub-root</button>
+      <pre>{log().join("\n")}</pre>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 Use it for nested roots _(literally nested, or provided manually to dependency array)_ that should be disposed before or with their owner.
@@ -65,6 +103,34 @@ function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (Owner | 
 A wrapper for creating callbacks with `runWithOwner`.
 It gives you the option to use reactive primitives after root setup and outside of effects.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal } from "solid-js";
+import { createCallback } from "@solid-primitives/rootless";
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const [fired, setFired] = createSignal(0);
+
+  // runs with the component's owner, so the effect is attached to (and disposed with) it
+  const addWatcher = createCallback(() => {
+    createEffect(count, () => {
+      setFired(n => n + 1);
+    });
+  });
+
+  return (
+    <>
+      <button onClick={addWatcher}>Add watcher</button>
+      <button onClick={() => setCount(n => n + 1)}>Increment ({count()})</button>
+      <p>watcher runs: {fired()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 **Why?**
 
 All of the callback-based (in opposite to effect-based) events is Solid don't have a root, because the root is changed synchronously after initialization finishes. So normally that would prevent you from using reactive primitives there.
@@ -95,6 +161,33 @@ function createCallback<T extends AnyFunction>(callback: T, owner?: Owner | null
 ###### Previously `runWithSubRoot`
 
 For disposing computations early – before the root cleanup.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEffect, createSignal } from "solid-js";
+import { createDisposable } from "@solid-primitives/rootless";
+
+function Demo() {
+  const [text, setText] = createSignal("");
+  const [mirror, setMirror] = createSignal("");
+
+  const stop = createDisposable(() => {
+    createEffect(text, value => {
+      setMirror(value);
+    });
+  });
+
+  return (
+    <>
+      <input value={text()} onInput={e => setText(e.currentTarget.value)} placeholder="Type..." />
+      <button onClick={stop}>Stop mirroring</button>
+      <p>mirror: {mirror()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -155,6 +248,53 @@ const state = useState();
 function createSingletonRoot<T>(factory: (dispose: Fn) => T): () => T;
 ```
 
+### `createSharedRoot` (deprecated alias)
+
+Deprecated alias of `createSingletonRoot` — same behavior, kept for backwards compatibility. The demo below works identically with `createSingletonRoot`, which new code should prefer.
+
+```tsx repl
+import { render, Show } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+// prefer createSingletonRoot; createSharedRoot is a deprecated alias
+import { createSharedRoot } from "@solid-primitives/rootless";
+
+let roots = 0;
+const useClock = createSharedRoot(() => {
+  const [now, setNow] = createSignal(Date.now());
+  const id = setInterval(() => setNow(Date.now()), 1000);
+  onCleanup(() => clearInterval(id));
+  return { now, root: ++roots };
+});
+
+function Clock() {
+  const { now, root } = useClock();
+  return (
+    <p>
+      root #{root}: {new Date(now()).toLocaleTimeString()}
+    </p>
+  );
+}
+
+function Demo() {
+  const [a, setA] = createSignal(true);
+  const [b, setB] = createSignal(true);
+  return (
+    <>
+      <button onClick={() => setA(v => !v)}>Toggle A</button>
+      <button onClick={() => setB(v => !v)}>Toggle B</button>
+      <Show when={a()}>
+        <Clock />
+      </Show>
+      <Show when={b()}>
+        <Clock />
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### `createHydratableSingletonRoot`
 
 A experimental version of `createSingletonRoot` that will deopt of creating a singleton root if used in SSR or during hydration.
@@ -170,6 +310,31 @@ Creates a pool of roots, that can be reused. Useful for creating components that
 When the root is created, it will call the factory function.
 Roots are created by calling the returned function, after cleanup they won't be disposed but instead put back into the pool to be reused.
 Next time the function is called, it will reuse the root from the pool and update it with the new data.
+
+```tsx repl
+import { render, Show } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createRootPool } from "@solid-primitives/rootless";
+
+function Demo() {
+  const [visible, setVisible] = createSignal(true);
+
+  // the counter's root (and its state) is kept in the pool while hidden, then reused
+  const useCounter = createRootPool(() => {
+    const [count, setCount] = createSignal(0);
+    return <button onClick={() => setCount(n => n + 1)}>Count: {count()}</button>;
+  });
+
+  return (
+    <>
+      <button onClick={() => setVisible(v => !v)}>{visible() ? "Hide" : "Show"}</button>
+      <Show when={visible()}>{useCounter()}</Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

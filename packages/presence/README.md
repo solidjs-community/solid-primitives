@@ -4,7 +4,7 @@
 
 # @solid-primitives/presence
 
-[![size](https://img.shields.io/badge/size-648_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/presence)
+[![size](https://img.shields.io/badge/size-863_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/presence)
 [![version](https://img.shields.io/npm/v/@solid-primitives/presence?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/presence)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -35,6 +35,38 @@ pnpm add @solid-primitives/presence
 ## How to use it
 
 ### `createPresence` boolean example
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { createPresence } from "@solid-primitives/presence";
+
+function Demo() {
+  const [show, setShow] = createSignal(true);
+  const { isMounted, isVisible, isExiting } = createPresence(show, { transitionDuration: 500 });
+  return (
+    <>
+      <button onClick={() => setShow(v => !v)}>{show() ? "Hide" : "Show"}</button>
+      <p>
+        mounted: {String(isMounted())}, exiting: {String(isExiting())}
+      </p>
+      <Show when={isMounted()}>
+        <div
+          style={{
+            transition: "all 500ms ease",
+            opacity: isVisible() ? "1" : "0",
+            transform: isVisible() ? "translateY(0)" : "translateY(-12px)",
+          }}
+        >
+          I animate in and out!
+        </div>
+      </Show>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 const FirstExample = () => {
@@ -161,6 +193,81 @@ const ThirdExample = () => {
 };
 ```
 
+### Ending transitions on `transitionend` / `animationend`
+
+By default a transition is considered over once its duration has passed. If the duration lives in CSS, or the animation is driven by JavaScript, you can end the current enter or exit transition yourself with `done`. Hand it to the element's `onTransitionEnd` / `onAnimationEnd`, or call it when your animation finishes. The duration then only acts as a fallback timeout, in case the event never fires (for example when the transition is cancelled or `prefers-reduced-motion` turns it off).
+
+```tsx
+// Type
+type PresenceResult<TItem> = {
+  // ...
+  done: (event?: Event) => void;
+  bindDone: () => (event?: Event) => void;
+};
+
+// Example
+const Panel = () => {
+  const [open, setOpen] = createSignal(false);
+  const presence = createPresence(open, {
+    // fallback in case no transitionend event arrives
+    transitionDuration: 1000,
+  });
+
+  return (
+    <>
+      <button onClick={() => setOpen(o => !o)}>Toggle</button>
+      <Show when={presence.isMounted()}>
+        <div
+          class={{ panel: true, visible: presence.isVisible() }}
+          onTransitionEnd={presence.done}
+          onAnimationEnd={presence.done}
+        >
+          The transition is over as soon as the element's own transition is.
+        </div>
+      </Show>
+    </>
+  );
+};
+```
+
+- When given an event, `done` ignores it unless it was fired by the element the handler is attached to, so transitions of descendants bubbling up don't end the transition early.
+- `transitionend` fires once per transitioned property. If several properties transition with different durations, filter for the longest one: `onTransitionEnd={e => e.propertyName === "transform" && presence.done(e)}`.
+- Calling `done` while no transition is running does nothing.
+- `done` ends whichever transition is running when it is called. A late call, for example from a JS animation that was started for an earlier transition, ends the newer one. The element's own `transitionend` / `animationend` belong to the running transition, so handing `done` to them is safe.
+- When the item is swapped, `done` ends the exit of the old item, after which the new item mounts and enters as usual.
+- Call it from event handlers or other callbacks, not from inside a component body, memo or effect.
+
+#### Completion callbacks of JavaScript animations
+
+A JavaScript animation can finish after the transition it was started for has been superseded (the item changed back, or changed again). Use `bindDone()` to get a `done` bound to the transition that is running now: once the item has changed again, calling it does nothing, so a late callback cannot end a newer transition.
+
+```tsx
+const FadingPanel = (props: { open: boolean }) => {
+  let el!: HTMLDivElement;
+  // the duration is the fallback in case the animation never finishes
+  const presence = createPresence(() => props.open, { transitionDuration: 1000 });
+
+  createEffect(
+    () => presence.isExiting(),
+    exiting => {
+      if (!exiting) return;
+      const finish = presence.bindDone();
+      const animation = el.animate([{ opacity: 1 }, { opacity: 0 }], 300);
+      animation.finished.then(() => finish(), () => {});
+      return () => animation.cancel();
+    },
+  );
+
+  return (
+    <Show when={presence.isMounted()}>
+      <div ref={el}>Fades out with the Web Animations API.</div>
+    </Show>
+  );
+};
+```
+
+`bindDone()` binds to the state as of the last flush, so call it once the transition has started (as above, in an effect on `isEntering()` / `isExiting()`). Called right after changing the item, before that change is flushed, it binds to the previous transition and its callback is ignored; the duration then still ends the transition.
+
 ### `createPresence` options API
 
 ```ts
@@ -193,6 +300,10 @@ type PresenceResult<TItem> = {
   isEntering: Accessor<boolean>;
   /** Is the component exiting currently? */
   isExiting: Accessor<boolean>;
+  /** Ends the current enter or exit transition now; the duration then only acts as a fallback. */
+  done: (event?: Event) => void;
+  /** Returns a `done` bound to the current transition; it does nothing once the item has changed again. */
+  bindDone: () => (event?: Event) => void;
 };
 ```
 

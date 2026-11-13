@@ -4,7 +4,7 @@
 
 # @solid-primitives/favicon
 
-[![size](https://img.shields.io/badge/size-2.5_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/favicon)
+[![size](https://img.shields.io/badge/size-2.55_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/favicon)
 [![version](https://img.shields.io/npm/v/@solid-primitives/favicon?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/favicon)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -37,6 +37,56 @@ pnpm add @solid-primitives/favicon
 ## How to use it
 
 ### `makeFavicon` / `createFavicon`
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeFavicon } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+
+function Demo() {
+  const favicon = makeFavicon(icon("slateblue"));
+  onCleanup(favicon.dispose);
+  const [href, setHref] = createSignal(favicon.href);
+  const swap = (fill: string) => {
+    favicon.setHref(icon(fill));
+    setHref(favicon.href);
+  };
+  return (
+    <>
+      <img src={href()} width={32} height={32} alt="current favicon" />
+      <button onClick={() => swap("slateblue")}>Default</button>
+      <button onClick={() => swap("crimson")}>Alert</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFavicon } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+
+function Demo() {
+  const [alert, setAlert] = createSignal(false);
+  const href = createFavicon(() => icon(alert() ? "crimson" : "slateblue"));
+  return (
+    <>
+      <img src={href()} width={32} height={32} alt="current favicon" />
+      <button onClick={() => setAlert(a => !a)}>{alert() ? "Clear alert" : "Alert"}</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const favicon = makeFavicon("/favicon-dark.svg");
@@ -77,6 +127,60 @@ mount/unmount) — each call restores whatever was there right before it ran, li
 
 For build-status spinners, "recording" pulses, and similar loading indicators — cycles the
 favicon through a sequence of pre-rendered frames.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeFaviconAnimation } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+const frames = ["slateblue", "orchid", "crimson", "orange"].map(icon);
+
+function Demo() {
+  const anim = makeFaviconAnimation(frames, { interval: 150 });
+  // the controller is non-reactive — poll its getters to mirror them in the page
+  const [frame, setFrame] = createSignal(anim.frame);
+  const timer = setInterval(() => setFrame(anim.frame), 50);
+  onCleanup(() => {
+    clearInterval(timer);
+    anim.dispose();
+  });
+  return (
+    <>
+      <img src={frames[frame()]} width={32} height={32} alt="current favicon" />
+      <button onClick={() => anim.play()}>Play</button>
+      <button onClick={() => anim.pause()}>Pause</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createFaviconAnimation } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+const frames = ["slateblue", "orchid", "crimson", "orange"].map(icon);
+
+function Demo() {
+  const spinner = createFaviconAnimation(frames, { interval: 150 });
+  return (
+    <>
+      <img src={frames[spinner.frame()]} width={32} height={32} alt="current favicon" />
+      <button onClick={() => (spinner.playing() ? spinner.pause() : spinner.play())}>
+        {spinner.playing() ? "Pause" : "Play"}
+      </button>
+      <p>frame: {spinner.frame()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 const anim = makeFaviconAnimation(["/spin-1.png", "/spin-2.png", "/spin-3.png"], {
@@ -139,6 +243,66 @@ function createFaviconAnimation(
 Overlays a notification count, short string, or plain dot onto a base icon — the way native apps
 decorate their dock/taskbar icon.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeFaviconBadge } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+const base = icon("slateblue");
+
+function Demo() {
+  const [count, setCount] = createSignal(0);
+  const [href, setHref] = createSignal(base);
+  let badge = makeFaviconBadge(base, 0);
+  // the badge is drawn asynchronously and the controller is non-reactive — poll its href
+  const timer = setInterval(() => setHref(badge.href), 50);
+  onCleanup(() => {
+    clearInterval(timer);
+    badge.dispose();
+  });
+  const bump = () => {
+    const next = count() + 1;
+    badge.dispose();
+    badge = makeFaviconBadge(base, next);
+    setCount(next);
+  };
+  return (
+    <>
+      <img src={href()} width={32} height={32} alt="current favicon" />
+      <button onClick={bump}>Notify ({count()})</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFaviconBadge } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+
+function Demo() {
+  const [count, setCount] = createSignal(3);
+  const href = createFaviconBadge(icon("slateblue"), count, { max: 9 });
+  return (
+    <>
+      <img src={href()} width={32} height={32} alt="current favicon" />
+      <button onClick={() => setCount(c => c + 1)}>+1</button>
+      <button onClick={() => setCount(0)}>Clear</button>
+      <p>count: {count()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const badge = makeFaviconBadge("/favicon.png", 3);
 badge.dispose(); // restores the previous favicon
@@ -194,6 +358,59 @@ the favicon entirely.
 Swaps between two icons to match the OS/browser `prefers-color-scheme`, staying in sync as that
 preference changes (e.g. the user's system switches modes, or they toggle it in devtools).
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeFaviconScheme } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+
+function Demo() {
+  const favicon = makeFaviconScheme({ light: icon("slateblue"), dark: icon("gold") });
+  onCleanup(favicon.dispose);
+  // the controller is non-reactive — read its getters on demand
+  const read = () => ({ scheme: favicon.scheme, href: favicon.href });
+  const [state, setState] = createSignal(read());
+  return (
+    <>
+      <img src={state().href} width={32} height={32} alt="current favicon" />
+      <p>scheme: {state().scheme} (toggle your OS dark mode, then re-check)</p>
+      <button onClick={() => setState(read())}>Re-check</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFaviconScheme } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+const pairs = [
+  { light: icon("slateblue"), dark: icon("gold") },
+  { light: icon("seagreen"), dark: icon("orange") },
+];
+
+function Demo() {
+  const [index, setIndex] = createSignal(0);
+  const favicon = createFaviconScheme(() => pairs[index()]!);
+  return (
+    <>
+      <img src={favicon.href()} width={32} height={32} alt="current favicon" />
+      <p>scheme: {favicon.scheme()} (toggle your OS dark mode)</p>
+      <button onClick={() => setIndex(i => (i + 1) % pairs.length)}>Swap icon pair</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const favicon = makeFaviconScheme({ light: "/favicon-light.svg", dark: "/favicon-dark.svg" });
 favicon.scheme; // "light" | "dark"
@@ -238,6 +455,73 @@ Overlays a progress ring (0–100) onto a base icon — for upload/download-styl
 the opposite of the badge overlay above, where `0` means "no badge." Use `undefined` while there's
 no operation in progress, and `0`/a number once one starts.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, onCleanup } from "solid-js";
+import { makeFaviconProgress } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+const base = icon("slateblue");
+
+function Demo() {
+  const [progress, setProgress] = createSignal<number | undefined>(undefined);
+  const [href, setHref] = createSignal(base);
+  let favicon = makeFaviconProgress(base, undefined);
+  // the ring is drawn asynchronously and the controller is non-reactive — poll its href
+  const timer = setInterval(() => setHref(favicon.href), 50);
+  onCleanup(() => {
+    clearInterval(timer);
+    favicon.dispose();
+  });
+  const step = () => {
+    const current = progress();
+    const next = current === undefined ? 0 : current >= 100 ? undefined : current + 20;
+    favicon.dispose();
+    favicon = makeFaviconProgress(base, next);
+    setProgress(next);
+  };
+  return (
+    <>
+      <img src={href()} width={32} height={32} alt="current favicon" />
+      <button onClick={step}>
+        Progress: {progress() === undefined ? "idle (no ring)" : `${progress()}%`}
+      </button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createFaviconProgress } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+
+function Demo() {
+  const [progress, setProgress] = createSignal<number | undefined>(40);
+  const href = createFaviconProgress(icon("slateblue"), progress);
+  return (
+    <>
+      <img src={href()} width={32} height={32} alt="current favicon" />
+      <input
+        type="range"
+        value={progress() ?? 0}
+        onInput={e => setProgress(e.currentTarget.valueAsNumber)}
+      />
+      <button onClick={() => setProgress(undefined)}>No ring</button>
+      <p>{progress() === undefined ? "no ring" : `${progress()}%`}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const favicon = makeFaviconProgress("/favicon.png", 40);
 favicon.dispose(); // restores the previous favicon
@@ -274,6 +558,31 @@ Values are clamped to `[0, 100]`. Like the badge overlay, a failed base-image lo
 the plain `href`.
 
 ### `FaviconLink` — server-rendering the initial favicon
+
+```tsx repl
+import { Portal, render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { FaviconLink } from "@solid-primitives/favicon";
+
+const icon = (fill: string) =>
+  `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><circle cx='32' cy='32' r='28' fill='${fill}'/></svg>`;
+
+function Demo() {
+  const [alert, setAlert] = createSignal(false);
+  const href = () => icon(alert() ? "crimson" : "slateblue");
+  return (
+    <>
+      <Portal mount={document.head}>
+        <FaviconLink href={href()} />
+      </Portal>
+      <img src={href()} width={32} height={32} alt="current favicon" />
+      <button onClick={() => setAlert(a => !a)}>Toggle</button>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 Every `make*`/`create*` primitive above is SSR-safe in the sense that it won't crash on the
 server — but since it works by mutating `document.head` imperatively, **nothing about the favicon

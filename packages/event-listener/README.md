@@ -4,7 +4,7 @@
 
 # @solid-primitives/event-listener
 
-[![size](https://img.shields.io/badge/size-981_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-listener)
+[![size](https://img.shields.io/badge/size-973_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-listener)
 [![size](https://img.shields.io/npm/v/@solid-primitives/event-listener?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-listener)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -112,6 +112,36 @@ clear();
 
 Reactive version of [`makeEventListener`](#makeeventlistener), that can take signal `target` and `type` arguments to apply new listeners once changed.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createEventListener } from "@solid-primitives/event-listener";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  const [type, setType] = createSignal<"click" | "dblclick">("click");
+  const [count, setCount] = createSignal(0);
+  // the target is an accessor, so the listener attaches after mount; `type` is reactive
+  createEventListener(
+    () => box,
+    type,
+    () => setCount(n => n + 1),
+  );
+  return (
+    <>
+      <button onClick={() => setType(t => (t === "click" ? "dblclick" : "click"))}>
+        Switch event (now: {type()})
+      </button>
+      <div ref={box} style={{ padding: "2rem", background: "#e0e7ff", "user-select": "none" }}>
+        {type()} here — count: {count()}
+      </div>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```tsx
@@ -202,6 +232,26 @@ import { eventListener } from "@solid-primitives/event-listener";
 
 Like [`createEventListener`](#createeventlistener), but events are handled with the returned signal, instead of with a callback.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createEventSignal } from "@solid-primitives/event-listener";
+
+function Demo() {
+  let box!: HTMLDivElement;
+  const lastEvent = createEventSignal(() => box, ["mousemove", "click"]);
+  return (
+    <div ref={box} style={{ padding: "3rem", background: "#e0e7ff", "user-select": "none" }}>
+      Move or click here
+      <p style={{ "pointer-events": "none" }}>
+        {lastEvent()?.type ?? "—"} at {lastEvent()?.offsetX ?? 0}, {lastEvent()?.offsetY ?? 0}
+      </p>
+    </div>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ### How to use it
 
 ```ts
@@ -218,6 +268,30 @@ createEffect(() => {
 ## `createEventListenerMap`
 
 A helpful primitive that listens to a map of events. Handle them by individual callbacks.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { createEventListenerMap } from "@solid-primitives/event-listener";
+
+function Demo() {
+  let input!: HTMLInputElement;
+  const [status, setStatus] = createSignal("idle");
+  createEventListenerMap(() => input, {
+    focus: () => setStatus("focused"),
+    blur: () => setStatus("blurred"),
+    keydown: e => setStatus(`pressed "${e.key}"`),
+  });
+  return (
+    <>
+      <input ref={input} placeholder="Focus me and type" />
+      <p>status: {status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 
@@ -257,6 +331,31 @@ createEventListenerMap<{
 
 Listen to the `window` DOM Events, using a component.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Show } from "solid-js";
+import { WindowEventListener } from "@solid-primitives/event-listener";
+
+function Demo() {
+  const [enabled, setEnabled] = createSignal(true);
+  const [pos, setPos] = createSignal({ x: 0, y: 0 });
+  return (
+    <>
+      {/* listeners are removed when the component unmounts */}
+      <Show when={enabled()}>
+        <WindowEventListener onmousemove={e => setPos({ x: e.clientX, y: e.clientY })} />
+      </Show>
+      <button onClick={() => setEnabled(v => !v)}>{enabled() ? "Detach" : "Attach"}</button>
+      <p>
+        mouse: {pos().x}, {pos().y}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 You can use it with any Solid's Control-Flow components, e.g. `<Show/>` or `<Switch/>`.
 
 The event handler prop is reactive, so you can use it with signals.
@@ -272,6 +371,27 @@ import { WindowEventListener } from "@solid-primitives/event-listener";
 ## `DocumentEventListener`
 
 The same as [`WindowEventListener`](#windoweventlistener), but listens to `document` events.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { DocumentEventListener } from "@solid-primitives/event-listener";
+
+function Demo() {
+  const [clicks, setClicks] = createSignal(0);
+  const [key, setKey] = createSignal("—");
+  return (
+    <>
+      <DocumentEventListener onclick={() => setClicks(n => n + 1)} onkeydown={e => setKey(e.key)} />
+      <p>Click anywhere or press a key</p>
+      <p>document clicks: {clicks()}</p>
+      <p>last key: {key()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### How to use it
 

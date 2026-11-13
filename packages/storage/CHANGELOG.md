@@ -1,5 +1,17 @@
 # @solid-primitives/storage
 
+## 5.0.0-next.8
+
+### Minor Changes
+
+- 790b4de: Add a `merge` option to `makePersisted` that applies stored data on top of the initial value instead of replacing it, so keys added to a store's initial value later keep their defaults when older persisted data is loaded (#748). `merge: true` deep-merges plain objects (arrays and other values are replaced); a function `(stored, initial) => value` allows custom merging. Default behavior is unchanged.
+
+  If the initial value is still pending (an async or optimistic signal), there are no defaults yet: `merge: true` uses the stored data as is, and a custom merge function receives `undefined` as the initial value.
+
+### Patch Changes
+
+- 790b4de: `multiplexStorage`: with asynchronous storages, `getItem`/`key` now resolve to the first storage (in order) that returns a value instead of whichever storage answers first, so a fast storage without a value no longer hides a slower one that has it. A rejecting storage is skipped; the first rejection is only rethrown if no storage returns a value. (#799)
+
 ## 5.0.0-next.7
 
 ### Patch Changes

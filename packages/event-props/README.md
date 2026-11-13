@@ -27,6 +27,40 @@ pnpm add @solid-primitives/event-props
 
 Receive the event props and a props with the latest events:
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createMemo } from "solid-js";
+import { createEventProps } from "@solid-primitives/event-props";
+
+function Demo() {
+  const [events, eventProps] = createEventProps("mousedown", "mousemove", "mouseup");
+  const isMouseDown = createMemo(
+    () => (events.mousedown?.timeStamp ?? 0) > (events.mouseup?.timeStamp ?? 0),
+  );
+  return (
+    <>
+      <div
+        onMouseDown={eventProps.onmousedown}
+        onMouseMove={eventProps.onmousemove}
+        onMouseUp={eventProps.onmouseup}
+        style={{ padding: "40px", border: "1px solid gray" }}
+      >
+        Press and move over me
+      </div>
+      <p>mouse down: {isMouseDown() ? "yes" : "no"}</p>
+      <p>
+        last drag:{" "}
+        {isMouseDown()
+          ? `${events.mousemove?.offsetX ?? "-"}, ${events.mousemove?.offsetY ?? "-"}`
+          : "-"}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 const [events, eventProps] = createEventProps('mousedown', 'mousemove', 'mouseup');
 

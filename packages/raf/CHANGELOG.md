@@ -1,5 +1,25 @@
 # @solid-primitives/raf
 
+## 4.0.0-next.6
+
+### Patch Changes
+
+- 790b4de: Correct the `createScheduledLoop` motion example: `frame.render` returns the scheduled callback, so it can be passed to `cancelFrame` directly.
+- Updated dependencies [790b4de]
+  - @solid-primitives/set@1.0.0-next.5
+
+## 4.0.0-next.5
+
+### Minor Changes
+
+- a675c46: Add `createCallbacksSet`, `useGlobalRAF` and `createScheduledLoop`, ported to Solid 2.0 from the original work by Roy Eden (@royeden) in #824.
+
+  - `createCallbacksSet` combines several callbacks into one, so they can share a single `createRAF` loop.
+  - `useGlobalRAF` runs callbacks on one shared `requestAnimationFrame` loop held in a singleton root.
+  - `createScheduledLoop` gives external frameloop schedulers (e.g. motion's `frame`) the `[running, start, stop]` shape of `createRAF`.
+
+  Fixes in `createRAF`: `stop()` no longer calls `cancelAnimationFrame(0)` when no frame was requested, and calling `start()` twice before a flush no longer starts two loops.
+
 ## 4.0.0-next.4
 
 ### Patch Changes

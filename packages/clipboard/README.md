@@ -40,6 +40,31 @@ const items = await readClipboard();
 
 One-shot async write. Accepts a string or `ClipboardItem[]`.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import { writeClipboard } from "@solid-primitives/clipboard";
+
+function Demo() {
+  const [text, setText] = createSignal("Hello World");
+  const [status, setStatus] = createSignal("");
+  const copy = () =>
+    writeClipboard(text()).then(
+      () => setStatus(`Copied "${text()}"`),
+      (e: Error) => setStatus(`Failed: ${e.message}`),
+    );
+  return (
+    <>
+      <input value={text()} onInput={e => setText(e.currentTarget.value)} />
+      <button onClick={copy}>Copy</button>
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { writeClipboard } from "@solid-primitives/clipboard";
 
@@ -104,6 +129,44 @@ import { isPending } from "solid-js";
 ## `copyToClipboard`
 
 A `ref` directive factory that writes an element's value to clipboard on click. On `<input>`/`<textarea>` elements it captures `.value`; on any other element it captures `.innerHTML`. Both can be overridden via `options.value`.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal } from "solid-js";
+import {
+  copyToClipboard,
+  input as inputHighlighter,
+  writeClipboard,
+  type ClipboardSetter,
+} from "@solid-primitives/clipboard";
+
+function Demo() {
+  const [status, setStatus] = createSignal("");
+  const setter: ClipboardSetter = async data => {
+    try {
+      await writeClipboard(data);
+      setStatus(typeof data === "string" ? `Copied "${data}"` : "Copied clipboard items");
+    } catch (e) {
+      setStatus(`Failed: ${(e as Error).message}`);
+    }
+  };
+  return (
+    <>
+      <input
+        value="Click me to copy"
+        readonly
+        ref={copyToClipboard({ highlight: inputHighlighter(), setter })}
+      />
+      <button ref={copyToClipboard({ value: "Hello from a button!", setter })}>
+        Copy greeting
+      </button>
+      <p>{status()}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```tsx
 import { copyToClipboard } from "@solid-primitives/clipboard";

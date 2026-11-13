@@ -34,6 +34,45 @@ Creates a raw `EventSource` connection without any Solid lifecycle management. E
 
 This is the foundation primitive — `createSSE` uses it internally.
 
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, For, onCleanup } from "solid-js";
+import { makeSSE } from "@solid-primitives/sse";
+
+function Demo() {
+  const [messages, setMessages] = createSignal<string[]>([]);
+  const [status, setStatus] = createSignal("disconnected");
+  let cleanup: VoidFunction | undefined;
+  const disconnect = () => {
+    cleanup?.();
+    cleanup = undefined;
+    setStatus("disconnected");
+  };
+  const connect = () => {
+    disconnect();
+    setStatus("connecting");
+    [, cleanup] = makeSSE("https://sse.dev/test", {
+      onOpen: () => setStatus("open"),
+      onMessage: e => setMessages(m => [e.data, ...m].slice(0, 5)),
+      onError: () => setStatus("error"),
+    });
+  };
+  onCleanup(disconnect);
+  return (
+    <>
+      <button onClick={connect}>Connect</button>
+      <button onClick={disconnect}>Disconnect</button>
+      <p>status: {status()}</p>
+      <ul>
+        <For each={messages()}>{msg => <li>{msg}</li>}</For>
+      </ul>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
 ```ts
 import { makeSSE } from "@solid-primitives/sse";
 
@@ -71,6 +110,33 @@ type SSEOptions = {
 ## `createSSE`
 
 Reactive SSE primitive. Connects on creation, closes when the owner is disposed, and reacts to URL changes.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { Errored, Loading } from "solid-js";
+import { createSSE, SSEReadyState } from "@solid-primitives/sse";
+
+const STATES = Object.keys(SSEReadyState); // ["CONNECTING", "OPEN", "CLOSED"]
+
+function Demo() {
+  const { data, readyState, close, reconnect } = createSSE("https://sse.dev/test");
+  // After Reconnect, the new state shows together with the next message (held as one transition)
+  return (
+    <>
+      <p>readyState: {STATES[readyState()]}</p>
+      <button onClick={close}>Close</button>
+      <button onClick={reconnect}>Reconnect</button>
+      <Errored fallback={<p>Connection failed</p>}>
+        <Loading fallback={<p>Waiting for first message…</p>}>
+          <pre>{data()}</pre>
+        </Loading>
+      </Errored>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ```ts
 import { createSSE, SSEReadyState } from "@solid-primitives/sse";
@@ -453,6 +519,41 @@ const { data } = createSSE<string>(url, {
 ## Running SSE in a Worker
 
 `@solid-primitives/sse` ships a `makeSSEWorker` adapter that moves the `EventSource` connection into a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) or a [SharedWorker](https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker). The reactive API you get back from `createSSE` is identical — `data`, `readyState`, `reconnect`, etc. work exactly as documented above.
+
+### `makeSSEWorker`
+
+Tunnels `createSSE`'s connection through a Worker running the `worker-handler` script — pass it as the `source` option.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, Errored, Loading, Show } from "solid-js";
+import { createSSE } from "@solid-primitives/sse";
+import { makeSSEWorker } from "@solid-primitives/sse/worker";
+
+// Load the worker-handler entry in a module Worker
+// (a bundler would use `new URL(…, import.meta.url)` instead of a blob URL)
+const handler = `import "https://esm.sh/@solid-primitives/sse@next/worker-handler";`;
+const worker = new Worker(URL.createObjectURL(new Blob([handler], { type: "text/javascript" })), {
+  type: "module",
+});
+const [failed, setFailed] = createSignal(false);
+worker.onerror = () => setFailed(true);
+
+function Demo() {
+  const { data } = createSSE("https://sse.dev/test", { source: makeSSEWorker(worker) });
+  return (
+    <Show when={!failed()} fallback={<p>Worker failed to load</p>}>
+      <Errored fallback={<p>Connection failed</p>}>
+        <Loading fallback={<p>Waiting for the worker…</p>}>
+          <pre>{data()}</pre>
+        </Loading>
+      </Errored>
+    </Show>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
 
 ### When to use this
 
