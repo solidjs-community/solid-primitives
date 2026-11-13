@@ -277,6 +277,18 @@ importers:
         specifier: catalog:peer
         version: 2.0.0-rc.21
 
+  packages/collections:
+    devDependencies:
+      '@solidjs/signals':
+        specifier: 'catalog:'
+        version: 2.0.0-rc.21
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-rc.21(solid-js@2.0.0-rc.21)
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-rc.21
+
   packages/connectivity:
     dependencies:
       '@solid-primitives/event-listener':

@@ -1,4 +1,5 @@
-import { type JSX, Show, onCleanup } from "solid-js";
+import { Show, onCleanup } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import {
   type FormControlContextValue,
   createFormControl,

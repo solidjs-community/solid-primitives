@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { For } from "solid-js";
 import { colors, font, radii } from "./tokens.js";
 

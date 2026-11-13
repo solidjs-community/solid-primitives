@@ -51,6 +51,8 @@ export default defineConfig(({ mode }) => {
               include: ["packages/*/test/*.test.{ts,tsx}"],
               exclude: [
                 "packages/*/test/server.test.{ts,tsx}",
+                // Collections runs SSR before hydration through its package test runner.
+                "packages/collections/test/**",
                 ...UNMIGRATED_PACKAGES.map(name => `packages/${name}/test/*.test.{ts,tsx}`),
               ],
             }),

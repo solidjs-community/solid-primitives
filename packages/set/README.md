@@ -21,6 +21,8 @@ Reactive `Set` and `WeakSet` primitives, plus a suite of derived set-algebra ope
 | [`symmetricDifference`](#symmetricdifference) | `function` | Elements in `a` or `b`, but not both       |
 | [`readonlySet`](#readonlyset)                 | `function` | Cast a `ReactiveSet` to `ReadonlySet`      |
 
+> For computed, async, and optimistic collections, see [`@solid-primitives/collections`](../collections/README.md).
+
 ## Installation
 
 ```bash
