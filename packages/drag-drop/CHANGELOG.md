@@ -1,5 +1,11 @@
 # @solid-primitives/drag-drop
 
+## 0.1.0-next.4
+
+### Patch Changes
+
+- 3490301: Republish with a clean build. The previously published `next` builds imported `solid-js/web`, which no longer exists in Solid 2.0, so importing the package failed with `ERR_PACKAGE_PATH_NOT_EXPORTED`. The compiled output now imports `@solidjs/web`.
+
 ## 0.1.0-next.3
 
 ### Patch Changes
