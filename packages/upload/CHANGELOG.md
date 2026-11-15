@@ -1,5 +1,12 @@
 # @solid-primitives/upload
 
+## 1.0.0-next.8
+
+### Patch Changes
+
+- Updated dependencies [3490301]
+  - @solid-primitives/drag-drop@0.1.0-next.4
+
 ## 1.0.0-next.7
 
 ### Patch Changes
