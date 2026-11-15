@@ -67,7 +67,9 @@ export function createMultiSelectListState<T>(
 
   // Interactive state has no async source, so on the server these are plain boxes rather
   // than signals — a setter must not run during a server render (`SERVER_WRITE`).
-  const [cursor, setCursor] = createServerSafeSignal<T | undefined>(defaultedProps.initialCursor as never);
+  const [cursor, setCursor] = createServerSafeSignal<T | undefined>(
+    defaultedProps.initialCursor as never,
+  );
   const [active, setActive] = createServerSafeSignal<T[]>(defaultedProps.initialActive);
   const [selected, setSelected] = createServerSafeSignal<T[]>(defaultedProps.initialSelected);
 
@@ -97,7 +99,9 @@ export function createMultiSelectListState<T>(
   const toggleSelected = (item: T) => {
     const currentSelected = selected();
     updateSelected(
-      currentSelected.includes(item) ? currentSelected.filter((s) => s !== item) : [...currentSelected, item],
+      currentSelected.includes(item)
+        ? currentSelected.filter(s => s !== item)
+        : [...currentSelected, item],
     );
   };
 
@@ -161,7 +165,7 @@ export function createMultiSelectListState<T>(
             const newCursor = _items[_cursorIndex + 1]!;
             updateCursor(newCursor);
             if (_active.includes(newCursor)) {
-              updateActive(_active.filter((a) => a !== _cursor));
+              updateActive(_active.filter(a => a !== _cursor));
               toggleSelected(_cursor!);
             } else {
               updateActive([..._active, newCursor]);
@@ -184,10 +188,7 @@ export function createMultiSelectListState<T>(
         if (_cursorIndex === undefined) {
           setCursorActive(_items[_itemCount - 1]);
           updateSelected([_items[_itemCount - 1]!]);
-        } else if (
-          _cursorIndex !== 0 ||
-          (_active.length === 1 && direction === "next")
-        ) {
+        } else if (_cursorIndex !== 0 || (_active.length === 1 && direction === "next")) {
           if (_active.length === 1 && direction !== "previous") {
             toggleSelected(_cursor!);
             direction = direction === "next" ? null : "previous";
@@ -195,7 +196,7 @@ export function createMultiSelectListState<T>(
             const newCursor = _items[_cursorIndex - 1]!;
             updateCursor(newCursor);
             if (_active.includes(newCursor)) {
-              updateActive(_active.filter((a) => a !== _cursor));
+              updateActive(_active.filter(a => a !== _cursor));
               toggleSelected(_cursor!);
             } else {
               updateActive([..._active, newCursor]);
@@ -209,9 +210,7 @@ export function createMultiSelectListState<T>(
             setCursorActive(_items[_itemCount - 1]);
           }
         } else {
-          setCursorActive(
-            _items[_cursorIndex !== undefined ? _cursorIndex - 1 : _itemCount - 1],
-          );
+          setCursorActive(_items[_cursorIndex !== undefined ? _cursorIndex - 1 : _itemCount - 1]);
         }
       }
     } else if (eventKey === "home") {

@@ -97,7 +97,9 @@ export function createLatest<T extends readonly Accessor<any>[]>(
       DEV ? { name: i + 1 + ". source", equals: false } : EQUALS_FALSE_OPTIONS,
     ),
   );
-  return createMemo(() => memos.map(m => m())[index]!, options as any) as Accessor<ReturnType<T[number]>>;
+  return createMemo(() => memos.map(m => m())[index]!, options as any) as Accessor<
+    ReturnType<T[number]>
+  >;
 }
 
 /**
@@ -175,7 +177,10 @@ export function createWritableMemo<T>(
 ): [signal: Accessor<T>, setter: Setter<T>] {
   let combined: Accessor<T> = () => value as T;
 
-  const [signal, setSignal] = createSignal(value as Exclude<T, Function>, { equals: false, ownedWrite: true }),
+  const [signal, setSignal] = createSignal(value as Exclude<T, Function>, {
+      equals: false,
+      ownedWrite: true,
+    }),
     memo = createMemo(
       callbackWith(fn, () => combined()),
       EQUALS_FALSE_OPTIONS,
@@ -295,12 +300,14 @@ export function createMemoCache<Key, Value>(
   const run: CacheKeyAccessor<Key, Value> = key => {
     if (cache.has(key)) return (cache.get(key) as Accessor<Value>)();
     let prevVal: Value | undefined;
-    const memo = runWithOwner(owner, () =>
-      createMemo<Value>((): Value => {
-        const v = calc(key, prevVal);
-        prevVal = v;
-        return v;
-      }, options as any) as Accessor<Value>,
+    const memo = runWithOwner(
+      owner,
+      () =>
+        createMemo<Value>((): Value => {
+          const v = calc(key, prevVal);
+          prevVal = v;
+          return v;
+        }, options as any) as Accessor<Value>,
     )!;
     if (options.size === undefined || cache.size < options.size) cache.set(key, memo);
     return memo();
@@ -326,7 +333,10 @@ export function createReducer<T, ActionData extends Array<any>>(
   initialValue: T,
   options?: SignalOptions<T>,
 ): [accessor: Accessor<T>, dispatch: (...args: ActionData) => void] {
-  const [state, setState] = createSignal(initialValue as Exclude<T, Function>, { ownedWrite: true, ...options });
+  const [state, setState] = createSignal(initialValue as Exclude<T, Function>, {
+    ownedWrite: true,
+    ...options,
+  });
 
   return [state, (...args: ActionData) => void setState(state => dispatcher(state, ...args))];
 }

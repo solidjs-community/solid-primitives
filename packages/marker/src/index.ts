@@ -1,4 +1,11 @@
-import { type Accessor, createRoot, createSignal, getOwner, onCleanup, runWithOwner } from "solid-js";
+import {
+  type Accessor,
+  createRoot,
+  createSignal,
+  getOwner,
+  onCleanup,
+  runWithOwner,
+} from "solid-js";
 
 const SANITIZE_REGEX = /[^\w\s]/g,
   SPLIT_WORDS_REGEX = /\s+/g,

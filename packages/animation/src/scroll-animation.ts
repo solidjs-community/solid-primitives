@@ -2,7 +2,10 @@ import { createSignal, createEffect, type Accessor } from "solid-js";
 import { type MaybeAccessor, asAccessor, INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 type ScrollAxis = "block" | "inline" | "x" | "y";
-declare const ScrollTimeline: new (options?: { source?: Element; axis?: ScrollAxis }) => AnimationTimeline;
+declare const ScrollTimeline: new (options?: {
+  source?: Element;
+  axis?: ScrollAxis;
+}) => AnimationTimeline;
 
 export type ScrollAnimationOptions = Omit<KeyframeAnimationOptions, "timeline"> & {
   /** Scrolling container. Defaults to the document root scroller. */
@@ -37,7 +40,10 @@ export function createScrollAnimation(
 ): Accessor<Animation | undefined> {
   const getKf = asAccessor(keyframes);
   const getOpts = typeof options === "function" ? options : () => options;
-  const [animation, setAnimation] = createSignal<Animation | undefined>(undefined, INTERNAL_OPTIONS);
+  const [animation, setAnimation] = createSignal<Animation | undefined>(
+    undefined,
+    INTERNAL_OPTIONS,
+  );
 
   createEffect(
     () => ({ el: target(), kf: getKf(), opts: getOpts() }),

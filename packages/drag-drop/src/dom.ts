@@ -25,7 +25,10 @@ export function applyStyle(el: HTMLElement, style: Partial<CSSStyleDeclaration> 
   }
 }
 
-export function removeStyle(el: HTMLElement, style: Partial<CSSStyleDeclaration> | undefined): void {
+export function removeStyle(
+  el: HTMLElement,
+  style: Partial<CSSStyleDeclaration> | undefined,
+): void {
   if (!style) return;
   for (const k of Object.keys(style)) {
     (el.style as any)[k] = "";
@@ -53,5 +56,6 @@ export function removeClass(el: HTMLElement, classes: string | undefined): void 
 export function markAsDraggable(el: HTMLElement): void {
   if (!el.hasAttribute("tabindex")) el.tabIndex = 0;
   if (!el.hasAttribute("role")) el.setAttribute("role", "button");
-  if (!el.hasAttribute("aria-roledescription")) el.setAttribute("aria-roledescription", "draggable");
+  if (!el.hasAttribute("aria-roledescription"))
+    el.setAttribute("aria-roledescription", "draggable");
 }

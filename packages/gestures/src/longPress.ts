@@ -4,7 +4,7 @@ import type { PointerCallback } from "./core.ts";
 
 export type LongPressProps = {
   callback: (position: { x: number; y: number }) => void;
-  threshold?: number;     // ms to hold before firing (default: 500)
+  threshold?: number; // ms to hold before firing (default: 500)
   moveThreshold?: number; // px of movement that cancels the gesture (default: 10)
 };
 

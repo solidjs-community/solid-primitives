@@ -1,5 +1,14 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV, NotReadyError } from "solid-js";
+import {
+  action,
+  createUniqueId,
+  latest,
+  untrack,
+  reconcile,
+  snapshot,
+  DEV,
+  NotReadyError,
+} from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
 export type SyncStorage = {
@@ -59,7 +68,7 @@ export type PersistenceSyncAPI = [
 export type PersistenceOptions<
   S extends Signal<any> | [Store<any>, StoreSetter<any>] | readonly [Store<any>, StoreSetter<any>],
   O extends Record<string, any> | undefined,
-  T = S extends Signal<infer T> ? T : S extends [Store<infer T>, StoreSetter<infer T>] ? T : never
+  T = S extends Signal<infer T> ? T : S extends [Store<infer T>, StoreSetter<infer T>] ? T : never,
 > = {
   name?: string;
   serialize?: (data: T) => string;
@@ -84,9 +93,11 @@ export type PersistenceOptions<
       storageOptions?: O;
     });
 
-export type PersistedState<S, I = Promise<string> | string | null> = S extends [any, any] ? [...S, I, () => void] : never;
+export type PersistedState<S, I = Promise<string> | string | null> = S extends [any, any]
+  ? [...S, I, () => void]
+  : never;
 
-export type StoreTuple<T> = [Store<T>, StoreSetter<T>]; 
+export type StoreTuple<T> = [Store<T>, StoreSetter<T>];
 
 /** Whether `value` is a plain object (an object literal or one created with `Object.create(null)`). */
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
@@ -96,7 +107,12 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
 };
 
 const setOwn = (target: Record<string, unknown>, key: string, value: unknown) =>
-  Object.defineProperty(target, key, { value, enumerable: true, writable: true, configurable: true });
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
 
 /**
  * Deep-copies arrays and plain objects; any other value is returned as is. Keys are written as
@@ -118,7 +134,11 @@ const mergeDefaults = (defaults: unknown, stored: unknown): unknown => {
   if (!isPlainObject(defaults) || !isPlainObject(stored)) return stored;
   const result = clonePlain(defaults);
   for (const key of Object.keys(stored))
-    setOwn(result, key, Object.hasOwn(defaults, key) ? mergeDefaults(defaults[key], stored[key]) : stored[key]);
+    setOwn(
+      result,
+      key,
+      Object.hasOwn(defaults, key) ? mergeDefaults(defaults[key], stored[key]) : stored[key],
+    );
   return result;
 };
 
@@ -153,22 +173,26 @@ export function makePersisted<T>(
   signal: StoreTuple<T>,
   options?: PersistenceOptions<StoreTuple<T>, undefined>,
 ): PersistedState<StoreTuple<T>>;
-export function makePersisted<
-  T,
-  O extends Record<string, any>
->(signal: Signal<T>, options: PersistenceOptions<Signal<T>, O>): PersistedState<Signal<T>>;
-export function makePersisted<
-  T,
-  O extends Record<string, any>
->(signal: Signal<T>, options: PersistenceOptions<Signal<T>, O> & { storage: AsyncStorage | AsyncStorageWithOptions<O> }): PersistedState<Signal<T>, Promise<string> | null>;
-export function makePersisted<
-  T,
-  O extends Record<string, any>
->(signal: StoreTuple<T>, options: PersistenceOptions<StoreTuple<T>, O>): PersistedState<StoreTuple<T>>;
-export function makePersisted<
-  T,
-  O extends Record<string, any>
->(signal: StoreTuple<T>, options: PersistenceOptions<StoreTuple<T>, O> & { storage: AsyncStorage | AsyncStorageWithOptions<O> }): PersistedState<StoreTuple<T>, Promise<string> | null>;
+export function makePersisted<T, O extends Record<string, any>>(
+  signal: Signal<T>,
+  options: PersistenceOptions<Signal<T>, O>,
+): PersistedState<Signal<T>>;
+export function makePersisted<T, O extends Record<string, any>>(
+  signal: Signal<T>,
+  options: PersistenceOptions<Signal<T>, O> & {
+    storage: AsyncStorage | AsyncStorageWithOptions<O>;
+  },
+): PersistedState<Signal<T>, Promise<string> | null>;
+export function makePersisted<T, O extends Record<string, any>>(
+  signal: StoreTuple<T>,
+  options: PersistenceOptions<StoreTuple<T>, O>,
+): PersistedState<StoreTuple<T>>;
+export function makePersisted<T, O extends Record<string, any>>(
+  signal: StoreTuple<T>,
+  options: PersistenceOptions<StoreTuple<T>, O> & {
+    storage: AsyncStorage | AsyncStorageWithOptions<O>;
+  },
+): PersistedState<StoreTuple<T>, Promise<string> | null>;
 export function makePersisted<
   T,
   O extends Record<string, any> | undefined,
@@ -205,7 +229,8 @@ export function makePersisted<
   const merge: ((stored: T) => T) | undefined = !options.merge
     ? undefined
     : typeof options.merge === "function"
-      ? (stored: T) => (options.merge as (stored: T, initial: T) => T)(stored, clonePlain(initial as T))
+      ? (stored: T) =>
+          (options.merge as (stored: T, initial: T) => T)(stored, clonePlain(initial as T))
       : (stored: T) => mergeDefaults(initial, stored) as T;
   /** Deserializes stored data and, when `merge` is set, merges it onto the initial value. */
   const read = (data: string): T => {
@@ -268,20 +293,33 @@ export function makePersisted<
   };
   const persist = () => persistValue(untrack(() => latest(getter)));
   return [
-    signal[0], 
-    (value: any) => untrack(() => {
-      const output = signal[1](value);
-      // As of solid-js 2.0.0-rc.1 a signal write stays pending until the next flush, so
-      // reading it back through `getter` here would still report the *previous* value —
-      // which would persist stale data, or wipe the entry entirely when the previous
-      // value was nullish. A plain signal setter returns the value it just wrote, so
-      // persist that directly. Stores mutate in place and are still read back through
-      // `getter`, as are action-wrapped setters, whose value settles with the promise.
-      if (isSignal && !(output instanceof Promise)) persistValue(output as T);
-      else persist();
-      unchanged = false;
-      return output instanceof Promise ? output.then(async (result) => { await Promise.resolve(); persist(); return result; }, (err) => { persist(); throw err; }) : output;
-    }),
+    signal[0],
+    (value: any) =>
+      untrack(() => {
+        const output = signal[1](value);
+        // As of solid-js 2.0.0-rc.1 a signal write stays pending until the next flush, so
+        // reading it back through `getter` here would still report the *previous* value —
+        // which would persist stale data, or wipe the entry entirely when the previous
+        // value was nullish. A plain signal setter returns the value it just wrote, so
+        // persist that directly. Stores mutate in place and are still read back through
+        // `getter`, as are action-wrapped setters, whose value settles with the promise.
+        if (isSignal && !(output instanceof Promise)) persistValue(output as T);
+        else persist();
+        unchanged = false;
+        return output instanceof Promise
+          ? output.then(
+              async result => {
+                await Promise.resolve();
+                persist();
+                return result;
+              },
+              err => {
+                persist();
+                throw err;
+              },
+            )
+          : output;
+      }),
     init,
     () => {
       unchanged = false;
@@ -310,7 +348,10 @@ export const storageSync: PersistenceSyncAPI = [
 /**
  * messageSync - synchronize over post message or broadcast channel API
  */
-export const messageSync = (channel: Window | BroadcastChannel = window, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
+export const messageSync = (
+  channel: Window | BroadcastChannel = window,
+  url: string | undefined = globalThis.location?.href,
+): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) => {
     const handler = (ev: Event) => {
       subscriber((ev as MessageEvent).data);
@@ -319,16 +360,17 @@ export const messageSync = (channel: Window | BroadcastChannel = window, url: st
     return () => channel.removeEventListener("message", handler);
   },
   (key, newValue) =>
-    channel.postMessage(
-      { key, newValue, timeStamp: Date.now(), url },
-      location.origin,
-    ),
+    channel.postMessage({ key, newValue, timeStamp: Date.now(), url }, location.origin),
 ];
 
 /**
  * wsSync - syncronize persisted storage via web socket
  */
-export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV, url: string | undefined = globalThis.location?.href): PersistenceSyncAPI => [
+export const wsSync = (
+  ws: WebSocket,
+  warnOnError: boolean = !!DEV,
+  url: string | undefined = globalThis.location?.href,
+): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) => {
     const handler = (ev: MessageEvent) => {
       try {

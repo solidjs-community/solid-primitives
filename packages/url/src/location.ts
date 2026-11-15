@@ -200,10 +200,12 @@ export function createLocationState(fallback?: LocationFallbackInit): [
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/url#useSharedLocationState
  */
-export const useSharedLocationState: ReturnType<typeof createHydratableSingletonRoot<ReturnType<typeof createLocationState>>> = /*#__PURE__*/ createHydratableSingletonRoot(() =>
-  createLocationState(),
-);
+export const useSharedLocationState: ReturnType<
+  typeof createHydratableSingletonRoot<ReturnType<typeof createLocationState>>
+> = /*#__PURE__*/ createHydratableSingletonRoot(() => createLocationState());
 
 /** @internal */
-export const _useLocationState: (useShared: boolean) => ReturnType<typeof createLocationState> = (useShared: boolean): ReturnType<typeof createLocationState> =>
+export const _useLocationState: (useShared: boolean) => ReturnType<typeof createLocationState> = (
+  useShared: boolean,
+): ReturnType<typeof createLocationState> =>
   useShared ? useSharedLocationState() : createLocationState();

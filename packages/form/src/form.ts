@@ -1,10 +1,31 @@
-import { createSignal, createMemo, createRoot, onCleanup, untrack, createEffect, type Accessor } from "solid-js";
+import {
+  createSignal,
+  createMemo,
+  createRoot,
+  onCleanup,
+  untrack,
+  createEffect,
+  type Accessor,
+} from "solid-js";
 import { isServer } from "@solidjs/web";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import type { ValidatorFn, FieldsConfig, InferValue, FormField, FormReturn, FormConfig } from "./types.ts";
+import type {
+  ValidatorFn,
+  FieldsConfig,
+  InferValue,
+  FormField,
+  FormReturn,
+  FormConfig,
+} from "./types.ts";
 
-export type { ValidatorFn, FieldConfig, FieldsConfig, FormField, FormReturn, FormConfig } from "./types.ts";
-
+export type {
+  ValidatorFn,
+  FieldConfig,
+  FieldsConfig,
+  FormField,
+  FormReturn,
+  FormConfig,
+} from "./types.ts";
 
 /**
  * Converts a plain values object into a `FormData` instance.
@@ -129,15 +150,22 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
 
   for (const [name, fc] of Object.entries(config.fields)) {
     const validators = fc.validate
-      ? Array.isArray(fc.validate) ? fc.validate : [fc.validate]
+      ? Array.isArray(fc.validate)
+        ? fc.validate
+        : [fc.validate]
       : [];
     const validateOn = fc.validateOn ?? formValidateOn;
 
     const [value, _setValueRaw] = createSignal<any>(fc.initial, { ownedWrite: true });
     const [touched, setTouched] = createSignal(false, { ownedWrite: true });
-    const [externalError, setExternalError] = createSignal<string | null>(null, { ownedWrite: true });
+    const [externalError, setExternalError] = createSignal<string | null>(null, {
+      ownedWrite: true,
+    });
     // A server-side error is stale the moment the user edits the field; clear it automatically.
-    const setValue = (v: any) => { _setValueRaw(v); setExternalError(null); };
+    const setValue = (v: any) => {
+      _setValueRaw(v);
+      setExternalError(null);
+    };
 
     let asyncError: Accessor<string | null> = () => null;
     let _asyncPending: Accessor<boolean> = () => false;
@@ -173,16 +201,20 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       }
 
       // Lazy so the probe above counts as the first evaluation; no double-run on mount.
-      const syncMemo: Accessor<string | null> = syncFns.length > 0
-        ? createMemo(() => {
-            const val = value();
-            for (const fn of syncFns) {
-              const r = fn(val);
-              if (r !== null) return r as string;
-            }
-            return null;
-          }, { lazy: true })
-        : () => null;
+      const syncMemo: Accessor<string | null> =
+        syncFns.length > 0
+          ? createMemo(
+              () => {
+                const val = value();
+                for (const fn of syncFns) {
+                  const r = fn(val);
+                  if (r !== null) return r as string;
+                }
+                return null;
+              },
+              { lazy: true },
+            )
+          : () => null;
       _syncError = syncMemo;
 
       if (asyncFns.length > 0) {
@@ -252,14 +284,14 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     // Validator-only error (no external component) — this is the part that respects validateOn
     // timing below. Kept separate from _rawError so a setError() call is never accidentally
     // gated along with it.
-    const validatorError: Accessor<string | null> = validators.length === 0
-      ? () => null
-      : createMemo(() => _syncError() ?? asyncError());
+    const validatorError: Accessor<string | null> =
+      validators.length === 0 ? () => null : createMemo(() => _syncError() ?? asyncError());
 
     // Always tracks the true validation state; never gated by validateOn.
-    const _rawError: Accessor<string | null> = validators.length === 0
-      ? externalError
-      : createMemo(() => validatorError() ?? externalError());
+    const _rawError: Accessor<string | null> =
+      validators.length === 0
+        ? externalError
+        : createMemo(() => validatorError() ?? externalError());
 
     // Displayed error respects validateOn — but only for the validator portion. An external
     // error (setError()) is caller-injected out-of-band (e.g. a server response) and is always
@@ -271,16 +303,17 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     // initial) rather than on any "has an input event fired" flag, so a programmatic setValue
     // back to the initial value correctly re-hides the error too. dirtyVer forces recompute on
     // reset(newValues), same as the form-level `dirty` memo below - see its comment.
-    const error = validateOn === "change"
-      ? createMemo(() => {
-          dirtyVer();
-          const isDirty = value() !== fc.initial;
-          return (isDirty ? validatorError() : null) ?? externalError();
-        })
-      : createMemo(() => {
-          const showValidator = validateOn === "blur" ? touched() : submitted();
-          return (showValidator ? validatorError() : null) ?? externalError();
-        });
+    const error =
+      validateOn === "change"
+        ? createMemo(() => {
+            dirtyVer();
+            const isDirty = value() !== fc.initial;
+            return (isDirty ? validatorError() : null) ?? externalError();
+          })
+        : createMemo(() => {
+            const showValidator = validateOn === "blur" ? touched() : submitted();
+            return (showValidator ? validatorError() : null) ?? externalError();
+          });
 
     internalFields[name] = {
       initial: fc.initial,
@@ -308,7 +341,10 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
         setValue: f._setValue,
         setTouched: f._setTouched,
         setError: f._setExternalError,
-        reset: () => { f._setValue(f.initial); f._setTouched(false); },
+        reset: () => {
+          f._setValue(f.initial);
+          f._setTouched(false);
+        },
       } satisfies FormField<any>,
     ]),
   ) as unknown as FormReturn<C>["fields"];
@@ -425,7 +461,11 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       );
       const off2 = makeEventListener(el, "blur", () => f._setTouched(true));
 
-      return () => { off1(); off2(); disposeEffect(); };
+      return () => {
+        off1();
+        off2();
+        disposeEffect();
+      };
     };
   };
 
@@ -435,7 +475,9 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       void submit();
     });
 
-  onCleanup(() => { _isSubmitting = false; });
+  onCleanup(() => {
+    _isSubmitting = false;
+  });
 
   return {
     fields,

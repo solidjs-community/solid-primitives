@@ -73,7 +73,10 @@ function createFileUploader(send: SendFunction): FileUploader {
             send(
               uploadFile,
               (p: UploadProgress) => {
-                if (generation === thisGen) setFiles(s => { s[i]!.progress = p; });
+                if (generation === thisGen)
+                  setFiles(s => {
+                    s[i]!.progress = p;
+                  });
               },
               controllers[i]!.signal,
             ),
@@ -93,8 +96,7 @@ function createFileUploader(send: SendFunction): FileUploader {
               setFiles(s => {
                 s[i]!.status =
                   err instanceof DOMException && err.name === "AbortError" ? "aborted" : "error";
-                s[i]!.error =
-                  err instanceof DOMException && err.name === "AbortError" ? null : err;
+                s[i]!.error = err instanceof DOMException && err.name === "AbortError" ? null : err;
               });
             }
             return undefined;

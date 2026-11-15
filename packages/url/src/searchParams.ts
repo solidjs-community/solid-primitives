@@ -117,9 +117,9 @@ export function createLocationSearchParams(options?: { useSharedState?: boolean 
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/url#useSharedLocationSearchParams
  */
-export const useSharedLocationSearchParams: ReturnType<typeof createSingletonRoot<ReturnType<typeof createLocationSearchParams>>> = /*#__PURE__*/ createSingletonRoot(() =>
-  createLocationSearchParams({ useSharedState: true }),
-);
+export const useSharedLocationSearchParams: ReturnType<
+  typeof createSingletonRoot<ReturnType<typeof createLocationSearchParams>>
+> = /*#__PURE__*/ createSingletonRoot(() => createLocationSearchParams({ useSharedState: true }));
 
 /**
  * Creates an instance of the {@link ReactiveSearchParams} class — a reactive version of `URLSearchParams`.

@@ -61,7 +61,9 @@ export function normalizeColor(v: string | IColor): IColor {
  * - `"hsl"` → `["hue", "saturation", "lightness"]`
  * - `"hsb"` → `["hue", "saturation", "brightness"]`
  */
-export function getColorChannels(colorSpace: ColorSpace): [ColorChannel, ColorChannel, ColorChannel] {
+export function getColorChannels(
+  colorSpace: ColorSpace,
+): [ColorChannel, ColorChannel, ColorChannel] {
   switch (colorSpace) {
     case "rgb":
       return RGBColor.colorChannels;
@@ -353,10 +355,7 @@ class RGBColor extends Color {
     if (match?.[1]) {
       // Normalize separators (comma, slash) to spaces, trim, then split on any
       // run of whitespace so leading/trailing spaces don't produce empty tokens.
-      const tokens = match[1]
-        .replaceAll(/,|\//gu, " ")
-        .trim()
-        .split(/\s+/);
+      const tokens = match[1].replaceAll(/,|\//gu, " ").trim().split(/\s+/);
 
       // Require exactly 3 (rgb) or 4 (rgba) tokens.
       if (tokens.length !== 3 && tokens.length !== 4) return undefined;

@@ -20,9 +20,11 @@ describe("createWebShare", () => {
 describe("createSocialShare", () => {
   test("doesn't break in SSR", () => {
     createRoot(dispose => {
-      const { share, close, isSharing } = createSocialShare(
-        () => ({ url: "https://solidjs.com", title: "SolidJS", description: "A reactive library" }),
-      );
+      const { share, close, isSharing } = createSocialShare(() => ({
+        url: "https://solidjs.com",
+        title: "SolidJS",
+        description: "A reactive library",
+      }));
 
       expect(typeof share).toBe("function");
       expect(typeof close).toBe("function");

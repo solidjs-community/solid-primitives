@@ -1,7 +1,12 @@
 import { type Accessor, createEffect, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
-import { createHydratableSignal, INTERNAL_OPTIONS, trueFn, type MaybeAccessor } from "@solid-primitives/utils";
+import {
+  createHydratableSignal,
+  INTERNAL_OPTIONS,
+  trueFn,
+  type MaybeAccessor,
+} from "@solid-primitives/utils";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
 /**

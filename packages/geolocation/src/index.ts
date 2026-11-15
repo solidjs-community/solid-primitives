@@ -1,11 +1,5 @@
 import { isServer } from "@solidjs/web";
-import {
-  type Accessor,
-  createEffect,
-  createSignal,
-  NotReadyError,
-  onCleanup,
-} from "solid-js";
+import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } from "solid-js";
 import { access, noop, type MaybeAccessor } from "@solid-primitives/utils";
 
 export type GeolocationCoord = { latitude: number; longitude: number };

@@ -121,7 +121,9 @@ export const createVideo = (
   // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const seek = player.fastSeek
     ? (time: number) => player.fastSeek(time)
-    : (time: number) => { player.currentTime = time; };
+    : (time: number) => {
+        player.currentTime = time;
+      };
 
   const [playing, setPlayingSignal] = createSignal(!player.paused, INTERNAL_OPTIONS);
   const setPlaying = (v: boolean) => (v ? player.play() : player.pause());

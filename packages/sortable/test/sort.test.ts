@@ -55,7 +55,9 @@ describe("createSorted", () => {
     const [list] = createSignal([3, 1, 2]);
     const [dir, setDir] = createSignal<"asc" | "desc">("asc");
     const comparator = () => (dir() === "asc" ? ascending : descending);
-    const [dispose, sorted] = createRoot(dispose => [dispose, createSorted(list, comparator)] as const);
+    const [dispose, sorted] = createRoot(
+      dispose => [dispose, createSorted(list, comparator)] as const,
+    );
 
     flush();
     expect(sorted()).toEqual([1, 2, 3]);
@@ -69,7 +71,14 @@ describe("createSorted", () => {
   test("supports a `by` comparator", () => {
     const [list] = createSignal([{ price: 3 }, { price: 1 }, { price: 2 }]);
     const [dispose, sorted] = createRoot(
-      dispose => [dispose, createSorted(list, by((i: { price: number }) => i.price))] as const,
+      dispose =>
+        [
+          dispose,
+          createSorted(
+            list,
+            by((i: { price: number }) => i.price),
+          ),
+        ] as const,
     );
 
     flush();

@@ -10,8 +10,12 @@ describe("createTriggerCache", () => {
       const key1 = {};
       const key2 = {};
       createEffect(
-        () => { track(key1); },
-        () => { runs++; },
+        () => {
+          track(key1);
+        },
+        () => {
+          runs++;
+        },
       );
       flush();
       expect(runs).toBe(0);
@@ -30,8 +34,12 @@ describe("createTriggerCache", () => {
       const [track, , dirtyAll] = createTriggerCache(Map);
       let runs = -1;
       createEffect(
-        () => { track(1); },
-        () => { runs++; },
+        () => {
+          track(1);
+        },
+        () => {
+          runs++;
+        },
       );
       flush();
       expect(runs).toBe(0);
@@ -50,12 +58,20 @@ describe("createTriggerCache", () => {
       const key1 = "key1";
       const key2 = "key2";
       createEffect(
-        () => { track(key1); },
-        () => { runs1++; },
+        () => {
+          track(key1);
+        },
+        () => {
+          runs1++;
+        },
       );
       createEffect(
-        () => { track(key2); },
-        () => { runs2++; },
+        () => {
+          track(key2);
+        },
+        () => {
+          runs2++;
+        },
       );
       flush();
       expect(runs1).toBe(0);
@@ -82,7 +98,9 @@ describe("createTriggerCache", () => {
       } as any);
 
       createEffect(
-        () => { track(key); },
+        () => {
+          track(key);
+        },
         () => {},
       );
 
@@ -116,11 +134,15 @@ describe("createTriggerCache", () => {
       } as any);
 
       createEffect(
-        () => { if (enabled1()) track(key); },
+        () => {
+          if (enabled1()) track(key);
+        },
         () => {},
       );
       createEffect(
-        () => { if (enabled2()) track(key); },
+        () => {
+          if (enabled2()) track(key);
+        },
         () => {},
       );
 

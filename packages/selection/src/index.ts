@@ -45,7 +45,10 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
       sel => (typeof sel === "function" ? (sel as any)([null, NaN, NaN]) : sel),
     ];
   }
-  const [getSelection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN], INTERNAL_OPTIONS);
+  const [getSelection, setSelection] = createSignal<HTMLSelection>(
+    [null, NaN, NaN],
+    INTERNAL_OPTIONS,
+  );
   const [selected, setSelected] = createSignal<HTMLSelection>([null, NaN, NaN], INTERNAL_OPTIONS);
   const selectionHandler = () => {
     const active = document.activeElement;

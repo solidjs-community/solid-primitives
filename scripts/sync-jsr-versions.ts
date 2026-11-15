@@ -28,7 +28,10 @@ for (const name of fs.readdirSync(packagesDir)) {
   console.log(`${name}: ${match[1]} -> ${pkgVersion}`);
 
   if (!check) {
-    fs.writeFileSync(denoPath, denoText.replace(/"version":\s*"[^"]+"/, `"version": "${pkgVersion}"`));
+    fs.writeFileSync(
+      denoPath,
+      denoText.replace(/"version":\s*"[^"]+"/, `"version": "${pkgVersion}"`),
+    );
   }
 }
 

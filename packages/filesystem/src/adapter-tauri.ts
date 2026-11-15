@@ -2,7 +2,9 @@ import type { BaseDirectory, FileEntry, FsDirOptions } from "@tauri-apps/api/fs"
 import type { AsyncFileSystemAdapter } from "./types.ts";
 import type * as TauriFS from "@tauri-apps/api/fs";
 
-export const makeTauriFileSystem = (options: FsDirOptions = { dir: 22 as BaseDirectory.AppData }): AsyncFileSystemAdapter | null =>
+export const makeTauriFileSystem = (
+  options: FsDirOptions = { dir: 22 as BaseDirectory.AppData },
+): AsyncFileSystemAdapter | null =>
   ((taurifs: typeof TauriFS | undefined | null) =>
     taurifs
       ? {

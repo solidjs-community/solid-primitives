@@ -69,8 +69,7 @@ export const makeBattery = (onChange: (reading: BatteryReading) => void): VoidFu
  * @returns Accessor yielding the current BatteryReading, or `undefined` before the API resolves
  */
 export const createBattery = (): Accessor<BatteryReading | undefined> => {
-  if (isServer)
-    return () => ({ charging: false, chargingTime: 0, dischargingTime: 0, level: 1 });
+  if (isServer) return () => ({ charging: false, chargingTime: 0, dischargingTime: 0, level: 1 });
   const [reading, setReading] = createSignal<BatteryReading | undefined>(
     undefined,
     OWNED_WRITE as SignalOptions<BatteryReading | undefined>,

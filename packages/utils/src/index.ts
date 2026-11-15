@@ -60,7 +60,9 @@ export const defaultEquals: typeof Object.is = Object.is.bind(Object);
  * notify subscribers even when the value hasn't changed. Useful for signals
  * holding mutable objects where structural equality cannot be assumed.
  */
-export const EQUALS_FALSE_OPTIONS: { readonly equals: false } = { equals: false } as const satisfies SignalOptions<unknown>;
+export const EQUALS_FALSE_OPTIONS: { readonly equals: false } = {
+  equals: false,
+} as const satisfies SignalOptions<unknown>;
 
 /**
  * Signal options that allow writes from inside an owned reactive scope
@@ -70,7 +72,9 @@ export const EQUALS_FALSE_OPTIONS: { readonly equals: false } = { equals: false 
  * Use only for implementation-detail signals that genuinely need to be written
  * from within a scope — not as a general escape hatch.
  */
-export const INTERNAL_OPTIONS: { readonly ownedWrite: true }  = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS: { readonly ownedWrite: true } = {
+  ownedWrite: true,
+} as const satisfies SignalOptions<unknown>;
 
 /**
  * Returns `true` if `v` is an instance of `c`. Checks both `instanceof` and
@@ -126,7 +130,8 @@ export function reverseChain<Args extends [] | any[]>(
 }
 
 /** Clamps `n` to the inclusive range `[min, max]`. */
-export const clamp = (n: number, min: number, max: number): number => Math.min(Math.max(n, min), max);
+export const clamp = (n: number, min: number, max: number): number =>
+  Math.min(Math.max(n, min), max);
 
 /** Creates an ID generator with its own isolated counter and per-generator random segment. Each call to the returned function produces a `timestamp-sequence-random` string that is unique within the generator and with high probability unique across independent generators (e.g. separate processes or SSR requests). */
 export const createIdGenerator = (): (() => string) => {
@@ -303,7 +308,7 @@ export function createMicrotask<A extends any[] | []>(fn: (...a: A) => void): (.
   let args: A;
   onCleanup(() => (calls = 0));
   return (...a: A) => {
-    (args = a), calls++;
+    ((args = a), calls++);
     queueMicrotask(() => --calls === 0 && fn(...args));
   };
 }

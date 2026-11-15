@@ -163,7 +163,7 @@ export function createMasonry<T>(
   const { source, mapHeight, mapElement } = options,
     mapped = mapArray<T, any>(
       source,
-       
+
       (item: any, index: any) =>
         mapData(
           item,

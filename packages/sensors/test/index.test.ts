@@ -66,7 +66,12 @@ describe("makeAccelerometer", () => {
 
   it("throttles rapid events", () => {
     let count = 0;
-    const cleanup = makeAccelerometer(() => { count++; }, { interval: 100 });
+    const cleanup = makeAccelerometer(
+      () => {
+        count++;
+      },
+      { interval: 100 },
+    );
     dispatchMotion({ x: 1, y: 0, z: 0 });
     dispatchMotion({ x: 2, y: 0, z: 0 });
     dispatchMotion({ x: 3, y: 0, z: 0 });
@@ -275,7 +280,9 @@ class MockGenericSensor extends EventTarget {
 describe("makeSensor", () => {
   it("calls onChange on each reading", () => {
     const readings: number[] = [];
-    const cleanup = makeSensor(MockGenericSensor, s => readings.push((s as MockGenericSensor).value));
+    const cleanup = makeSensor(MockGenericSensor, s =>
+      readings.push((s as MockGenericSensor).value),
+    );
     lastSensorInstance.fireReading(42);
     expect(readings).toEqual([42]);
     cleanup!();

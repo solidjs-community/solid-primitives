@@ -56,14 +56,11 @@ export const createCompass = (options?: CompassOptions): CompassReading => {
   const [x, setX] = createSignal(0, OWNED_WRITE as SignalOptions<number>);
   const [y, setY] = createSignal(0, OWNED_WRITE as SignalOptions<number>);
   const [z, setZ] = createSignal(0, OWNED_WRITE as SignalOptions<number>);
-  const cleanup = makeCompass(
-    r => {
-      setX(r.x);
-      setY(r.y);
-      setZ(r.z);
-    },
-    options,
-  );
+  const cleanup = makeCompass(r => {
+    setX(r.x);
+    setY(r.y);
+    setZ(r.z);
+  }, options);
   if (cleanup) onCleanup(cleanup);
   return {
     get x() {

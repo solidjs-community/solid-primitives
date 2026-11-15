@@ -15,7 +15,9 @@ afterEach(() => vi.useRealTimers());
 describe("makeAnalytics", () => {
   it("dispatches page events immediately to a ready plugin", async () => {
     const pageSpy = vi.fn();
-    const [analytics, cleanup] = makeAnalytics([makeReadyPlugin({ page: ({ payload }) => pageSpy(payload) })]);
+    const [analytics, cleanup] = makeAnalytics([
+      makeReadyPlugin({ page: ({ payload }) => pageSpy(payload) }),
+    ]);
     analytics.page({ title: "Home" });
     await vi.advanceTimersByTimeAsync(0);
     expect(pageSpy).toHaveBeenCalledOnce();
@@ -28,7 +30,9 @@ describe("makeAnalytics", () => {
 
   it("dispatches track events to a ready plugin", async () => {
     const trackSpy = vi.fn();
-    const [analytics, cleanup] = makeAnalytics([makeReadyPlugin({ track: ({ payload }) => trackSpy(payload) })]);
+    const [analytics, cleanup] = makeAnalytics([
+      makeReadyPlugin({ track: ({ payload }) => trackSpy(payload) }),
+    ]);
     analytics.track("button_click", { name: "signup" });
     await vi.advanceTimersByTimeAsync(0);
     expect(trackSpy).toHaveBeenCalledOnce();
@@ -79,8 +83,18 @@ describe("makeAnalytics", () => {
 
   it("dispatches to multiple plugins sequentially", async () => {
     const order: string[] = [];
-    const pluginA: AnalyticsPlugin = { name: "a", track: async () => { order.push("a"); } };
-    const pluginB: AnalyticsPlugin = { name: "b", track: async () => { order.push("b"); } };
+    const pluginA: AnalyticsPlugin = {
+      name: "a",
+      track: async () => {
+        order.push("a");
+      },
+    };
+    const pluginB: AnalyticsPlugin = {
+      name: "b",
+      track: async () => {
+        order.push("b");
+      },
+    };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
     analytics.track("ev");
     await vi.advanceTimersByTimeAsync(10);
@@ -91,7 +105,13 @@ describe("makeAnalytics", () => {
   it("abort() stops subsequent plugins from receiving the event", async () => {
     const spyA = vi.fn();
     const spyB = vi.fn();
-    const pluginA: AnalyticsPlugin = { name: "a", track: ({ abort }) => { spyA(); abort(); } };
+    const pluginA: AnalyticsPlugin = {
+      name: "a",
+      track: ({ abort }) => {
+        spyA();
+        abort();
+      },
+    };
     const pluginB: AnalyticsPlugin = { name: "b", track: () => spyB() };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
     analytics.track("ev");
@@ -105,7 +125,9 @@ describe("makeAnalytics", () => {
     const spyB = vi.fn();
     const pluginA: AnalyticsPlugin = {
       name: "broken",
-      track: () => { throw new Error("boom"); },
+      track: () => {
+        throw new Error("boom");
+      },
     };
     const pluginB: AnalyticsPlugin = { name: "ok", track: () => spyB() };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
@@ -164,7 +186,10 @@ describe("makeAnalytics", () => {
 
   it("each event gets a unique rid", async () => {
     const rids: string[] = [];
-    const plugin: AnalyticsPlugin = { name: "p", track: ({ payload }) => rids.push(payload.meta.rid) };
+    const plugin: AnalyticsPlugin = {
+      name: "p",
+      track: ({ payload }) => rids.push(payload.meta.rid),
+    };
     const [analytics, cleanup] = makeAnalytics([plugin]);
     analytics.track("a");
     analytics.track("b");
@@ -197,7 +222,9 @@ describe("createAnalytics", () => {
     let analyticsRef!: ReturnType<typeof createAnalytics>;
     createRoot(d => {
       dispose = d;
-      analyticsRef = createAnalytics([{ name: "async", initialize: () => initDone, page: () => {} }]);
+      analyticsRef = createAnalytics([
+        { name: "async", initialize: () => initDone, page: () => {} },
+      ]);
       analyticsRef.page({ title: "A" });
       analyticsRef.page({ title: "B" });
       flush();
@@ -233,7 +260,10 @@ describe("createAnalytics", () => {
         const plugin: AnalyticsPlugin = {
           name: "cfg",
           config: { apiKey: "abc" },
-          track: ({ config }) => { spy(config); resolve(); },
+          track: ({ config }) => {
+            spy(config);
+            resolve();
+          },
         };
         createAnalytics([plugin]).track("ev");
       });
@@ -276,7 +306,13 @@ describe("drain()", () => {
     const spy = vi.fn();
     await new Promise<void>(resolve => {
       createRoot(async d => {
-        const analytics = createAnalytics([makeReadyPlugin({ track: async () => { spy(); } })]);
+        const analytics = createAnalytics([
+          makeReadyPlugin({
+            track: async () => {
+              spy();
+            },
+          }),
+        ]);
         analytics.track("ev");
         await analytics.drain();
         expect(spy).toHaveBeenCalledOnce();

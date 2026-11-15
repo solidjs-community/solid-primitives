@@ -65,14 +65,23 @@ export function createMousePosition(
 
   const [state, setState] = createStaticStore(fallback);
 
-  const attachListeners = (el: SVGSVGElement | HTMLElement | Window | Document | undefined): VoidFunction => {
+  const attachListeners = (
+    el: SVGSVGElement | HTMLElement | Window | Document | undefined,
+  ): VoidFunction => {
     const clear1 = makeMousePositionListener(el, setState, options);
     const clear2 = makeMouseInsideListener(el, setState.bind(void 0, "isInside"), options);
-    return () => { clear1(); clear2(); };
+    return () => {
+      clear1();
+      clear2();
+    };
   };
 
   if (typeof target !== "function") attachListeners(target);
-  else createEffect(() => target(), el => attachListeners(el));
+  else
+    createEffect(
+      () => target(),
+      el => attachListeners(el),
+    );
 
   return state;
 }
@@ -93,9 +102,8 @@ export function createMousePosition(
  *   ([x, y]) => console.log(x, y),
  * );
  */
-export const useMousePosition: ReturnType<typeof createHydratableSingletonRoot> = /*#__PURE__*/ createHydratableSingletonRoot(
-  createMousePosition.bind(void 0, void 0, void 0),
-);
+export const useMousePosition: ReturnType<typeof createHydratableSingletonRoot> =
+  /*#__PURE__*/ createHydratableSingletonRoot(createMousePosition.bind(void 0, void 0, void 0));
 
 /**
  * Provides an autoupdating position relative to an element based on provided page position.
@@ -135,7 +143,10 @@ export function createPositionToElement(
     getEl = asAccessor(element),
     [shouldFallback, setShouldFallback] = createSignal(!!isHydrating, { equals: false });
 
-  if (isHydrating || isFn) onSettled(() => { setShouldFallback(false); });
+  if (isHydrating || isFn)
+    onSettled(() => {
+      setShouldFallback(false);
+    });
 
   return createDerivedStaticStore(() => {
     let el!: Element | undefined;

@@ -45,7 +45,12 @@ export function createReactiveWorker<
 >(
   url: URL | string,
   schema: { inputs: I; outputs: O },
-): { inputs: I; setInputs: StoreSetter<I>; outputs: Readonly<O>; error: Accessor<ErrorEvent | null> } {
+): {
+  inputs: I;
+  setInputs: StoreSetter<I>;
+  outputs: Readonly<O>;
+  error: Accessor<ErrorEvent | null>;
+} {
   const [inputs, setInputs] = createStore<I>(schema.inputs as any);
   const [outputs, _setOutputs] = createStore<O>(schema.outputs as any);
   const [error, _setError] = createSignal<ErrorEvent | null>(null);
@@ -64,7 +69,8 @@ export function createReactiveWorker<
     for (const key of Object.keys(schema.inputs)) {
       createEffect(
         () => deep((inputs as any)[key]),
-        (value: unknown) => worker.postMessage({ type: "input", key, value } satisfies BridgeMessage),
+        (value: unknown) =>
+          worker.postMessage({ type: "input", key, value } satisfies BridgeMessage),
         { defer: true } as any,
       );
     }

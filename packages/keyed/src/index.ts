@@ -228,9 +228,8 @@ export function MapEntries<K, V>(props: {
       () => props.of && Array.from(props.of.keys()),
       mapFn.length < 3
         ? key =>
-            (mapFn as (key: K, v: Accessor<V>) => JSX.Element)(
-              key,
-              () => (props.of as Map<K, V>).get(key)!,
+            (mapFn as (key: K, v: Accessor<V>) => JSX.Element)(key, () =>
+              (props.of as Map<K, V>).get(key)!,
             )
         : (key, i) => mapFn(key, () => (props.of as Map<K, V>).get(key)!, i),
       "fallback" in props ? { fallback: () => props.fallback } : undefined,
@@ -283,8 +282,7 @@ export function Rerun<
   S extends (object | string | bigint | number | boolean) & { length?: never },
 >(props: { on: S; children: RerunChildren<S> }): JSX.Element;
 export function Rerun(props: { on: any; children: RerunChildren<any> }): JSX.Element {
-  const key =
-    typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
+  const key = typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
   const getKey = Array.isArray(key)
     ? () => (key as Accessor<unknown>[]).map(fn => fn())
     : (key as Accessor<unknown>);

@@ -25,9 +25,7 @@ export function createSortedProjection<T extends object>(
   comparator?: MaybeAccessor<Comparator<T>>,
   key: string | ((item: T) => unknown) = "id",
 ): Refreshable<Store<T[]>> {
-  return createProjection<T[]>(
-    () => [...access(list)].sort(access(comparator) ?? ascending),
-    [],
-    { key },
-  );
+  return createProjection<T[]>(() => [...access(list)].sort(access(comparator) ?? ascending), [], {
+    key,
+  });
 }

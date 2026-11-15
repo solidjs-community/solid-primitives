@@ -59,7 +59,9 @@ describe("mapRange", () => {
     const [to, setTo] = createSignal(0.2);
     const [step, setStep] = createSignal(1.5);
 
-    const [dispose, mapped] = createRoot(dispose => [dispose, mapRange(start, to, step, n => n)] as const);
+    const [dispose, mapped] = createRoot(
+      dispose => [dispose, mapRange(start, to, step, n => n)] as const,
+    );
 
     expect(mapped()).toEqual([-3.5, -2, -0.5]);
 
@@ -87,12 +89,15 @@ describe("mapRange", () => {
     const [step, setStep] = createSignal(1);
     const captured: (string | number)[] = [];
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      mapRange(start, to, step, n => {
-        captured.push(n);
-      }),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          mapRange(start, to, step, n => {
+            captured.push(n);
+          }),
+        ] as const,
+    );
 
     mapped();
     expect(captured).toEqual([4, 5, 6, 7]);
@@ -124,12 +129,15 @@ describe("mapRange", () => {
     const [step, setStep] = createSignal(1);
     const captured: (string | number)[] = [];
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      mapRange(start, to, step, n => {
-        onCleanup(() => captured.push(n));
-      }),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          mapRange(start, to, step, n => {
+            onCleanup(() => captured.push(n));
+          }),
+        ] as const,
+    );
 
     mapped();
     expect(captured).toEqual([]);
@@ -160,10 +168,13 @@ describe("mapRange", () => {
     const [to, setTo] = createSignal(8);
     const [step] = createSignal(1);
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      mapRange<string | number>(start, to, step, n => n, { fallback: () => "fb" }),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          mapRange<string | number>(start, to, step, n => n, { fallback: () => "fb" }),
+        ] as const,
+    );
 
     setStart(0);
     setTo(0);

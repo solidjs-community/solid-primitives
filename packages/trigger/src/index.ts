@@ -4,9 +4,10 @@ import { noop } from "@solid-primitives/utils";
 
 export type Trigger = [track: VoidFunction, dirty: VoidFunction];
 
-const triggerOptions: SignalOptions<any> = !isServer && DEV
-  ? { equals: false, name: "trigger", ownedWrite: true }
-  : { equals: false, ownedWrite: true };
+const triggerOptions: SignalOptions<any> =
+  !isServer && DEV
+    ? { equals: false, name: "trigger", ownedWrite: true }
+    : { equals: false, ownedWrite: true };
 
 const triggerCacheOptions: SignalOptions<any> = { equals: false, ownedWrite: true };
 
@@ -66,8 +67,7 @@ export class TriggerCache<T> {
       this.#map.set(key, (trigger = { $, $$, n: 1 }));
     } else trigger.n++;
     onCleanup(() => {
-      if (--trigger.n === 0)
-        queueMicrotask(() => trigger.n === 0 && this.#map.delete(key));
+      if (--trigger.n === 0) queueMicrotask(() => trigger.n === 0 && this.#map.delete(key));
     });
     trigger.$();
   }

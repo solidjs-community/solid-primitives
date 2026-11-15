@@ -1,6 +1,6 @@
 import { onCleanup, createMemo } from "solid-js";
 import type { Accessor, SourceAccessor } from "solid-js";
-import type { ReadableStream as NodeReadableStream } from "node:stream/web"
+import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 
 const chained = new Map<() => AbortSignal, (() => void)[]>();
 
@@ -14,9 +14,18 @@ const chained = new Map<() => AbortSignal, (() => void)[]>();
  * const streamed = createMemo(fromStream(() => getStream()));
  * ```
  */
-export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream): (...args: Args) => AsyncGenerator<string, void, unknown> {
-  return async function*(...args: Args) {
-    let parts = '', decoder;
+export function fromStream<Args extends [] | [any, ...any[]]>(
+  fetcher: (
+    ...args: Args
+  ) =>
+    | Promise<Response | ReadableStream | NodeReadableStream>
+    | Response
+    | ReadableStream
+    | NodeReadableStream,
+): (...args: Args) => AsyncGenerator<string, void, unknown> {
+  return async function* (...args: Args) {
+    let parts = "",
+      decoder;
     const source = await fetcher(...args);
     const stream = source instanceof Response ? source.body : source;
     const reader = stream?.getReader();
@@ -27,7 +36,7 @@ export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args:
       const { done, value } = await reader.read();
       if (done) return;
       if (value) {
-        if (typeof value !== 'string') {
+        if (typeof value !== "string") {
           parts += (decoder ??= new TextDecoder()).decode(value, { stream: true });
         } else {
           parts += value;
@@ -35,25 +44,34 @@ export function fromStream<Args extends [] | [any, ...any[]]>(fetcher: (...args:
       }
       yield parts;
     }
-  }
+  };
 }
 
 const endMatcher = /(?:[,:]\s*)(t|tru?|f|fa|fals?|n|nul?)$/;
 const endLiterals: Record<string, string> = {
-  t: "rue", tr: "ue", tru: "e", 
-  f: "alse", fa: "lse", fal: "se", fals: "e",
-  n: "ull", nu: "ll", nul: "l"
+  t: "rue",
+  tr: "ue",
+  tru: "e",
+  f: "alse",
+  fa: "lse",
+  fal: "se",
+  fals: "e",
+  n: "ull",
+  nu: "ll",
+  nul: "l",
 };
 
 const closeJSONPart = (json: string) =>
-  json.replace(/[,:]\s*$/, "") + 
-    (endMatcher.test(json) && endLiterals[RegExp.$1] || "") +
-    [...json].reduce((stack: string[], char: string) => {
-      const close = ({ '"': '"', "[": "]", "{": "}" })[char];
+  json.replace(/[,:]\s*$/, "") +
+  ((endMatcher.test(json) && endLiterals[RegExp.$1]) || "") +
+  [...json]
+    .reduce((stack: string[], char: string) => {
+      const close = { '"': '"', "[": "]", "{": "}" }[char];
       if (char === stack[0]) stack.shift();
       else if (close) stack.unshift(close);
       return stack;
-    }, []).join("");
+    }, [])
+    .join("");
 
 /**
  * **aggregates web stream chunks into a memo supporting partial JSON**
@@ -65,23 +83,33 @@ const closeJSONPart = (json: string) =>
  * const streamed = createMemo(fromJSONStream(() => getStream()));
  * ```
  */
-export function fromJSONStream<Args extends [] | [any, ...any[]]>(fetcher: (...args: Args) => Promise<Response | ReadableStream | NodeReadableStream> | Response | ReadableStream | NodeReadableStream): (...args: Args) => AsyncGenerator<any, void, unknown> {
+export function fromJSONStream<Args extends [] | [any, ...any[]]>(
+  fetcher: (
+    ...args: Args
+  ) =>
+    | Promise<Response | ReadableStream | NodeReadableStream>
+    | Response
+    | ReadableStream
+    | NodeReadableStream,
+): (...args: Args) => AsyncGenerator<any, void, unknown> {
   const wrappedFetcher = fromStream(fetcher);
-  return async function*(...args: Args) {
+  return async function* (...args: Args) {
     for await (const data of wrappedFetcher(...args)) {
       try {
         const parsed = JSON.parse(closeJSONPart(data));
         yield parsed;
-      } catch (_e) { /* ignore erroneous states, recover later */ }
+      } catch (_e) {
+        /* ignore erroneous states, recover later */
+      }
     }
-  }
+  };
 }
 
 export type AbortableReturn = [
   signal: () => AbortSignal,
   abort: (reason?: string) => void,
   filterAbortError: (err: any) => void,
-]
+];
 
 export type AbortableOptions = {
   /** Should abort when a new signal is requested, default is true */
@@ -107,9 +135,7 @@ export type AbortableOptions = {
  * - `autoAbort`: defaults to `true`, aborting the previous signal whenever a new one is requested; set to `false` to opt out
  * - `chainTo`: listen to another abort signal to abort this signal
  */
-export function makeAbortable(
-  options: AbortableOptions = {},
-): AbortableReturn {
+export function makeAbortable(options: AbortableOptions = {}): AbortableReturn {
   let controller: AbortController;
   let timeout: ReturnType<typeof setTimeout> | undefined;
   const abort = (reason?: string) => {
@@ -117,18 +143,20 @@ export function makeAbortable(
     controller?.abort(reason);
   };
   if (options.chainTo) {
-    chained.set(options.chainTo, [...(chained.get(options.chainTo) || []), () => abort("chain abort")]);
+    chained.set(options.chainTo, [
+      ...(chained.get(options.chainTo) || []),
+      () => abort("chain abort"),
+    ]);
   }
   function signal() {
-    if (options.autoAbort !== false && controller?.signal.aborted === false)
-      abort("retry");
+    if (options.autoAbort !== false && controller?.signal.aborted === false) abort("retry");
     controller = new AbortController();
     if (options.timeout) {
       timeout = setTimeout(() => abort("timeout"), options.timeout);
     }
-    controller.signal.addEventListener('abort', () => chained.get(signal)?.forEach(a => a()));
+    controller.signal.addEventListener("abort", () => chained.get(signal)?.forEach(a => a()));
     return controller.signal;
-  };
+  }
   return [
     signal,
     abort,
@@ -164,15 +192,17 @@ export function createAbortable(
   return [signal, abort, filterAbortError];
 }
 
-const isPromiseLike = (obj: unknown): obj is PromiseLike<unknown> => !!obj &&
-  ['object', 'function'].includes(typeof obj) && typeof (obj as PromiseLike<unknown>).then === 'function';
+const isPromiseLike = (obj: unknown): obj is PromiseLike<unknown> =>
+  !!obj &&
+  ["object", "function"].includes(typeof obj) &&
+  typeof (obj as PromiseLike<unknown>).then === "function";
 
 const isIterable = (obj: unknown): obj is Iterable<unknown> =>
-  typeof (obj as { [Symbol.iterator]?: unknown })?.[Symbol.iterator] === 'function';
-  
+  typeof (obj as { [Symbol.iterator]?: unknown })?.[Symbol.iterator] === "function";
+
 const isAsyncIterable = (obj: unknown): obj is AsyncIterable<unknown> =>
-  typeof (obj as { [Symbol.asyncIterator]?: unknown })?.[Symbol.asyncIterator] === 'function';
-  
+  typeof (obj as { [Symbol.asyncIterator]?: unknown })?.[Symbol.asyncIterator] === "function";
+
 export type RetryOptions = {
   delay?: number;
   retries?: number;
@@ -195,17 +225,17 @@ export function makeRetrying<T>(
 ): () => AsyncGenerator<T, void> {
   const delay = options.delay ?? 5000;
   let retries = options.retries ?? 3;
-  
+
   return async function* retrying(v?: T): AsyncGenerator<T> {
     let result: T | PromiseLike<T> | AsyncIterable<T> | undefined;
     while (true) {
       try {
         result = fetcher(v);
-        if (isPromiseLike(result)) { 
+        if (isPromiseLike(result)) {
           yield await result;
           return;
         } else if (isIterable(result)) {
-          for (const item of result) 
+          for (const item of result)
             if (isPromiseLike(item)) yield item as PromiseLike<T>;
             else yield Promise.resolve(item) as Promise<T>;
           return;
@@ -216,7 +246,7 @@ export function makeRetrying<T>(
           yield Promise.resolve(result) as PromiseLike<T>;
           return;
         }
-      } catch(_error) {
+      } catch (_error) {
         if (retries-- <= 0) {
           retries = options.retries ?? 3;
           throw new Error(`retry failed ${options.retries ?? 3} times`);
@@ -224,8 +254,8 @@ export function makeRetrying<T>(
         if (delay) await new Promise<void>(resolve => setTimeout(resolve, delay));
       }
     }
-  };}
-
+  };
+}
 
 function toArray(item: any) {
   return Array.isArray(item) ? item : item ? [item] : [];
@@ -249,7 +279,11 @@ function toArray(item: any) {
  *
  * Objects and Arrays are re-created on each operation, but the values will be left untouched, so `<For>` should work fine.
  */
-export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initialValue?: I, memoOptions?: Parameters<typeof createMemo<{} | R | I | R[] | I[] | undefined>>[1]): SourceAccessor<I | R | {} | R[] | I[] | undefined> {
+export function createAggregated<R, I extends R | R[]>(
+  res: Accessor<R>,
+  initialValue?: I,
+  memoOptions?: Parameters<typeof createMemo<{} | R | I | R[] | I[] | undefined>>[1],
+): SourceAccessor<I | R | {} | R[] | I[] | undefined> {
   return createMemo<I | R | {} | R[] | I[] | undefined>((previous = initialValue) => {
     const current = res();
     return current == null && previous == null

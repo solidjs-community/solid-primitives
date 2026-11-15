@@ -24,8 +24,9 @@ describe("createIsMounted", () => {
     let readInLaterOnSettled: boolean | undefined;
     let isMounted!: () => boolean;
     const dispose = createRoot(d => {
-      isMounted = createIsMounted();       // registers onSettled #1: setIsMounted(true)
-      onSettled(() => {                    // registers onSettled #2
+      isMounted = createIsMounted(); // registers onSettled #1: setIsMounted(true)
+      onSettled(() => {
+        // registers onSettled #2
         readInLaterOnSettled = isMounted();
       });
       return d;

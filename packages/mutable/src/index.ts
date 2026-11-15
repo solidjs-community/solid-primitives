@@ -116,9 +116,7 @@ function setProperty(
   const prev = state[property],
     len = state.length;
 
-  if (DEV)
-    DEV.hooks.onStoreNodeUpdate &&
-      DEV.hooks.onStoreNodeUpdate(state, property, value, prev);
+  if (DEV) DEV.hooks.onStoreNodeUpdate && DEV.hooks.onStoreNodeUpdate(state, property, value, prev);
 
   /*
     TODO: setting to undefined should not delete the property
@@ -297,7 +295,10 @@ export function createMutable<T extends MutableNode>(state: T, _options?: Mutabl
 
   const unwrappedStore = state;
 
-  if (DEV && ((state as any) === null || (typeof state !== "object" && typeof state !== "function")))
+  if (
+    DEV &&
+    ((state as any) === null || (typeof state !== "object" && typeof state !== "function"))
+  )
     throw new Error(
       `Unexpected value ${String(state)} received when initializing 'createMutable'. Expected a non-null object or function.`,
     );

@@ -46,7 +46,10 @@ export function makeSequence(factories: AnimationFactory[]): SequenceControls {
       const next = () => {
         if (gen !== generation || i >= factories.length) return;
         const anim = factories[i++]!();
-        if (!anim) { next(); return; }
+        if (!anim) {
+          next();
+          return;
+        }
         current = anim;
         anim.addEventListener("finish", next, { once: true });
       };

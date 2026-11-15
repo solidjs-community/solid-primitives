@@ -4,7 +4,7 @@ import { createListState, createMultiSelectListState } from "../src/index.js";
 
 describe("createListState - SSR safety", () => {
   it("creates list state without errors", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { active } = createListState({
         items: ["a", "b", "c"],
         initialActive: "a",
@@ -15,7 +15,7 @@ describe("createListState - SSR safety", () => {
   });
 
   it("supports all configuration options in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { active } = createListState({
         items: ["a", "b", "c"],
         initialActive: "a",
@@ -32,7 +32,7 @@ describe("createListState - SSR safety", () => {
   });
 
   it("handles accessor functions in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { active } = createListState({
         items: () => ["a", "b", "c"],
         initialActive: "a",
@@ -43,7 +43,7 @@ describe("createListState - SSR safety", () => {
   });
 
   it("onKeyDown handler exists in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { onKeyDown } = createListState({
         items: ["a", "b", "c"],
         initialActive: "a",
@@ -54,7 +54,7 @@ describe("createListState - SSR safety", () => {
   });
 
   it("handles empty items in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { active } = createListState({
         items: [],
       });
@@ -64,7 +64,7 @@ describe("createListState - SSR safety", () => {
   });
 
   it("supports callback in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const onChange = vi.fn();
       const { onKeyDown } = createListState({
         items: ["a", "b", "c"],
@@ -79,7 +79,7 @@ describe("createListState - SSR safety", () => {
 
 describe("createMultiSelectListState - SSR safety", () => {
   it("creates multi-select list state without errors", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { cursor, active, selected } = createMultiSelectListState({
         items: ["a", "b", "c"],
         initialCursor: "a",
@@ -94,11 +94,10 @@ describe("createMultiSelectListState - SSR safety", () => {
   });
 
   it("handles cursor and selection state in SSR", () => {
-    createRoot((dispose) => {
-      const { cursor, active, selected, setCursorActive } =
-        createMultiSelectListState({
-          items: ["a", "b", "c"],
-        });
+    createRoot(dispose => {
+      const { cursor, active, selected, setCursorActive } = createMultiSelectListState({
+        items: ["a", "b", "c"],
+      });
       setCursorActive("b");
       expect(cursor()).toBe("b");
       expect(active()).toEqual(["b"]);
@@ -108,7 +107,7 @@ describe("createMultiSelectListState - SSR safety", () => {
   });
 
   it("supports all configuration options in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { cursor } = createMultiSelectListState({
         items: ["a", "b", "c"],
         initialCursor: "a",
@@ -130,7 +129,7 @@ describe("createMultiSelectListState - SSR safety", () => {
   });
 
   it("handles accessor functions in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { cursor } = createMultiSelectListState({
         items: () => ["a", "b", "c"],
         initialCursor: "a",
@@ -141,7 +140,7 @@ describe("createMultiSelectListState - SSR safety", () => {
   });
 
   it("onKeyDown handler exists in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { onKeyDown } = createMultiSelectListState({
         items: ["a", "b", "c"],
       });
@@ -151,7 +150,7 @@ describe("createMultiSelectListState - SSR safety", () => {
   });
 
   it("handles empty items in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const { cursor } = createMultiSelectListState({
         items: [],
       });
@@ -161,7 +160,7 @@ describe("createMultiSelectListState - SSR safety", () => {
   });
 
   it("supports callbacks in SSR", () => {
-    createRoot((dispose) => {
+    createRoot(dispose => {
       const onCursorChange = vi.fn();
       const onActiveChange = vi.fn();
       const onSelectedChange = vi.fn();

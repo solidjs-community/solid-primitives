@@ -12,37 +12,37 @@ import { type Accessor, createEffect } from "solid-js";
  * Listens for `reset` event on the closest `<form>` element and execute the given handler.
  */
 export function createFormResetListener(
-	element: Accessor<HTMLElement | null | undefined>,
-	handler: () => void,
+  element: Accessor<HTMLElement | null | undefined>,
+  handler: () => void,
 ): void {
-	createEffect(
-		() => element(),
-		(element) => {
-			if (element == null) {
-				return;
-			}
+  createEffect(
+    () => element(),
+    element => {
+      if (element == null) {
+        return;
+      }
 
-			const form = getClosestForm(element);
+      const form = getClosestForm(element);
 
-			if (form == null) {
-				return;
-			}
+      if (form == null) {
+        return;
+      }
 
-			form.addEventListener("reset", handler, { passive: true });
+      form.addEventListener("reset", handler, { passive: true });
 
-			return () => {
-				form.removeEventListener("reset", handler);
-			};
-		},
-	);
+      return () => {
+        form.removeEventListener("reset", handler);
+      };
+    },
+  );
 }
 
 function getClosestForm(element: HTMLElement) {
-	return isFormElement(element) ? element.form : element.closest("form");
+  return isFormElement(element) ? element.form : element.closest("form");
 }
 
 function isFormElement(
-	element: HTMLElement,
+  element: HTMLElement,
 ): element is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement {
-	return element.matches("textarea, input, select, button");
+  return element.matches("textarea, input, select, button");
 }

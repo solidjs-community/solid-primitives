@@ -4,8 +4,8 @@ import type { PointerCallback } from "./core.ts";
 
 export type DoubleTapProps = {
   callback: (position: { x: number; y: number }) => void;
-  timeframe?: number;          // ms window between taps (default: 300)
-  positionThreshold?: number;  // max px distance between tap positions (default: 30)
+  timeframe?: number; // ms window between taps (default: 300)
+  positionThreshold?: number; // max px distance between tap positions (default: 30)
 };
 
 export function doubleTap(props: DoubleTapProps): (node: HTMLElement) => void {

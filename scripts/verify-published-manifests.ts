@@ -32,15 +32,19 @@ import * as path from "node:path";
 import { execFileSync } from "node:child_process";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
-const DEP_FIELDS = ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"] as const;
+const DEP_FIELDS = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies",
+] as const;
 const BAD_PROTOCOLS = ["catalog:", "workspace:"];
 // Solid 1.x subpaths that were removed or moved in Solid 2.0.
 const REMOVED_SOLID_SUBPATHS =
   /^solid-js\/(web|store|html|h|universal|jsx-runtime|jsx-dev-runtime)(\/|$)/;
 // Runtime packages whose imports must be declared in the manifest.
 const SOLID_RUNTIME_PACKAGES = new Set(["solid-js", "@solidjs/web"]);
-const IMPORT_SPECIFIER =
-  /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)["']([^"']+)["']/g;
+const IMPORT_SPECIFIER = /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)["']([^"']+)["']/g;
 
 /** Package name of a bare import specifier (`@scope/pkg/sub` -> `@scope/pkg`), or null if not a package import. */
 const packageNameOf = (specifier: string): string | null => {
@@ -165,9 +169,7 @@ if (undeclaredFailures.length > 0) {
   failed = true;
   console.error("Built output imports the Solid runtime without declaring it:\n");
   for (const f of undeclaredFailures) console.error(`  - ${f}`);
-  console.error(
-    "\nAdd it to `peerDependencies`, otherwise consumers can't resolve it.\n",
-  );
+  console.error("\nAdd it to `peerDependencies`, otherwise consumers can't resolve it.\n");
 }
 
 fs.rmSync(tmpDir, { recursive: true, force: true });

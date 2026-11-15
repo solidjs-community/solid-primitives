@@ -284,11 +284,7 @@ describe("combineProps", () => {
 
     let combinedProps: any;
     createRoot(() => {
-      combinedProps = combineProps(
-        signal,
-        { class: "secondary" },
-        { style: { padding: "10px" } },
-      );
+      combinedProps = combineProps(signal, { class: "secondary" }, { style: { padding: "10px" } });
 
       expect(combinedProps.class).toBe("primary secondary");
       expect(combinedProps.style).toEqual({ margin: "10px", padding: "10px" });

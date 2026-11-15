@@ -77,23 +77,29 @@ const errorMessage = (err: unknown) => {
 };
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-const askOtp = () => new Promise<string>(resolve => rl.question("npm OTP: ", a => resolve(a.trim())));
+const askOtp = () =>
+  new Promise<string>(resolve => rl.question("npm OTP: ", a => resolve(a.trim())));
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Retries with a freshly prompted OTP on EOTP, and waits out registry rate limits on E429.
 const npm = async (args: string[]): Promise<string> => {
   let otpPrompts = 0;
-  for (let rateLimited = 0; ; ) {
+  for (let rateLimited = 0; ;) {
     try {
       return runNpm(args);
     } catch (err) {
       const message = errorMessage(err);
       if (/EOTP/.test(message) && otpPrompts++ < 2) {
         otp = await askOtp();
-      } else if (/E429|Too Many Requests/i.test(message) && rateLimited++ < MAX_RATE_LIMIT_RETRIES) {
+      } else if (
+        /E429|Too Many Requests/i.test(message) &&
+        rateLimited++ < MAX_RATE_LIMIT_RETRIES
+      ) {
         const wait = RATE_LIMIT_WAIT_MS * rateLimited;
-        console.log(`  rate limited, waiting ${wait / 1000}s (retry ${rateLimited}/${MAX_RATE_LIMIT_RETRIES})`);
+        console.log(
+          `  rate limited, waiting ${wait / 1000}s (retry ${rateLimited}/${MAX_RATE_LIMIT_RETRIES})`,
+        );
         await sleep(wait);
       } else {
         throw err;
@@ -142,7 +148,17 @@ for (const [i, name] of names.entries()) {
       console.log(`= ${name} (already configured)`);
       continue;
     }
-    const args = ["trust", "github", name, "--repo", REPO, "--file", file, "--allow-publish", "--yes"];
+    const args = [
+      "trust",
+      "github",
+      name,
+      "--repo",
+      REPO,
+      "--file",
+      file,
+      "--allow-publish",
+      "--yes",
+    ];
     if (dryRun) args.push("--dry-run");
     await npm(args);
     created.push(name);

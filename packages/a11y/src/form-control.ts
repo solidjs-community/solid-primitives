@@ -13,13 +13,7 @@
  */
 
 import type { Context } from "solid-js";
-import {
-  createContext,
-  createEffect,
-  createSignal,
-  createUniqueId,
-  useContext,
-} from "solid-js";
+import { createContext, createEffect, createSignal, createUniqueId, useContext } from "solid-js";
 import { access } from "@solid-primitives/utils";
 import type {
   CreateFormControlInputProps,
@@ -32,7 +26,9 @@ import type {
  * Solid context that carries the `FormControlContextValue` produced by `createFormControl`.
  * Provide it with `<FormControlContext value={ctx}>` and consume it with `useFormControl()`.
  */
-export const FormControlContext: Context<FormControlContextValue | undefined> = createContext<FormControlContextValue | undefined>(undefined);
+export const FormControlContext: Context<FormControlContextValue | undefined> = createContext<
+  FormControlContextValue | undefined
+>(undefined);
 
 /**
  * Reads `FormControlContext` from the nearest ancestor `<FormControlContext>` provider.
@@ -105,8 +101,12 @@ export function createFormControl(props: CreateFormControlProps): FormControlCon
 
   const [labelId, setLabelId] = createSignal<string | undefined>(undefined, { ownedWrite: true });
   const [fieldId, setFieldId] = createSignal<string | undefined>(undefined, { ownedWrite: true });
-  const [descriptionId, setDescriptionId] = createSignal<string | undefined>(undefined, { ownedWrite: true });
-  const [errorMessageId, setErrorMessageId] = createSignal<string | undefined>(undefined, { ownedWrite: true });
+  const [descriptionId, setDescriptionId] = createSignal<string | undefined>(undefined, {
+    ownedWrite: true,
+  });
+  const [errorMessageId, setErrorMessageId] = createSignal<string | undefined>(undefined, {
+    ownedWrite: true,
+  });
 
   const generateId = (part: string) => `${id()}-${part}`;
 
@@ -218,7 +218,7 @@ export function createFormControlInput(props: CreateFormControlInputProps = {}):
   // running the next registration.
   createEffect(
     () => id(),
-    (id) => context.registerField(id),
+    id => context.registerField(id),
   );
 
   return {

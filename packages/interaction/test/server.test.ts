@@ -31,10 +31,7 @@ describe("createInteractOutside on server", () => {
 
   it("accepts a shouldExcludeElement callback without throwing", () => {
     expect(() => {
-      createInteractOutside(
-        { shouldExcludeElement: () => true },
-        () => undefined,
-      );
+      createInteractOutside({ shouldExcludeElement: () => true }, () => undefined);
     }).not.toThrow();
   });
 });

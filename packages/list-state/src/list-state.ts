@@ -51,7 +51,9 @@ export function createListState<T>(props: ListStateOptions<T>): ListStateReturn<
 
   // Interactive state has no async source, so on the server these are plain boxes rather
   // than signals — a setter must not run during a server render (`SERVER_WRITE`).
-  const [active, setActive] = createServerSafeSignal<T | undefined>(defaultedProps.initialActive as never);
+  const [active, setActive] = createServerSafeSignal<T | undefined>(
+    defaultedProps.initialActive as never,
+  );
 
   const nextKeys = () => {
     const vimKeys = access(defaultedProps.vimKeys);

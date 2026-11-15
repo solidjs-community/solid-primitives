@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createRoot } from "solid-js";
-import { createReactiveWorker, createWorker, createWorkerPool, createWorkerQuery } from "../src/index.js";
+import {
+  createReactiveWorker,
+  createWorker,
+  createWorkerPool,
+  createWorkerQuery,
+} from "../src/index.js";
 import { workerScope } from "../src/worker-scope.js";
 
 // All tests run with --mode ssr so isServer === true
@@ -9,7 +14,11 @@ describe("createWorker (SSR)", () => {
   it("returns a stub [EventTarget, noop, noop, Set] tuple without throwing", () => {
     let result: ReturnType<typeof createWorker<{ add: (a: number, b: number) => number }>>;
     createRoot(dispose => {
-      result = createWorker({ add(a: number, b: number) { return a + b; } });
+      result = createWorker({
+        add(a: number, b: number) {
+          return a + b;
+        },
+      });
       dispose();
     });
     expect(result![0]).toBeInstanceOf(EventTarget);

@@ -1,9 +1,9 @@
 import { isServer } from "@solidjs/web";
 
 export type Handlers<T> = {
-  [Property in keyof T as Property extends `on${infer EventName}`
-    ? Uncapitalize<EventName>
-    : never]: T[Property];
+  [
+    Property in keyof T as Property extends `on${infer EventName}` ? Uncapitalize<EventName> : never
+  ]: T[Property];
 };
 
 export type DispatcherOptions = {
@@ -36,8 +36,7 @@ export function createEventDispatcher<Props>(props: Props): <
   }
   return function <N extends keyof Handlers<Props> & string>(
     ...args: Handlers<Props>[N] extends
-      | undefined
-      | ((evt?: CustomEvent<infer D> | undefined) => any)
+      undefined | ((evt?: CustomEvent<infer D> | undefined) => any)
       ? // this will handle typing for callbacks with optional payloads like (e.g. onMyEvent: (evt?: CustomEvent<string> => void))
         [eventName: N, payload?: D | undefined, dispatcherOptions?: DispatcherOptions]
       : Handlers<Props>[N] extends undefined | ((evt: CustomEvent<infer D>) => any)

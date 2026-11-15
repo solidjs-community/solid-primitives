@@ -172,7 +172,9 @@ export const createClipboard = (
  * <button ref={copyToClipboard(() => ({ value: text() }))}>Copy</button>
  * ```
  */
-export const copyToClipboard = (options?: MaybeAccessor<CopyToClipboardOptions>): (el: HTMLElement) => void => {
+export const copyToClipboard = (
+  options?: MaybeAccessor<CopyToClipboardOptions>,
+): ((el: HTMLElement) => void) => {
   let _el: HTMLElement | undefined;
 
   const setValue = () => {

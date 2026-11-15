@@ -8,7 +8,11 @@ interface Props {
 describe("createEventDispatcher server", () => {
   test("returns a no-op dispatcher that always returns true", () => {
     let called = false;
-    const dispatch = createEventDispatcher<Props>({ onFoo: () => { called = true; } });
+    const dispatch = createEventDispatcher<Props>({
+      onFoo: () => {
+        called = true;
+      },
+    });
 
     expect(dispatch("foo" as any, "payload")).toBe(true);
     expect(called).toBe(false);

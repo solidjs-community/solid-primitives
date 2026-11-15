@@ -66,10 +66,7 @@ export function arrayMove<T>(array: readonly T[], from: number, to: number): T[]
  * </For>
  * ```
  */
-export function createSortable<T = unknown>(
-  id: string | number,
-  data?: T,
-): SortableReturn<T> {
+export function createSortable<T = unknown>(id: string | number, data?: T): SortableReturn<T> {
   if (isServer) {
     return {
       ref: noop,

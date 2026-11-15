@@ -221,7 +221,7 @@ describe("Setting state from Effects", () => {
     let state: { data: string };
     let getData: solid.Accessor<string>, setData: solid.Setter<string>;
     solid.createRoot(() => {
-      ([getData, setData] = solid.createSignal("init")), (state = createMutable({ data: "" }));
+      (([getData, setData] = solid.createSignal("init")), (state = createMutable({ data: "" })));
       solid.createEffect(
         () => getData(),
         data => {

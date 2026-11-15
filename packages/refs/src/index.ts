@@ -1,11 +1,5 @@
 import { chain, arrayEquals } from "@solid-primitives/utils";
-import {
-  type Accessor,
-  children,
-  createEffect,
-  createMemo,
-  onCleanup,
-} from "solid-js";
+import { type Accessor, children, createEffect, createMemo, onCleanup } from "solid-js";
 import { isServer, type JSX } from "@solidjs/web";
 
 /**

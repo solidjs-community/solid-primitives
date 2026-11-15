@@ -23,7 +23,9 @@ import { isServer } from "@solidjs/web";
 export function createIsMounted(): Accessor<boolean> {
   if (isServer) return () => false;
   const [isMounted, setIsMounted] = createSignal(false);
-  onSettled(() => { setIsMounted(true); });
+  onSettled(() => {
+    setIsMounted(true);
+  });
   return isMounted;
 }
 

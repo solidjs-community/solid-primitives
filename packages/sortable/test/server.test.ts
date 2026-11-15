@@ -25,7 +25,11 @@ describe("sortable — SSR", () => {
       const indexOf = createSortedIndex(() => [item], ascending);
       expect(indexOf(item)()).toBe(0);
 
-      const projected = createSortedProjection(() => [item], by((i: typeof item) => i.name), "id");
+      const projected = createSortedProjection(
+        () => [item],
+        by((i: typeof item) => i.name),
+        "id",
+      );
       expect(projected.map(i => i.id)).toEqual([1]);
 
       dispose();

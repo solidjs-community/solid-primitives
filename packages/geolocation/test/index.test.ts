@@ -249,7 +249,10 @@ describe("createDistance", () => {
   it("returns a positive km distance for a different target", () =>
     createRoot(async dispose => {
       // ~1 degree north of mockCoordinates ≈ 111 km away
-      const distance = createDistance({ latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude });
+      const distance = createDistance({
+        latitude: mockCoordinates.latitude + 1,
+        longitude: mockCoordinates.longitude,
+      });
       await Promise.resolve();
       await Promise.resolve();
       expect(distance()).toBeGreaterThan(100);
@@ -269,7 +272,9 @@ describe("createDistance", () => {
 
   it("reacts when target changes", () =>
     createRoot(async dispose => {
-      const [target, setTarget] = createSignal<{ latitude: number; longitude: number }>(mockCoordinates);
+      const [target, setTarget] = createSignal<{ latitude: number; longitude: number }>(
+        mockCoordinates,
+      );
       const distance = createDistance(target);
       await Promise.resolve();
       await Promise.resolve();
@@ -321,7 +326,10 @@ describe("createWithinRadius", () => {
   it("returns false when user is outside radius", () =>
     createRoot(async dispose => {
       // Centre is ~111 km away; radius is only 1 km
-      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const farCenter = {
+        latitude: mockCoordinates.latitude + 1,
+        longitude: mockCoordinates.longitude,
+      };
       const within = createWithinRadius(farCenter, 1000);
       await Promise.resolve();
       await Promise.resolve();
@@ -332,7 +340,10 @@ describe("createWithinRadius", () => {
   it("reacts when radius changes", () =>
     createRoot(async dispose => {
       // Centre is ~111 km away; start with small radius then expand
-      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const farCenter = {
+        latitude: mockCoordinates.latitude + 1,
+        longitude: mockCoordinates.longitude,
+      };
       const [radius, setRadius] = createSignal(1000);
       const within = createWithinRadius(farCenter, radius);
       await Promise.resolve();
@@ -357,7 +368,10 @@ describe("createWithinRadius", () => {
 
   it("initialLocation: returns false when seed is outside radius", () =>
     createRoot(dispose => {
-      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const farCenter = {
+        latitude: mockCoordinates.latitude + 1,
+        longitude: mockCoordinates.longitude,
+      };
       const within = createWithinRadius(farCenter, 1000, {
         enabled: false,
         initialLocation: mockCoordinates,

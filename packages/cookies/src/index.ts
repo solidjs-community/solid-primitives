@@ -78,9 +78,7 @@ export function createServerCookie<T>(
     (string, prev) => {
       if (prev === string) return;
       document.cookie =
-        string === undefined
-          ? `${name}=;max-age=0`
-          : `${name}=${string};max-age=${cookieMaxAge}`;
+        string === undefined ? `${name}=;max-age=0` : `${name}=${string};max-age=${cookieMaxAge}`;
     },
   );
 

@@ -14,7 +14,9 @@ export function makeStagger(
 ): Animation[] {
   const { stagger = 0, ...animOptions } = options ?? {};
   const baseDelay = typeof animOptions.delay === "number" ? animOptions.delay : 0;
-  return els.map((el, i) => el.animate(keyframes, { ...animOptions, delay: baseDelay + i * stagger }));
+  return els.map((el, i) =>
+    el.animate(keyframes, { ...animOptions, delay: baseDelay + i * stagger }),
+  );
 }
 
 /**
@@ -33,7 +35,11 @@ export function createStagger(
   createEffect(
     () => ({ els: targets(), kf: getKf(), opts: getOpts() }),
     ({ els, kf, opts }) => {
-      const anims = makeStagger(els.filter((el): el is Element => el != null), kf, opts);
+      const anims = makeStagger(
+        els.filter((el): el is Element => el != null),
+        kf,
+        opts,
+      );
       setAnimations(anims);
       return () => anims.forEach(a => a.cancel());
     },

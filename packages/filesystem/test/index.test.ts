@@ -131,16 +131,13 @@ describe("createFileSystem (sync) relays file system errors", () => {
       const vfs = makeVirtualFileSystem({ "test.json": "{}" });
       const fs = createFileSystem(vfs);
       createRoot(() => {
-        createEffect(
-          () => fs.readFile("test.json"),
-          {
-            effect: () => {},
-            error: err => {
-              expect(err).toEqual(new Error('"test.json" is not a file'));
-              done();
-            },
+        createEffect(() => fs.readFile("test.json"), {
+          effect: () => {},
+          error: err => {
+            expect(err).toEqual(new Error('"test.json" is not a file'));
+            done();
           },
-        );
+        });
         setTimeout(() => fs.rm("test.json"), 30);
       });
     }));

@@ -143,7 +143,9 @@ export function makeBroadcastChannel<T>(name: string): TBroadcastChannelInstance
  * - `channelName` - the name of the channel
  * - `instance` - the underlying [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance
  */
-export function createBroadcastChannel<T>(name: string): Omit<TBroadcastChannelInstance<T>["instance"], "onMessage"> & { message: Accessor<T | null> } {
+export function createBroadcastChannel<T>(
+  name: string,
+): Omit<TBroadcastChannelInstance<T>["instance"], "onMessage"> & { message: Accessor<T | null> } {
   const [message, setMessage] = createSignal<T | null>(null);
   const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel<T>(name);
 

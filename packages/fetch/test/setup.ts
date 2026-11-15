@@ -1,7 +1,11 @@
 class ResponseMock {
   constructor(
     public body: BodyInit | null,
-    private init: Partial<ResponseInit> & { redirected?: boolean; type?: "cors" | "basic"; url?: string },
+    private init: Partial<ResponseInit> & {
+      redirected?: boolean;
+      type?: "cors" | "basic";
+      url?: string;
+    },
   ) {}
   get status() {
     return this.init.status || -1;

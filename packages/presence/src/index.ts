@@ -240,7 +240,10 @@ export function createPresence<TItem>(
   );
   const mountedItem: Accessor<TItem | undefined> = () => mounted().item;
   const setMountedItem = (item: TItem | undefined) => setMounted({ item });
-  const [shouldBeMounted, setShouldBeMounted] = createSignal<boolean>(itemShouldBeMounted(initial), INTERNAL_OPTIONS);
+  const [shouldBeMounted, setShouldBeMounted] = createSignal<boolean>(
+    itemShouldBeMounted(initial),
+    INTERNAL_OPTIONS,
+  );
   // Keeps `mountedItem` / `shouldBeMounted` in step with `item`. It runs when `item` changes and
   // when an exit transition has finished (see `onExited`), and nowhere else: a change while still
   // mounted only starts the exit, the swap itself happens once the exit is over.

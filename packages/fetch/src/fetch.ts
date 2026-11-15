@@ -17,10 +17,9 @@ export type DistributeFetcherArgs<FetcherArgs extends any[], ExtraArgs extends a
   FetcherArgs,
   ExtraArgs,
 ] extends [any, any]
-  ?
-      | [...FetcherArgs, ...ExtraArgs]
-      | [Accessor<FetcherArgs | undefined>, ...ExtraArgs]
-      | [...{ [n in keyof FetcherArgs]: Accessor<FetcherArgs[n] | undefined> }, ...ExtraArgs]
+  ? | [...FetcherArgs, ...ExtraArgs]
+    | [Accessor<FetcherArgs | undefined>, ...ExtraArgs]
+    | [...{ [n in keyof FetcherArgs]: Accessor<FetcherArgs[n] | undefined> }, ...ExtraArgs]
   : never;
 
 /** Options accepted as the second or third argument of {@link createFetch}. */

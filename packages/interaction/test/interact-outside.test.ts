@@ -1,10 +1,7 @@
 import { renderHydrationRoundTrip } from "../../../scripts/test-utils/hydration-harness.ts";
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
-import {
-  createInteractOutside,
-  type CreateInteractOutsideProps,
-} from "../src/index.js";
+import { createInteractOutside, type CreateInteractOutsideProps } from "../src/index.js";
 
 beforeAll(() => {
   if (!("PointerEvent" in window)) {

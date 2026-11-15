@@ -11,7 +11,11 @@ describe("createSortedProjection", () => {
         { id: 1, name: "b" },
         { id: 2, name: "a" },
       ]);
-      const sorted = createSortedProjection(items, by((i: { id: number; name: string }) => i.name), "id");
+      const sorted = createSortedProjection(
+        items,
+        by((i: { id: number; name: string }) => i.name),
+        "id",
+      );
       flush();
       expect(sorted.map(i => i.id)).toEqual([2, 1]);
       dispose();
@@ -27,7 +31,11 @@ describe("createSortedProjection", () => {
     let runs = 0;
 
     const dispose = createRoot(dispose => {
-      const sorted = createSortedProjection(items, by((i: Row) => i.name), "id");
+      const sorted = createSortedProjection(
+        items,
+        by((i: Row) => i.name),
+        "id",
+      );
       createEffect(
         () => {
           runs++;

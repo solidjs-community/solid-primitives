@@ -1,6 +1,14 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { access, type FalsyValue } from "@solid-primitives/utils";
-import { type Accessor, createEffect, createMemo, createSignal, onCleanup, onSettled, sharedConfig } from "solid-js";
+import {
+  type Accessor,
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onSettled,
+  sharedConfig,
+} from "solid-js";
 import { isServer } from "@solidjs/web";
 
 export type Bounds = {

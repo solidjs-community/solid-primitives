@@ -16,7 +16,7 @@ import { type FalsyValue } from "@solid-primitives/utils";
  * <button ref={autofocus()} autofocus>Autofocused</button>
  * ```
  */
-export const autofocus = (): (element: HTMLElement) => void => {
+export const autofocus = (): ((element: HTMLElement) => void) => {
   let el: HTMLElement | undefined;
 
   onSettled(() => {
