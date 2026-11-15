@@ -12,7 +12,7 @@
   },
   "primitive": {
     "name": "a11y",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createFormControl",
       "createFormControlInput",

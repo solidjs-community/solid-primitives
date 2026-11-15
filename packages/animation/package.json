@@ -10,7 +10,7 @@
   },
   "primitive": {
     "name": "animation",
-    "stage": 0,
+    "stage": 2,
     "list": [
       "makeAnimate",
       "createAnimate",
