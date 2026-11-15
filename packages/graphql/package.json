@@ -21,7 +21,7 @@
       "createGraphQLMutation"
     ],
     "category": "Network",
-    "gzip": 1210
+    "gzip": 1216
   },
   "files": [
     "dist"
