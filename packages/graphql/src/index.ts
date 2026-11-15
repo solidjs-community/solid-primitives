@@ -342,7 +342,8 @@ export const gql = (query: TemplateStringsArray, ...expressions: any[]): string 
   query
     .map((s, i) => `${s}${expressions[i] ?? ""}`)
     .join("")
-    .replace(/#.+\r?\n|\r/g, "")
+    // `[^\r\n]*` always matches, so there is no backtracking: linear time even for a long run of `#`
+    .replace(/#[^\r\n]*/g, "")
     .replace(/\r?\n|\r/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();

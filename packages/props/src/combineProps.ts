@@ -3,7 +3,35 @@ import type { JSX } from "@solidjs/web";
 import { access, chain, reverseChain, type MaybeAccessor } from "@solid-primitives/utils";
 import { propTraps } from "./propTraps.ts";
 
-const extractCSSregex = /((?:--)?(?:\w+-?)+)\s*:\s*([^;]*)/g;
+const isWordChar = (code: number): boolean =>
+  (code >= 48 && code <= 57) || // 0-9
+  (code >= 65 && code <= 90) || // A-Z
+  (code >= 97 && code <= 122) || // a-z
+  code === 95; // _
+
+const isSpace = (char: string): boolean => /\s/.test(char);
+
+/**
+ * Reads the property name that ends right before the `:` at `colon` (whitespace allowed in between):
+ * the trailing run of word characters and hyphens. A single leading hyphen (vendor prefix) is not part
+ * of the name, custom properties keep their `--`. Returns `""` when there is no name.
+ * Linear time: the scan walks backwards once and stops at the first character that cannot belong to a name.
+ */
+function readPropertyName(declaration: string, colon: number): string {
+  let end = colon;
+  while (end > 0 && isSpace(declaration[end - 1]!)) end--;
+  let start = end;
+  while (
+    start > 0 &&
+    (declaration[start - 1] === "-" || isWordChar(declaration.charCodeAt(start - 1)))
+  )
+    start--;
+  // `--custom-property` keeps its prefix, other leading hyphens (`-webkit-`) are dropped
+  const keepsPrefix =
+    declaration.startsWith("--", start) && isWordChar(declaration.charCodeAt(start + 2));
+  while (!keepsPrefix && start < end && declaration[start] === "-") start++;
+  return declaration.slice(start, end);
+}
 
 /**
  * converts inline string styles to object form
@@ -13,9 +41,18 @@ const extractCSSregex = /((?:--)?(?:\w+-?)+)\s*:\s*([^;]*)/g;
  * */
 export function stringStyleToObject(style: string): JSX.CSSProperties {
   const object: Record<string, string> = {};
-  let match: RegExpExecArray | null;
-  while ((match = extractCSSregex.exec(style))) {
-    object[match[1]!] = match[2]!;
+  // Declarations are `;`-separated. This is a hand-written scan, not a regex, because the
+  // equivalent regex (nested quantifiers over `\w` and `-`) backtracks catastrophically.
+  for (const declaration of style.split(";")) {
+    let colon = declaration.indexOf(":");
+    while (colon !== -1) {
+      const name = readPropertyName(declaration, colon);
+      if (name) {
+        object[name] = declaration.slice(colon + 1).replace(/^\s+/, "");
+        break;
+      }
+      colon = declaration.indexOf(":", colon + 1);
+    }
   }
   return object;
 }
