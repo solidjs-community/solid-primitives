@@ -7,6 +7,7 @@
 //   pnpm jsr:sync-versions --check  # exit 1 if anything is out of sync, don't write
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { isUnmigratedPackage } from "./utils/unmigrated-packages.js";
 
 const check = process.argv.includes("--check");
 const packagesDir = path.resolve(import.meta.dirname, "../packages");
@@ -14,6 +15,7 @@ const packagesDir = path.resolve(import.meta.dirname, "../packages");
 let mismatches = 0;
 
 for (const name of fs.readdirSync(packagesDir)) {
+  if (isUnmigratedPackage(name)) continue; // not checked until migrated to Solid 2.0
   const dir = path.join(packagesDir, name);
   const denoPath = path.join(dir, "deno.jsonc");
   const pkgPath = path.join(dir, "package.json");

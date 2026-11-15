@@ -31,6 +31,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
 import { builtinModules } from "node:module";
+import { isUnmigratedPackage } from "./utils/unmigrated-packages.js";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
 const DEP_FIELDS = [
@@ -92,7 +93,10 @@ const failures: string[] = [];
 const distFailures: string[] = [];
 const undeclaredFailures: string[] = [];
 
-for (const pkg of packed) {
+// Solid 1.x packages are not checked until they are migrated (see scripts/utils/unmigrated-packages.ts)
+const checked = packed.filter(pkg => !isUnmigratedPackage(pkg.name));
+
+for (const pkg of checked) {
   const manifestText = execFileSync("tar", ["-xzO", "-f", pkg.filename, "package/package.json"], {
     encoding: "utf8",
   });
@@ -182,5 +186,5 @@ fs.rmSync(tmpDir, { recursive: true, force: true });
 if (failed) process.exit(1);
 
 console.log(
-  `Verified ${packed.length} packed packages: no unresolved workspace protocols, no removed Solid subpaths, no undeclared imports in dist.`,
+  `Verified ${checked.length} packed packages (${packed.length - checked.length} unmigrated skipped): no unresolved workspace protocols, no removed Solid subpaths, no undeclared imports in dist.`,
 );

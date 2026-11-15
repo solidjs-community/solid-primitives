@@ -20,7 +20,10 @@ if (nameFromArg) {
   targetNames = [nameFromCwd];
 } else {
   const allModules = await utils.getModulesData();
-  targetNames = allModules.filter(m => m.primitive != null).map(m => m.name);
+  // Solid 1.x packages are skipped until they are migrated (see scripts/utils/unmigrated-packages.ts)
+  targetNames = allModules
+    .filter(m => m.primitive != null && !utils.isUnmigratedPackage(m.name))
+    .map(m => m.name);
   utils.log_info(`Measuring all ${targetNames.length} packages...\n`);
 }
 
