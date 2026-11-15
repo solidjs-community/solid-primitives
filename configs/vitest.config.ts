@@ -3,7 +3,7 @@ import solidPlugin from "@solidjs/vite-plugin";
 import * as utils from "../scripts/utils/index.js";
 
 // Packages still on solid-js 1.x, not yet migrated to Solid 2.0.
-const UNMIGRATED_PACKAGES = ["fetch", "immutable", "db-store", "graphql", "resource"];
+const UNMIGRATED_PACKAGES = ["fetch", "resource"];
 
 const package_name = utils.getPackageNameFromCWD();
 
@@ -67,9 +67,6 @@ export default defineConfig(({ mode }) => {
           }),
     },
     resolve: {
-      alias: {
-        "solid-js/web": "@solidjs/web",
-      },
       conditions,
     },
     // inlined modules are evaluated through vite's SSR pipeline, which has its own conditions
