@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 3.0.0-next.5
+
+### Patch Changes
+
+- 88a48f3: Fix package manifests. `keyed` and `share` import `@solid-primitives/utils` at runtime but did not declare it, so the import could not be resolved under strict installs (pnpm, Yarn PnP). It is now a dependency. `analytics` no longer declares the legacy optional peer `@tanstack/start`: the TanStack relay takes the user's `createServerFn` and imports nothing from TanStack.
+
 ## 3.0.0-next.4
 
 ### Patch Changes

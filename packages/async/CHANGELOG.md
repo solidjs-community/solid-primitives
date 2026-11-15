@@ -1,5 +1,11 @@
 # @solid-primitives/async
 
+## 0.0.101-next.6
+
+### Patch Changes
+
+- e395f54: Update the primitive stage in each package's metadata: `a11y` 3, `sortable` 3, `favicon` 3, `url` 3, `workers` 3, `analytics` 2, `animation` 2, `drag-drop` 2, `async` 1. No code changes.
+
 ## 0.0.101-next.5
 
 ### Patch Changes
