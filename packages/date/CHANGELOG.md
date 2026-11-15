@@ -1,5 +1,11 @@
 # @solid-primitives/date
 
+## 3.0.0-next.6
+
+### Patch Changes
+
+- 3221a4f: `getCountdown` (and so `createCountdown` / `createCountdownFromNow`) now returns the milliseconds left after the whole seconds (`% 1000` instead of `% 100`). `formatDateRelative` returns `messages.justNow` instead of `"in 0 second"` / `"0 second ago"` for differences under half a second.
+
 ## 3.0.0-next.5
 
 ### Patch Changes
