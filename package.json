@@ -13,7 +13,8 @@
   "scripts": {
     "generate": "pnpm run build && pnpm -dir site run generate",
     "dev": "pnpm -dir site run dev",
-    "format": "prettier --cache -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}",
+    "format": "prettier --cache --cache-strategy content -w \"{site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}\"",
+    "format:check": "prettier --cache --cache-strategy content --check \"{site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}\"",
     "lint:packages": "oxlint --max-warnings 0 packages --ignore-pattern \"packages/*/{test,stories,dev}\"",
     "lint:stories": "oxlint packages --ignore-pattern \"packages/*/{src,dev,test}\"",
     "lint:tests": "oxlint packages --ignore-pattern \"packages/*/{src,stories,dev}\"",
@@ -21,8 +22,6 @@
     "test:client": "vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
-    "test:client2": "vitest -c ./configs/vitest.config.solid2.ts",
-    "test:ssr2": "pnpm run test:client2 --mode ssr",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "build": "tsdown",

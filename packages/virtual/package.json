@@ -53,9 +53,8 @@
     "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
-    "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
-    "test": "pnpm run vitest2",
-    "test:ssr": "pnpm run vitest2 --mode ssr"
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

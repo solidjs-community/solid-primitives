@@ -4,6 +4,7 @@ import fsp from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getModulesData, type ModuleData } from "../../scripts/utils/index.js";
+import { STORYBOOK_URL } from "../src/config.js";
 import { fetchProjectStats, type ProjectStats } from "../src/lib/project-stats.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -214,8 +215,6 @@ function cleanReadme(readme: string, name: string): string {
       .trim()
   );
 }
-
-const STORYBOOK_URL = "https://primitives2-storybook.solidjs.community";
 
 /** Storybook's own `toId()` sanitizer (see storybook/dist/csf) — lowercases and turns
  *  whitespace/punctuation into single hyphens, trimming the ends. */

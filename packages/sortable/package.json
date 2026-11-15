@@ -65,7 +65,7 @@
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
-    "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },

@@ -3,11 +3,10 @@ import { vitePlugin as ogp } from "@solidjs/ogp/unplugin";
 import { createSolidBase } from "@kobalte/solidbase/config";
 import defaultTheme from "@kobalte/solidbase/default-theme";
 import { defineConfig } from "vite";
+import { SITE_URL } from "./src/config";
 import { sidebar } from "./src/generated/sidebar";
 
 const solidBase = createSolidBase(defaultTheme);
-
-const SITE_URL = "https://primitives2.solidjs.community";
 
 // Crawlers need absolute og:image URLs. Netlify deploy previews / branch deploys use their own
 // address (`DEPLOY_PRIME_URL`), so their cards come from their own `/_server`; production uses the

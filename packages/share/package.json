@@ -57,6 +57,9 @@
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",
     "solid-js": "catalog:peer"

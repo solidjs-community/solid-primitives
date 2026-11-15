@@ -3,6 +3,7 @@ import { getRequestEvent, isServer, NoHydration } from "@solidjs/web";
 import { Meta } from "@solidjs/meta";
 import { useLocation } from "@solidjs/router";
 import { DynamicImage, urlFromImage } from "@solidjs/ogp";
+import { SITE_URL } from "../config";
 import { useFrontmatter, useSolidBaseContext } from "@kobalte/solidbase/client";
 import { ogFonts } from "./og-fonts";
 
@@ -141,10 +142,7 @@ function Backdrop() {
 function Brand() {
   return (
     <div style={{ display: "flex", "align-items": "center" }}>
-      <img
-        src="https://primitives2.solidjs.community/logo-light.png"
-        style={{ width: "242px", height: "44px" }}
-      />
+      <img src={`${SITE_URL}/logo-light.png`} style={{ width: "242px", height: "44px" }} />
       <div
         style={{
           display: "flex",
@@ -168,7 +166,7 @@ function Brand() {
 function Cube() {
   return (
     <img
-      src="https://primitives2.solidjs.community/logo-wire.png"
+      src={`${SITE_URL}/logo-wire.png`}
       style={{
         position: "absolute",
         right: "64px",

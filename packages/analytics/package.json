@@ -81,13 +81,7 @@
   ],
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",
-    "@tanstack/start": "*",
     "solid-js": "catalog:peer"
-  },
-  "peerDependenciesMeta": {
-    "@tanstack/start": {
-      "optional": true
-    }
   },
   "dependencies": {
     "@solid-primitives/page-utilities": "workspace:^",
