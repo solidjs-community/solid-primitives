@@ -1,5 +1,5 @@
-import { describe, test, expect, assert } from "vitest";
-import { handleDiffArray, arrayEquals, createHydratableSignal } from "../src/index.js";
+import { describe, test, expect, assert, vi } from "vitest";
+import { handleDiffArray, arrayEquals, createHydratableSignal, withAccess } from "../src/index.js";
 
 describe("handleDiffArray", () => {
   test("handleAdded called for new array", () => {
@@ -100,5 +100,27 @@ describe("createHydratableSignal", () => {
     const [state, setState] = createHydratableSignal("server", () => "client");
     expect(state()).toEqual("client");
     expect(setState).toBeInstanceOf(Function);
+  });
+});
+
+describe("withAccess", () => {
+  test("calls the function with a value or the result of an accessor", () => {
+    const received: unknown[] = [];
+    withAccess(1, v => received.push(v));
+    withAccess(
+      () => 2,
+      v => received.push(v),
+    );
+    withAccess(0, v => received.push(v));
+    expect(received).toEqual([1, 2, 0]);
+  });
+
+  test("skips undefined and null", () => {
+    const fn = vi.fn();
+    withAccess(undefined, fn);
+    withAccess(null, fn);
+    withAccess(() => undefined, fn);
+    withAccess(() => null, fn);
+    expect(fn).not.toHaveBeenCalled();
   });
 });
