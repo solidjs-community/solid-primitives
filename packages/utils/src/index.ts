@@ -107,7 +107,7 @@ export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T
   typeof v === "function" && !v.length ? v() : (v as any);
 
 export const asArray = <T>(value: T): (T extends any[] ? T[number] : NonNullable<T>)[] =>
-  Array.isArray(value) ? (value as any) : value ? [value as any] : [];
+  Array.isArray(value) ? (value as any) : value != null ? [value as any] : [];
 
 /**
  * Access an array of MaybeAccessors
