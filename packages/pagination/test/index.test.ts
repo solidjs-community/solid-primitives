@@ -231,6 +231,20 @@ describe("createSegment", () => {
       dispose();
     });
   });
+
+  test("creates a new segment when moving from a sparse page to a full one", () => {
+    createRoot(dispose => {
+      const [items] = createSignal<(number | undefined)[]>([, , , 4, 5, 6]);
+      const [page, setPage] = createSignal(1);
+      const segment = createSegment(items, 3, page);
+
+      expect(segment()).toHaveLength(3);
+      setPage(2);
+      expect(segment()).toEqual([4, 5, 6]);
+
+      dispose();
+    });
+  });
 });
 
 //@ts-ignore

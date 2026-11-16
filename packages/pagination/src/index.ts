@@ -37,12 +37,16 @@ export const createSegment = <T>(
     const start = (page() - 1) * access(limit);
     const end = Math.min(start + access(limit), currentItems.length);
     // keep the previous segment only if it still holds the same items
-    if (
-      previous &&
-      previous.length === Math.max(0, end - start) &&
-      previous.every((item, index) => item === currentItems[start + index])
-    ) {
-      return previous;
+    if (previous && previous.length === Math.max(0, end - start)) {
+      // indexed loop, not every(): every() skips holes in sparse arrays
+      let same = true;
+      for (let index = 0; index < previous.length; index++) {
+        if (previous[index] !== currentItems[start + index]) {
+          same = false;
+          break;
+        }
+      }
+      if (same) return previous;
     }
     return currentItems.slice(start, end);
   });
