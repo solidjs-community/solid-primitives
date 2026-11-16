@@ -328,6 +328,42 @@ describe("createSegment", () => {
     expect(seg1).not.toBe(seg2);
     dispose();
   });
+
+  test("creates a new segment if the items change but keep their length", () => {
+    const [items, setItems] = createSignal([1, 2, 3, 4, 5, 6]);
+    const [page, setPage] = createSignal(1);
+    const { segment, dispose } = createRoot(dispose => ({
+      segment: createSegment(items, 3, page),
+      dispose,
+    }));
+
+    expect(segment()).toEqual([1, 2, 3]);
+    setItems([6, 5, 4, 3, 2, 1]);
+    flush();
+    expect(segment()).toEqual([6, 5, 4]);
+    setPage(2);
+    flush();
+    expect(segment()).toEqual([3, 2, 1]);
+    setItems(items => items.map(item => (item === 2 ? 20 : item)));
+    flush();
+    expect(segment()).toEqual([3, 20, 1]);
+    dispose();
+  });
+
+  test("creates a new segment when moving from a sparse page to a full one", () => {
+    const [items] = createSignal<(number | undefined)[]>([, , , 4, 5, 6]);
+    const [page, setPage] = createSignal(1);
+    const { segment, dispose } = createRoot(dispose => ({
+      segment: createSegment(items, 3, page),
+      dispose,
+    }));
+
+    expect(segment()).toHaveLength(3);
+    setPage(2);
+    flush();
+    expect(segment()).toEqual([4, 5, 6]);
+    dispose();
+  });
 });
 
 class MockIntersectionObserver {
