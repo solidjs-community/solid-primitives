@@ -1,5 +1,14 @@
 # @solid-primitives/page-visibility
 
+## 2.1.7
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+  - @solid-primitives/event-listener@2.4.7
+  - @solid-primitives/rootless@1.5.5
+
 ## 2.1.6
 
 ### Patch Changes
