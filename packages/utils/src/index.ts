@@ -179,7 +179,7 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
 ): void => {
   const _value = access(value);
   // oxlint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  typeof _value != null && fn(_value as NonNullable<V>);
+  _value != null && fn(_value as NonNullable<V>);
 };
 
 /**

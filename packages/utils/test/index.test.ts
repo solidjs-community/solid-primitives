@@ -8,6 +8,7 @@ import {
   createServerSafeSignal,
   wrapSetter,
   globalRegistry,
+  withAccess,
 } from "../src/index.js";
 
 describe("handleDiffArray", () => {
@@ -221,4 +222,28 @@ test("hydrates primitive output and its following sibling", async () => {
   } finally {
     result.cleanup();
   }
+});
+
+describe("withAccess", () => {
+  test("calls the function with a value or the result of an accessor", () => {
+    const received: unknown[] = [];
+    withAccess(1, v => received.push(v));
+    withAccess(
+      () => 2,
+      v => received.push(v),
+    );
+    withAccess(0, v => received.push(v));
+    withAccess("", v => received.push(v));
+    withAccess(false, v => received.push(v));
+    expect(received).toEqual([1, 2, 0, "", false]);
+  });
+
+  test("skips undefined and null", () => {
+    const fn = vi.fn();
+    withAccess(undefined, fn);
+    withAccess(null, fn);
+    withAccess(() => undefined, fn);
+    withAccess(() => null, fn);
+    expect(fn).not.toHaveBeenCalled();
+  });
 });
