@@ -32,20 +32,18 @@ export const createSegment = <T>(
   limit: MaybeAccessor<number>,
   page: Accessor<number>,
 ): Accessor<T[]> => {
-  let previousStart = NaN,
-    previousEnd = NaN;
   return createMemo(previous => {
     const currentItems = access(items);
     const start = (page() - 1) * access(limit);
     const end = Math.min(start + access(limit), currentItems.length);
+    // keep the previous segment only if it still holds the same items
     if (
       previous &&
-      ((previous.length === 0 && end <= start) || (start === previousStart && end === previousEnd))
+      previous.length === Math.max(0, end - start) &&
+      previous.every((item, index) => item === currentItems[start + index])
     ) {
       return previous;
     }
-    previousStart = start;
-    previousEnd = end;
     return currentItems.slice(start, end);
   });
 };
