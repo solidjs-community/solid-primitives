@@ -71,7 +71,6 @@ export const maskArrayToFn =
           return;
         } else if (match.index > 0) {
           value = value.slice(0, pos) + value.slice(pos + match.index);
-          pos -= match.index - 1;
           selection[0] -= ((selection[0] > pos) as unknown as number) * match.index;
           selection[1] -= ((selection[1] > pos) as unknown as number) * match.index;
         }
