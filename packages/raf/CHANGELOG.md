@@ -1,5 +1,14 @@
 # @solid-primitives/raf
 
+## 2.4.1
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+  - @solid-primitives/rootless@1.5.5
+  - @solid-primitives/set@0.7.5
+
 ## 2.4.0
 
 ### Minor Changes
