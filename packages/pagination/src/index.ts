@@ -32,20 +32,22 @@ export const createSegment = <T>(
   limit: MaybeAccessor<number>,
   page: Accessor<number>,
 ): Accessor<T[]> => {
-  let previousStart = NaN,
-    previousEnd = NaN;
   return createMemo(previous => {
     const currentItems = access(items);
     const start = (page() - 1) * access(limit);
     const end = Math.min(start + access(limit), currentItems.length);
-    if (
-      previous &&
-      ((previous.length === 0 && end <= start) || (start === previousStart && end === previousEnd))
-    ) {
-      return previous;
+    // keep the previous segment only if it still holds the same items
+    if (previous && previous.length === Math.max(0, end - start)) {
+      // indexed loop, not every(): every() skips holes in sparse arrays
+      let same = true;
+      for (let index = 0; index < previous.length; index++) {
+        if (previous[index] !== currentItems[start + index]) {
+          same = false;
+          break;
+        }
+      }
+      if (same) return previous;
     }
-    previousStart = start;
-    previousEnd = end;
     return currentItems.slice(start, end);
   });
 };
