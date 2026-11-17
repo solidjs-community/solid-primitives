@@ -18,7 +18,7 @@ import { isServer } from "solid-js/web";
  * const windowWidth = createMemo(() => isMounted() ? ref.offsetWidth : 0)
  * <div ref={ref}>{windowWidth()}</div>
  * ```
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#createIsMounted
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/lifecycle#createIsMounted
  */
 export function createIsMounted(): Accessor<boolean> {
   if (isServer) return () => false;
@@ -36,7 +36,7 @@ export function createIsMounted(): Accessor<boolean> {
  *
  * Switching from `false` to `true` will trigger the signal to update.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#isHydrated
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/lifecycle#isHydrated
  */
 export const isHydrated = (): boolean =>
   !isServer && (!sharedConfig.context || (!!getListener() && createIsMounted()()));
@@ -57,7 +57,7 @@ export const isHydrated = (): boolean =>
  *   })
  * }} />
  * ```
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#onConnect
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/lifecycle#onConnect
  */
 export function onElementConnect(el: Element, fn: VoidFunction): void {
   if (isServer) return;

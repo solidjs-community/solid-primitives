@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/props?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/props)
 [![size](https://img.shields.io/npm/v/@solid-primitives/props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/props)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Library of primitives focused around component props.
 
@@ -86,7 +86,7 @@ const combined = combineProps(
 combined.onClick(); // "child" "parent"
 ```
 
-##### For better reference of how exactly `combineProps` works, see the [TESTS](https://github.com/solidjs-community/solid-primitives/blob/main/packages/props/test/combineProps.test.ts)
+##### For better reference of how exactly `combineProps` works, see the [TESTS](https://github.com/solidjs-community/solid-primitives/blob/v1/packages/props/test/combineProps.test.ts)
 
 ### Additional helpers
 

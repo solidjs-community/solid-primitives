@@ -15,15 +15,15 @@ type PackageData = {
 // eslint-disable-next-line no-console
 console.log("updateReadme", "Updating README documentation");
 
-const githubURL = "https://github.com/solidjs-community/solid-primitives/tree/main/packages/";
+const githubURL = "https://github.com/solidjs-community/solid-primitives/tree/v1/packages/";
 const sizeShield = "https://img.shields.io/bundlephobia/minzip/";
 const bundlephobiaURL = "https://bundlephobia.com/package/";
 const npmShield = "https://img.shields.io/npm/v/";
 const npmURL = "https://www.npmjs.com/package/";
 const stageShieldBaseURL =
-  "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
+  "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
 const stageShieldLink =
-  "https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process";
+  "https://github.com/solidjs-community/solid-primitives/blob/v1/CONTRIBUTING.md#contribution-process";
 
 const categories: Record<string, PackageData[]> = {};
 const rootDependencies: string[] = [

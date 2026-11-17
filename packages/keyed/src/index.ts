@@ -27,7 +27,7 @@ function dispose(list: Iterable<{ dispose: VoidFunction }>) {
  * @param mapFn reactive function used to create mapped output item. Similar to `Array.prototype.map` but both item and index are signals, that could change over time.
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#keyArray
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyed#keyArray
  */
 export function keyArray<T, U, K>(
   items: Accessor<readonly T[] | undefined | null | false>,
@@ -142,7 +142,7 @@ export function keyArray<T, U, K>(
  * <Key each={items()} by="id">
  * ```
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#Key
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyed#Key
  */
 export function Key<T>(props: {
   each?: readonly T[] | null | false;
@@ -174,7 +174,7 @@ export function Key<T>(props: {
  * </Entries>
  * ```
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#Entries
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyed#Entries
  */
 export function Entries<K extends string | number, V>(props: {
   of: Record<K, V> | ArrayLike<V> | undefined | null | false;
@@ -215,7 +215,7 @@ export function Entries<K extends string | number, V>(props: {
  * </MapEntries>
  * ```
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#mapentries
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyed#mapentries
  */
 export function MapEntries<K, V>(props: {
   of: Map<K, V> | undefined | null | false;
@@ -252,7 +252,7 @@ export function MapEntries<K, V>(props: {
  * </SetValues>
  * ```
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#setvalues
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyed#setvalues
  */
 export function SetValues<T>(props: {
   of: Set<T> | undefined | null | false;
@@ -274,7 +274,7 @@ export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Elem
 
 /**
  * Causes the children to rerender when the `on` changes.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Rerun
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/refs#Rerun
  */
 export function Rerun<S>(props: {
   on: AccessorArray<S> | Accessor<S>;

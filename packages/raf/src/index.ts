@@ -6,7 +6,7 @@ import { isServer } from "solid-js/web";
 
 /**
  * A primitive creating reactive `window.requestAnimationFrame`, that is automatically disposed onCleanup.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createRAF
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#createRAF
  * @param callback The callback to run each frame
  * @returns Returns a signal if currently running as well as start and stop methods
  * ```ts
@@ -65,7 +65,7 @@ function createCallbacksSet<T extends (...args: any) => void>(
 }
 
 /**
- * A singleton root that returns a function similar to `createRAF` that batches multiple `window.requestAnimationFrame` executions within the same same timestamp (same RAF cycle) instead of skipping requests in separate frames. This is done by using a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) in conjuction with [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet)
+ * A singleton root that returns a function similar to `createRAF` that batches multiple `window.requestAnimationFrame` executions within the same same timestamp (same RAF cycle) instead of skipping requests in separate frames. This is done by using a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) in conjuction with [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#createCallbacksSet)
  *
  * @returns Returns a factory function that works like `createRAF` with an additional parameter to start the global RAF loop when adding the callback to the callbacks set. This function return is also similar to `createRAF`, but it's first three elements of the tuple are related to the presence of the callback in the callbacks set, while the next three are the same as `createRAF`, but for the global loop that executes all the callbacks present in the callbacks set.
  * ```ts
@@ -128,7 +128,7 @@ const useGlobalRAF = createHydratableSingletonRoot<
 /**
  * A primitive for creating reactive interactions with external frameloop related functions (for example using [motion's frame util](https://motion.dev/docs/frame)) that are automatically disposed onCleanup.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createScheduledLoop
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#createScheduledLoop
  * @param schedule Receives the callback and schedules it to run every frame until cancelled, returning the ID that `cancel` needs. Must not return `null` or `undefined`. It is called once per `start()`, so a one-shot scheduler such as `requestAnimationFrame` only runs the callback once; use `createRAF` for that.
  * @param cancel The function that cancels the scheduled callback using the requestID.
  * @returns Returns a function that receives a callback that's compatible with the provided scheduler and returns a signal if currently running as well as start and stop methods
@@ -194,7 +194,7 @@ function createScheduledLoop<
  *
  * Keep in mind that limiting FPS is achieved by not executing a callback if the frames are above defined limit. This can lead to not consistant frame duration.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#targetFPS
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#targetFPS
  * @param callback The callback to run each *allowed* frame
  * @param fps The target FPS limit
  * @returns Wrapped RAF callback

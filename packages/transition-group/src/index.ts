@@ -54,7 +54,7 @@ export type SwitchTransitionOptions<T> = {
  * @param options transition options {@link SwitchTransitionOptions}
  * @returns a signal with an array of the current element and exiting previous elements.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createSwitchTransition
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/transition-group#createSwitchTransition
  *
  * @example
  * const [el, setEl] = createSignal<HTMLDivElement>();
@@ -194,7 +194,7 @@ export type ListTransitionOptions<T> = {
  * Any object can used as the element, but most likely you will want to use a `HTMLElement` or `SVGElement`.
  * @param options transition options {@link ListTransitionOptions}
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createListTransition
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/transition-group#createListTransition
  *
  * @example
  * const [els, setEls] = createSignal<HTMLElement[]>([]);

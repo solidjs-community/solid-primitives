@@ -69,7 +69,7 @@ export type GraphQLClientQuery = {
  * @param options Options that will be applied to all the subsequent requests
  * @returns Returns a query generator the produces Solid resources for queries
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql#how-to-use-it
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/graphql#how-to-use-it
  *
  * @example
  * ```ts
@@ -141,7 +141,7 @@ export async function request<T = any, V extends object = {}>(
  * @param options config object where you can specify query variables, request headers, method, etc.
  * @returns a Promise resolving in JSON value if the request was successful
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql#file-upload-support
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/graphql#file-upload-support
  */
 export async function multipartRequest<T = any, V extends object = {}>(
   url: string,

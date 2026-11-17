@@ -36,7 +36,7 @@ export type EventHub<M extends { readonly [key: string | number]: EventHubChanne
  *
  * @returns hub functions: `{on, emit, listen, value}` + channels available by their key
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventHub
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#createEventHub
  *
  * @example
  * const hub = createEventHub({

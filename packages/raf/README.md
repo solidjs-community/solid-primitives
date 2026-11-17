@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/raf?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/raf)
 [![size](https://img.shields.io/npm/v/@solid-primitives/raf?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/raf)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Reactive primitives providing support to `window.requestAnimationFrame`.
 
@@ -131,7 +131,7 @@ function createCallbacksSet<T extends (...args: any) => void>(
 
 ## useGlobalRAF
 
-A singleton root that returns a function similar to `createRAF` that batches multiple `window.requestAnimationFrame` executions within the same same timestamp (same RAF cycle) instead of skipping requests in separate frames. This is done by using a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) in conjuction with [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet)
+A singleton root that returns a function similar to `createRAF` that batches multiple `window.requestAnimationFrame` executions within the same same timestamp (same RAF cycle) instead of skipping requests in separate frames. This is done by using a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) in conjuction with [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#createCallbacksSet)
 
 Returns a factory function that works like `createRAF` with an additional parameter to start the global RAF loop when adding the callback to the callbacks set. This function return is also similar to `createRAF`, but it's first three elements of the tuple are related to the presence of the callback in the callbacks set, while the next three are the same as `createRAF`, but for the global loop that executes all the callbacks present in the callbacks set.
 
@@ -199,7 +199,7 @@ function useGlobalRAF(): (
 
 #### Warning
 
-Only use this when you absolutely need to schedule animations on the same frame and stick to quick executions trying not to overload the amount of work performed in the current animation frame. If you need to ensure multiple things run on the same request but you also want to schedule multiple requests, you can use [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet) and a singleton `createRAF` to compose something similar to this primitive.
+Only use this when you absolutely need to schedule animations on the same frame and stick to quick executions trying not to overload the amount of work performed in the current animation frame. If you need to ensure multiple things run on the same request but you also want to schedule multiple requests, you can use [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#createCallbacksSet) and a singleton `createRAF` to compose something similar to this primitive.
 
 ## createScheduledLoop
 
