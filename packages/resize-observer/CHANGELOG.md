@@ -1,5 +1,62 @@
 # @solid-primitives/resize-observer
 
+## 4.0.0
+
+### Major Changes
+
+- 68b803a: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/resize-observer`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `createResizeObserver`: internal `createEffect` converted to the Solid 2.0 split compute/apply pattern
+  - `createElementSize`: internal `createEffect` converted to split compute/apply pattern; element cleanup (`unobserve`) is returned from apply phase instead of using `onCleanup`
+  - `createElementSize`: `sharedConfig.context` replaced with `sharedConfig.hydrating` for hydration detection
+  - `createStore` setter in consuming code now requires a function argument (Solid 2.0 store API change)
+
+### Minor Changes
+
+- d0cc459: Add `clientWidth`/`clientHeight` to `getElementSize` and `createElementSize` (resolves #804). These come from the element's `clientWidth`/`clientHeight` properties (padding-box, excludes border/scrollbar, unaffected by CSS transforms) alongside the existing `width`/`height` (from `getBoundingClientRect`, border-box, affected by CSS transforms). Purely additive — non-breaking.
+
+### Patch Changes
+
+- 52673b2: Preserve hydration identifiers when `createElementSize` receives a target accessor during server rendering.
+- 347b49d: Fix Solid 2 hydration owner counting with a transparent resize observer effect and matching window size onSettled calls.
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- 04a170e: Import `sharedConfig` and `createOwner` from `solid-js/internal`, where `solid-js@2.0.0` declares them. They resolve to the same objects as before; this only fixes type resolution (and the JSR type check).
+- Updated dependencies [89c5324]
+- Updated dependencies [cc30d55]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [a47cf15]
+- Updated dependencies [ab4c926]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [91a92aa]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/event-listener@3.0.0
+  - @solid-primitives/rootless@2.0.0
+  - @solid-primitives/static-store@1.0.0
+
 ## 4.0.0-next.7
 
 ### Patch Changes
