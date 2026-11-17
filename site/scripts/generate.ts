@@ -19,9 +19,9 @@ const generatedDir = path.join(siteDir, "src", "generated");
 const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
 
 /** Build-time copy of the homepage stats (see src/lib/project-stats.ts). The homepage refreshes
- *  them at runtime through `/_server`; this copy is what's prerendered and what stays on screen
- *  when no server answers. Any failure here just omits the stats block rather than failing the
- *  whole build — this data is a nice-to-have, not content. */
+ *  them at runtime through `/api/stats` (worker/index.ts); this copy is what's prerendered and
+ *  what stays on screen when the Worker doesn't answer. Any failure here just omits the stats
+ *  block rather than failing the whole build — this data is a nice-to-have, not content. */
 async function getProjectStats(moduleNames: string[]): Promise<ProjectStats | null> {
   try {
     return await fetchProjectStats(moduleNames);
@@ -422,7 +422,7 @@ async function main() {
       // Typed rather than `as const`: a failed fetch writes `null`, and `null as const` doesn't compile.
       `export const projectStats: ProjectStats | null = ${JSON.stringify(stats, null, 2)};\n`,
   );
-  // For the runtime stats refresh (src/lib/stats.server.ts). Its own module so the homepage's
+  // For the runtime stats refresh (worker/index.ts). Its own module so the homepage's
   // client bundle, which imports stats.ts, doesn't carry the list.
   await fsp.writeFile(
     path.join(generatedDir, "packages.ts"),

@@ -1,0 +1,18 @@
+// Cloudflare Pages project for the docs site (https://primitives.solidjs.community).
+//
+// Pages dashboard settings that go with this file:
+//   Production branch ....... main
+//   Build command ........... pnpm build && pnpm --dir site run deploy
+//   Build output directory .. site/dist/client   (set by `pages_build_output_dir` below)
+//   Root directory .......... / (repository root)
+//   Environment variables ... NODE_VERSION=22.18.0 (also pinned in .node-version; pnpm comes from the
+//                             `packageManager` field), and optionally SITE_GITHUB_TOKEN
+//
+// The build emits `dist/client/_worker.js` (site/worker/index.ts), which Pages runs in "advanced
+// mode"; `site/public/_routes.json` restricts it to `/api/*`, so everything else is served as a
+// static asset without invoking it.
+{
+  "name": "solid-primitives",
+  "pages_build_output_dir": "./site/dist/client",
+  "compatibility_date": "2026-11-01",
+}

@@ -251,7 +251,7 @@ html[data-theme*="dark"] {
    docs) version-selector — repurpose it via generated content instead of
    wiring up that whole feature for a single static label. */
 [class*="version-selector_"]::after {
-  content: "v2.0-RC2";
+  content: "v2.0";
   display: inline-flex;
   align-items: center;
   padding: 0.15em 0.55em;
@@ -430,8 +430,8 @@ article:has(.pl-hero) > [class*="content_"] {
   background: color-mix(in hsl, var(--sb-text-color) 6%, transparent);
 }
 
-/* Live project stats (npm downloads, open issues/PRs — see site/scripts/generate.ts's
-   getProjectStats) between the hero actions and the category grid. */
+/* Project stats (npm downloads, open issues/PRs — baked in by site/scripts/generate.ts, refreshed
+   live from /api/stats by ProjectStats.tsx) between the hero actions and the category grid. */
 .pl-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
