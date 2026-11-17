@@ -115,7 +115,7 @@ function compareStoreWithCache(
  * @param store - The store to track.
  * @returns A function that returns an array of updates to the store since the last execution.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#captureStoreUpdates
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/deep#captureStoreUpdates
  *
  * @example
  * ```ts

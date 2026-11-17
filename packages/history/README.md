@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/history?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/history)
 [![version](https://img.shields.io/npm/v/@solid-primitives/history?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/history)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitives for managing undo/redo history in Solid.
 
@@ -99,7 +99,7 @@ const history = createUndoHistory(() => {
 
 To clone only the parts of the store that changed, you can use the [`captureStoreUpdates` utility from `@solid-primitives/deep`](https://primitives.solidjs.community/package/deep#captureStoreUpdates). This is useful for large stores where you want to avoid unnecessary cloning and reconciliation.
 
-The code for this example you'll find [in the source code of the DEMO](https://github.com/solidjs-community/solid-primitives/blob/main/packages/history/dev/index.tsx).
+The code for this example you'll find [in the source code of the DEMO](https://github.com/solidjs-community/solid-primitives/blob/v1/packages/history/dev/index.tsx).
 
 ### Observing multiple sources
 

@@ -29,7 +29,7 @@ const disposeAll = (list: { dispose: VoidFunction }[]) => {
 /**
  * Creates a function for marking parts of a string that match a regex. Each match will be mapped by {@link mapMatch} and returned as an array of strings and mapped values.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/marker#createMarker
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/marker#createMarker
  *
  * @param mapMatch A callback for mapping the matched string to a value to be added to the returned array.
  * @param options Options for the marker.

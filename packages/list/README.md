@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/list?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/list)
 [![version](https://img.shields.io/npm/v/@solid-primitives/list?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/list)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Package providing additional way to manage arrays. Alternative to `<For>` and `<Index>` that has reactive item value and reactive index. Focuses on avoiding recreation of mapped elements.
 

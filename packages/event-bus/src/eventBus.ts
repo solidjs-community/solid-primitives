@@ -25,7 +25,7 @@ export interface EventBus<T> {
  * 
  * @returns the emitter: `{listen, emit, clear}`
  * 
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventBus
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#createEventBus
  * 
  * @example
 const bus = createEventBus<string>();

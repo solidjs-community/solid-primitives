@@ -50,7 +50,7 @@ export type UndoHistoryReturn = {
  * @param options Configuration object. See {@link UndoHistoryOptions}.
  * @returns An object for interacting with the undo history. See {@link UndoHistoryReturn}.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/history#createUndoHistory
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/history#createUndoHistory
  *
  * @example
  * ```ts

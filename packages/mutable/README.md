@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mutable?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/mutable)
 [![version](https://img.shields.io/npm/v/@solid-primitives/mutable?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mutable)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A primitive for creating a mutable store proxy object. An alternative to `createStore` from `"solid-js/store"`.
 
@@ -131,7 +131,7 @@ modifyMutable(state.user, produce((u) => {
 
 ## Demo
 
-[Deployed example](https://primitives.solidjs.community/playground/mutable) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutable/dev/index.tsx)
+[Deployed example](https://primitives.solidjs.community/playground/mutable) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/mutable/dev/index.tsx)
 
 ## Changelog
 

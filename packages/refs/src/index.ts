@@ -216,7 +216,7 @@ export function resolveFirst(
 /**
  * Get up-to-date references of the multiple children elements.
  * @param ref Getter of current array of elements
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Refs
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/refs#Refs
  * @example
  * ```tsx
  * const [refs, setRefs] = createSignal<Element[]>([]);
@@ -248,7 +248,7 @@ export function Refs(props: { ref: Ref<Element[]>; children: JSX.Element }): JSX
 /**
  * Get up-to-date reference to a single child element.
  * @param ref Getter of current element *(or `undefined` if not mounted)*
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Ref
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/refs#Ref
  * @example
  * ```tsx
  * const [ref, setRef] = createSignal<Element | undefined>();

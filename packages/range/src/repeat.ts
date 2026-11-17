@@ -7,7 +7,7 @@ import { toFunction } from "./common.js";
  * @param mapFn reactive function used to create mapped output item array
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#repeat
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/range#repeat
  * @example
  * ```tsx
  * const [length, setLength] = createSignal(10)
@@ -93,7 +93,7 @@ export function repeat<T>(
  * @param times number of elements
  * @param fallback element returned when `of` equals 0
  * @param children render function
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Repeat-1
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/range#Repeat-1
  * @example
  * ```tsx
  * <Repeat times={10}>

@@ -10,7 +10,7 @@ import { abs, accessor, ceil, floor, min, type RangeProps, toFunction } from "./
  * @param mapFn reactive function used to create mapped output item array
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#mapRange
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/range#mapRange
  * @example
  * ```tsx
  * const [to, setTo] = createSignal(5)
@@ -145,7 +145,7 @@ export function mapRange<T>(
  * @param step difference between two points in the range *(negative step value depends on the `to` being greater/smaller then `start`, not this argument)* *(defaults to 1)*
  * @param fallback element returned when the range size is 0
  * @param children render function, recives plain number value
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Range
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/range#Range
  * @example
  * ```tsx
  * <Range start={2} to={14} step={0.5}>

@@ -113,7 +113,7 @@ const mapData = <TSource, TElement>(
  * Accessor<TElement[]> & { height: Accessor<number> }
  * ```
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createMasonry
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/active-element#createMasonry
  *
  * @example
  * ```tsx

@@ -28,7 +28,7 @@ export type EventStackConfig<E, V = E> = {
  * 
  * @returns event stack: `{listen, emit, remove, clear, value, setValue}`
  * 
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventStack
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#createEventStack
  * 
  * @example
 const bus = createEventStack<{ message: string }>();

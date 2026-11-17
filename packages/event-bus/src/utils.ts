@@ -8,7 +8,7 @@ import type { Listen, Listener, Emit } from "./eventBus.js";
  * @param subscribe listen function from any EventBus/Emitter
  * @returns a promise resulting in the captured event value
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#toPromise
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#toPromise
  *
  * @example
  * const emitter = createEventBus<string>();
@@ -26,7 +26,7 @@ export function toPromise<T>(subscribe: Listen<T>): Promise<T> {
  *
  * @returns unsubscribe function
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#once
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#once
  *
  * @example
  * const { listen, emit } = createEventBus<string>();
@@ -50,7 +50,7 @@ export function once<T>(subscribe: Listen<T>, listener: Listener<T>): VoidFuncti
  * @param emit the emit function of any emitter/event-bus
  * @returns modified emit function
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#toEffect
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#toEffect
  *
  * @example
  * const { listen, emit } = createEventBus();
@@ -76,7 +76,7 @@ export function toEffect<T>(emit: Emit<T>): Emit<T> {
 /**
  * Wraps `emit` calls inside a `batch` call. It causes that listeners execute in a single batch, so they are not executed in sepatate queue ticks.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#batchEmits
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#batchEmits
  */
 export function batchEmits<T extends { emit: AnyFunction }>(bus: T): T {
   return {

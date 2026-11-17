@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/virtual?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/virtual)
 [![version](https://img.shields.io/npm/v/@solid-primitives/virtual?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/virtual)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 - [`createVirtualList`](#createvirtuallist) - A headless utility function for [virtualized lists](https://www.patterns.dev/vanilla/virtual-lists/)
 - [`VirtualList`](#virtuallist) - a basic, unstyled component based on `createVirtualList`

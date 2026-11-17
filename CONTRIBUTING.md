@@ -119,7 +119,7 @@ Every package has its own set of scripts that you can run with `pnpm run`:
 
 ### Inputs
 
-- createGesture ([in progress](https://github.com/solidjs-community/solid-primitives/tree/main/packages/gestures))
+- createGesture ([in progress](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/gestures))
 - createCompositionObserver (CompositionEvent observer)
 - createForm
 - createInput
@@ -127,6 +127,6 @@ Every package has its own set of scripts that you can run with `pnpm run`:
 
 ### Utilities
 
-- createWorker ([in progress](https://github.com/solidjs-community/solid-primitives/tree/main/packages/workers))
+- createWorker ([in progress](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/workers))
 - createQueue
 - createEffectWhen

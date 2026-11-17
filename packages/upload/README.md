@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/upload?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/upload)
 [![size](https://img.shields.io/npm/v/@solid-primitives/upload?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/upload)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitive to make uploading files and making dropzones easier.
 
@@ -71,7 +71,7 @@ const { setRef: dropzoneRef, files: droppedFiles } = createDropzone({
 ## Demo
 
 Working example: https://primitives.solidjs.community/playground/upload
-Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/upload/dev/index.tsx
+Source code: https://github.com/solidjs-community/solid-primitives/blob/v1/packages/upload/dev/index.tsx
 
 ## Changelog
 

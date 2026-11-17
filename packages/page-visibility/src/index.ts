@@ -29,7 +29,7 @@ export const createPageVisibility = (): Accessor<boolean> => {
 /**
  * Returns a signal with a boolean value identifying the page visibility state.
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) except if during hydration.
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) except if during hydration.
  *
  * @example
  * ```ts

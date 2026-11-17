@@ -15,7 +15,7 @@ export type EventHandlersMap<EventMap> = {
  * @param options e.g. `{ passive: true }`
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#createEventListenerMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-listener#createEventListenerMap
  *
  * @example
  * createEventListenerMap(element, {

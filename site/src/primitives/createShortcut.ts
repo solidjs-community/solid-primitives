@@ -26,9 +26,9 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
 /**
  * Provides a signal with the list of currently held keys, ordered from least recent to most recent.
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownList
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyboard#useKeyDownList
  *
  * @returns
  * Returns a signal of a list of keys, and a signal of last keydown event.
@@ -92,9 +92,9 @@ const useKeyDownList = createSharedRoot<
 /**
  * Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useCurrentlyHeldKey
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyboard#useCurrentlyHeldKey
  *
  * @returns
  * ```ts
@@ -129,9 +129,9 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<strin
 /**
  * Provides a signal with a sequence of currently held keys, as they were pressed down and up.
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownSequence
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyboard#useKeyDownSequence
  *
  * @returns
  * ```ts
@@ -162,7 +162,7 @@ export const useKeyDownSequence = /*#__PURE__*/ createSharedRoot<Accessor<string
  * Provides a `boolean` signal indicating if provided {@link key} is currently being held down.
  * Holding multiple keys at the same time will return `false` — holding only the specified one will return `true`.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#createKeyHold
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyboard#createKeyHold
  *
  * @param key The key to check for.
  * @options The options for the key hold.
@@ -206,7 +206,7 @@ export function createKeyHold(
 /**
  * Creates a keyboard shotcut observer. The provided {@link callback} will be called when the specified {@link keys} are pressed.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#createShortcut
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/keyboard#createShortcut
  *
  * @param keys The sequence of keys to watch for.
  * @param callback The callback to call when the keys are pressed.

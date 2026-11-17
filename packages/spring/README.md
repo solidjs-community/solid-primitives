@@ -6,14 +6,14 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/spring?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/spring)
 [![version](https://img.shields.io/npm/v/@solid-primitives/spring?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/spring)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A small SolidJS hook to interpolate signal changes with spring physics. Inspired by & directly forked from [`svelte-motion/spring`](https://svelte.dev/docs/svelte-motion#spring) as such, has a very familiar API design.
 
 With this primitive, you can easily animate values that can be interpolated like `number`, `date`, and collections (arrays or nested objects) of those datatypes.
 
 - `createSpring` - Provides a getter and setter for the spring primitive.
-- `createDerivedSpring` - Provides only a getter for the spring primitive deriving from an accessor parameter. Similar to the [@solid-primitives/tween](https://github.com/solidjs-community/solid-primitives/tree/main/packages/tween) API.
+- `createDerivedSpring` - Provides only a getter for the spring primitive deriving from an accessor parameter. Similar to the [@solid-primitives/tween](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/tween) API.
 
 The following physics options are available:
 
@@ -53,7 +53,7 @@ const springedValue = createDerivedSpring(myNumber, { stiffness: 0.03 });
 
 ## Demo
 
-- **[Playground](https://primitives.solidjs.community/playground/spring)** - [source code](https://github.com/solidjs-community/solid-primitives/blob/main/packages/spring/dev/index.tsx)
+- **[Playground](https://primitives.solidjs.community/playground/spring)** - [source code](https://github.com/solidjs-community/solid-primitives/blob/v1/packages/spring/dev/index.tsx)
 
 - **[CodeSandbox - Basic Example](https://codesandbox.io/p/devbox/ecstatic-borg-k2wqfr)**
 

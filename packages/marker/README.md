@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/marker?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/marker)
 [![version](https://img.shields.io/npm/v/@solid-primitives/marker?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/marker)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A reactive primitive for marking parts of a string that match a regular expression. Useful for highlighting search results.
 
@@ -103,7 +103,7 @@ Regex returned by `makeSearchRegex` will:
 
 ## Demo
 
-[Deployed example](https://primitives.solidjs.community/playground/marker) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/marker/dev)
+[Deployed example](https://primitives.solidjs.community/playground/marker) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/marker/dev)
 
 ## Changelog
 
