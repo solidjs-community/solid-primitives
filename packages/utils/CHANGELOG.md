@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 7.0.0-next.8
+
+### Patch Changes
+
+- 5c23fda: Fix `withAccess` calling its callback with `undefined` or `null`. The check was `typeof _value != null`, which is always true, so the value was never skipped.
+
 ## 7.0.0-next.7
 
 ### Patch Changes
