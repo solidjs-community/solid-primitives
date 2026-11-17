@@ -47,6 +47,37 @@ describe("throttle", () => {
     expect(val).toBe(0);
   });
 
+  test("keeps working after the callback throws", () => {
+    const calls: number[] = [];
+    const trigger = throttle((current: number) => {
+      calls.push(current);
+      if (current === 1) throw new Error("boom");
+    }, 20);
+
+    trigger(1);
+    expect(() => vi.advanceTimersByTime(50)).toThrow("boom");
+
+    trigger(2);
+    vi.advanceTimersByTime(50);
+    expect(calls).toEqual([1, 2]);
+  });
+
+  test("a call made from inside the callback is scheduled", () => {
+    const calls: number[] = [];
+    const trigger = throttle((current: number) => {
+      calls.push(current);
+      if (current < 3) trigger(current + 1);
+    }, 20);
+
+    trigger(1);
+    vi.advanceTimersByTime(20);
+    expect(calls).toEqual([1]);
+    vi.advanceTimersByTime(20);
+    expect(calls).toEqual([1, 2]);
+    vi.advanceTimersByTime(20);
+    expect(calls).toEqual([1, 2, 3]);
+  });
+
   test("autoclearing throttle", () => {
     let val = 0;
     createRoot(dispose => {
@@ -109,6 +140,27 @@ describe("leading throttle", () => {
 });
 
 describe("leadingAndTrailing throttle", () => {
+  test("keeps working after the trailing call throws", () => {
+    const calls: number[] = [];
+    const trigger = leadingAndTrailing(
+      throttle,
+      (current: number) => {
+        calls.push(current);
+        if (current === 2) throw new Error("boom");
+      },
+      20,
+    );
+
+    trigger(1);
+    trigger(2);
+    expect(calls).toEqual([1]);
+    expect(() => vi.advanceTimersByTime(50)).toThrow("boom");
+    expect(calls).toEqual([1, 2]);
+
+    trigger(3);
+    expect(calls).toEqual([1, 2, 3]);
+  });
+
   test("setup and trigger throttle", () => {
     let val = 0;
     const trigger = leadingAndTrailing(throttle, (current: number) => (val = current), 20);
