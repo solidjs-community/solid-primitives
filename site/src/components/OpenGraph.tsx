@@ -64,7 +64,7 @@ function forImage(text: string): string {
 
 /**
  * Origin for the absolute og:image / og:url values. Builds bake in `__SITE_ORIGIN__` (production,
- * a preview deployment's own URL, or `SITE_ORIGIN` at build time). Under `vite dev` that origin
+ * or `SITE_ORIGIN` at build time). Under `vite dev` that origin
  * doesn't serve this checkout's `/_server` endpoint, so use the origin the page is actually being
  * served from.
  */

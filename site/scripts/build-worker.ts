@@ -1,5 +1,6 @@
-// Bundles worker/index.ts into dist/client/_worker.js, the entry Cloudflare Pages runs in
-// "advanced mode" (and a Workers Static Assets entry would also use). Runs after `vite build`.
+// Bundles worker/index.ts into dist/client/_worker.js, the Worker entry wrangler.jsonc points at
+// (`main`). public/.assetsignore keeps it out of the uploaded static assets. Runs after
+// `vite build`.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { build } from "esbuild";

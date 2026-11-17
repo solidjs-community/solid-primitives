@@ -9,18 +9,10 @@ import { ogVersion } from "./scripts/og-version";
 
 const solidBase = createSolidBase(defaultTheme);
 
-// Crawlers need absolute og:image URLs. Cloudflare Pages preview deployments (any branch other than
-// production) are served from their own address (`CF_PAGES_URL`), so their pages and OG images
-// point at themselves; production uses the canonical domain. `SITE_ORIGIN` overrides both (e.g.
-// `vite preview` on localhost).
-const PRODUCTION_BRANCH = "main";
-const SITE_ORIGIN = (
-  process.env.SITE_ORIGIN ??
-  (process.env.CF_PAGES_BRANCH && process.env.CF_PAGES_BRANCH !== PRODUCTION_BRANCH
-    ? process.env.CF_PAGES_URL
-    : undefined) ??
-  SITE_URL
-).replace(/\/$/, "");
+// Crawlers need absolute og:image URLs, so builds bake in the canonical origin. Workers Builds
+// doesn't expose a preview deployment's URL at build time, so previews point at production too.
+// `SITE_ORIGIN` overrides it (e.g. `vite preview` on localhost).
+const SITE_ORIGIN = (process.env.SITE_ORIGIN ?? SITE_URL).replace(/\/$/, "");
 
 export default defineConfig({
   define: {

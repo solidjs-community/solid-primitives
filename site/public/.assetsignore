@@ -1,0 +1,2 @@
+# Not public assets: the Worker entry bundled by scripts/build-worker.ts.
+_worker.js

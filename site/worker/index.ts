@@ -1,12 +1,11 @@
 /**
- * Cloudflare Worker for the docs site, bundled to `dist/client/_worker.js` by
- * scripts/build-worker.ts (Cloudflare Pages "advanced mode"; also works as a Workers Static Assets
- * entry).
+ * Cloudflare Worker for the docs site (static assets + this Worker; see wrangler.jsonc). Bundled to
+ * `dist/client/_worker.js` by scripts/build-worker.ts.
  *
  * The site itself is fully static (prerendered pages and pre-rendered OG images in `dist/client`).
  * The only dynamic path is `/api/stats`: fresh homepage numbers (npm downloads, open issues/PRs),
- * refreshed at most once a day. `public/_routes.json` limits the Worker to `/api/*`, so every
- * other request is answered from static assets without invoking it.
+ * refreshed at most once a day. `assets.run_worker_first` in wrangler.jsonc limits the Worker to
+ * `/api/*`, so every other request is answered from static assets without invoking it.
  *
  * If a refresh fails, the endpoint answers 502 (cached for an hour, so visitors don't each retry
  * the ~100 upstream requests) and the homepage keeps the numbers baked in at build time.
