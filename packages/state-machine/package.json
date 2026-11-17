@@ -20,7 +20,7 @@
       "createMachine"
     ],
     "category": "Reactivity",
-    "gzip": 456
+    "gzip": 466
   },
   "keywords": [
     "solid",

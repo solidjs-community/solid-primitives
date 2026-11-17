@@ -20,7 +20,7 @@
       "createSelection"
     ],
     "category": "Inputs",
-    "gzip": 916
+    "gzip": 926
   },
   "sideEffects": false,
   "type": "module",

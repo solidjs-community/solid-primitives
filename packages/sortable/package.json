@@ -31,7 +31,7 @@
       "createSortedProjection"
     ],
     "category": "Reactivity",
-    "gzip": 743
+    "gzip": 755
   },
   "keywords": [
     "solid",
