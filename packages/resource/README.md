@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/resource?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/resource)
 [![version](https://img.shields.io/npm/v/@solid-primitives/resource?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/resource)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A collection of composable primitives to augment [`createResource`](https://www.solidjs.com/docs/latest/api#createresource)
 
@@ -174,7 +174,7 @@ Nothing stops you from using keys as Source for your fetch request through [`mak
 
 #### Network mode
 
-Just filter your source with `isOnline` from the [`connectivity`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/connectivity) package:
+Just filter your source with `isOnline` from the [`connectivity`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/connectivity) package:
 
 ```ts
 import { createConnectivitySignal } from "@solid-primitives/connectivity";
@@ -186,7 +186,7 @@ const [data] = createResource(source, url => fetch(url));
 
 #### Window focus refetching
 
-The `createEventListener` primitive from the [`event-listener`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener) pacakge comes in helpful to do that:
+The `createEventListener` primitive from the [`event-listener`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-listener) pacakge comes in helpful to do that:
 
 ```ts
 import { createEventListener } from "@solid-primitives/event-listener";
@@ -195,7 +195,7 @@ const [data, { refetch }] = createResource(() => fetch("url"));
 createEventListener(document, "visibilitychange", () => document.hidden || refetch());
 ```
 
-You could also augment this code with the [`scheduled`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled) package to throttle the refetch calls not to happen again sooner than after 5s:
+You could also augment this code with the [`scheduled`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled) package to throttle the refetch calls not to happen again sooner than after 5s:
 
 ```ts
 import { createEventListener } from "@solid-primitives/event-listener";

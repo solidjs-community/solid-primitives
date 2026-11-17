@@ -24,7 +24,7 @@ const OMITTED_PROPS = ["src"] as const;
  * The `src` prop is required and will be used to set the `src` or `textContent` attribute. It can be a string or an accessor.
  * @returns The script element that was created. (will be undefined in SSR)
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/script-loader#createScriptLoader
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/script-loader#createScriptLoader
  *
  * @example
  * createScriptLoader({

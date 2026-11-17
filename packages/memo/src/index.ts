@@ -37,7 +37,7 @@ const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
  * - `options.initial` — an array of functions to be run initially and tracked. *(useful for runing code before other pure computations)*
  * @returns track() function
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createPureReaction
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/memo#createPureReaction
  *
  * @example
  * const [count, setCount] = createSignal(0);
@@ -172,7 +172,7 @@ export function createLatestMany<T>(
  * @param value initial value (for calcultion)
  * @param options give a name to the reactive computation, or change `equals` method.
  * @returns signal returning value of the last change.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createWritableMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/memo#createWritableMemo
  * @example
  * const [count, setCount] = createSignal(1);
  * const [result, setResult] = createWritableMemo(() => count() * 2);
@@ -372,7 +372,7 @@ export function createAsyncMemo<T>(
  * @param options set computation name for debugging pourposes
  * @returns signal of a value that was returned by the calculation
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createLazyMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/memo#createLazyMemo
  *
  * @example
  * const double = createLazyMemo(() => count() * 2)
@@ -445,7 +445,7 @@ export function createLazyMemo<T>(
  * @param options computation options
  * @returns accessor of the calculated value
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createRcMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/memo#createRcMemo
  *
  * @example
  * ```ts
@@ -548,7 +548,7 @@ export type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
  * @param options set maximum **size** of the cache, or memo options.
  * @returns signal access function
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createMemoCache
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/memo#createMemoCache
  *
  * @example
  * set the reactive key up-front
@@ -600,7 +600,7 @@ export function createMemoCache<Key, Value>(
 
 /**
  * Primitive for updating signal in a predictable way. SolidJS equivalent of React's [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer).
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createReducer
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/memo#createReducer
  * @param dispatcher is the reducer, it's 1st parameter always is the current state of the reducer and it returns the new state of the reducer.
  * @param initialValue initial value of the signal
  * @returns

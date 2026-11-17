@@ -140,7 +140,7 @@ export type PresenceResult<TItem> = {
  * @param options options to configure the transition, see {@link Options}
  * @returns an object with reactive accessors representing the state of the transition. See {@link PresenceResult}.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/presence#createPresence
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/presence#createPresence
  *
  * @example
  * ```ts

@@ -23,7 +23,7 @@ export const getRemSize = (): number =>
 /**
  * Creates a reactive signal with value of the current rem size, and tracks it's changes.
  * @returns A signal with the current rem size in pixels.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/styles#createRemSize.
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/styles#createRemSize.
  * @example
  * const remSize = createRemSize();
  * console.log(remSize()); // 16
@@ -57,10 +57,10 @@ export function createRemSize(): Accessor<number> {
 /**
  * Returns a reactive signal with value of the current rem size, and tracks it's changes.
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) except if during hydration.
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) except if during hydration.
  *
  * @returns A signal with the current rem size in pixels.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/styles#useRemSize.
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/styles#useRemSize.
  * @example
  * const remSize = useRemSize();
  * console.log(remSize()); // 16

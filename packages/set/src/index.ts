@@ -5,7 +5,7 @@ const $KEYS = Symbol("track-keys");
 
 /**
  * A reactive version of a Javascript built-in `Set` class.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#ReactiveSet
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/set#ReactiveSet
  * @example
  * const set = new ReactiveSet([1,2,3]);
  * [...set] // reactive on any change
@@ -101,7 +101,7 @@ export class ReactiveSet<T> extends Set<T> {
 
 /**
  * A reactive version of a Javascript built-in `WeakSet` class.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#ReactiveWeakSet
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/set#ReactiveWeakSet
  * @example
  * const set = new ReactiveWeakSet([1,2,3]);
  * set.has(2) // reactive on change to the result

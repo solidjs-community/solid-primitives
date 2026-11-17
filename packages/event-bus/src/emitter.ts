@@ -44,7 +44,7 @@ export type Emitter<M extends Record<PropertyKey, any>> = {
  *
  * @returns emitter mathods: `{on, emit, clear}`
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEmitter
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#createEmitter
  *
  * @example
  * const emitter = createEmitter<{
@@ -97,7 +97,7 @@ export type GlobalEmitter<M extends Record<PropertyKey, any>> = {
  *
  * @returns emitter mathods: `{on, listen, emit, clear}`
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createGlobalEmitter
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/event-bus#createGlobalEmitter
  *
  * @example
  * const emitter = createGlobalEmitter<{

@@ -71,7 +71,7 @@ export function createPrefersDark(serverFallback?: boolean) {
 /**
  * Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) except if during hydration.
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) except if during hydration.
  *
  * @returns a boolean signal
  * @example

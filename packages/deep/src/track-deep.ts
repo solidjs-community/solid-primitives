@@ -7,7 +7,7 @@ import { type Store } from "solid-js/store";
  * @param store reactive store dependency
  * @returns same {@link store} that was passed in
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#trackDeep
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/deep#trackDeep
  *
  * @example
  * ```ts

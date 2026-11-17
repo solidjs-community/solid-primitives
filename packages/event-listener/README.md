@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-listener?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-listener)
 [![size](https://img.shields.io/npm/v/@solid-primitives/event-listener?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-listener)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A set of primitives that help with listening to DOM and Custom Events.
 
@@ -162,7 +162,7 @@ createEventListener(window, type, e => {...});
 setType([]);
 ```
 
-2. Wrapping usage of `createEventListener` primitive in Solid's `createRoot` or `createBranch` | `createDisposable` from ["@solid-primitives/rootless"](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createDisposable).
+2. Wrapping usage of `createEventListener` primitive in Solid's `createRoot` or `createBranch` | `createDisposable` from ["@solid-primitives/rootless"](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createDisposable).
 
 ```ts
 import { createDisposable } from "@solid-primitives/rootless";

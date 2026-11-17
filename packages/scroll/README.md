@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scroll?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
 [![size](https://img.shields.io/npm/v/@solid-primitives/scroll?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scroll)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Reactive primitives to react to element/window scrolling.
 
@@ -77,7 +77,7 @@ setTarget(undefined);
 
 #### Destructuring
 
-If you are interested in listening to only single axis, you'd still have to access `scroll.y` as a property. To use it as a separate signal, you can wrap it with a function, or use [`destructure`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/destructure#destructure) helper.
+If you are interested in listening to only single axis, you'd still have to access `scroll.y` as a property. To use it as a separate signal, you can wrap it with a function, or use [`destructure`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/destructure#destructure) helper.
 
 ```ts
 const scroll = createScrollPosition();
@@ -100,7 +100,7 @@ https://codesandbox.io/s/solid-primitives-scroll-xy19c8?file=/index.tsx
 
 Returns a reactive object with current window scroll position.
 
-`useWindowScrollPosition` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive, hence the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
+`useWindowScrollPosition` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive, hence the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
 
 ```ts
 const scroll = useWindowScrollPosition();

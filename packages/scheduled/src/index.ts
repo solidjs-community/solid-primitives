@@ -20,7 +20,7 @@ export interface Scheduled<Args extends unknown[]> {
  * @param wait The duration to debounce in milliseconds
  * @returns The debounced function
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#debounce
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled#debounce
  *
  * @example
  * ```ts
@@ -52,7 +52,7 @@ export const debounce: ScheduleCallback = (callback, wait) => {
  * @param wait The duration to throttle
  * @returns The throttled callback trigger
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#throttle
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled#throttle
  *
  * @example
  * ```ts
@@ -101,7 +101,7 @@ export const throttle: ScheduleCallback = (callback, wait) => {
  * @param maxWait maximum wait time in milliseconds until the callback is called
  * @returns The throttled callback trigger
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#scheduleidle
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled#scheduleidle
  *
  * @example
  * ```ts
@@ -153,7 +153,7 @@ export const scheduleIdle: ScheduleCallback = isServer
  * @param wait timeout duration
  * @returns The scheduled callback trigger
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#leading
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled#leading
  *
  * @example
  * ```ts
@@ -204,7 +204,7 @@ export function leading<Args extends unknown[]>(
  * @param wait timeout duration
  * @returns The scheduled callback trigger
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#leadingAndTrailing
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled#leadingAndTrailing
  *
  * @example
  * ```ts
@@ -267,7 +267,7 @@ export function leadingAndTrailing<Args extends unknown[]>(
  * @param schedule Schedule the invalidate function (can be {@link debounce} or {@link throttle})
  * @returns A function used to track the signal. It returns `true` if the signal is dirty *(callback should be called)* and `false` otherwise.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#createScheduled
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled#createScheduled
  *
  * @example
  * ```ts

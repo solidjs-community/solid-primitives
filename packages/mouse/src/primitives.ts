@@ -41,7 +41,7 @@ export interface PositionToElementOptions extends UseTouchOptions, FollowTouchOp
  * ```ts
  * { x: number, y: number, sourceType: MouseSourceType, isInside: boolean }
  * ```
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#createmouseposition
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/mouse#createmouseposition
  * @example
  * const [el, setEl] = createSignal(ref)
  * const pos = createMousePosition(el, { touch: false })
@@ -78,12 +78,12 @@ export function createMousePosition(
 /**
  * Attaches event listeners to `window` to provide a reactive object of current mouse position on the page.
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot).
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot).
  * @returns reactive object of current mouse position on the page
  * ```ts
  * { x: number, y: number, sourceType: MouseSourceType, isInside: boolean }
  * ```
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#useMousePosition
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/mouse#useMousePosition
  * @example
  * const pos = useMousePosition()
  * createEffect(() => {
@@ -102,7 +102,7 @@ export const useMousePosition = /*#__PURE__*/ createHydratableSingletonRoot(
  * @param options {@link PositionToElementOptions}
  * @returns Autoupdating position relative to top-left of the target + current bounds of the element.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#createPositionToElement
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/mouse#createPositionToElement
  *
  * @example
  * const [el, setEl] = createSignal(ref)

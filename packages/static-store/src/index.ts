@@ -30,7 +30,7 @@ export type StaticStoreSetter<T extends object> = {
  * ```ts
  * [access: T, write: StaticStoreSetter<T>]
  * ```
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createStaticStore
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/static-store#createStaticStore
  * @example
  * ```ts
  * const [size, setSize] = createStaticStore({ width: 0, height: 0 });
@@ -96,7 +96,7 @@ export function createStaticStore<T extends object>(
  * ```ts
  * [access: T, write: StaticStoreSetter<T>]
  * ```
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createHydratableStaticStore
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/static-store#createHydratableStaticStore
  */
 export function createHydratableStaticStore<T extends object>(
   serverValue: T,
@@ -117,7 +117,7 @@ export function createHydratableStaticStore<T extends object>(
  * A derived version of the {@link createStaticStore}. It will use the update function to derive the value of the store. It will only update when the dependencies of the update function change.
  * @param fn a reactive function to derive the value of the store
  * @returns a shallow, reactive, static store object
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createDerivedStaticStore
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/static-store#createDerivedStaticStore
  * @example
  * ```ts
  * const [size, setSize] = createSignal({ width: 0, height: 0 });

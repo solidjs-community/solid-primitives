@@ -131,7 +131,7 @@ export function createWindowSize(): Readonly<Size> {
 /**
  * Returns a reactive store-like object of current width and height dimensions of window, page and screen.
  *
- * This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive.
+ * This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive.
  *
  * @example
  * const size = useWindowSize();

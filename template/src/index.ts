@@ -21,8 +21,8 @@ export const createPrimitiveTemplate = (
 // While making primitives, there are many patterns in our arsenal
 // There are functions like one above, but we also can use components, directives, element properties, etc.
 // Solid's tutorial on directives: https://www.solidjs.com/tutorial/bindings_directives
-// Example package that uses directives: https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer
-// Example use of components: https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-listener/src/components.ts
+// Example package that uses directives: https://github.com/solidjs-community/solid-primitives/tree/v1/packages/intersection-observer
+// Example use of components: https://github.com/solidjs-community/solid-primitives/blob/v1/packages/event-listener/src/components.ts
 
 // This is how you would declare types for a directive:
 declare module "solid-js" {

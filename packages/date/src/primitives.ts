@@ -35,7 +35,7 @@ export const createDate = (init: MaybeAccessor<DateInit>): [Accessor<Date>, Date
  * Creates an autoupdating and reactive `new Date()`
  *
  * @param interval delay in ms for updating the date. Set to `false` to disable autoupdating. *Default = `30000`*
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/date#createDateNow
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/date#createDateNow
  *
  * @example
  * ```ts
@@ -76,7 +76,7 @@ export function createDateNow(
  * *May be a reactive signal*
  * @param to timestamp `number` | date `string` | `Date` instance;
  * *May be a reactive signal*
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/date#createTimeDifference
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/date#createTimeDifference
  *
  * @example
  * const [target, setTarget] = createSignal(1641408329089)
@@ -101,7 +101,7 @@ export function createTimeDifference(
  * @param to a target timestamp `number` | date `string` | `Date` instance;
  * *May be a reactive signal*
  * @param updateInterval number or a function returning a number of ms to wait before updating the **now**
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/date#createTimeDifferenceFromNow
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/date#createTimeDifferenceFromNow
  *
  * @example
  * const [target, setTarget] = createSignal(1641408329089)
@@ -133,7 +133,7 @@ export function createTimeDifferenceFromNow(
  * @param to a target timestamp `number` | date `string` | `Date` instance;
  * *May be a reactive signal*
  * @param options
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/date#createTimeAgo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/date#createTimeAgo
  *
  * @example
  * ```ts
@@ -191,7 +191,7 @@ export function createTimeAgo(
  *
  * @param difference Time difference between two dates; *May be a reactive signal*
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/date#createCountdown
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/date#createCountdown
  * @example
  * const [to, setTo] = createSignal(1641408329089)
  * const countdown = createCountdown("2020 1 11", to)
@@ -223,7 +223,7 @@ export function createCountdown(
  * *May be a reactive signal*
  * @param updateInterval number or a function returning a number of ms to wait before updating the **now**. Defaults to one second.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/date#createCountdownFromNow
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/date#createCountdownFromNow
  * @example
  * // target date may be reactive
  * const [to, setTo] = createSignal(1641408329089)
