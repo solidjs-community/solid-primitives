@@ -30,12 +30,20 @@
     ]
   },
   "catalog": {
-    "solid-js": "2.0.0-rc.9",
-    "@solidjs/web": "2.0.0-rc.9",
-    "tsdown": "^0.22.3",
-    "unplugin-solid": "^1.0.0"
+    "tsdown": "^0.23.7",
+    "unplugin-solid": "^3.0.0",
+    "solid-js": "2.0.0",
+    "@solidjs/web": "2.0.0",
+    "@solidjs/signals": "2.0.0",
+    "@solidjs/babel-plugin": "2.0.0",
+    "@solidjs/vite-plugin": "3.0.0",
+    "@babel/core": "^7.29.7"
   },
   "catalogs": {
+    "peer": {
+      "solid-js": "^2.0.0",
+      "@solidjs/web": "^2.0.0"
+    },
     "graphql": {
       "@graphql-typed-document-node/core": "^3.2.0",
       "graphql": "^16.8.1"

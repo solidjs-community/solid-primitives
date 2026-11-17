@@ -5,6 +5,10 @@ packages:
 overrides:
   react: 19.2.7
   react-dom: 19.2.7
+  # @kobalte/solidbase 3.0.0 hard-pins @solidjs/meta and @solidjs/router to next builds. Force the stable
+  # 2.0.0 so the site (and solidbase) share a single copy of each, and no pre-release is installed.
+  '@solidjs/meta': 2.0.0
+  '@solidjs/router': 2.0.0
   # @vercel/og 1.0.2+ bundles harfbuzzjs with a `require("fs")` shim and a missing hb.wasm, so its
   # node entry crashes on import under plain Node ESM (it only works when Next.js bundles it).
   # 1.0.1 is the last release that loads. Used by the site's OG image server functions.
@@ -25,8 +29,9 @@ minimumReleaseAgeExclude:
   - '@solidjs/signals@2.0.0'
   - '@solidjs/web@2.0.0'
   - solid-js@2.0.0
-  - '@dom-expressions/babel-plugin-jsx@0.50.0-next.44'
-  - '@solidjs/vite-plugin@3.0.0-next.57 || 3.0.0'
+  - '@solidjs/vite-plugin@3.0.0'
+  - '@solidjs/meta@2.0.0'
+  - '@solidjs/router@2.0.0'
   - '@solidjs/ogp@0.1.0'
   - '@solidjs/babel-plugin@2.0.0'
   - '@solidjs/compiler-darwin-arm64@2.0.0'
