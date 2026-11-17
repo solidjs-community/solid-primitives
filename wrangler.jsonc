@@ -13,7 +13,7 @@
 // sends to the Worker (site/worker/index.ts, bundled to dist/client/_worker.js by the site build).
 // `site/public/.assetsignore` keeps that bundle from also being uploaded as a public asset.
 {
-  "name": "solid-primitives-site",
+  "name": "solid-primitives",
   "main": "./site/dist/client/_worker.js",
   "compatibility_date": "2026-11-01",
   "assets": {
