@@ -1,5 +1,62 @@
 # @solid-primitives/raf
 
+## 4.0.0
+
+### Major Changes
+
+- ec17f08: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/raf`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - `createRAF`: `running` signal created with `{ ownedWrite: true }` to allow `start()`/`stop()` to be called from within reactive scopes
+  - Added `test/server.test.ts` verifying SSR no-op behaviour for `createRAF`, `targetFPS`, and `createMs`
+
+### Minor Changes
+
+- a675c46: Add `createCallbacksSet`, `useGlobalRAF` and `createScheduledLoop`, ported to Solid 2.0 from the original work by Roy Eden (@royeden) in #824.
+
+  - `createCallbacksSet` combines several callbacks into one, so they can share a single `createRAF` loop.
+  - `useGlobalRAF` runs callbacks on one shared `requestAnimationFrame` loop held in a singleton root.
+  - `createScheduledLoop` gives external frameloop schedulers (e.g. motion's `frame`) the `[running, start, stop]` shape of `createRAF`.
+
+  Fixes in `createRAF`: `stop()` no longer calls `cancelAnimationFrame(0)` when no frame was requested, and calling `start()` twice before a flush no longer starts two loops.
+
+### Patch Changes
+
+- 790b4de: Correct the `createScheduledLoop` motion example: `frame.render` returns the scheduled callback, so it can be passed to `cancelFrame` directly.
+- 1b703e1: `createRAF`/`createMs` `start()` no longer tracks its own `running` signal, which made a tracking caller (e.g. one created inside a memo) re-run forever.
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [790b4de]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [a7f09be]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/rootless@2.0.0
+  - @solid-primitives/set@1.0.0
+
 ## 4.0.0-next.6
 
 ### Patch Changes

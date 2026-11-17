@@ -1,5 +1,44 @@
 # @solid-primitives/context
 
+## 2.0.0
+
+### Major Changes
+
+- bca95a8: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `Context` is now used directly as the provider component — `Context.Provider` no longer exists in Solid 2.0. `createContextProvider` and `MultiProvider` both reflect this change.
+  - `ContextProviderComponent` is now a proper export from `solid-js`; the previous workaround importing from an internal `node_modules` path has been removed.
+  - `JSX.Element` replaced with `Element` from `solid-js` throughout the public API types, matching Solid 2.0's renderer-neutral type model.
+  - `MultiProvider` no longer falls back to accessing `.Provider` on non-function items — contexts passed in `values` must be functions (which all `Context` objects now are in Solid 2.0).
+
+  ## New APIs
+  - `createContextProvider` now returns `Exclude<T, undefined>` from its `useContext` helper, matching Solid 2's throwing behavior for missing context values.
+  - Added `createOptionalContextProvider` — uses an internal Symbol fallback and returns `undefined` when the context is missing or its value is `undefined`. Accepts an optional default value for missing providers.
+
+### Minor Changes
+
+- 5a29dd6: `MultiProvider` now passes props to providers created by `createContextProvider`, `createOptionalContextProvider` and `createLayeredContext`: `[CounterProvider, { initial: 1 }]` behaves exactly like `<CounterProvider initial={1}>` (closes #755). Raw contexts and other provider components still receive the second item as `value`, and entries are now type-checked against their provider's props.
+
+  **Migration:** a `[Provider, value]` pair for one of these providers previously reached the factory as `props.value`; pass `[Provider, { value }]` to keep that shape.
+
+- dd43194: Add `ContextConsumer`
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
 ## 2.0.0-next.5
 
 ### Minor Changes

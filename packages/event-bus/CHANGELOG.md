@@ -1,5 +1,68 @@
 # @solid-primitives/event-bus
 
+## 3.0.0
+
+### Major Changes
+
+- 37b1bab: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
+
+  ### `batchEmits`
+
+  In Solid 2.0, all signal writes are automatically batched via microtasks. `batchEmits` is now a no-op that returns the bus unchanged. The `batch` wrapper has been removed.
+
+  ### `toEffect`
+
+  Updated to use the Solid 2.0 split `createEffect(compute, apply)` signature. The `on()` helper (removed in Solid 2.0) has been replaced with the split effect pattern. The reactive owner is now explicitly captured at creation time and forwarded via `runWithOwner` in the apply phase, since the apply phase is unowned in Solid 2.0.
+
+  ### `createEventStack`
+
+  The internal stack signal is created with `{ ownedWrite: true }` to allow writes from event listeners called within reactive contexts (e.g. `createRoot`, effects). Signal reads are now deferred in Solid 2.0, so the stack value emitted in event payloads is now computed inside the setter callback to ensure it reflects the updated state.
+
+  ### Tests
+
+  Tests that read signal values after `emit()` now require `flush()` to commit pending signal updates before assertions.
+
+### Patch Changes
+
+- cc30d55: `toEffect` now keeps pending payloads in a plain queue and uses a counter signal to schedule the drain, instead of writing an empty array back into the signal its own effect reads. Payloads are still emitted in order, once per flush, under the captured owner; the only observable difference is that the extra empty re-run of the effect (and its `EFFECT_WRITES_OWN_SOURCE` dev diagnostic) is gone. Calling the wrapped emit from inside a listener during a drain still throws, as before.
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+
 ## 3.0.0-next.6
 
 ### Patch Changes

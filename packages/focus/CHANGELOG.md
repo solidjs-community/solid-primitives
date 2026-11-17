@@ -1,5 +1,89 @@
 # @solid-primitives/focus
 
+## 1.0.0
+
+### Major Changes
+
+- ddf4ecd: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `autofocus` is now a **ref callback factory** (`use:autofocus` directive removed; Solid 2.0 no longer supports `use:` directives):
+    ```tsx
+    // Before
+    <button use:autofocus autofocus>...</button>
+    // After
+    <button ref={autofocus()} autofocus>...</button>
+
+    // Before
+    <button use:autofocus={false} autofocus>...</button>
+    // After
+    <button ref={autofocus(false)} autofocus>...</button>
+    ```
+  - `JSX` type is now imported from `@solidjs/web` (was `solid-js`)
+  - `onMount` replaced by `onSettled` from `solid-js`
+  - `createAutofocus` uses split `createEffect(compute, apply)` form with proper timeout cleanup on re-focus
+
+  ## New Primitives
+
+  `makeFocusListener` and `createFocusSignal` have moved here from `@solid-primitives/active-element`:
+
+  - **`makeFocusListener(target, callback, useCapture?)`** — attaches `focus`/`blur` listeners to an element, calling `callback` with the new boolean focus state. Returns a cleanup function.
+    ```ts
+    const clear = makeFocusListener(el, isFocused => console.log(isFocused));
+    clear(); // remove listeners
+    ```
+  - **`createFocusSignal(target)`** — reactive signal that tracks whether `target` is focused.
+    ```ts
+    const isFocused = createFocusSignal(() => el);
+    isFocused(); // boolean
+    ```
+
+### Minor Changes
+
+- b7ef2f3: Add `createFocusRestore` — saves the currently focused element while active and restores focus to it once deactivated, without trapping focus or managing tab order. For non-modal surfaces (Popover, Tooltip, Menu) that should return focus to their trigger on close but must not intercept Tab navigation while open; for modal dialogs needing both behaviors, use `createFocusTrap`'s existing `restoreFocus` option instead.
+
+  Also fixed a stale-closure race shared between `createFocusTrap` and the new `createFocusRestore`: the restore target used to be read from a mutable outer variable inside a deferred `afterPaint` callback, so a fast reactivate-before-restore-fires cycle could restore focus to the wrong element. Both primitives now share one internal helper that captures the target synchronously at deactivation time.
+
+- 53d9fee: Add `createFocusGroup` — creates a focus group for moving focus imperatively (`focusNext`/`focusPrevious`/`focusFirst`/`focusLast`) between the focusable/tabbable elements of a container, with arrow-key/Home/End/Tab keyboard navigation enabled by default (a `keydown` listener attached to the group's ref, removed on ref change or disposal). Useful for building menus, listboxes, toolbars, and other composite widgets that need roving-tabindex-style navigation.
+
+  Options split into two groups: `from`, `tabbable`, `wrap`, and `accept` are traversal options that can be passed per-method-call or as defaults (the second argument to `createFocusGroup`); `orientation`, `textDirection`, `handleTab`, and `keyboardNavigation` are group-level keyboard options read only from those defaults.
+
+  Radio button groups are handled per native semantics: with `tabbable: true`, only one `<input type="radio">` per same-`name` group is tabbable at a time (the checked one, or the first if none is checked), matching browser roving-tabindex behavior for radio groups.
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [cc30d55]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [a47cf15]
+- Updated dependencies [ab4c926]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [91a92aa]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/event-listener@3.0.0
+
 ## 1.0.0-next.6
 
 ### Patch Changes

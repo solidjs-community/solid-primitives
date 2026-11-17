@@ -1,5 +1,48 @@
 # @solid-primitives/storage
 
+## 5.0.0
+
+### Major Changes
+
+- 9404090: **`makePersisted`** - simplify setter, Solid 2.0 adaption, simpler types using function overloads
+
+### Minor Changes
+
+- 790b4de: Add a `merge` option to `makePersisted` that applies stored data on top of the initial value instead of replacing it, so keys added to a store's initial value later keep their defaults when older persisted data is loaded (#748). `merge: true` deep-merges plain objects (arrays and other values are replaced); a function `(stored, initial) => value` allows custom merging. Default behavior is unchanged.
+
+  If the initial value is still pending (an async or optimistic signal), there are no defaults yet: `merge: true` uses the stored data as is, and a custom merge function receives `undefined` as the initial value.
+
+### Patch Changes
+
+- 99b7631: sync API: allow for url specification
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- 673347c: Fixed a build failure in `messageSync` and `wsSync`: their `url` parameter's default value (`globalThis.location?.href`) lacked an explicit type annotation, which `--isolatedDeclarations` (used by the package's `.d.ts` generation) requires on any parameter whose type can't be trivially inferred. No behavior or API changes — `url` is still `string | undefined`.
+- 790b4de: `multiplexStorage`: with asynchronous storages, `getItem`/`key` now resolve to the first storage (in order) that returns a value instead of whichever storage answers first, so a fast storage without a value no longer hides a slower one that has it. A rejecting storage is skipped; the first rejection is only rethrown if no storage returns a value. (#799)
+- 2dfa8d5: Return an explicit disposer as the fourth value from `makePersisted` to unsubscribe sync listeners and cancel pending initialization. Preserve writes made before deferred initialization.
+- 8226cf9: fix: hydration mismatch
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+
 ## 5.0.0-next.8
 
 ### Minor Changes

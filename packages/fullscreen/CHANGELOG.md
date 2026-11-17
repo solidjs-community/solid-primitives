@@ -1,5 +1,65 @@
 # @solid-primitives/fullscreen
 
+## 2.0.0
+
+### Major Changes
+
+- a25fa88: Migrate `@solid-primitives/fullscreen` to Solid.js 2.0 (beta.14).
+
+  **Breaking changes:**
+
+  - Peer dependency updated from `solid-js ^1.6.12` to `solid-js ^2.0.0-beta.14` and `@solidjs/web ^2.0.0-beta.14`.
+  - The `use:createFullscreen` JSX directive (Solid 1.x `use:` namespace) is removed. Use the new `fullscreen()` ref directive factory instead:
+
+    ```tsx
+    // Before (Solid 1.x)
+    <div use:createFullscreen={fs} />
+
+    // After (Solid 2.0)
+    <div ref={fullscreen(fs)} />
+    ```
+
+  **New exports:**
+
+  - `fullscreen(active?, options?)` — ref directive factory that wraps `createFullscreen` for direct use on JSX elements via the `ref` prop.
+
+  **Internal changes:**
+
+  - `isServer` now imported from `@solidjs/web` (was `solid-js/web`).
+  - `createEffect` updated to Solid 2.0 split compute/effect signature.
+  - Test mock fixed: `document.fullscreenElement` is now a dynamic getter reflecting current fullscreen state; `document.exitFullscreen` now dispatches `fullscreenchange` matching browser behaviour.
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [cc30d55]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [a47cf15]
+- Updated dependencies [ab4c926]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [91a92aa]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/event-listener@3.0.0
+
 ## 2.0.0-next.5
 
 ### Patch Changes
