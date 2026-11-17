@@ -4,14 +4,14 @@
 
 # Solid Primitives 2.0
 
-[![website](https://img.shields.io/badge/website-primitives2.solidjs.community-blue?style=for-the-badge)](https://primitives2.solidjs.community)
+[![website](https://img.shields.io/badge/website-primitives.solidjs.community-blue?style=for-the-badge)](https://primitives.solidjs.community)
 [![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc00ff.svg?style=for-the-badge&logo=pnpm)](https://pnpm.io/)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Solid Primitives is a project dedicated to building high-quality, community-contributed primitives for Solid 2.0. Every utility is thoroughly tested, continuously maintained, and reviewed against a consistent quality bar before it lands in the repository. Our aim is to extend Solid's primary and secondary primitives with a well-rounded set of tertiary primitives.
 While Solid Primitives isn't officially maintained by the SolidJS Core Team, it's managed by members of the SolidJS core and ecosystem teams. This separation lets the core library iterate independently while keeping Solid Primitives in sync with where Solid is headed.
 
-Visit [https://primitives2.solidjs.community](https://primitives2.solidjs.community) for documentation and demos for each primitive.
+Visit [https://primitives.solidjs.community](https://primitives.solidjs.community) for documentation and demos for each primitive.
 
 ## Philosophy
 
@@ -21,7 +21,7 @@ Solid Primitives wraps client- and server-side functionality in a fully reactive
 
 The `next` branch and all packages published under the `next` dist-tag target **Solid.js 2.0** (`solid-js@^2.0.0`). Solid 2.0 introduces a new async reactivity model, updated control-flow primitives, and breaking API changes that affect every package in this library.
 
-Every package in this release has been migrated to the new 2.0 APIs and is incompatible with Solid 1.x, with two exceptions: `fetch` and `resource` still target Solid 1.x. See the [migration guide](https://primitives2.solidjs.community/migration) for what changed in each package. If you are still on Solid 1.x, use the latest stable releases from the `main` branch.
+Every package in this release has been migrated to the new 2.0 APIs and is incompatible with Solid 1.x, with two exceptions: `fetch` and `resource` still target Solid 1.x. See the [migration guide](https://primitives.solidjs.community/migration) for what changed in each package. If you are still on Solid 1.x, use the latest stable releases from the `main` branch.
 
 ### What changed
 
@@ -31,7 +31,7 @@ Every package in this release has been migrated to the new 2.0 APIs and is incom
 - **Split effects** — all `createEffect` calls use the Solid 2.0 two-argument compute/apply form to avoid stale reads.
 - **Peer dependencies** — migrated packages require `solid-js@^2.0.0` and `@solidjs/web@^2.0.0`.
 
-See the [migration guide](https://primitives2.solidjs.community/migration) and the CHANGELOG of each individual package for a full list of breaking changes.
+See the [migration guide](https://primitives.solidjs.community/migration) and the CHANGELOG of each individual package for a full list of breaking changes.
 
 ## Primitives Catalogue
 

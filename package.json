@@ -34,7 +34,7 @@
     "version": "changeset version && pnpm jsr:sync-versions && pnpm i --no-frozen-lockfile && git add .",
     "setup:trusted-publishing": "node --import=@nothing-but/node-resolve-ts ./scripts/setup-trusted-publishing.ts",
     "release": "pnpm build && pnpm run verify:manifests && changeset publish",
-    "release-tagged": "pnpm build && pnpm run verify:manifests && if [ -f .changeset/pre.json ]; then changeset publish; else changeset publish --tag \"$BRANCH_NAME\"; fi"
+    "release-tagged": "pnpm build && pnpm run verify:manifests && if [ -f .changeset/pre.json ] || [ \"$BRANCH_NAME\" = main ]; then changeset publish; else changeset publish --tag \"$BRANCH_NAME\"; fi"
   },
   "devDependencies": {
     "@babel/core": "catalog:",

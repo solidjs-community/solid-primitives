@@ -2,7 +2,7 @@ name: Format and Update Readme
 
 on:
   push:
-    branches: [main, next]
+    branches: [main]
 
 jobs:
   format-and-update:
