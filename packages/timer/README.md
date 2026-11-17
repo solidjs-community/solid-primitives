@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Timer" alt="Solid Primitives Timer">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Timer&version=2.0" alt="Solid Primitives Timer">
 </p>
 
 # @solid-primitives/timer

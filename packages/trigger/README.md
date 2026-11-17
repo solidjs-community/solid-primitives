@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=trigger" alt="Solid Primitives trigger">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=trigger&version=2.0" alt="Solid Primitives trigger">
 </p>
 
 # @solid-primitives/trigger

@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Tokenizer" alt="Solid Primitives JSX Tokenizer">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Tokenizer&version=2.0" alt="Solid Primitives JSX Tokenizer">
 </p>
 
 # @solid-primitives/jsx-tokenizer

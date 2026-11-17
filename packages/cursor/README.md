@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=cursor" alt="Solid Primitives cursor">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=cursor&version=2.0" alt="Solid Primitives cursor">
 </p>
 
 # @solid-primitives/cursor

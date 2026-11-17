@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Websocket" alt="Solid Primitives Websocket">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Websocket&version=2.0" alt="Solid Primitives Websocket">
 </p>
 
 # @solid-primitives/websocket

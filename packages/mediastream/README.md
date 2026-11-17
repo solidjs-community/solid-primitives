@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Mediastream" alt="Solid Primitives Mediastream">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Mediastream&version=2.0" alt="Solid Primitives Mediastream">
 </p>
 
 # @solid-primitives/mediastream

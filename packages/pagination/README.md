@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Pagination" alt="Solid Primitives pagination">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Pagination&version=2.0" alt="Solid Primitives pagination">
 </p>
 
 # @solid-primitives/pagination

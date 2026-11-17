@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=broadcast-channel" alt="Solid Primitives broadcast-channel">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=broadcast-channel&version=2.0" alt="Solid Primitives broadcast-channel">
 </p>
 
 # @solid-primitives/broadcast-channel

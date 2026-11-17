@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=transition" alt="Solid Primitives transition">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=transition&version=2.0" alt="Solid Primitives transition">
 </p>
 
 # @solid-primitives/transition-group

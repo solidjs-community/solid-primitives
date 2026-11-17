@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Clipboard" alt="Solid Primitives Clipboard">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Clipboard&version=2.0" alt="Solid Primitives Clipboard">
 </p>
 
 # @solid-primitives/clipboard

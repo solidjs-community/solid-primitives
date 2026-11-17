@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Graphql" alt="Solid Primitives Graphql">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Graphql&version=2.0" alt="Solid Primitives Graphql">
 </p>
 
 # @solid-primitives/graphql

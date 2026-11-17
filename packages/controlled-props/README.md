@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Controlled%20Props" alt="Solid Primitives Controlled Props">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Controlled%20Props&version=2.0" alt="Solid Primitives Controlled Props">
 </p>
 
 # @solid-primitives/controlled-props

@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=event-dispatcher" alt="Solid Primitives event-dispatcher">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=event-dispatcher&version=2.0" alt="Solid Primitives event-dispatcher">
 </p>
 
 # @solid-primitives/event-dispatcher

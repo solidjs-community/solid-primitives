@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Drag%20%26%20Drop" alt="Solid Primitives Drag & Drop">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Drag%20%26%20Drop&version=2.0" alt="Solid Primitives Drag & Drop">
 </p>
 
 # @solid-primitives/drag-drop

@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Gestures" alt="Solid Primitives Gestures">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Gestures&version=2.0" alt="Solid Primitives Gestures">
 </p>
 
 # @solid-primitives/gestures

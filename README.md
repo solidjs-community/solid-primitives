@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=2.0" alt="Solid Primitives 2.0">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=&version=2.0" alt="Solid Primitives 2.0">
 </p>
 
 # Solid Primitives 2.0
@@ -19,7 +19,7 @@ Solid Primitives wraps client- and server-side functionality in a fully reactive
 
 ## Solid 2.0
 
-The `next` branch and all packages published under the `next` dist-tag target **Solid.js 2.0** (`solid-js@^2.0.0-rc.21`). Solid 2.0 introduces a new async reactivity model, updated control-flow primitives, and breaking API changes that affect every package in this library.
+The `next` branch and all packages published under the `next` dist-tag target **Solid.js 2.0** (`solid-js@^2.0.0`). Solid 2.0 introduces a new async reactivity model, updated control-flow primitives, and breaking API changes that affect every package in this library.
 
 Every package in this release has been migrated to the new 2.0 APIs and is incompatible with Solid 1.x, with two exceptions: `fetch` and `resource` still target Solid 1.x. See the [migration guide](https://primitives2.solidjs.community/migration) for what changed in each package. If you are still on Solid 1.x, use the latest stable releases from the `main` branch.
 
@@ -29,7 +29,7 @@ Every package in this release has been migrated to the new 2.0 APIs and is incom
 - **`use:` directives removed** — directive-based APIs (e.g. `use:fileUploader`) have been replaced with ref callback factories (`ref={fileUploader(opts)}`).
 - **`isServer` import path** — moved from `solid-js/web` to `@solidjs/web`.
 - **Split effects** — all `createEffect` calls use the Solid 2.0 two-argument compute/apply form to avoid stale reads.
-- **Peer dependencies** — migrated packages require `solid-js@^2.0.0-rc.21` and `@solidjs/web@^2.0.0-rc.21`.
+- **Peer dependencies** — migrated packages require `solid-js@^2.0.0` and `@solidjs/web@^2.0.0`.
 
 See the [migration guide](https://primitives2.solidjs.community/migration) and the CHANGELOG of each individual package for a full list of breaking changes.
 

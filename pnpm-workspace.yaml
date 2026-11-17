@@ -22,12 +22,20 @@ allowBuilds:
   sharp: false
 
 minimumReleaseAgeExclude:
-  - '@solidjs/signals@2.0.0-rc.21'
-  - '@solidjs/web@2.0.0-rc.21'
-  - solid-js@2.0.0-rc.21
+  - '@solidjs/signals@2.0.0'
+  - '@solidjs/web@2.0.0'
+  - solid-js@2.0.0
   - '@dom-expressions/babel-plugin-jsx@0.50.0-next.44'
-  - '@solidjs/vite-plugin@3.0.0-next.57'
+  - '@solidjs/vite-plugin@3.0.0-next.57 || 3.0.0'
   - '@solidjs/ogp@0.1.0'
+  - '@solidjs/babel-plugin@2.0.0'
+  - '@solidjs/compiler-darwin-arm64@2.0.0'
+  - '@solidjs/compiler-darwin-x64@2.0.0'
+  - '@solidjs/compiler-linux-arm64-gnu@2.0.0'
+  - '@solidjs/compiler-linux-x64-gnu@2.0.0'
+  - '@solidjs/compiler-wasm32-wasi@2.0.0'
+  - '@solidjs/compiler-win32-x64-msvc@2.0.0'
+  - '@solidjs/compiler@2.0.0'
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
@@ -36,14 +44,14 @@ onlyBuiltDependencies:
 catalog:
   tsdown: ^0.23.7
   unplugin-solid: ^3.0.0
-  solid-js: 2.0.0-rc.21
-  '@solidjs/web': 2.0.0-rc.21
-  '@solidjs/signals': 2.0.0-rc.21
-  '@solidjs/babel-plugin': 2.0.0-rc.21
-  '@solidjs/vite-plugin': 3.0.0-next.57
+  solid-js: 2.0.0
+  '@solidjs/web': 2.0.0
+  '@solidjs/signals': 2.0.0
+  '@solidjs/babel-plugin': 2.0.0
+  '@solidjs/vite-plugin': 3.0.0
   '@babel/core': ^7.29.7
 
 catalogs:
   peer:
-    solid-js: ^2.0.0-rc.21
-    '@solidjs/web': ^2.0.0-rc.21
+    solid-js: ^2.0.0
+    '@solidjs/web': ^2.0.0

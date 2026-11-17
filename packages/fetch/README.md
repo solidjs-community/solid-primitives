@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Fetch" alt="Solid Primitives Fetch">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Fetch&version=2.0" alt="Solid Primitives Fetch">
 </p>
 
 # @solid-primitives/fetch

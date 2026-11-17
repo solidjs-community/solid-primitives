@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=keyboard" alt="Solid Primitives keyboard">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=keyboard&version=2.0" alt="Solid Primitives keyboard">
 </p>
 
 # @solid-primitives/keyboard

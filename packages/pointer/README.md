@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Pointer" alt="Solid Primitives Pointer">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Pointer&version=2.0" alt="Solid Primitives Pointer">
 </p>
 
 # @solid-primitives/pointer

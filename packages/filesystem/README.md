@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=filesystem" alt="Solid Primitives filesystem">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=filesystem&version=2.0" alt="Solid Primitives filesystem">
 </p>
 
 # @solid-primitives/filesystem

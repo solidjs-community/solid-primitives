@@ -16,7 +16,7 @@ Category: Utilities
 ---
 
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Analytics" alt="Solid Primitives Analytics">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Analytics&version=2.0" alt="Solid Primitives Analytics">
 </p>
 
 # @solid-primitives/analytics

@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=orientation" alt="Solid Primitives orientation">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=orientation&version=2.0" alt="Solid Primitives orientation">
 </p>
 
 # @solid-primitives/orientation

@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Deep" alt="Solid Primitives Deep">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Deep&version=2.0" alt="Solid Primitives Deep">
 </p>
 
 # @solid-primitives/deep

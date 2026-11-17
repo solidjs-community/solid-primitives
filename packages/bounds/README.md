@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=bounds" alt="Solid Primitives Bounds">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=bounds&version=2.0" alt="Solid Primitives Bounds">
 </p>
 
 # @solid-primitives/bounds

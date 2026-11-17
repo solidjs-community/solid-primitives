@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Geolocation" alt="Solid Primitives Geolocation">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Geolocation&version=2.0" alt="Solid Primitives Geolocation">
 </p>
 
 # @solid-primitives/geolocation
