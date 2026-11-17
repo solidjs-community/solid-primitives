@@ -1,5 +1,11 @@
 # @solid-primitives/cookies
 
+## 2.0.0
+
+### Major Changes
+
+- 323101c: Release as 2.0.0. The `1.0.0` version number was published and unpublished on npm in 2021, so npm will not accept it again.
+
 ## 1.0.0
 
 ### Major Changes
