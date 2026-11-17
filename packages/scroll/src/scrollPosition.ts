@@ -1,11 +1,5 @@
-import {
-  type Accessor,
-  createEffect,
-  createRenderEffect,
-  createSignal,
-  onSettled,
-  sharedConfig,
-} from "solid-js";
+import { type Accessor, createEffect, createRenderEffect, createSignal, onSettled } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore } from "@solid-primitives/static-store";

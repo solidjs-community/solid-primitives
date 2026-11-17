@@ -6,11 +6,11 @@ import {
   getObserver,
   type NoInfer,
   onSettled,
-  sharedConfig,
   type Signal,
   type SignalOptions,
   untrack,
 } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 
 type Defined<T> = T extends undefined ? never : T;

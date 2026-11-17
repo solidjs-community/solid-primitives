@@ -4,12 +4,12 @@ import {
   onCleanup,
   runWithOwner,
   type Owner,
-  sharedConfig,
   type Accessor,
   createSignal,
   type Signal,
   type Setter,
 } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 import {
   type AnyFunction,

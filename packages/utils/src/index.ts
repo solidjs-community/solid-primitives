@@ -12,9 +12,9 @@ import {
   type Signal,
   type Store,
   type StoreSetter,
-  sharedConfig,
   DEV,
 } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 
 // isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
 // typeof window is a universal fallback compatible with both versions.

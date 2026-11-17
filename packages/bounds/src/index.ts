@@ -7,8 +7,8 @@ import {
   createSignal,
   onCleanup,
   onSettled,
-  sharedConfig,
 } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 
 export type Bounds = {

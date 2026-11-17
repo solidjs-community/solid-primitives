@@ -1,11 +1,5 @@
-import {
-  type Accessor,
-  createSignal,
-  getObserver,
-  onCleanup,
-  onSettled,
-  sharedConfig,
-} from "solid-js";
+import { type Accessor, createSignal, getObserver, onCleanup, onSettled } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 
 /**

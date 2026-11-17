@@ -10,7 +10,8 @@ import {
   noop,
   filterNonNullable,
 } from "@solid-primitives/utils";
-import { type Accessor, createEffect, onSettled, onCleanup, sharedConfig } from "solid-js";
+import { type Accessor, createEffect, onSettled, onCleanup } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 
 type ResizeObserverEntryGeneric<T extends Element> = ResizeObserverEntry & { readonly target: T };
