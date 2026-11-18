@@ -473,9 +473,7 @@ export function SiteOpenGraph() {
       <Meta property="og:image:alt" content={imageAlt()} />
       <Meta name="twitter:card" content="summary_large_image" />
       <Meta name="twitter:title" content={metaTitle()} />
-      <Show when={description()}>
-        {d => <Meta name="twitter:description" content={d()} />}
-      </Show>
+      <Show when={description()}>{d => <Meta name="twitter:description" content={d()} />}</Show>
       <Meta name="twitter:image" content={image()} />
       <Meta name="twitter:image:alt" content={imageAlt()} />
       <Link rel="canonical" href={origin + location.pathname} />
