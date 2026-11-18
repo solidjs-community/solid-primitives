@@ -10,7 +10,7 @@ export let traceCurrent: {
   update(): void;
 };
 
-export function TracingFixture(props: { kind: "iterable" | "promise" }) {
+export function TracingFixture(props: { kind: "iterable" | "promise" | "generator" }) {
   const [revision, update] = createSignal(0);
   const state = {
     opened: 0,
@@ -25,6 +25,13 @@ export function TracingFixture(props: { kind: "iterable" | "promise" }) {
         await NativePromise.resolve();
         if (!isServer && n === 0) throw new Error("discarded trace rejection");
         return new Map([["value", n + 1]]);
+      })();
+    if (props.kind === "generator")
+      return (async function* () {
+        // This first pull runs during the discarded client trace too.
+        await NativePromise.resolve();
+        if (!isServer && n === 0) throw new Error("discarded generator trace rejection");
+        yield new Map([["value", n + 1]]);
       })();
     return {
       [Symbol.asyncIterator]() {

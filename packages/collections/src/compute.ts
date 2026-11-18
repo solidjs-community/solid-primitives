@@ -35,16 +35,19 @@ export function runCompute<Draft, Result>(
   replace: (result: Result) => void,
   data: { readonly revision: number },
   beforeCommit?: () => void,
+  afterCommit?: () => void,
 ): void | Promise<void> | AsyncIterable<void> {
   const commit = (result: void | Result) => {
     beforeCommit?.();
     if (result !== undefined && result !== (draft as unknown)) replace(result);
+    afterCommit?.();
   };
   const result = compute(draft);
   const method = result != null && (result as AsyncIterable<Result>)[Symbol.asyncIterator];
   if (typeof method === "function") {
     const open = (): AsyncIterableIterator<void> => {
       const source = Reflect.apply(method, result, []) as AsyncIterator<void | Result>;
+      let next: AsyncIterator<void | Result>["next"] | undefined;
       let closed = false,
         finished = false,
         yielded = false,
@@ -68,7 +71,8 @@ export function runCompute<Draft, Result>(
         if (closed || finished) return done();
         let step: IteratorResult<void | Result>;
         try {
-          step = await source.next();
+          next ??= source.next;
+          step = await Reflect.apply(next, source, []);
         } catch (error) {
           if (closed) return done();
           return fail(error);
@@ -82,6 +86,7 @@ export function runCompute<Draft, Result>(
             return { done: false, value: undefined };
           }
           beforeCommit?.();
+          afterCommit?.();
           finished = true;
           return !yielded || revision !== data.revision
             ? { done: false, value: undefined }
@@ -111,8 +116,18 @@ export function runCompute<Draft, Result>(
     };
     // Keep Solid's generator-shaped dependency trace, but do not turn an
     // ordinary iterable into a generator: opening it may subscribe to events.
-    const adapted: AsyncIterable<void> =
-      typeof (result as any).next === "function" ? open() : { [Symbol.asyncIterator]: open };
+    let generatorShaped = false;
+    for (let proto = result as object | null; proto; proto = Object.getPrototypeOf(proto)) {
+      const descriptor = Object.getOwnPropertyDescriptor(proto, "next");
+      if (descriptor) {
+        // Detect methods without invoking an unrelated iterable accessor.
+        generatorShaped = typeof descriptor.value === "function";
+        break;
+      }
+    }
+    const adapted: AsyncIterable<void> = generatorShaped
+      ? open()
+      : { [Symbol.asyncIterator]: open };
     Object.defineProperty(adapted, Symbol.for("solid.LiveSource"), {
       value: (result as any)[Symbol.for("solid.LiveSource")],
     });

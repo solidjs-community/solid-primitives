@@ -18,7 +18,7 @@ function apply(container: Element, chunk: string, first: boolean) {
   for (const script of scripts) (0, eval)(script);
 }
 
-for (const kind of ["iterable", "promise"] as const)
+for (const kind of ["iterable", "promise", "generator"] as const)
   it(`does not leak discarded ${kind} hydration traces`, async () => {
     const artifact = JSON.parse(
       readFileSync(resolve(artifactDirectory("weak-ssr"), `trace-${kind}.json`), "utf8"),

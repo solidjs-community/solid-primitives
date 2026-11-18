@@ -352,6 +352,9 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
             write(state => {
               if (slots.drain(state, true)) data.revision++;
             }),
+          // Server drafts mutate the authoritative state directly. Effects do
+          // not run there, so acknowledge only after a successful commit.
+          isServer ? () => slots.confirm(draft) : undefined,
         );
       },
       seed,

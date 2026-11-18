@@ -93,23 +93,27 @@ describe("reactive collection factories", () => {
         });
         data.encoder.adopt(data.store);
       }
-      const reader = root(() => observe(() => [map.has(key), map.get(key)]));
+      const has = root(() => observe(() => map.has(key)));
+      const get = root(() => observe(() => map.get(key)));
       flush();
-      expect(reader.values.at(-1)).toEqual([true, 1]);
+      expect(has.values).toEqual([true]);
+      expect(get.values).toEqual([1]);
       const pending = action(function* () {
         map.delete(key);
         yield gate.promise;
       })();
       try {
         flush();
-        expect(reader.values.at(-1)).toEqual([false, undefined]);
+        expect(has.values).toEqual([true, false]);
+        expect(get.values).toEqual([1, undefined]);
       } finally {
         gate.resolve();
         await pending;
         flush();
       }
       expect([map.has(key), map.get(key)]).toEqual([true, 1]);
-      expect(reader.values.at(-1)).toEqual([true, 1]);
+      expect(has.values).toEqual([true, false, true]);
+      expect(get.values).toEqual([1, undefined, 1]);
     });
   it("keeps backend fields out of ordinary enumeration and JSON", () => {
     const map = root(() => createReactiveMap([["a", 1]]));

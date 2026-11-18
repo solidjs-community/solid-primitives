@@ -3,6 +3,18 @@ import { mergeConfig, type PluginOption } from "vite";
 import solidPlugin from "@solidjs/vite-plugin";
 import { execFileSync } from "node:child_process";
 
+function sourceRef(): string {
+  if (process.env.STORYBOOK_SOURCE_REF) return process.env.STORYBOOK_SOURCE_REF;
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "main";
+  }
+}
+
 // storybook-solidjs-vite injects the Solid 1 `vite-plugin-solid` (babel-preset-solid 1.x, which
 // emits helpers like `use` that @solidjs/web 2.x no longer exports). Strip it so the Solid 2
 // plugin below is the only JSX compiler.
@@ -40,9 +52,7 @@ const config: StorybookConfig = {
   async viteFinal(config) {
     return mergeConfig({ ...config, plugins: withoutLegacySolidPlugin(config.plugins) }, {
       define: {
-        "import.meta.env.STORYBOOK_SOURCE_REF": JSON.stringify(
-          execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
-        ),
+        "import.meta.env.STORYBOOK_SOURCE_REF": JSON.stringify(sourceRef()),
       },
       plugins: [
         solidPlugin({ refresh: false, solid: { moduleName: "@solidjs/web", omitNestedClosingTags: false } }),

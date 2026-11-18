@@ -93,6 +93,7 @@ test("an active computed stream prunes collected keys without restarting", async
     stopped = false,
     closed = false;
   let current: WeakRef<object> | undefined;
+  let lastSlot: string | undefined;
   const map = root(() =>
     createReactiveWeakMap<object, unknown>(
       async function* (draft) {
@@ -104,9 +105,7 @@ test("an active computed stream prunes collected keys without restarting", async
               releases.set(i, resolve);
             });
             if (stopped) return;
-            const key = {};
-            draft.set(key, { key });
-            current = new WeakRef(key);
+            current = addTransientKey(draft);
             yielded++;
             yield;
           }
@@ -133,16 +132,21 @@ test("an active computed stream prunes collected keys without restarting", async
       );
       assert.equal(started, 1);
       assert.equal(map.has(current!.deref()!), true);
+      if (i === 3) lastSlot = (map as any).data.slots.slot(current!.deref()!, inspect(map));
       assert.ok(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length <= 2);
       await collect();
     }
+    await waitUntil(
+      () => (map as any).data.slots.dead.includes(lastSlot),
+      "the final key was not finalized before the terminal pull",
+    );
   } finally {
     stopped = true;
     for (const release of releases.values()) release();
     if (started) await waitUntil(() => closed, "producer did not close during teardown");
   }
   await waitUntil(
-    () => Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length <= 1,
+    () => !(lastSlot! in inspect(map)) && !("k:" + lastSlot in inspect(map)),
     "terminal cleanup was not published",
   );
 });

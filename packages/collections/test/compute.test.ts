@@ -9,6 +9,86 @@ import {
 import { runCompute } from "../src/compute.ts";
 
 describe("compute source adaptation", () => {
+  it("caches next on the returned iterator and preserves its receiver", async () => {
+    let reads = 0,
+      pulls = 0;
+    const source = {
+      get next() {
+        if (++reads > 1) throw new Error("next read twice");
+        return async function (this: unknown) {
+          expect(this).toBe(source);
+          return ++pulls < 3
+            ? { done: false as const, value: new Map([["value", pulls]]) }
+            : { done: true as const, value: undefined };
+        };
+      },
+    };
+    const values: number[] = [];
+    const adapted = runCompute(
+      () => ({ [Symbol.asyncIterator]: () => source }),
+      new Map<string, number>(),
+      value => values.push(value!.get("value")!),
+      { revision: 0 },
+    ) as AsyncIterable<void>;
+    for await (const _ of adapted) {
+      /* consume */
+    }
+    expect(values).toEqual([1, 2]);
+    expect(reads).toBe(1);
+  });
+
+  it("closes an iterator whose initial next getter throws", async () => {
+    const error = new Error("next lookup failed");
+    let returns = 0;
+    const adapted = runCompute(
+      () => ({
+        [Symbol.asyncIterator]() {
+          return {
+            get next(): AsyncIterator<Map<string, number>>["next"] {
+              throw error;
+            },
+            async return() {
+              returns++;
+              return { done: true as const, value: undefined };
+            },
+          };
+        },
+      }),
+      new Map<string, number>(),
+      () => {},
+      { revision: 0 },
+    ) as AsyncIterable<void>;
+    await expect(adapted[Symbol.asyncIterator]().next()).rejects.toBe(error);
+    expect(returns).toBe(1);
+  });
+
+  it("does not read an unrelated next getter on an ordinary iterable", async () => {
+    let opened = 0;
+    const adapted = runCompute(
+      () => ({
+        get next(): never {
+          throw new Error("outer next must not be read");
+        },
+        [Symbol.asyncIterator]() {
+          opened++;
+          return {
+            async next() {
+              return { done: true as const, value: undefined };
+            },
+          };
+        },
+      }),
+      new Map<string, number>(),
+      () => {},
+      { revision: 0 },
+    ) as AsyncIterable<void>;
+    expect(opened).toBe(0);
+    for await (const _ of adapted) {
+      /* consume */
+    }
+    expect(opened).toBe(1);
+  });
+
   for (const failure of ["pull", "commit"] as const)
     for (const cleanup of ["reject", "pending", "throw"] as const) {
       it(`preserves a ${failure} error when cleanup will ${cleanup}`, async () => {

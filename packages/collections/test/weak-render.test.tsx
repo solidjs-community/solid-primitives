@@ -10,7 +10,7 @@ import { TracingFixture } from "./fixtures/tracing.tsx";
 const directory = artifactDirectory("weak-ssr");
 mkdirSync(directory, { recursive: true });
 
-for (const kind of ["iterable", "promise"] as const)
+for (const kind of ["iterable", "promise", "generator"] as const)
   it(`renders a ${kind} tracing fixture`, async () => {
     const chunks: string[] = [];
     await new Promise<void>((resolve, reject) => {
