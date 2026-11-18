@@ -177,14 +177,15 @@ describe("compute source adaptation", () => {
             return cleanup === "reject" ? Promise.reject(cleanupError) : new Promise(() => {});
           },
         };
-        const adapter = runCompute(
+        const adapted = runCompute(
           () => source,
           new Map(),
           () => {
             throw error;
           },
           { revision: 0 },
-        ) as AsyncIterableIterator<void>;
+        ) as AsyncIterable<void>;
+        const adapter = adapted[Symbol.asyncIterator]();
         await expect(adapter.next()).rejects.toBe(error);
         await adapter.return!();
         expect(returns).toBe(1);
@@ -314,12 +315,13 @@ describe("compute source adaptation", () => {
         return { done: true, value: undefined };
       },
     };
-    const adapter = runCompute(
+    const adapted = runCompute(
       () => source,
       new Map(),
       value => values.push(value),
       { revision: 0 },
-    ) as AsyncIterableIterator<void>;
+    ) as AsyncIterable<void>;
+    const adapter = adapted[Symbol.asyncIterator]();
     const pull = adapter.next();
     const closing = adapter.return!();
     try {

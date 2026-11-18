@@ -31,18 +31,11 @@ export function collectionWriter<T>(state: T): StoreSetter<T> {
 
 function generatorShaped(value: object): boolean {
   const seen = new Set<object>();
-  let foundNext = false;
   try {
     for (let proto: object | null = value, depth = 0; proto && depth < 32; depth++) {
       if (seen.has(proto)) return false;
       seen.add(proto);
-      if (!foundNext) {
-        const descriptor = Object.getOwnPropertyDescriptor(proto, "next");
-        if (descriptor) {
-          foundNext = true;
-          if (typeof descriptor.value === "function") return true;
-        }
-      }
+      // A callable next alone does not prove that the iterable is its iterator.
       // Native generators remain traceable when an accessor shadows next.
       if (Object.getOwnPropertyDescriptor(proto, Symbol.toStringTag)?.value === "AsyncGenerator")
         return true;
@@ -100,7 +93,8 @@ export function runCompute<Draft, Result>(
         }
       };
       const fail = (error: unknown): never => {
-        close();
+        if (tracing) queueMicrotask(close);
+        else close();
         throw error;
       };
       const pull = async (): Promise<IteratorResult<void>> => {
@@ -108,18 +102,18 @@ export function runCompute<Draft, Result>(
         let step: IteratorResult<void | Result>;
         try {
           next ??= source.next;
-          step = await Reflect.apply(next, source, []);
+          const pending = Reflect.apply(next, source, []);
+          // The synchronous part of next() captures dependencies. Do not wait
+          // for a discarded pull that may need return() to release its wait.
+          // A microtask also lets Solid restore the real Promise/fetch first.
+          if (tracing) queueMicrotask(close);
+          step = await pending;
         } catch (error) {
           if (closed) return done();
           return fail(error);
         }
         if (closed) return done();
-        if (tracing) {
-          // Dependencies were captured by the first pull. Its value is ignored,
-          // so close the suspended generator instead of leaving resources live.
-          close();
-          return done();
-        }
+        if (tracing) return done();
         try {
           if (!step.done) {
             commit(step.value);

@@ -7,7 +7,7 @@ import { action, flush } from "solid-js";
 import { hydrate } from "@solidjs/web";
 import { WeakTokenFixture, kinds, current, releaseHybrid } from "./fixtures/weak-collections.js";
 import { AliasKeyFixture, aliasCurrent } from "./fixtures/alias-keys.tsx";
-import { TracingFixture, traceCurrent, traceKinds } from "./fixtures/tracing.tsx";
+import { TracingFixture, traceKinds, type TraceFixtureState } from "./fixtures/tracing.tsx";
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 function apply(container: Element, chunk: string, first: boolean) {
   const pattern = /<script(?:[^>]*)>([\s\S]*?)<\/script>/g;
@@ -27,33 +27,59 @@ for (const kind of traceKinds)
     document.body.appendChild(container);
     (globalThis as any)._$HY = { events: [], completed: new WeakSet(), r: {}, fe() {} };
     let dispose: (() => void) | undefined;
+    let fixture: TraceFixtureState | undefined;
+    let liveReturnsBeforeDispose: number | undefined;
     try {
       apply(container, artifact.shell, true);
-      dispose = hydrate(() => <TracingFixture kind={kind} />, container);
+      dispose = hydrate(
+        () => (
+          <TracingFixture
+            kind={kind}
+            onCreate={state => {
+              fixture = state;
+            }}
+          />
+        ),
+        container,
+      );
+      const current = fixture!;
       flush();
       await sleep(10);
-      expect(traceCurrent.read()).toBe(1);
+      expect(current.read()).toBe(1);
       expect(container.textContent).toBe("1");
-      const liveGenerator = kind === "generator-live" || kind === "generator-accessor";
+      const liveGenerator =
+        kind === "generator-live" || kind === "generator-accessor" || kind === "generator-pending";
       await vi.waitFor(() => {
-        expect(traceCurrent.opened).toBe(liveGenerator ? 1 : 0);
-        expect(traceCurrent.closed).toBe(liveGenerator ? 1 : 0);
+        expect(current.opened).toBe(liveGenerator ? 1 : 0);
+        expect(current.closed).toBe(liveGenerator ? 1 : 0);
+        expect(current.returns).toBe(kind.startsWith("generator") ? 1 : 0);
       });
-      traceCurrent.update();
+      current.update();
       await vi.waitFor(() => {
         flush();
         expect(container.textContent).toBe("2");
       });
-      expect(traceCurrent.opened).toBe(liveGenerator ? 2 : kind === "iterable" ? 1 : 0);
-      if (liveGenerator) expect(traceCurrent.closed).toBe(1);
+      expect(current.opened).toBe(liveGenerator ? 2 : kind.startsWith("iterable") ? 1 : 0);
+      if (liveGenerator) {
+        expect(current.closed).toBe(1);
+        liveReturnsBeforeDispose = current.returns;
+      }
     } finally {
-      dispose?.();
-      traceCurrent.release();
-      container.remove();
+      try {
+        try {
+          dispose?.();
+          if (liveReturnsBeforeDispose !== undefined)
+            expect(fixture!.returns).toBe(liveReturnsBeforeDispose + 1);
+        } finally {
+          fixture?.release();
+        }
+      } finally {
+        container.remove();
+      }
     }
-    if (kind === "iterable") expect(traceCurrent.closed).toBe(1);
-    if (kind === "generator-live" || kind === "generator-accessor")
-      await vi.waitFor(() => expect(traceCurrent.closed).toBe(2));
+    if (kind.startsWith("iterable")) expect(fixture!.closed).toBe(1);
+    if (kind === "generator-live" || kind === "generator-accessor" || kind === "generator-pending")
+      await vi.waitFor(() => expect(fixture!.closed).toBe(2));
   });
 
 for (const weak of [false, true])
