@@ -36,18 +36,24 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
 
       expect(runs).toBe(1);
 
-      set(s => { s.a["a.b"] = "minds"; });
+      set(s => {
+        s.a["a.b"] = "minds";
+      });
       flush();
       expect(runs).toBe(2);
 
-      set(s => { s.b = "bar"; });
+      set(s => {
+        s.b = "bar";
+      });
       flush();
       expect(runs).toBe(3);
     });
@@ -60,22 +66,30 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
 
       expect(runs).toBe(2);
 
-      set(s => { s.a["a.b"] = "minds"; });
+      set(s => {
+        s.a["a.b"] = "minds";
+      });
       flush();
       expect(runs).toBe(4);
 
-      set(s => { s.b = "bar"; });
+      set(s => {
+        s.b = "bar";
+      });
       flush();
       expect(runs).toBe(6);
     });
@@ -88,14 +102,20 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set(s => { s.a["a.b"] = "minds"; });
-      set(s => { s.b = "bar"; });
+      set(s => {
+        s.a["a.b"] = "minds";
+      });
+      set(s => {
+        s.b = "bar";
+      });
       flush();
       expect(runs).toBe(2);
     });
@@ -108,13 +128,17 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set((s: any) => { s.b = "foo"; });
+      set((s: any) => {
+        s.b = "foo";
+      });
       flush();
       expect(runs).toBe(2);
     });
@@ -127,13 +151,17 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set(s => { (s as any).b = undefined; });
+      set(s => {
+        (s as any).b = undefined;
+      });
       flush();
       expect(runs).toBe(2);
     });
@@ -146,7 +174,9 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
@@ -156,7 +186,9 @@ for (const api of apis) {
       flush();
       expect(runs).toBe(2);
 
-      set(s => { s.a["a.b"] = "thoughts"; });
+      set(s => {
+        s.a["a.b"] = "thoughts";
+      });
       flush();
       expect(runs).toBe(3);
     });
@@ -169,13 +201,19 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set(s => { s.a[0] = 2; s.a[1] = 3; s.a[2] = 1; });
+      set(s => {
+        s.a[0] = 2;
+        s.a[1] = 3;
+        s.a[2] = 1;
+      });
       flush();
       expect(runs).toBe(2);
     });
@@ -192,13 +230,17 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs += 1; },
+          () => {
+            runs += 1;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set(s => { s.count = 1; });
+      set(s => {
+        s.count = 1;
+      });
       flush();
       expect(runs).toBe(2);
     });
@@ -218,11 +260,15 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn_root(),
-          () => { runs_root += 1; },
+          () => {
+            runs_root += 1;
+          },
         );
         createEffect(
           () => fn_leaf(),
-          () => { runs_leaf += 1; },
+          () => {
+            runs_leaf += 1;
+          },
         );
       });
       flush();
@@ -230,7 +276,9 @@ for (const api of apis) {
       expect(runs_root).toBe(1);
       expect(runs_leaf).toBe(1);
 
-      set(s => { s.count = 1; });
+      set(s => {
+        s.count = 1;
+      });
       flush();
       expect(runs_root).toBe(2);
       expect(runs_leaf).toBe(2);
@@ -246,18 +294,24 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
 
       expect(runs).toBe(1);
 
-      set(s => { s.a.count = 1; });
+      set(s => {
+        s.a.count = 1;
+      });
       flush();
       expect(runs).toBe(2);
 
-      set(s => { s.b.count = 2; });
+      set(s => {
+        s.b.count = 2;
+      });
       flush();
       expect(runs).toBe(3);
     });
@@ -275,11 +329,15 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn_a(),
-          () => { runs_a++; },
+          () => {
+            runs_a++;
+          },
         );
         createEffect(
           () => fn_b(),
-          () => { runs_b++; },
+          () => {
+            runs_b++;
+          },
         );
       });
       flush();
@@ -287,12 +345,16 @@ for (const api of apis) {
       expect(runs_a).toBe(1);
       expect(runs_b).toBe(1);
 
-      set(s => { s.a.count = 1; });
+      set(s => {
+        s.a.count = 1;
+      });
       flush();
       expect(runs_a).toBe(2);
       expect(runs_b).toBe(2);
 
-      set(s => { s.b.count = 2; });
+      set(s => {
+        s.b.count = 2;
+      });
       flush();
       expect(runs_a).toBe(3);
       expect(runs_b).toBe(3);
@@ -310,14 +372,20 @@ for (const api of apis) {
         );
         const a = sign.a;
         createEffect(
-          () => { api.fn(a); },
-          () => { runs++; },
+          () => {
+            api.fn(a);
+          },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set((s: any) => { s.b = "foo"; });
+      set((s: any) => {
+        s.b = "foo";
+      });
       flush();
       expect(runs).toBe(1);
     });
@@ -330,17 +398,23 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set((s: any) => { s.a = { foo: "bar" }; });
+      set((s: any) => {
+        s.a = { foo: "bar" };
+      });
       flush();
       expect(runs).toBe(2);
 
-      set((s: any) => { s.a.foo = "baz"; });
+      set((s: any) => {
+        s.a.foo = "baz";
+      });
       flush();
       expect(runs).toBe(3);
     });
@@ -354,13 +428,17 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set(s => { s.a["a.b"] = "minds"; });
+      set(s => {
+        s.a["a.b"] = "minds";
+      });
       flush();
       expect(runs).toBe(1);
     });
@@ -373,13 +451,17 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();
       expect(runs).toBe(1);
 
-      set(s => { s.a["a.b"] = "minds"; });
+      set(s => {
+        s.a["a.b"] = "minds";
+      });
       flush();
       if (api.pojo) {
         expect(runs).toBe(2);
@@ -402,7 +484,9 @@ for (const api of apis) {
       createRoot(() => {
         createEffect(
           () => fn(),
-          () => { runs++; },
+          () => {
+            runs++;
+          },
         );
       });
       flush();

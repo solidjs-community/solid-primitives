@@ -10,7 +10,14 @@ import {
   refresh,
   snapshot,
 } from "solid-js";
-import { makePersisted, messageSync, multiplexSync, storageSync, wsSync, type PersistenceSyncData } from "../src/persisted.js";
+import {
+  makePersisted,
+  messageSync,
+  multiplexSync,
+  storageSync,
+  wsSync,
+  type PersistenceSyncData,
+} from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
@@ -77,19 +84,21 @@ describe("makePersisted", () => {
     const DataServer = {
       data: "server",
       get: () => Promise.resolve(DataServer.data),
-      set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
+      set: (next: string) =>
+        new Promise(res => setTimeout(() => res((DataServer.data = next)), 50)),
     };
     const [signal, setSignal] = makePersisted(
       createRoot(() => createOptimistic(() => DataServer.get())),
       {
         storage: mockStorage,
         name: "test-optimistic",
-        action: ([getter, setter]) => function*(next) {
-          setter(next);
-          yield DataServer.set(next);
-          refresh(getter);
-        }
-      }
+        action: ([getter, setter]) =>
+          function* (next) {
+            setter(next);
+            yield DataServer.set(next);
+            refresh(getter);
+          },
+      },
     );
     // let the initial server fetch settle before the optimistic write
     await new Promise(res => setTimeout(res, 0));
@@ -97,8 +106,8 @@ describe("makePersisted", () => {
     await setSignal("persisted");
     flush();
     expect(mockStorage.getItem("test-optimistic")).toBe('"persisted"');
-    expect(latest(signal)).toBe("persisted")
-  })
+    expect(latest(signal)).toBe("persisted");
+  });
 
   it("reads the persisted value from a synchronous storage into the signal", () => {
     mockStorage.setItem("test2", '"persistence"');
@@ -126,29 +135,46 @@ describe("makePersisted", () => {
       storage: mockStorage,
       name: "test4",
     });
-    setStore((s) => { s.test = "persisted" });
+    setStore(s => {
+      s.test = "persisted";
+    });
     flush();
     expect(store.test).toBe("persisted");
     expect(mockStorage.getItem("test4")).toBe(JSON.stringify({ test: "persisted" }));
   });
-  
+
   it("only updates the leaves in initialization", async () => {
     mockAsyncStorage.setItem("test4a", JSON.stringify({ a: { b: { c: 1 } } }));
     const triggered = { a: 0, b: 0, c: 0 };
-    await createRoot(async (dispose) => {
+    await createRoot(async dispose => {
       const [state, setState] = createStore({ a: { b: { c: 0 } } });
-      createEffect(() => state.a, (_) => { triggered.a++; });
-      createEffect(() => state.a.b, (_) => { triggered.b++; });
-      createEffect(() => state.a.b.c, (_) => { triggered.c++; });
-      const [store, _setStore] = makePersisted(
-        [state, setState],
-        { storage: mockAsyncStorage, name: "test4a" }
+      createEffect(
+        () => state.a,
+        _ => {
+          triggered.a++;
+        },
       );
+      createEffect(
+        () => state.a.b,
+        _ => {
+          triggered.b++;
+        },
+      );
+      createEffect(
+        () => state.a.b.c,
+        _ => {
+          triggered.c++;
+        },
+      );
+      const [store, _setStore] = makePersisted([state, setState], {
+        storage: mockAsyncStorage,
+        name: "test4a",
+      });
       await new Promise(r => setTimeout(r, 50));
       flush();
       expect(store).toEqual({ a: { b: { c: 1 } } });
       expect(triggered).toEqual({ a: 1, b: 1, c: 2 });
-      queueMicrotask(dispose);;
+      queueMicrotask(dispose);
     });
   });
 
@@ -207,7 +233,7 @@ describe("makePersisted", () => {
     });
     expect(init).toBe(promise);
   });
-  
+
   it("keeps early writes and explicitly disposes sync and deferred init", async () => {
     mockStorage.setItem("cleanup", '"init"');
     const [value, setValue, , dispose] = createRoot(disposeRoot => {
@@ -220,9 +246,12 @@ describe("makePersisted", () => {
       disposeRoot();
       return persisted;
     });
-    const send = (newValue: string) => window.dispatchEvent(new MessageEvent("message", {
-      data: { key: "cleanup", newValue: JSON.stringify(newValue) },
-    }));
+    const send = (newValue: string) =>
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: { key: "cleanup", newValue: JSON.stringify(newValue) },
+        }),
+      );
     send("synced");
     flush();
     expect(value()).toBe("synced");
@@ -268,7 +297,9 @@ describe("makePersisted", () => {
       expect(store).toEqual({ a: 2, b: 1 });
       // merged defaults are not persisted until the next write
       expect(mockStorage.getItem("merge2")).toBe(JSON.stringify({ a: 2 }));
-      setStore(s => { s.b = 3; });
+      setStore(s => {
+        s.b = 3;
+      });
       flush();
       expect(mockStorage.getItem("merge2")).toBe(JSON.stringify({ a: 2, b: 3 }));
     });
@@ -317,15 +348,18 @@ describe("makePersisted", () => {
 
     it("accepts a custom merge function", () => {
       mockStorage.setItem("merge6", JSON.stringify({ items: [{ id: 1 }] }));
-      const [store] = makePersisted(createStore({ items: [] as { id: number; done?: boolean }[] }), {
-        storage: mockStorage,
-        name: "merge6",
-        merge: (stored, initial) => ({
-          ...initial,
-          ...stored,
-          items: stored.items.map(item => ({ done: false, ...item })),
-        }),
-      });
+      const [store] = makePersisted(
+        createStore({ items: [] as { id: number; done?: boolean }[] }),
+        {
+          storage: mockStorage,
+          name: "merge6",
+          merge: (stored, initial) => ({
+            ...initial,
+            ...stored,
+            items: stored.items.map(item => ({ done: false, ...item })),
+          }),
+        },
+      );
       flush();
       expect(store).toEqual({ items: [{ id: 1, done: false }] });
     });
@@ -359,15 +393,21 @@ describe("makePersisted", () => {
     });
 
     it("merges synced data onto the initial value, not onto the current state", () => {
-      const [store, , , dispose] = makePersisted(createStore<Record<string, number>>({ a: 1, b: 1 }), {
-        storage: mockStorage,
-        name: "merge9",
-        merge: true,
-        sync: messageSync(window),
-      });
-      const send = (newValue: unknown) => window.dispatchEvent(new MessageEvent("message", {
-        data: { key: "merge9", newValue: JSON.stringify(newValue) },
-      }));
+      const [store, , , dispose] = makePersisted(
+        createStore<Record<string, number>>({ a: 1, b: 1 }),
+        {
+          storage: mockStorage,
+          name: "merge9",
+          merge: true,
+          sync: messageSync(window),
+        },
+      );
+      const send = (newValue: unknown) =>
+        window.dispatchEvent(
+          new MessageEvent("message", {
+            data: { key: "merge9", newValue: JSON.stringify(newValue) },
+          }),
+        );
       send({ a: 2, c: 3 });
       flush();
       expect(store).toEqual({ a: 2, b: 1, c: 3 });
@@ -390,16 +430,21 @@ describe("makePersisted", () => {
       });
       flush();
       expect(store).toEqual({ a: 2, nested: { x: 99 }, list: [1, 2] });
-      window.dispatchEvent(new MessageEvent("message", {
-        data: { key: "merge10", newValue: JSON.stringify({ a: 3 }) },
-      }));
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: { key: "merge10", newValue: JSON.stringify({ a: 3 }) },
+        }),
+      );
       flush();
       expect(store).toEqual({ a: 3, nested: { x: 1 }, list: [1] });
       dispose();
     });
 
     it("does not let a stored __proto__ key change prototypes", () => {
-      mockStorage.setItem("merge11", '{"__proto__":{"polluted":true},"nested":{"__proto__":{"x":1}}}');
+      mockStorage.setItem(
+        "merge11",
+        '{"__proto__":{"polluted":true},"nested":{"__proto__":{"x":1}}}',
+      );
       const [store] = makePersisted(createStore<Record<string, any>>({ a: 1, nested: { y: 1 } }), {
         storage: mockStorage,
         name: "merge11",
@@ -415,11 +460,14 @@ describe("makePersisted", () => {
 
     it("lets a stored null replace an object default", () => {
       mockStorage.setItem("merge12", JSON.stringify({ a: null }));
-      const [store] = makePersisted(createStore<{ a: { x: number } | null; b: number }>({ a: { x: 1 }, b: 1 }), {
-        storage: mockStorage,
-        name: "merge12",
-        merge: true,
-      });
+      const [store] = makePersisted(
+        createStore<{ a: { x: number } | null; b: number }>({ a: { x: 1 }, b: 1 }),
+        {
+          storage: mockStorage,
+          name: "merge12",
+          merge: true,
+        },
+      );
       flush();
       expect(store).toEqual({ a: null, b: 1 });
     });
@@ -443,7 +491,8 @@ describe("makePersisted", () => {
       const DataServer = {
         data: "server",
         get: () => Promise.resolve(DataServer.data),
-        set: (next: string) => new Promise(res => setTimeout(() => res((DataServer.data = next)), 50)),
+        set: (next: string) =>
+          new Promise(res => setTimeout(() => res((DataServer.data = next)), 50)),
       };
       const [signal, setSignal] = makePersisted(
         createRoot(() => createOptimistic(() => DataServer.get())),
@@ -492,15 +541,16 @@ describe("makePersisted", () => {
   it("defers the initialization if the hydrated option is set", async () => {
     const anotherMockStorage = { ...mockStorage };
     anotherMockStorage.setItem("test18", '"init"');
-    const [signal, _setSignal] = makePersisted(
-      createSignal("default"), 
-      { storage: anotherMockStorage, name: "test18", hydrated: true }
-    );
+    const [signal, _setSignal] = makePersisted(createSignal("default"), {
+      storage: anotherMockStorage,
+      name: "test18",
+      hydrated: true,
+    });
     flush();
     expect(signal()).toBe("default");
     await new Promise(r => setTimeout(r, 200));
     flush();
-    expect(signal()).toBe("init"); 
+    expect(signal()).toBe("init");
   });
 });
 
@@ -508,10 +558,12 @@ describe("storageSync", () => {
   it("receives messages", () => {
     const [message, subscriber] = createSignal<PersistenceSyncData>();
     storageSync[0](subscriber);
-    const event = new StorageEvent(
-      "storage",
-      { key: "test9", newValue: "received", timeStamp: Date.now(), url: "https://storage.solid-primitives.org" }
-    );
+    const event = new StorageEvent("storage", {
+      key: "test9",
+      newValue: "received",
+      timeStamp: Date.now(),
+      url: "https://storage.solid-primitives.org",
+    });
     window.dispatchEvent(event);
     flush();
     expect(message()).toEqual(event);
@@ -538,9 +590,9 @@ describe("messageSync", () => {
 describe("wsSync", () => {
   it("sends and receives messages", async () => {
     const mockWs = {
-      addEventListener: (name: string, handler: (ev: unknown) => void) => { 
+      addEventListener: (name: string, handler: (ev: unknown) => void) => {
         expect(name).toBe("message");
-        mockWs.send = (data) => handler(new MessageEvent("message", { data }));
+        mockWs.send = data => handler(new MessageEvent("message", { data }));
       },
     };
     const [message, subscriber] = createSignal<PersistenceSyncData>();

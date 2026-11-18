@@ -1,10 +1,10 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Media" alt="Solid Primitives Media">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Media&version=2.0" alt="Solid Primitives Media">
 </p>
 
 # @solid-primitives/media
 
-[![size](https://img.shields.io/badge/size-1.31_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/media)
+[![size](https://img.shields.io/badge/size-1.32_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/media)
 [![size](https://img.shields.io/npm/v/@solid-primitives/media?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/media)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -196,7 +196,7 @@ const moduleSize = () =>
   })[matches.key];
 ```
 
-This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://solid-primitives.netlify.app/package/masonry#createMasonry).
+This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://primitives.solidjs.community/package/masonry#createMasonry).
 
 > **Warning** for this feature to work, the breakpoints needs to be ordered from small to large. If you cannot ensure this, use the `sortBreakpoints` helper.
 

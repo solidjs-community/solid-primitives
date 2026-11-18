@@ -39,20 +39,22 @@ export const createSegment = <T>(
   limit: MaybeAccessor<number>,
   page: Accessor<number>,
 ): Accessor<T[]> => {
-  let previousStart = NaN,
-    previousEnd = NaN;
   return createMemo(prev => {
     const currentItems = access(items);
     const start = (page() - 1) * access(limit);
     const end = Math.min(start + access(limit), currentItems.length);
-    if (
-      prev &&
-      ((prev.length === 0 && end <= start) || (start === previousStart && end === previousEnd))
-    ) {
-      return prev;
+    // keep the previous segment only if it still holds the same items
+    if (prev && prev.length === Math.max(0, end - start)) {
+      // indexed loop, not every(): every() skips holes in sparse arrays
+      let same = true;
+      for (let index = 0; index < prev.length; index++) {
+        if (prev[index] !== currentItems[start + index]) {
+          same = false;
+          break;
+        }
+      }
+      if (same) return prev;
     }
-    previousStart = start;
-    previousEnd = end;
     return currentItems.slice(start, end);
   });
 };
@@ -87,7 +89,7 @@ export type PaginationOptions = {
   /** content for the last page element, e.g. an SVG icon, default is ">|" */
   lastContent?: JSX.Element;
   /** accessible name for the first page element, default is "First page" */
-  firstAriaLabel?: string;  
+  firstAriaLabel?: string;
   /** accessible name for the last page element, default is "Last page" */
   lastAriaLabel?: string;
   /** always show first and last page, with an adjacent ellipsis if there is a gap */
@@ -100,7 +102,7 @@ export type PaginationProps = {
   "aria-current"?: "page";
   "aria-label"?: string;
   disabled?: boolean;
-  /** hides ellipsis from screen readers to be accessible */ 
+  /** hides ellipsis from screen readers to be accessible */
   inert?: boolean;
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
   onKeyUp?: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent>;
@@ -184,13 +186,18 @@ export const createPagination = (
 
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
     // select the parent before we might get detached
-    let parent = ev.currentTarget, current;
-    while (parent instanceof HTMLElement && parent.childElementCount < 3) parent = parent.parentNode;
+    let parent = ev.currentTarget,
+      current;
+    while (parent instanceof HTMLElement && parent.childElementCount < 3)
+      parent = parent.parentNode;
     setPage(p);
     flush();
     // select the current page
-    if (parent) {      
-      while (parent instanceof HTMLElement && !(current = parent.querySelector('[aria-current="page"]')))
+    if (parent) {
+      while (
+        parent instanceof HTMLElement &&
+        !(current = parent.querySelector('[aria-current="page"]'))
+      )
         parent = parent.parentNode;
       current instanceof HTMLElement && current.focus();
     }
@@ -328,21 +335,18 @@ export const createPagination = (
       },
     },
   );
-  const ellipsis = Object.defineProperties(
-     ({ inert: true } as unknown as PaginationProps[number]),
-     {
-       children: { 
-         // Read through `opts()` per access: choosing the getter at creation reads the option
-         // at the top level of the calling component (STRICT_READ_UNTRACKED) and freezes it.
-         get: () => {
-           const content = opts().ellipsisContent;
-           return typeof content === "function" ? content() : PAGINATION_DEFAULTS.ellipsisContent;
-         },
-         set: noop,
-         enumerable: true,
-       },
-     },
-  );
+  const ellipsis = Object.defineProperties({ inert: true } as unknown as PaginationProps[number], {
+    children: {
+      // Read through `opts()` per access: choosing the getter at creation reads the option
+      // at the top level of the calling component (STRICT_READ_UNTRACKED) and freezes it.
+      get: () => {
+        const content = opts().ellipsisContent;
+        return typeof content === "function" ? content() : PAGINATION_DEFAULTS.ellipsisContent;
+      },
+      set: noop,
+      enumerable: true,
+    },
+  });
 
   // Read through `opts()` on each call rather than once at creation: a top-level read here
   // would freeze the option and warn STRICT_READ_UNTRACKED in the calling component.
@@ -350,9 +354,9 @@ export const createPagination = (
     const opt = opts().showEllipsis;
     return typeof opt === "function" ? opt(page(), pages().length) : opt;
   };
-    
+
   const start = createMemo(() =>
-    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1)
+    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1),
   );
   const showFirst = createMemo(() =>
     normalizeOption("showFirst", opts().showFirst, page(), opts().pages),
@@ -366,17 +370,22 @@ export const createPagination = (
   const showLast = createMemo(() =>
     normalizeOption("showLast", opts().showLast, page(), opts().pages),
   );
-  
+
   const paginationProps = createMemo<PaginationProps>(() => {
     const firstEllipsis = showEllipsis() && start() > 0;
     const lastEllipsis = showEllipsis() && start() + maxPages() < pages().length - 1;
     const props = [];
-    
+
     if (showFirst() && !showEllipsis()) props.push(first);
     if (opts().jumpPages) props.push(jumpBack);
     if (showPrev()) props.push(back);
     if (firstEllipsis) props.push(pages()[0], ellipsis);
-    props.push(...pages().slice(start() + (firstEllipsis ? 2 : 0), start() + maxPages() - (lastEllipsis ? 2 : 0)));
+    props.push(
+      ...pages().slice(
+        start() + (firstEllipsis ? 2 : 0),
+        start() + maxPages() - (lastEllipsis ? 2 : 0),
+      ),
+    );
     if (lastEllipsis) props.push(ellipsis, pages().at(-1));
     if (showNext()) props.push(next);
     if (opts().jumpPages) props.push(jumpForth);

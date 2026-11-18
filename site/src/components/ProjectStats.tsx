@@ -1,22 +1,29 @@
 import { createSignal, onSettled, Show, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 import type { ProjectStats as Stats } from "../lib/project-stats";
-import { getProjectStats } from "../lib/stats.server";
 
 /**
  * Homepage stats block (npm downloads, open issues, open PRs).
  *
  * Renders `initial` (the build-time copy from src/generated/stats.ts) so the prerendered page and
- * hydration agree, then asks `/_server` for the live, day-cached copy and swaps it in. If that
- * request fails (no server behind the static site, GitHub down), the build-time numbers stay.
+ * hydration agree, then asks `/api/stats` (worker/index.ts) for the live, day-cached copy and swaps
+ * it in. If that request fails (no Worker behind the static site, GitHub down), the build-time
+ * numbers stay.
  */
+
+async function fetchLiveStats(): Promise<Stats> {
+  const res = await fetch("/api/stats");
+  if (!res.ok) throw new Error(`/api/stats responded ${res.status}`);
+  return res.json();
+}
+
 export function ProjectStats(props: { initial: Stats | null }) {
   const [stats, setStats] = createSignal<Stats | null>(untrack(() => props.initial));
 
   onSettled(() => {
     if (isServer) return;
     let active = true;
-    getProjectStats().then(
+    fetchLiveStats().then(
       fresh => {
         if (active) setStats(fresh);
       },

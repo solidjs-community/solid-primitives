@@ -1,5 +1,53 @@
 # @solid-primitives/keyed
 
+## 3.0.0
+
+### Major Changes
+
+- 8526767: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  - `isServer` is now imported from `@solidjs/web` (was `solid-js/web`)
+  - `JSX` type is now imported from `@solidjs/web` (was `solid-js`)
+  - `Rerun` props: `on` type changed from `AccessorArray<S> | Accessor<S>` to `Accessor<S>[] | Accessor<S>` (`AccessorArray` was removed from `solid-js`)
+  - Internal signals in `keyArray` now use `ownedWrite: true` to satisfy Solid 2.0's owned-scope write restrictions
+
+### Patch Changes
+
+- 88a48f3: Fix package manifests. `keyed` and `share` import `@solid-primitives/utils` at runtime but did not declare it, so the import could not be resolved under strict installs (pnpm, Yarn PnP). It is now a dependency. `analytics` no longer declares the legacy optional peer `@tanstack/start`: the TanStack relay takes the user's `createServerFn` and imports nothing from TanStack.
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+
+## 3.0.0-next.5
+
+### Patch Changes
+
+- 88a48f3: Fix package manifests. `keyed` and `share` import `@solid-primitives/utils` at runtime but did not declare it, so the import could not be resolved under strict installs (pnpm, Yarn PnP). It is now a dependency. `analytics` no longer declares the legacy optional peer `@tanstack/start`: the TanStack relay takes the user's `createServerFn` and imports nothing from TanStack.
+
 ## 3.0.0-next.4
 
 ### Patch Changes

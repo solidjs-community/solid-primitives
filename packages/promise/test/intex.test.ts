@@ -1,6 +1,14 @@
 import { createRoot, createSignal, flush, onCleanup } from "solid-js";
 import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
-import { until, untilAll, untilAny, changed, promiseTimeout, raceTimeout, retry } from "../src/index.js";
+import {
+  until,
+  untilAll,
+  untilAny,
+  changed,
+  promiseTimeout,
+  raceTimeout,
+  retry,
+} from "../src/index.js";
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -485,7 +493,12 @@ describe("retry", () => {
         if (callCount < 3) throw new Error("fail");
         return Promise.resolve("done");
       },
-      { delay: attempt => { seenAttempts.push(attempt); return (attempt + 1) * 100; } },
+      {
+        delay: attempt => {
+          seenAttempts.push(attempt);
+          return (attempt + 1) * 100;
+        },
+      },
     );
 
     await vi.advanceTimersByTimeAsync(100); // delay(0) = 100ms

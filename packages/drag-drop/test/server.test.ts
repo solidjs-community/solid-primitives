@@ -60,7 +60,11 @@ describe("SSR safety", () => {
     expect(ctx.over()).toBeNull();
     expect(ctx.transform()).toBeNull();
     expect(() =>
-      ctx.Provider({ get children() { return null; } } as never),
+      ctx.Provider({
+        get children() {
+          return null;
+        },
+      } as never),
     ).not.toThrow();
   });
 

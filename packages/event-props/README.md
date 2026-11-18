@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Event%20Props" alt="Solid Primitives Event Props">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Event%20Props&version=2.0" alt="Solid Primitives Event Props">
 </p>
 
 # @solid-primitives/event-props

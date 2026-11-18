@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/url",
-  "version": "0.2.0-next.4",
+  "version": "0.2.0",
   "description": "Reactive primitives covering Browser's location, URL and URLSearchParams interfaces.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -17,7 +17,7 @@
   },
   "primitive": {
     "name": "url",
-    "stage": 0,
+    "stage": 3,
     "list": [
       "createLocationState",
       "useSharedLocationState",
@@ -33,7 +33,7 @@
       "ReactiveSearchParams"
     ],
     "category": "Browser APIs",
-    "gzip": 2740
+    "gzip": 2759
   },
   "keywords": [
     "solid",

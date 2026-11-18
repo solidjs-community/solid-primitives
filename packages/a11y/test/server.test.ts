@@ -1,11 +1,22 @@
 import { describe, it, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createFormControl, useFormControl, makeAnnounce, createAnnounce, createReducedMotion } from "../src/index.js";
+import {
+  createFormControl,
+  useFormControl,
+  makeAnnounce,
+  createAnnounce,
+  createReducedMotion,
+} from "../src/index.js";
 
 describe("createFormControl (SSR)", () => {
   it("returns static accessors without throwing", () => {
     createRoot(dispose => {
-      const ctx = createFormControl({ id: "ctrl", name: "email", validationState: "invalid", required: true });
+      const ctx = createFormControl({
+        id: "ctrl",
+        name: "email",
+        validationState: "invalid",
+        required: true,
+      });
       expect(ctx.name()).toBe("email");
       expect(ctx.validationState()).toBe("invalid");
       expect(ctx.isRequired()).toBe(true);

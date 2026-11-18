@@ -1,5 +1,83 @@
 # @solid-primitives/favicon
 
+## 1.0.0
+
+### Major Changes
+
+- 63b3375: New package: `@solid-primitives/favicon`
+
+  Primitives for controlling the document favicon, built for Solid 2.0 (beta.24).
+
+  ### `makeFavicon` / `createFavicon`
+
+  Non-reactive base and reactive primitive for swapping the favicon `<link>` href. Reuses an existing `<link rel="icon">` if present and restores its previous href on `dispose()`/cleanup; creates and removes one otherwise. Nested/sequential calls compose correctly under normal mount/unmount ordering.
+
+  ### `makeFaviconAnimation` / `createFaviconAnimation`
+
+  Cycles the favicon through a sequence of hrefs on an interval — for build-status spinners and similar loading indicators. The reactive version accepts a static or reactive frame list, exposes `frame`/`playing` signals and `play`/`pause`, and automatically pauses while the tab is hidden (`document.visibilitychange`), resuming if it was playing before.
+
+  ### `makeFaviconBadge` / `createFaviconBadge`
+
+  Composites a notification count, short string, or plain dot onto a base icon via an offscreen canvas. `0`/`false`/`undefined`/`""` render no badge; `true` renders a dot; numbers clamp to `"{max}+"`. Falls back to the plain base href if the base image fails to load.
+
+  ### `makeFaviconScheme` / `createFaviconScheme`
+
+  Swaps between a light/dark icon to match `prefers-color-scheme`, staying in sync via a `matchMedia` listener as the OS/browser preference changes. Treats SSR as `"light"` (no reliable server-side signal for OS theme).
+
+  ### `makeFaviconProgress` / `createFaviconProgress`
+
+  Composites a progress ring (0–100, clamped) onto a base icon via an offscreen canvas — for upload/download-style indicators. `undefined` shows the base icon with no ring; `0` still draws the (empty) ring track. Falls back to the plain base href if the base image fails to load.
+
+  ### `FaviconLink`
+
+  A component that renders the favicon `<link>` directly, so its initial href is part of the server-rendered HTML instead of only applying once client JS hydrates. Place it once in your document's real `<head>` region (e.g. your SSR framework's root document component); any `make*`/`create*` call elsewhere composes with it automatically, since `bindFaviconLink`'s existing "reuse an existing link" lookup finds and takes over the exact element it rendered.
+
+  ### Design notes
+
+  Rather than one `createAdvancedFavicon` combining all of this behind an options object, each capability is its own small `make*`/`create*` pair sharing internal DOM (`link.ts`) and canvas (`canvas.ts`) helpers — consistent with this repo's existing layered-primitive packages (e.g. `video`). See [DESIGN.md](../packages/favicon/DESIGN.md) for the full reasoning.
+
+### Patch Changes
+
+- e395f54: Update the primitive stage in each package's metadata: `a11y` 3, `sortable` 3, `favicon` 3, `url` 3, `workers` 3, `analytics` 2, `animation` 2, `drag-drop` 2, `async` 1. No code changes.
+- cc30d55: `createFaviconScheme` and `createFavicon` now derive the `href` they return from their inputs (a memo resolved against the document base URL, the same value the `<link>` reports) instead of copying it back out of the `<link>` element after an effect. Previously a consumer reading `scheme()` together with `href()`, or `createFavicon`'s result together with another signal changed in the same write, could see the new value next to the previous href for one flush. The `<link>` element is still written by the effect, and the public API and types are unchanged.
+
+  Behavior notes: the returned `href()` now already holds the new value while the flush is still running, before the effect writes it to the `<link>` (so a reader in that window sees `href()` ahead of the element). A `<base href>` change alone does not update a reactive `href()`; it re-resolves on the next change of the icon/scheme. For a static string passed to `createFavicon`, the returned function re-resolves on every call, so it follows a later `<base>` change (before, it held the value frozen at creation).
+
+- 3490301: Republish with a clean build. The previously published `next` builds imported `solid-js/web`, which no longer exists in Solid 2.0, so importing the package failed with `ERR_PACKAGE_PATH_NOT_EXPORTED`. The compiled output now imports `@solidjs/web`.
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [cc30d55]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [a47cf15]
+- Updated dependencies [ab4c926]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [91a92aa]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/event-listener@3.0.0
+
+## 1.0.0-next.6
+
+### Patch Changes
+
+- e395f54: Update the primitive stage in each package's metadata: `a11y` 3, `sortable` 3, `favicon` 3, `url` 3, `workers` 3, `analytics` 2, `animation` 2, `drag-drop` 2, `async` 1. No code changes.
+
 ## 1.0.0-next.5
 
 ### Patch Changes

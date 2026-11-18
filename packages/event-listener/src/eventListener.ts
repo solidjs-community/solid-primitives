@@ -5,7 +5,13 @@ import {
   asArray,
   tryOnCleanup,
 } from "@solid-primitives/utils";
-import { type Accessor, createEffect, createOwner, createRenderEffect, createSignal } from "solid-js";
+import {
+  type Accessor,
+  createEffect,
+  createOwner,
+  createRenderEffect,
+  createSignal,
+} from "solid-js";
 import { isServer } from "@solidjs/web";
 import type {
   EventListenerDirectiveProps,

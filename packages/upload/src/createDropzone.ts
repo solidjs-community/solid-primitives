@@ -87,7 +87,9 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
  * <div ref={dz} class={dz.isDragging() ? "dragging" : ""} />
  * ```
  */
-function dropzone<T extends HTMLElement = HTMLElement>(options?: DropzoneOptions): Dropzone<T>["ref"] & Omit<Dropzone<T>, "ref"> {
+function dropzone<T extends HTMLElement = HTMLElement>(
+  options?: DropzoneOptions,
+): Dropzone<T>["ref"] & Omit<Dropzone<T>, "ref"> {
   const { ref, ...state } = createDropzone<T>(options);
   return Object.assign(ref, state);
 }

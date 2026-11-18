@@ -52,7 +52,9 @@ describe("createNumericRange", () => {
   it("reactive start and to", () => {
     const [start, setStart] = createSignal(2);
     const [to, setTo] = createSignal(6);
-    const [dispose, nums] = createRoot(dispose => [dispose, createNumericRange(start, to)] as const);
+    const [dispose, nums] = createRoot(
+      dispose => [dispose, createNumericRange(start, to)] as const,
+    );
 
     expect(nums()).toEqual([2, 3, 4, 5]);
     setStart(4);
@@ -67,7 +69,9 @@ describe("createNumericRange", () => {
 
   it("reactive step", () => {
     const [step, setStep] = createSignal(1);
-    const [dispose, nums] = createRoot(dispose => [dispose, createNumericRange(0, 6, step)] as const);
+    const [dispose, nums] = createRoot(
+      dispose => [dispose, createNumericRange(0, 6, step)] as const,
+    );
 
     expect(nums()).toEqual([0, 1, 2, 3, 4, 5]);
     setStep(2);

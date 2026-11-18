@@ -85,8 +85,18 @@ describe("makeAnalytics (server)", () => {
 
   it("dispatches to multiple server plugins sequentially", async () => {
     const order: string[] = [];
-    const pluginA: AnalyticsPlugin = { name: "a", track: async () => { order.push("a"); } };
-    const pluginB: AnalyticsPlugin = { name: "b", track: async () => { order.push("b"); } };
+    const pluginA: AnalyticsPlugin = {
+      name: "a",
+      track: async () => {
+        order.push("a");
+      },
+    };
+    const pluginB: AnalyticsPlugin = {
+      name: "b",
+      track: async () => {
+        order.push("b");
+      },
+    };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
 
     analytics.track("ev");
@@ -99,7 +109,13 @@ describe("makeAnalytics (server)", () => {
   it("abort() works on the server", async () => {
     const spyA = vi.fn();
     const spyB = vi.fn();
-    const pluginA: AnalyticsPlugin = { name: "a", track: ({ abort }) => { spyA(); abort(); } };
+    const pluginA: AnalyticsPlugin = {
+      name: "a",
+      track: ({ abort }) => {
+        spyA();
+        abort();
+      },
+    };
     const pluginB: AnalyticsPlugin = { name: "b", track: () => spyB() };
     const [analytics, cleanup] = makeAnalytics([pluginA, pluginB]);
 
@@ -117,7 +133,10 @@ describe("makeAnalytics (server)", () => {
     const order: string[] = [];
     const plugin: AnalyticsPlugin = {
       name: "slow",
-      track: async () => { await trackDone; order.push("plugin"); },
+      track: async () => {
+        await trackDone;
+        order.push("plugin");
+      },
     };
     const [analytics, cleanup] = makeAnalytics([plugin]);
 

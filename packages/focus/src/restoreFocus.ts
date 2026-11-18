@@ -29,8 +29,14 @@ export type ScheduleFocusRestoreOptions = {
  * Schedules (via `afterPaint`) a cancelable-custom-event-gated focus restore.
  */
 export function scheduleFocusRestore(options: ScheduleFocusRestoreOptions): void {
-  const { resolveEventTarget, eventName, shouldRestore, resolveTarget, fallbackTarget, onFinalFocus } =
-    options;
+  const {
+    resolveEventTarget,
+    eventName,
+    shouldRestore,
+    resolveTarget,
+    fallbackTarget,
+    onFinalFocus,
+  } = options;
   afterPaint(() => {
     if (shouldRestore && !shouldRestore()) return;
     const target = resolveTarget() ?? fallbackTarget;

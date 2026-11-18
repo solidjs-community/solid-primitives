@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Permission" alt="Solid Primitives Permission">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Permission&version=2.0" alt="Solid Primitives Permission">
 </p>
 
 # @solid-primitives/permission

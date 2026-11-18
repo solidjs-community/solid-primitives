@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-bus",
-  "version": "3.0.0-next.6",
+  "version": "3.0.0",
   "description": "A collection of primitives providing various features of a pubsub/event-emitter/event-bus.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -19,7 +19,7 @@
       "createEventStack"
     ],
     "category": "Utilities",
-    "gzip": 1059
+    "gzip": 1072
   },
   "private": false,
   "sideEffects": false,

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "4.0.0-next.5",
+  "version": "4.0.0",
   "description": "Library of primitives focused around component props.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -20,7 +20,7 @@
       "partitionProps"
     ],
     "category": "Utilities",
-    "gzip": 1162
+    "gzip": 1355
   },
   "keywords": [
     "props",

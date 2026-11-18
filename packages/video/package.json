@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/video",
-  "version": "1.0.0-next.5",
+  "version": "1.0.0",
   "description": "Primitives to manage HTML video playback.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
@@ -25,7 +25,7 @@
       "createVideoFrameCallback"
     ],
     "category": "Display & Media",
-    "gzip": 1876
+    "gzip": 1886
   },
   "keywords": [
     "solid",

@@ -1,5 +1,99 @@
 # @solid-primitives/analytics
 
+## 2.0.0
+
+### Major Changes
+
+- 5b99671: Redesign for Solid.js v2.0 (beta.14) with a queue-based plugin pipeline
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  The previous `createAnalytics(handlers)` default export and `EventType` / `TrackHandler` types have been replaced with a richer API:
+
+  - **`makeAnalytics(plugins, options?)`** — non-reactive base primitive returning `[controls, cleanup]`
+  - **`createAnalytics(plugins, options?)`** — reactive primitive returning controls plus `initialized` and `pendingCount` signals
+
+  ### Plugin format
+
+  Plugins follow the [`analytics`](https://www.npmjs.com/package/analytics) npm package interface (`name`, `initialize`, `loaded`, `page`, `track`, `identify`), so any plugin from the [analytics plugin catalogue](https://www.npmjs.com/package/analytics#analytic-plugins) works directly — install it separately and pass it in.
+
+  No first-party plugins are bundled in this package.
+
+  ### Event queue
+
+  Events fired before plugins finish initializing are buffered in a bounded FIFO queue and replayed automatically once all plugins report ready. The queue limit and poll interval are configurable via `AnalyticsOptions`.
+
+  ### Migration
+
+  ```ts
+  // Before (v0.x)
+  import createAnalytics, { EventType } from "@solid-primitives/analytics";
+  const track = createAnalytics([myHandler]);
+  track(EventType.Event, { category: "ui", action: "click" });
+
+  // After (v1.x) — use any plugin from https://www.npmjs.com/package/analytics#analytic-plugins
+  import { createAnalytics } from "@solid-primitives/analytics";
+  import googleAnalytics from "@analytics/google-analytics";
+
+  const analytics = createAnalytics([googleAnalytics({ measurementId: "G-xxx" })]);
+  analytics.track("click", { category: "ui" });
+  ```
+
+### Patch Changes
+
+- e395f54: Update the primitive stage in each package's metadata: `a11y` 3, `sortable` 3, `favicon` 3, `url` 3, `workers` 3, `analytics` 2, `animation` 2, `drag-drop` 2, `async` 1. No code changes.
+- 88a48f3: Fix package manifests. `keyed` and `share` import `@solid-primitives/utils` at runtime but did not declare it, so the import could not be resolved under strict installs (pnpm, Yarn PnP). It is now a dependency. `analytics` no longer declares the legacy optional peer `@tanstack/start`: the TanStack relay takes the user's `createServerFn` and imports nothing from TanStack.
+- 7ee755d: Stop writing signals during server renders, and ship ref-factory forms of the remaining `use:`-shaped directives.
+
+  Solid 2 (`2.0.0-rc.1`+) flags a signal or store setter that runs during a server render (`SERVER_WRITE`): the write lands as inert data today and will throw in a later release. Eight primitives still did this:
+
+  - `@solid-primitives/utils`: new `createServerSafeSignal(value, options)` — `createSignal` on the client; on the server the signal is still created (so hydration ids stay aligned) but reads and writes go to a plain box. For primitives that hold interactive state with no async source.
+  - `@solid-primitives/analytics`, `@solid-primitives/list-state`, `@solid-primitives/queue`, and `createInfiniteScroll` in `@solid-primitives/pagination`: internal state uses `createServerSafeSignal`.
+  - `@solid-primitives/controlled-signal`: on the server an uncontrolled write lands in a plain override instead of the signal; reads and `onChange` behave as before.
+  - `@solid-primitives/date`: `createCountdown` is now a derived store (`createStore(fn, seed)`) instead of a render effect writing into one — the shape upstream prescribes.
+  - `@solid-primitives/masonry`: the one-shot signal that wired items to the layout memo is a plain variable.
+  - `@solid-primitives/pagination`: `createPagination` no longer reads its options at the top level of the calling component (`STRICT_READ_UNTRACKED`).
+  - `@solid-primitives/tween`: the effect's apply phase reads the current value with `untrack` (`STRICT_READ_UNTRACKED`).
+
+  `@solid-primitives/event-listener` and `@solid-primitives/pointer`: `eventListener`, `pointerPosition` and `pointerHover` now return a ref callback when called with props alone — `<button ref={eventListener(["click", onClick])} />`, `<div ref={pointerHover(setHovering)} />` — matching the `ref` directive shape Solid 2 replaced `use:` with. The two-argument `(el, props)` form still works.
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [5bff218]
+- Updated dependencies [e4c9991]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/queue@1.0.0
+  - @solid-primitives/page-utilities@3.0.0
+
+## 2.0.0-next.5
+
+### Patch Changes
+
+- e395f54: Update the primitive stage in each package's metadata: `a11y` 3, `sortable` 3, `favicon` 3, `url` 3, `workers` 3, `analytics` 2, `animation` 2, `drag-drop` 2, `async` 1. No code changes.
+- 88a48f3: Fix package manifests. `keyed` and `share` import `@solid-primitives/utils` at runtime but did not declare it, so the import could not be resolved under strict installs (pnpm, Yarn PnP). It is now a dependency. `analytics` no longer declares the legacy optional peer `@tanstack/start`: the TanStack relay takes the user's `createServerFn` and imports nothing from TanStack.
+
 ## 2.0.0-next.4
 
 ### Patch Changes

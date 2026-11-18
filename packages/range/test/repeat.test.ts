@@ -7,13 +7,16 @@ describe("repeat", () => {
     const [length, setLength] = createSignal(5);
     const captured: number[] = [];
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      repeat(length, i => {
-        captured.push(i);
-        return i;
-      }),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          repeat(length, i => {
+            captured.push(i);
+            return i;
+          }),
+        ] as const,
+    );
 
     expect(mapped(), "initial mapped").toEqual([0, 1, 2, 3, 4]);
     expect(captured, "initial captured").toEqual([0, 1, 2, 3, 4]);
@@ -36,22 +39,25 @@ describe("repeat", () => {
     const [length, setLength] = createSignal(4);
     const captured: (string | number)[] = [];
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      repeat<string | number>(
-        length,
-        i => {
-          captured.push(i);
-          return i;
-        },
-        {
-          fallback: () => {
-            captured.push("fb");
-            return "fb";
-          },
-        },
-      ),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          repeat<string | number>(
+            length,
+            i => {
+              captured.push(i);
+              return i;
+            },
+            {
+              fallback: () => {
+                captured.push("fb");
+                return "fb";
+              },
+            },
+          ),
+        ] as const,
+    );
 
     expect(mapped(), "initial mapped").toEqual([0, 1, 2, 3]);
     expect(captured, "initial captured").toEqual([0, 1, 2, 3]);
@@ -70,22 +76,25 @@ describe("repeat", () => {
     const [length, setLength] = createSignal(2);
     const cleanups: (string | number)[] = [];
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      repeat<string | number>(
-        length,
-        i => {
-          onCleanup(() => cleanups.push(i));
-          return i;
-        },
-        {
-          fallback: () => {
-            onCleanup(() => cleanups.push("fb"));
-            return "fb";
-          },
-        },
-      ),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          repeat<string | number>(
+            length,
+            i => {
+              onCleanup(() => cleanups.push(i));
+              return i;
+            },
+            {
+              fallback: () => {
+                onCleanup(() => cleanups.push("fb"));
+                return "fb";
+              },
+            },
+          ),
+        ] as const,
+    );
 
     mapped();
     expect(cleanups, "initial cleanups").toEqual([]);

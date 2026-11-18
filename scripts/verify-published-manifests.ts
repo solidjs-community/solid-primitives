@@ -18,10 +18,10 @@
 //   1. imports of Solid 1.x subpaths that no longer exist in Solid 2.0 (`solid-js/web`,
 //      `solid-js/store`, ...), which fail at import time with ERR_PACKAGE_PATH_NOT_EXPORTED.
 //      Typically caused by compiling JSX without `moduleName: "@solidjs/web"`.
-//   2. imports of the Solid runtime (`solid-js`, `@solidjs/web`) that the manifest does not declare
-//      as a dependency or peer dependency (e.g. dist importing `@solidjs/web` while only
-//      `solid-js` is a peer). Other packages are not checked: several packages intentionally
-//      import optional integrations.
+//   2. imports of any package the manifest does not declare as a dependency, peer dependency or
+//      optional dependency (e.g. dist importing `@solid-primitives/utils` while it is not a
+//      dependency). Consumers cannot resolve it under strict installs (pnpm, Yarn PnP).
+// Comments are ignored, so JSDoc examples (`import x from "some-lib"`) are not reported.
 // Packages that still target Solid 1.x (peer `solid-js` ^1) are exempt from check 1.
 // See https://github.com/solidjs-community/solid-primitives/issues/1098.
 //
@@ -30,22 +30,31 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
+import { builtinModules } from "node:module";
+import { isUnmigratedPackage } from "./utils/unmigrated-packages.js";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
-const DEP_FIELDS = ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"] as const;
+const DEP_FIELDS = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies",
+] as const;
 const BAD_PROTOCOLS = ["catalog:", "workspace:"];
 // Solid 1.x subpaths that were removed or moved in Solid 2.0.
 const REMOVED_SOLID_SUBPATHS =
   /^solid-js\/(web|store|html|h|universal|jsx-runtime|jsx-dev-runtime)(\/|$)/;
-// Runtime packages whose imports must be declared in the manifest.
-const SOLID_RUNTIME_PACKAGES = new Set(["solid-js", "@solidjs/web"]);
-const IMPORT_SPECIFIER =
-  /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)["']([^"']+)["']/g;
+const IMPORT_SPECIFIER = /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)["']([^"']+)["']/g;
+
+/** Removes block comments and whole-line `//` comments so JSDoc examples are not scanned as imports. */
+const stripComments = (code: string): string =>
+  code.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^[ \t]*\/\/.*$/gm, "");
 
 /** Package name of a bare import specifier (`@scope/pkg/sub` -> `@scope/pkg`), or null if not a package import. */
 const packageNameOf = (specifier: string): string | null => {
   if (specifier.startsWith(".") || specifier.startsWith("/")) return null;
   if (specifier.startsWith("node:") || specifier.startsWith("data:")) return null;
+  if (builtinModules.includes(specifier)) return null;
   const parts = specifier.split("/");
   return specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]!;
 };
@@ -84,7 +93,10 @@ const failures: string[] = [];
 const distFailures: string[] = [];
 const undeclaredFailures: string[] = [];
 
-for (const pkg of packed) {
+// Solid 1.x packages are not checked until they are migrated (see scripts/utils/unmigrated-packages.ts)
+const checked = packed.filter(pkg => !isUnmigratedPackage(pkg.name));
+
+for (const pkg of checked) {
   const manifestText = execFileSync("tar", ["-xzO", "-f", pkg.filename, "package/package.json"], {
     encoding: "utf8",
   });
@@ -117,7 +129,7 @@ for (const pkg of packed) {
 
   for (const file of walk(distDir)) {
     const rel = path.relative(path.join(extractDir, "package"), file);
-    const text = fs.readFileSync(file, "utf8");
+    const text = stripComments(fs.readFileSync(file, "utf8"));
     for (const [, specifier] of text.matchAll(IMPORT_SPECIFIER)) {
       if (!specifier) continue;
       const key = `${rel}\0${specifier}`;
@@ -131,7 +143,7 @@ for (const pkg of packed) {
         continue;
       }
       const dependency = packageNameOf(specifier);
-      if (dependency && SOLID_RUNTIME_PACKAGES.has(dependency) && !declared.has(dependency)) {
+      if (dependency && !declared.has(dependency)) {
         reported.add(key);
         undeclaredFailures.push(
           `${pkg.name}@${pkg.version} ${rel} imports "${specifier}", but "${dependency}" is not a dependency or peerDependency`,
@@ -163,10 +175,10 @@ if (distFailures.length > 0) {
 
 if (undeclaredFailures.length > 0) {
   failed = true;
-  console.error("Built output imports the Solid runtime without declaring it:\n");
+  console.error("Built output imports packages the manifest does not declare:\n");
   for (const f of undeclaredFailures) console.error(`  - ${f}`);
   console.error(
-    "\nAdd it to `peerDependencies`, otherwise consumers can't resolve it.\n",
+    "\nAdd the package to `dependencies` (or `peerDependencies`), otherwise consumers can't resolve it.\n",
   );
 }
 
@@ -174,5 +186,5 @@ fs.rmSync(tmpDir, { recursive: true, force: true });
 if (failed) process.exit(1);
 
 console.log(
-  `Verified ${packed.length} packed packages: no unresolved workspace protocols, no removed Solid subpaths, no undeclared imports in dist.`,
+  `Verified ${checked.length} packed packages (${packed.length - checked.length} unmigrated skipped): no unresolved workspace protocols, no removed Solid subpaths, no undeclared imports in dist.`,
 );

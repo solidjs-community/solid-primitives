@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/list",
-  "version": "1.0.0-next.4",
+  "version": "1.0.0",
   "description": "A List component, an alternative to For and Index.",
   "author": "Maciek50322 <34212298+maciek50322@users.noreply.github.com>",
   "contributors": [],
@@ -21,7 +21,7 @@
       "List"
     ],
     "category": "Control Flow",
-    "gzip": 1289
+    "gzip": 1301
   },
   "keywords": [
     "solid",

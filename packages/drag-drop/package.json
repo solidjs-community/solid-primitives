@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/drag-drop",
-  "version": "0.1.0-next.4",
+  "version": "0.1.0",
   "description": "Composable drag-and-drop primitives.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "drag-drop",
-    "stage": 0,
+    "stage": 2,
     "list": [
       "makeDraggable",
       "makeDroppable",
@@ -31,7 +31,7 @@
       "pointerWithin"
     ],
     "category": "UI Patterns",
-    "gzip": 3971
+    "gzip": 3978
   },
   "keywords": [
     "solid",

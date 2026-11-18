@@ -8,7 +8,9 @@ describe("createSortedIndex", () => {
       const a = { name: "b" };
       const b = { name: "a" };
       const [list] = createSignal([a, b]);
-      const indexOf = createSortedIndex(list, (x: typeof a, y: typeof a) => ascending(x.name, y.name));
+      const indexOf = createSortedIndex(list, (x: typeof a, y: typeof a) =>
+        ascending(x.name, y.name),
+      );
       flush();
       expect(indexOf(a)()).toBe(1);
       expect(indexOf(b)()).toBe(0);
@@ -21,7 +23,9 @@ describe("createSortedIndex", () => {
       const a = { name: "a" };
       const missing = { name: "z" };
       const [list] = createSignal([a]);
-      const indexOf = createSortedIndex(list, (x: typeof a, y: typeof a) => ascending(x.name, y.name));
+      const indexOf = createSortedIndex(list, (x: typeof a, y: typeof a) =>
+        ascending(x.name, y.name),
+      );
       flush();
       expect(indexOf(missing)()).toBe(-1);
       dispose();
@@ -44,7 +48,9 @@ describe("createSortedIndex", () => {
     let runsE = 0;
 
     const [dispose, idxA, idxB, idxC, idxD, idxE] = createRoot(dispose => {
-      const indexOf = createSortedIndex(items, (x: typeof a, y: typeof a) => ascending(x.name, y.name));
+      const indexOf = createSortedIndex(items, (x: typeof a, y: typeof a) =>
+        ascending(x.name, y.name),
+      );
       const idxA = indexOf(a);
       const idxB = indexOf(b);
       const idxC = indexOf(c);

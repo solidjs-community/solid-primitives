@@ -1,10 +1,10 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=bounds" alt="Solid Primitives Bounds">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=bounds&version=2.0" alt="Solid Primitives Bounds">
 </p>
 
 # @solid-primitives/bounds
 
-[![size](https://img.shields.io/badge/size-894_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/bounds)
+[![size](https://img.shields.io/badge/size-904_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/bounds)
 [![version](https://img.shields.io/npm/v/@solid-primitives/bounds?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/bounds)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)

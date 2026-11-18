@@ -4,7 +4,8 @@
  * Shared by two callers:
  * - `scripts/generate.ts` bakes a copy into `src/generated/stats.ts` at build time, so the
  *   prerendered homepage always has numbers, even with no server behind it.
- * - `stats.server.ts` serves a fresh copy (cached for a day) that the homepage swaps in after load.
+ * - `worker/index.ts` (the Cloudflare Worker behind `/api/stats`) serves a fresh copy, cached for a
+ *   day, that the homepage swaps in after load.
  *
  * Plain `fetch` only (no Vite or Solid imports), so the Node generate script can import it too.
  */
@@ -20,13 +21,20 @@ export type ProjectStats = {
 
 const GITHUB_API_REPO = "solidjs-community/solid-primitives";
 
-async function githubSearchCount(query: string): Promise<number> {
+async function githubSearchCount(query: string, tokenOption?: string): Promise<number> {
   const url = `https://api.github.com/search/issues?q=${encodeURIComponent(`repo:${GITHUB_API_REPO} ${query}`)}`;
-  const headers: Record<string, string> = { Accept: "application/vnd.github+json" };
+  // GitHub rejects API requests with no User-Agent (HTTP 403). Node's fetch sends one; Cloudflare
+  // Workers' doesn't.
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "solid-primitives-site",
+  };
   // Optional. Unauthenticated search allows 10 requests/minute per IP, which a daily refresh never
   // gets near; a token just avoids sharing that budget with anything else on the host. A
-  // site-specific name, so an unrelated GITHUB_TOKEN in the environment isn't picked up.
-  const token = typeof process !== "undefined" ? process.env.SITE_GITHUB_TOKEN : undefined;
+  // site-specific name, so an unrelated GITHUB_TOKEN in the environment isn't picked up. Callers
+  // without `process` (the Worker) pass it in explicitly.
+  const token =
+    tokenOption ?? (typeof process !== "undefined" ? process.env.SITE_GITHUB_TOKEN : undefined);
   if (token) headers.Authorization = `Bearer ${token}`;
   let res = await fetch(url, { headers });
   if (res.status === 401 && token) {
@@ -65,10 +73,13 @@ async function npmDownloadsLastMonthOf(name: string): Promise<number> {
 }
 
 /** Throws if GitHub or npm can't be read completely (see `npmDownloadsLastMonthOf`). */
-export async function fetchProjectStats(moduleNames: readonly string[]): Promise<ProjectStats> {
+export async function fetchProjectStats(
+  moduleNames: readonly string[],
+  options: { githubToken?: string } = {},
+): Promise<ProjectStats> {
   const [openIssues, openPullRequests] = await Promise.all([
-    githubSearchCount("type:issue state:open"),
-    githubSearchCount("type:pr state:open"),
+    githubSearchCount("type:issue state:open", options.githubToken),
+    githubSearchCount("type:pr state:open", options.githubToken),
   ]);
 
   // npm's bulk downloads endpoint doesn't support scoped packages, so each package

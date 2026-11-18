@@ -1,11 +1,5 @@
-import {
-  type Accessor,
-  createSignal,
-  getObserver,
-  onCleanup,
-  onSettled,
-  sharedConfig,
-} from "solid-js";
+import { type Accessor, createSignal, getObserver, onCleanup, onSettled } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 
 /**
@@ -23,7 +17,9 @@ import { isServer } from "@solidjs/web";
 export function createIsMounted(): Accessor<boolean> {
   if (isServer) return () => false;
   const [isMounted, setIsMounted] = createSignal(false);
-  onSettled(() => { setIsMounted(true); });
+  onSettled(() => {
+    setIsMounted(true);
+  });
   return isMounted;
 }
 

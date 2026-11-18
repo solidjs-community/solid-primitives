@@ -28,10 +28,7 @@ export function makeMotionPath(
   el.style.offsetPath = path.includes("(") ? path : `path("${path}")`;
   el.style.offsetRotate = rotate;
   el.style.offsetAnchor = "center";
-  return el.animate(
-    [{ offsetDistance: "0%" }, { offsetDistance: "100%" }],
-    animOptions,
-  );
+  return el.animate([{ offsetDistance: "0%" }, { offsetDistance: "100%" }], animOptions);
 }
 
 /**
@@ -45,12 +42,18 @@ export function createMotionPath(
 ): Accessor<Animation | undefined> {
   const getPath = asAccessor(path);
   const getOpts = typeof options === "function" ? options : () => options;
-  const [animation, setAnimation] = createSignal<Animation | undefined>(undefined, INTERNAL_OPTIONS);
+  const [animation, setAnimation] = createSignal<Animation | undefined>(
+    undefined,
+    INTERNAL_OPTIONS,
+  );
 
   createEffect(
     () => ({ el: target(), path: getPath(), opts: getOpts() }),
     ({ el, path, opts }) => {
-      if (!el) { setAnimation(undefined); return; }
+      if (!el) {
+        setAnimation(undefined);
+        return;
+      }
       const anim = makeMotionPath(el, path, opts);
       setAnimation(anim);
       return () => anim.cancel();

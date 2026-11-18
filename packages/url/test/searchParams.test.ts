@@ -30,17 +30,13 @@ describe("ReactiveSearchParams", () => {
   // realms racing during vitest's jsdom environment setup. The class genuinely does extend the
   // global `URLSearchParams` (see its source), so a retry papers over test-infra timing, not a
   // real bug.
-  test(
-    "behaves like URLSearchParams",
-    { retry: 3 },
-    () => {
-      const params = createSearchParams("foo=1&foo=2&bar=baz");
-      expect(params).toBeInstanceOf(URLSearchParams);
-      expect(params.get("foo")).toBe("1");
-      expect(params.getAll("foo")).toEqual(["1", "2"]);
-      expect(params.toString()).toBe("foo=1&foo=2&bar=baz");
-    },
-  );
+  test("behaves like URLSearchParams", { retry: 3 }, () => {
+    const params = createSearchParams("foo=1&foo=2&bar=baz");
+    expect(params).toBeInstanceOf(URLSearchParams);
+    expect(params.get("foo")).toBe("1");
+    expect(params.getAll("foo")).toEqual(["1", "2"]);
+    expect(params.toString()).toBe("foo=1&foo=2&bar=baz");
+  });
 
   test("is granularly reactive per key", () =>
     createRoot(dispose => {

@@ -296,7 +296,7 @@ export function createScheduled(
     dirty();
   });
   return (): boolean => {
-    if (!isDirty) call(), track();
+    if (!isDirty) (call(), track());
 
     if (isDirty) {
       isDirty = !!listeners;

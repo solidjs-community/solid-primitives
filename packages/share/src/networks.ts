@@ -21,8 +21,7 @@ export const FACEBOOK: Network =
 export const FLIPBOARD: Network =
   "https://share.flipboard.com/bookmarklet/popout?v=2&url=@u&title=@t";
 export const HACKERNEWS: Network = "https://news.ycombinator.com/submitlink?u=@u&t=@t";
-export const INSTAPAPER: Network =
-  "https://www.instapaper.com/edit?url=@u&title=@t&description=@d";
+export const INSTAPAPER: Network = "https://www.instapaper.com/edit?url=@u&title=@t&description=@d";
 export const LINE: Network = "https://line.me/R/msg/text/?@t%0D%0A@u%0D%0A@d";
 export const LINKEDIN: Network = "https://www.linkedin.com/sharing/share-offsite/?url=@u";
 export const MESSENGER: Network = "fb-messenger://share/?link=@u";

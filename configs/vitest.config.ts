@@ -2,8 +2,8 @@ import { defineConfig } from "vitest/config";
 import solidPlugin from "@solidjs/vite-plugin";
 import * as utils from "../scripts/utils/index.js";
 
-// Packages still on solid-js 1.x, not yet migrated to Solid 2.0.
-const UNMIGRATED_PACKAGES = ["fetch", "resource"];
+// Packages still on solid-js 1.x, not yet migrated to Solid 2.0 (see scripts/utils/unmigrated-packages.ts).
+const { UNMIGRATED_PACKAGES } = utils;
 
 const package_name = utils.getPackageNameFromCWD();
 
@@ -29,7 +29,11 @@ export default defineConfig(({ mode }) => {
       solidPlugin({
         refresh: false,
         // For testing SSR we need to do a SSR JSX transform
-        solid: { generate: testSSR ? "ssr" : "dom", omitNestedClosingTags: false, moduleName: "@solidjs/web" },
+        solid: {
+          generate: testSSR ? "ssr" : "dom",
+          omitNestedClosingTags: false,
+          moduleName: "@solidjs/web",
+        },
       }),
     ],
     test: {
@@ -45,7 +49,9 @@ export default defineConfig(({ mode }) => {
           {
             ...(testSSR && {
               include: ["packages/*/test/server.test.{ts,tsx}"],
-              exclude: UNMIGRATED_PACKAGES.map(name => `packages/${name}/test/server.test.{ts,tsx}`),
+              exclude: UNMIGRATED_PACKAGES.map(
+                name => `packages/${name}/test/server.test.{ts,tsx}`,
+              ),
             }),
             ...(!testSSR && {
               include: ["packages/*/test/*.test.{ts,tsx}"],

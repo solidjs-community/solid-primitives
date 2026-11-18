@@ -136,8 +136,7 @@ export function makeSpring<T extends SpringTarget>(
   SpringExtras,
   cleanup: () => void,
 ] {
-  const getOptions: () => SpringOptions =
-    typeof options === "function" ? options : () => options;
+  const getOptions: () => SpringOptions = typeof options === "function" ? options : () => options;
 
   const [signal, setSignal] = createSignal<T>(
     initialValue as Exclude<T, Function>,
@@ -167,7 +166,14 @@ export function makeSpring<T extends SpringTarget>(
     rs.forEach(r => r());
   };
 
-  function tick(last: any, current: any, target: any, stiffness: number, damping: number, precision: number): any {
+  function tick(
+    last: any,
+    current: any,
+    target: any,
+    stiffness: number,
+    damping: number,
+    precision: number,
+  ): any {
     if (typeof current === "number" || is_date(current)) {
       const delta = +target - +current;
       const velocity = (+current - +last) / time_delta;
@@ -299,8 +305,7 @@ export function createSpring<T extends SpringTarget>(
   options: SpringOptions | Accessor<SpringOptions> = {},
 ): [Accessor<WidenSpringTarget<T>>, SpringSetter<WidenSpringTarget<T>>, SpringExtras] {
   if (isServer) {
-    const getOptions: () => SpringOptions =
-      typeof options === "function" ? options : () => options;
+    const getOptions: () => SpringOptions = typeof options === "function" ? options : () => options;
 
     const [signal, setSignal] = createSignal<T>(
       initialValue as Exclude<T, Function>,

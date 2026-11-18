@@ -6,11 +6,11 @@ import {
   getObserver,
   type NoInfer,
   onSettled,
-  sharedConfig,
   type Signal,
   type SignalOptions,
   untrack,
 } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 
 type Defined<T> = T extends undefined ? never : T;
@@ -55,7 +55,10 @@ export function createStaticStore<T extends Record<string, Exclude<unknown, Func
     let signal = cache[key];
     if (!signal) {
       if (!getObserver()) return copy[key];
-      cache[key] = signal = createSignal(copy[key] as Exclude<T[keyof T], Function>, { ownedWrite: true } as SignalOptions<T[keyof T]>);
+      cache[key] = signal = createSignal(
+        copy[key] as Exclude<T[keyof T], Function>,
+        { ownedWrite: true } as SignalOptions<T[keyof T]>,
+      );
       delete copy[key];
     }
     return signal[0]();
@@ -102,7 +105,9 @@ export function createHydratableStaticStore<T extends Record<string, Exclude<unk
 ): ReturnType<typeof createStaticStore<T>> {
   if (isServer || sharedConfig.hydrating) {
     const [state, setState] = createStaticStore(serverValue);
-    onSettled(() => { setState(update()); });
+    onSettled(() => {
+      setState(update());
+    });
     return [state, setState];
   }
 

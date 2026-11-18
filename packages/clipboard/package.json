@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/clipboard",
-  "version": "2.0.0-next.19",
+  "version": "2.0.0",
   "description": "Primitives for reading and writing to clipboard.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -21,7 +21,7 @@
       "createClipboard"
     ],
     "category": "Browser APIs",
-    "gzip": 919
+    "gzip": 927
   },
   "files": [
     "dist"

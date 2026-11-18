@@ -20,13 +20,16 @@ import type {
   IdentifyPayload,
 } from "./types.ts";
 
-
-
 const generateId = createIdGenerator();
 
 function buildPagePayload(properties: PageProperties): PagePayload {
   const defaults: PageProperties = !isServer
-    ? { path: window.location.pathname, url: window.location.href, title: document.title, referrer: document.referrer }
+    ? {
+        path: window.location.pathname,
+        url: window.location.href,
+        title: document.title,
+        referrer: document.referrer,
+      }
     : {};
   return {
     type: "page",
@@ -50,7 +53,9 @@ function buildIdentifyPayload(userId: string, traits: IdentifyTraits): IdentifyP
 async function invokePlugin(plugin: AnalyticsPlugin, payload: AnyPayload): Promise<boolean> {
   const config = plugin.config ?? {};
   let aborted = false;
-  const abort = (): void => { aborted = true; };
+  const abort = (): void => {
+    aborted = true;
+  };
   try {
     if (payload.type === "page" && plugin.page) {
       await plugin.page({ payload, config, abort });
@@ -71,7 +76,7 @@ async function invokePlugin(plugin: AnalyticsPlugin, payload: AnyPayload): Promi
  */
 async function dispatchSequential(plugins: AnalyticsPlugin[], payload: AnyPayload): Promise<void> {
   for (const plugin of plugins) {
-    if (!await invokePlugin(plugin, payload)) break;
+    if (!(await invokePlugin(plugin, payload))) break;
   }
 }
 
@@ -227,11 +232,25 @@ export function makeAnalytics(
   // underlying queue — no batching involved — which is what the drain loop needs.
   const queue: EventBuffer = onQueueChange
     ? {
-        get size() { return q.size; },
-        get isEmpty() { return q.isEmpty; },
-        add(item) { q.add(item); onQueueChange(q.size); },
-        remove() { const r = q.remove(); onQueueChange(q.size); return r; },
-        clear() { q.clear(); onQueueChange(0); },
+        get size() {
+          return q.size;
+        },
+        get isEmpty() {
+          return q.isEmpty;
+        },
+        add(item) {
+          q.add(item);
+          onQueueChange(q.size);
+        },
+        remove() {
+          const r = q.remove();
+          onQueueChange(q.size);
+          return r;
+        },
+        clear() {
+          q.clear();
+          onQueueChange(0);
+        },
       }
     : q;
 

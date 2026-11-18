@@ -101,7 +101,7 @@ describe("makeQueue", () => {
     const q = makeQueue([10]);
     q.push(asc, 5, 15); // inserts sorted: [5, 10, 15]
     expect(q.first).toBe(5);
-    q.add(1);            // appends to back: [5, 10, 15, 1]
+    q.add(1); // appends to back: [5, 10, 15, 1]
     expect(q.last).toBe(1);
   });
 });
@@ -343,8 +343,16 @@ describe("createTaskQueue", () => {
       startTask2 = () => r(1);
     });
 
-    const p1 = q.enqueue(() => blockingTask.then(v => { log.push(1); return v; }));
-    const p2 = q.enqueue(async () => { log.push(2); return 2; });
+    const p1 = q.enqueue(() =>
+      blockingTask.then(v => {
+        log.push(1);
+        return v;
+      }),
+    );
+    const p2 = q.enqueue(async () => {
+      log.push(2);
+      return 2;
+    });
 
     // task2 must not start until task1 finishes
     expect(log).toEqual([]);
@@ -361,7 +369,12 @@ describe("createTaskQueue", () => {
     const q = createTaskQueue<void>();
 
     let releaseTask1!: () => void;
-    const p1 = q.enqueue(() => new Promise<void>(r => { releaseTask1 = r; }));
+    const p1 = q.enqueue(
+      () =>
+        new Promise<void>(r => {
+          releaseTask1 = r;
+        }),
+    );
     q.enqueue(async () => {});
     q.enqueue(async () => {});
 
@@ -386,7 +399,12 @@ describe("createTaskQueue", () => {
     expect(q.active()).toBe(false);
 
     let release!: () => void;
-    const p = q.enqueue(() => new Promise<void>(r => { release = r; }));
+    const p = q.enqueue(
+      () =>
+        new Promise<void>(r => {
+          release = r;
+        }),
+    );
     flush();
     expect(q.active()).toBe(true);
 
@@ -400,7 +418,9 @@ describe("createTaskQueue", () => {
     const q = createTaskQueue<number>();
 
     await expect(
-      q.enqueue(async () => { throw new Error("boom"); }),
+      q.enqueue(async () => {
+        throw new Error("boom");
+      }),
     ).rejects.toThrow("boom");
 
     // Queue should still be functional
@@ -412,7 +432,12 @@ describe("createTaskQueue", () => {
     const q = createTaskQueue<number>();
 
     let release!: () => void;
-    const p1 = q.enqueue(() => new Promise<number>(r => { release = () => r(1); }));
+    const p1 = q.enqueue(
+      () =>
+        new Promise<number>(r => {
+          release = () => r(1);
+        }),
+    );
     const p2 = q.enqueue(async () => 2);
     const p3 = q.enqueue(async () => 3);
 
@@ -433,7 +458,12 @@ describe("createTaskQueue", () => {
     const q = createTaskQueue<number>();
 
     let release!: () => void;
-    q.enqueue(() => new Promise<number>(r => { release = () => r(0); }));
+    q.enqueue(
+      () =>
+        new Promise<number>(r => {
+          release = () => r(0);
+        }),
+    );
     const toBeCleared = q.enqueue(async () => 1);
 
     q.clear();
@@ -448,9 +478,15 @@ describe("createTaskQueue", () => {
     const q = createTaskQueue<number>();
     const results: number[] = [];
 
-    const p1 = q.enqueue(async () => { results.push(1); return 1; });
+    const p1 = q.enqueue(async () => {
+      results.push(1);
+      return 1;
+    });
     // Enqueue task2 before task1 resolves — drain is already running
-    const p2 = q.enqueue(async () => { results.push(2); return 2; });
+    const p2 = q.enqueue(async () => {
+      results.push(2);
+      return 2;
+    });
 
     await Promise.all([p1, p2]);
     expect(results).toEqual([1, 2]);
@@ -611,7 +647,9 @@ describe("createPriorityQueue", () => {
 
       createEffect(
         () => q.first(),
-        first => { firsts.push(first); },
+        first => {
+          firsts.push(first);
+        },
       );
 
       flush();
@@ -660,13 +698,28 @@ describe("createConcurrentTaskQueue", () => {
     let releaseB!: () => void;
     let releaseC!: () => void;
 
-    const pA = q.enqueue(() => new Promise<number>(r => { releaseA = () => r(1); }));
-    const pB = q.enqueue(() => new Promise<number>(r => { releaseB = () => r(2); }));
-    const pC = q.enqueue(() => new Promise<number>(r => { releaseC = () => r(3); }));
+    const pA = q.enqueue(
+      () =>
+        new Promise<number>(r => {
+          releaseA = () => r(1);
+        }),
+    );
+    const pB = q.enqueue(
+      () =>
+        new Promise<number>(r => {
+          releaseB = () => r(2);
+        }),
+    );
+    const pC = q.enqueue(
+      () =>
+        new Promise<number>(r => {
+          releaseC = () => r(3);
+        }),
+    );
 
     flush();
     expect(q.active()).toBe(2); // A and B running
-    expect(q.size()).toBe(1);   // C pending
+    expect(q.size()).toBe(1); // C pending
 
     releaseA();
     await pA;
@@ -685,9 +738,24 @@ describe("createConcurrentTaskQueue", () => {
     const q = createConcurrentTaskQueue<void>(3);
 
     let r1!: () => void, r2!: () => void, r3!: () => void;
-    const p1 = q.enqueue(() => new Promise<void>(r => { r1 = r; }));
-    const p2 = q.enqueue(() => new Promise<void>(r => { r2 = r; }));
-    const p3 = q.enqueue(() => new Promise<void>(r => { r3 = r; }));
+    const p1 = q.enqueue(
+      () =>
+        new Promise<void>(r => {
+          r1 = r;
+        }),
+    );
+    const p2 = q.enqueue(
+      () =>
+        new Promise<void>(r => {
+          r2 = r;
+        }),
+    );
+    const p3 = q.enqueue(
+      () =>
+        new Promise<void>(r => {
+          r3 = r;
+        }),
+    );
 
     flush();
     expect(q.active()).toBe(3);
@@ -698,7 +766,8 @@ describe("createConcurrentTaskQueue", () => {
     flush();
     expect(q.active()).toBe(2);
 
-    r2(); r3();
+    r2();
+    r3();
     await Promise.all([p2, p3]);
     flush();
     expect(q.active()).toBe(0);
@@ -708,7 +777,12 @@ describe("createConcurrentTaskQueue", () => {
     const q = createConcurrentTaskQueue<void>(1);
 
     let release!: () => void;
-    const p1 = q.enqueue(() => new Promise<void>(r => { release = r; }));
+    const p1 = q.enqueue(
+      () =>
+        new Promise<void>(r => {
+          release = r;
+        }),
+    );
     q.enqueue(async () => {});
     q.enqueue(async () => {});
 
@@ -729,7 +803,9 @@ describe("createConcurrentTaskQueue", () => {
     const q = createConcurrentTaskQueue<number>(2);
 
     await expect(
-      q.enqueue(async () => { throw new Error("boom"); }),
+      q.enqueue(async () => {
+        throw new Error("boom");
+      }),
     ).rejects.toThrow("boom");
 
     expect(await q.enqueue(async () => 99)).toBe(99);
@@ -739,7 +815,12 @@ describe("createConcurrentTaskQueue", () => {
     const q = createConcurrentTaskQueue<number>(1);
 
     let release!: () => void;
-    const p1 = q.enqueue(() => new Promise<number>(r => { release = () => r(1); }));
+    const p1 = q.enqueue(
+      () =>
+        new Promise<number>(r => {
+          release = () => r(1);
+        }),
+    );
     const p2 = q.enqueue(async () => 2);
     const p3 = q.enqueue(async () => 3);
 
@@ -758,7 +839,12 @@ describe("createConcurrentTaskQueue", () => {
     const q = createConcurrentTaskQueue<number>(1);
 
     let release!: () => void;
-    q.enqueue(() => new Promise<number>(r => { release = () => r(0); }));
+    q.enqueue(
+      () =>
+        new Promise<number>(r => {
+          release = () => r(0);
+        }),
+    );
     const toBeCleared = q.enqueue(async () => 1);
 
     q.clear();

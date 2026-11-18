@@ -95,7 +95,10 @@ export function createDroppable<T = unknown>(
     );
   }
 
-  const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(undefined, INTERNAL_OPTIONS);
+  const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(
+    undefined,
+    INTERNAL_OPTIONS,
+  );
 
   // `ctx._isOver` is a createProjection lookup — checking it doesn't mark every other
   // droppable's `isOver` stale on each hover change, unlike `ctx.over()?.id === id`.
@@ -242,7 +245,10 @@ export function createNativeDroppable(
     return { ref: noop, isOver: () => false };
   }
 
-  const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(undefined, INTERNAL_OPTIONS);
+  const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(
+    undefined,
+    INTERNAL_OPTIONS,
+  );
   const [isOver, setIsOver] = createSignal(false, INTERNAL_OPTIONS);
 
   createEffect(

@@ -2,7 +2,8 @@ import { limitPath } from "./tools.ts";
 import { isServer } from "@solidjs/web";
 import type { AsyncFileSystemAdapter } from "./types.ts";
 
-export const makeNodeFileSystem: ((basePath?: string) => Promise<AsyncFileSystemAdapter>) | (() => Promise<null>) = isServer
+export const makeNodeFileSystem:
+  ((basePath?: string) => Promise<AsyncFileSystemAdapter>) | (() => Promise<null>) = isServer
   ? async (basePath: string = "/"): Promise<AsyncFileSystemAdapter> => {
       const fs = await import("node:fs/promises");
       const p = limitPath(basePath);

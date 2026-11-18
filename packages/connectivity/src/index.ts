@@ -9,14 +9,7 @@ import { isServer } from "@solidjs/web";
 export type EffectiveConnectionType = "slow-2g" | "2g" | "3g" | "4g";
 
 export type ConnectionType =
-  | "bluetooth"
-  | "cellular"
-  | "ethernet"
-  | "none"
-  | "wifi"
-  | "wimax"
-  | "other"
-  | "unknown";
+  "bluetooth" | "cellular" | "ethernet" | "none" | "wifi" | "wimax" | "other" | "unknown";
 
 /**
  * Snapshot of the current network state, combining `navigator.onLine` with
@@ -195,10 +188,7 @@ export function createNetworkInformation(): NetworkInformationReturn {
 
   const [online, setOnline] = createSignal(initial.online, opts);
   const [downlink, setDownlink] = createSignal<number | undefined>(initial.downlink, opts);
-  const [downlinkMax, setDownlinkMax] = createSignal<number | undefined>(
-    initial.downlinkMax,
-    opts,
-  );
+  const [downlinkMax, setDownlinkMax] = createSignal<number | undefined>(initial.downlinkMax, opts);
   const [effectiveType, setEffectiveType] = createSignal<EffectiveConnectionType | undefined>(
     initial.effectiveType,
     opts,

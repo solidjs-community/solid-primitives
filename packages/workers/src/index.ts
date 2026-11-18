@@ -170,7 +170,8 @@ export function createWorkerPool<T extends Record<string, Function>>(
     get(_, method: string) {
       current = current + 1 >= workers.length ? 0 : current + 1;
       const idx = current;
-      return (...args: unknown[]) => (workers[idx]![0] as Record<string, Function>)[method]!(...args);
+      return (...args: unknown[]) =>
+        (workers[idx]![0] as Record<string, Function>)[method]!(...args);
     },
   });
 

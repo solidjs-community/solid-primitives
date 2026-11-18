@@ -6,7 +6,8 @@ export type Request<FetcherArgs extends any[]> = <Result>(
   ...args: any[]
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
-let fetchFallback: typeof fetch | typeof NodeFetch | undefined = globalThis.fetch as typeof fetch | undefined;
+let fetchFallback: typeof fetch | typeof NodeFetch | undefined = globalThis.fetch as
+  typeof fetch | undefined;
 if (isServer && !fetchFallback) {
   try {
     const { default: nodeFetch } = await import("node-fetch");

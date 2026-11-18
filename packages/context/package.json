@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/context",
-  "version": "2.0.0-next.5",
+  "version": "2.0.0",
   "description": "Primitives simplifying or extending the Context API",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",

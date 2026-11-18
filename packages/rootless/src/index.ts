@@ -4,12 +4,12 @@ import {
   onCleanup,
   runWithOwner,
   type Owner,
-  sharedConfig,
   type Accessor,
   createSignal,
   type Signal,
   type Setter,
 } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 import {
   type AnyFunction,
@@ -171,7 +171,10 @@ export const createSharedRoot: typeof createSingletonRoot = createSingletonRoot;
 export function createHydratableSingletonRoot<T>(factory: (dispose: VoidFunction) => T): () => T {
   const owner = getOwner();
   const singleton = createSingletonRoot(factory, owner);
-  return () => (isServer || sharedConfig.hydrating ? runWithOwner(owner, () => createRoot(factory)) : singleton());
+  return () =>
+    isServer || sharedConfig.hydrating
+      ? runWithOwner(owner, () => createRoot(factory))
+      : singleton();
 }
 
 /**
@@ -251,7 +254,8 @@ export function createRootPool<TArg, TResult>(
   // don't cache roots on the server
   if (isServer) {
     const owner = getOwner();
-    return args => runWithOwner(owner, () => createRoot(dispose => factory(() => args, trueFn, dispose)));
+    return args =>
+      runWithOwner(owner, () => createRoot(dispose => factory(() => args, trueFn, dispose)));
   }
 
   type Root = {
@@ -328,7 +332,9 @@ export function createRootPool<TArg, TResult>(
       root.setA(true);
     } else
       root = runWithOwner(owner, () =>
-        createRoot(dispose => mapRoot(dispose, createSignal(arg as Exclude<TArg, Function>, INTERNAL_OPTIONS))),
+        createRoot(dispose =>
+          mapRoot(dispose, createSignal(arg as Exclude<TArg, Function>, INTERNAL_OPTIONS)),
+        ),
       );
 
     onCleanup(() => cleanupRoot(root));

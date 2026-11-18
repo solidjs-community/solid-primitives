@@ -42,4 +42,5 @@ export const power = (a: number, ...b: number[]): number => {
 };
 
 /** clamp a number value between two other values */
-export const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
+export const clamp = (n: number, min: number, max: number): number =>
+  Math.min(max, Math.max(min, n));

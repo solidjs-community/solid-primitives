@@ -96,9 +96,7 @@ describe("useRemSize", () => {
   });
 
   it("returns the same signal for multiple callers", () => {
-    const [a, b, dispose] = createRoot(
-      dispose => [useRemSize(), useRemSize(), dispose] as const,
-    );
+    const [a, b, dispose] = createRoot(dispose => [useRemSize(), useRemSize(), dispose] as const);
     expect(a).toBe(b);
     dispose();
   });

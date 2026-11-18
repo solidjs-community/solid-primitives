@@ -13,16 +13,15 @@
   "scripts": {
     "generate": "pnpm run build && pnpm -dir site run generate",
     "dev": "pnpm -dir site run dev",
-    "format": "prettier --cache -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}",
-    "lint:packages": "oxlint --max-warnings 0 packages --ignore-pattern \"packages/*/{test,stories,dev}\"",
-    "lint:stories": "oxlint packages --ignore-pattern \"packages/*/{src,dev,test}\"",
-    "lint:tests": "oxlint packages --ignore-pattern \"packages/*/{src,stories,dev}\"",
+    "format": "prettier --cache --cache-strategy content -w \"{site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}\"",
+    "format:check": "prettier --cache --cache-strategy content --check \"{site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}\"",
+    "lint:packages": "oxlint --max-warnings 0 packages --ignore-pattern \"packages/*/{test,stories,dev}\" --ignore-pattern \"packages/{fetch,resource}/**\"",
+    "lint:stories": "oxlint packages --ignore-pattern \"packages/*/{src,dev,test}\" --ignore-pattern \"packages/{fetch,resource}/**\"",
+    "lint:tests": "oxlint packages --ignore-pattern \"packages/*/{src,stories,dev}\" --ignore-pattern \"packages/{fetch,resource}/**\"",
     "lint": "pnpm run \"/^lint:.*/\"",
     "test:client": "vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
-    "test:client2": "vitest -c ./configs/vitest.config.solid2.ts",
-    "test:ssr2": "pnpm run test:client2 --mode ssr",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "build": "tsdown",
@@ -35,7 +34,7 @@
     "version": "changeset version && pnpm jsr:sync-versions && pnpm i --no-frozen-lockfile && git add .",
     "setup:trusted-publishing": "node --import=@nothing-but/node-resolve-ts ./scripts/setup-trusted-publishing.ts",
     "release": "pnpm build && pnpm run verify:manifests && changeset publish",
-    "release-tagged": "pnpm build && pnpm run verify:manifests && if [ -f .changeset/pre.json ]; then changeset publish; else changeset publish --tag \"$BRANCH_NAME\"; fi"
+    "release-tagged": "pnpm build && pnpm run verify:manifests && if [ -f .changeset/pre.json ] || [ \"$BRANCH_NAME\" = main ]; then changeset publish; else changeset publish --tag \"$BRANCH_NAME\"; fi"
   },
   "devDependencies": {
     "@babel/core": "catalog:",

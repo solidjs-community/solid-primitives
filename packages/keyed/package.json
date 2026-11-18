@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "3.0.0-next.4",
+  "version": "3.0.0",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -20,7 +20,7 @@
       "SetValues"
     ],
     "category": "Control Flow",
-    "gzip": 979
+    "gzip": 988
   },
   "keywords": [
     "key",
@@ -51,7 +51,7 @@
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
-    "vitest": "vitest -c ../../configs/vitest.config.solid2.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
@@ -59,6 +59,9 @@
     "@solid-primitives/utils": "workspace:^",
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:peer"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",

@@ -1,5 +1,63 @@
 # @solid-primitives/geolocation
 
+## 3.0.0
+
+### Major Changes
+
+- aadb2ce: Adapt geolocation primitives for Solid 2.0 async reactivity.
+
+  ## `createGeolocationWatcher` — breaking changes
+
+  **Pending state via `NotReadyError` (replaces `undefined`):** `location()` now throws `NotReadyError` until the first GPS fix arrives, integrating with `<Loading>` boundaries. Previously it returned `undefined` (which was cast away) using the Solid 1.x `<Suspense>` suspension mechanism.
+
+  ```tsx
+  // Before — undefined was returned silently (Solid 1.x Suspense behavior)
+  const { location } = createGeolocationWatcher(true);
+  location() // undefined before first fix
+
+  // After — throws NotReadyError (Solid 2.0 <Loading> pattern)
+  const { location } = createGeolocationWatcher(true);
+  location() // throws NotReadyError before first fix
+
+  // Integrate with <Loading>:
+  <Loading fallback="Acquiring GPS fix...">
+    <Map lat={location().latitude} lng={location().longitude} />
+  </Loading>
+  ```
+
+  **Reactive options now correctly restart the watcher:** Previously `options` was read inside the effect handler (untracked), so changing a reactive `options` accessor had no effect. The effect source now tracks both `enabled` and `options` — when `options` changes while the watcher is active, the watcher is closed and reopened with the new options.
+
+  ## SSR stubs — breaking changes
+
+  `createGeolocation` and `createGeolocationWatcher` now throw `NotReadyError` on the server instead of a plain `Error`. This means SSR renders show the `<Loading>` fallback (pending state) rather than hitting the `<Errored>` boundary, which is the correct behavior for client-side-only APIs that will hydrate and resolve client-side.
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/static-store@1.0.0
+
 ## 3.0.0-next.4
 
 ### Patch Changes

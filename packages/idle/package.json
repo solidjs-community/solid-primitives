@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/idle",
-  "version": "1.0.0-next.5",
+  "version": "1.0.0",
   "description": "A primitive to observe the user's idle status and react to its changes.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
@@ -20,7 +20,7 @@
       "createIdleTimer"
     ],
     "category": "Display & Media",
-    "gzip": 774
+    "gzip": 782
   },
   "private": false,
   "sideEffects": false,

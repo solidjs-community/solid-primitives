@@ -16,7 +16,13 @@ import {
 // Helpers
 
 function mockAnim() {
-  return { cancel: vi.fn(), play: vi.fn(), pause: vi.fn(), finish: vi.fn(), reverse: vi.fn() } as unknown as Animation;
+  return {
+    cancel: vi.fn(),
+    play: vi.fn(),
+    pause: vi.fn(),
+    finish: vi.fn(),
+    reverse: vi.fn(),
+  } as unknown as Animation;
 }
 
 function makeEl() {
@@ -27,7 +33,17 @@ function makeEl() {
 }
 
 const rect = (x: number, y: number, w: number, h: number): DOMRect =>
-  ({ left: x, top: y, width: w, height: h, right: x + w, bottom: y + h, x, y, toJSON: () => {} }) as DOMRect;
+  ({
+    left: x,
+    top: y,
+    width: w,
+    height: h,
+    right: x + w,
+    bottom: y + h,
+    x,
+    y,
+    toJSON: () => {},
+  }) as DOMRect;
 
 declare global {
   var ScrollTimeline: new (...args: unknown[]) => AnimationTimeline;
@@ -38,8 +54,14 @@ const KF: Keyframe[] = [{ opacity: "0" }, { opacity: "1" }];
 const OPTS: KeyframeAnimationOptions = { duration: 300 };
 
 beforeEach(() => {
-  vi.stubGlobal("ScrollTimeline", vi.fn(function () {}));
-  vi.stubGlobal("ViewTimeline", vi.fn(function () {}));
+  vi.stubGlobal(
+    "ScrollTimeline",
+    vi.fn(function () {}),
+  );
+  vi.stubGlobal(
+    "ViewTimeline",
+    vi.fn(function () {}),
+  );
 });
 
 afterEach(() => {
@@ -96,9 +118,7 @@ describe("createAnimate", () => {
     const { el } = makeEl();
     const anim1 = mockAnim();
     const anim2 = mockAnim();
-    (el.animate as ReturnType<typeof vi.fn>)
-      .mockReturnValueOnce(anim1)
-      .mockReturnValueOnce(anim2);
+    (el.animate as ReturnType<typeof vi.fn>).mockReturnValueOnce(anim1).mockReturnValueOnce(anim2);
 
     const [kf, setKf] = createSignal<Keyframe[]>(KF);
     const dispose = createRoot(d => {
@@ -217,9 +237,7 @@ describe("makeViewAnimation", () => {
     const { el } = makeEl();
     makeViewAnimation(el, KF, OPTS);
 
-    expect(globalThis.ViewTimeline).toHaveBeenCalledWith(
-      expect.objectContaining({ subject: el }),
-    );
+    expect(globalThis.ViewTimeline).toHaveBeenCalledWith(expect.objectContaining({ subject: el }));
   });
 
   it("uses an explicit subject when provided", () => {
@@ -227,9 +245,7 @@ describe("makeViewAnimation", () => {
     const subject = document.createElement("section");
     makeViewAnimation(el, KF, { ...OPTS, subject });
 
-    expect(globalThis.ViewTimeline).toHaveBeenCalledWith(
-      expect.objectContaining({ subject }),
-    );
+    expect(globalThis.ViewTimeline).toHaveBeenCalledWith(expect.objectContaining({ subject }));
   });
 
   it("forwards axis and inset to ViewTimeline and strips them from animOptions", () => {
@@ -297,7 +313,7 @@ describe("makeFlip", () => {
   it("animates from the snapshotted geometry to the new geometry", () => {
     const { el } = makeEl();
     vi.spyOn(el, "getBoundingClientRect")
-      .mockReturnValueOnce(rect(0, 0, 100, 50))   // snapshot
+      .mockReturnValueOnce(rect(0, 0, 100, 50)) // snapshot
       .mockReturnValueOnce(rect(20, 10, 100, 50)); // flip
 
     const { snapshot, flip } = makeFlip(el, OPTS);
@@ -339,8 +355,8 @@ describe("makeFlip", () => {
   it("accounts for size changes via scale", () => {
     const { el } = makeEl();
     vi.spyOn(el, "getBoundingClientRect")
-      .mockReturnValueOnce(rect(0, 0, 200, 100))  // snapshot: larger
-      .mockReturnValueOnce(rect(0, 0, 100, 50));   // flip: smaller
+      .mockReturnValueOnce(rect(0, 0, 200, 100)) // snapshot: larger
+      .mockReturnValueOnce(rect(0, 0, 100, 50)); // flip: smaller
 
     const { snapshot, flip } = makeFlip(el);
     snapshot();
@@ -360,8 +376,14 @@ describe("makeFlip", () => {
 
 describe("makeStagger", () => {
   it("animates each element with staggered delays", () => {
-    const els = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
-    els.forEach(el => { el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate; });
+    const els = [
+      document.createElement("div"),
+      document.createElement("div"),
+      document.createElement("div"),
+    ];
+    els.forEach(el => {
+      el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate;
+    });
 
     makeStagger(els, KF, { duration: 300, stagger: 50 });
 
@@ -372,7 +394,9 @@ describe("makeStagger", () => {
 
   it("stacks stagger on top of the base delay", () => {
     const els = [document.createElement("div"), document.createElement("div")];
-    els.forEach(el => { el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate; });
+    els.forEach(el => {
+      el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate;
+    });
 
     makeStagger(els, KF, { delay: 100, stagger: 50 });
 
@@ -382,7 +406,9 @@ describe("makeStagger", () => {
 
   it("defaults stagger to 0 when not provided", () => {
     const els = [document.createElement("div"), document.createElement("div")];
-    els.forEach(el => { el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate; });
+    els.forEach(el => {
+      el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate;
+    });
 
     makeStagger(els, KF, { delay: 0 });
 
@@ -393,7 +419,9 @@ describe("makeStagger", () => {
   it("returns one Animation per element", () => {
     const els = [document.createElement("div"), document.createElement("div")];
     const anims = els.map(() => mockAnim());
-    els.forEach((el, i) => { el.animate = vi.fn(() => anims[i]) as unknown as typeof el.animate; });
+    els.forEach((el, i) => {
+      el.animate = vi.fn(() => anims[i]) as unknown as typeof el.animate;
+    });
 
     const result = makeStagger(els, KF, { stagger: 100 });
     expect(result).toHaveLength(2);
@@ -407,7 +435,9 @@ describe("makeStagger", () => {
 describe("createStagger", () => {
   it("creates animations for each non-null target", () => {
     const els = [document.createElement("div"), document.createElement("div")];
-    els.forEach(el => { el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate; });
+    els.forEach(el => {
+      el.animate = vi.fn(() => mockAnim()) as unknown as typeof el.animate;
+    });
 
     createRoot(dispose => {
       const anims = createStagger(() => els, KF, { stagger: 50 });
@@ -434,7 +464,9 @@ describe("createStagger", () => {
   it("cancels all animations on dispose", () => {
     const els = [document.createElement("div"), document.createElement("div")];
     const anims = els.map(() => mockAnim());
-    els.forEach((el, i) => { el.animate = vi.fn(() => anims[i]) as unknown as typeof el.animate; });
+    els.forEach((el, i) => {
+      el.animate = vi.fn(() => anims[i]) as unknown as typeof el.animate;
+    });
 
     const dispose = createRoot(d => {
       createStagger(() => els, KF, { stagger: 50 });

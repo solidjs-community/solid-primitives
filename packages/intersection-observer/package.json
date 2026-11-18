@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "3.0.0-next.5",
+  "version": "3.0.0",
   "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -24,7 +24,7 @@
       "createVisibilityObserver"
     ],
     "category": "Display & Media",
-    "gzip": 1742
+    "gzip": 1750
   },
   "private": false,
   "sideEffects": false,
@@ -48,7 +48,6 @@
     "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
-    "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createRoot, createSignal, flush, merge } from "solid-js";
-import { combineProps, combineHandlers } from "../src/index.js";
+import { combineProps, combineHandlers, combineStyle, stringStyleToObject } from "../src/index.js";
 
 describe("combineProps", () => {
   it("handles one argument", () =>
@@ -284,11 +284,7 @@ describe("combineProps", () => {
 
     let combinedProps: any;
     createRoot(() => {
-      combinedProps = combineProps(
-        signal,
-        { class: "secondary" },
-        { style: { padding: "10px" } },
-      );
+      combinedProps = combineProps(signal, { class: "secondary" }, { style: { padding: "10px" } });
 
       expect(combinedProps.class).toBe("primary secondary");
       expect(combinedProps.style).toEqual({ margin: "10px", padding: "10px" });
@@ -353,5 +349,67 @@ describe("combineHandlers", () => {
   it("returns the single handler unchanged (no wrapping)", () => {
     const fn = vi.fn();
     expect(combineHandlers(fn)).toBe(fn);
+  });
+});
+
+describe("stringStyleToObject", () => {
+  it("converts inline declarations to an object", () => {
+    expect(stringStyleToObject("margin: 24px; border: 1px solid #121212")).toEqual({
+      margin: "24px",
+      border: "1px solid #121212",
+    });
+  });
+
+  it("handles whitespace, trailing semicolons and newlines", () => {
+    expect(stringStyleToObject("  color :red ;\n background:  blue;\n")).toEqual({
+      color: "red ",
+      background: "blue",
+    });
+  });
+
+  it("keeps custom properties and drops the vendor prefix hyphen", () => {
+    expect(stringStyleToObject("--main-color: #fff; -webkit-box-shadow: 0 0 1px red")).toEqual({
+      "--main-color": "#fff",
+      "webkit-box-shadow": "0 0 1px red",
+    });
+  });
+
+  it("keeps colons inside values", () => {
+    expect(stringStyleToObject("background: url(http://x.y/z.png)")).toEqual({
+      background: "url(http://x.y/z.png)",
+    });
+  });
+
+  it("ignores junk around declarations", () => {
+    expect(stringStyleToObject("{color: red}; : bad; ;; no-colon; width: 1px")).toEqual({
+      color: "red}",
+      width: "1px",
+    });
+    expect(stringStyleToObject("")).toEqual({});
+  });
+
+  it("combines string styles through combineStyle", () => {
+    expect(combineStyle("margin: 24px; color: red", { color: "blue" })).toEqual({
+      margin: "24px",
+      color: "blue",
+    });
+  });
+
+  // The previous implementation used a regex with nested quantifiers: 26 characters took over a second
+  // and every extra character doubled that, and long hyphenated runs were quadratic.
+  it("runs in linear time on pathological input", () => {
+    const inputs = [
+      "a".repeat(5_000) + "!",
+      "a-".repeat(50_000),
+      "-".repeat(100_000),
+      "a ".repeat(50_000),
+      ":".repeat(100_000),
+      "a".repeat(100_000) + " ".repeat(100_000),
+    ];
+    for (const input of inputs) {
+      const start = performance.now();
+      stringStyleToObject(input);
+      expect(performance.now() - start).toBeLessThan(500);
+    }
   });
 });

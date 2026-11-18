@@ -5,10 +5,20 @@ packages:
 overrides:
   react: 19.2.7
   react-dom: 19.2.7
+  # @kobalte/solidbase 3.0.0 hard-pins @solidjs/meta and @solidjs/router to next builds. Force the stable
+  # 2.0.0 so the site (and solidbase) share a single copy of each, and no pre-release is installed.
+  '@solidjs/meta': 2.0.0
+  '@solidjs/router': 2.0.0
   # @vercel/og 1.0.2+ bundles harfbuzzjs with a `require("fs")` shim and a missing hb.wasm, so its
   # node entry crashes on import under plain Node ESM (it only works when Next.js bundles it).
   # 1.0.1 is the last release that loads. Used by the site's OG image server functions.
   '@solidjs/ogp>@vercel/og': 1.0.1
+  # Dev-tooling advisories fixed by a minor/patch release (lodash, postcss-selector-parser).
+  lodash@<4.18.0: ^4.18.0
+  postcss-selector-parser@<6.1.5: ^6.1.5
+  # `geist` is only used for its font files, but lists `next` as a peer and `auto-install-peers`
+  # would install the whole Next.js tree (and its pinned postcss) for it.
+  geist>next: '-'
 
 allowBuilds:
   '@parcel/watcher': true
@@ -16,12 +26,21 @@ allowBuilds:
   sharp: false
 
 minimumReleaseAgeExclude:
-  - '@solidjs/signals@2.0.0-rc.21'
-  - '@solidjs/web@2.0.0-rc.21'
-  - solid-js@2.0.0-rc.21
-  - '@dom-expressions/babel-plugin-jsx@0.50.0-next.44'
-  - '@solidjs/vite-plugin@3.0.0-next.57'
+  - '@solidjs/signals@2.0.0'
+  - '@solidjs/web@2.0.0'
+  - solid-js@2.0.0
+  - '@solidjs/vite-plugin@3.0.0'
+  - '@solidjs/meta@2.0.0'
+  - '@solidjs/router@2.0.0'
   - '@solidjs/ogp@0.1.0'
+  - '@solidjs/babel-plugin@2.0.0'
+  - '@solidjs/compiler-darwin-arm64@2.0.0'
+  - '@solidjs/compiler-darwin-x64@2.0.0'
+  - '@solidjs/compiler-linux-arm64-gnu@2.0.0'
+  - '@solidjs/compiler-linux-x64-gnu@2.0.0'
+  - '@solidjs/compiler-wasm32-wasi@2.0.0'
+  - '@solidjs/compiler-win32-x64-msvc@2.0.0'
+  - '@solidjs/compiler@2.0.0'
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
@@ -30,15 +49,15 @@ onlyBuiltDependencies:
 catalog:
   tsdown: ^0.23.7
   unplugin-solid: ^3.0.0
-  solid-js: 2.0.0-rc.21
-  '@solidjs/web': 2.0.0-rc.21
-  '@solidjs/signals': 2.0.0-rc.21
-  '@solidjs/babel-plugin': 2.0.0-rc.21
-  '@solidjs/vite-plugin': 3.0.0-next.57
+  solid-js: 2.0.0
+  '@solidjs/web': 2.0.0
+  '@solidjs/signals': 2.0.0
+  '@solidjs/babel-plugin': 2.0.0
+  '@solidjs/vite-plugin': 3.0.0
   '@babel/core': ^7.29.7
 
 catalogs:
   peer:
-    solid-js: ^2.0.0-rc.21
-    '@solidjs/web': ^2.0.0-rc.21
-    '@solidjs/signals': 2.0.0-rc.21
+    solid-js: ^2.0.0
+    '@solidjs/web': ^2.0.0
+    '@solidjs/signals': ^2.0.0

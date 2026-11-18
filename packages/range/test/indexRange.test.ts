@@ -59,10 +59,9 @@ describe("indexRange", () => {
     const [to, setTo] = createSignal(0.2);
     const [step, setStep] = createSignal(1.5);
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      indexRange(start, to, step, n => n),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose => [dispose, indexRange(start, to, step, n => n)] as const,
+    );
 
     const a = mapped();
     expect(a.length).toBe(3);
@@ -102,12 +101,15 @@ describe("indexRange", () => {
     const [step] = createSignal(1);
     const captured: (string | number)[] = [];
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      indexRange(start, to, step, n => {
-        captured.push(n());
-      }),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          indexRange(start, to, step, n => {
+            captured.push(n());
+          }),
+        ] as const,
+    );
 
     mapped();
     expect(captured).toEqual([4, 5, 6, 7]);
@@ -133,12 +135,15 @@ describe("indexRange", () => {
     const [step, setStep] = createSignal(1);
     const captured: (string | number)[] = [];
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      indexRange(start, to, step, n => {
-        onCleanup(() => captured.push(n()));
-      }),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          indexRange(start, to, step, n => {
+            onCleanup(() => captured.push(n()));
+          }),
+        ] as const,
+    );
 
     mapped();
     expect(captured).toEqual([]);
@@ -168,10 +173,13 @@ describe("indexRange", () => {
     const [to, setTo] = createSignal(8);
     const [step] = createSignal(1);
 
-    const [dispose, mapped] = createRoot(dispose => [
-      dispose,
-      indexRange<string | number>(start, to, step, n => n(), { fallback: () => "fb" }),
-    ] as const);
+    const [dispose, mapped] = createRoot(
+      dispose =>
+        [
+          dispose,
+          indexRange<string | number>(start, to, step, n => n(), { fallback: () => "fb" }),
+        ] as const,
+    );
 
     setStart(0);
     setTo(0);

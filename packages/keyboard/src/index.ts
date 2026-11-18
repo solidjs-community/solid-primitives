@@ -67,22 +67,22 @@ function isEditableTarget(target: EventTarget | null): boolean {
  * );
  * ```
  */
-export const useKeyDownEvent: ReturnType<typeof createSingletonRoot<Accessor<KeyboardEvent | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
-  () => {
-    if (isServer) {
-      return () => null;
-    }
+export const useKeyDownEvent: ReturnType<
+  typeof createSingletonRoot<Accessor<KeyboardEvent | null>>
+> = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(() => {
+  if (isServer) {
+    return () => null;
+  }
 
-    const [event, setEvent] = createSignal<KeyboardEvent | null>(null, INTERNAL_OPTIONS);
+  const [event, setEvent] = createSignal<KeyboardEvent | null>(null, INTERNAL_OPTIONS);
 
-    makeEventListener(window, "keydown", e => {
-      setEvent(e);
-      setTimeout(() => setEvent(null));
-    });
+  makeEventListener(window, "keydown", e => {
+    setEvent(e);
+    setTimeout(() => setEvent(null));
+  });
 
-    return event;
-  },
-);
+  return event;
+});
 
 /**
  * Provides a signal with the list of currently held keys, ordered from least recent to most recent.
@@ -106,65 +106,66 @@ export const useKeyDownEvent: ReturnType<typeof createSingletonRoot<Accessor<Key
  * );
  * ```
  */
-export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<string[]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
-  if (isServer) {
-    return () => [];
-  }
-
-  const [pressedKeys, setPressedKeys] = createSignal<string[]>([], INTERNAL_OPTIONS);
-  const reset = () => setPressedKeys([]);
-
-  makeEventListener(window, "keydown", e => {
-    // e.key may be undefined when used with <datalist> el
-    // gh issue: https://github.com/solidjs-community/solid-primitives/issues/246
-    if (e.repeat || typeof e.key !== "string") return;
-
-    const key = e.key.toUpperCase(),
-      currentKeys = pressedKeys();
-
-    if (currentKeys.includes(key)) return;
-
-    const keys = [...currentKeys, key];
-
-    // if the modifier is pressed before we start listening
-    // we should add it to the list
-    if (
-      currentKeys.length === 0 &&
-      key !== "ALT" &&
-      key !== "CONTROL" &&
-      key !== "META" &&
-      key !== "SHIFT"
-    ) {
-      if (e.shiftKey) keys.unshift("SHIFT");
-      if (e.altKey) keys.unshift("ALT");
-      if (e.ctrlKey) keys.unshift("CONTROL");
-      if (e.metaKey) keys.unshift("META");
+export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<string[]>>> =
+  /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
+    if (isServer) {
+      return () => [];
     }
 
-    setPressedKeys(keys);
-  });
+    const [pressedKeys, setPressedKeys] = createSignal<string[]>([], INTERNAL_OPTIONS);
+    const reset = () => setPressedKeys([]);
 
-  makeEventListener(window, "keyup", e => {
-    if (typeof e.key !== "string") return;
-    const key = e.key.toUpperCase();
-    // macOS never fires keyup for other keys held down together with Meta —
-    // only Meta's own keyup arrives — so its release must clear everything,
-    // or the other keys' stale state corrupts the next press.
-    // See https://github.com/solidjs-community/solid-primitives/issues/269
-    if (key === "META") {
-      reset();
-    } else {
-      setPressedKeys(prev => prev.filter(_key => _key !== key));
-    }
-  });
+    makeEventListener(window, "keydown", e => {
+      // e.key may be undefined when used with <datalist> el
+      // gh issue: https://github.com/solidjs-community/solid-primitives/issues/246
+      if (e.repeat || typeof e.key !== "string") return;
 
-  makeEventListener(window, "blur", reset);
-  makeEventListener(window, "contextmenu", e => {
-    e.defaultPrevented || reset();
-  });
+      const key = e.key.toUpperCase(),
+        currentKeys = pressedKeys();
 
-  return pressedKeys;
-});
+      if (currentKeys.includes(key)) return;
+
+      const keys = [...currentKeys, key];
+
+      // if the modifier is pressed before we start listening
+      // we should add it to the list
+      if (
+        currentKeys.length === 0 &&
+        key !== "ALT" &&
+        key !== "CONTROL" &&
+        key !== "META" &&
+        key !== "SHIFT"
+      ) {
+        if (e.shiftKey) keys.unshift("SHIFT");
+        if (e.altKey) keys.unshift("ALT");
+        if (e.ctrlKey) keys.unshift("CONTROL");
+        if (e.metaKey) keys.unshift("META");
+      }
+
+      setPressedKeys(keys);
+    });
+
+    makeEventListener(window, "keyup", e => {
+      if (typeof e.key !== "string") return;
+      const key = e.key.toUpperCase();
+      // macOS never fires keyup for other keys held down together with Meta —
+      // only Meta's own keyup arrives — so its release must clear everything,
+      // or the other keys' stale state corrupts the next press.
+      // See https://github.com/solidjs-community/solid-primitives/issues/269
+      if (key === "META") {
+        reset();
+      } else {
+        setPressedKeys(prev => prev.filter(_key => _key !== key));
+      }
+    });
+
+    makeEventListener(window, "blur", reset);
+    makeEventListener(window, "contextmenu", e => {
+      e.defaultPrevented || reset();
+    });
+
+    return pressedKeys;
+  });
 
 /**
  * Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
@@ -187,8 +188,8 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
  * );
  * ```
  */
-export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor<string | null>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
-  () => {
+export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor<string | null>>> =
+  /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(() => {
     if (isServer) {
       return () => null;
     }
@@ -203,8 +204,7 @@ export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor
       if (prev.length === 0 && _keys.length === 1) return _keys[0]!;
       return null;
     });
-  },
-);
+  });
 
 /**
  * Provides a signal with a sequence of currently held keys, as they were pressed down and up.
@@ -228,20 +228,21 @@ export const useCurrentlyHeldKey: ReturnType<typeof createSingletonRoot<Accessor
  * );
  * ```
  */
-export const useKeyDownSequence: ReturnType<typeof createSingletonRoot<Accessor<string[][]>>> = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
-  if (isServer) {
-    return () => [];
-  }
+export const useKeyDownSequence: ReturnType<typeof createSingletonRoot<Accessor<string[][]>>> =
+  /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
+    if (isServer) {
+      return () => [];
+    }
 
-  const keys = useKeyDownList();
+    const keys = useKeyDownList();
 
-  // createMemo's second arg is options (not initialValue). The prev
-  // parameter starts as undefined; handle it with a fallback.
-  return createMemo((prev: string[][] | undefined) => {
-    if (keys().length === 0) return [];
-    return [...(prev ?? []), keys()];
+    // createMemo's second arg is options (not initialValue). The prev
+    // parameter starts as undefined; handle it with a fallback.
+    return createMemo((prev: string[][] | undefined) => {
+      if (keys().length === 0) return [];
+      return [...(prev ?? []), keys()];
+    });
   });
-});
 
 /**
  * Provides a `boolean` signal indicating if provided {@link key} is currently being held down.
@@ -397,7 +398,9 @@ export function createShortcut(
       } else {
         reset = true;
         const holding = sequence.at(-1) ?? [];
-        const matches = anyOrder ? isSameKeySet(holding, keys) : equalsKeyHoldSequence(sequence, keys);
+        const matches = anyOrder
+          ? isSameKeySet(holding, keys)
+          : equalsKeyHoldSequence(sequence, keys);
         if (matches) {
           preventDefault && e.preventDefault();
           callback(e);

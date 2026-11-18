@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createForm } from "../src/index.js";
 
-const isEmail = (v: string) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email";
+const isEmail = (v: string) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email");
 
 describe("createForm (SSR)", () => {
   it("returns static accessors with initial values", () => {
@@ -78,4 +77,3 @@ describe("createForm (SSR)", () => {
     await expect(form.submit()).resolves.toBeUndefined();
   });
 });
-

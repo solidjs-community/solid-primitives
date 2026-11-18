@@ -69,9 +69,7 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
 
   const [stream, setStream] = createSignal<MediaStream | undefined>(undefined, INTERNAL_OPTIONS);
 
-  const constraints = createMemo(() =>
-    constraintsFromDevice(access(streamSource) || undefined),
-  );
+  const constraints = createMemo(() => constraintsFromDevice(access(streamSource) || undefined));
 
   createEffect(
     () => constraints(),
@@ -81,14 +79,17 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
 
       if (c) {
         setStream(undefined);
-        navigator.mediaDevices.getUserMedia(c).then(s => {
-          if (active) setStream(s);
-          else stopStream(s);
-        }).catch((err: unknown) => {
-          if (active) setStream(undefined);
-          // oxlint-disable-next-line no-console
-          console.error(err);
-        });
+        navigator.mediaDevices
+          .getUserMedia(c)
+          .then(s => {
+            if (active) setStream(s);
+            else stopStream(s);
+          })
+          .catch((err: unknown) => {
+            if (active) setStream(undefined);
+            // oxlint-disable-next-line no-console
+            console.error(err);
+          });
       } else {
         setStream(undefined);
       }
@@ -105,7 +106,10 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
     stream,
     {
       mute: (muted?: boolean) => muteStream(untrack(stream), muted),
-      stop: () => { stopStream(untrack(stream)); setStream(undefined); },
+      stop: () => {
+        stopStream(untrack(stream));
+        setStream(undefined);
+      },
     },
   ];
 };
@@ -251,14 +255,17 @@ export const createScreen = (
 
       if (constraints) {
         setStream(undefined);
-        navigator.mediaDevices.getDisplayMedia(constraints).then(s => {
-          if (active) setStream(s);
-          else stopStream(s);
-        }).catch((err: unknown) => {
-          if (active) setStream(undefined);
-          // oxlint-disable-next-line no-console
-          console.error(err);
-        });
+        navigator.mediaDevices
+          .getDisplayMedia(constraints)
+          .then(s => {
+            if (active) setStream(s);
+            else stopStream(s);
+          })
+          .catch((err: unknown) => {
+            if (active) setStream(undefined);
+            // oxlint-disable-next-line no-console
+            console.error(err);
+          });
       } else {
         setStream(undefined);
       }
@@ -275,7 +282,10 @@ export const createScreen = (
     stream,
     {
       mute: (muted?: boolean) => muteStream(untrack(stream), muted),
-      stop: () => { stopStream(untrack(stream)); setStream(undefined); },
+      stop: () => {
+        stopStream(untrack(stream));
+        setStream(undefined);
+      },
     },
   ];
 };

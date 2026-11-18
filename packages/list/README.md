@@ -1,11 +1,11 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=list" alt="Solid Primitives list">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=list&version=2.0" alt="Solid Primitives list">
 </p>
 
 # @solid-primitives/list
 
 [![docs](https://img.shields.io/badge/-docs-blue?style=for-the-badge)](https://primitives.solidjs.community/package/list)
-[![size](https://img.shields.io/badge/size-1.29_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/list)
+[![size](https://img.shields.io/badge/size-1.3_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/list)
 [![version](https://img.shields.io/npm/v/@solid-primitives/list?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/list)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)

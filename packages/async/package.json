@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/async",
-  "version": "0.0.101-next.5",
+  "version": "0.0.101",
   "description": "A collection of primitives for asynchronous handling.",
   "author": "Alex Lohr <alexthkloss@web.de>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "async",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "fromStream",
       "fromJSONStream",
@@ -56,7 +56,6 @@
     "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
-    "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },

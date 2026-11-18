@@ -86,7 +86,9 @@ describe("darken", () => {
 
 describe("saturate", () => {
   it("increases saturation", () => {
-    expect(saturate(parseColor("hsl(220, 50%, 50%)"), 0.1).getChannelValue("saturation")).toBeCloseTo(60);
+    expect(
+      saturate(parseColor("hsl(220, 50%, 50%)"), 0.1).getChannelValue("saturation"),
+    ).toBeCloseTo(60);
   });
 
   it("clamps at 100", () => {
@@ -96,7 +98,9 @@ describe("saturate", () => {
 
 describe("desaturate", () => {
   it("decreases saturation", () => {
-    expect(desaturate(parseColor("hsl(220, 50%, 50%)"), 0.1).getChannelValue("saturation")).toBeCloseTo(40);
+    expect(
+      desaturate(parseColor("hsl(220, 50%, 50%)"), 0.1).getChannelValue("saturation"),
+    ).toBeCloseTo(40);
   });
 
   it("clamps at 0", () => {
@@ -259,4 +263,3 @@ describe("perceptualColorScale", () => {
     );
   });
 });
-

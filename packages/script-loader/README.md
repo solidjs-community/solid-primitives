@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Script%20Loader" alt="Solid Primitives Script Loader">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Script%20Loader&version=2.0" alt="Solid Primitives Script Loader">
 </p>
 
 # @solid-primitives/script-loader

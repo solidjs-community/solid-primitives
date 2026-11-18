@@ -54,5 +54,9 @@ export function createSorted<T>(
 
   // reactive comparator (a zero-arg accessor) — signal-builders' `sort` doesn't track this, so
   // read it ourselves inside the memo.
-  return createMemo(() => access(list).slice().sort(access(comparator) ?? ascending));
+  return createMemo(() =>
+    access(list)
+      .slice()
+      .sort(access(comparator) ?? ascending),
+  );
 }

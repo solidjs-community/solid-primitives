@@ -1,5 +1,93 @@
 # @solid-primitives/utils
 
+## 7.0.0
+
+### Major Changes
+
+- 4a5bf32: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/media`
+  - `isServer` now imported from `@solidjs/web` (not `solid-js/web`)
+  - Requires Solid.js v2 — `classList` is replaced by `class` with object/array forms in consuming code
+
+  ### `@solid-primitives/utils`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createHydratableSignal`: uses `onSettled` (was `onMount`) and `sharedConfig.hydrating` (was `sharedConfig.context`) for hydration detection
+  - `INTERNAL_OPTIONS`: `{ internal: true }` changed to `{ pureWrite: true }` to match Solid 2.0 `SignalOptions`
+  - `defaultEquals` now aliases `isEqual` (was `equalFn`)
+  - `defer`: `AccessorArray<S>` type replaced with `Accessor<S>[]` (type was removed in Solid 2.0)
+
+  ### `@solid-primitives/static-store`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createStaticStore`: uses `getObserver` (was `getListener`) and `{ pureWrite: true }` (was `{ internal: true }`)
+  - Removed explicit `batch()` calls — updates are automatically batched in Solid 2.0
+  - `createHydratableStaticStore`: uses `onSettled` (was `onMount`) and `sharedConfig.hydrating` (was `sharedConfig.context`)
+
+  ### `@solid-primitives/rootless`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web`
+  - `createHydratableSingletonRoot`: uses `sharedConfig.hydrating` (was `sharedConfig.context`)
+  - `createRootPool`: removed `batch()` calls — Solid 2.0 auto-batches on microtasks
+
+  ### `@solid-primitives/event-listener`
+  - `isServer` import moved from `solid-js/web` to `@solidjs/web` across all source files
+  - `createEventListener` and `createRenderEffect` converted to split compute/apply effect pattern required by Solid 2.0
+  - `eventListener` directive converted to split effect pattern; cleanup is returned from apply phase instead of using `onCleanup`
+
+### Minor Changes
+
+- 89c5324: new wrapSetter primitive to wrap the setters of signals and stores
+- 7ee755d: Stop writing signals during server renders, and ship ref-factory forms of the remaining `use:`-shaped directives.
+
+  Solid 2 (`2.0.0-rc.1`+) flags a signal or store setter that runs during a server render (`SERVER_WRITE`): the write lands as inert data today and will throw in a later release. Eight primitives still did this:
+
+  - `@solid-primitives/utils`: new `createServerSafeSignal(value, options)` — `createSignal` on the client; on the server the signal is still created (so hydration ids stay aligned) but reads and writes go to a plain box. For primitives that hold interactive state with no async source.
+  - `@solid-primitives/analytics`, `@solid-primitives/list-state`, `@solid-primitives/queue`, and `createInfiniteScroll` in `@solid-primitives/pagination`: internal state uses `createServerSafeSignal`.
+  - `@solid-primitives/controlled-signal`: on the server an uncontrolled write lands in a plain override instead of the signal; reads and `onChange` behave as before.
+  - `@solid-primitives/date`: `createCountdown` is now a derived store (`createStore(fn, seed)`) instead of a render effect writing into one — the shape upstream prescribes.
+  - `@solid-primitives/masonry`: the one-shot signal that wired items to the layout memo is a plain variable.
+  - `@solid-primitives/pagination`: `createPagination` no longer reads its options at the top level of the calling component (`STRICT_READ_UNTRACKED`).
+  - `@solid-primitives/tween`: the effect's apply phase reads the current value with `untrack` (`STRICT_READ_UNTRACKED`).
+
+  `@solid-primitives/event-listener` and `@solid-primitives/pointer`: `eventListener`, `pointerPosition` and `pointerHover` now return a ref callback when called with props alone — `<button ref={eventListener(["click", onClick])} />`, `<div ref={pointerHover(setHovering)} />` — matching the `ref` directive shape Solid 2 replaced `use:` with. The two-argument `(el, props)` form still works.
+
+- b7ef2f3: Add `globalRegistry(key, init)` — returns a singleton value keyed by `key` on `globalThis` (via `Symbol.for`), shared across every copy of the calling module loaded in the same JS realm. Use it instead of a plain module-scope `let`/`const` for state (ref-counts, active-instance stacks) that must stay consistent even if the app's dependency graph ends up with more than one installed copy of a package.
+
+### Patch Changes
+
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- dd165cd: Make client-only effects transparent to Solid 2 hydration and call hydratable helpers’ onSettled on both server and client so later nodes bind correctly.
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- 04a170e: Import `sharedConfig` and `createOwner` from `solid-js/internal`, where `solid-js@2.0.0` declares them. They resolve to the same objects as before; this only fixes type resolution (and the JSR type check).
+- 5c23fda: Fix `withAccess` calling its callback with `undefined` or `null`. The check was `typeof _value != null`, which is always true, so the value was never skipped.
+
+## 7.0.0-next.8
+
+### Patch Changes
+
+- 5c23fda: Fix `withAccess` calling its callback with `undefined` or `null`. The check was `typeof _value != null`, which is always true, so the value was never skipped.
+
 ## 7.0.0-next.7
 
 ### Patch Changes

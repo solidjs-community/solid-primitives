@@ -1,5 +1,100 @@
 # @solid-primitives/sse
 
+## 1.0.0
+
+### Major Changes
+
+- ce9b27a: Align `createSSE` with Solid 2.0 async reactivity patterns
+
+  ### Breaking changes
+
+  **`pending` removed from `SSEReturn`**
+
+  Use `<Loading>` for initial load UI and `isPending(() => data())` for stale-while-revalidating. Both are re-exported from this package.
+
+  ```tsx
+  // Before
+  const { data, pending } = createSSE(url);
+  <Show when={!pending()}><p>{data()}</p></Show>
+
+  // After — declarative initial load
+  <Loading fallback={<p>Connecting…</p>}>
+    <p>{data()}</p>
+  </Loading>
+
+  // After — stale-while-revalidating (only true once a value exists and new data is pending)
+  <Show when={isPending(() => data())}><p>Refreshing…</p></Show>
+  ```
+
+  **`error` removed from `SSEReturn`**
+
+  Terminal errors (connection CLOSED with no retries left) now propagate through `data()` to `<Errored>`. Non-terminal errors (browser reconnecting) are still surfaced via `onError` callback.
+
+  ```tsx
+  // Before
+  const { data, error } = createSSE(url);
+  <Show when={error()}><p>Error: {error()?.type}</p></Show>
+
+  // After — single error path via Errored boundary
+  <Errored fallback={err => <p>Connection failed</p>}>
+    <Loading fallback={<p>Connecting…</p>}>
+      <p>{data()}</p>
+    </Loading>
+  </Errored>
+  ```
+
+  **`data` type narrowed from `Accessor<T | undefined>` to `Accessor<T>`**
+
+  The `| undefined` loading hole is removed. When `data()` is not ready it throws `NotReadyError` (caught by `<Loading>`) or the terminal error (caught by `<Errored>`); it never returns `undefined` due to pending state.
+
+  **SSR stub**: `data()` now throws `NotReadyError` on the server when no `initialValue` is provided (consistent with browser behaviour). Provide `initialValue` for a non-throwing SSR default.
+
+  ### New primitives
+
+  **`makeSSEAsyncIterable<T>(url, options?)`**
+
+  Wraps an SSE endpoint as a standard `AsyncIterable<T>`. Each message is one yielded value; terminal errors are thrown. Cleanup runs automatically when the iterator is abandoned.
+
+  ```ts
+  for await (const msg of makeSSEAsyncIterable<string>(url)) {
+    console.log(msg);
+  }
+  ```
+
+  **`createSSEStream<T>(url, options?)`**
+
+  Minimal reactive alternative to `createSSE` — returns only a `data: Accessor<T>` backed by an async iterable. Same `<Loading>` / `<Errored>` integration, no `source` / `readyState` / `close` / `reconnect`.
+
+  ```ts
+  const data = createSSEStream<{ msg: string }>(url, { transform: JSON.parse });
+  ```
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+
 ## 1.0.0-next.4
 
 ### Patch Changes

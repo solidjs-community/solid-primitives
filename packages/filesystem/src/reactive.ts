@@ -69,7 +69,9 @@ export const createSyncFileSystem = (
     },
     mkdir: path => {
       adapter.mkdir(path);
-      readdirMap.get(getParentDir(path))?.[1]((items = []) => [...items, getItemName(path)] as DirEntries);
+      readdirMap.get(getParentDir(path))?.[1](
+        (items = []) => [...items, getItemName(path)] as DirEntries,
+      );
     },
     readFile: (path, refresh) => {
       if (!readFileMap.has(path)) {
@@ -154,9 +156,7 @@ export const createSyncFileSystem = (
       }
       if (operation === "rm") {
         getTypeMap.get(path)?.[1](null);
-        parentSignal?.[1]((items = []) =>
-          items.filter(item => item !== name) as [] | DirEntries,
-        );
+        parentSignal?.[1]((items = []) => items.filter(item => item !== name) as [] | DirEntries);
       }
       if (operation === "writeFile" && readFileMap.has(path)) {
         fs.readFile(path, true);
@@ -178,7 +178,10 @@ export const createAsyncFileSystem = (
   const fs: AsyncFileSystem = {
     getType: (path, refresh) => {
       if (!getTypeMap.has(path)) {
-        getTypeMap.set(path, makeAsyncEntry(() => adapter.getType(path)));
+        getTypeMap.set(
+          path,
+          makeAsyncEntry(() => adapter.getType(path)),
+        );
       }
       const entry = getTypeMap.get(path)!;
       if (refresh) entry.refetch();
@@ -186,7 +189,10 @@ export const createAsyncFileSystem = (
     },
     readdir: (path, refresh) => {
       if (!readdirMap.has(path)) {
-        readdirMap.set(path, makeAsyncEntry(() => adapter.readdir(path)));
+        readdirMap.set(
+          path,
+          makeAsyncEntry(() => adapter.readdir(path)),
+        );
       }
       const entry = readdirMap.get(path)!;
       if (refresh) entry.refetch();
@@ -206,7 +212,10 @@ export const createAsyncFileSystem = (
       }),
     readFile: (path, refresh) => {
       if (!readFileMap.has(path)) {
-        readFileMap.set(path, makeAsyncEntry(() => adapter.readFile(path)));
+        readFileMap.set(
+          path,
+          makeAsyncEntry(() => adapter.readFile(path)),
+        );
       }
       const entry = readFileMap.get(path)!;
       if (refresh) entry.refetch();

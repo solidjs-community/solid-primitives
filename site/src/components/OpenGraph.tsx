@@ -5,6 +5,8 @@ import { useLocation } from "@solidjs/router";
 import { DynamicImage, urlFromImage } from "@solidjs/ogp";
 import { useFrontmatter, useSolidBaseContext } from "@kobalte/solidbase/client";
 import { ogFonts } from "./og-fonts";
+import { ogStaticPath } from "../lib/og-path";
+import { ogAssetUrl } from "./og-assets";
 
 /**
  * Open Graph / Twitter card tags for every page, with a generated preview image.
@@ -26,8 +28,11 @@ import { ogFonts } from "./og-fonts";
  * - `imageOptions` must be an inline object literal; the compiler copies it into the server
  *   function verbatim, so `ogFonts()` there runs on the server only.
  *
- * Pages are prerendered, so crawlers read the tags straight from the static HTML; the image itself
- * is rendered on request by the `/_server` endpoint of dist/server/server.js.
+ * Pages are prerendered, so crawlers read the tags straight from the static HTML. The images are
+ * rendered once at build time: `scripts/static-og.ts` runs after `vite build`, requests each
+ * `/_server` image URL from dist/server/server.js, saves the PNG under `/og/`, and points the
+ * page's og:image / twitter:image tags at that static file. Nothing renders images at request
+ * time, so the deployed site needs no server for them.
  */
 
 const WIDTH = 1200;
@@ -59,8 +64,9 @@ function forImage(text: string): string {
 
 /**
  * Origin for the absolute og:image / og:url values. Builds bake in `__SITE_ORIGIN__` (production,
- * or `SITE_ORIGIN` at build time). Under `vite dev` that origin doesn't serve this checkout's
- * `/_server` endpoint, so use the origin the page is actually being served from.
+ * or `SITE_ORIGIN` at build time). Under `vite dev` that origin
+ * doesn't serve this checkout's `/_server` endpoint, so use the origin the page is actually being
+ * served from.
  */
 function siteOrigin(): string {
   if (!import.meta.env.DEV) return __SITE_ORIGIN__;
@@ -137,14 +143,11 @@ function Backdrop() {
   );
 }
 
-/** Header logo + the "v2.0-RC2" badge (`[class*="version-selector_"]::after` in app.css). */
+/** Header logo + the "v2.0" badge (`[class*="version-selector_"]::after` in app.css). */
 function Brand() {
   return (
     <div style={{ display: "flex", "align-items": "center" }}>
-      <img
-        src="https://primitives2.solidjs.community/logo-light.png"
-        style={{ width: "242px", height: "44px" }}
-      />
+      <img src={ogAssetUrl("logo-light.png")} style={{ width: "242px", height: "44px" }} />
       <div
         style={{
           display: "flex",
@@ -158,7 +161,7 @@ function Brand() {
           "font-size": "20px",
         }}
       >
-        v2.0-RC2
+        v2.0
       </div>
     </div>
   );
@@ -168,7 +171,7 @@ function Brand() {
 function Cube() {
   return (
     <img
-      src="https://primitives2.solidjs.community/logo-wire.png"
+      src={ogAssetUrl("logo-wire.png")}
       style={{
         position: "absolute",
         right: "64px",
@@ -434,9 +437,18 @@ export function SiteOpenGraph() {
 
   // Inside a memo so client-side navigation re-evaluates the image arguments: the compiled
   // <DynamicImage> captures its argument values when it's called.
+  //
+  // In a production build the card is a static file (scripts/static-og.ts). The server render keeps
+  // the `/_server` URL in the HTML, which that script finds, renders and rewrites. The client
+  // computes the same static path itself: `@solidjs/meta` re-evaluates this after hydration and on
+  // every navigation, and the static host has no `/_server` to answer the original URL.
   const image = createMemo(() => {
     const fm = frontmatter();
-    return origin + (fm?.package ? packageCardUrl(fm) : defaultCardUrl());
+    const renderUrl = fm?.package ? packageCardUrl(fm) : defaultCardUrl();
+    return (
+      origin +
+      (isServer || import.meta.env.DEV ? renderUrl : ogStaticPath(renderUrl, __OG_VERSION__))
+    );
   });
   const description = () => frontmatter()?.description ?? config().description;
 

@@ -337,9 +337,9 @@ export function MultiProvider<const T extends readonly unknown[]>(props: {
  * ```
  */
 export function ContextConsumer<T>(props: {
-  children: (value: T) => Element,
-  fallback?: (() => Element) | Element,
-  provider: (() => T | undefined) | Context<T>,
+  children: (value: T) => Element;
+  fallback?: (() => Element) | Element;
+  provider: (() => T | undefined) | Context<T>;
 }): Element {
   // A required context that is missing (or provided with `undefined`, which Solid treats the same)
   // throws `ContextNotFoundError` from `useContext` (or from the

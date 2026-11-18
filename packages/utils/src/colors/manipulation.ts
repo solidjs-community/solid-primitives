@@ -83,7 +83,10 @@ export function detectColorFormat(value: string): ColorFormat | undefined {
  */
 export function lighten(color: Color, amount: number): Color {
   const hsl = color.toFormat("hsl");
-  return hsl.withChannelValue("lightness", clamp(hsl.getChannelValue("lightness") + amount * 100, 0, 100));
+  return hsl.withChannelValue(
+    "lightness",
+    clamp(hsl.getChannelValue("lightness") + amount * 100, 0, 100),
+  );
 }
 
 /**
@@ -100,7 +103,10 @@ export function darken(color: Color, amount: number): Color {
  */
 export function saturate(color: Color, amount: number): Color {
   const hsl = color.toFormat("hsl");
-  return hsl.withChannelValue("saturation", clamp(hsl.getChannelValue("saturation") + amount * 100, 0, 100));
+  return hsl.withChannelValue(
+    "saturation",
+    clamp(hsl.getChannelValue("saturation") + amount * 100, 0, 100),
+  );
 }
 
 /**
@@ -142,8 +148,14 @@ export function mix(a: Color, b: Color, ratio = 0.5): Color {
   const lerp = (x: number, y: number) => x + (y - x) * r;
   return ra
     .withChannelValue("red", Math.round(lerp(ra.getChannelValue("red"), rb.getChannelValue("red"))))
-    .withChannelValue("green", Math.round(lerp(ra.getChannelValue("green"), rb.getChannelValue("green"))))
-    .withChannelValue("blue", Math.round(lerp(ra.getChannelValue("blue"), rb.getChannelValue("blue"))))
+    .withChannelValue(
+      "green",
+      Math.round(lerp(ra.getChannelValue("green"), rb.getChannelValue("green"))),
+    )
+    .withChannelValue(
+      "blue",
+      Math.round(lerp(ra.getChannelValue("blue"), rb.getChannelValue("blue"))),
+    )
     .withChannelValue("alpha", lerp(ra.getChannelValue("alpha"), rb.getChannelValue("alpha")));
 }
 
@@ -258,11 +270,13 @@ function oklchToColor(l: number, c: number, h: number, alpha: number): Color {
 
   const r_lin = +4.0767416621 * ll - 3.3077115913 * mm + 0.2309699292 * ss;
   const g_lin = -1.2684380046 * ll + 2.6097574011 * mm - 0.3413193965 * ss;
-  const b_lin = -0.0041960863 * ll - 0.7034186147 * mm + 1.7076147010 * ss;
+  const b_lin = -0.0041960863 * ll - 0.7034186147 * mm + 1.707614701 * ss;
 
   const toSRGB = (v: number) => {
     const clamped = clamp(v, 0, 1);
-    return Math.round((clamped <= 0.0031308 ? 12.92 * clamped : 1.055 * clamped ** (1 / 2.4) - 0.055) * 255);
+    return Math.round(
+      (clamped <= 0.0031308 ? 12.92 * clamped : 1.055 * clamped ** (1 / 2.4) - 0.055) * 255,
+    );
   };
 
   return parseColor(`rgba(${toSRGB(r_lin)}, ${toSRGB(g_lin)}, ${toSRGB(b_lin)}, ${alpha})`);

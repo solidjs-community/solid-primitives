@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/virtual",
-  "version": "1.0.0-next.7",
+  "version": "1.0.0",
   "description": "A virtualized list component for performantly rendering lists with many elements",
   "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
   "contributors": [],
@@ -21,7 +21,7 @@
       "VirtualList"
     ],
     "category": "UI Patterns",
-    "gzip": 647
+    "gzip": 658
   },
   "keywords": [
     "solid",
@@ -53,9 +53,8 @@
     "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
     "build": "pnpm -w build",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
-    "vitest2": "vitest -c ../../configs/vitest.config.solid2.ts",
-    "test": "pnpm run vitest2",
-    "test:ssr": "pnpm run vitest2 --mode ssr"
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

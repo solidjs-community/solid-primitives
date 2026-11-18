@@ -1,13 +1,13 @@
 import {
   $TRACK,
   createMemo,
-  createOwner,
   createSignal,
   runWithOwner,
   type Accessor,
   type Signal,
   type Element,
 } from "solid-js";
+import { createOwner } from "solid-js/internal";
 import { isDev } from "@solid-primitives/utils";
 
 export type Maybe<T> = T | void | null | undefined | false;

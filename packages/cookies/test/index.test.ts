@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createRoot, flush } from "solid-js";
-import { parseCookie, getCookiesString, createServerCookie, createUserTheme } from "../src/index.js";
+import {
+  parseCookie,
+  getCookiesString,
+  createServerCookie,
+  createUserTheme,
+} from "../src/index.js";
 
 beforeEach(() => {
   document.cookie.split(";").forEach(c => {

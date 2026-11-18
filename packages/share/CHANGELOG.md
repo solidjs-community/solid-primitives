@@ -1,5 +1,66 @@
 # @solid-primitives/share
 
+## 4.0.0
+
+### Major Changes
+
+- f68a71f: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependencies**: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14` are now required.
+
+  ### `@solid-primitives/share`
+  - `isServer` is now imported from `@solidjs/web` (was `solid-js/web`)
+  - `createWebShare` — internal `createEffect` converted to the split compute/apply pattern required by Solid 2.0; the `on` helper (removed in Solid 2.0) is no longer used
+
+### Patch Changes
+
+- 88a48f3: Fix package manifests. `keyed` and `share` import `@solid-primitives/utils` at runtime but did not declare it, so the import could not be resolved under strict installs (pnpm, Yarn PnP). It is now a dependency. `analytics` no longer declares the legacy optional peer `@tanstack/start`: the TanStack relay takes the user's `createServerFn` and imports nothing from TanStack.
+- 5fc4efa: Fix named imports breaking under Rolldown (Vite 8+ / Storybook 10.4.6+) bundlers.
+
+  These packages re-export their public API via `export * from "./x.js"` barrels. Rollup resolves named imports through these at link time, but Rolldown's static analysis doesn't reliably follow `export *` for named-export resolution, causing errors like:
+
+  ```
+  "createEventListener" is not exported by "@solid-primitives/event-listener/dist/index.js"
+  ```
+
+  The build now also emits explicit `export { name } from "./x.js"` lines for every runtime export reachable through a barrel's `export *`, derived automatically from each submodule's compiled output — so `dist/` is bundler-agnostic regardless of how a given tool resolves star re-exports.
+
+- 20afdb7: Fixed test-suite breakage caused by a new Solid 2.0 beta.17 runtime guard; no API or behavior changes.
+
+  `@solidjs/signals@2.0.0-beta.17` added an `ACTION_CALLED_IN_OWNED_SCOPE` guard that throws when an `action()`-created function (like `createWebShare`'s `share`) is invoked while a reactive owner is active — actions are meant to be called from an event handler or other imperative scope, not from inside a component/computation. `createWebShare`'s tests called `share(...)` directly inside a `createRoot` callback, which now trips this guard. Updated the tests to invoke `share` via `runWithOwner(null, () => share(...))`, matching how a real DOM event handler calls it.
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+
+## 4.0.0-next.7
+
+### Patch Changes
+
+- 88a48f3: Fix package manifests. `keyed` and `share` import `@solid-primitives/utils` at runtime but did not declare it, so the import could not be resolved under strict installs (pnpm, Yarn PnP). It is now a dependency. `analytics` no longer declares the legacy optional peer `@tanstack/start`: the TanStack relay takes the user's `createServerFn` and imports nothing from TanStack.
+
 ## 4.0.0-next.6
 
 ### Patch Changes

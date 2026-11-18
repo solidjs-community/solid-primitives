@@ -32,7 +32,10 @@ export function makeFlip(
       if (dx === 0 && dy === 0 && sx === 1 && sy === 1) return;
       return el.animate(
         [
-          { transformOrigin: "top left", transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` },
+          {
+            transformOrigin: "top left",
+            transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
+          },
           { transformOrigin: "top left", transform: "none" },
         ],
         options,

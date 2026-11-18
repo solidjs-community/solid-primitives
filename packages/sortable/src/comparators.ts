@@ -38,20 +38,25 @@ export const descending: Comparator<any> = (a, b) => {
  * const byPrice = by((item: Product) => item.price);
  * const byPriceDesc = by((item: Product) => item.price, descending);
  */
-export const by = <T, K>(accessor: (item: T) => K, comparator: Comparator<K> = ascending): Comparator<T> => (a, b) => comparator(accessor(a), accessor(b));
+export const by =
+  <T, K>(accessor: (item: T) => K, comparator: Comparator<K> = ascending): Comparator<T> =>
+  (a, b) =>
+    comparator(accessor(a), accessor(b));
 
 /**
  * Composes comparators so later ones break ties left by earlier ones.
  * @example
  * const cmp = combine(by((p: Product) => p.category), by((p: Product) => p.price, descending));
  */
-export const combine = <T>(...comparators: Comparator<T>[]): Comparator<T> => (a, b) => {
-  for (const comparator of comparators) {
-    const result = comparator(a, b);
-    if (result !== 0) return result;
-  }
-  return 0;
-};
+export const combine =
+  <T>(...comparators: Comparator<T>[]): Comparator<T> =>
+  (a, b) => {
+    for (const comparator of comparators) {
+      const result = comparator(a, b);
+      if (result !== 0) return result;
+    }
+    return 0;
+  };
 
 /**
  * Flips the order of any comparator (composes with {@link by} and {@link combine}).
@@ -63,4 +68,7 @@ export const combine = <T>(...comparators: Comparator<T>[]): Comparator<T> => (a
  * {@link descending}, or a comparator that handles missing values explicitly, instead of
  * `reverse(ascending)` when missing values must stay last.
  */
-export const reverse = <T>(comparator: Comparator<T>): Comparator<T> => (a, b) => comparator(b, a);
+export const reverse =
+  <T>(comparator: Comparator<T>): Comparator<T> =>
+  (a, b) =>
+    comparator(b, a);

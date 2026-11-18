@@ -36,8 +36,14 @@ function el() {
 function mockRect(element: HTMLElement, rect: Partial<DOMRect>) {
   Object.defineProperty(element, "getBoundingClientRect", {
     value: () => ({
-      left: 0, top: 0, right: 100, bottom: 100,
-      width: 100, height: 100, x: 0, y: 0,
+      left: 0,
+      top: 0,
+      right: 100,
+      bottom: 100,
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
       toJSON: () => ({}),
       ...rect,
     }),
@@ -51,7 +57,9 @@ function mockScroll(x: number, y: number) {
 }
 
 function key(target: EventTarget, keyName: string) {
-  target.dispatchEvent(new KeyboardEvent("keydown", { key: keyName, bubbles: true, cancelable: true }));
+  target.dispatchEvent(
+    new KeyboardEvent("keydown", { key: keyName, bubbles: true, cancelable: true }),
+  );
 }
 
 afterEach(() => {
@@ -66,7 +74,11 @@ describe("makeDraggable", () => {
   it("calls onStart on left pointerdown", () => {
     const div = el();
     let started = false;
-    const cleanup = makeDraggable(div, { onStart: () => { started = true; } });
+    const cleanup = makeDraggable(div, {
+      onStart: () => {
+        started = true;
+      },
+    });
     ptr(div, "pointerdown", { button: 0 });
     expect(started).toBe(true);
     cleanup();
@@ -75,7 +87,11 @@ describe("makeDraggable", () => {
   it("ignores non-left-button events", () => {
     const div = el();
     let started = false;
-    const cleanup = makeDraggable(div, { onStart: () => { started = true; } });
+    const cleanup = makeDraggable(div, {
+      onStart: () => {
+        started = true;
+      },
+    });
     ptr(div, "pointerdown", { button: 2 });
     expect(started).toBe(false);
     cleanup();
@@ -84,7 +100,11 @@ describe("makeDraggable", () => {
   it("calls onMove with accumulated delta", () => {
     const div = el();
     let delta: Transform | null = null;
-    const cleanup = makeDraggable(div, { onMove: d => { delta = d; } });
+    const cleanup = makeDraggable(div, {
+      onMove: d => {
+        delta = d;
+      },
+    });
     ptr(div, "pointerdown", { button: 0, clientX: 10, clientY: 10 });
     ptr(document, "pointermove", { clientX: 30, clientY: 25 });
     expect(delta).toEqual({ x: 20, y: 15 });
@@ -95,7 +115,11 @@ describe("makeDraggable", () => {
   it("calls onEnd with final delta", () => {
     const div = el();
     let endDelta: Transform | null = null;
-    const cleanup = makeDraggable(div, { onEnd: d => { endDelta = d; } });
+    const cleanup = makeDraggable(div, {
+      onEnd: d => {
+        endDelta = d;
+      },
+    });
     ptr(div, "pointerdown", { button: 0, clientX: 0, clientY: 0 });
     ptr(document, "pointerup", { clientX: 5, clientY: 10 });
     expect(endDelta).toEqual({ x: 5, y: 10 });
@@ -122,7 +146,12 @@ describe("makeDraggable", () => {
   it("no-ops when disabled", () => {
     const div = el();
     let started = false;
-    const cleanup = makeDraggable(div, { onStart: () => { started = true; }, disabled: true });
+    const cleanup = makeDraggable(div, {
+      onStart: () => {
+        started = true;
+      },
+      disabled: true,
+    });
     ptr(div, "pointerdown", { button: 0 });
     expect(started).toBe(false);
     cleanup();
@@ -147,7 +176,11 @@ describe("makeDraggable", () => {
   it("compensates onMove delta for scroll that happens mid-drag", () => {
     const div = el();
     let delta: Transform | null = null;
-    const cleanup = makeDraggable(div, { onMove: d => { delta = d; } });
+    const cleanup = makeDraggable(div, {
+      onMove: d => {
+        delta = d;
+      },
+    });
     ptr(div, "pointerdown", { button: 0, clientX: 10, clientY: 10 });
     mockScroll(0, 50);
     // Pointer hasn't moved, but the page scrolled — reported delta should include it.
@@ -160,7 +193,11 @@ describe("makeDraggable", () => {
   it("compensates onEnd delta for scroll that happens mid-drag", () => {
     const div = el();
     let endDelta: Transform | null = null;
-    const cleanup = makeDraggable(div, { onEnd: d => { endDelta = d; } });
+    const cleanup = makeDraggable(div, {
+      onEnd: d => {
+        endDelta = d;
+      },
+    });
     ptr(div, "pointerdown", { button: 0, clientX: 10, clientY: 10 });
     mockScroll(20, 0);
     ptr(document, "pointerup", { clientX: 15, clientY: 10 });
@@ -175,7 +212,11 @@ describe("makeDroppable", () => {
   it("calls onEnter on pointerenter", () => {
     const div = el();
     let entered = false;
-    const cleanup = makeDroppable(div, { onEnter: () => { entered = true; } });
+    const cleanup = makeDroppable(div, {
+      onEnter: () => {
+        entered = true;
+      },
+    });
     ptr(div, "pointerenter");
     expect(entered).toBe(true);
     cleanup();
@@ -184,7 +225,11 @@ describe("makeDroppable", () => {
   it("calls onLeave on pointerleave", () => {
     const div = el();
     let left = false;
-    const cleanup = makeDroppable(div, { onLeave: () => { left = true; } });
+    const cleanup = makeDroppable(div, {
+      onLeave: () => {
+        left = true;
+      },
+    });
     ptr(div, "pointerleave");
     expect(left).toBe(true);
     cleanup();
@@ -193,7 +238,11 @@ describe("makeDroppable", () => {
   it("calls onDrop on pointerup", () => {
     const div = el();
     let dropped = false;
-    const cleanup = makeDroppable(div, { onDrop: () => { dropped = true; } });
+    const cleanup = makeDroppable(div, {
+      onDrop: () => {
+        dropped = true;
+      },
+    });
     ptr(div, "pointerup");
     expect(dropped).toBe(true);
     cleanup();
@@ -202,7 +251,12 @@ describe("makeDroppable", () => {
   it("no-ops when disabled", () => {
     const div = el();
     let entered = false;
-    const cleanup = makeDroppable(div, { onEnter: () => { entered = true; }, disabled: true });
+    const cleanup = makeDroppable(div, {
+      onEnter: () => {
+        entered = true;
+      },
+      disabled: true,
+    });
     ptr(div, "pointerenter");
     expect(entered).toBe(false);
     cleanup();
@@ -224,7 +278,11 @@ describe("makeNativeDroppable", () => {
   it("calls onEnter on first dragenter", () => {
     const div = el();
     let entered = false;
-    const cleanup = makeNativeDroppable(div, { onEnter: () => { entered = true; } });
+    const cleanup = makeNativeDroppable(div, {
+      onEnter: () => {
+        entered = true;
+      },
+    });
     drag(div, "dragenter");
     expect(entered).toBe(true);
     cleanup();
@@ -246,7 +304,11 @@ describe("makeNativeDroppable", () => {
   it("calls onDrop and resets depth", () => {
     const div = el();
     let dropped = false;
-    const cleanup = makeNativeDroppable(div, { onDrop: () => { dropped = true; } });
+    const cleanup = makeNativeDroppable(div, {
+      onDrop: () => {
+        dropped = true;
+      },
+    });
     drag(div, "dragenter");
     drag(div, "drop");
     expect(dropped).toBe(true);
@@ -258,7 +320,9 @@ describe("makeNativeDroppable", () => {
     let dropped = false;
     const cleanup = makeNativeDroppable(div, {
       accept: () => false,
-      onDrop: () => { dropped = true; },
+      onDrop: () => {
+        dropped = true;
+      },
     });
     drag(div, "drop");
     expect(dropped).toBe(false);
@@ -269,7 +333,9 @@ describe("makeNativeDroppable", () => {
     const div = el();
     const cleanup = makeNativeDroppable(div);
     let prevented = false;
-    div.addEventListener("dragover", e => { if (e.defaultPrevented) prevented = true; });
+    div.addEventListener("dragover", e => {
+      if (e.defaultPrevented) prevented = true;
+    });
     drag(div, "dragover");
     expect(prevented).toBe(true);
     cleanup();
@@ -280,7 +346,9 @@ describe("makeNativeDroppable", () => {
     let entered = false;
     const cleanup = makeNativeDroppable(div, {
       accept: () => false,
-      onEnter: () => { entered = true; },
+      onEnter: () => {
+        entered = true;
+      },
     });
     drag(div, "dragenter");
     expect(entered).toBe(false);
@@ -290,7 +358,12 @@ describe("makeNativeDroppable", () => {
   it("no-ops when disabled", () => {
     const div = el();
     let entered = false;
-    const cleanup = makeNativeDroppable(div, { onEnter: () => { entered = true; }, disabled: true });
+    const cleanup = makeNativeDroppable(div, {
+      onEnter: () => {
+        entered = true;
+      },
+      disabled: true,
+    });
     drag(div, "dragenter");
     expect(entered).toBe(false);
     cleanup();
@@ -302,7 +375,9 @@ describe("makeNativeDroppable", () => {
     let entered = false;
     const cleanup = makeNativeDroppable(div, {
       accept: () => !rejectNext,
-      onEnter: () => { entered = true; },
+      onEnter: () => {
+        entered = true;
+      },
     });
     drag(div, "dragenter"); // rejected — depth must stay at 0, not go negative
     drag(div, "dragleave");
@@ -620,21 +695,18 @@ describe("createDragContext", () => {
     let drop!: DroppableReturn;
 
     const container = el();
-    const dispose = render(
-      () => {
-        ctx = createDragContext();
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            drag = createDraggable("a", "data-a");
-            drop = createDroppable("b", "data-b");
-            drag.ref(dragEl);
-            drop.ref(dropEl);
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      ctx = createDragContext();
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          drag = createDraggable("a", "data-a");
+          drop = createDroppable("b", "data-b");
+          drag.ref(dragEl);
+          drop.ref(dropEl);
+          return null;
+        },
+      });
+    }, container);
     flush();
 
     ptr(dragEl, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
@@ -663,23 +735,20 @@ describe("createDragContext", () => {
     const dragEl = el();
 
     const container = el();
-    const dispose = render(
-      () => {
-        const ctx = createDragContext({
-          onDragStart: () => events.push("start"),
-          onDragMove: () => events.push("move"),
-          onDragEnd: () => events.push("end"),
-        });
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            drag = createDraggable("x");
-            drag.ref(dragEl);
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      const ctx = createDragContext({
+        onDragStart: () => events.push("start"),
+        onDragMove: () => events.push("move"),
+        onDragEnd: () => events.push("end"),
+      });
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          drag = createDraggable("x");
+          drag.ref(dragEl);
+          return null;
+        },
+      });
+    }, container);
     flush();
 
     ptr(dragEl, "pointerdown", { button: 0 });
@@ -696,19 +765,20 @@ describe("createDragContext", () => {
     const dragEl = el();
 
     const container = el();
-    const dispose = render(
-      () => {
-        const ctx = createDragContext({ onDragCancel: () => { cancelled = true; } });
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            drag = createDraggable("x");
-            drag.ref(dragEl);
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      const ctx = createDragContext({
+        onDragCancel: () => {
+          cancelled = true;
+        },
+      });
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          drag = createDraggable("x");
+          drag.ref(dragEl);
+          return null;
+        },
+      });
+    }, container);
     flush();
 
     ptr(dragEl, "pointerdown", { button: 0 });
@@ -724,22 +794,23 @@ describe("createDragContext", () => {
     const dragEl = el();
 
     const container = el();
-    const dispose = render(
-      () => {
-        const ctx = createDragContext({
-          onDragCancel: () => { cancelled = true; },
-          onDragEnd: () => { ended = true; },
-        });
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            drag = createDraggable("x");
-            drag.ref(dragEl);
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      const ctx = createDragContext({
+        onDragCancel: () => {
+          cancelled = true;
+        },
+        onDragEnd: () => {
+          ended = true;
+        },
+      });
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          drag = createDraggable("x");
+          drag.ref(dragEl);
+          return null;
+        },
+      });
+    }, container);
     flush();
 
     ptr(dragEl, "pointerdown", { button: 0 });
@@ -763,25 +834,22 @@ describe("createDragContext", () => {
     const drops: DroppableReturn[] = [];
 
     const container = el();
-    const dispose = render(
-      () => {
-        const ctx = createDragContext();
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            for (let i = 0; i < 3; i++) {
-              const d = createDraggable(`d${i}`);
-              d.ref(dragEls[i]!);
-              drags.push(d);
-              const drop = createDroppable(`z${i}`);
-              drop.ref(dropEls[i]!);
-              drops.push(drop);
-            }
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      const ctx = createDragContext();
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          for (let i = 0; i < 3; i++) {
+            const d = createDraggable(`d${i}`);
+            d.ref(dragEls[i]!);
+            drags.push(d);
+            const drop = createDroppable(`z${i}`);
+            drop.ref(dropEls[i]!);
+            drops.push(drop);
+          }
+          return null;
+        },
+      });
+    }, container);
     flush();
 
     // Start dragging only the first draggable.
@@ -819,19 +887,16 @@ describe("createDragContext", () => {
 
     let s!: ReturnType<typeof createSortable>;
     const container = el();
-    const dispose = render(
-      () => {
-        const ctx = createDragContext();
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            s = createSortable("s1");
-            s.ref(div);
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      const ctx = createDragContext();
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          s = createSortable("s1");
+          s.ref(div);
+          return null;
+        },
+      });
+    }, container);
     flush();
 
     ptr(div, "pointerdown", { button: 0, clientX: 50, clientY: 50 });
@@ -848,19 +913,16 @@ describe("createDragContext", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const div = el();
     const container = el();
-    const dispose = render(
-      () => {
-        const ctx = createDragContext();
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            const drop = createDroppable("zone");
-            drop.ref(div);
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      const ctx = createDragContext();
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          const drop = createDroppable("zone");
+          drop.ref(div);
+          return null;
+        },
+      });
+    }, container);
     flush();
     expect(warnSpy).not.toHaveBeenCalled();
     dispose();
@@ -873,19 +935,16 @@ describe("createDragContext", () => {
 
     let ctx!: ReturnType<typeof createDragContext>;
     const container = el();
-    const dispose = render(
-      () => {
-        ctx = createDragContext();
-        return (ctx.Provider as (p: { children: unknown }) => unknown)({
-          get children() {
-            const drag = createDraggable("a");
-            drag.ref(dragEl);
-            return null;
-          },
-        });
-      },
-      container,
-    );
+    const dispose = render(() => {
+      ctx = createDragContext();
+      return (ctx.Provider as (p: { children: unknown }) => unknown)({
+        get children() {
+          const drag = createDraggable("a");
+          drag.ref(dragEl);
+          return null;
+        },
+      });
+    }, container);
     flush();
 
     ptr(dragEl, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
@@ -913,22 +972,19 @@ describe("createDragContext", () => {
       let drop!: DroppableReturn;
 
       const container = el();
-      const dispose = render(
-        () => {
-          ctx = createDragContext();
-          return (ctx.Provider as (p: { children: unknown }) => unknown)({
-            get children() {
-              // dragEl's center is (25, 25); a single 200px step lands well inside dropEl.
-              drag = createDraggable("a", "data-a", { keyboardStep: 200 });
-              drop = createDroppable("b", "data-b");
-              drag.ref(dragEl);
-              drop.ref(dropEl);
-              return null;
-            },
-          });
-        },
-        container,
-      );
+      const dispose = render(() => {
+        ctx = createDragContext();
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            // dragEl's center is (25, 25); a single 200px step lands well inside dropEl.
+            drag = createDraggable("a", "data-a", { keyboardStep: 200 });
+            drop = createDroppable("b", "data-b");
+            drag.ref(dragEl);
+            drop.ref(dropEl);
+            return null;
+          },
+        });
+      }, container);
       flush();
 
       key(dragEl, "Enter");
@@ -956,19 +1012,20 @@ describe("createDragContext", () => {
       mockRect(dragEl, { left: 0, top: 0, right: 50, bottom: 50 });
 
       const container = el();
-      const dispose = render(
-        () => {
-          const ctx = createDragContext({ onDragCancel: () => { cancelled = true; } });
-          return (ctx.Provider as (p: { children: unknown }) => unknown)({
-            get children() {
-              drag = createDraggable("x");
-              drag.ref(dragEl);
-              return null;
-            },
-          });
-        },
-        container,
-      );
+      const dispose = render(() => {
+        const ctx = createDragContext({
+          onDragCancel: () => {
+            cancelled = true;
+          },
+        });
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            drag = createDraggable("x");
+            drag.ref(dragEl);
+            return null;
+          },
+        });
+      }, container);
       flush();
 
       key(dragEl, " ");
@@ -993,19 +1050,16 @@ describe("createDragContext", () => {
       const scrollBySpy = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
 
       const container = el();
-      const dispose = render(
-        () => {
-          const ctx = createDragContext({ autoScroll: true });
-          return (ctx.Provider as (p: { children: unknown }) => unknown)({
-            get children() {
-              const drag = createDraggable("a");
-              drag.ref(dragEl);
-              return null;
-            },
-          });
-        },
-        container,
-      );
+      const dispose = render(() => {
+        const ctx = createDragContext({ autoScroll: true });
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            const drag = createDraggable("a");
+            drag.ref(dragEl);
+            return null;
+          },
+        });
+      }, container);
       flush();
 
       ptr(dragEl, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
@@ -1030,19 +1084,16 @@ describe("createDragContext", () => {
       const scrollBySpy = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
 
       const container = el();
-      const dispose = render(
-        () => {
-          const ctx = createDragContext();
-          return (ctx.Provider as (p: { children: unknown }) => unknown)({
-            get children() {
-              const drag = createDraggable("a");
-              drag.ref(dragEl);
-              return null;
-            },
-          });
-        },
-        container,
-      );
+      const dispose = render(() => {
+        const ctx = createDragContext();
+        return (ctx.Provider as (p: { children: unknown }) => unknown)({
+          get children() {
+            const drag = createDraggable("a");
+            drag.ref(dragEl);
+            return null;
+          },
+        });
+      }, container);
       flush();
 
       ptr(dragEl, "pointerdown", { button: 0, clientX: 25, clientY: 25 });
@@ -1174,7 +1225,11 @@ describe("createNativeDroppable", () => {
     createRoot(dispose => {
       const div = el();
       let dropped = false;
-      const drop = createNativeDroppable({ onDrop: () => { dropped = true; } });
+      const drop = createNativeDroppable({
+        onDrop: () => {
+          dropped = true;
+        },
+      });
       drop.ref(div);
       flush(); // refs no longer flush; effects attach on the next flush
       drag(div, "drop");
@@ -1187,7 +1242,12 @@ describe("createNativeDroppable", () => {
     createRoot(dispose => {
       const div = el();
       let dropped = false;
-      const drop = createNativeDroppable({ accept: () => false, onDrop: () => { dropped = true; } });
+      const drop = createNativeDroppable({
+        accept: () => false,
+        onDrop: () => {
+          dropped = true;
+        },
+      });
       drop.ref(div);
       flush(); // refs no longer flush; effects attach on the next flush
       drag(div, "drop");
@@ -1275,9 +1335,15 @@ describe("arrayMove", () => {
 
 function makeRect(left: number, top: number, right: number, bottom: number): DOMRect {
   return {
-    left, top, right, bottom,
-    width: right - left, height: bottom - top,
-    x: left, y: top, toJSON: () => ({}),
+    left,
+    top,
+    right,
+    bottom,
+    width: right - left,
+    height: bottom - top,
+    x: left,
+    y: top,
+    toJSON: () => ({}),
   } as DOMRect;
 }
 

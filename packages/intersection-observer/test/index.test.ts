@@ -52,7 +52,7 @@ class IntersectionObserver {
     this.elements.push(el);
   }
   unobserve(el: HTMLElement) {
-    for (let index; (index = this.elements.indexOf(el)) !== -1; ) {
+    for (let index; (index = this.elements.indexOf(el)) !== -1;) {
       this.elements.splice(index, 1);
     }
   }

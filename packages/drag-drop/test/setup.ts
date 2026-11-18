@@ -50,7 +50,10 @@ export function restoreGlobals(): void {
   g.requestAnimationFrame = originals.requestAnimationFrame;
   g.cancelAnimationFrame = originals.cancelAnimationFrame;
   Object.defineProperty(window, "innerWidth", { value: originals.innerWidth, configurable: true });
-  Object.defineProperty(window, "innerHeight", { value: originals.innerHeight, configurable: true });
+  Object.defineProperty(window, "innerHeight", {
+    value: originals.innerHeight,
+    configurable: true,
+  });
 }
 
 // Install globally so test files can use `new PointerEvent(...)` / `new DragEvent(...)`

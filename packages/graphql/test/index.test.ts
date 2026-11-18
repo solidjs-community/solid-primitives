@@ -326,6 +326,44 @@ describe("gql", () => {
   });
 });
 
+describe("gql comments", () => {
+  test("strips comments", () => {
+    expect(gql`
+      query {
+        # who to greet
+        hello # trailing
+      }
+    `).toEqual("query { hello }");
+  });
+
+  test("strips a bare # line without swallowing the next line", () => {
+    expect(gql`
+      #
+      query {
+        a
+      }
+    `).toEqual("query { a }");
+  });
+
+  test("strips a comment on the last line", () => {
+    expect(gql`
+      query {
+        a
+      } # note
+    `).toEqual("query { a }");
+  });
+
+  // The previous regex (`/#.+\r?\n/`) was quadratic: 160k characters took about 19 seconds.
+  test("runs in linear time on a long run of #", () => {
+    for (const input of ["#".repeat(100_000), "# ".repeat(100_000), "#\n".repeat(50_000)]) {
+      const start = performance.now();
+      // a hand-built template strings array: exactly `input`, no added whitespace
+      gql(Object.assign([input], { raw: [input] }) as unknown as TemplateStringsArray);
+      expect(performance.now() - start).toBeLessThan(500);
+    }
+  });
+});
+
 describe("makeMultipartBody", () => {
   test("top-level and nested blobs are correctly replaced", () => {
     const form = makeMultipartBody("", {

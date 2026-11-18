@@ -1,0 +1,25 @@
+// Cloudflare Worker with static assets for the docs site (https://primitives.solidjs.community).
+//
+// Workers Builds (git-connected) settings that go with this file:
+//   Worker name ............. solid-primitives-site   (must match the `name` below)
+//   Production branch ....... main
+//   Root directory .......... / (repository root)
+//   Build command ........... pnpm build && pnpm --dir site run deploy
+//   Deploy command .......... npx wrangler deploy
+//   Build variables ......... NODE_VERSION=22.18.0 (also pinned in .node-version; pnpm comes from
+//                             the `packageManager` field), optionally SITE_GITHUB_TOKEN
+//
+// Everything is a static asset (site/dist/client) except `/api/stats`, which `run_worker_first`
+// sends to the Worker (site/worker/index.ts, bundled to dist/client/_worker.js by the site build).
+// `site/public/.assetsignore` keeps that bundle from also being uploaded as a public asset.
+{
+  "name": "solid-primitives",
+  "main": "./site/dist/client/_worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./site/dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"],
+  },
+}

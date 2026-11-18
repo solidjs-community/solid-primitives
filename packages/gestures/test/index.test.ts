@@ -1,6 +1,15 @@
 import { createRoot } from "solid-js";
 import { describe, it, expect } from "vitest";
-import { pan, pinch, rotate, swipe, tap, longPress, doubleTap, registerPointerListener } from "../src/index.js";
+import {
+  pan,
+  pinch,
+  rotate,
+  swipe,
+  tap,
+  longPress,
+  doubleTap,
+  registerPointerListener,
+} from "../src/index.js";
 
 // jsdom 25 does not implement PointerEvent — extend MouseEvent for tests
 if (typeof PointerEvent === "undefined") {
@@ -217,7 +226,10 @@ describe("swipe", () => {
     createRoot(dispose => {
       const node = makeNode();
       const directions: string[] = [];
-      const ref = swipe({ callback: d => directions.push(d), parameters: { minSwipeDistance: 200 } });
+      const ref = swipe({
+        callback: d => directions.push(d),
+        parameters: { minSwipeDistance: 200 },
+      });
       ref(node);
 
       // distance of 100 is below threshold of 200
@@ -343,7 +355,7 @@ describe("rotate", () => {
       pointerdown(node, 1, 0, 50);
       pointerdown(node, 2, 100, 50);
       pointermove(node, 1, 0, 50); // set prevAngle
-      pointermove(node, 1, 0, 0);  // move ptr1 up → angle changes
+      pointermove(node, 1, 0, 0); // move ptr1 up → angle changes
       expect(rotations.length).toBeGreaterThan(0);
       expect(typeof rotations[0]).toBe("number");
       expect(rotations[0]).toBeGreaterThanOrEqual(-180);
@@ -363,7 +375,7 @@ describe("rotate", () => {
       // place fingers to establish an initial angle near 0
       pointerdown(node, 1, 0, 50);
       pointerdown(node, 2, 100, 50); // horizontal → initAngle near 0°
-      pointermove(node, 1, 0, 50);   // set prevAngle
+      pointermove(node, 1, 0, 50); // set prevAngle
 
       // move ptr2 to a position that would give curAngle - initAngle ≈ -270 (= +90 clamped)
       pointermove(node, 2, 50, 150); // below ptr1 — should give large negative unclamped angle
@@ -448,7 +460,12 @@ describe("longPress", () => {
     createRoot(async dispose => {
       const node = makeNode();
       let fired = false;
-      const ref = longPress({ callback: () => { fired = true; }, threshold: 30 });
+      const ref = longPress({
+        callback: () => {
+          fired = true;
+        },
+        threshold: 30,
+      });
       ref(node);
 
       pointerdown(node, 1, 0, 0);
@@ -574,7 +591,12 @@ describe("doubleTap", () => {
     createRoot(async dispose => {
       const node = makeNode();
       let fired = false;
-      const ref = doubleTap({ callback: () => { fired = true; }, timeframe: 200 });
+      const ref = doubleTap({
+        callback: () => {
+          fired = true;
+        },
+        timeframe: 200,
+      });
       ref(node);
 
       // first tap

@@ -44,7 +44,9 @@ describe("filterProps", () => {
       const filtered = filterProps(proxy, key => key !== "b" && key !== "d");
       createEffect(
         () => ({ ...filtered }),
-        v => { captured = v; },
+        v => {
+          captured = v;
+        },
       );
       flush();
       expect(captured).toEqual({ a: 1, c: 3 });
@@ -114,7 +116,9 @@ describe("filterProps + createPropsPredicate", () => {
       );
       createEffect(
         () => ({ ...filtered }),
-        v => { captured = v; },
+        v => {
+          captured = v;
+        },
       );
       flush();
       expect(captured).toEqual({ a: 1, c: 3 });
@@ -170,7 +174,10 @@ describe("partitionProps", () => {
       const [matched, rest] = partitionProps(proxy, key => key !== "b");
       createEffect(
         () => [{ ...matched }, { ...rest }],
-        ([m, r]) => { capturedMatched = m; capturedRest = r; },
+        ([m, r]) => {
+          capturedMatched = m;
+          capturedRest = r;
+        },
       );
       flush();
       expect(capturedMatched).toEqual({ a: 1, c: 3 });
@@ -197,7 +204,7 @@ describe("partitionProps", () => {
       matched.a;
       matched.a; // cache hit — predicate should not run again
       rest.b;
-      rest.b;   // cache hit
+      rest.b; // cache hit
 
       expect(checked).toEqual(["a", "b"]);
 

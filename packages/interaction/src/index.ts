@@ -21,7 +21,13 @@
  */
 
 import { type Accessor, createEffect, onCleanup } from "solid-js";
-import { type MaybeAccessor, access, globalRegistry, isServer, noop } from "@solid-primitives/utils";
+import {
+  type MaybeAccessor,
+  access,
+  globalRegistry,
+  isServer,
+  noop,
+} from "@solid-primitives/utils";
 
 // ---- ariaHideOutside / createHideOutside ----
 
@@ -88,7 +94,11 @@ function refCountedApply(
 }
 
 /** Reverts `unapply` once the last ref-counted hold on `node` in `map` is released. */
-function refCountedRelease(map: WeakMap<Element, number>, node: Element, unapply: () => void): void {
+function refCountedRelease(
+  map: WeakMap<Element, number>,
+  node: Element,
+  unapply: () => void,
+): void {
   const count = map.get(node);
   if (count == null) return;
   if (count === 1) {
@@ -216,14 +226,20 @@ export function ariaHideOutside(
   observer.observe(root, { childList: true, subtree: true });
 
   const wrapper = {
-    observe() { observer.observe(root, { childList: true, subtree: true }); },
-    disconnect() { observer.disconnect(); },
+    observe() {
+      observer.observe(root, { childList: true, subtree: true });
+    },
+    disconnect() {
+      observer.disconnect();
+    },
   };
   observerStack.push(wrapper);
 
   return () => {
     observer.disconnect();
-    hiddenNodes.forEach(node => refCountedRelease(refCountMap, node, () => node.removeAttribute("aria-hidden")));
+    hiddenNodes.forEach(node =>
+      refCountedRelease(refCountMap, node, () => node.removeAttribute("aria-hidden")),
+    );
     inertedNodes.forEach(node =>
       refCountedRelease(inertRefCountMap, node, () => {
         (node as HTMLElement).inert = false;

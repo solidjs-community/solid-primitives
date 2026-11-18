@@ -1,5 +1,49 @@
 # @solid-primitives/notification
 
+## 1.0.0
+
+### Major Changes
+
+- cf498ee: Add `@solid-primitives/notification` package (Stage 0)
+
+  New primitives for the browser [Notifications API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API).
+
+  - **`isNotificationSupported()`** — SSR-safe runtime check for Notifications API availability.
+  - **`makeNotification(title, options?)`** — Non-reactive helper returning `[show, close]`. `show()` creates and returns a `Notification` instance (or `null` when permission is not `"granted"`); calling it again replaces the previous notification. No Solid lifecycle dependency.
+  - **`createNotification(title, options?)`** — Reactive primitive returning `{ show, close, notification, supported }`. Accepts reactive accessors for `title` and `options` — their current values are read at `show()` time. The `notification` accessor tracks the live instance, updating to `null` when it is dismissed by the OS or closed programmatically. Cleans up automatically on owner disposal.
+  - **`createNotificationPermission()`** — Reactive permission manager returning `{ permission, requestPermission }`. The `permission` accessor reflects `Notification.permission` and updates after each `requestPermission()` call. Degrades gracefully to `"unknown"` on the server or when the Notifications API is unsupported.
+
+  Peer dependencies: `solid-js@^2.0.0-beta.14` and `@solidjs/web@^2.0.0-beta.14`.
+
+### Patch Changes
+
+- b7ef2f3: `createNotificationPermission`'s `requestPermission` now calls `affects(permission)`, so `isPending(permission)` reads `true` for the duration of the request — the standard Solid 2.0 idiom for callers who don't want the existing bespoke `pending` accessor, which is unchanged and kept for backward compatibility.
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
+- Updated dependencies [89c5324]
+- Updated dependencies [5fc4efa]
+- Updated dependencies [4a5bf32]
+- Updated dependencies [dd165cd]
+- Updated dependencies [7ee755d]
+- Updated dependencies [50e36c9]
+- Updated dependencies [c98cb2d]
+- Updated dependencies [1b703e1]
+- Updated dependencies [638c530]
+- Updated dependencies [04a170e]
+- Updated dependencies [88833b5]
+- Updated dependencies [b7ef2f3]
+- Updated dependencies [5c23fda]
+  - @solid-primitives/utils@7.0.0
+  - @solid-primitives/permission@2.0.0
+
 ## 1.0.0-next.5
 
 ### Patch Changes

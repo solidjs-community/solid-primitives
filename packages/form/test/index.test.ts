@@ -3,14 +3,11 @@ import { createEffect, createRoot, createSignal, flush, OBSERVE } from "solid-js
 import { attribution } from "solid-js/attribution";
 import { createForm, createFormResetListener, toFormData } from "../src/index.js";
 
-const isEmail = (v: string) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email";
+const isEmail = (v: string) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Invalid email");
 
-const minLength = (n: number) => (v: string) =>
-  v.length < n ? `Minimum ${n} characters` : null;
+const minLength = (n: number) => (v: string) => (v.length < n ? `Minimum ${n} characters` : null);
 
-const hasUppercase = (v: string) =>
-  /[A-Z]/.test(v) ? null : "Must contain an uppercase letter";
+const hasUppercase = (v: string) => (/[A-Z]/.test(v) ? null : "Must contain an uppercase letter");
 
 describe("field signals", () => {
   it("initializes field values from config", () => {
@@ -318,7 +315,7 @@ describe("reset", () => {
       const form = createForm({
         fields: {
           email: { initial: "" },
-          name:  { initial: "" },
+          name: { initial: "" },
         },
       });
 
@@ -352,7 +349,7 @@ describe("reset", () => {
       const form = createForm({
         fields: {
           email: { initial: "old@example.com" },
-          name:  { initial: "OldName" },
+          name: { initial: "OldName" },
         },
       });
 

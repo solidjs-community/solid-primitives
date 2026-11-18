@@ -1,0 +1,7 @@
+# Cache policy for Workers Static Assets (copied into dist/client as-is).
+# Both directories hold content-addressed files (Vite's hashed bundles, scripts/static-og.ts's
+# hash-named OG cards, see src/lib/og-path.ts), so they can be cached forever. HTML and the rest keep the default policy.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/og/*
+  Cache-Control: public, max-age=31536000, immutable

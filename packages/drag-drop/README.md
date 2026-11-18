@@ -1,12 +1,12 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Drag%20%26%20Drop" alt="Solid Primitives Drag & Drop">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Drag%20%26%20Drop&version=2.0" alt="Solid Primitives Drag & Drop">
 </p>
 
 # @solid-primitives/drag-drop
 
-[![size](https://img.shields.io/badge/size-3.97_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/drag-drop)
+[![size](https://img.shields.io/badge/size-3.98_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/drag-drop)
 [![version](https://img.shields.io/npm/v/@solid-primitives/drag-drop?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/drag-drop)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Composable, tree-shakeable drag-and-drop primitives.
 

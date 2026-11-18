@@ -15,29 +15,14 @@
 import type { ColorIntlTranslations } from "./intl.ts";
 
 /** Supported color string formats. Formats without an `a` suffix treat alpha as fully opaque. */
-export type ColorFormat =
-  | "hex"
-  | "hexa"
-  | "rgb"
-  | "rgba"
-  | "hsl"
-  | "hsla"
-  | "hsb"
-  | "hsba";
+export type ColorFormat = "hex" | "hexa" | "rgb" | "rgba" | "hsl" | "hsla" | "hsb" | "hsba";
 
 /** The three supported color spaces. */
 export type ColorSpace = "rgb" | "hsl" | "hsb";
 
 /** Individual channel names across all supported color spaces. */
 export type ColorChannel =
-  | "hue"
-  | "saturation"
-  | "brightness"
-  | "lightness"
-  | "red"
-  | "green"
-  | "blue"
-  | "alpha";
+  "hue" | "saturation" | "brightness" | "lightness" | "red" | "green" | "blue" | "alpha";
 
 /** Maps x/y/z axes to {@link ColorChannel} names for 2D color gradient pickers. */
 export type ColorAxes = {

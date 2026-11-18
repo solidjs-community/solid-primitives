@@ -1,4 +1,5 @@
-import { type Accessor, createEffect, createRenderEffect, createSignal, onSettled, sharedConfig } from "solid-js";
+import { type Accessor, createEffect, createRenderEffect, createSignal, onSettled } from "solid-js";
+import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore } from "@solid-primitives/static-store";
@@ -78,7 +79,9 @@ export function createScrollPosition(
     isServer
       ? { ...FALLBACK_SCROLL_POSITION }
       : getScrollPosition(
-          isFn ? (target as Accessor<Element | Window | undefined>)() : (target as Element | Window),
+          isFn
+            ? (target as Accessor<Element | Window | undefined>)()
+            : (target as Element | Window),
         );
 
   // Plain integer counter — avoids Solid 2.0 createSignal(fn) derived-signal semantics.
@@ -135,6 +138,7 @@ export function createScrollPosition(
  *   ([x, y]) => console.log(x, y),
  * );
  */
-export const useWindowScrollPosition: ReturnType<typeof createHydratableSingletonRoot> = /*#__PURE__*/ createHydratableSingletonRoot(() =>
-  createScrollPosition(isServer ? () => undefined : window),
-);
+export const useWindowScrollPosition: ReturnType<typeof createHydratableSingletonRoot> =
+  /*#__PURE__*/ createHydratableSingletonRoot(() =>
+    createScrollPosition(isServer ? () => undefined : window),
+  );

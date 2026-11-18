@@ -1,4 +1,11 @@
-import { action, affects, createOptimistic, createSignal, onCleanup, type Accessor } from "solid-js";
+import {
+  action,
+  affects,
+  createOptimistic,
+  createSignal,
+  onCleanup,
+  type Accessor,
+} from "solid-js";
 import { isServer } from "@solidjs/web";
 import { INTERNAL_OPTIONS, isDev, noop, access, type MaybeAccessor } from "@solid-primitives/utils";
 import { createPermission } from "@solid-primitives/permission";

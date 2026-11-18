@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=store" alt="Solid Primitives store">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=store&version=2.0" alt="Solid Primitives store">
 </p>
 
 # @solid-primitives/flux-store

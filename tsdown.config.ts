@@ -1,6 +1,7 @@
 // tsdown.config.ts
 import { defineConfig } from "tsdown";
 import solid from "unplugin-solid/rolldown";
+import { UNMIGRATED_PACKAGES } from "./scripts/utils/unmigrated-packages.ts";
 
 export default defineConfig({
   outDir: "dist",
@@ -46,6 +47,8 @@ export default defineConfig({
       "site",
       "template",
       "packages/storage/tauri-storage",
+      // still on Solid 1.x until migrated (see scripts/utils/unmigrated-packages.ts)
+      ...UNMIGRATED_PACKAGES.map(name => `packages/${name}`),
       "**/node_modules/**",
       "**/dist/**",
       "**/test?(s)/**",

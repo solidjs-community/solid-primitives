@@ -1,12 +1,12 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=sortable" alt="Solid Primitives sortable">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=sortable&version=2.0" alt="Solid Primitives sortable">
 </p>
 
 # @solid-primitives/sortable
 
-[![size](https://img.shields.io/badge/size-743_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/sortable)
+[![size](https://img.shields.io/badge/size-755_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/sortable)
 [![version](https://img.shields.io/npm/v/@solid-primitives/sortable?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/sortable)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
 Reactive sorting primitives — comparators, reactive sort (with an in-place `dirty` mode), sorted

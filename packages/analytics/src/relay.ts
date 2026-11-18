@@ -25,8 +25,8 @@ export function createServerPlugin(
   const handles = (type: AnyPayload["type"]) => !events || events.includes(type);
   return {
     name,
-    page:     handles("page")     ? ({ payload }) => fn(payload) as Promise<void> : undefined,
-    track:    handles("track")    ? ({ payload }) => fn(payload) as Promise<void> : undefined,
+    page: handles("page") ? ({ payload }) => fn(payload) as Promise<void> : undefined,
+    track: handles("track") ? ({ payload }) => fn(payload) as Promise<void> : undefined,
     identify: handles("identify") ? ({ payload }) => fn(payload) as Promise<void> : undefined,
   };
 }

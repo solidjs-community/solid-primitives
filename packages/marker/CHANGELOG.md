@@ -1,5 +1,35 @@
 # @solid-primitives/marker
 
+## 2.0.0
+
+### Major Changes
+
+- 5457e3a: Migrate to Solid.js v2.0 (beta.14)
+
+  ## Breaking Changes
+
+  **Peer dependency**: `solid-js@^2.0.0-beta.14` is now required.
+
+  ### `createMarker`
+
+  **`createRoot` second parameter removed** — In Solid 1.x the second argument to `createRoot` was a parent owner. In Solid 2.0 the API changed to an options object; the parent is now implicitly the current reactive context. The implementation now uses `runWithOwner(owner, () => createRoot(...))` to explicitly parent cached element roots to the marker's creation-time owner, preserving the existing lifecycle semantics.
+
+  **Signal `ownedWrite: true`** — In Solid 2.0, writing to a signal from inside an owned reactive scope (component body, `createRoot` callback, effect compute phase) throws by default. The internal per-match signal is now created with `{ ownedWrite: true }` so that `set()` can be called when the marker function is invoked from any reactive context.
+
+  **Deferred signal reads after `set()`** — In Solid 2.0 all signal writes are deferred until the next microtask flush. When a cached match element is reused and its text is updated via `set(newText)`, reading the signal accessor immediately returns the previously committed value. Call `flush()` from `solid-js` before reading a reused element's accessor if synchronous access is required (e.g. in tests).
+
+### Patch Changes
+
+- 50e36c9: Bump the `solid-js`/`@solidjs/web` peer and dev dependency range to `2.0.0-beta.20`. No API or behavior changes; beta.19/beta.20 introduced no breaking changes upstream (internal tree-shaking work, a new `solid-js/refresh` HMR entry point, and SSR/hydration/`lazy()` bug fixes).
+- c98cb2d: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals`/`babel-preset-solid` peer and dev dependency range to `2.0.0-rc.0`. No API or behavior changes on our end — this tracks upstream's move from the beta series into the release candidate.
+- 1b703e1: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.14`.
+- 638c530: Bump the `solid-js`/`@solidjs/web`/`@solidjs/signals` peer and dev dependency range to `2.0.0-rc.9`, and `babel-preset-solid` to `2.0.0-rc.2`.
+
+  Two behavior fixes were needed to keep up with upstream changes in this range:
+
+  - `@solid-primitives/deep`: `captureStoreUpdates` no longer missed property changes. As of `2.0.0-rc.1` a store's `[$TRACK]` only fires for structural changes (key additions/removals), so leaf value changes stopped being reported. Each node's direct property values are now tracked individually. Updates are still reported at the shallowest node that actually changed.
+  - `@solid-primitives/storage`: `makePersisted` no longer persists stale data. Signal writes stay pending until the next flush in `2.0.0-rc.1`+, so reading the value back inside the setter returned the _previous_ one — persisting stale data, or removing the stored entry entirely when the previous value was nullish. The value returned by the setter is now persisted directly.
+
 ## 2.0.0-next.4
 
 ### Patch Changes

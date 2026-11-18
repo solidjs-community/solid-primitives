@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "7.0.0-next.7",
+  "version": "7.0.0",
   "description": "A bunch of reactive utility types and functions, for building primitives",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [
@@ -141,7 +141,7 @@
       "COLOR_INTL_TRANSLATIONS"
     ],
     "category": "Utilities",
-    "gzip": 1591
+    "gzip": 1605
   },
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",

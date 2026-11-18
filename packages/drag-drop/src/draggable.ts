@@ -2,8 +2,20 @@ import { createEffect, createMemo, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, INTERNAL_OPTIONS, noop } from "@solid-primitives/utils";
 import { DEFAULT_KEYBOARD_STEP, useDragContext } from "./context.tsx";
-import { applyClass, applyStyle, markAsDraggable, removeClass, removeStyle, scrollCompensatedDelta } from "./dom.ts";
-import type { CreateDraggableOptions, DraggableReturn, MakeDraggableOptions, Transform } from "./types.ts";
+import {
+  applyClass,
+  applyStyle,
+  markAsDraggable,
+  removeClass,
+  removeStyle,
+  scrollCompensatedDelta,
+} from "./dom.ts";
+import type {
+  CreateDraggableOptions,
+  DraggableReturn,
+  MakeDraggableOptions,
+  Transform,
+} from "./types.ts";
 
 /**
  * Attaches pointer-based drag behaviour to an existing element.
@@ -35,7 +47,14 @@ export function makeDraggable<T = unknown>(
   let startScrollY = 0;
 
   const onPointerMove = (event: PointerEvent) => {
-    const delta = scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY);
+    const delta = scrollCompensatedDelta(
+      event.clientX,
+      event.clientY,
+      startX,
+      startY,
+      startScrollX,
+      startScrollY,
+    );
     options.onMove?.(delta, event);
   };
 
@@ -51,13 +70,27 @@ export function makeDraggable<T = unknown>(
 
   const onPointerUp = (event: PointerEvent) => {
     stopTracking();
-    const delta = scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY);
+    const delta = scrollCompensatedDelta(
+      event.clientX,
+      event.clientY,
+      startX,
+      startY,
+      startScrollX,
+      startScrollY,
+    );
     options.onEnd?.(delta, event);
   };
 
   const onPointerCancel = (event: PointerEvent) => {
     stopTracking();
-    const delta = scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY);
+    const delta = scrollCompensatedDelta(
+      event.clientX,
+      event.clientY,
+      startX,
+      startY,
+      startScrollX,
+      startScrollY,
+    );
     options.onEnd?.(delta, event);
   };
 
@@ -114,7 +147,10 @@ export function createDraggable<T = unknown>(
   }
 
   const ctx = useDragContext();
-  const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(undefined, INTERNAL_OPTIONS);
+  const [elSignal, setElSignal] = createSignal<HTMLElement | undefined>(
+    undefined,
+    INTERNAL_OPTIONS,
+  );
   const step = () => options.keyboardStep ?? DEFAULT_KEYBOARD_STEP;
 
   let isDragging: () => boolean;
@@ -137,7 +173,16 @@ export function createDraggable<T = unknown>(
     let startScrollY = 0;
 
     const onPointerMove = (event: PointerEvent) => {
-      setTransform(scrollCompensatedDelta(event.clientX, event.clientY, startX, startY, startScrollX, startScrollY));
+      setTransform(
+        scrollCompensatedDelta(
+          event.clientX,
+          event.clientY,
+          startX,
+          startY,
+          startScrollX,
+          startScrollY,
+        ),
+      );
     };
 
     // Shared by pointerup (normal end) and pointercancel (OS/browser-interrupted drag) —
@@ -170,10 +215,22 @@ export function createDraggable<T = unknown>(
       }
 
       switch (event.key) {
-        case "ArrowUp": event.preventDefault(); nudge(0, -step()); break;
-        case "ArrowDown": event.preventDefault(); nudge(0, step()); break;
-        case "ArrowLeft": event.preventDefault(); nudge(-step(), 0); break;
-        case "ArrowRight": event.preventDefault(); nudge(step(), 0); break;
+        case "ArrowUp":
+          event.preventDefault();
+          nudge(0, -step());
+          break;
+        case "ArrowDown":
+          event.preventDefault();
+          nudge(0, step());
+          break;
+        case "ArrowLeft":
+          event.preventDefault();
+          nudge(-step(), 0);
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          nudge(step(), 0);
+          break;
         case " ":
         case "Enter":
         case "Escape":
@@ -239,10 +296,22 @@ export function createDraggable<T = unknown>(
           }
 
           switch (event.key) {
-            case "ArrowUp": event.preventDefault(); ctx._moveBy(0, -step()); break;
-            case "ArrowDown": event.preventDefault(); ctx._moveBy(0, step()); break;
-            case "ArrowLeft": event.preventDefault(); ctx._moveBy(-step(), 0); break;
-            case "ArrowRight": event.preventDefault(); ctx._moveBy(step(), 0); break;
+            case "ArrowUp":
+              event.preventDefault();
+              ctx._moveBy(0, -step());
+              break;
+            case "ArrowDown":
+              event.preventDefault();
+              ctx._moveBy(0, step());
+              break;
+            case "ArrowLeft":
+              event.preventDefault();
+              ctx._moveBy(-step(), 0);
+              break;
+            case "ArrowRight":
+              event.preventDefault();
+              ctx._moveBy(step(), 0);
+              break;
             case " ":
             case "Enter":
               event.preventDefault();

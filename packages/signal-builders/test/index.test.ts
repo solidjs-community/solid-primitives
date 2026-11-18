@@ -239,20 +239,35 @@ describe("capitalize()", () => {
 describe("substring()", () => {
   it("extracts a range with start and end", () =>
     createRoot(dispose => {
-      expect(substring(() => "Hello, world!", () => 7, () => 12)()).toBe("world");
+      expect(
+        substring(
+          () => "Hello, world!",
+          () => 7,
+          () => 12,
+        )(),
+      ).toBe("world");
       dispose();
     }));
 
   it("extracts to end when end is omitted", () =>
     createRoot(dispose => {
-      expect(substring(() => "Hello, world!", () => 7)()).toBe("world!");
+      expect(
+        substring(
+          () => "Hello, world!",
+          () => 7,
+        )(),
+      ).toBe("world!");
       dispose();
     }));
 
   it("updates when string signal changes", () => {
     const [s, setS] = createSignal("abcdef");
     const { result, dispose } = createRoot(d => ({
-      result: substring(s, () => 1, () => 4),
+      result: substring(
+        s,
+        () => 1,
+        () => 4,
+      ),
       dispose: d,
     }));
     expect(result()).toBe("bcd");
@@ -289,20 +304,37 @@ describe("template`...`", () => {
 describe("add()", () => {
   it("adds two numbers", () =>
     createRoot(dispose => {
-      expect(add(() => 2, () => 3)()).toBe(5);
+      expect(
+        add(
+          () => 2,
+          () => 3,
+        )(),
+      ).toBe(5);
       dispose();
     }));
 
   it("adds multiple numbers", () =>
     createRoot(dispose => {
-      expect(add(() => 1, () => 2, () => 3, () => 4)()).toBe(10);
+      expect(
+        add(
+          () => 1,
+          () => 2,
+          () => 3,
+          () => 4,
+        )(),
+      ).toBe(10);
       dispose();
     }));
 
   it("coerces to string when a string arg is present (starts from 0)", () =>
     createRoot(dispose => {
       // add() starts accumulating from 0, so number args sum first, then string coercion kicks in
-      expect(add(() => 5, () => " items")()).toBe("5 items");
+      expect(
+        add(
+          () => 5,
+          () => " items",
+        )(),
+      ).toBe("5 items");
       dispose();
     }));
 
@@ -321,13 +353,24 @@ describe("add()", () => {
 describe("substract()", () => {
   it("subtracts two values", () =>
     createRoot(dispose => {
-      expect(substract(() => 10, () => 3)()).toBe(7);
+      expect(
+        substract(
+          () => 10,
+          () => 3,
+        )(),
+      ).toBe(7);
       dispose();
     }));
 
   it("subtracts multiple values left-to-right", () =>
     createRoot(dispose => {
-      expect(substract(() => 10, () => 3, () => 2)()).toBe(5);
+      expect(
+        substract(
+          () => 10,
+          () => 3,
+          () => 2,
+        )(),
+      ).toBe(5);
       dispose();
     }));
 
@@ -348,13 +391,24 @@ describe("substract()", () => {
 describe("multiply()", () => {
   it("multiplies two values", () =>
     createRoot(dispose => {
-      expect(multiply(() => 3, () => 4)()).toBe(12);
+      expect(
+        multiply(
+          () => 3,
+          () => 4,
+        )(),
+      ).toBe(12);
       dispose();
     }));
 
   it("multiplies multiple values", () =>
     createRoot(dispose => {
-      expect(multiply(() => 2, () => 3, () => 4)()).toBe(24);
+      expect(
+        multiply(
+          () => 2,
+          () => 3,
+          () => 4,
+        )(),
+      ).toBe(24);
       dispose();
     }));
 
@@ -372,13 +426,24 @@ describe("multiply()", () => {
 describe("divide()", () => {
   it("divides two values", () =>
     createRoot(dispose => {
-      expect(divide(() => 12, () => 4)()).toBe(3);
+      expect(
+        divide(
+          () => 12,
+          () => 4,
+        )(),
+      ).toBe(3);
       dispose();
     }));
 
   it("divides multiple values left-to-right", () =>
     createRoot(dispose => {
-      expect(divide(() => 100, () => 5, () => 4)()).toBe(5);
+      expect(
+        divide(
+          () => 100,
+          () => 5,
+          () => 4,
+        )(),
+      ).toBe(5);
       dispose();
     }));
 
@@ -396,13 +461,24 @@ describe("divide()", () => {
 describe("power()", () => {
   it("raises to a power", () =>
     createRoot(dispose => {
-      expect(power(() => 2, () => 10)()).toBe(1024);
+      expect(
+        power(
+          () => 2,
+          () => 10,
+        )(),
+      ).toBe(1024);
       dispose();
     }));
 
   it("applies exponent chain left-to-right: (2**3)**2 = 64", () =>
     createRoot(dispose => {
-      expect(power(() => 2, () => 3, () => 2)()).toBe(64);
+      expect(
+        power(
+          () => 2,
+          () => 3,
+          () => 2,
+        )(),
+      ).toBe(64);
       dispose();
     }));
 
@@ -477,26 +553,48 @@ describe("floor()", () => {
 describe("clamp()", () => {
   it("clamps a value above max to max", () =>
     createRoot(dispose => {
-      expect(clamp(() => 15, () => 0, () => 10)()).toBe(10);
+      expect(
+        clamp(
+          () => 15,
+          () => 0,
+          () => 10,
+        )(),
+      ).toBe(10);
       dispose();
     }));
 
   it("clamps a value below min to min", () =>
     createRoot(dispose => {
-      expect(clamp(() => -5, () => 0, () => 10)()).toBe(0);
+      expect(
+        clamp(
+          () => -5,
+          () => 0,
+          () => 10,
+        )(),
+      ).toBe(0);
       dispose();
     }));
 
   it("keeps a value already within range unchanged", () =>
     createRoot(dispose => {
-      expect(clamp(() => 7, () => 0, () => 10)()).toBe(7);
+      expect(
+        clamp(
+          () => 7,
+          () => 0,
+          () => 10,
+        )(),
+      ).toBe(7);
       dispose();
     }));
 
   it("updates when value signal changes", () => {
     const [val, setVal] = createSignal(5);
     const { result, dispose } = createRoot(d => ({
-      result: clamp(val, () => 0, () => 10),
+      result: clamp(
+        val,
+        () => 0,
+        () => 10,
+      ),
       dispose: d,
     }));
     expect(result()).toBe(5);
@@ -512,7 +610,11 @@ describe("clamp()", () => {
   it("updates when max signal changes", () => {
     const [max, setMax] = createSignal(10);
     const { result, dispose } = createRoot(d => ({
-      result: clamp(() => 5, () => 0, max),
+      result: clamp(
+        () => 5,
+        () => 0,
+        max,
+      ),
       dispose: d,
     }));
     expect(result()).toBe(5);
@@ -525,7 +627,11 @@ describe("clamp()", () => {
   it("updates when min signal changes", () => {
     const [min, setMin] = createSignal(0);
     const { result, dispose } = createRoot(d => ({
-      result: clamp(() => 5, min, () => 10),
+      result: clamp(
+        () => 5,
+        min,
+        () => 10,
+      ),
       dispose: d,
     }));
     expect(result()).toBe(5);
@@ -539,14 +645,23 @@ describe("clamp()", () => {
 describe("push()", () => {
   it("appends items to the array", () =>
     createRoot(dispose => {
-      expect(push(() => [1, 2], () => 3, () => 4)()).toEqual([1, 2, 3, 4]);
+      expect(
+        push(
+          () => [1, 2],
+          () => 3,
+          () => 4,
+        )(),
+      ).toEqual([1, 2, 3, 4]);
       dispose();
     }));
 
   it("does not mutate the original array", () =>
     createRoot(dispose => {
       const original = [1, 2, 3];
-      push(() => original, () => 4)();
+      push(
+        () => original,
+        () => 4,
+      )();
       expect(original).toEqual([1, 2, 3]);
       dispose();
     }));
@@ -620,7 +735,10 @@ describe("filter()", () => {
   // Spread into a plain array before comparing to avoid property mismatch in toEqual.
   it("keeps items that match a predicate", () =>
     createRoot(dispose => {
-      const result = filter(() => [1, 2, 3, 4, 5], n => n % 2 === 0)();
+      const result = filter(
+        () => [1, 2, 3, 4, 5],
+        n => n % 2 === 0,
+      )();
       expect([...result]).toEqual([2, 4]);
       expect(result.removed).toBe(3);
       dispose();
@@ -644,7 +762,10 @@ describe("filterOut()", () => {
   // filterOut delegates to filter, so it also attaches a `.removed` property.
   it("removes all occurrences of the item", () =>
     createRoot(dispose => {
-      const result = filterOut(() => [1, 2, 3, 2, 1], () => 2)();
+      const result = filterOut(
+        () => [1, 2, 3, 2, 1],
+        () => 2,
+      )();
       expect([...result]).toEqual([1, 3, 1]);
       expect(result.removed).toBe(2);
       dispose();
@@ -693,7 +814,12 @@ describe("sort()", () => {
 describe("map()", () => {
   it("maps items to new values", () =>
     createRoot(dispose => {
-      expect(map(() => [1, 2, 3], n => n * 2)()).toEqual([2, 4, 6]);
+      expect(
+        map(
+          () => [1, 2, 3],
+          n => n * 2,
+        )(),
+      ).toEqual([2, 4, 6]);
       dispose();
     }));
 
@@ -738,20 +864,37 @@ describe("slice()", () => {
 describe("splice()", () => {
   it("removes elements at a position", () =>
     createRoot(dispose => {
-      expect(splice(() => [1, 2, 3, 4, 5], () => 1, () => 2)()).toEqual([1, 4, 5]);
+      expect(
+        splice(
+          () => [1, 2, 3, 4, 5],
+          () => 1,
+          () => 2,
+        )(),
+      ).toEqual([1, 4, 5]);
       dispose();
     }));
 
   it("replaces elements", () =>
     createRoot(dispose => {
-      expect(splice(() => [1, 2, 3], () => 1, () => 1, () => 99)()).toEqual([1, 99, 3]);
+      expect(
+        splice(
+          () => [1, 2, 3],
+          () => 1,
+          () => 1,
+          () => 99,
+        )(),
+      ).toEqual([1, 99, 3]);
       dispose();
     }));
 
   it("updates when list signal changes", () => {
     const [list, setList] = createSignal([1, 2, 3, 4, 5]);
     const { result, dispose } = createRoot(d => ({
-      result: splice(list, () => 0, () => 2),
+      result: splice(
+        list,
+        () => 0,
+        () => 2,
+      ),
       dispose: d,
     }));
     expect(result()).toEqual([3, 4, 5]);
@@ -765,7 +908,12 @@ describe("splice()", () => {
 describe("remove()", () => {
   it("removes the first occurrence of the item", () =>
     createRoot(dispose => {
-      expect(remove(() => [1, 2, 3, 2, 1], () => 2)()).toEqual([1, 3, 2, 1]);
+      expect(
+        remove(
+          () => [1, 2, 3, 2, 1],
+          () => 2,
+        )(),
+      ).toEqual([1, 3, 2, 1]);
       dispose();
     }));
 
@@ -788,14 +936,24 @@ describe("removeItems()", () => {
   // Once a provided item is matched once, subsequent occurrences in the list are kept.
   it("removes the first occurrence of each provided item", () =>
     createRoot(dispose => {
-      expect(removeItems(() => [1, 2, 3, 2, 1], () => 1, () => 2)()).toEqual([3, 2, 1]);
+      expect(
+        removeItems(
+          () => [1, 2, 3, 2, 1],
+          () => 1,
+          () => 2,
+        )(),
+      ).toEqual([3, 2, 1]);
       dispose();
     }));
 
   it("updates when list signal changes", () => {
     const [list, setList] = createSignal([1, 2, 3, 4, 5]);
     const { result, dispose } = createRoot(d => ({
-      result: removeItems(list, () => 2, () => 4),
+      result: removeItems(
+        list,
+        () => 2,
+        () => 4,
+      ),
       dispose: d,
     }));
     expect(result()).toEqual([1, 3, 5]);
@@ -809,13 +967,24 @@ describe("removeItems()", () => {
 describe("concat()", () => {
   it("concatenates two arrays", () =>
     createRoot(dispose => {
-      expect(concat(() => [1, 2], () => [3, 4])()).toEqual([1, 2, 3, 4]);
+      expect(
+        concat(
+          () => [1, 2],
+          () => [3, 4],
+        )(),
+      ).toEqual([1, 2, 3, 4]);
       dispose();
     }));
 
   it("concatenates more than two arrays", () =>
     createRoot(dispose => {
-      expect(concat(() => [1], () => [2], () => [3])()).toEqual([1, 2, 3]);
+      expect(
+        concat(
+          () => [1],
+          () => [2],
+          () => [3],
+        )(),
+      ).toEqual([1, 2, 3]);
       dispose();
     }));
 
@@ -837,7 +1006,12 @@ describe("concat()", () => {
 describe("flatten()", () => {
   it("flattens one level deep", () =>
     createRoot(dispose => {
-      expect(flatten(() => [[1, 2], [3, 4]])()).toEqual([1, 2, 3, 4]);
+      expect(
+        flatten(() => [
+          [1, 2],
+          [3, 4],
+        ])(),
+      ).toEqual([1, 2, 3, 4]);
       dispose();
     }));
 
@@ -848,7 +1022,10 @@ describe("flatten()", () => {
     }));
 
   it("updates when list signal changes", () => {
-    const [list, setList] = createSignal([[1, 2], [3, 4]]);
+    const [list, setList] = createSignal([
+      [1, 2],
+      [3, 4],
+    ]);
     const { result, dispose } = createRoot(d => ({ result: flatten(list), dispose: d }));
     expect(result()).toEqual([1, 2, 3, 4]);
     setList([[5, 6], [7]]);
@@ -985,7 +1162,12 @@ describe("get()", () => {
 describe("merge()", () => {
   it("merges two objects, later keys override earlier", () =>
     createRoot(dispose => {
-      expect(merge(() => ({ a: 1, b: 2 }), () => ({ b: 99, c: 3 }))()).toEqual({
+      expect(
+        merge(
+          () => ({ a: 1, b: 2 }),
+          () => ({ b: 99, c: 3 }),
+        )(),
+      ).toEqual({
         a: 1,
         b: 99,
         c: 3,
@@ -995,7 +1177,13 @@ describe("merge()", () => {
 
   it("merges three objects", () =>
     createRoot(dispose => {
-      expect(merge(() => ({ a: 1 }), () => ({ b: 2 }), () => ({ c: 3 }))()).toEqual({
+      expect(
+        merge(
+          () => ({ a: 1 }),
+          () => ({ b: 2 }),
+          () => ({ c: 3 }),
+        )(),
+      ).toEqual({
         a: 1,
         b: 2,
         c: 3,
@@ -1043,9 +1231,9 @@ describe("update()", () => {
 
   it("sets a nested key path", () =>
     createRoot(dispose => {
-      expect(
-        update(() => ({ user: { name: "Alice", age: 30 } }), "user", "name", "Bob")(),
-      ).toEqual({ user: { name: "Bob", age: 30 } });
+      expect(update(() => ({ user: { name: "Alice", age: 30 } }), "user", "name", "Bob")()).toEqual(
+        { user: { name: "Bob", age: 30 } },
+      );
       dispose();
     }));
 

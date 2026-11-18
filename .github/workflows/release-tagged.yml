@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: ["v[1-9]", "next"]
+    branches: [main]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
