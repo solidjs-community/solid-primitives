@@ -9,6 +9,73 @@ import {
 import { runCompute } from "../src/compute.ts";
 
 describe("compute source adaptation", () => {
+  for (const prototype of ["cycle", "endless", "throw"] as const)
+    it(`keeps a proxied iterable lazy with a ${prototype} prototype probe`, async () => {
+      let opened = 0,
+        probes = 0;
+      const handler: ProxyHandler<object> = {
+        getPrototypeOf() {
+          probes++;
+          if (prototype === "throw") throw new Error("prototype inspection refused");
+          return prototype === "cycle" ? source : new Proxy({}, handler);
+        },
+      };
+      const source: AsyncIterable<Map<string, number>> = new Proxy(
+        {
+          [Symbol.asyncIterator]() {
+            opened++;
+            return {
+              async next() {
+                return { done: true as const, value: undefined };
+              },
+            };
+          },
+        },
+        handler,
+      ) as AsyncIterable<Map<string, number>>;
+      const adapted = runCompute(
+        () => source,
+        new Map<string, number>(),
+        () => {},
+        { revision: 0 },
+      ) as AsyncIterable<void>;
+      expect(opened).toBe(0);
+      expect("next" in adapted).toBe(false);
+      expect(probes).toBeLessThanOrEqual(32);
+      for await (const _ of adapted) {
+        /* consume */
+      }
+      expect(opened).toBe(1);
+    });
+
+  it("recognizes a native generator with an accessor next without reading it early", async () => {
+    let reads = 0;
+    const source = (async function* () {
+      yield new Map([["value", 1]]);
+    })();
+    const next = source.next;
+    Object.defineProperty(source, "next", {
+      get() {
+        if (++reads > 1) throw new Error("next read twice");
+        return next;
+      },
+    });
+    const values: number[] = [];
+    const adapted = runCompute(
+      () => source,
+      new Map<string, number>(),
+      value => values.push(value!.get("value")!),
+      { revision: 0 },
+    ) as AsyncIterableIterator<void>;
+    expect(typeof adapted.next).toBe("function");
+    expect(reads).toBe(0);
+    for await (const _ of adapted) {
+      /* consume */
+    }
+    expect(values).toEqual([1]);
+    expect(reads).toBe(1);
+  });
+
   it("caches next on the returned iterator and preserves its receiver", async () => {
     let reads = 0,
       pulls = 0;

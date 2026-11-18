@@ -5,8 +5,9 @@ import { execFileSync } from "node:child_process";
 
 function sourceRef(): string {
   if (process.env.STORYBOOK_SOURCE_REF) return process.env.STORYBOOK_SOURCE_REF;
+  if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA;
   try {
-    return execFileSync("git", ["rev-parse", "HEAD"], {
+    return execFileSync("git", ["rev-parse", "--verify", "@{upstream}"], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     }).trim();

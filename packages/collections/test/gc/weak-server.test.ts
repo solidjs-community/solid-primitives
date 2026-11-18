@@ -55,6 +55,7 @@ for (const optimistic of [false, true]) {
     });
     const { state, slots } = (map as any).data;
     const iterator = getProjectionTrace(state)!.subscribe()[Symbol.asyncIterator]();
+    let lastSlot!: string;
     try {
       for (let i = 0; i < gates.length; i++) {
         assert.equal((await iterator.next()).done, false);
@@ -62,11 +63,23 @@ for (const optimistic of [false, true]) {
         assert.equal(metadata.length, 1, "previous committed cleanup must remove metadata");
         assert.equal(slots.dead.length, 0, "successful server cleanup must retire queued IDs");
         const slot = metadata[0]!.slice(2);
+        lastSlot = slot;
         await collectUntil(() => slots.dead.includes(slot));
         gates[i]!.resolve();
       }
       // A terminal cleanup-only value publishes deletion of the final slot.
-      assert.equal((await iterator.next()).done, false);
+      const terminal = await iterator.next();
+      assert.equal(terminal.done, false);
+      assert.ok(Array.isArray(terminal.value));
+      const deletions = terminal.value.filter((patch: unknown[]) => patch.length === 1);
+      assert.ok(
+        deletions.some((patch: unknown[][]) => patch[0]!.length === 1 && patch[0]![0] === lastSlot),
+      );
+      assert.ok(
+        deletions.some(
+          (patch: unknown[][]) => patch[0]!.length === 1 && patch[0]![0] === "k:" + lastSlot,
+        ),
+      );
       assert.equal(Object.keys(state).filter(k => k.startsWith("k:")).length, 0);
       assert.equal(slots.dead.length, 0);
       assert.equal((await iterator.next()).done, true);

@@ -29,6 +29,31 @@ export function collectionWriter<T>(state: T): StoreSetter<T> {
   };
 }
 
+function generatorShaped(value: object): boolean {
+  const seen = new Set<object>();
+  let foundNext = false;
+  try {
+    for (let proto: object | null = value, depth = 0; proto && depth < 32; depth++) {
+      if (seen.has(proto)) return false;
+      seen.add(proto);
+      if (!foundNext) {
+        const descriptor = Object.getOwnPropertyDescriptor(proto, "next");
+        if (descriptor) {
+          foundNext = true;
+          if (typeof descriptor.value === "function") return true;
+        }
+      }
+      // Native generators remain traceable when an accessor shadows next.
+      if (Object.getOwnPropertyDescriptor(proto, Symbol.toStringTag)?.value === "AsyncGenerator")
+        return true;
+      proto = Object.getPrototypeOf(proto);
+    }
+  } catch {
+    // Exotic objects may refuse inspection; consume them as lazy iterables.
+  }
+  return false;
+}
+
 export function runCompute<Draft, Result>(
   compute: ReactiveCollectionCompute<Draft, Result>,
   draft: Draft,
@@ -47,13 +72,21 @@ export function runCompute<Draft, Result>(
   if (typeof method === "function") {
     const open = (): AsyncIterableIterator<void> => {
       const source = Reflect.apply(method, result, []) as AsyncIterator<void | Result>;
+      // Solid's discarded dependency trace replaces Promise with a mock whose
+      // constructor skips executors. Capture that boundary while it is active;
+      // a live compute during hydration still executes a normal executor.
+      let tracing = true;
+      void new Promise<void>(resolve => {
+        tracing = false;
+        resolve();
+      });
       let next: AsyncIterator<void | Result>["next"] | undefined;
       let closed = false,
         finished = false,
         yielded = false,
         revision = data.revision;
       const done = (): IteratorReturnResult<undefined> => ({ done: true, value: undefined });
-      const fail = (error: unknown): never => {
+      const close = () => {
         if (!closed) {
           closed = true;
           // Cleanup is best effort here: its failure or latency must never
@@ -65,6 +98,9 @@ export function runCompute<Draft, Result>(
             /* preserve the original failure */
           }
         }
+      };
+      const fail = (error: unknown): never => {
+        close();
         throw error;
       };
       const pull = async (): Promise<IteratorResult<void>> => {
@@ -78,6 +114,12 @@ export function runCompute<Draft, Result>(
           return fail(error);
         }
         if (closed) return done();
+        if (tracing) {
+          // Dependencies were captured by the first pull. Its value is ignored,
+          // so close the suspended generator instead of leaving resources live.
+          close();
+          return done();
+        }
         try {
           if (!step.done) {
             commit(step.value);
@@ -116,16 +158,7 @@ export function runCompute<Draft, Result>(
     };
     // Keep Solid's generator-shaped dependency trace, but do not turn an
     // ordinary iterable into a generator: opening it may subscribe to events.
-    let generatorShaped = false;
-    for (let proto = result as object | null; proto; proto = Object.getPrototypeOf(proto)) {
-      const descriptor = Object.getOwnPropertyDescriptor(proto, "next");
-      if (descriptor) {
-        // Detect methods without invoking an unrelated iterable accessor.
-        generatorShaped = typeof descriptor.value === "function";
-        break;
-      }
-    }
-    const adapted: AsyncIterable<void> = generatorShaped
+    const adapted: AsyncIterable<void> = generatorShaped(result as object)
       ? open()
       : { [Symbol.asyncIterator]: open };
     Object.defineProperty(adapted, Symbol.for("solid.LiveSource"), {

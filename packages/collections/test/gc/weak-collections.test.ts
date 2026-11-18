@@ -92,7 +92,7 @@ test("an active computed stream prunes collected keys without restarting", async
     started = 0,
     stopped = false,
     closed = false;
-  let current: WeakRef<object> | undefined;
+  let current: object | undefined;
   let lastSlot: string | undefined;
   const map = root(() =>
     createReactiveWeakMap<object, unknown>(
@@ -105,7 +105,8 @@ test("an active computed stream prunes collected keys without restarting", async
               releases.set(i, resolve);
             });
             if (stopped) return;
-            current = addTransientKey(draft);
+            current = {};
+            draft.set(current, { key: current });
             yielded++;
             yield;
           }
@@ -131,9 +132,10 @@ test("an active computed stream prunes collected keys without restarting", async
         "producer did not publish and request another pull",
       );
       assert.equal(started, 1);
-      assert.equal(map.has(current!.deref()!), true);
-      if (i === 3) lastSlot = (map as any).data.slots.slot(current!.deref()!, inspect(map));
+      assert.equal(map.has(current!), true);
+      if (i === 3) lastSlot = (map as any).data.slots.slot(current!, inspect(map));
       assert.ok(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length <= 2);
+      current = undefined;
       await collect();
     }
     await waitUntil(
@@ -141,6 +143,7 @@ test("an active computed stream prunes collected keys without restarting", async
       "the final key was not finalized before the terminal pull",
     );
   } finally {
+    current = undefined;
     stopped = true;
     for (const release of releases.values()) release();
     if (started) await waitUntil(() => closed, "producer did not close during teardown");

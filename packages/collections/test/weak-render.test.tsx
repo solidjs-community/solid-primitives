@@ -6,11 +6,11 @@ import { renderToStream } from "@solidjs/web";
 import { WeakCollectionTokenPlugin } from "@solid-primitives/collections/serialization";
 import { WeakTokenFixture, kinds } from "./fixtures/weak-collections.js";
 import { AliasKeyFixture } from "./fixtures/alias-keys.tsx";
-import { TracingFixture } from "./fixtures/tracing.tsx";
+import { TracingFixture, traceKinds } from "./fixtures/tracing.tsx";
 const directory = artifactDirectory("weak-ssr");
 mkdirSync(directory, { recursive: true });
 
-for (const kind of ["iterable", "promise", "generator"] as const)
+for (const kind of traceKinds)
   it(`renders a ${kind} tracing fixture`, async () => {
     const chunks: string[] = [];
     await new Promise<void>((resolve, reject) => {
