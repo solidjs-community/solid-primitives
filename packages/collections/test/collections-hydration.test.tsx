@@ -11,6 +11,7 @@ import {
   current,
   currentSet,
   kinds,
+  releaseCollectionHybrid,
 } from "./fixtures/collections.js";
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 async function expectView(container: Element, read: () => string, expected: string, phase: string) {
@@ -114,7 +115,26 @@ describe("real SSR to collection hydration", () => {
             flush();
             await sleep(kind.includes("hybrid") ? 50 : 10);
             flush();
-            if (mode === "streamed" && artifact.rest) apply(container, artifact.rest, false);
+            if (kind === "stream" && mode === "streamed") {
+              apply(container, artifact.earlyRest, false);
+              await vi.waitFor(() => {
+                flush();
+                expect(current.map!.has("tail")).toBe(false);
+              });
+              apply(container, artifact.lateRest, false);
+            } else if (mode === "streamed" && artifact.rest) apply(container, artifact.rest, false);
+            if (kind.includes("hybrid")) {
+              try {
+                await expectView(
+                  container,
+                  current.read,
+                  "true:0:true:true:1:false",
+                  "adopted hybrid answer",
+                );
+              } finally {
+                releaseCollectionHybrid?.();
+              }
+            }
             const streamed = kind === "stream" || kind.includes("hybrid");
             await expectView(
               container,
@@ -142,6 +162,7 @@ describe("real SSR to collection hydration", () => {
             );
             expect(warn).not.toHaveBeenCalled();
           } finally {
+            if (kind.includes("hybrid")) releaseCollectionHybrid?.();
             dispose?.();
             await sleep(0);
             warn.mockRestore();
@@ -179,16 +200,33 @@ describe("real Set hydration", () => {
             flush();
             await sleep(10);
             flush();
-            if (mode === "streamed" && artifact.rest) apply(container, artifact.rest, false);
-            await expectView(container, currentSet.read, "true:true:true:5:true:true", "hydrated");
+            if (kind === "stream" && mode === "streamed") {
+              apply(container, artifact.earlyRest, false);
+              await vi.waitFor(() => {
+                flush();
+                expect(currentSet.set.has("tail")).toBe(false);
+              });
+              apply(container, artifact.lateRest, false);
+            } else if (mode === "streamed" && artifact.rest) apply(container, artifact.rest, false);
+            await expectView(
+              container,
+              currentSet.read,
+              "true:true:true:5:true:true:0",
+              "hydrated",
+            );
             expect(container.querySelector("section")).toBe(section);
             expect(container.querySelector("b")).toBe(sibling);
             await checkLocalEdits(currentSet.set, optimistic);
             currentSet.update();
             flush();
-            await expectView(container, currentSet.read, "true:true:true:5:true:true", "updated");
+            await expectView(container, currentSet.read, "true:true:true:5:true:true:1", "updated");
             await currentSet.refresh();
-            await expectView(container, currentSet.read, "true:true:true:5:true:true", "refreshed");
+            await expectView(
+              container,
+              currentSet.read,
+              "true:true:true:5:true:true:2",
+              "refreshed",
+            );
             expect(currentSet.set.has(2)).toBe(true);
             expect(currentSet.set.has(1)).toBe(false);
             expect(warn).not.toHaveBeenCalled();

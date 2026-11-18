@@ -12,7 +12,12 @@ import {
   NotReadyError,
   refresh,
 } from "@solidjs/signals";
-import { createReactiveMap, createReactiveSet } from "@solid-primitives/collections";
+import {
+  createReactiveMap,
+  createReactiveSet,
+  createReactiveWeakMap,
+} from "@solid-primitives/collections";
+import { createWeakCollectionToken } from "../src/weak-token.ts";
 
 const disposers: (() => void)[] = [];
 function root<T>(fn: () => T): T {
@@ -61,6 +66,51 @@ const target = (collection: any) => collection.data.store[$TARGET];
 const count = (record: object | null) => (record ? Reflect.ownKeys(record).length : 0);
 
 describe("reactive collection factories", () => {
+  for (const weak of [false, true])
+    it(`keeps tracked aliases live across delete rollback, weak=${weak}`, async () => {
+      const key = {},
+        gate = deferred();
+      const map = root(() =>
+        weak
+          ? createReactiveWeakMap([[key, 1]], { optimistic: true })
+          : createReactiveMap([[key, 1]], { optimistic: true }),
+      );
+      const data = (map as any).data;
+      // Adopt a later wire alias while the earlier local alias is still visible.
+      if (weak) {
+        data.slots.slot(key, {
+          keys: Object.freeze({}),
+          "k:wire": createWeakCollectionToken(key, key),
+          wire: createWeakCollectionToken(key, 1),
+        });
+        data.slots.notify();
+      } else {
+        data.encoder.encode(key, {
+          order: [{ id: 1, slot: "wire" }],
+          size: 1,
+          "k:wire": Object.freeze({ value: key }),
+          wire: 1,
+        });
+        data.encoder.adopt(data.store);
+      }
+      const reader = root(() => observe(() => [map.has(key), map.get(key)]));
+      flush();
+      expect(reader.values.at(-1)).toEqual([true, 1]);
+      const pending = action(function* () {
+        map.delete(key);
+        yield gate.promise;
+      })();
+      try {
+        flush();
+        expect(reader.values.at(-1)).toEqual([false, undefined]);
+      } finally {
+        gate.resolve();
+        await pending;
+        flush();
+      }
+      expect([map.has(key), map.get(key)]).toEqual([true, 1]);
+      expect(reader.values.at(-1)).toEqual([true, 1]);
+    });
   it("keeps backend fields out of ordinary enumeration and JSON", () => {
     const map = root(() => createReactiveMap([["a", 1]]));
     const set = root(() => createReactiveSet([1]));

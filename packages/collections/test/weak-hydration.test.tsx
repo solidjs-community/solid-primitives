@@ -7,6 +7,7 @@ import { action, flush } from "solid-js";
 import { hydrate } from "@solidjs/web";
 import { WeakTokenFixture, kinds, current, releaseHybrid } from "./fixtures/weak-collections.js";
 import { AliasKeyFixture, aliasCurrent } from "./fixtures/alias-keys.tsx";
+import { TracingFixture, traceCurrent } from "./fixtures/tracing.tsx";
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 function apply(container: Element, chunk: string, first: boolean) {
   const pattern = /<script(?:[^>]*)>([\s\S]*?)<\/script>/g;
@@ -16,6 +17,36 @@ function apply(container: Element, chunk: string, first: boolean) {
   else container.insertAdjacentHTML("beforeend", markup);
   for (const script of scripts) (0, eval)(script);
 }
+
+for (const kind of ["iterable", "promise"] as const)
+  it(`does not leak discarded ${kind} hydration traces`, async () => {
+    const artifact = JSON.parse(
+      readFileSync(resolve(artifactDirectory("weak-ssr"), `trace-${kind}.json`), "utf8"),
+    );
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    (globalThis as any)._$HY = { events: [], completed: new WeakSet(), r: {}, fe() {} };
+    let dispose: (() => void) | undefined;
+    try {
+      apply(container, artifact.shell, true);
+      dispose = hydrate(() => <TracingFixture kind={kind} />, container);
+      flush();
+      await sleep(10);
+      expect(traceCurrent.read()).toBe(1);
+      expect(container.textContent).toBe("1");
+      expect(traceCurrent.opened).toBe(0);
+      traceCurrent.update();
+      await vi.waitFor(() => {
+        flush();
+        expect(container.textContent).toBe("2");
+      });
+      expect(traceCurrent.opened).toBe(kind === "iterable" ? 1 : 0);
+    } finally {
+      dispose?.();
+      container.remove();
+    }
+    if (kind === "iterable") expect(traceCurrent.closed).toBe(1);
+  });
 
 for (const weak of [false, true])
   for (const optimistic of [false, true]) {
@@ -35,6 +66,7 @@ for (const weak of [false, true])
         dispose = hydrate(() => <AliasKeyFixture weak={weak} optimistic={optimistic} />, container);
         flush();
         expect(aliasCurrent.has.at(-1)).toBe(false);
+        expect(aliasCurrent.get.length).toBeGreaterThan(0);
         expect(aliasCurrent.get.at(-1)).toBeUndefined();
         apply(container, artifact.rest, false);
         flush();
@@ -125,6 +157,7 @@ describe("real weak token projection hydration", () => {
             }
             expect(warn).not.toHaveBeenCalled();
           } finally {
+            if (kind === "hybrid") releaseHybrid?.();
             dispose?.();
             await sleep(0);
             warn.mockRestore();

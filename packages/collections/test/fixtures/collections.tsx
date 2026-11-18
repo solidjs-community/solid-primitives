@@ -6,10 +6,19 @@ import {
   Loading,
   refresh,
 } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { createReactiveMap } from "../../src/index.js";
 import { createReactiveSet } from "../../src/index.js";
 export const kinds = ["promise", "stream", "loading", "client", "hybrid", "store-hybrid"] as const;
 export type Kind = (typeof kinds)[number];
+export let releaseCollectionHybrid: (() => void) | undefined;
+function hybridGate(active: boolean): Promise<void> | undefined {
+  return active && !isServer
+    ? new Promise(resolve => {
+        releaseCollectionHybrid = resolve;
+      })
+    : undefined;
+}
 type Key = { tag: string } | string;
 type Value = { n: number; date: Date; missing: undefined; nan: number; big: bigint; self?: Value };
 export let current: {
@@ -28,6 +37,7 @@ export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
   if (props.kind === "store-hybrid") return StoreHybridFixture(props);
   const [version, update] = createSignal(0);
   let refreshed = 0;
+  const gate = hybridGate(props.kind === "hybrid");
   // The same serialized object must be shared between this source and the map.
   // A deep JSON snapshot of the store would silently break that identity.
   const key = createMemo(async () => ({ tag: "shared" }));
@@ -37,6 +47,7 @@ export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
           const n = version() + refreshed,
             k = key();
           await sleep(2);
+          if (gate) await gate;
           draft.set(k, value(n));
           yield;
           await sleep(5);
@@ -88,12 +99,14 @@ export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
 function StoreHybridFixture(props: { optimistic: boolean }) {
   const [version, update] = createSignal(0);
   let refreshed = 0;
+  const gate = hybridGate(true);
   const key = createMemo(async () => ({ tag: "shared" }));
   const [state] = (props.optimistic ? createOptimisticStore : createStore)(
     async function* (draft) {
       const n = version() + refreshed,
         k = key();
       await sleep(2);
+      if (gate) await gate;
       draft.key = k;
       draft.value = value(n);
       yield;
@@ -163,7 +176,7 @@ export function SetCollectionFixture(props: {
   const read = () =>
     set.has("placeholder")
       ? "placeholder"
-      : `${set.has(key())}:${set.has(NaN)}:${set.has(Symbol.for("set-symbol"))}:${set.size}:${set.has("tail")}:${set.has(version() + refreshed)}`;
+      : `${set.has(key())}:${set.has(NaN)}:${set.has(Symbol.for("set-symbol"))}:${set.size}:${set.has("tail")}:${set.has(version() + refreshed)}:${[...set].find(item => typeof item === "number" && Number.isFinite(item))}`;
   currentSet = {
     set,
     read,

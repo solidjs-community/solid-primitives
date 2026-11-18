@@ -1,6 +1,7 @@
 import type { StorybookConfig } from "storybook-solidjs-vite";
 import { mergeConfig, type PluginOption } from "vite";
 import solidPlugin from "@solidjs/vite-plugin";
+import { execFileSync } from "node:child_process";
 
 // storybook-solidjs-vite injects the Solid 1 `vite-plugin-solid` (babel-preset-solid 1.x, which
 // emits helpers like `use` that @solidjs/web 2.x no longer exports). Strip it so the Solid 2
@@ -38,6 +39,11 @@ const config: StorybookConfig = {
       ),
   async viteFinal(config) {
     return mergeConfig({ ...config, plugins: withoutLegacySolidPlugin(config.plugins) }, {
+      define: {
+        "import.meta.env.STORYBOOK_SOURCE_REF": JSON.stringify(
+          execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+        ),
+      },
       plugins: [
         solidPlugin({ refresh: false, solid: { moduleName: "@solidjs/web", omitNestedClosingTags: false } }),
         // babel-preset-solid <beta.14 generates `addEventListener` but @solidjs/web@beta.14

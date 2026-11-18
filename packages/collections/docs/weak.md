@@ -12,7 +12,7 @@ Membership and value reads track separate store nodes. Undefined is stored direc
 
 An old token can still retain its value if the key remains externally live. Solid must release obsolete companion nodes after reader disposal for overwritten/deleted values to become collectible. The lifetime suite covers both unreachable key cycles and obsolete values with live keys.
 
-FinalizationRegistry callbacks queue only property IDs for installed entries; lookup-only misses do not register cleanup. Ordinary writes and current producer writes or yields drain this queue. Superseded and disposed producers cannot consume queued IDs. Ordinary optimistic writes leave it queued, since cleanup through that path would roll back. An active optimistic stream prunes during its next authoritative yield without restarting the producer.
+FinalizationRegistry callbacks queue only property IDs for installed entries; lookup-only misses do not register cleanup. Ordinary writes and current producer commits drain this queue. Superseded and disposed producers cannot consume queued IDs. Cleanup in a producer draft remains retryable until the authoritative store confirms deletion. Ordinary optimistic writes leave it queued, since cleanup through that path would roll back. An active optimistic stream prunes during its next authoritative yield without restarting the producer, including terminal cleanup.
 
 Iterable-initialized optimistic collections use an internal backing store. Finalization callbacks prune only finalized slots in that backing, preserving unrelated optimistic edits in the view. Owner disposal disconnects its finalization callback. User keys/values can be collected before empty metadata is pruned; finalization timing is unspecified.
 

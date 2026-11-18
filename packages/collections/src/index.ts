@@ -12,7 +12,13 @@
 import { $REFRESH, type Refreshable, type StoreSetter } from "@solidjs/signals";
 import { createStore, createOptimisticStore, createEffect, getOwner, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { collectionWriter, createAliasSlots, runCompute, type AliasSlots } from "./compute.ts";
+import {
+  collectionWriter,
+  createAliasSlots,
+  normalizeCollectionInput,
+  runCompute,
+  type AliasSlots,
+} from "./compute.ts";
 export {
   createReactiveWeakMap,
   createReactiveWeakSet,
@@ -153,6 +159,8 @@ function keyEncoder<K>() {
           return slot;
         });
         objects.get(key as WeakKey)!.track();
+        const aliases = objects.get(key as WeakKey)!.slots;
+        if (aliases.length > 1) for (const alias of aliases) void ("k:" + alias in state);
         return slot;
       }
       // Prefixes cannot collide with metadata or pollution-guarded names.
@@ -473,7 +481,7 @@ function createCollection<K, V, Draft, Result>(
     ssrSource: options?.ssrSource,
   };
   let state: State, write: StoreSetter<State>;
-  if (typeof input === "function" && typeof (input as any)[Symbol.iterator] !== "function") {
+  if (typeof input === "function") {
     if (loading)
       new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(
         entries(options!.loadingValue!),
@@ -522,7 +530,7 @@ export function createReactiveMap<K, V>(
   options?: CreateReactiveMapOptions<K, V>,
 ): Refreshable<Map<K, V>> {
   return createCollection(
-    value,
+    normalizeCollectionInput(value),
     options,
     data => new CollectionMap(data),
     map => map.entries(),
@@ -552,10 +560,9 @@ export function createReactiveSet<T>(
     (function* () {
       for (const key of set) yield [key, true] as const;
     })();
+  const input = normalizeCollectionInput(value);
   return createCollection(
-    typeof value === "function" && typeof (value as any)[Symbol.iterator] !== "function"
-      ? value
-      : entries(value as Iterable<T>),
+    typeof input === "function" ? input : entries(input),
     options,
     data => new CollectionSet(data),
     entries,

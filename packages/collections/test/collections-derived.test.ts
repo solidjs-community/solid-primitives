@@ -118,10 +118,12 @@ describe("derived async boundaries", () => {
         const gates = [deferred(), deferred()];
         const [run, next] = createSignal(0);
         const cleaned: number[] = [];
+        const started: number[] = [];
         const map = root(() =>
           createReactiveMap<string, number>(
             async function* (draft) {
               const i = run();
+              started.push(i);
               try {
                 draft.set("initial", i);
                 yield;
@@ -163,7 +165,7 @@ describe("derived async boundaries", () => {
           ]);
         } finally {
           for (const gate of gates) gate.resolve();
-          await vi.waitFor(() => expect(cleaned.toSorted()).toEqual([0, 1]));
+          await vi.waitFor(() => expect(cleaned.toSorted()).toEqual(started.toSorted()));
         }
         expect(cleaned.sort()).toEqual([0, 1]);
         expect([...map]).toEqual([
@@ -192,12 +194,15 @@ describe("derived async boundaries", () => {
               return new Map([["value", 2]]);
             };
         const map = root(() => createReactiveMap(compute, { optimistic }));
-        if (stream)
-          await vi.waitFor(() => {
-            flush();
-            expect(map.get("value")).toBe(1);
-          });
-        gate.resolve();
+        try {
+          if (stream)
+            await vi.waitFor(() => {
+              flush();
+              expect(map.get("value")).toBe(1);
+            });
+        } finally {
+          gate.resolve();
+        }
         await vi.waitFor(() => {
           flush();
           for (const read of [

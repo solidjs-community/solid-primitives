@@ -4,6 +4,8 @@
   "include": [
     "test/collections.type-tests.ts",
     "test/compute.test.ts",
+    "test/story-controls.test.tsx",
+    "test/fixtures/tracing.tsx",
     "test/collections-derived.test.ts",
     "test/collections-order.test.ts",
     "test/collections.bench.ts",

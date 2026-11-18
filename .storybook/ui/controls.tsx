@@ -1,10 +1,15 @@
 import type { JSX } from "@solidjs/web";
 import { colors, font, radii } from "./tokens.js";
 
+const ariaPressed = (
+  value: boolean | JSX.AriaAttributes["aria-pressed"],
+): JSX.AriaAttributes["aria-pressed"] =>
+  typeof value === "boolean" ? (value ? "true" : "false") : value;
+
 export const Button = (props: {
   "aria-current"?: "page";
   "aria-label"?: string;
-  "aria-pressed"?: JSX.AriaAttributes["aria-pressed"];
+  "aria-pressed"?: boolean | JSX.AriaAttributes["aria-pressed"];
   inert?: boolean;
   onClick?: (ev: MouseEvent) => void;
   onKeyUp?: (ev: KeyboardEvent) => void;
@@ -19,7 +24,7 @@ export const Button = (props: {
   <button
     aria-label={props["aria-label"]}
     aria-current={props["aria-current"]}
-    aria-pressed={props["aria-pressed"]}
+    aria-pressed={ariaPressed(props["aria-pressed"])}
     inert={props.inert}
     ref={props.ref}
     type={props.type ?? "button"}

@@ -6,10 +6,17 @@ import {
   createEffect,
   getOwner,
   onCleanup,
+  latest,
   untrack,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { collectionWriter, createAliasSlots, runCompute, type AliasSlots } from "./compute.ts";
+import {
+  collectionWriter,
+  createAliasSlots,
+  normalizeCollectionInput,
+  runCompute,
+  type AliasSlots,
+} from "./compute.ts";
 import { createWeakCollectionToken, type WeakCollectionToken } from "./weak-token.ts";
 import type { ReactiveCollectionOptions, ReactiveCollectionCompute } from "./index.ts";
 
@@ -116,19 +123,28 @@ class KeySlots<K extends WeakKey> {
       return slot;
     });
     this.aliases.get(key)!.track();
+    const aliases = this.aliases.get(key)!.slots;
+    if (aliases.length > 1) for (const alias of aliases) void ("k:" + alias in state);
     return slot;
   }
 
-  drain(state: State): void {
+  confirm(state: State): void {
+    latest(() => {
+      this.dead = this.dead.filter(slot => slot in state || "k:" + slot in state);
+    });
+  }
+
+  drain(state: State, retry = false): boolean {
     // Finalizers never invoke a derived setter: that would cancel a queued
     // compute. Empty tokens are pruned at the next ordinary write/derive.
-    if (!this.dead.length) return;
+    if (!this.dead.length) return false;
     for (const slot of this.dead) {
       delete state[slot];
       delete state["k:" + slot];
     }
-    this.dead.length = 0;
+    if (!retry) this.dead.length = 0;
     this.publish(state);
+    return true;
   }
 }
 
@@ -190,11 +206,12 @@ class WeakData<K extends WeakKey, V> {
     return deleted;
   }
   replace(source: Iterable<Pair<K, V>>): void {
-    if (typeof source?.[Symbol.iterator] !== "function")
+    const method = source?.[Symbol.iterator];
+    if (typeof method !== "function")
       throw new TypeError(
         "Weak collection replacements must be iterable; mutate the draft for native WeakMap/WeakSet inputs",
       );
-    const incoming = new Map(source);
+    const incoming = new Map<K, V>({ [Symbol.iterator]: () => Reflect.apply(method, source, []) });
     for (const key of incoming.keys())
       if (!validKey(key)) throw new TypeError("Invalid weak collection key");
     this.write(state => {
@@ -282,7 +299,10 @@ function createMaintainedStore<K extends WeakKey>(
   const result = untrack(() => createOptimisticStore(backing, { shallow: true, name }));
   // Update only finalized slots in the backing. Re-asking a derived
   // optimistic store would also settle unrelated live guesses in Solid 2.
-  slots.maintenance = () => write(state => slots.drain(state));
+  slots.maintenance = () =>
+    write(state => {
+      slots.drain(state);
+    });
   if (getOwner())
     onCleanup(() => {
       slots.maintenance = undefined;
@@ -308,7 +328,7 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
     ssrSource: options?.ssrSource,
   };
   let state: State, write: StoreSetter<State>;
-  if (typeof input === "function" && typeof (input as any)[Symbol.iterator] !== "function") {
+  if (typeof input === "function") {
     if (options?.loadingValue)
       new WeakData(seed, collectionWriter(seed), slots).replace(options.loadingValue);
     [state, write] = factory(
@@ -317,14 +337,10 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
         onCleanup(() => {
           active = false;
         });
-        slots.drain(draft);
+        slots.drain(draft, true);
         const writer = collectionWriter(draft);
         const write: StoreSetter<State> = fn => {
-          if (active)
-            writer(state => {
-              slots.drain(state);
-              fn(state);
-            });
+          if (active) writer(fn);
         };
         const data = new WeakData<K, V>(draft, write, slots, true, false);
         return runCompute(
@@ -332,7 +348,10 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
           view(data),
           result => data.replace(entries(result)),
           data,
-          () => write(() => {}),
+          () =>
+            write(state => {
+              if (slots.drain(state, true)) data.revision++;
+            }),
         );
       },
       seed,
@@ -345,6 +364,7 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
         effect: () => {
           untrack(() => slots.adopt(state));
           slots.notify();
+          slots.confirm(state);
         },
         error: () => {},
       });
@@ -372,7 +392,7 @@ export function createReactiveWeakMap<K extends WeakKey, V>(
   options?: CreateReactiveWeakMapOptions<K, V>,
 ): Refreshable<WeakMap<K, V>> {
   return createWeakCollection(
-    input,
+    normalizeCollectionInput(input),
     options,
     data => new WeakMapView(data),
     entries => entries,
@@ -391,10 +411,9 @@ export function createReactiveWeakSet<K extends WeakKey>(
   input: Iterable<K> | CreateReactiveWeakSetComputeFunction<K> = [],
   options?: CreateReactiveWeakSetOptions<K>,
 ): Refreshable<WeakSet<K>> {
+  const value = normalizeCollectionInput(input);
   return createWeakCollection(
-    typeof input === "function" && typeof (input as any)[Symbol.iterator] !== "function"
-      ? input
-      : setEntries(input as Iterable<K>),
+    typeof value === "function" ? value : setEntries(value),
     {
       ...options,
       loadingValue: options?.loadingValue && setEntries(options.loadingValue),

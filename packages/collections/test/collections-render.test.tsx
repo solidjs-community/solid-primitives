@@ -6,6 +6,21 @@ import { renderToStream } from "@solidjs/web";
 import { CollectionFixture, SetCollectionFixture, kinds } from "./fixtures/collections.js";
 const directory = artifactDirectory("collections-hydration");
 mkdirSync(directory, { recursive: true });
+
+function streamArtifact(chunks: string[], shell: string, streamed: boolean) {
+  const full = chunks.join("");
+  if (!streamed) return { shell, rest: full.slice(shell.length) };
+  const tailChunk = chunks.findIndex(chunk => chunk.includes('"k:string:tail"'));
+  expect(tailChunk).toBeGreaterThan(0);
+  const split = chunks.slice(0, tailChunk).join("").length;
+  expect(split).toBeGreaterThan(shell.length);
+  return {
+    shell,
+    rest: full.slice(shell.length),
+    earlyRest: full.slice(shell.length, split),
+    lateRest: full.slice(split),
+  };
+}
 describe("real collection SSR fixtures", () => {
   for (const kind of kinds)
     for (const optimistic of [false, true]) {
@@ -44,7 +59,7 @@ describe("real collection SSR fixtures", () => {
         expect(visible).toContain("after");
         writeFileSync(
           resolve(directory, `${kind}-${optimistic}.json`),
-          JSON.stringify({ shell, rest: full.slice(shell.length) }),
+          JSON.stringify(streamArtifact(chunks, shell, kind === "stream")),
         );
       });
     }
@@ -83,11 +98,11 @@ describe("real Set SSR fixtures", () => {
         if (!shell) shell = full;
         const visible = full.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]*>/g, "");
         expect(visible).toContain(
-          kind === "stream" ? "true:true:true:4:false:true" : "placeholder",
+          kind === "stream" ? "true:true:true:4:false:true:0" : "placeholder",
         );
         writeFileSync(
           resolve(directory, `set-${kind}-${optimistic}.json`),
-          JSON.stringify({ shell, rest: full.slice(shell.length) }),
+          JSON.stringify(streamArtifact(chunks, shell, kind === "stream")),
         );
       });
     }

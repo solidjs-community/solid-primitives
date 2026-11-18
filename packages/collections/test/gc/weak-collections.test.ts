@@ -8,6 +8,7 @@ import {
   flush,
   isPending,
   latest,
+  refresh,
 } from "@solidjs/signals";
 import { createReactiveWeakMap, createReactiveWeakSet } from "../../src/weak.js";
 
@@ -76,44 +77,74 @@ test("lookup misses do not register finalizers or accumulate cleanup records", a
   assert.equal(registrations, 1, "insertion after a miss still registers cleanup");
 });
 
+async function waitUntil(check: () => boolean, message: string): Promise<void> {
+  const deadline = Date.now() + 3000;
+  while (!check()) {
+    assert.ok(Date.now() < deadline, message);
+    await new Promise(resolve => setTimeout(resolve, 5));
+    flush();
+  }
+}
+
 test("an active computed stream prunes collected keys without restarting", async () => {
-  let advance!: () => void;
-  let yielded = 0;
+  const releases = new Map<number, () => void>();
+  let yielded = 0,
+    started = 0,
+    stopped = false,
+    closed = false;
+  let current: WeakRef<object> | undefined;
   const map = root(() =>
     createReactiveWeakMap<object, unknown>(
       async function* (draft) {
-        for (let i = 0; i < 4; i++) {
+        started++;
+        try {
+          for (let i = 0; i < 4; i++) {
+            if (stopped) return;
+            await new Promise<void>(resolve => {
+              releases.set(i, resolve);
+            });
+            if (stopped) return;
+            const key = {};
+            draft.set(key, { key });
+            current = new WeakRef(key);
+            yielded++;
+            yield;
+          }
           await new Promise<void>(resolve => {
-            advance = resolve;
+            releases.set(4, resolve);
           });
-          const key = {};
-          draft.set(key, { key });
-          yielded++;
-          yield;
+        } finally {
+          closed = true;
         }
-        await new Promise<void>(resolve => {
-          advance = resolve;
-        });
       },
       { optimistic: true },
     ),
   );
   root(() => observe(() => map.has({})));
-  await tick();
   try {
     for (let i = 0; i < 4; i++) {
+      await waitUntil(() => releases.has(i), "producer did not request the next pull");
+      const advance = releases.get(i)!;
+      releases.delete(i);
       advance();
-      await tick();
-      flush();
-      assert.equal(yielded, i + 1);
-      // The generator retains its current key during the next pending pull.
+      await waitUntil(
+        () => yielded === i + 1 && releases.has(i + 1),
+        "producer did not publish and request another pull",
+      );
+      assert.equal(started, 1);
+      assert.equal(map.has(current!.deref()!), true);
       assert.ok(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length <= 2);
       await collect();
     }
   } finally {
-    advance();
-    await tick();
+    stopped = true;
+    for (const release of releases.values()) release();
+    if (started) await waitUntil(() => closed, "producer did not close during teardown");
   }
+  await waitUntil(
+    () => Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length <= 1,
+    "terminal cleanup was not published",
+  );
 });
 
 function addTransientKey(map: WeakMap<object, unknown>): WeakRef<object> {
@@ -151,6 +182,10 @@ test("a cleanup-only stream yield preserves unrelated optimistic edits", async (
   try {
     await collect();
     assert.equal(dead.deref(), undefined);
+    await waitUntil(
+      () => (map as any).data.slots.dead.length > 0,
+      "finalizer did not queue the slot",
+    );
     assert.equal(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length, 2);
     next.resolve();
     await tick();
@@ -637,3 +672,62 @@ test("a key explicitly captured by a live compute remains reachable by design", 
   assert.ok(fixture.key.deref());
   assert.equal(fixture.map.has(fixture.key.deref()!), true);
 });
+
+for (const optimistic of [false, true])
+  for (const replacement of [false, true])
+    test(`retries cleanup discarded by a failed loading draft, optimistic=${optimistic}, replacement=${replacement}`, async () => {
+      const gate = deferred();
+      const survivor = {};
+      let fail = true;
+      const compute = async function* (draft: WeakMap<object, unknown>) {
+        await gate.promise;
+        if (fail) {
+          if (replacement) {
+            yield {
+              [Symbol.iterator](): Iterator<readonly [object, unknown]> {
+                throw new Error("first pull failed");
+              },
+            };
+            return;
+          }
+          draft.set(survivor, 2);
+          throw new Error("first pull failed");
+        }
+      };
+      const fixture = root(() => {
+        const key = {};
+        return {
+          map: createReactiveWeakMap<object, unknown>(compute, {
+            loadingValue: [[key, 1]],
+            optimistic,
+          }),
+          key: new WeakRef(key),
+        };
+      });
+      const slots = (fixture.map as any).data.slots;
+      try {
+        assert.equal(fixture.map.has({}), false);
+        await collect();
+        assert.equal(fixture.key.deref(), undefined);
+        await waitUntil(() => slots.dead.length > 0, "loading key finalizer did not run");
+        gate.resolve();
+        await waitUntil(() => {
+          try {
+            fixture.map.has({});
+            return false;
+          } catch (error) {
+            return (error as Error).message === "first pull failed";
+          }
+        }, "failed producer did not expose its error");
+        assert.ok(slots.dead.length > 0, "discarded cleanup must remain retryable");
+        fail = false;
+        await refresh(fixture.map);
+        await waitUntil(
+          () => slots.dead.length === 0,
+          "successful refresh did not confirm cleanup",
+        );
+        assert.equal(Object.keys(inspect(fixture.map)).filter(k => k.startsWith("k:")).length, 0);
+      } finally {
+        gate.resolve();
+      }
+    });
