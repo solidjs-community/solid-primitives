@@ -1,5 +1,5 @@
 import preview from "../../../.storybook/preview.js";
-import readme from "../README.md?raw";
+import { readme } from "./readme.ts";
 import { BasicSet } from "./examples/set-basic.js";
 import BasicSetSource from "./examples/set-basic.tsx?raw";
 import { AsyncSet } from "./examples/set-async.js";

@@ -2,6 +2,12 @@ import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 import { transformAsync } from "@babel/core";
 import babelSolid from "@solidjs/babel-plugin";
+const serverTests = [
+  "test/collections-server.test.ts",
+  "test/collections-shallow-server.test.ts",
+  "test/collections-render.test.tsx",
+  "test/weak-render.test.tsx",
+];
 export default defineConfig(({ mode }) => ({
   root: fileURLToPath(new URL("./", import.meta.url)),
   plugins: [
@@ -40,24 +46,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   test: {
-    include:
-      mode === "ssr"
-        ? [
-            "test/collections-server.test.ts",
-            "test/collections-shallow-server.test.ts",
-            "test/collections-render.test.tsx",
-            "test/weak-render.test.tsx",
-          ]
-        : ["test/*.test.{ts,tsx}"],
-    exclude:
-      mode === "ssr"
-        ? []
-        : [
-            "test/collections-server.test.ts",
-            "test/collections-shallow-server.test.ts",
-            "test/collections-render.test.tsx",
-            "test/weak-render.test.tsx",
-          ],
+    include: mode === "ssr" ? serverTests : ["test/*.test.{ts,tsx}"],
+    exclude: mode === "ssr" ? [] : serverTests,
     // Resolve runtime exports with this suite's client/server conditions.
     server: { deps: { inline: ["solid-js", "@solidjs/signals", "@solidjs/web"] } },
     // Codec lifetime checks require real GC in an isolated process.

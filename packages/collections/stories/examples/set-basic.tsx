@@ -12,6 +12,7 @@ export function BasicSet() {
           <Card>
             <BoolRow label={`has(${fruit})`} value={selected.has(fruit)} />
             <Button
+              aria-pressed={selected.has(fruit)}
               variant={selected.has(fruit) ? "primary" : "outline"}
               onClick={() => (selected.has(fruit) ? selected.delete(fruit) : selected.add(fruit))}
             >

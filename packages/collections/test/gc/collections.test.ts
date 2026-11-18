@@ -27,6 +27,7 @@ function fixture(kind: "map" | "set" | "loading", operation: "delete" | "clear")
           })
         : createReactiveMap(input as Map<object, object>),
   );
+  assert.equal(collection.has(key), true, "the seed must exist before removal");
   if (operation === "clear") collection.clear();
   else collection.delete(key);
   flush();
@@ -58,7 +59,10 @@ function cursorFixture(kind: "keys" | "values" | "entries") {
   map.set("first", 1).set(key, value);
   flush();
   const cursor = map[kind]();
-  cursor.next();
+  assert.deepEqual(cursor.next(), {
+    done: false,
+    value: kind === "keys" ? "first" : kind === "values" ? 1 : ["first", 1],
+  });
   map.clear();
   flush();
   return { map, cursor, key: new WeakRef(key), value: new WeakRef(value) };

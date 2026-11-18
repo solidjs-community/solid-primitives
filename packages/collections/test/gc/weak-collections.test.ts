@@ -53,6 +53,120 @@ function inspect(map: object): Record<string, unknown> {
   return (map as { data: { state: Record<string, unknown> } }).data.state;
 }
 function emptyCompute(): void {}
+test("lookup misses do not register finalizers or accumulate cleanup records", async () => {
+  const map = root(() => createReactiveWeakMap<object, unknown>());
+  const slots = (map as any).data.slots;
+  let registrations = 0;
+  const register = slots.registry.register.bind(slots.registry);
+  slots.registry.register = (...args: unknown[]) => {
+    registrations++;
+    register(...args);
+  };
+  for (let i = 0; i < 128; i++) {
+    map.has({});
+    map.get({});
+  }
+  await collect();
+  assert.equal(registrations, 0);
+  assert.equal(slots.dead.length, 0);
+  const key = {};
+  map.get(key);
+  map.set(key, 1);
+  flush();
+  assert.equal(registrations, 1, "insertion after a miss still registers cleanup");
+});
+
+test("an active computed stream prunes collected keys without restarting", async () => {
+  let advance!: () => void;
+  let yielded = 0;
+  const map = root(() =>
+    createReactiveWeakMap<object, unknown>(
+      async function* (draft) {
+        for (let i = 0; i < 4; i++) {
+          await new Promise<void>(resolve => {
+            advance = resolve;
+          });
+          const key = {};
+          draft.set(key, { key });
+          yielded++;
+          yield;
+        }
+        await new Promise<void>(resolve => {
+          advance = resolve;
+        });
+      },
+      { optimistic: true },
+    ),
+  );
+  root(() => observe(() => map.has({})));
+  await tick();
+  try {
+    for (let i = 0; i < 4; i++) {
+      advance();
+      await tick();
+      flush();
+      assert.equal(yielded, i + 1);
+      // The generator retains its current key during the next pending pull.
+      assert.ok(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length <= 2);
+      await collect();
+    }
+  } finally {
+    advance();
+    await tick();
+  }
+});
+
+function addTransientKey(map: WeakMap<object, unknown>): WeakRef<object> {
+  const key = {};
+  map.set(key, { key });
+  return new WeakRef(key);
+}
+
+test("a cleanup-only stream yield preserves unrelated optimistic edits", async () => {
+  const survivor = {},
+    next = deferred(),
+    finish = deferred(),
+    hold = deferred();
+  let dead!: WeakRef<object>;
+  const map = root(() =>
+    createReactiveWeakMap<object, unknown>(
+      async function* (draft) {
+        dead = addTransientKey(draft);
+        draft.set(survivor, 0);
+        yield;
+        await next.promise;
+        yield;
+        await finish.promise;
+      },
+      { optimistic: true },
+    ),
+  );
+  root(() => observe(() => map.get(survivor)));
+  await tick();
+  const pending = action(function* () {
+    map.set(survivor, 1);
+    yield hold.promise;
+  })();
+  flush();
+  try {
+    await collect();
+    assert.equal(dead.deref(), undefined);
+    assert.equal(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length, 2);
+    next.resolve();
+    await tick();
+    assert.equal(
+      latest(() => Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length),
+      1,
+    );
+    assert.equal(map.get(survivor), 1);
+  } finally {
+    hold.resolve();
+    next.resolve();
+    finish.resolve();
+    await pending;
+    await tick();
+  }
+});
 function installValue(write: (value: object) => void): WeakRef<object> {
   const value = { old: true };
   write(value);
@@ -457,6 +571,7 @@ test("static optimistic maintenance during an unrelated action preserves its ove
   flush();
   await collect();
   assert.equal(fixture.key.deref(), undefined);
+  assert.equal(count(), 1, "dead metadata is pruned before the action settles");
   assert.equal(
     fixture.map.get(survivor),
     1,

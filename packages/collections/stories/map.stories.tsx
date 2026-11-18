@@ -1,5 +1,5 @@
 import preview from "../../../.storybook/preview.js";
-import readme from "../README.md?raw";
+import { readme } from "./readme.ts";
 import { BasicMap } from "./examples/map-basic.js";
 import BasicMapSource from "./examples/map-basic.tsx?raw";
 import { AsyncMap } from "./examples/map-async.js";

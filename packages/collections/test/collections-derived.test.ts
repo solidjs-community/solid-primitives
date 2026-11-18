@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createEffect, createRoot, createSignal, flush, refresh } from "solid-js";
 import { createReactiveMap, createReactiveSet } from "../src/index.js";
 
@@ -13,10 +13,6 @@ afterEach(() => {
   while (disposers.length) disposers.pop()!();
   flush();
 });
-const tick = async () => {
-  for (let i = 0; i < 40; i++) await Promise.resolve();
-  flush();
-};
 function deferred() {
   let resolve!: () => void;
   const promise = new Promise<void>(r => {
@@ -116,46 +112,66 @@ describe("native cursor behavior", () => {
 
 describe("derived async boundaries", () => {
   for (const optimistic of [false, true]) {
-    it(`ignores superseded stream writes, replacements, and cleanup edits, optimistic=${optimistic}`, async () => {
-      const gates = [deferred(), deferred()];
-      const [run, next] = createSignal(0);
-      const cleaned: number[] = [];
-      const map = root(() =>
-        createReactiveMap<string, number>(
-          async function* (draft) {
-            const i = run();
-            try {
-              draft.set("initial", i);
-              yield;
-              await gates[i]!.promise;
-              draft.set("late", i);
-              yield new Map([["result", i]]);
-            } finally {
-              draft.set("cleanup", i);
-              cleaned.push(i);
-            }
-          },
-          { optimistic },
-        ),
-      );
-      await tick();
-      expect([...map]).toEqual([["initial", 0]]);
-      next(1);
-      flush();
-      gates[1]!.resolve();
-      await tick();
-      expect([...map]).toEqual([
-        ["result", 1],
-        ["cleanup", 1],
-      ]);
-      gates[0]!.resolve();
-      await tick();
-      expect(cleaned.sort()).toEqual([0, 1]);
-      expect([...map]).toEqual([
-        ["result", 1],
-        ["cleanup", 1],
-      ]);
-    });
+    it.each([false, true])(
+      `ignores superseded stream writes, replacements, and cleanup edits, optimistic=${optimistic}, oldWhileActive=%s`,
+      async oldWhileActive => {
+        const gates = [deferred(), deferred()];
+        const [run, next] = createSignal(0);
+        const cleaned: number[] = [];
+        const map = root(() =>
+          createReactiveMap<string, number>(
+            async function* (draft) {
+              const i = run();
+              try {
+                draft.set("initial", i);
+                yield;
+                await gates[i]!.promise;
+                draft.set("late", i);
+                yield new Map([["result", i]]);
+              } finally {
+                draft.set("cleanup", i);
+                cleaned.push(i);
+              }
+            },
+            { optimistic },
+          ),
+        );
+        try {
+          await vi.waitFor(() => {
+            flush();
+            expect([...map]).toEqual([["initial", 0]]);
+          });
+          next(1);
+          flush();
+          if (oldWhileActive) {
+            await vi.waitFor(() => {
+              flush();
+              expect([...map]).toEqual([["initial", 1]]);
+            });
+            gates[0]!.resolve();
+            await vi.waitFor(() => expect(cleaned).toContain(0));
+            expect([...map]).toEqual([["initial", 1]]);
+          }
+          gates[1]!.resolve();
+          await vi.waitFor(() => {
+            flush();
+            expect(cleaned).toContain(1);
+          });
+          expect([...map]).toEqual([
+            ["result", 1],
+            ["cleanup", 1],
+          ]);
+        } finally {
+          for (const gate of gates) gate.resolve();
+          await vi.waitFor(() => expect(cleaned.toSorted()).toEqual([0, 1]));
+        }
+        expect(cleaned.sort()).toEqual([0, 1]);
+        expect([...map]).toEqual([
+          ["result", 1],
+          ["cleanup", 1],
+        ]);
+      },
+    );
 
     for (const stream of [false, true]) {
       it(`recovers from ${stream ? "a stream failure after a yield" : "a rejected promise"}, optimistic=${optimistic}`, async () => {
@@ -176,21 +192,28 @@ describe("derived async boundaries", () => {
               return new Map([["value", 2]]);
             };
         const map = root(() => createReactiveMap(compute, { optimistic }));
-        await tick();
-        if (stream) expect(map.get("value")).toBe(1);
+        if (stream)
+          await vi.waitFor(() => {
+            flush();
+            expect(map.get("value")).toBe(1);
+          });
         gate.resolve();
-        await tick();
-        for (const read of [
-          () => map.get("value"),
-          () => map.has("value"),
-          () => map.size,
-          () => [...map],
-        ])
-          expect(read).toThrow("source failed");
+        await vi.waitFor(() => {
+          flush();
+          for (const read of [
+            () => map.get("value"),
+            () => map.has("value"),
+            () => map.size,
+            () => [...map],
+          ])
+            expect(read).toThrow("source failed");
+        });
         fail = false;
         await refresh(map);
-        await tick();
-        expect([...map]).toEqual([["value", 2]]);
+        await vi.waitFor(() => {
+          flush();
+          expect([...map]).toEqual([["value", 2]]);
+        });
       });
     }
 

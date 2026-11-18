@@ -1,9 +1,10 @@
+import { artifactDirectory } from "./artifacts.ts";
 import { describe, expect, it } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStream } from "@solidjs/web";
 import { CollectionFixture, SetCollectionFixture, kinds } from "./fixtures/collections.js";
-const directory = resolve("node_modules/.cache/collections-hydration");
+const directory = artifactDirectory("collections-hydration");
 mkdirSync(directory, { recursive: true });
 describe("real collection SSR fixtures", () => {
   for (const kind of kinds)
@@ -31,6 +32,10 @@ describe("real collection SSR fixtures", () => {
           });
         });
         const full = chunks.join("");
+        if (kind === "stream") {
+          expect(shell).not.toBe("");
+          expect(full.slice(shell.length)).not.toBe("");
+        }
         if (!shell) shell = full;
         const visible = full.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]*>/g, "");
         expect(visible).toContain(
@@ -71,6 +76,10 @@ describe("real Set SSR fixtures", () => {
           });
         });
         const full = chunks.join("");
+        if (kind === "stream") {
+          expect(shell).not.toBe("");
+          expect(full.slice(shell.length)).not.toBe("");
+        }
         if (!shell) shell = full;
         const visible = full.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]*>/g, "");
         expect(visible).toContain(

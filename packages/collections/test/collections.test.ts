@@ -289,16 +289,35 @@ describe("reactive collection factories", () => {
     map.set("a", 3);
     flush();
     const context = {};
+    let mapCalls = 0;
     map.forEach(function (this: object, value, key, self) {
+      mapCalls++;
       expect(this).toBe(context);
       expect(self).toBe(map);
       expect([key, value]).toEqual(["a", 3]);
     }, context);
+    expect(mapCalls).toBe(1);
     const set = root(() => createReactiveSet([1]));
+    let setCalls = 0;
     set.forEach((value, key, self) => {
+      setCalls++;
       expect(value).toBe(key);
       expect(self).toBe(set);
     });
+    expect(setCalls).toBe(1);
+  });
+
+  it("invokes forEach callbacks that shadow Function.prototype.call", () => {
+    const values: unknown[][] = [];
+    const callback = Object.assign((...args: unknown[]) => values.push(args), { call: undefined });
+    const map = root(() => createReactiveMap([["a", 1]]));
+    const set = root(() => createReactiveSet([2]));
+    map.forEach(callback);
+    set.forEach(callback);
+    expect(values).toEqual([
+      [1, "a", map],
+      [2, 2, set],
+    ]);
   });
 
   it("overrides native set algebra instead of reading the facade's empty native storage", () => {

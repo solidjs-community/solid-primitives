@@ -143,10 +143,13 @@ describe("ordered collections", () => {
       yield gate;
     })();
     flush();
-    expect([...set]).toEqual([1, 3]);
-    expect(iterator.next().value).toBe(3);
-    release();
-    await pending;
+    try {
+      expect([...set]).toEqual([1, 3]);
+      expect(iterator.next().value).toBe(3);
+    } finally {
+      release();
+      await pending;
+    }
     flush();
     expect([...set]).toEqual([1, 2]);
     // Restored entries behind the consumed insertion ordinal are not replayed.

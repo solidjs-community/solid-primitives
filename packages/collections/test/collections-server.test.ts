@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { createRoot, NotReadyError } from "solid-js";
+import { createRoot, from, NotReadyError } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { getProjectionTrace } from "solid-js/internal";
 import { createReactiveMap, createReactiveSet } from "../src/index.js";
@@ -20,6 +20,24 @@ const trace = (collection: any) =>
   getProjectionTrace(collection.data.store)!.subscribe()[Symbol.asyncIterator]();
 
 describe("server collections", () => {
+  it("takes one subscription answer and closes its server subscription", async () => {
+    let closed = 0;
+    const map = root(() =>
+      createReactiveMap(() =>
+        from(emit => {
+          emit(new Map([["value", 1]]));
+          return () => {
+            closed++;
+          };
+        }),
+      ),
+    );
+    await expect.poll(() => closed).toBe(1);
+    expect(map.get("value")).toBe(1);
+    const iterator = trace(map);
+    expect((await iterator.next()).done).toBe(false);
+    expect((await iterator.next()).done).toBe(true);
+  });
   it("uses the server runtime and preserves synchronous raw key/value identity", () => {
     expect(isServer).toBe(true);
     const key = {},
@@ -65,6 +83,21 @@ describe("server collections", () => {
     expect(finalPatch.value.some((patch: any) => patch[0][0] === "size" && patch[1] === 2)).toBe(
       true,
     );
+    const snapshot = { ...first.value };
+    for (const [path, value] of finalPatch.value) {
+      expect(path).toHaveLength(1);
+      snapshot[path[0]] = value;
+    }
+    const restored = snapshot.order.map(({ slot }: { slot: string }) => [
+      snapshot["k:" + slot].value,
+      snapshot[slot],
+    ]);
+    expect(restored).toEqual([
+      [key, 1],
+      [terminalKey, 2],
+    ]);
+    expect(restored[0][0]).toBe(key);
+    expect(restored[1][0]).toBe(terminalKey);
     expect((await iterator.next()).done).toBe(true);
     expect([...map]).toEqual([[key, 1]]);
   });

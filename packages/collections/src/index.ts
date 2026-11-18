@@ -10,9 +10,9 @@
  * shallow-store hydration protocol, including streamed patches.
  */
 import { $REFRESH, type Refreshable, type StoreSetter } from "@solidjs/signals";
-import { createStore, createOptimisticStore, untrack } from "solid-js";
+import { createStore, createOptimisticStore, createEffect, getOwner, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { collectionWriter, runCompute } from "./compute.ts";
+import { collectionWriter, createAliasSlots, runCompute, type AliasSlots } from "./compute.ts";
 export {
   createReactiveWeakMap,
   createReactiveWeakSet,
@@ -100,7 +100,8 @@ function readKey<K>(state: State, slot: string): K {
  * directly; objects, functions and local symbols use a WeakMap. Never use a
  * caller's symbol as a slot: it could be one of Solid's store protocol keys. */
 function keyEncoder<K>() {
-  const objects = new WeakMap<WeakKey, string[]>();
+  const objects = new WeakMap<WeakKey, AliasSlots>();
+  const notifications = new Set<() => void>();
   const seen = new WeakSet<Order>();
   const register = (order: Order, state: State): void => {
     if (seen.has(order)) return;
@@ -112,8 +113,11 @@ function keyEncoder<K>() {
         (typeof key === "symbol" && Symbol.keyFor(key) === undefined)
       ) {
         const slots = objects.get(key as WeakKey);
-        if (!slots) objects.set(key as WeakKey, [slot]);
-        else if (!slots.includes(slot)) slots.push(slot);
+        if (!slots) objects.set(key as WeakKey, createAliasSlots(slot));
+        else if (!slots.slots.includes(slot)) {
+          slots.slots.push(slot);
+          notifications.add(slots.notify);
+        }
       }
     }
     seen.add(order);
@@ -132,7 +136,7 @@ function keyEncoder<K>() {
         // Hydrated snapshots carry the authoritative key identities and slot
         // names. Adopt each visible order once, without subscribing the
         // caller to structure. This also replaces mappings made by trace runs.
-        return untrack(() => {
+        const slot = untrack(() => {
           register(state.order, state);
           const object = key as WeakKey;
           const slots = objects.get(object);
@@ -141,13 +145,15 @@ function keyEncoder<K>() {
             // generations. Retain both trace and wire aliases, choosing the
             // one actually present in this reader's state.
             return (
-              slots.find(slot => unbox(state["k:" + slot]) === key) ?? slots[slots.length - 1]!
+              slots.slots.find(slot => unbox(state["k:" + slot]) === key) ?? slots.slots.at(-1)!
             );
           }
           const slot = "o:" + (isServer ? "s" : "c") + next++;
-          objects.set(object, [slot]);
+          objects.set(object, createAliasSlots(slot));
           return slot;
         });
+        objects.get(key as WeakKey)!.track();
+        return slot;
       }
       // Prefixes cannot collide with metadata or pollution-guarded names.
       default:
@@ -156,6 +162,11 @@ function keyEncoder<K>() {
   };
   return {
     encode,
+    adopt: (state: State): void => {
+      register(state.order, state);
+      for (const notify of notifications) notify();
+      notifications.clear();
+    },
     order: (order: Order): Order => {
       // Locally built orders already registered every key through encode().
       // Only unfamiliar hydrated orders need a scan to adopt wire identities.
@@ -369,7 +380,7 @@ class CollectionMap<K, V> extends Map<K, V> {
   }
   override forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
     if (typeof callback !== "function") throw new TypeError("callback must be a function");
-    for (const [key, value] of this.entries()) callback.call(thisArg, value, key, this);
+    for (const [key, value] of this.entries()) Reflect.apply(callback, thisArg, [value, key, this]);
   }
 }
 
@@ -415,7 +426,7 @@ class CollectionSet<T> extends Set<T> {
   }
   override forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
     if (typeof callback !== "function") throw new TypeError("callback must be a function");
-    for (const value of this.values()) callback.call(thisArg, value, value, this);
+    for (const value of this.values()) Reflect.apply(callback, thisArg, [value, value, this]);
   }
   // Native set algebra reads the receiver's internal [[SetData]]. Our native
   // superclass is only a facade, so every algebra method needs a real snapshot.
@@ -462,7 +473,7 @@ function createCollection<K, V, Draft, Result>(
     ssrSource: options?.ssrSource,
   };
   let state: State, write: StoreSetter<State>;
-  if (typeof input === "function") {
+  if (typeof input === "function" && typeof (input as any)[Symbol.iterator] !== "function") {
     if (loading)
       new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(
         entries(options!.loadingValue!),
@@ -475,8 +486,17 @@ function createCollection<K, V, Draft, Result>(
       seed,
       storeOptions,
     );
+    // Reserve the same owner slot on both runtimes. SSR must not read a
+    // client-only source; application reads still expose source errors.
+    if (getOwner())
+      createEffect(() => (isServer ? undefined : state.order), {
+        effect: () => untrack(() => slot.adopt(state)),
+        error: () => {},
+      });
   } else {
-    new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(input);
+    new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(
+      input as Iterable<Entry<K, V>>,
+    );
     [state, write] = factory(seed, storeOptions);
   }
   return view(new CollectionData(state, write, slot, ordinal)) as Refreshable<Draft>;
@@ -490,13 +510,13 @@ function createCollection<K, V, Draft, Result>(
  * Compute-backed maps support Solid's refresh(), loading, and hydration protocols.
  */
 export function createReactiveMap<K, V>(
-  value: ReactiveCollectionCompute<Map<K, V>, ReadonlyMap<K, V>>,
-  options?: CreateReactiveMapOptions<K, V>,
-): Refreshable<Map<K, V>>;
-export function createReactiveMap<K, V>(
   value?: Iterable<readonly [K, V]>,
   options?: ReactiveCollectionOptions,
 ): Map<K, V>;
+export function createReactiveMap<K, V>(
+  value: ReactiveCollectionCompute<Map<K, V>, ReadonlyMap<K, V>>,
+  options?: CreateReactiveMapOptions<K, V>,
+): Refreshable<Map<K, V>>;
 export function createReactiveMap<K, V>(
   value: Iterable<readonly [K, V]> | ReactiveCollectionCompute<Map<K, V>, ReadonlyMap<K, V>> = [],
   options?: CreateReactiveMapOptions<K, V>,
@@ -517,13 +537,13 @@ export function createReactiveMap<K, V>(
  * Compute-backed sets support Solid's refresh(), loading, and hydration protocols.
  */
 export function createReactiveSet<T>(
-  value: ReactiveCollectionCompute<Set<T>, ReadonlySet<T>>,
-  options?: CreateReactiveSetOptions<T>,
-): Refreshable<Set<T>>;
-export function createReactiveSet<T>(
   value?: Iterable<T>,
   options?: ReactiveCollectionOptions,
 ): Set<T>;
+export function createReactiveSet<T>(
+  value: ReactiveCollectionCompute<Set<T>, ReadonlySet<T>>,
+  options?: CreateReactiveSetOptions<T>,
+): Refreshable<Set<T>>;
 export function createReactiveSet<T>(
   value: Iterable<T> | ReactiveCollectionCompute<Set<T>, ReadonlySet<T>> = [],
   options?: CreateReactiveSetOptions<T>,
@@ -533,7 +553,9 @@ export function createReactiveSet<T>(
       for (const key of set) yield [key, true] as const;
     })();
   return createCollection(
-    typeof value === "function" ? value : entries(value),
+    typeof value === "function" && typeof (value as any)[Symbol.iterator] !== "function"
+      ? value
+      : entries(value as Iterable<T>),
     options,
     data => new CollectionSet(data),
     entries,

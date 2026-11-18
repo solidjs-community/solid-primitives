@@ -32,6 +32,10 @@ function verify(value: ReturnType<typeof source>) {
   expect(value.value.self).toBe(value.value);
   expect(value.value.date.getTime()).toBe(1234);
   expect(value.missing.ref).toBeUndefined();
+  expect(Object.isFrozen(value.missing)).toBe(true);
+  expect(value.missing.$weak).toBe(true);
+  expect(Object.prototype.toString.call(value.missing.values)).toBe("[object WeakMap]");
+  expect(value.missing.values.has(value.key)).toBe(false);
   expect(value.undefined.values.has(value.key)).toBe(true);
   expect(value.undefined.values.get(value.key)).toBeUndefined();
   expect(Object.isFrozen(value.token)).toBe(true);

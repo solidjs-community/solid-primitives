@@ -1,3 +1,4 @@
+import { artifactDirectory } from "./artifacts.ts";
 /** @vitest-environment jsdom */
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
@@ -92,7 +93,7 @@ describe("real SSR to collection hydration", () => {
         it(`${kind}, optimistic=${optimistic}, ${mode}`, async () => {
           const artifact = JSON.parse(
             readFileSync(
-              resolve(`node_modules/.cache/collections-hydration/${kind}-${optimistic}.json`),
+              resolve(artifactDirectory("collections-hydration"), `${kind}-${optimistic}.json`),
               "utf8",
             ),
           );
@@ -126,7 +127,6 @@ describe("real SSR to collection hydration", () => {
             if (current.map) await checkLocalEdits(current.map, optimistic);
             current.update();
             flush();
-            const updated = streamed ? "true:11:true:true:2:true" : "true:1:true:true:1:false";
             await expectView(
               container,
               current.read,
@@ -134,7 +134,12 @@ describe("real SSR to collection hydration", () => {
               "updated",
             );
             await current.refresh();
-            await expectView(container, current.read, updated, "refreshed");
+            await expectView(
+              container,
+              current.read,
+              streamed ? "true:12:true:true:2:true" : "true:2:true:true:1:false",
+              "refreshed",
+            );
             expect(warn).not.toHaveBeenCalled();
           } finally {
             dispose?.();
@@ -153,7 +158,7 @@ describe("real Set hydration", () => {
         it(`${kind}, optimistic=${optimistic}, ${mode}`, async () => {
           const artifact = JSON.parse(
             readFileSync(
-              resolve(`node_modules/.cache/collections-hydration/set-${kind}-${optimistic}.json`),
+              resolve(artifactDirectory("collections-hydration"), `set-${kind}-${optimistic}.json`),
               "utf8",
             ),
           );
@@ -184,6 +189,8 @@ describe("real Set hydration", () => {
             await expectView(container, currentSet.read, "true:true:true:5:true:true", "updated");
             await currentSet.refresh();
             await expectView(container, currentSet.read, "true:true:true:5:true:true", "refreshed");
+            expect(currentSet.set.has(2)).toBe(true);
+            expect(currentSet.set.has(1)).toBe(false);
             expect(warn).not.toHaveBeenCalled();
           } finally {
             dispose?.();

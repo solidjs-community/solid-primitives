@@ -2,22 +2,35 @@
 // compiler hydrates them. Never consume stale fixtures after a failed render.
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-for (const extra of [["--mode", "ssr"], []]) {
-  const result = spawnSync(
-    process.execPath,
-    ["../../node_modules/vitest/vitest.mjs", "run", "--config", "vitest.config.ts", ...extra],
-    { cwd: root, stdio: "inherit" },
-  );
-  if (result.error) throw result.error;
-  if (result.status !== 0) process.exit(result.status ?? 1);
-}
+const cacheRoot = fileURLToPath(new URL("../node_modules/.cache/", import.meta.url));
+await mkdir(cacheRoot, { recursive: true });
+const artifacts = await mkdtemp(cacheRoot + "collections-tests-");
+try {
+  for (const extra of [["--mode", "ssr"], []]) {
+    const result = spawnSync(
+      process.execPath,
+      ["../../node_modules/vitest/vitest.mjs", "run", "--config", "vitest.config.ts", ...extra],
+      {
+        cwd: root,
+        stdio: "inherit",
+        env: { ...process.env, COLLECTIONS_TEST_ARTIFACTS: artifacts },
+      },
+    );
+    if (result.error) throw result.error;
+    if (result.status !== 0)
+      throw new Error(`Collection tests exited with status ${result.status}`);
+  }
 
-// GC must run with shipped-build defines, without test-only owner registries.
-const gc = spawnSync(process.execPath, ["scripts/test-gc.mjs"], {
-  cwd: root,
-  stdio: "inherit",
-});
-if (gc.error) throw gc.error;
-if (gc.status !== 0) process.exit(gc.status ?? 1);
+  // GC must run with shipped-build defines, without test-only owner registries.
+  const gc = spawnSync(process.execPath, ["scripts/test-gc.mjs"], {
+    cwd: root,
+    stdio: "inherit",
+  });
+  if (gc.error) throw gc.error;
+  process.exitCode = gc.status ?? 1;
+} finally {
+  await rm(artifacts, { recursive: true, force: true });
+}

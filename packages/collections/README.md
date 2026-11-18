@@ -6,6 +6,8 @@
 
 Reactive Map, Set, WeakMap, and WeakSet factories with per-key tracking, computed drafts, async sources, optimistic updates, and SSR.
 
+An input that is both callable and iterable is consumed as an iterable. Plain functions are computes. A compute draft starts empty by default; `loadingValue` seeds it, so clear the draft, delete weak placeholders, or return replacement contents when those placeholders should be removed. Solid `from(subscription)` sources keep their live-source SSR policy: the server takes one answer and hydration reconnects the subscription.
+
 - [`createReactiveMap`](#createreactivemap)
 - [`createReactiveSet`](#createreactiveset)
 - [`createReactiveWeakMap`](#createreactiveweakmap)
@@ -32,7 +34,7 @@ import { createReactiveMap } from "@solid-primitives/collections";
 
 // Create inside a component or reactive owner.
 const counts = createReactiveMap<string, number>();
-const counts = createReactiveMap<string, number>([["a", 1]]);
+const initialCounts = createReactiveMap<string, number>([["a", 1]]);
 const totals = createReactiveMap<string, number>(draft => {
   draft.set("total", items().length);
 });
@@ -44,7 +46,7 @@ const users = createReactiveMap(
   },
   { optimistic: true },
 );
-const users = createReactiveMap<string, User>(async function* (draft) {
+const liveUsers = createReactiveMap<string, User>(async function* (draft) {
   for await (const user of updates()) {
     draft.set(user.id, user);
     yield;

@@ -7,7 +7,7 @@ The public contracts and examples are in the [package README](../README.md).
 ## API and storage
 
 - Iterable input returns `Map<K, V>` or `Set<T>`; compute input returns the corresponding `Refreshable` type.
-- A compute receives an initially empty mutable draft. It can mutate the draft or return a readonly/native replacement, a PromiseLike of either result, or an AsyncIterable yielding either result.
+- A compute receives a mutable draft, empty by default. `loadingValue` seeds that draft, including during SSR: added entries can coexist with placeholders. Clear the draft (or delete weak placeholders) or return a replacement to remove placeholders. The compute can return a readonly/native replacement, a PromiseLike of either result, or an AsyncIterable yielding either result.
 - Compute options include `loadingValue`, `deferStream`, and `ssrSource`. Both input forms accept `name` and `optimistic`. An `ownedWrite` override is not exposed.
 - Values are shallow and preserve identity. External mutations follow Solid batching; draft writes are immediately readable. Solid guards superseded and disposed async drafts.
 
@@ -47,7 +47,7 @@ pnpm lint
 pnpm build
 ```
 
-`test` runs server rendering before client hydration, then strong and weak lifetime suites in separate development/production processes with real GC. A failed server run prevents consumption of stale fixtures. Tests live directly under `test/`, with shared render fixtures in `test/fixtures/` and lifetime suites in `test/gc/`. The shared Vitest config explicitly excludes this package so its package runner can select the right compiler/runtime conditions, generate fresh SSR fixtures before hydration, and enable GC for lifetime checks. The repository's root `pnpm test` invokes this runner through `test:collections`, so local and CI runs include the same coverage. Generated bundles and hydration fixtures stay under the ignored `node_modules/.cache` directory.
+`test` runs server rendering before client hydration, then strong and weak lifetime suites in separate development/production processes with real GC. A failed server run prevents consumption of stale fixtures. Tests live directly under `test/`, with shared render fixtures in `test/fixtures/` and lifetime suites in `test/gc/`. The shared Vitest config explicitly excludes this package so its package runner can select the right compiler/runtime conditions, generate fresh SSR fixtures before hydration, and enable GC for lifetime checks. The repository's root `pnpm test` invokes this runner through `test:collections`, so local and CI runs include the same coverage. Each invocation uses its own directory under the ignored `node_modules/.cache` directory for bundles and hydration fixtures, and removes it on exit.
 
 Coverage includes lazy node allocation/release, raw identity, native collection behavior and live iteration, deterministic differential tests with mixed keys and batched writes, signed-zero/NaN value equality, replacement order, errors, refresh, async supersession/disposal, held truth, optimistic rollback, shared serialized identities, structural edits after hydration, and strong/weak key/value lifetime.
 

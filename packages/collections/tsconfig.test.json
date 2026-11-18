@@ -3,6 +3,7 @@
   "compilerOptions": { "isolatedDeclarations": false, "noEmit": true, "types": ["node"] },
   "include": [
     "test/collections.type-tests.ts",
+    "test/compute.test.ts",
     "test/collections-derived.test.ts",
     "test/collections-order.test.ts",
     "test/collections.bench.ts",

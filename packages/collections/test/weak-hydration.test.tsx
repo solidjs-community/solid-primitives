@@ -1,10 +1,12 @@
+import { artifactDirectory } from "./artifacts.ts";
 /** @vitest-environment jsdom */
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { action, flush } from "solid-js";
 import { hydrate } from "@solidjs/web";
-import { WeakTokenFixture, kinds, current } from "./fixtures/weak-collections.js";
+import { WeakTokenFixture, kinds, current, releaseHybrid } from "./fixtures/weak-collections.js";
+import { AliasKeyFixture, aliasCurrent } from "./fixtures/alias-keys.tsx";
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 function apply(container: Element, chunk: string, first: boolean) {
   const pattern = /<script(?:[^>]*)>([\s\S]*?)<\/script>/g;
@@ -14,6 +16,44 @@ function apply(container: Element, chunk: string, first: boolean) {
   else container.insertAdjacentHTML("beforeend", markup);
   for (const script of scripts) (0, eval)(script);
 }
+
+for (const weak of [false, true])
+  for (const optimistic of [false, true]) {
+    it(`updates early key observers on payload adoption, weak=${weak}, optimistic=${optimistic}`, async () => {
+      const artifact = JSON.parse(
+        readFileSync(
+          resolve(artifactDirectory("weak-ssr"), `aliases-${weak}-${optimistic}.json`),
+          "utf8",
+        ),
+      );
+      const container = document.createElement("div");
+      document.body.appendChild(container);
+      (globalThis as any)._$HY = { events: [], completed: new WeakSet(), r: {}, fe() {} };
+      let dispose: (() => void) | undefined;
+      try {
+        apply(container, artifact.shell, true);
+        dispose = hydrate(() => <AliasKeyFixture weak={weak} optimistic={optimistic} />, container);
+        flush();
+        expect(aliasCurrent.has.at(-1)).toBe(false);
+        expect(aliasCurrent.get.at(-1)).toBeUndefined();
+        apply(container, artifact.rest, false);
+        flush();
+        await vi.waitFor(() => {
+          flush();
+          expect(aliasCurrent.has.at(-1)).toBe(true);
+          expect(aliasCurrent.get.at(-1)).toBe(1);
+          expect(container.textContent).toBe("true1");
+        });
+        expect(aliasCurrent.read()).toEqual([true, 1]);
+        expect(aliasCurrent.has.at(-1)).toBe(true);
+        expect(aliasCurrent.get.at(-1)).toBe(1);
+        expect(container.textContent).toBe("true1");
+      } finally {
+        dispose?.();
+        container.remove();
+      }
+    });
+  }
 describe("real weak token projection hydration", () => {
   for (const kind of kinds)
     for (const optimistic of [false, true])
@@ -21,7 +61,7 @@ describe("real weak token projection hydration", () => {
         it(`${kind}, optimistic=${optimistic}, ${mode}`, async () => {
           const artifact = JSON.parse(
             readFileSync(
-              resolve(`node_modules/.cache/weak-ssr/${kind}-${optimistic}.json`),
+              resolve(artifactDirectory("weak-ssr"), `${kind}-${optimistic}.json`),
               "utf8",
             ),
           );
@@ -52,6 +92,13 @@ describe("real weak token projection hydration", () => {
                 },
                 { timeout: 1500, interval: 10 },
               );
+            if (kind === "hybrid") {
+              try {
+                await expectValue(100);
+              } finally {
+                releaseHybrid?.();
+              }
+            }
             await expectValue(n);
             expect(container.querySelector("section")).toBe(section);
             if (kind === "static" && optimistic) {
@@ -63,15 +110,18 @@ describe("real weak token projection hydration", () => {
                 current.update();
                 yield gate;
               })();
-              await expectValue(1);
-              settle();
-              await pending;
+              try {
+                await expectValue(1);
+              } finally {
+                settle();
+                await pending;
+              }
               await expectValue(0);
             } else {
               current.update();
               await expectValue(n + 1);
               await current.refresh();
-              await expectValue(n + 1);
+              await expectValue(n + (kind === "static" ? 1 : 2));
             }
             expect(warn).not.toHaveBeenCalled();
           } finally {

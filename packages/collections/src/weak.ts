@@ -1,8 +1,15 @@
 /** Weak entries stored as ephemeron tokens in independent shallow store slots. */
 import { $REFRESH, type Refreshable, type StoreSetter } from "@solidjs/signals";
-import { createStore, createOptimisticStore, getOwner, onCleanup, untrack } from "solid-js";
+import {
+  createStore,
+  createOptimisticStore,
+  createEffect,
+  getOwner,
+  onCleanup,
+  untrack,
+} from "solid-js";
 import { isServer } from "@solidjs/web";
-import { collectionWriter, runCompute } from "./compute.ts";
+import { collectionWriter, createAliasSlots, runCompute, type AliasSlots } from "./compute.ts";
 import { createWeakCollectionToken, type WeakCollectionToken } from "./weak-token.ts";
 import type { ReactiveCollectionOptions, ReactiveCollectionCompute } from "./index.ts";
 
@@ -40,8 +47,10 @@ const read = <K extends WeakKey, V>(
 ): V | undefined => token?.values.get(key);
 
 class KeySlots<K extends WeakKey> {
-  private aliases = new WeakMap<K, string[]>();
+  private aliases = new WeakMap<K, AliasSlots>();
+  private notifications = new Set<() => void>();
   private seen = new WeakSet<object>();
+  private registered = new WeakMap<K, Set<string>>();
   private next = 0;
   private dead: string[] = [];
   maintenance: (() => void) | undefined;
@@ -52,21 +61,36 @@ class KeySlots<K extends WeakKey> {
 
   private register(key: K, slot: string): void {
     const slots = this.aliases.get(key);
-    if (slots?.includes(slot)) return;
-    if (slots) slots.push(slot);
-    else this.aliases.set(key, [slot]);
+    if (slots?.slots.includes(slot)) return;
+    if (slots) {
+      slots.slots.push(slot);
+      this.notifications.add(slots.notify);
+    } else this.aliases.set(key, createAliasSlots(slot));
+  }
+
+  install(key: K, slot: string): void {
+    this.register(key, slot);
+    let installed = this.registered.get(key);
+    if (!installed) this.registered.set(key, (installed = new Set()));
+    if (installed.has(slot)) return;
+    installed.add(slot);
     this.registry.register(key, slot);
   }
 
-  private adopt(state: State): void {
+  adopt(state: State): void {
     const marker = state.keys;
     if (this.seen.has(marker)) return;
     for (const prop of Object.keys(state))
       if (prop.startsWith("k:")) {
         const key = (state[prop] as WeakCollectionToken<K, K>).ref?.deref();
-        if (key !== undefined) this.register(key, prop.slice(2));
+        if (key !== undefined) this.install(key, prop.slice(2));
       }
     this.seen.add(marker);
+  }
+
+  notify(): void {
+    for (const notify of this.notifications) notify();
+    this.notifications.clear();
   }
 
   publish(state: State): void {
@@ -79,15 +103,20 @@ class KeySlots<K extends WeakKey> {
   }
 
   slot(key: K, state: State): string {
-    return untrack(() => {
+    const slot = untrack(() => {
       this.adopt(state);
       const aliases = this.aliases.get(key);
       if (aliases)
-        return aliases.find(slot => state["k:" + slot]?.ref?.deref() === key) ?? aliases.at(-1)!;
+        return (
+          aliases.slots.find(slot => state["k:" + slot]?.ref?.deref() === key) ??
+          aliases.slots.at(-1)!
+        );
       const slot = "o:" + (isServer ? "s" : "c") + this.next++;
       this.register(key, slot);
       return slot;
     });
+    this.aliases.get(key)!.track();
+    return slot;
   }
 
   drain(state: State): void {
@@ -136,6 +165,7 @@ class WeakData<K extends WeakKey, V> {
       const present = slot in state;
       if (!present) {
         state["k:" + slot] = createWeakCollectionToken(key, key);
+        this.slots.install(key, slot);
         if (this.publishKeys) this.slots.publish(state);
       }
       if (!present || !Object.is(read(state[slot], key), value)) {
@@ -278,20 +308,48 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
     ssrSource: options?.ssrSource,
   };
   let state: State, write: StoreSetter<State>;
-  if (typeof input === "function") {
+  if (typeof input === "function" && typeof (input as any)[Symbol.iterator] !== "function") {
     if (options?.loadingValue)
       new WeakData(seed, collectionWriter(seed), slots).replace(options.loadingValue);
     [state, write] = factory(
       draft => {
+        let active = true;
+        onCleanup(() => {
+          active = false;
+        });
         slots.drain(draft);
-        const data = new WeakData<K, V>(draft, collectionWriter(draft), slots, true, false);
-        return runCompute(input, view(data), result => data.replace(entries(result)), data);
+        const writer = collectionWriter(draft);
+        const write: StoreSetter<State> = fn => {
+          if (active)
+            writer(state => {
+              slots.drain(state);
+              fn(state);
+            });
+        };
+        const data = new WeakData<K, V>(draft, write, slots, true, false);
+        return runCompute(
+          input,
+          view(data),
+          result => data.replace(entries(result)),
+          data,
+          () => write(() => {}),
+        );
       },
       seed,
       config,
     );
+    // Reserve the same owner slot on both runtimes. SSR must not read a
+    // client-only source; application reads still expose source errors.
+    if (getOwner())
+      createEffect(() => (isServer ? undefined : state.keys), {
+        effect: () => {
+          untrack(() => slots.adopt(state));
+          slots.notify();
+        },
+        error: () => {},
+      });
   } else {
-    new WeakData(seed, collectionWriter(seed), slots).replace(input);
+    new WeakData(seed, collectionWriter(seed), slots).replace(input as Iterable<Pair<K, V>>);
     [state, write] = options?.optimistic
       ? createMaintainedStore(seed, slots, options.name)
       : factory(seed, config);
@@ -302,13 +360,13 @@ function createWeakCollection<K extends WeakKey, V, Draft, Result>(
 }
 
 export function createReactiveWeakMap<K extends WeakKey, V>(
-  input: CreateReactiveWeakMapComputeFunction<K, V>,
-  options?: CreateReactiveWeakMapOptions<K, V>,
-): Refreshable<WeakMap<K, V>>;
-export function createReactiveWeakMap<K extends WeakKey, V>(
   input?: Iterable<Pair<K, V>>,
   options?: ReactiveCollectionOptions,
 ): WeakMap<K, V>;
+export function createReactiveWeakMap<K extends WeakKey, V>(
+  input: CreateReactiveWeakMapComputeFunction<K, V>,
+  options?: CreateReactiveWeakMapOptions<K, V>,
+): Refreshable<WeakMap<K, V>>;
 export function createReactiveWeakMap<K extends WeakKey, V>(
   input: Iterable<Pair<K, V>> | CreateReactiveWeakMapComputeFunction<K, V> = [],
   options?: CreateReactiveWeakMapOptions<K, V>,
@@ -322,19 +380,21 @@ export function createReactiveWeakMap<K extends WeakKey, V>(
 }
 
 export function createReactiveWeakSet<K extends WeakKey>(
-  input: CreateReactiveWeakSetComputeFunction<K>,
-  options?: CreateReactiveWeakSetOptions<K>,
-): Refreshable<WeakSet<K>>;
-export function createReactiveWeakSet<K extends WeakKey>(
   input?: Iterable<K>,
   options?: ReactiveCollectionOptions,
 ): WeakSet<K>;
+export function createReactiveWeakSet<K extends WeakKey>(
+  input: CreateReactiveWeakSetComputeFunction<K>,
+  options?: CreateReactiveWeakSetOptions<K>,
+): Refreshable<WeakSet<K>>;
 export function createReactiveWeakSet<K extends WeakKey>(
   input: Iterable<K> | CreateReactiveWeakSetComputeFunction<K> = [],
   options?: CreateReactiveWeakSetOptions<K>,
 ): Refreshable<WeakSet<K>> {
   return createWeakCollection(
-    typeof input === "function" ? input : setEntries(input),
+    typeof input === "function" && typeof (input as any)[Symbol.iterator] !== "function"
+      ? input
+      : setEntries(input as Iterable<K>),
     {
       ...options,
       loadingValue: options?.loadingValue && setEntries(options.loadingValue),

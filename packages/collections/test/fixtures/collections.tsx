@@ -27,13 +27,14 @@ const value = (n: number): Value => {
 export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
   if (props.kind === "store-hybrid") return StoreHybridFixture(props);
   const [version, update] = createSignal(0);
+  let refreshed = 0;
   // The same serialized object must be shared between this source and the map.
   // A deep JSON snapshot of the store would silently break that identity.
   const key = createMemo(async () => ({ tag: "shared" }));
   const compute =
     props.kind === "stream" || props.kind === "hybrid"
       ? async function* (draft: Map<Key, Value>) {
-          const n = version(),
+          const n = version() + refreshed,
             k = key();
           await sleep(2);
           draft.set(k, value(n));
@@ -44,7 +45,7 @@ export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
           draft.set("tail", value(99));
         }
       : async (draft: Map<Key, Value>) => {
-          const n = version(),
+          const n = version() + refreshed,
             k = key();
           await sleep(2);
           draft.clear();
@@ -62,9 +63,17 @@ export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
     if (map.has("placeholder")) return "placeholder";
     const k = key(),
       entry = map.get(k);
-    return `${map.has(k)}:${entry?.n}:${entry?.date instanceof Date && entry.big === 1n && entry.self === entry}:${Number.isNaN(entry?.nan)}:${map.size}:${map.has("tail")}`;
+    return `${map.has(k)}:${entry?.n}:${entry?.date instanceof Date && entry.big === 1n && entry.self === entry && Object.hasOwn(entry, "missing") && entry.missing === undefined}:${Number.isNaN(entry?.nan)}:${map.size}:${map.has("tail")}`;
   };
-  current = { map, read, update: () => update(n => n + 1), refresh: () => refresh(map) };
+  current = {
+    map,
+    read,
+    update: () => update(n => n + 1),
+    refresh: () => {
+      refreshed++;
+      return refresh(map);
+    },
+  };
   return (
     <section>
       <Loading fallback={<span data-loading="">loading</span>}>
@@ -78,10 +87,11 @@ export function CollectionFixture(props: { kind: Kind; optimistic: boolean }) {
 // Control case: exercise the same delayed hybrid handoff without collections.
 function StoreHybridFixture(props: { optimistic: boolean }) {
   const [version, update] = createSignal(0);
+  let refreshed = 0;
   const key = createMemo(async () => ({ tag: "shared" }));
   const [state] = (props.optimistic ? createOptimisticStore : createStore)(
     async function* (draft) {
-      const n = version(),
+      const n = version() + refreshed,
         k = key();
       await sleep(2);
       draft.key = k;
@@ -97,9 +107,16 @@ function StoreHybridFixture(props: { optimistic: boolean }) {
   );
   const read = () => {
     const entry = state.value;
-    return `${state.key === key()}:${entry?.n}:${entry?.date instanceof Date && entry.big === 1n && entry.self === entry}:${Number.isNaN(entry?.nan)}:${state.tail ? 2 : 1}:${state.tail}`;
+    return `${state.key === key()}:${entry?.n}:${entry?.date instanceof Date && entry.big === 1n && entry.self === entry && Object.hasOwn(entry, "missing") && entry.missing === undefined}:${Number.isNaN(entry?.nan)}:${state.tail ? 2 : 1}:${state.tail}`;
   };
-  current = { read, update: () => update(n => n + 1), refresh: () => refresh(state) };
+  current = {
+    read,
+    update: () => update(n => n + 1),
+    refresh: () => {
+      refreshed++;
+      return refresh(state);
+    },
+  };
   return (
     <section>
       <Loading fallback={<span>loading</span>}>
@@ -121,10 +138,11 @@ export function SetCollectionFixture(props: {
   optimistic: boolean;
 }) {
   const [version, update] = createSignal(0);
+  let refreshed = 0;
   const key = createMemo(async () => ({ tag: "set-key" }));
   const set = createReactiveSet<unknown>(
     async function* (draft) {
-      const revision = version();
+      const revision = version() + refreshed;
       const k = key();
       await sleep(2);
       draft.clear();
@@ -145,8 +163,16 @@ export function SetCollectionFixture(props: {
   const read = () =>
     set.has("placeholder")
       ? "placeholder"
-      : `${set.has(key())}:${set.has(NaN)}:${set.has(Symbol.for("set-symbol"))}:${set.size}:${set.has("tail")}:${set.has(version())}`;
-  currentSet = { set, read, update: () => update(n => n + 1), refresh: () => refresh(set) };
+      : `${set.has(key())}:${set.has(NaN)}:${set.has(Symbol.for("set-symbol"))}:${set.size}:${set.has("tail")}:${set.has(version() + refreshed)}`;
+  currentSet = {
+    set,
+    read,
+    update: () => update(n => n + 1),
+    refresh: () => {
+      refreshed++;
+      return refresh(set);
+    },
+  };
   return (
     <section>
       <Loading fallback={<span>loading</span>}>

@@ -348,14 +348,17 @@ describe("weak collection store slots", () => {
     const held = action(function* () {
       yield pending.promise;
     })();
-    update(1);
-    flush();
-    expect(map.get(a)).toBe(0);
-    expect(map.get(b)).toBe(0);
-    expect(latest(() => map.get(b))).toBe(1);
-    expect(reader.values).toEqual([0]);
-    pending.resolve();
-    await held;
+    try {
+      update(1);
+      flush();
+      expect(map.get(a)).toBe(0);
+      expect(map.get(b)).toBe(0);
+      expect(latest(() => map.get(b))).toBe(1);
+      expect(reader.values).toEqual([0]);
+    } finally {
+      pending.resolve();
+      await held;
+    }
     await tick();
     expect(map.get(b)).toBe(1);
   });
@@ -375,16 +378,18 @@ describe("weak collection store slots", () => {
       yield gates[1]!.promise;
     })();
     flush();
-    expect(map.has(a)).toBe(false);
-    expect(map.get(b)).toBe(2);
-    gates[1]!.resolve();
-    await tick();
-    // Solid 2 settles independent store slots separately. Weak collections
-    // have no shared iteration order that would couple these membership edits.
-    expect(map.has(a)).toBe(false);
-    expect(map.has(b)).toBe(false);
-    gates[0]!.resolve();
-    await Promise.all([first, second]);
+    try {
+      expect(map.has(a)).toBe(false);
+      expect(map.get(b)).toBe(2);
+      gates[1]!.resolve();
+      await tick();
+      // Weak collections have no shared iteration order coupling these edits.
+      expect(map.has(a)).toBe(false);
+      expect(map.has(b)).toBe(false);
+    } finally {
+      for (const gate of gates) gate.resolve();
+      await Promise.all([first, second]);
+    }
     await tick();
     expect(map.get(a)).toBe(1);
     expect(map.has(b)).toBe(false);
@@ -413,13 +418,18 @@ describe("weak collection store slots", () => {
       yield gates[1]!.promise;
     })();
     flush();
-    gates[1]!.resolve();
-    await second;
-    await tick();
-    expect(map.get(a)).toBe(10);
-    expect(map.get(b)).toBe(2);
-    gates[0]!.resolve();
-    await first;
+    try {
+      expect(map.get(a)).toBe(10);
+      expect(map.get(b)).toBe(20);
+      gates[1]!.resolve();
+      await second;
+      await tick();
+      expect(map.get(a)).toBe(10);
+      expect(map.get(b)).toBe(2);
+    } finally {
+      for (const gate of gates) gate.resolve();
+      await Promise.all([first, second]);
+    }
     await tick();
     expect(map.get(a)).toBe(1);
   });

@@ -22,6 +22,7 @@ export function StreamingSet() {
         <For each={["Europe", "Asia"]}>
           {name => (
             <Button
+              aria-pressed={region() === name}
               variant={region() === name ? "primary" : "outline"}
               onClick={() => setRegion(name)}
             >

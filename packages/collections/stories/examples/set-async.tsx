@@ -22,7 +22,11 @@ export function AsyncSet() {
       <ButtonRow>
         <For each={["Reader", "Editor"]}>
           {name => (
-            <Button variant={role() === name ? "primary" : "outline"} onClick={() => setRole(name)}>
+            <Button
+              aria-pressed={role() === name}
+              variant={role() === name ? "primary" : "outline"}
+              onClick={() => setRole(name)}
+            >
               {name}
             </Button>
           )}

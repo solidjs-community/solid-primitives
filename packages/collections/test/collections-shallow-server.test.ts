@@ -48,6 +48,7 @@ describe("server shallow store integration", () => {
       expect(first.value.value).toBe(value);
       const next = await iterator.next();
       expect(next.value).toEqual([[["value"], replacement]]);
+      expect(next.value[0][1]).toBe(replacement);
       expect(state.value).toBe(value);
       await iterator.return?.();
     } finally {

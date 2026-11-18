@@ -12,7 +12,7 @@ Membership and value reads track separate store nodes. Undefined is stored direc
 
 An old token can still retain its value if the key remains externally live. Solid must release obsolete companion nodes after reader disposal for overwritten/deleted values to become collectible. The lifetime suite covers both unreachable key cycles and obsolete values with live keys.
 
-FinalizationRegistry callbacks queue only property IDs. Ordinary writes or a fresh compute drain this queue. Stale async drafts cannot drain it, since their guarded writes would do nothing. Ordinary optimistic writes also leave it queued, since a deletion through that path would roll back. Computed optimistic collections prune during the next authoritative computation.
+FinalizationRegistry callbacks queue only property IDs for installed entries; lookup-only misses do not register cleanup. Ordinary writes and current producer writes or yields drain this queue. Superseded and disposed producers cannot consume queued IDs. Ordinary optimistic writes leave it queued, since cleanup through that path would roll back. An active optimistic stream prunes during its next authoritative yield without restarting the producer.
 
 Iterable-initialized optimistic collections use an internal backing store. Finalization callbacks prune only finalized slots in that backing, preserving unrelated optimistic edits in the view. Owner disposal disconnects its finalization callback. User keys/values can be collected before empty metadata is pruned; finalization timing is unspecified.
 
@@ -50,6 +50,6 @@ The primitive cannot safely clear shared references: later chunks, late hydratio
 
 ## Validation and future core support
 
-Run `pnpm test` from this package directory for the combined runtime, SSR, codec, and GC checks. The [validation guide](./implementation.md#validation) documents setup and individual commands. Weak coverage includes 23 runtime cases, 41 SSR/hydration/codec cases, and 40 lifetime cases in each shipped development/production profile.
+Run `pnpm test` from this package directory for the combined runtime, SSR, codec, and GC checks. The [validation guide](./implementation.md#validation) documents setup and individual commands. Weak coverage includes early hydration aliases, subscription handoff, active-stream pruning, lookup-only misses, and lifetime checks in both shipped development/production profiles.
 
 No additional collection-specific core support is currently required. Exposing leaf signals alone would leave async, held-truth, optimistic, and hydration behavior to reconstruct, so the store backend remains the practical choice.

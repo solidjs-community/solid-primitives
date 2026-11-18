@@ -1,9 +1,19 @@
-import { createMemo, createSignal, Loading, refresh, untrack } from "solid-js";
+import { createMemo, createSignal, from, Loading, refresh, untrack } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { createReactiveWeakMap, createReactiveWeakSet } from "../../src/weak.js";
 
 export let current: { read(): string; update(): void; refresh(): Promise<unknown> };
 export let calls = 0;
-export const kinds = ["promise", "stream", "hybrid", "loading", "client", "static"] as const;
+export let releaseHybrid: (() => void) | undefined;
+export const kinds = [
+  "promise",
+  "stream",
+  "hybrid",
+  "loading",
+  "client",
+  "static",
+  "subscription",
+] as const;
 export type Kind = (typeof kinds)[number];
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 type Key = { name: string };
@@ -15,6 +25,13 @@ export function WeakTokenFixture(props: { kind: Kind; optimistic: boolean }) {
   const key = createMemo(async () => ({ name: "shared" }));
   const placeholder: Key = { name: "placeholder" };
   const [version, update] = createSignal(0);
+  let refreshed = 0;
+  const hybridGate =
+    props.kind === "hybrid" && !isServer
+      ? new Promise<void>(resolve => {
+          releaseHybrid = resolve;
+        })
+      : undefined;
   const change = (draft: WeakMap<Key, Value>, key: Key, count: number) => {
     draft.delete(placeholder);
     const value: Value = { key, count };
@@ -26,24 +43,36 @@ export function WeakTokenFixture(props: { kind: Kind; optimistic: boolean }) {
     ...(props.kind === "hybrid" || props.kind === "client" ? { ssrSource: props.kind } : {}),
   };
   const map = createReactiveWeakMap<Key, Value>(
-    props.kind !== "stream" && props.kind !== "hybrid"
-      ? async draft => {
-          calls++;
+    props.kind === "subscription"
+      ? () => {
           const k = key(),
-            n = version();
-          await sleep(2);
-          change(draft, k, n);
+            count = version() + refreshed;
+          return from<Iterable<readonly [Key, Value]>>(emit => {
+            const value: Value = { key: k, count };
+            value.self = value;
+            emit([[k, value]]);
+            return () => {};
+          });
         }
-      : async function* (draft) {
-          calls++;
-          const k = key(),
-            n = version();
-          await sleep(2);
-          change(draft, k, n);
-          yield;
-          await sleep(5);
-          change(draft, k, n + 10);
-        },
+      : props.kind !== "stream" && props.kind !== "hybrid"
+        ? async draft => {
+            calls++;
+            const k = key(),
+              n = version() + refreshed;
+            await sleep(2);
+            change(draft, k, n);
+          }
+        : async function* (draft) {
+            calls++;
+            const k = key(),
+              n = version() + refreshed;
+            await sleep(2);
+            if (hybridGate) await hybridGate;
+            change(draft, k, props.kind === "hybrid" && isServer ? n + 100 : n);
+            yield;
+            await sleep(5);
+            change(draft, k, n + 10);
+          },
     {
       ...options,
       ...(props.kind === "loading" || props.kind === "client"
@@ -66,7 +95,10 @@ export function WeakTokenFixture(props: { kind: Kind; optimistic: boolean }) {
   current = {
     read,
     update: () => update(n => n + 1),
-    refresh: () => Promise.all([refresh(map), refresh(set)]),
+    refresh: () => {
+      refreshed++;
+      return Promise.all([refresh(map), refresh(set)]);
+    },
   };
   return (
     <section>
