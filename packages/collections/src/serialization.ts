@@ -4,7 +4,7 @@ import {
   isWeakCollectionToken,
   createWeakCollectionToken,
   type WeakCollectionToken,
-} from "./weak-token.js";
+} from "./weak-token.ts";
 
 function snapshot(token: WeakCollectionToken<WeakKey, unknown>): [] | [WeakKey, unknown] {
   const key = token.ref?.deref();

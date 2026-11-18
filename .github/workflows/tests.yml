@@ -42,6 +42,10 @@ jobs:
         if: success() || failure()
         run: pnpm test
 
+      - name: Test collections package (SSR, client, and GC)
+        if: success() || failure()
+        run: pnpm --filter @solid-primitives/collections test
+
       - name: Measure bundle sizes
         if: github.ref == 'refs/heads/main'
         run: pnpm measure --save && pnpm update-readme

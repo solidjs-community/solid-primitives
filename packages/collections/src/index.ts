@@ -12,7 +12,7 @@
 import { $REFRESH, type Refreshable, type StoreSetter } from "@solidjs/signals";
 import { createStore, createOptimisticStore, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { collectionWriter, runCompute } from "./compute.js";
+import { collectionWriter, runCompute } from "./compute.ts";
 export {
   createReactiveWeakMap,
   createReactiveWeakSet,
@@ -20,7 +20,7 @@ export {
   type CreateReactiveWeakSetOptions,
   type CreateReactiveWeakMapComputeFunction,
   type CreateReactiveWeakSetComputeFunction,
-} from "./weak.js";
+} from "./weak.ts";
 
 export interface ReactiveCollectionOptions {
   /** Label passed to Solid's store diagnostics. */

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   $TARGET,
   action,
@@ -58,6 +58,32 @@ function observe<T>(fn: () => T) {
 }
 
 describe("weak collection store slots", () => {
+  for (const kind of ["map", "set"] as const) {
+    it(`keeps metadata visits linear when computing a weak ${kind}`, () => {
+      const keys = Array.from({ length: 128 }, () => ({}));
+      const objectKeys = Object.keys;
+      let metadataVisits = 0;
+      const spy = vi.spyOn(Object, "keys").mockImplementation(object => {
+        const props = objectKeys(object);
+        metadataVisits += props.filter(prop => prop.startsWith("k:")).length;
+        return props;
+      });
+      try {
+        const collection = root(() =>
+          kind === "map"
+            ? createReactiveWeakMap(() => keys.map((key, i) => [key, i] as const))
+            : createReactiveWeakSet<object>(draft => {
+                for (const key of keys) draft.add(key);
+              }),
+        );
+        expect(collection.has(keys.at(-1)!)).toBe(true);
+        expect(metadataVisits).toBeLessThanOrEqual(keys.length * 4);
+      } finally {
+        spy.mockRestore();
+      }
+    });
+  }
+
   it("allocates independent lazy nodes for membership and value", () => {
     const a = {},
       b = {};
@@ -334,7 +360,7 @@ describe("weak collection store slots", () => {
     expect(map.get(b)).toBe(1);
   });
 
-  it("keeps overlapping structural actions coherent through shared store settlement", async () => {
+  it("settles overlapping structural actions on distinct weak keys independently", async () => {
     const a = {},
       b = {},
       gates = [gate(), gate()];
@@ -353,10 +379,10 @@ describe("weak collection store slots", () => {
     expect(map.get(b)).toBe(2);
     gates[1]!.resolve();
     await tick();
-    // Optimistic stores share an internal key-set slot even with no iterator.
-    // Distinct membership edits therefore settle together, like strong maps.
+    // Solid 2 settles independent store slots separately. Weak collections
+    // have no shared iteration order that would couple these membership edits.
     expect(map.has(a)).toBe(false);
-    expect(map.has(b)).toBe(true);
+    expect(map.has(b)).toBe(false);
     gates[0]!.resolve();
     await Promise.all([first, second]);
     await tick();

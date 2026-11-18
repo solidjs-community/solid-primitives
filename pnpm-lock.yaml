@@ -283,13 +283,13 @@ importers:
     devDependencies:
       '@solidjs/signals':
         specifier: 'catalog:'
-        version: 2.0.0-rc.21
+        version: 2.0.0
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-rc.21(solid-js@2.0.0-rc.21)
+        version: 2.0.0(solid-js@2.0.0)
       solid-js:
         specifier: 'catalog:'
-        version: 2.0.0-rc.21
+        version: 2.0.0
 
   packages/connectivity:
     dependencies:

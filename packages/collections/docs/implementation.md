@@ -26,7 +26,7 @@ The implementation uses public Solid APIs. Private node inspections and projecti
 ## Behavioral boundaries
 
 - When a source changes in the same batch as a manual edit, Solid runs the compute after applying the edit. The compute decides whether to preserve or replace that value. A standalone manual edit does not rerun the compute.
-- Optimistic value edits to independent Map keys settle independently. Structural edits can settle together through Solid's shared key-set node.
+- Optimistic value edits to independent Map keys settle independently. Strong collection structural edits can settle together through their shared order/size state; weak collections have no shared iteration state and settle distinct-key edits independently.
 - Iterators do not rewind on optimistic rollback. Order-changing replacements act as a new insertion generation.
 - The facade has empty native internal storage. Use `new Map(map)` / `new Set(set)` with native intrinsics, structured cloning, or serializers that bypass instance methods.
 - Functions and local symbols are supported on the client but are not generally wire-serializable. Local-symbol bookkeeping requires runtime support for weak symbol keys.
@@ -36,7 +36,7 @@ The implementation uses public Solid APIs. Private node inspections and projecti
 
 Install the workspace dependencies before running the package checks. Runtime tests, type checking, and Storybook use the installed Solid packages.
 
-Some hydration cases currently fail on unmodified `@solidjs/web@2.0.0-rc.21` because server serialization can clone cyclic graphs and lose shared object-key identity. These tests remain enabled to track the upstream behavior, including the equivalent direct-store control.
+Hydration tests run against the workspace's stable Solid 2.0 dependencies and cover cyclic graphs and shared object-key identity, including an equivalent direct-store control.
 
 From this package directory:
 

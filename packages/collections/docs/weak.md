@@ -14,7 +14,7 @@ An old token can still retain its value if the key remains externally live. Soli
 
 FinalizationRegistry callbacks queue only property IDs. Ordinary writes or a fresh compute drain this queue. Stale async drafts cannot drain it, since their guarded writes would do nothing. Ordinary optimistic writes also leave it queued, since a deletion through that path would roll back. Computed optimistic collections prune during the next authoritative computation.
 
-Iterable-initialized optimistic collections have an internal maintenance projection driven by a key-free counter. This supplies an authoritative cleanup channel without sharing key subscriptions. Owner disposal disconnects its finalization callback. User keys/values can be collected before empty metadata is pruned; finalization timing is unspecified.
+Iterable-initialized optimistic collections use an internal backing store. Finalization callbacks prune only finalized slots in that backing, preserving unrelated optimistic edits in the view. Owner disposal disconnects its finalization callback. User keys/values can be collected before empty metadata is pruned; finalization timing is unspecified.
 
 ## API boundaries
 
@@ -22,7 +22,7 @@ Iterable-initialized optimistic collections have an internal maintenance project
 - There is no size, enumeration, clear, or set algebra.
 - Keys may be objects, functions, and supported non-registered symbols. Mutators reject primitive and registered-symbol keys. `WeakRef` and `FinalizationRegistry` are required.
 - Values preserve identity. External writes follow Solid batching; draft edits are immediately readable.
-- Independent existing-value edits can settle separately. Structural optimistic edits can settle together through Solid's root key-set node.
+- Optimistic edits to distinct weak keys settle independently, including membership changes.
 - Native intrinsics bypass the facade's methods. Its native internal storage is empty, and weak collections cannot be materialized by iteration.
 
 ## SSR and hydration
@@ -50,6 +50,6 @@ The primitive cannot safely clear shared references: later chunks, late hydratio
 
 ## Validation and future core support
 
-Run `pnpm test` from this package directory for the combined runtime, SSR, codec, and GC checks. The [validation guide](./implementation.md#validation) documents setup and individual commands. Weak coverage includes 21 runtime cases, 41 SSR/hydration/codec cases, and 40 lifetime cases in each shipped development/production profile.
+Run `pnpm test` from this package directory for the combined runtime, SSR, codec, and GC checks. The [validation guide](./implementation.md#validation) documents setup and individual commands. Weak coverage includes 23 runtime cases, 41 SSR/hydration/codec cases, and 40 lifetime cases in each shipped development/production profile.
 
-No additional collection-specific core support is currently required. A safe authoritative maintenance operation could simplify cleanup, and an explicit opt-out from key-set observation could allow independent structural optimistic settlement. Exposing leaf signals alone would leave async, held-truth, optimistic, and hydration behavior to reconstruct, so the store backend remains the practical choice.
+No additional collection-specific core support is currently required. Exposing leaf signals alone would leave async, held-truth, optimistic, and hydration behavior to reconstruct, so the store backend remains the practical choice.

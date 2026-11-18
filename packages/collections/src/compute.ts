@@ -1,6 +1,6 @@
 import { type StoreSetter } from "@solidjs/signals";
 import { untrack } from "solid-js";
-import type { ReactiveCollectionCompute } from "./index.js";
+import type { ReactiveCollectionCompute } from "./index.ts";
 
 // A separate closure avoids retaining a factory's input and old loading seed.
 // Bookkeeping reads the draft without becoming dependencies of the compute,

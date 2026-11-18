@@ -1,17 +1,10 @@
 /** Weak entries stored as ephemeron tokens in independent shallow store slots. */
 import { $REFRESH, type Refreshable, type StoreSetter } from "@solidjs/signals";
-import {
-  createStore,
-  createOptimisticStore,
-  createSignal,
-  getOwner,
-  onCleanup,
-  untrack,
-} from "solid-js";
+import { createStore, createOptimisticStore, getOwner, onCleanup, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { collectionWriter, runCompute } from "./compute.js";
-import { createWeakCollectionToken, type WeakCollectionToken } from "./weak-token.js";
-import type { ReactiveCollectionOptions, ReactiveCollectionCompute } from "./index.js";
+import { collectionWriter, runCompute } from "./compute.ts";
+import { createWeakCollectionToken, type WeakCollectionToken } from "./weak-token.ts";
+import type { ReactiveCollectionOptions, ReactiveCollectionCompute } from "./index.ts";
 
 type Pair<K, V> = readonly [K, V];
 type State = Record<string, any> & { keys: object };
@@ -65,17 +58,29 @@ class KeySlots<K extends WeakKey> {
     this.registry.register(key, slot);
   }
 
+  private adopt(state: State): void {
+    const marker = state.keys;
+    if (this.seen.has(marker)) return;
+    for (const prop of Object.keys(state))
+      if (prop.startsWith("k:")) {
+        const key = (state[prop] as WeakCollectionToken<K, K>).ref?.deref();
+        if (key !== undefined) this.register(key, prop.slice(2));
+      }
+    this.seen.add(marker);
+  }
+
+  publish(state: State): void {
+    // Adopt hydrated metadata before replacing its marker. Locally registered
+    // keys already have aliases, so the next insertion needs no metadata scan.
+    untrack(() => this.adopt(state));
+    const marker = Object.freeze({});
+    this.seen.add(marker);
+    state.keys = marker;
+  }
+
   slot(key: K, state: State): string {
     return untrack(() => {
-      const marker = state.keys;
-      if (!this.seen.has(marker)) {
-        for (const prop of Object.keys(state))
-          if (prop.startsWith("k:")) {
-            const key = (state[prop] as WeakCollectionToken<K, K>).ref?.deref();
-            if (key !== undefined) this.register(key, prop.slice(2));
-          }
-        this.seen.add(marker);
-      }
+      this.adopt(state);
       const aliases = this.aliases.get(key);
       if (aliases)
         return aliases.find(slot => state["k:" + slot]?.ref?.deref() === key) ?? aliases.at(-1)!;
@@ -94,7 +99,7 @@ class KeySlots<K extends WeakKey> {
       delete state["k:" + slot];
     }
     this.dead.length = 0;
-    state.keys = Object.freeze({});
+    this.publish(state);
   }
 }
 
@@ -131,7 +136,7 @@ class WeakData<K extends WeakKey, V> {
       const present = slot in state;
       if (!present) {
         state["k:" + slot] = createWeakCollectionToken(key, key);
-        if (this.publishKeys) state.keys = Object.freeze({});
+        if (this.publishKeys) this.slots.publish(state);
       }
       if (!present || !Object.is(read(state[slot], key), value)) {
         state[slot] = value === undefined ? undefined : createWeakCollectionToken(key, value);
@@ -148,7 +153,7 @@ class WeakData<K extends WeakKey, V> {
       if (!(slot in state)) return;
       delete state[slot];
       delete state["k:" + slot];
-      if (this.publishKeys) state.keys = Object.freeze({});
+      if (this.publishKeys) this.slots.publish(state);
       this.revision++;
       deleted = true;
     });
@@ -170,7 +175,7 @@ class WeakData<K extends WeakKey, V> {
           if (key === undefined || !incoming.has(key)) {
             delete state[prop.slice(2)];
             delete state[prop];
-            if (this.publishKeys) state.keys = Object.freeze({});
+            if (this.publishKeys) this.slots.publish(state);
             this.revision++;
           }
         }
@@ -235,7 +240,7 @@ function* setEntries<K>(values: Iterable<K>): Generator<Pair<K, true>> {
 }
 
 // Static optimism has no user derive in which to prune dead properties. A
-// private maintenance projection provides an authoritative cleanup channel;
+// private backing store provides an authoritative cleanup channel;
 // ordinary optimistic setters would roll that cleanup back. Keep this helper
 // outside the input factory's closure environment so it cannot retain entries.
 function createMaintainedStore<K extends WeakKey>(
@@ -243,18 +248,11 @@ function createMaintainedStore<K extends WeakKey>(
   slots: KeySlots<K>,
   name?: string,
 ): [State, StoreSetter<State>] {
-  const [version, bump] = createSignal(0);
-  const result = createOptimisticStore<State>(
-    draft => {
-      version();
-      slots.drain(draft);
-    },
-    seed,
-    { shallow: true, key: null, name },
-  );
-  slots.maintenance = () => {
-    bump(value => value + 1);
-  };
+  const [backing, write] = createStore(seed, { shallow: true, name });
+  const result = untrack(() => createOptimisticStore(backing, { shallow: true, name }));
+  // Update only finalized slots in the backing. Re-asking a derived
+  // optimistic store would also settle unrelated live guesses in Solid 2.
+  slots.maintenance = () => write(state => slots.drain(state));
   if (getOwner())
     onCleanup(() => {
       slots.maintenance = undefined;
