@@ -196,7 +196,7 @@ const moduleSize = () =>
   })[matches.key];
 ```
 
-This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://solid-primitives.netlify.app/package/masonry#createMasonry).
+This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://primitives.solidjs.community/package/masonry#createMasonry).
 
 > **Warning** for this feature to work, the breakpoints needs to be ordered from small to large. If you cannot ensure this, use the `sortBreakpoints` helper.
 

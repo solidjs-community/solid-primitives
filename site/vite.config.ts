@@ -5,23 +5,19 @@ import defaultTheme from "@kobalte/solidbase/default-theme";
 import { defineConfig } from "vite";
 import { SITE_URL } from "./src/config";
 import { sidebar } from "./src/generated/sidebar";
+import { ogVersion } from "./scripts/og-version";
 
 const solidBase = createSolidBase(defaultTheme);
 
-// Crawlers need absolute og:image URLs. Netlify deploy previews / branch deploys use their own
-// address (`DEPLOY_PRIME_URL`), so their cards come from their own `/_server`; production uses the
-// canonical domain. `SITE_ORIGIN` overrides both (e.g. `vite preview` on localhost).
-const SITE_ORIGIN = (
-  process.env.SITE_ORIGIN ??
-  (process.env.CONTEXT && process.env.CONTEXT !== "production"
-    ? process.env.DEPLOY_PRIME_URL
-    : undefined) ??
-  SITE_URL
-).replace(/\/$/, "");
+// Crawlers need absolute og:image URLs, so builds bake in the canonical origin. Workers Builds
+// doesn't expose a preview deployment's URL at build time, so previews point at production too.
+// `SITE_ORIGIN` overrides it (e.g. `vite preview` on localhost).
+const SITE_ORIGIN = (process.env.SITE_ORIGIN ?? SITE_URL).replace(/\/$/, "");
 
 export default defineConfig({
   define: {
     __SITE_ORIGIN__: JSON.stringify(SITE_ORIGIN),
+    __OG_VERSION__: JSON.stringify(ogVersion()),
   },
   // SolidBase's theme depends on pinned @solid-primitives/*@next releases. Left external, the
   // prerender worker would resolve `@solid-primitives/utils` up the tree to a different copy
@@ -80,7 +76,8 @@ export default defineConfig({
     }),
     // start mode (SSR + static prerender into dist/client) replaces SolidStart + Nitro.
     // Pages stay prerendered; `serverFunctions` keeps dist/server so its `{ fetch }` handler can
-    // serve the OG image endpoint (`/_server`) — netlify/functions/server.mjs.
+    // render the OG cards (`/_server`) at build time — scripts/static-og.ts. dist/server is a build
+    // tool only; it is not deployed.
     solid(solidBase.startConfig({ serverFunctions: true })),
   ],
 });
