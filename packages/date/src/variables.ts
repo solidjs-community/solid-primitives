@@ -17,7 +17,7 @@ export const SECOND = 1000,
 
 /** @internal */
 export const UNITS: Unit[] = [
-  { max: 60000, value: SECOND, name: "second" },
+  { max: 59500, value: SECOND, name: "second" },
   { max: 2760000, value: MINUTE, name: "minute" },
   { max: 72000000, value: HOUR, name: "hour" },
   { max: 518400000, value: DAY, name: "day" },
