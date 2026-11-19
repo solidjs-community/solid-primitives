@@ -40,14 +40,14 @@
   "exports": {
     "import": {
       "@solid-primitives/source": "./src/index.tsx",
-      "solid": "./dist/index.jsx",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
   "typesVersions": {},
   "tsdown": {
-    "entry": "src/**/*.{ts,tsx}"
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
   },
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
