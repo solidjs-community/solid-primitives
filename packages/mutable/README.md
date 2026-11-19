@@ -11,7 +11,7 @@
 
 A primitive for creating a mutable store proxy object. A compatibility layer for code that relies on direct mutation semantics (similar to MobX/Vue reactivity).
 
-- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/reactivity-mutable--docs)
+- [**Docs (Storybook)**](https://storybook.primitives.solidjs.community/?path=/docs/reactivity-mutable--docs)
 - [`createMutable`](#createmutable) - Creates a mutable store proxy object.
 - [`modifyMutable`](#modifymutable) - Helper for applying multiple mutations to a mutable store in one call.
 

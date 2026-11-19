@@ -1,0 +1,23 @@
+// Cloudflare Worker with static assets for Storybook (the component/primitive docs).
+//
+// Workers Builds (git-connected) settings that go with this file:
+//   Worker name ............. solid-primitives-storybook   (must match the `name` below)
+//   Production branch ....... main
+//   Root directory .......... / (repository root)
+//   Build command ........... pnpm run build-storybook
+//                             (use `pnpm build && pnpm run build-storybook` if Storybook can't
+//                              resolve the package builds)
+//   Deploy command .......... npx wrangler deploy --config wrangler.storybook.jsonc
+//   Preview command ......... npx wrangler versions upload --config wrangler.storybook.jsonc
+//   Build variables ......... NODE_VERSION=22.18.0
+//
+// --config is required on both commands: without it wrangler picks up the root wrangler.jsonc,
+// which belongs to the docs site.
+{
+  "name": "solid-primitives-storybook",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./storybook-static",
+    "not_found_handling": "404-page",
+  },
+}

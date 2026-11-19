@@ -1,6 +1,6 @@
 import { createMemo, Show } from "solid-js";
 import { getRequestEvent, isServer, NoHydration } from "@solidjs/web";
-import { Meta } from "@solidjs/meta";
+import { Link, Meta } from "@solidjs/meta";
 import { useLocation } from "@solidjs/router";
 import { DynamicImage, urlFromImage } from "@solidjs/ogp";
 import { useFrontmatter, useSolidBaseContext } from "@kobalte/solidbase/client";
@@ -451,6 +451,12 @@ export function SiteOpenGraph() {
     );
   });
   const description = () => frontmatter()?.description ?? config().description;
+  const imageAlt = () => {
+    const fm = frontmatter();
+    return fm?.package
+      ? `${fm.title ?? fm.package} (@solid-primitives/${fm.package}) — Solid Primitives`
+      : `${config().title} — reactive primitives for Solid`;
+  };
 
   return (
     <>
@@ -459,11 +465,18 @@ export function SiteOpenGraph() {
       <Meta property="og:title" content={metaTitle()} />
       <Meta property="og:url" content={origin + location.pathname} />
       <Show when={description()}>{d => <Meta property="og:description" content={d()} />}</Show>
+      <Meta property="og:locale" content="en_US" />
       <Meta property="og:image" content={image()} />
+      <Meta property="og:image:type" content="image/png" />
       <Meta property="og:image:width" content={String(WIDTH)} />
       <Meta property="og:image:height" content={String(HEIGHT)} />
+      <Meta property="og:image:alt" content={imageAlt()} />
       <Meta name="twitter:card" content="summary_large_image" />
+      <Meta name="twitter:title" content={metaTitle()} />
+      <Show when={description()}>{d => <Meta name="twitter:description" content={d()} />}</Show>
       <Meta name="twitter:image" content={image()} />
+      <Meta name="twitter:image:alt" content={imageAlt()} />
+      <Link rel="canonical" href={origin + location.pathname} />
     </>
   );
 }

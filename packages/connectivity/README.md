@@ -11,7 +11,7 @@
 
 Reactive primitives for network connectivity and connection quality. Wraps `navigator.onLine` for basic online/offline detection and the [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API) (`navigator.connection`) for adaptive loading strategies.
 
-- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/network-connectivity--docs)
+- [**Docs (Storybook)**](https://storybook.primitives.solidjs.community/?path=/docs/network-connectivity--docs)
 - [`makeConnectivityListener`](#makeconnectivitylistener) — low-level callback when online status changes
 - [`createConnectivitySignal`](#createconnectivitysignal) — signal for `navigator.onLine`
 - [`useConnectivitySignal`](#useconnectivitysignal) — singleton variant of `createConnectivitySignal`
