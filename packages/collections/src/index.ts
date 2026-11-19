@@ -9,16 +9,18 @@
  * Persistent insertion order and boxed raw leaves are transported by Solid's
  * shallow-store hydration protocol, including streamed patches.
  */
-import { $REFRESH, type Refreshable, type StoreSetter } from "@solidjs/signals";
-import { createStore, createOptimisticStore, createEffect, getOwner, untrack } from "solid-js";
-import { isServer } from "@solidjs/web";
+import type { Refreshable, StoreSetter } from "@solidjs/signals";
+import { createStore, createOptimisticStore, untrack } from "solid-js";
+import { normalizeCollectionInput, runCompute } from "./compute.ts";
 import {
+  collectionView,
   collectionWriter,
-  createAliasSlots,
-  normalizeCollectionInput,
-  runCompute,
-  type AliasSlots,
-} from "./compute.ts";
+  deleteSlot,
+  observeKeys,
+  setEntries,
+  storeOptions,
+} from "./collection.ts";
+import { isWeakKey, KeyAliases } from "./keys.ts";
 export {
   createReactiveWeakMap,
   createReactiveWeakSet,
@@ -61,19 +63,8 @@ type Entry<K, V> = readonly [K, V];
 type Order = readonly { readonly id: number; readonly slot: string }[];
 
 // Inherit helpers where supported, without adding a dependency on global Iterator.
-const iteratorPrototype = Object.getPrototypeOf(Object.getPrototypeOf(new Map().keys()));
-
-// Separate closure environments keep input iterables and old loading seeds out
-// of the long-lived ordinal/derive callbacks.
-function createOrdinal(): (root?: Order) => number {
-  let next = 0;
-  return (order?: Order) => {
-    next = Math.max(next, (order?.at(-1)?.id ?? -1) + 1);
-    if (next === Number.MAX_SAFE_INTEGER)
-      throw new RangeError("Collection insertion limit exceeded");
-    return next++;
-  };
-}
+const iteratorPrototype = /* @__PURE__ */ (() =>
+  Object.getPrototypeOf(Object.getPrototypeOf(new Map().keys())))();
 
 // A shallow store permanently raw-marks inserted wrappable objects. Collections
 // must not change a user's object's behavior in OTHER stores. Only our frozen
@@ -94,184 +85,128 @@ function unbox<V>(value: any): V {
 // handles well-known symbols. Encode registered keys as their registry name.
 // Map values still follow the serializer's ordinary supported-value contract.
 function boxKey(key: unknown): unknown {
-  return typeof key === "symbol" && Symbol.keyFor(key) !== undefined
-    ? Symbol.keyFor(key)
-    : box(key);
+  return typeof key === "symbol" ? (Symbol.keyFor(key) ?? key) : box(key);
 }
-function readKey<K>(state: State, slot: string): K {
-  return slot.startsWith("symbol:") ? (Symbol.for(slot.slice(7)) as K) : unbox(state["k:" + slot]);
-}
-
 /** No strong registry of absent keys: primitives/global symbols encode
  * directly; objects, functions and local symbols use a WeakMap. Never use a
  * caller's symbol as a slot: it could be one of Solid's store protocol keys. */
-function keyEncoder<K>() {
-  const objects = new WeakMap<WeakKey, AliasSlots>();
-  const notifications = new Set<() => void>();
-  const seen = new WeakSet<Order>();
-  const register = (order: Order, state: State): void => {
-    if (seen.has(order)) return;
+class KeyEncoder extends KeyAliases<State> {
+  private _nextOrdinal = 0;
+
+  _reserve(order: Order, count: number): number {
+    const first = Math.max(this._nextOrdinal, (order.at(-1)?.id ?? -1) + 1);
+    if (first + count > Number.MAX_SAFE_INTEGER)
+      throw new RangeError("Collection insertion limit exceeded");
+    this._nextOrdinal = first + count;
+    return first;
+  }
+
+  _readKey<K>(state: State, slot: string): K {
+    return slot.startsWith("symbol:")
+      ? (Symbol.for(slot.slice(7)) as K)
+      : unbox(state["k:" + slot]);
+  }
+
+  _adopt(state: State): void {
+    const order = state.order;
+    if (this._seen.has(order)) return;
     for (const { slot } of order) {
-      const key = readKey<K>(state, slot);
-      if (
-        (typeof key === "object" && key !== null) ||
-        typeof key === "function" ||
-        (typeof key === "symbol" && Symbol.keyFor(key) === undefined)
-      ) {
-        const slots = objects.get(key as WeakKey);
-        if (!slots) objects.set(key as WeakKey, createAliasSlots(slot));
-        else if (!slots.slots.includes(slot)) {
-          slots.slots.push(slot);
-          notifications.add(slots.notify);
-        }
-      }
+      const key = this._readKey(state, slot);
+      if (isWeakKey(key)) this._register(key, slot);
     }
-    seen.add(order);
-  };
-  let next = 0;
-  const encode = (key: K, state: State): string => {
+    this._seen.add(order);
+  }
+
+  override _slot(key: unknown, state: State): string {
+    if (isWeakKey(key)) return super._slot(key, state);
     if (key === null) return "l:";
-    switch (typeof key) {
-      case "object":
-      case "function":
-      case "symbol": {
-        if (typeof key === "symbol") {
-          const globalKey = Symbol.keyFor(key);
-          if (globalKey !== undefined) return "symbol:" + globalKey;
-        }
-        // Hydrated snapshots carry the authoritative key identities and slot
-        // names. Adopt each visible order once, without subscribing the
-        // caller to structure. This also replaces mappings made by trace runs.
-        const slot = untrack(() => {
-          register(state.order, state);
-          const object = key as WeakKey;
-          const slots = objects.get(object);
-          if (slots) {
-            // Loading/held/optimistic readers can simultaneously see different
-            // generations. Retain both trace and wire aliases, choosing the
-            // one actually present in this reader's state.
-            return (
-              slots.slots.find(slot => unbox(state["k:" + slot]) === key) ?? slots.slots.at(-1)!
-            );
-          }
-          const slot = "o:" + (isServer ? "s" : "c") + next++;
-          objects.set(object, createAliasSlots(slot));
-          return slot;
-        });
-        objects.get(key as WeakKey)!.track();
-        const aliases = objects.get(key as WeakKey)!.slots;
-        if (aliases.length > 1) for (const alias of aliases) void ("k:" + alias in state);
-        return slot;
-      }
-      // Prefixes cannot collide with metadata or pollution-guarded names.
-      default:
-        return typeof key + ":" + String(key);
-    }
-  };
-  return {
-    encode,
-    adopt: (state: State): void => {
-      register(state.order, state);
-      for (const notify of notifications) notify();
-      notifications.clear();
-    },
-    order: (order: Order): Order => {
-      // Locally built orders already registered every key through encode().
-      // Only unfamiliar hydrated orders need a scan to adopt wire identities.
-      seen.add(order);
-      return order;
-    },
-  };
+    if (typeof key === "symbol") return "symbol:" + Symbol.keyFor(key);
+    return typeof key + ":" + String(key);
+  }
+
+  _order(order: Order): Order {
+    // Locally built orders have already registered every key.
+    this._seen.add(order);
+    return order;
+  }
+}
+
+function writeValue(state: State, slot: string, value: unknown, present: boolean): boolean {
+  if (present && Object.is(unbox(state[slot]), value)) return false;
+  state[slot] = box(value);
+  return true;
 }
 
 class CollectionData<K, V> {
-  revision = 0;
+  _revision = 0;
   constructor(
-    readonly store: State,
-    readonly write: StoreSetter<State>,
-    readonly encoder: ReturnType<typeof keyEncoder<K>>,
-    readonly ordinal: (root?: Order) => number,
+    readonly _state: State,
+    readonly _write: StoreSetter<State>,
+    readonly _slots: KeyEncoder,
   ) {}
 
-  slot(key: K): string {
-    return this.encoder.encode(key, this.store);
+  _slot(key: K, state = this._state): string {
+    return this._slots._slot(key, state);
   }
 
-  has(key: K): boolean {
-    return this.slot(key) in this.store;
-  }
-
-  get(key: K): V | undefined {
-    return unbox(this.store[this.slot(key)]);
-  }
-
-  set(key: K, value: V): void {
+  _set(key: K, value: V): void {
     // Native Map/Set canonicalize negative zero, including iteration output.
     if (key === 0) key = 0 as K;
-    this.write(state => {
-      const slot = this.encoder.encode(key, state);
+    this._write(state => {
+      const slot = this._slot(key, state);
       const present = slot in state;
       if (!present) {
-        const id = this.ordinal(state.order);
+        const id = this._slots._reserve(state.order, 1);
         state["k:" + slot] = boxKey(key);
-        state.order = this.encoder.order([...state.order, { id, slot }]);
+        state.order = this._slots._order([...state.order, { id, slot }]);
         state.size++;
       }
-      if (!present || !Object.is(unbox(state[slot]), value)) {
-        state[slot] = box(value);
-        this.revision++;
-      }
+      if (writeValue(state, slot, value, present)) this._revision++;
     });
   }
 
-  delete(key: K): boolean {
+  _delete(key: K): boolean {
     let deleted = false;
-    this.write(state => {
-      const slot = this.encoder.encode(key, state);
+    this._write(state => {
+      const slot = this._slot(key, state);
       if (!(slot in state)) return;
       deleted = true;
-      this.revision++;
-      state.order = this.encoder.order(state.order.filter(entry => entry.slot !== slot));
-      delete state[slot];
-      delete state["k:" + slot];
+      this._revision++;
+      state.order = this._slots._order(state.order.filter(entry => entry.slot !== slot));
+      deleteSlot(state, slot);
       state.size--;
     });
     return deleted;
   }
 
-  clear(): void {
-    this.write(state => {
+  _clear(): void {
+    this._write(state => {
       if (!state.size) return;
-      this.revision++;
-      for (const { slot } of state.order) {
-        delete state[slot];
-        delete state["k:" + slot];
-      }
-      state.order = this.encoder.order([]);
+      this._revision++;
+      for (const { slot } of state.order) deleteSlot(state, slot);
+      state.order = this._slots._order([]);
       state.size = 0;
     });
   }
 
-  replace(entries: Iterable<Entry<K, V>>): void {
+  _replace(entries: Iterable<Entry<K, V>>): void {
     // Materialize before writing: replacements may read this very collection.
     const incoming = new Map(entries);
-    this.write(state => {
-      this.revision++;
-      const order = [...incoming.keys()];
+    this._write(state => {
+      this._revision++;
       // Resolve identities before removing metadata from the old index. The
       // encoder must never cache a half-written historical order as adopted.
-      const slots = order.map(key => this.encoder.encode(key, state));
+      const slots = Array.from(incoming.keys(), key => this._slot(key, state));
       const retained = new Set(slots);
       for (const { slot } of state.order) {
-        if (!retained.has(slot)) {
-          delete state[slot];
-          delete state["k:" + slot];
-        }
+        if (!retained.has(slot)) deleteSlot(state, slot);
       }
       let index = 0;
-      for (const value of incoming.values()) {
+      for (const [key, value] of incoming) {
         const slot = slots[index++]!;
-        if (!(slot in state) || !Object.is(unbox(state[slot]), value)) state[slot] = box(value);
+        const present = slot in state;
+        if (!present) state["k:" + slot] = boxKey(key);
+        writeValue(state, slot, value, present);
       }
       if (
         slots.length !== state.order.length ||
@@ -279,153 +214,130 @@ class CollectionData<K, V> {
       ) {
         // A changed replacement order is a fresh iteration generation, like
         // clear/reinsert, while unchanged value and presence slots stay intact.
-        const first = order.length ? this.ordinal(state.order) : 0;
-        state.order = this.encoder.order(
-          order.map((key, index) => {
-            const slot = slots[index]!,
-              id = index === 0 ? first : this.ordinal();
-            if (!("k:" + slot in state)) state["k:" + slot] = boxKey(key);
-            return { id, slot };
-          }),
-        );
+        const first = this._slots._reserve(state.order, slots.length);
+        state.order = this._slots._order(slots.map((slot, index) => ({ id: first + index, slot })));
       }
-      state.size = order.length;
+      state.size = slots.length;
     });
   }
 
-  key(slot: string): K {
+  _key(slot: string): K {
     // Order already tracks identity. Keys need no metadata subscription/cache.
-    return untrack(() => readKey<K>(this.store, slot));
+    return untrack(() => this._slots._readKey<K>(this._state, slot));
   }
 
   /** Track on consumption; old orders/cursors contain slot names, never keys. */
-  iterate<R>(select: (slot: string) => R): MapIterator<R> {
+  _iterate<R>(select: (slot: string) => R): MapIterator<R> {
     let previous: Order | undefined,
       index = 0,
-      cursor = -1,
-      done = false;
+      cursor = -1;
     // Native cursors have no return(): early loop exits leave them usable.
     return Object.setPrototypeOf(
       {
         next: () => {
-          if (done) return { done: true, value: undefined };
-          const order = this.store.order;
-          if (order !== previous) {
-            let low = 0,
-              high = order.length;
-            while (low < high) {
-              const middle = (low + high) >>> 1;
-              if (order[middle]!.id <= cursor) low = middle + 1;
-              else high = middle;
+          if (index >= 0) {
+            const order = this._state.order;
+            if (order !== previous) {
+              let low = 0,
+                high = order.length;
+              while (low < high) {
+                const middle = (low + high) >>> 1;
+                if (order[middle]!.id <= cursor) low = middle + 1;
+                else high = middle;
+              }
+              index = low;
+              previous = order;
             }
-            index = low;
-            previous = order;
-          }
-          const entry = order[index++];
-          if (!entry) {
-            done = true;
+            const entry = order[index++];
+            if (entry) {
+              cursor = entry.id;
+              return { done: false, value: select(entry.slot) };
+            }
+            index = -1;
             previous = undefined;
-            return { done: true, value: undefined };
           }
-          cursor = entry.id;
-          return { done: false, value: select(entry.slot) };
+          return { done: true, value: undefined };
         },
       },
       iteratorPrototype,
     );
   }
 
-  keys(): MapIterator<K> {
-    return this.iterate(slot => this.key(slot));
-  }
-  values(): MapIterator<V> {
-    return this.iterate(slot => unbox<V>(this.store[slot]));
-  }
-  entries(): MapIterator<[K, V]> {
-    return this.iterate(slot => [this.key(slot), unbox<V>(this.store[slot])]);
+  _keys(): MapIterator<K> {
+    return this._iterate(slot => this._key(slot));
   }
 }
 
+function assertCallback(callback: unknown): void {
+  if (typeof callback !== "function") throw new TypeError("callback must be a function");
+}
+
 class CollectionMap<K, V> extends Map<K, V> {
-  declare private readonly data: CollectionData<K, V>;
-  constructor(data: CollectionData<K, V>) {
-    super();
-    Object.defineProperty(this, "data", { value: data });
-  }
-  get [$REFRESH]() {
-    return this.data.store[$REFRESH];
-  }
+  declare readonly _data: CollectionData<K, V>;
   override get size() {
-    return this.data.store.size;
+    return this._data._state.size;
   }
   override has(key: K) {
-    return this.data.has(key);
+    return this._data._slot(key) in this._data._state;
   }
   override get(key: K) {
-    return this.data.get(key);
+    return unbox<V | undefined>(this._data._state[this._data._slot(key)]);
   }
   override set(key: K, value: V): this {
-    this.data.set(key, value);
+    this._data._set(key, value);
     return this;
   }
   override delete(key: K) {
-    return this.data.delete(key);
+    return this._data._delete(key);
   }
   override clear() {
-    this.data.clear();
+    this._data._clear();
   }
   override keys(): MapIterator<K> {
-    return this.data.keys();
+    return this._data._keys();
   }
   override values(): MapIterator<V> {
-    return this.data.values();
+    return this._data._iterate(slot => unbox<V>(this._data._state[slot]));
   }
   override entries(): MapIterator<[K, V]> {
-    return this.data.entries();
+    return this._data._iterate(slot => [this._data._key(slot), unbox<V>(this._data._state[slot])]);
   }
   override [Symbol.iterator](): MapIterator<[K, V]> {
     return this.entries();
   }
   override forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
-    if (typeof callback !== "function") throw new TypeError("callback must be a function");
+    assertCallback(callback);
     for (const [key, value] of this.entries()) Reflect.apply(callback, thisArg, [value, key, this]);
   }
 }
 
 class CollectionSet<T> extends Set<T> {
-  declare private readonly data: CollectionData<T, true>;
-  constructor(data: CollectionData<T, true>) {
-    super();
-    Object.defineProperty(this, "data", { value: data });
-  }
-  get [$REFRESH]() {
-    return this.data.store[$REFRESH];
-  }
+  declare readonly _data: CollectionData<T, true>;
   override get size() {
-    return this.data.store.size;
+    return this._data._state.size;
   }
   override has(value: T) {
-    return this.data.has(value);
+    return this._data._slot(value) in this._data._state;
   }
   override add(value: T): this {
-    this.data.set(value, true);
+    this._data._set(value, true);
     return this;
   }
   override delete(value: T) {
-    return this.data.delete(value);
+    return this._data._delete(value);
   }
   override clear() {
-    this.data.clear();
+    this._data._clear();
   }
   override keys(): SetIterator<T> {
     return this.values();
   }
   override values(): SetIterator<T> {
-    return this.data.keys();
+    return this._data._keys();
   }
   override entries(): SetIterator<[T, T]> {
-    return this.data.iterate(slot => {
-      const value = this.data.key(slot);
+    return this._data._iterate(slot => {
+      const value = this._data._key(slot);
       return [value, value];
     });
   }
@@ -433,7 +345,7 @@ class CollectionSet<T> extends Set<T> {
     return this.values();
   }
   override forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
-    if (typeof callback !== "function") throw new TypeError("callback must be a function");
+    assertCallback(callback);
     for (const value of this.values()) Reflect.apply(callback, thisArg, [value, value, this]);
   }
   // Native set algebra reads the receiver's internal [[SetData]]. Our native
@@ -464,50 +376,43 @@ class CollectionSet<T> extends Set<T> {
 function createCollection<K, V, Draft, Result>(
   input: Iterable<Entry<K, V>> | ReactiveCollectionCompute<Draft, Result>,
   options: ReactiveCollectionComputeOptions<Result> | undefined,
-  view: (data: CollectionData<K, V>) => Draft,
+  View: new () => Draft & { readonly _data: CollectionData<K, V> },
   entries: (result: Result) => Iterable<Entry<K, V>>,
 ): Refreshable<Draft> {
-  const slot = keyEncoder<K>();
-  const ordinal = createOrdinal();
+  const encoder = new KeyEncoder();
+  const dataFor = (state: State, write = collectionWriter(state)) =>
+    new CollectionData<K, V>(state, write, encoder);
   const seed: State = { order: [], size: 0 };
   const factory = options?.optimistic ? createOptimisticStore : createStore;
-  const loading = options?.loadingValue !== undefined;
-  const storeOptions = {
-    name: options?.name,
-    shallow: true,
-    key: null,
-    seedLoadingValue: loading,
-    deferStream: options?.deferStream,
-    ssrSource: options?.ssrSource,
-  };
+  const config = storeOptions(options);
   let state: State, write: StoreSetter<State>;
   if (typeof input === "function") {
-    if (loading)
-      new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(
-        entries(options!.loadingValue!),
-      );
+    if (config.seedLoadingValue) dataFor(seed)._replace(entries(options!.loadingValue!));
     [state, write] = factory(
       draft => {
-        const data = new CollectionData<K, V>(draft, collectionWriter(draft), slot, ordinal);
-        return runCompute(input, view(data), result => data.replace(entries(result)), data);
+        const data = dataFor(draft);
+        return runCompute(
+          input,
+          collectionView(View, data),
+          result => data._replace(entries(result)),
+          data,
+        );
       },
       seed,
-      storeOptions,
+      config,
     );
-    // Reserve the same owner slot on both runtimes. SSR must not read a
-    // client-only source; application reads still expose source errors.
-    if (getOwner())
-      createEffect(() => (isServer ? undefined : state.order), {
-        effect: () => untrack(() => slot.adopt(state)),
-        error: () => {},
-      });
+    observeKeys(
+      () => state.order,
+      () => {
+        untrack(() => encoder._adopt(state));
+        encoder._notify();
+      },
+    );
   } else {
-    new CollectionData<K, V>(seed, collectionWriter(seed), slot, ordinal).replace(
-      input as Iterable<Entry<K, V>>,
-    );
-    [state, write] = factory(seed, storeOptions);
+    dataFor(seed)._replace(input as Iterable<Entry<K, V>>);
+    [state, write] = factory(seed, config);
   }
-  return view(new CollectionData(state, write, slot, ordinal)) as Refreshable<Draft>;
+  return collectionView(View, dataFor(state, write));
 }
 
 /**
@@ -529,11 +434,8 @@ export function createReactiveMap<K, V>(
   value: Iterable<readonly [K, V]> | ReactiveCollectionCompute<Map<K, V>, ReadonlyMap<K, V>> = [],
   options?: CreateReactiveMapOptions<K, V>,
 ): Refreshable<Map<K, V>> {
-  return createCollection(
-    normalizeCollectionInput(value),
-    options,
-    data => new CollectionMap(data),
-    map => map.entries(),
+  return createCollection(normalizeCollectionInput(value), options, CollectionMap<K, V>, map =>
+    map.entries(),
   );
 }
 
@@ -556,15 +458,11 @@ export function createReactiveSet<T>(
   value: Iterable<T> | ReactiveCollectionCompute<Set<T>, ReadonlySet<T>> = [],
   options?: CreateReactiveSetOptions<T>,
 ): Refreshable<Set<T>> {
-  const entries = (set: Iterable<T>): Iterable<Entry<T, true>> =>
-    (function* () {
-      for (const key of set) yield [key, true] as const;
-    })();
   const input = normalizeCollectionInput(value);
   return createCollection(
-    typeof input === "function" ? input : entries(input),
+    typeof input === "function" ? input : setEntries(input),
     options,
-    data => new CollectionSet(data),
-    entries,
+    CollectionSet<T>,
+    setEntries,
   );
 }

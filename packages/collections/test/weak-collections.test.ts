@@ -88,7 +88,7 @@ describe("weak collection store slots", () => {
     const a = {},
       b = {};
     const map = root(() => createReactiveWeakMap([[a, 1]]));
-    const state = (map as any).data.state[$TARGET];
+    const state = (map as any)._data._state[$TARGET];
     expect(state.n).toBeNull();
     expect(state.h).toBeNull();
     expect(map.has(a)).toBe(true);

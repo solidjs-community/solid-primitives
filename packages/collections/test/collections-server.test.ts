@@ -17,7 +17,7 @@ const tick = async () => {
   for (let i = 0; i < 40; i++) await Promise.resolve();
 };
 const trace = (collection: any) =>
-  getProjectionTrace(collection.data.store)!.subscribe()[Symbol.asyncIterator]();
+  getProjectionTrace(collection._data._state)!.subscribe()[Symbol.asyncIterator]();
 
 describe("server collections", () => {
   it("takes one subscription answer and closes its server subscription", async () => {

@@ -1,32 +1,9 @@
-import { type StoreSetter } from "@solidjs/signals";
-import { createSignal, untrack } from "solid-js";
 import type { ReactiveCollectionCompute } from "./index.ts";
 
-export interface AliasSlots {
-  slots: string[];
-  track: () => number;
-  notify: () => void;
-}
+function noop(): void {}
 
-// Value-form signals consume no hydration id and retain no user key.
-export function createAliasSlots(slot: string): AliasSlots {
-  const [track, update] = createSignal(0);
-  return {
-    slots: [slot],
-    track,
-    notify: () => {
-      update(value => value + 1);
-    },
-  };
-}
-
-// A separate closure avoids retaining a factory's input and old loading seed.
-// Bookkeeping reads the draft without becoming dependencies of the compute,
-// including when the producer writes after an await.
-export function collectionWriter<T>(state: T): StoreSetter<T> {
-  return fn => {
-    untrack(() => fn(state));
-  };
+function iteratorResult(done: boolean): IteratorResult<void> {
+  return { done, value: undefined };
 }
 
 function generatorShaped(value: object): boolean {
@@ -51,7 +28,7 @@ export function runCompute<Draft, Result>(
   compute: ReactiveCollectionCompute<Draft, Result>,
   draft: Draft,
   replace: (result: Result) => void,
-  data: { readonly revision: number },
+  data: { readonly _revision: number },
   beforeCommit?: () => void,
   afterCommit?: () => void,
 ): void | Promise<void> | AsyncIterable<void> {
@@ -75,10 +52,8 @@ export function runCompute<Draft, Result>(
       });
       let next: AsyncIterator<void | Result>["next"] | undefined;
       let closed = false,
-        finished = false,
-        yielded = false,
-        revision = data.revision;
-      const done = (): IteratorReturnResult<undefined> => ({ done: true, value: undefined });
+        finished = false;
+      let lastYieldRevision: number | undefined;
       const close = () => {
         if (!closed) {
           closed = true;
@@ -86,7 +61,7 @@ export function runCompute<Draft, Result>(
           // replace or delay the error from the source/commit.
           try {
             const cleanup = source.return?.();
-            if (cleanup) void cleanup.then(undefined, () => {});
+            if (cleanup) void cleanup.then(undefined, noop);
           } catch {
             /* preserve the original failure */
           }
@@ -98,7 +73,7 @@ export function runCompute<Draft, Result>(
         throw error;
       };
       const pull = async (): Promise<IteratorResult<void>> => {
-        if (closed || finished) return done();
+        if (closed || finished) return iteratorResult(true);
         let step: IteratorResult<void | Result>;
         try {
           next ??= source.next;
@@ -109,24 +84,19 @@ export function runCompute<Draft, Result>(
           if (tracing) queueMicrotask(close);
           step = await pending;
         } catch (error) {
-          if (closed) return done();
+          if (closed) return iteratorResult(true);
           return fail(error);
         }
-        if (closed) return done();
-        if (tracing) return done();
+        if (closed || tracing) return iteratorResult(true);
         try {
           if (!step.done) {
             commit(step.value);
-            yielded = true;
-            revision = data.revision;
-            return { done: false, value: undefined };
+            lastYieldRevision = data._revision;
+            return iteratorResult(false);
           }
-          beforeCommit?.();
-          afterCommit?.();
+          commit();
           finished = true;
-          return !yielded || revision !== data.revision
-            ? { done: false, value: undefined }
-            : done();
+          return iteratorResult(lastYieldRevision === data._revision);
         } catch (error) {
           return fail(error);
         }
@@ -139,14 +109,14 @@ export function runCompute<Draft, Result>(
           const pending = pull();
           // Solid traces a generator's first pull but discards the result.
           // Observe rejection even when that trace has no consuming caller.
-          void pending.then(undefined, () => {});
+          void pending.then(undefined, noop);
           return pending;
         },
         async return() {
-          if (closed || finished) return done();
+          if (closed || finished) return iteratorResult(true);
           closed = true;
           await source.return?.();
-          return done();
+          return iteratorResult(true);
         },
       };
     };
@@ -155,15 +125,16 @@ export function runCompute<Draft, Result>(
     const adapted: AsyncIterable<void> = generatorShaped(result as object)
       ? open()
       : { [Symbol.asyncIterator]: open };
-    Object.defineProperty(adapted, Symbol.for("solid.LiveSource"), {
-      value: (result as any)[Symbol.for("solid.LiveSource")],
+    const liveSource = Symbol.for("solid.LiveSource");
+    Object.defineProperty(adapted, liveSource, {
+      value: (result as any)[liveSource],
     });
     return adapted;
   }
   const then = result != null && (result as PromiseLike<void | Result>).then;
   if (typeof then === "function") {
-    let resolve: ((value: void | Result | PromiseLike<void | Result>) => void) | undefined;
-    let reject: ((error: unknown) => void) | undefined;
+    let resolve: (value: void | Result | PromiseLike<void | Result>) => void = noop;
+    let reject: (error: unknown) => void = noop;
     const pending = new Promise<void | Result>((yes, no) => {
       resolve = yes;
       reject = no;
@@ -171,16 +142,9 @@ export function runCompute<Draft, Result>(
     // Hydration tracing replaces the global Promise with a mock that skips
     // executors. Attach to the original source outside that executor anyway.
     try {
-      Reflect.apply(then, result, [
-        (value: void | Result) => {
-          resolve?.(value);
-        },
-        (error: unknown) => {
-          reject?.(error);
-        },
-      ]);
+      Reflect.apply(then, result, [resolve, reject]);
     } catch (error) {
-      reject?.(error);
+      reject(error);
     }
     return pending.then(commit);
   }

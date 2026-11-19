@@ -37,7 +37,7 @@ describe("compute source adaptation", () => {
         () => source,
         new Map<string, number>(),
         () => {},
-        { revision: 0 },
+        { _revision: 0 },
       ) as AsyncIterable<void>;
       expect(opened).toBe(0);
       expect("next" in adapted).toBe(false);
@@ -65,7 +65,7 @@ describe("compute source adaptation", () => {
       () => source,
       new Map<string, number>(),
       value => values.push(value!.get("value")!),
-      { revision: 0 },
+      { _revision: 0 },
     ) as AsyncIterableIterator<void>;
     expect(typeof adapted.next).toBe("function");
     expect(reads).toBe(0);
@@ -95,7 +95,7 @@ describe("compute source adaptation", () => {
       () => ({ [Symbol.asyncIterator]: () => source }),
       new Map<string, number>(),
       value => values.push(value!.get("value")!),
-      { revision: 0 },
+      { _revision: 0 },
     ) as AsyncIterable<void>;
     for await (const _ of adapted) {
       /* consume */
@@ -123,7 +123,7 @@ describe("compute source adaptation", () => {
       }),
       new Map<string, number>(),
       () => {},
-      { revision: 0 },
+      { _revision: 0 },
     ) as AsyncIterable<void>;
     await expect(adapted[Symbol.asyncIterator]().next()).rejects.toBe(error);
     expect(returns).toBe(1);
@@ -147,7 +147,7 @@ describe("compute source adaptation", () => {
       }),
       new Map<string, number>(),
       () => {},
-      { revision: 0 },
+      { _revision: 0 },
     ) as AsyncIterable<void>;
     expect(opened).toBe(0);
     for await (const _ of adapted) {
@@ -183,7 +183,7 @@ describe("compute source adaptation", () => {
           () => {
             throw error;
           },
-          { revision: 0 },
+          { _revision: 0 },
         ) as AsyncIterable<void>;
         const adapter = adapted[Symbol.asyncIterator]();
         await expect(adapter.next()).rejects.toBe(error);
@@ -208,7 +208,7 @@ describe("compute source adaptation", () => {
       () => source,
       new Map(),
       () => {},
-      { revision: 0 },
+      { _revision: 0 },
     ) as AsyncIterable<void>;
     expect(opened).toBe(0);
     expect("next" in adapted).toBe(false);
@@ -319,7 +319,7 @@ describe("compute source adaptation", () => {
       () => source,
       new Map(),
       value => values.push(value),
-      { revision: 0 },
+      { _revision: 0 },
     ) as AsyncIterable<void>;
     const adapter = adapted[Symbol.asyncIterator]();
     const pull = adapter.next();
@@ -384,7 +384,7 @@ describe("compute source adaptation", () => {
       result => {
         value = result;
       },
-      { revision: 0 },
+      { _revision: 0 },
     );
     expect(value).toBe(replacement);
     expect(reads).toBe(1);
@@ -416,7 +416,7 @@ describe("compute source adaptation", () => {
       result => {
         value = result;
       },
-      { revision: 0 },
+      { _revision: 0 },
     ) as AsyncIterableIterator<void>;
     for await (const _ of adapter) {
       /* consume */

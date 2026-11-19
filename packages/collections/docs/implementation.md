@@ -19,7 +19,7 @@ Iterators read the current store order when consumed. They advance by array inde
 
 Values use frozen wrapper objects so shallow ingestion does not alter user objects. Negative zero is boxed as well, allowing a change from positive zero to invalidate a store value node. Value comparisons use `Object.is`; keys retain native SameValueZero semantics. The serializer handles shared identities and cycles through the backing store.
 
-Strong and weak collections share the promise/async-iterable adapter and untracked draft writer in `src/compute.ts`. Separate writer and ordinal factories prevent long-lived closures from retaining initial iterables or obsolete loading seeds.
+Strong and weak collections share the promise/async-iterable adapter, untracked draft writer, and hydration alias registry. The registry and writer live outside the input factory's closure so they can outlive initial iterables and obsolete loading seeds.
 
 The implementation uses public Solid APIs. Private node inspections and projection-trace inspection through `solid-js/internal` occur only in tests.
 

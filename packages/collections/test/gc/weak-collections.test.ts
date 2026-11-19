@@ -51,15 +51,15 @@ async function collect() {
 }
 function inspect(map: object): Record<string, unknown> {
   // Test-only inspection of representation; all runtime imports are public.
-  return (map as { data: { state: Record<string, unknown> } }).data.state;
+  return (map as { _data: { _state: Record<string, unknown> } })._data._state;
 }
 function emptyCompute(): void {}
 test("lookup misses do not register finalizers or accumulate cleanup records", async () => {
   const map = root(() => createReactiveWeakMap<object, unknown>());
-  const slots = (map as any).data.slots;
+  const slots = (map as any)._data._slots;
   let registrations = 0;
-  const register = slots.registry.register.bind(slots.registry);
-  slots.registry.register = (...args: unknown[]) => {
+  const register = slots._registry.register.bind(slots._registry);
+  slots._registry.register = (...args: unknown[]) => {
     registrations++;
     register(...args);
   };
@@ -69,7 +69,7 @@ test("lookup misses do not register finalizers or accumulate cleanup records", a
   }
   await collect();
   assert.equal(registrations, 0);
-  assert.equal(slots.dead.length, 0);
+  assert.equal(slots._dead.length, 0);
   const key = {};
   map.get(key);
   map.set(key, 1);
@@ -133,13 +133,13 @@ test("an active computed stream prunes collected keys without restarting", async
       );
       assert.equal(started, 1);
       assert.equal(map.has(current!), true);
-      if (i === 3) lastSlot = (map as any).data.slots.slot(current!, inspect(map));
+      if (i === 3) lastSlot = (map as any)._data._slots._slot(current!, inspect(map));
       assert.ok(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length <= 2);
       current = undefined;
       await collect();
     }
     await waitUntil(
-      () => (map as any).data.slots.dead.includes(lastSlot),
+      () => (map as any)._data._slots._dead.includes(lastSlot),
       "the final key was not finalized before the terminal pull",
     );
   } finally {
@@ -190,7 +190,7 @@ test("a cleanup-only stream yield preserves unrelated optimistic edits", async (
     await collect();
     assert.equal(dead.deref(), undefined);
     await waitUntil(
-      () => (map as any).data.slots.dead.length > 0,
+      () => (map as any)._data._slots._dead.length > 0,
       "finalizer did not queue the slot",
     );
     assert.equal(Object.keys(inspect(map)).filter(k => k.startsWith("k:")).length, 2);
@@ -711,12 +711,12 @@ for (const optimistic of [false, true])
           key: new WeakRef(key),
         };
       });
-      const slots = (fixture.map as any).data.slots;
+      const slots = (fixture.map as any)._data._slots;
       try {
         assert.equal(fixture.map.has({}), false);
         await collect();
         assert.equal(fixture.key.deref(), undefined);
-        await waitUntil(() => slots.dead.length > 0, "loading key finalizer did not run");
+        await waitUntil(() => slots._dead.length > 0, "loading key finalizer did not run");
         gate.resolve();
         await waitUntil(() => {
           try {
@@ -726,11 +726,11 @@ for (const optimistic of [false, true])
             return (error as Error).message === "first pull failed";
           }
         }, "failed producer did not expose its error");
-        assert.ok(slots.dead.length > 0, "discarded cleanup must remain retryable");
+        assert.ok(slots._dead.length > 0, "discarded cleanup must remain retryable");
         fail = false;
         await refresh(fixture.map);
         await waitUntil(
-          () => slots.dead.length === 0,
+          () => slots._dead.length === 0,
           "successful refresh did not confirm cleanup",
         );
         assert.equal(Object.keys(inspect(fixture.map)).filter(k => k.startsWith("k:")).length, 0);

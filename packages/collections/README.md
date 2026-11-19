@@ -198,7 +198,3 @@ renderToStream(() => <App />, { plugins: [WeakCollectionTokenPlugin] });
 ```
 
 Hydration preserves shared serializable key identities. Shared decoding reference tables may retain transported keys independently of the weak collection. See the [WeakMap factory documentation](#createreactiveweakmap) for renderer setup, garbage collection, metadata cleanup, and native-intrinsic limitations.
-
-## Development
-
-Tests, build configuration, and implementation notes live in this package. See the [validation guide](./docs/implementation.md#validation) and [weak storage/SSR notes](./docs/weak.md).

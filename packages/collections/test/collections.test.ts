@@ -62,7 +62,7 @@ function observe<T>(read: () => T) {
 }
 // Deliberate private inspection: prove nodes themselves are lazy/independent,
 // not just filtered callbacks. This adds no debug hook to production code.
-const target = (collection: any) => collection.data.store[$TARGET];
+const target = (collection: any) => collection._data._state[$TARGET];
 const count = (record: object | null) => (record ? Reflect.ownKeys(record).length : 0);
 
 describe("reactive collection factories", () => {
@@ -75,24 +75,24 @@ describe("reactive collection factories", () => {
           ? createReactiveWeakMap([[key, 1]], { optimistic: true })
           : createReactiveMap([[key, 1]], { optimistic: true }),
       );
-      const data = (map as any).data;
+      const data = (map as any)._data;
       // Adopt a later wire alias while the earlier local alias is still visible.
-      if (weak) {
-        data.slots.slot(key, {
-          keys: Object.freeze({}),
-          "k:wire": createWeakCollectionToken(key, key),
-          wire: createWeakCollectionToken(key, 1),
-        });
-        data.slots.notify();
-      } else {
-        data.encoder.encode(key, {
-          order: [{ id: 1, slot: "wire" }],
-          size: 1,
-          "k:wire": Object.freeze({ value: key }),
-          wire: 1,
-        });
-        data.encoder.adopt(data.store);
-      }
+      data._slots._slot(
+        key,
+        weak
+          ? {
+              keys: Object.freeze({}),
+              "k:wire": createWeakCollectionToken(key, key),
+              wire: createWeakCollectionToken(key, 1),
+            }
+          : {
+              order: [{ id: 1, slot: "wire" }],
+              size: 1,
+              "k:wire": Object.freeze({ value: key }),
+              wire: 1,
+            },
+      );
+      data._slots._notify();
       const has = root(() => observe(() => map.has(key)));
       const get = root(() => observe(() => map.get(key)));
       flush();

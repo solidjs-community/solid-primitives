@@ -53,7 +53,7 @@ for (const optimistic of [false, true]) {
         { optimistic },
       );
     });
-    const { state, slots } = (map as any).data;
+    const { _state: state, _slots: slots } = (map as any)._data;
     const iterator = getProjectionTrace(state)!.subscribe()[Symbol.asyncIterator]();
     let lastSlot!: string;
     try {
@@ -61,10 +61,10 @@ for (const optimistic of [false, true]) {
         assert.equal((await iterator.next()).done, false);
         const metadata = Object.keys(state).filter(k => k.startsWith("k:"));
         assert.equal(metadata.length, 1, "previous committed cleanup must remove metadata");
-        assert.equal(slots.dead.length, 0, "successful server cleanup must retire queued IDs");
+        assert.equal(slots._dead.length, 0, "successful server cleanup must retire queued IDs");
         const slot = metadata[0]!.slice(2);
         lastSlot = slot;
-        await collectUntil(() => slots.dead.includes(slot));
+        await collectUntil(() => slots._dead.includes(slot));
         gates[i]!.resolve();
       }
       // A terminal cleanup-only value publishes deletion of the final slot.
@@ -81,7 +81,7 @@ for (const optimistic of [false, true]) {
         ),
       );
       assert.equal(Object.keys(state).filter(k => k.startsWith("k:")).length, 0);
-      assert.equal(slots.dead.length, 0);
+      assert.equal(slots._dead.length, 0);
       assert.equal((await iterator.next()).done, true);
     } finally {
       stop = true;
@@ -112,13 +112,13 @@ for (const optimistic of [false, true]) {
           { optimistic, loadingValue: [[key, 1]] },
         );
       });
-      const { state, slots } = (map as any).data;
+      const { _state: state, _slots: slots } = (map as any)._data;
       const iterator = getProjectionTrace(state)!.subscribe()[Symbol.asyncIterator]();
       try {
-        await collectUntil(() => slots.dead.length > 0);
+        await collectUntil(() => slots._dead.length > 0);
         gate.resolve();
         await assert.rejects(iterator.next(), error);
-        assert.ok(slots.dead.length > 0, "a failed first commit must not acknowledge cleanup");
+        assert.ok(slots._dead.length > 0, "a failed first commit must not acknowledge cleanup");
       } finally {
         gate.resolve();
         await iterator.return?.();

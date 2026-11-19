@@ -18,6 +18,8 @@ try {
         bundle: true,
         platform: "node",
         format: "esm",
+        // The production bundle also exercises opt-in private property mangling.
+        mangleProps: dev ? undefined : /^_[a-zA-Z]/,
         // Linked dependencies may map imports to source in their tsconfig. These
         // lifetime checks must bundle their shipped builds instead.
         tsconfigRaw: { compilerOptions: {} },
