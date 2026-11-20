@@ -48,32 +48,23 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     ref = r;
   };
 
-  const onDragStart: JSX.EventHandler<T, DragEvent> = event => {
-    setIsDragging(true);
-    Promise.resolve(options?.onDragStart?.(transformFiles(event.dataTransfer?.files || null)));
-  };
-  const onDragEnd: JSX.EventHandler<T, DragEvent> = event => {
-    setIsDragging(false);
-    Promise.resolve(options?.onDragEnd?.(transformFiles(event.dataTransfer?.files || null)));
-  };
-
   const onDragEnter: JSX.EventHandler<T, DragEvent> = event => {
+    setIsDragging(true);
     Promise.resolve(options?.onDragEnter?.(transformFiles(event.dataTransfer?.files || null)));
   };
   const onDragLeave: JSX.EventHandler<T, DragEvent> = event => {
+    setIsDragging(false);
     Promise.resolve(options?.onDragLeave?.(transformFiles(event.dataTransfer?.files || null)));
   };
   const onDragOver: JSX.EventHandler<T, DragEvent> = event => {
     event.preventDefault();
     Promise.resolve(options?.onDragOver?.(transformFiles(event.dataTransfer?.files || null)));
   };
-  const onDrag: JSX.EventHandler<T, DragEvent> = event => {
-    Promise.resolve(options?.onDrag?.(transformFiles(event.dataTransfer?.files || null)));
-  };
 
   const onDrop: JSX.EventHandler<T, DragEvent> = event => {
     event.preventDefault();
 
+    setIsDragging(false)
     const parsedFiles = transformFiles(event.dataTransfer?.files || null);
     setFiles(parsedFiles);
 
@@ -84,21 +75,15 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     if (!ref) return;
 
     // TODO: Should event.stopPropagation() or event.preventDefault() in handlers below?
-    ref.addEventListener("dragstart", onDragStart as any);
     ref.addEventListener("dragenter", onDragEnter as any);
-    ref.addEventListener("dragend", onDragEnd as any);
     ref.addEventListener("dragleave", onDragLeave as any);
     ref.addEventListener("dragover", onDragOver as any);
-    ref.addEventListener("drag", onDrag as any);
     ref.addEventListener("drop", onDrop as any);
 
     onCleanup(() => {
-      ref?.removeEventListener("dragstart", onDragStart as any);
       ref?.removeEventListener("dragenter", onDragEnter as any);
-      ref?.removeEventListener("dragend", onDragEnd as any);
       ref?.removeEventListener("dragleave", onDragLeave as any);
       ref?.removeEventListener("dragover", onDragOver as any);
-      ref?.removeEventListener("drag", onDrag as any);
       ref?.removeEventListener("drop", onDrop as any);
     });
   });
