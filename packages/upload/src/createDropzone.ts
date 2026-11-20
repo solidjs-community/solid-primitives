@@ -64,7 +64,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   const onDrop: JSX.EventHandler<T, DragEvent> = event => {
     event.preventDefault();
 
-    setIsDragging(false)
+    setIsDragging(false);
     const parsedFiles = transformFiles(event.dataTransfer?.files || null);
     setFiles(parsedFiles);
 
