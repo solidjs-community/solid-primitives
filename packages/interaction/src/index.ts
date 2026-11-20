@@ -360,20 +360,24 @@ function containsComposed(parent: Node, child: Node | null): boolean {
 }
 
 /**
- * `target` as seen from `observer`'s node tree — the DOM's own retargeting algorithm.
+ * `target` as seen from `observer`'s node tree, preceded by every host it is retargeted through on
+ * the way — the DOM's own retargeting algorithm, with its intermediate steps kept.
  *
- * Climbs out of every shadow tree that does not also enclose `observer`, so encapsulated internals of
- * a foreign component are reported as that component's host. For an `observer` in the document this
- * is exactly the `event.target` a document listener sees; for an `observer` inside a shadow root,
- * siblings in that same root are reported as themselves rather than as the outer host.
+ * Climbs out of every shadow tree that does not also enclose `observer`. The *first* entry is what
+ * `observer`'s tree sees: encapsulated internals of a foreign component are reported as that
+ * component's host, while siblings in `observer`'s own shadow root are reported as themselves. For
+ * an `observer` in the document it is exactly the `event.target` a document listener sees. The
+ * *last* entry is `target` itself.
  */
-function retarget(target: Element, observer: Node): Element {
+function retargetChain(target: Element, observer: Node): Element[] {
+  const chain = [target];
   let node = target;
 
   for (;;) {
     const host = getShadowHost(node);
-    if (!host || containsComposed(node.getRootNode(), observer)) return node;
+    if (!host || containsComposed(node.getRootNode(), observer)) return chain.reverse();
     node = host;
+    chain.push(node);
   }
 }
 
@@ -506,12 +510,18 @@ export function makeInteractOutside<T extends Element>(
     if (!containsComposed(ownerDoc, target)) return null;
     // The composed path also covers content slotted into `el`, which a tree walk can't reach.
     if (path.includes(el) || containsComposed(el, target)) return null;
-    // Report the target as `el`'s own tree sees it. A sibling in `el`'s shadow root is itself, but a
-    // click inside a *foreign* web component (e.g. a trigger with its own shadow root) stays its
-    // host — the same element consumers received before shadow-aware resolution, so checks such as
-    // `trigger.contains(element)` in `shouldExcludeElement` keep matching.
-    const reported = retarget(target, el);
-    return options.shouldExcludeElement?.(reported) ? null : reported;
+    // Report the target as `el`'s own tree sees it (`chain[0]`). A sibling in `el`'s shadow root is
+    // itself, but a click inside a *foreign* web component (e.g. a trigger with its own shadow root)
+    // stays its host — the same element consumers received before shadow-aware resolution.
+    const chain = retargetChain(target, el);
+    // Exclusion is asked of every element the interaction belongs to, from that outermost host down
+    // to `target` itself, so a plain `trigger.contains(element)` check answers for the composed
+    // tree: it matches a web-component trigger through its host, and a trigger in a *different*
+    // shadow root than `el` (an app root vs. a portal root) through `target` itself — where `el`'s
+    // view of it is only that root's host.
+    const shouldExclude = options.shouldExcludeElement;
+    if (shouldExclude && chain.some(element => shouldExclude(element))) return null;
+    return chain[0]!;
   };
 
   const onPointerDown = (e: PointerEvent) => {

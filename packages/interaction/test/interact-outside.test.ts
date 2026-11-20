@@ -499,8 +499,8 @@ describe("createInteractOutside", () => {
         new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "mouse" }),
       );
 
-      expect(seen).toHaveLength(1);
-      expect(seen[0]).toBe(component);
+      // The host first — what the watched element's tree sees — then the element itself.
+      expect(seen).toEqual([component, componentInner]);
       expect(onPointerDownOutside).toHaveBeenCalledTimes(1);
       expect(onPointerDownOutside.mock.calls[0]![0].target).toBe(component);
       cleanup();
@@ -557,10 +557,52 @@ describe("createInteractOutside", () => {
         new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "mouse" }),
       );
 
-      expect(seen).toHaveLength(1);
-      expect(seen[0]).toBe(nested);
+      expect(seen).toEqual([nested, nestedInner]);
       dispose();
       host.remove();
+    });
+
+    it("lets shouldExcludeElement exempt a trigger in a different shadow root than the watched element", () => {
+      // An app rendered in one shadow root that portals its overlays into a second one. Seen from
+      // the watched element's tree, the trigger is only the app root's host, so `trigger.contains`
+      // must also be asked of the trigger itself — or the trigger dismisses its own overlay.
+      const appHost = document.createElement("div");
+      const portalHost = document.createElement("div");
+      document.body.append(appHost, portalHost);
+      const trigger = document.createElement("button");
+      const outside = document.createElement("button");
+      appHost.attachShadow({ mode: "open" }).append(trigger, outside);
+      const inside = createElement("div", "inside");
+      portalHost.attachShadow({ mode: "open" }).appendChild(inside);
+
+      const reported: (EventTarget | null)[] = [];
+      const dispose = createRoot(d => {
+        createInteractOutside(
+          {
+            shouldExcludeElement: el => trigger.contains(el),
+            onPointerDownOutside: e => reported.push(e.target),
+          },
+          () => inside,
+        );
+        return d;
+      });
+      flush();
+      vi.runAllTimers();
+
+      trigger.dispatchEvent(
+        new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "mouse" }),
+      );
+      touchDown(trigger);
+      expect(reported).toHaveLength(0);
+
+      // Genuinely outside: still reported, as the watched element's tree sees it (the app host).
+      outside.dispatchEvent(
+        new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "mouse" }),
+      );
+      expect(reported).toEqual([appHost]);
+      dispose();
+      appHost.remove();
+      portalHost.remove();
     });
 
     it("does not trigger on content slotted into the watched element", () => {
