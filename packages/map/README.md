@@ -14,6 +14,8 @@ The reactive versions of `Map` & `WeakMap` built-in data structures.
 - **[`ReactiveMap`](#reactivemap)** - A reactive `Map`.
 - **[`ReactiveWeakMap`](#reactiveweakmap)** - A reactive `WeakMap`.
 
+> For computed, async, and optimistic collections, see [`@solid-primitives/collections`](../collections/README.md).
+
 ## Installation
 
 ```bash

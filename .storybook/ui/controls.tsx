@@ -1,9 +1,15 @@
 import type { JSX } from "@solidjs/web";
 import { colors, font, radii } from "./tokens.js";
 
+const ariaPressed = (
+  value: boolean | JSX.AriaAttributes["aria-pressed"],
+): JSX.AriaAttributes["aria-pressed"] =>
+  typeof value === "boolean" ? (value ? "true" : "false") : value;
+
 export const Button = (props: {
   "aria-current"?: "page";
   "aria-label"?: string;
+  "aria-pressed"?: boolean | JSX.AriaAttributes["aria-pressed"];
   inert?: boolean;
   onClick?: (ev: MouseEvent) => void;
   onKeyUp?: (ev: KeyboardEvent) => void;
@@ -18,6 +24,7 @@ export const Button = (props: {
   <button
     aria-label={props["aria-label"]}
     aria-current={props["aria-current"]}
+    aria-pressed={ariaPressed(props["aria-pressed"])}
     inert={props.inert}
     ref={props.ref}
     type={props.type ?? "button"}
@@ -49,10 +56,7 @@ export const Button = (props: {
               : props.variant === "ghost"
                 ? colors.muted
                 : colors.primaryFg,
-      border:
-        props.variant === "outline"
-          ? `1px solid ${colors.border}`
-          : "none",
+      border: props.variant === "outline" ? `1px solid ${colors.border}` : "none",
       ...(props.style ?? {}),
     }}
   >
@@ -192,10 +196,7 @@ export const Code = (props: { children: JSX.Element }) => (
   </code>
 );
 
-export const Alert = (props: {
-  children: JSX.Element;
-  variant?: "info" | "warning" | "error";
-}) => (
+export const Alert = (props: { children: JSX.Element; variant?: "info" | "warning" | "error" }) => (
   <div
     style={{
       background:

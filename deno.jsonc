@@ -42,7 +42,8 @@
   "catalogs": {
     "peer": {
       "solid-js": "^2.0.0",
-      "@solidjs/web": "^2.0.0"
+      "@solidjs/web": "^2.0.0",
+      "@solidjs/signals": "^2.0.0"
     },
     "graphql": {
       "@graphql-typed-document-node/core": "^3.2.0",
