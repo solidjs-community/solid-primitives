@@ -1,5 +1,19 @@
 # @solid-primitives/storage
 
+## 4.4.3
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
+## 4.4.2
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+
 ## 4.4.1
 
 ### Patch Changes

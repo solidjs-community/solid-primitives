@@ -7,7 +7,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/keyboard?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/keyboard)
 [![version](https://img.shields.io/npm/v/@solid-primitives/keyboard?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/keyboard)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A library of reactive promitives helping handling user's keyboard input.
 
@@ -32,7 +32,7 @@ yarn add @solid-primitives/keyboard
 
 Provides a signal with the last keydown event.
 
-This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 
@@ -58,7 +58,7 @@ createEffect(() => {
 
 Provides a signal with the list of currently held keys, ordered from least recent to most recent.
 
-This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 
@@ -80,7 +80,7 @@ createEffect(() => {
 
 Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
 
-This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 
@@ -100,7 +100,7 @@ createEffect(() => {
 
 Provides a signal with a sequence of currently held keys, as they were pressed down and up.
 
-This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 

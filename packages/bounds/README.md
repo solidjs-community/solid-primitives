@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/bounds?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/bounds)
 [![version](https://img.shields.io/npm/v/@solid-primitives/bounds?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/bounds)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitives for tracking HTML element size and position on screen as it changes.
 
@@ -81,7 +81,7 @@ const bounds = createElementBounds(target, {
 
 Options [above](#disabling-types-of-tracking) allow passing a guarding function for controlling frequency of updates.
 
-The scroll event/mutations/resizing can be triggered dozens of times per second, causing calculating bounds and updating the store every time. Hence it is a good idea to [throttle/debounce](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) updates.
+The scroll event/mutations/resizing can be triggered dozens of times per second, causing calculating bounds and updating the store every time. Hence it is a good idea to [throttle/debounce](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/scheduled#readme) updates.
 
 ```ts
 import { UpdateGuard, createElementBounds } from "@solid-primitives/bounds";

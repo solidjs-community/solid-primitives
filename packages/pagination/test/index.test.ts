@@ -213,6 +213,38 @@ describe("createSegment", () => {
       dispose();
     });
   });
+
+  test("creates a new segment if the items change but keep their length", () => {
+    createRoot(dispose => {
+      const [items, setItems] = createSignal([1, 2, 3, 4, 5, 6]);
+      const [page, setPage] = createSignal(1);
+      const segment = createSegment(items, 3, page);
+
+      expect(segment()).toEqual([1, 2, 3]);
+      setItems([6, 5, 4, 3, 2, 1]);
+      expect(segment()).toEqual([6, 5, 4]);
+      setPage(2);
+      expect(segment()).toEqual([3, 2, 1]);
+      setItems(items => items.map(item => (item === 2 ? 20 : item)));
+      expect(segment()).toEqual([3, 20, 1]);
+
+      dispose();
+    });
+  });
+
+  test("creates a new segment when moving from a sparse page to a full one", () => {
+    createRoot(dispose => {
+      const [items] = createSignal<(number | undefined)[]>([, , , 4, 5, 6]);
+      const [page, setPage] = createSignal(1);
+      const segment = createSegment(items, 3, page);
+
+      expect(segment()).toHaveLength(3);
+      setPage(2);
+      expect(segment()).toEqual([4, 5, 6]);
+
+      dispose();
+    });
+  });
 });
 
 //@ts-ignore

@@ -1,5 +1,17 @@
 # @solid-primitives/utils
 
+## 6.4.3
+
+### Patch Changes
+
+- ce7d81a: Fix `asArray` dropping falsy values that are not nullish: `asArray(0)`, `asArray("")` and `asArray(false)` returned `[]` instead of `[0]`, `[""]` and `[false]`.
+
+## 6.4.2
+
+### Patch Changes
+
+- 10ad1e3: Fix `withAccess` calling its callback with `undefined` or `null`. The check was `typeof _value != null`, which is always true, so the value was never skipped.
+
 ## 6.4.1
 
 ### Patch Changes

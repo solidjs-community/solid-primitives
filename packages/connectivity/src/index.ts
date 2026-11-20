@@ -47,7 +47,7 @@ export function createConnectivitySignal(): Accessor<boolean> {
 /**
  * A signal representing the browser's interpretation of whether it is on- or offline.
  *
- * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) except if during hydration.
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) except if during hydration.
  *
  * @return Returns a signal representing the online status. Read-only.
  * @example

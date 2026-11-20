@@ -1,5 +1,21 @@
 # @solid-primitives/immutable
 
+## 1.1.7
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+  - @solid-primitives/keyed@1.5.3
+
+## 1.1.6
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+  - @solid-primitives/keyed@1.5.3
+
 ## 1.1.5
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @solid-primitives/set
 
+## 0.7.6
+
+### Patch Changes
+
+- @solid-primitives/trigger@1.2.6
+
+## 0.7.5
+
+### Patch Changes
+
+- @solid-primitives/trigger@1.2.5
+
 ## 0.7.4
 
 ### Patch Changes

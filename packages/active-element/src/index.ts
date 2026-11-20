@@ -22,7 +22,7 @@ const getActiveElement = () =>
 
 /**
  * Attaches event listeners to window, listening for the changes of the `document.activeElement`.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#makeActiveElementListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/active-element#makeActiveElementListener
  * @param callback handle active element change
  * @returns function to clear event listeners
  * @example
@@ -46,7 +46,7 @@ export function makeActiveElementListener(
 /**
  * Provides reactive signal of `document.activeElement`. Check which element is currently focused.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createActiveElement
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/active-element#createActiveElement
  * @example
  * const activeEl = createActiveElement()
  * activeEl() // T: Element | null
@@ -62,7 +62,7 @@ export function createActiveElement(): Accessor<Element | null> {
 
 /**
  * Attaches "blur" and "focus" event listeners to the element.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#makeFocusListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/active-element#makeFocusListener
  * @param target element
  * @param callback handle focus change
  * @param useCapture activates capturing, which allows to listen on events at the root that don't support bubbling.
@@ -90,7 +90,7 @@ export function makeFocusListener(
  * Provides a signal representing element's focus state.
  * @param target element or a reactive function returning one
  * @returns boolean signal representing element's focus state
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createFocusSignal
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/active-element#createFocusSignal
  * @example
  * const isFocused = createFocusSignal(() => el)
  * isFocused() // T: boolean
@@ -111,7 +111,7 @@ export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<bool
 /**
  * A directive that notifies you when the element becomes active or inactive.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#focus
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/active-element#focus
  *
  * @example
  * const [active, setActive] = createSignal(false)

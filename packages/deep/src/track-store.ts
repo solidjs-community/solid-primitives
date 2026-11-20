@@ -76,7 +76,7 @@ function getTrackStoreNode(node: StoreNode): VoidFunction | undefined {
  * @param store a reactive store proxy
  * @returns same {@link store} that was passed in
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#trackStore
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/deep#trackStore
  *
  * @example
  * ```ts

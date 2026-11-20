@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/resize-observer?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/resize-observer)
 [![size](https://img.shields.io/npm/v/@solid-primitives/resize-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/resize-observer)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Reactive primitives for observing resizing of HTML elements.
 
@@ -120,7 +120,7 @@ createEffect(() => {
 
 ### `useWindowSize`
 
-`useWindowSize` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive. It is providing the same reactive object as `createWindowSize`, but the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
+`useWindowSize` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive. It is providing the same reactive object as `createWindowSize`, but the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
 
 ```ts
 import { useWindowSize } from "@solid-primitives/resize-observer";
@@ -137,7 +137,7 @@ createEffect(() => {
 
 **The `createWindowSize` isn't meant to be used for creating media queries.**
 
-If you want a reactive interface for media-queries, please checkout [the media package](https://github.com/solidjs-community/solid-primitives/tree/main/packages/media#readme).
+If you want a reactive interface for media-queries, please checkout [the media package](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/media#readme).
 
 ## `createElementSize`
 

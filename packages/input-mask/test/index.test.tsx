@@ -46,6 +46,31 @@ describe("createInputMask", () => {
     dispose();
   });
 
+  it("skips several wrongful characters in the middle of the input", () => {
+    let input!: HTMLInputElement;
+    let dispose = render(
+      () => <input ref={input} onInput={createInputMask("9-9-9")} />,
+      document.body,
+    );
+    input.value = "1ab2cd3";
+    dispatchInputEvent(input);
+    expect(input.value).toBe("1-2-3");
+    expect(input.selectionStart).toBe(5);
+    dispose();
+
+    dispose = render(
+      () => <input ref={input} onInput={createInputMask("9999-99-99")} />,
+      document.body,
+    );
+    input.value = "12ab34";
+    dispatchInputEvent(input);
+    expect(input.value).toBe("1234");
+    input.value = "1abc234";
+    dispatchInputEvent(input);
+    expect(input.value).toBe("1234");
+    dispose();
+  });
+
   it("works with regex mask", () => {
     let input!: HTMLInputElement;
     let dispose = render(

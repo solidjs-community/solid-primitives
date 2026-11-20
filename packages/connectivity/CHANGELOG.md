@@ -1,5 +1,23 @@
 # @solid-primitives/connectivity
 
+## 0.4.8
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+  - @solid-primitives/event-listener@2.4.8
+  - @solid-primitives/rootless@1.5.6
+
+## 0.4.7
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+  - @solid-primitives/event-listener@2.4.7
+  - @solid-primitives/rootless@1.5.5
+
 ## 0.4.6
 
 ### Patch Changes

@@ -1,5 +1,31 @@
 # @solid-primitives/upload
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+
+## 0.1.7
+
+### Patch Changes
+
+- 9864461: Fix `transformFiles` throwing for every `FileList`. Iterating with `for...in` also visited the list's `length` and `item` members, so file pickers and drop zones crashed.
+
+## 0.1.6
+
+### Patch Changes
+
+- 04c31ee: `helper`: rework `transformFiles` internal function to remove unneeded checks
+
 ## 0.1.5
 
 ### Patch Changes

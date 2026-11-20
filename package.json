@@ -26,7 +26,7 @@
     "update-tsconfigs": "node --import=@nothing-but/node-resolve-ts --experimental-strip-types ./scripts/update-tsconfigs.ts",
     "measure": "node --import=@nothing-but/node-resolve-ts --experimental-strip-types ./scripts/measure.ts",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
-    "release": "pnpm build && changeset publish",
+    "release": "pnpm build && changeset publish --tag v1",
     "postinstall": "pnpm update-tsconfigs"
   },
   "devDependencies": {

@@ -7,7 +7,7 @@ const $OBJECT = Symbol("track-object");
  * A reactive version of `Map` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
  * @param initial initial entries of the reactive map
  * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#ReactiveMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/map#ReactiveMap
  * @example
  * const userPoints = new ReactiveMap<User, number>();
  * createEffect(() => {
@@ -138,7 +138,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
  * A reactive version of `WeakMap` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
  * @param initial initial entries of the reactive map
  * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#ReactiveWeakMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/v1/packages/map#ReactiveWeakMap
  * @example
  * const userPoints = new ReactiveWeakMap<User, number>();
  * createEffect(() => {

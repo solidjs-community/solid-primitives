@@ -1,5 +1,34 @@
 # @solid-primitives/raf
 
+## 2.4.2
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+  - @solid-primitives/rootless@1.5.6
+  - @solid-primitives/set@0.7.6
+
+## 2.4.1
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+  - @solid-primitives/rootless@1.5.5
+  - @solid-primitives/set@0.7.5
+
+## 2.4.0
+
+### Minor Changes
+
+- 9864461: Add `createCallbacksSet`, `useGlobalRAF` and `createScheduledLoop` (from #824 by Roy Eden), with fixes:
+
+  - `useGlobalRAF`: registering the same callback from two owners no longer lets one owner's `remove` or cleanup unregister the other's. Each registration is separate, so a callback added from two registrations runs once for each.
+  - `useGlobalRAF`: removing a callback that was never added no longer stops a loop that was started manually.
+  - `createCallbacksSet`: the returned callback is typed `(...args: Parameters<T>) => void`, since it returns nothing.
+  - `createRAF`: `stop()` no longer calls `cancelAnimationFrame` when no frame was requested.
+
 ## 2.3.5
 
 ### Patch Changes

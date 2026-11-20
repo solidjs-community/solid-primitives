@@ -1,5 +1,25 @@
 # @solid-primitives/pagination
 
+## 0.5.5
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
+## 0.5.4
+
+### Patch Changes
+
+- Updated dependencies [10ad1e3]
+  - @solid-primitives/utils@6.4.2
+
+## 0.5.3
+
+### Patch Changes
+
+- aa74fb0: createSegment: return a new segment when the items change but the start and end of the page stay the same (e.g. after sorting or replacing an item).
+
 ## 0.5.2
 
 ### Patch Changes

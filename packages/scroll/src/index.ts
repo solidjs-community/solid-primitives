@@ -95,7 +95,7 @@ export function createScrollPosition(
 /**
  * Returns a reactive object with current window scroll position.
  *
- * This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive.
+ * This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) primitive.
  *
  * @example
  * const scroll = useWindowScrollPosition();

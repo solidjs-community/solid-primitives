@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/raf?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/raf)
 [![size](https://img.shields.io/npm/v/@solid-primitives/raf?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/raf)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Reactive primitives providing support to `window.requestAnimationFrame`.
 
@@ -126,23 +126,23 @@ A primitive for executing multiple callbacks at once, intended for usage in conj
 ```ts
 function createCallbacksSet<T extends (...args: any) => void>(
   ...initialCallbacks: Array<T>
-): [callback: T, callbacksSet: ReactiveSet<T>];
+): [callback: (...args: Parameters<T>) => void, callbacksSet: ReactiveSet<T>];
 ```
 
 ## useGlobalRAF
 
-A singleton root that returns a function similar to `createRAF` that batches multiple `window.requestAnimationFrame` executions within the same same timestamp (same RAF cycle) instead of skipping requests in separate frames. This is done by using a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) in conjuction with [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet)
+A singleton root that returns a function similar to `createRAF` that batches multiple `window.requestAnimationFrame` executions within the same same timestamp (same RAF cycle) instead of skipping requests in separate frames. This is done by using a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/rootless#createSingletonRoot) in conjuction with [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#createCallbacksSet)
 
 Returns a factory function that works like `createRAF` with an additional parameter to start the global RAF loop when adding the callback to the callbacks set. This function return is also similar to `createRAF`, but it's first three elements of the tuple are related to the presence of the callback in the callbacks set, while the next three are the same as `createRAF`, but for the global loop that executes all the callbacks present in the callbacks set.
 
 ```ts
 import { useGlobalRAF } from "@solid-primitives/raf";
 
-const createScheduledLoop = useGlobalRAF();
-const [hasAddedManual, addManual, removeManual, isRunningManual] = createScheduledLoop(timeStamp =>
-  console.log("Time stamp is", timeStamp),
+const createGlobalRAFCallback = useGlobalRAF();
+const [hasAddedManual, addManual, removeManual, isRunningManual] = createGlobalRAFCallback(
+  timeStamp => console.log("Time stamp is", timeStamp),
 );
-const [hasAddedAuto, addAuto, removeAuto, isRunningAuto] = createScheduledLoop(
+const [hasAddedAuto, addAuto, removeAuto, isRunningAuto] = createGlobalRAFCallback(
   timeStamp => console.log("Time stamp is", timeStamp),
   true,
 );
@@ -165,15 +165,15 @@ isRunningManual(); // true
 ```ts
 import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
 
-const createScheduledLoop = useGlobalRAF();
+const createGlobalRAFCallback = useGlobalRAF();
 
-const [hasAddedLowFramerate, addLowFramerate, removeLowFramerate] = createScheduledLoop(
+const [hasAddedLowFramerate, addLowFramerate, removeLowFramerate] = createGlobalRAFCallback(
   targetFPS(() => {
     /* Low framerate loop, for example for video / webcam sampling where the framerate can be capped by external sources  */
   }, 30),
   true,
 );
-const [hasAddedHighFramerate, addHighFramerate, removeHighFramerate] = createScheduledLoop(
+const [hasAddedHighFramerate, addHighFramerate, removeHighFramerate] = createGlobalRAFCallback(
   targetFPS(() => {
     /* High framerate loop for an animation / drawing to a canvas */
   }, 60),
@@ -199,11 +199,13 @@ function useGlobalRAF(): (
 
 #### Warning
 
-Only use this when you absolutely need to schedule animations on the same frame and stick to quick executions trying not to overload the amount of work performed in the current animation frame. If you need to ensure multiple things run on the same request but you also want to schedule multiple requests, you can use [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet) and a singleton `createRAF` to compose something similar to this primitive.
+Only use this when you absolutely need to schedule animations on the same frame and stick to quick executions trying not to overload the amount of work performed in the current animation frame. If you need to ensure multiple things run on the same request but you also want to schedule multiple requests, you can use [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/v1/packages/raf#createCallbacksSet) and a singleton `createRAF` to compose something similar to this primitive.
 
 ## createScheduledLoop
 
 A primitive for creating reactive interactions with external frameloop related functions (for example using [motion's frame util](https://motion.dev/docs/frame)) that are automatically disposed onCleanup.
+
+`schedule` is called once per `start()` and must keep running the callback every frame until it is cancelled, returning an ID (not `null` or `undefined`) that `cancel` accepts. A one-shot scheduler like `requestAnimationFrame` only runs the callback once; use `createRAF` for that.
 
 ```ts
 import { cancelFrame, frame } from "motion";

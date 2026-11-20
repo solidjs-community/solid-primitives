@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/state-machine?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/state-machine)
 [![version](https://img.shields.io/npm/v/@solid-primitives/state-machine?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/state-machine)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fv1%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A primitive for creating a reactive state machine. For expressing possible exclusive states and transitions, and bounding reactive computations to the lifecycle of those states.
 
@@ -371,7 +371,7 @@ state.to(States.Idle);
 
 You may see the working example here: https://primitives.solidjs.community/playground/state-machine/
 
-Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/state-machine/dev/index.tsx
+Source code: https://github.com/solidjs-community/solid-primitives/blob/v1/packages/state-machine/dev/index.tsx
 
 ## Changelog
 

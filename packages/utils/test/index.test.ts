@@ -1,5 +1,11 @@
-import { describe, test, expect, assert } from "vitest";
-import { handleDiffArray, arrayEquals, createHydratableSignal } from "../src/index.js";
+import { describe, test, expect, assert, vi } from "vitest";
+import {
+  handleDiffArray,
+  arrayEquals,
+  asArray,
+  createHydratableSignal,
+  withAccess,
+} from "../src/index.js";
 
 describe("handleDiffArray", () => {
   test("handleAdded called for new array", () => {
@@ -100,5 +106,51 @@ describe("createHydratableSignal", () => {
     const [state, setState] = createHydratableSignal("server", () => "client");
     expect(state()).toEqual("client");
     expect(setState).toBeInstanceOf(Function);
+  });
+});
+
+describe("withAccess", () => {
+  test("calls the function with a value or the result of an accessor", () => {
+    const received: unknown[] = [];
+    withAccess(1, v => received.push(v));
+    withAccess(
+      () => 2,
+      v => received.push(v),
+    );
+    withAccess(0, v => received.push(v));
+    expect(received).toEqual([1, 2, 0]);
+  });
+
+  test("skips undefined and null", () => {
+    const fn = vi.fn();
+    withAccess(undefined, fn);
+    withAccess(null, fn);
+    withAccess(() => undefined, fn);
+    withAccess(() => null, fn);
+    expect(fn).not.toHaveBeenCalled();
+  });
+});
+
+describe("asArray", () => {
+  test("wraps single values", () => {
+    expect(asArray("a")).toEqual(["a"]);
+    const obj = {};
+    expect(asArray(obj)).toEqual([obj]);
+  });
+
+  test("keeps arrays as they are", () => {
+    const arr = [1, 2];
+    expect(asArray(arr)).toBe(arr);
+  });
+
+  test("keeps falsy values that are not nullish", () => {
+    expect(asArray(0)).toEqual([0]);
+    expect(asArray("")).toEqual([""]);
+    expect(asArray(false)).toEqual([false]);
+  });
+
+  test("returns an empty array for undefined and null", () => {
+    expect(asArray(undefined)).toEqual([]);
+    expect(asArray(null)).toEqual([]);
   });
 });

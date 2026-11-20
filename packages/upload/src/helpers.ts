@@ -13,30 +13,18 @@ export function createInputComponent({ multiple = false, accept = "" }: FileUplo
   return element;
 }
 
+/**
+ * Converts a `FileList` (from an input or a drop) into `UploadFile` entries, each with an object
+ * URL for previews. Returns an empty array for `null`.
+ */
 export function transformFiles(files: FileList | null): UploadFile[] {
-  const parsedFiles: UploadFile[] = [];
+  if (!files) return [];
 
-  if (!files) return parsedFiles;
-
-  for (const index in files) {
-    const fileIndex = +index;
-    if (isNaN(+fileIndex)) {
-      continue;
-    }
-
-    const file = files[fileIndex];
-    if (!file) {
-      continue;
-    }
-
-    const parsedFile: UploadFile = {
-      source: URL.createObjectURL(file),
-      name: file.name,
-      size: file.size,
-      file,
-    };
-    parsedFiles.push(parsedFile);
-  }
-
-  return parsedFiles;
+  // iterate the FileList itself: `for...in` would also visit its `length` and `item` members
+  return Array.from(files, file => ({
+    source: URL.createObjectURL(file),
+    name: file.name,
+    size: file.size,
+    file,
+  }));
 }
