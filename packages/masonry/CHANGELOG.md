@@ -1,5 +1,12 @@
 # @solid-primitives/masonry
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
 ## 0.1.5
 
 ### Patch Changes

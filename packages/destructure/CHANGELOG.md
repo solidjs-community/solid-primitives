@@ -1,5 +1,12 @@
 # @solid-primitives/destructure
 
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
 ## 0.2.5
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @solid-primitives/fullscreen
 
+## 1.3.7
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
 ## 1.3.6
 
 ### Patch Changes
