@@ -16,7 +16,7 @@
       "createMutationObserver"
     ],
     "category": "Browser APIs",
-    "gzip": 460
+    "gzip": 464
   },
   "keywords": [
     "mutationObserver",

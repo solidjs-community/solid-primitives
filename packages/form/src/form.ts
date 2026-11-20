@@ -7,7 +7,6 @@ import {
   createEffect,
   type Accessor,
 } from "solid-js";
-import { isServer } from "@solidjs/web";
 import { makeEventListener } from "@solid-primitives/event-listener";
 import type {
   ValidatorFn,
@@ -82,47 +81,6 @@ export function toFormData(values: Record<string, unknown>): FormData {
  */
 export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormReturn<C> {
   type Values = { [K in keyof C]: InferValue<C[K]> };
-
-  if (isServer) {
-    const initialValues = Object.fromEntries(
-      Object.entries(config.fields).map(([k, f]) => [k, f.initial]),
-    ) as Values;
-
-    const fields = Object.fromEntries(
-      Object.entries(config.fields).map(([k, f]) => [
-        k,
-        {
-          value: () => f.initial,
-          error: () => null,
-          touched: () => false,
-          pending: () => false,
-          setValue: () => void 0,
-          setTouched: () => void 0,
-          setError: () => void 0,
-          reset: () => void 0,
-        },
-      ]),
-    ) as unknown as FormReturn<C>["fields"];
-
-    return {
-      fields,
-      values: () => initialValues,
-      errors: () => ({}),
-      dirty: () => false,
-      valid: () => true,
-      pending: () => false,
-      submitting: () => false,
-      submitted: () => false,
-      bind: () => () => () => {},
-      ref: () => () => {},
-      validate: () => () => null,
-      setValues: () => void 0,
-      setError: () => void 0,
-      formData: () => toFormData(initialValues),
-      reset: () => void 0,
-      submit: async () => void 0,
-    };
-  }
 
   // Must be declared before the field loop: validateOn:"submit" error memos close over this signal.
   const [submitted, setSubmitted] = createSignal(false, { ownedWrite: true });

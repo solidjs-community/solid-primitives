@@ -11,7 +11,7 @@
 
 `createEventDispatcher` creates a custom-event dispatcher for emitting component events.
 
-- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/utilities-event-dispatcher--docs)
+- [**Docs (Storybook)**](https://storybook.primitives.solidjs.community/?path=/docs/utilities-event-dispatcher--docs)
 
 ## Installation
 

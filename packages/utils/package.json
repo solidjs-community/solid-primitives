@@ -141,7 +141,7 @@
       "COLOR_INTL_TRANSLATIONS"
     ],
     "category": "Utilities",
-    "gzip": 1605
+    "gzip": 1606
   },
   "peerDependencies": {
     "@solidjs/web": "catalog:peer",

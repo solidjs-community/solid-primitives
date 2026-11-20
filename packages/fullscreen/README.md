@@ -11,7 +11,7 @@
 
 Reactive wrapper around the [Fullscreen API](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API).
 
-- [**Docs (Storybook)**](https://primitives.solidjs.community/storybook/?path=/docs/browser-apis-fullscreen--docs)
+- [**Docs (Storybook)**](https://storybook.primitives.solidjs.community/?path=/docs/browser-apis-fullscreen--docs)
 - [`makeFullscreen`](#makefullscreen) — Non-reactive base, no Solid lifecycle.
 - [`createFullscreen`](#createfullscreen) — Reactive primitive with `isActive` state tracking.
 - [`fullscreen`](#fullscreen-ref-directive-factory) — Ref factory for click-to-toggle.

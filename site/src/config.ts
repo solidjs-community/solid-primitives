@@ -4,4 +4,4 @@
  * The static README intro still links to the site, so update it too.
  */
 export const SITE_URL = "https://primitives.solidjs.community";
-export const STORYBOOK_URL = "https://primitives-storybook.solidjs.community";
+export const STORYBOOK_URL = "https://storybook.primitives.solidjs.community";
