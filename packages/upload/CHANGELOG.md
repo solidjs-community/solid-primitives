@@ -1,5 +1,11 @@
 # @solid-primitives/upload
 
+## 0.2.0
+
+### Minor Changes
+
+- fc58170: `createDropzone`: corrected `isDragging` signal & removed unnecessary props
+
 ## 0.1.9
 
 ### Patch Changes
