@@ -1,5 +1,13 @@
 # @solid-primitives/interaction
 
+## 1.0.1
+
+### Patch Changes
+
+- 5f77b81: fix(interaction): keep a trigger excluded when it is in a different shadow root than the watched element
+- Updated dependencies [b8a7727]
+  - @solid-primitives/utils@7.0.1
+
 ## 1.0.0
 
 ### Major Changes

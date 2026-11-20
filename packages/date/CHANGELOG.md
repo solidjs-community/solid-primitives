@@ -1,5 +1,13 @@
 # @solid-primitives/date
 
+## 3.0.1
+
+### Patch Changes
+
+- 6c1ec9b: `formatDateRelative` no longer returns "60 seconds ago" or "in 60 seconds" for differences between 59.5 and 60 seconds; they now read "1 minute".
+- Updated dependencies [b8a7727]
+  - @solid-primitives/utils@7.0.1
+
 ## 3.0.0
 
 ### Major Changes
