@@ -1,5 +1,13 @@
 # @solid-primitives/active-element
 
+## 2.1.8
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+  - @solid-primitives/event-listener@2.4.8
+
 ## 2.1.7
 
 ### Patch Changes

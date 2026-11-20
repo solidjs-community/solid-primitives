@@ -1,5 +1,12 @@
 # @solid-primitives/event-listener
 
+## 2.4.8
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
 ## 2.4.7
 
 ### Patch Changes

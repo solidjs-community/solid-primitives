@@ -1,5 +1,12 @@
 # @solid-primitives/sse
 
+## 0.0.105
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+
 ## 0.0.104
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @solid-primitives/memo
 
+## 1.5.4
+
+### Patch Changes
+
+- Updated dependencies [ce7d81a]
+  - @solid-primitives/utils@6.4.3
+  - @solid-primitives/scheduled@1.5.4
+
 ## 1.5.3
 
 ### Patch Changes
