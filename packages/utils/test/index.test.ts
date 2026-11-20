@@ -1,5 +1,11 @@
 import { describe, test, expect, assert, vi } from "vitest";
-import { handleDiffArray, arrayEquals, createHydratableSignal, withAccess } from "../src/index.js";
+import {
+  handleDiffArray,
+  arrayEquals,
+  asArray,
+  createHydratableSignal,
+  withAccess,
+} from "../src/index.js";
 
 describe("handleDiffArray", () => {
   test("handleAdded called for new array", () => {
@@ -122,5 +128,29 @@ describe("withAccess", () => {
     withAccess(() => undefined, fn);
     withAccess(() => null, fn);
     expect(fn).not.toHaveBeenCalled();
+  });
+});
+
+describe("asArray", () => {
+  test("wraps single values", () => {
+    expect(asArray("a")).toEqual(["a"]);
+    const obj = {};
+    expect(asArray(obj)).toEqual([obj]);
+  });
+
+  test("keeps arrays as they are", () => {
+    const arr = [1, 2];
+    expect(asArray(arr)).toBe(arr);
+  });
+
+  test("keeps falsy values that are not nullish", () => {
+    expect(asArray(0)).toEqual([0]);
+    expect(asArray("")).toEqual([""]);
+    expect(asArray(false)).toEqual([false]);
+  });
+
+  test("returns an empty array for undefined and null", () => {
+    expect(asArray(undefined)).toEqual([]);
+    expect(asArray(null)).toEqual([]);
   });
 });
