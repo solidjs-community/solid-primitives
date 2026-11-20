@@ -153,10 +153,11 @@ export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T
 
 /**
  * Wraps `value` in a single-element array. If `value` is already an array it is
- * returned as-is. Falsy values (except `0` and `false`) produce an empty array.
+ * returned as-is. Only `null` and `undefined` produce an empty array; other falsy
+ * values such as `0`, `""` and `false` are wrapped.
  */
 export const asArray = <T>(value: T): (T extends any[] ? T[number] : NonNullable<T>)[] =>
-  Array.isArray(value) ? (value as any) : value ? [value as any] : [];
+  Array.isArray(value) ? (value as any) : value != null ? [value as any] : [];
 
 /**
  * Access an array of MaybeAccessors
