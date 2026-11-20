@@ -58,4 +58,11 @@ describe("formatDateRelative", () => {
     expect(formatDateRelative(500)).toBe("in 1 second");
     expect(formatDateRelative(-2000)).toBe("2 seconds ago");
   });
+
+  it("switches to minutes instead of printing 60 seconds", () => {
+    expect(formatDateRelative(59499)).toBe("in 59 seconds");
+    expect(formatDateRelative(59500)).toBe("in 1 minute");
+    expect(formatDateRelative(59600)).toBe("in 1 minute");
+    expect(formatDateRelative(-59600)).toBe("1 minute ago");
+  });
 });
