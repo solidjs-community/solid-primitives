@@ -1,0 +1,89 @@
+{
+  "name": "@solid-primitives/temporal",
+  "version": "0.0.100",
+  "description": "Reactive primitives for the Temporal API — auto-updating now, today, calendar-aware durations and localized relative time.",
+  "author": "Mauricio Galvez",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/temporal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "temporal",
+    "stage": 0,
+    "list": [
+      "createTemporal",
+      "createInstantNow",
+      "createZonedDateTimeNow",
+      "createToday",
+      "createDuration",
+      "createRelativeTime",
+      "formatRelativeTime",
+      "temporalEquals",
+      "durationEquals"
+    ],
+    "category": "Utilities",
+    "gzip": 1541
+  },
+  "keywords": [
+    "temporal",
+    "date",
+    "time",
+    "duration",
+    "timezone",
+    "solid",
+    "primitives"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
+    "build": "pnpm -w build",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/timer": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:peer",
+    "solid-js": "catalog:peer",
+    "temporal-polyfill": ">=0.3.0"
+  },
+  "peerDependenciesMeta": {
+    "temporal-polyfill": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:peer",
+    "temporal-polyfill": "^1.0.8"
+  }
+}

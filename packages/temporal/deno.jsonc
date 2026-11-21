@@ -1,0 +1,24 @@
+{
+  "name": "@solid-primitives/temporal",
+  "version": "0.0.100",
+  "description": "Reactive primitives for the Temporal API — auto-updating now, today, calendar-aware durations and localized relative time.",
+  "license": "MIT",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "package.json"
+    ],
+    "exclude": [
+      "dist",
+      "dev",
+      "test",
+      "node_modules",
+      "vitest.config.ts",
+      "tsconfig.json"
+    ]
+  }
+}

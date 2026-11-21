@@ -54,6 +54,7 @@
     "npm:solid-repl@^1.0.1": "1.0.1_@solidjs+web@2.0.0__solid-js@2.0.0_solid-js@2.0.0",
     "npm:storybook-solidjs-vite@^10.7.4": "10.7.4_@solidjs+web@2.0.0__solid-js@2.0.0_solid-js@2.0.0_storybook@10.6.7__@types+react@19.3.0__prettier@3.10.1__react@19.3.1_typescript@7.0.2_vite@8.3.8__@types+node@22.20.5__esbuild@0.28.2__yaml@2.9.0_vite-plugin-solid@2.11.16__@testing-library+jest-dom@7.0.1___@testing-library+dom@10.4.2___vitest@5.1.0____@types+node@22.20.5____jsdom@31.0.1____vite@8.3.8_____@types+node@22.20.5_____esbuild@0.28.2_____yaml@2.9.0____esbuild@0.28.2____yaml@2.9.0___@types+node@22.20.5___esbuild@0.28.2___jsdom@31.0.1___vite@8.3.8____@types+node@22.20.5____esbuild@0.28.2____yaml@2.9.0___yaml@2.9.0__solid-js@2.0.0__vite@8.3.8___@types+node@22.20.5___esbuild@0.28.2___yaml@2.9.0__@testing-library+dom@10.4.2__@types+node@22.20.5__esbuild@0.28.2__jsdom@31.0.1__vitest@5.1.0___@types+node@22.20.5___jsdom@31.0.1___vite@8.3.8____@types+node@22.20.5____esbuild@0.28.2____yaml@2.9.0___esbuild@0.28.2___yaml@2.9.0_@testing-library+dom@10.4.2_@testing-library+jest-dom@7.0.1__@testing-library+dom@10.4.2__vitest@5.1.0___@types+node@22.20.5___jsdom@31.0.1___vite@8.3.8____@types+node@22.20.5____esbuild@0.28.2____yaml@2.9.0___esbuild@0.28.2___yaml@2.9.0__@types+node@22.20.5__esbuild@0.28.2__jsdom@31.0.1__vite@8.3.8___@types+node@22.20.5___esbuild@0.28.2___yaml@2.9.0__yaml@2.9.0_@types+node@22.20.5_@types+react@19.3.0_esbuild@0.28.2_jsdom@31.0.1_prettier@3.10.1_react@19.3.1_vitest@5.1.0__@types+node@22.20.5__jsdom@31.0.1__vite@8.3.8___@types+node@22.20.5___esbuild@0.28.2___yaml@2.9.0__esbuild@0.28.2__yaml@2.9.0",
     "npm:storybook@^10.6.7": "10.6.7_@types+react@19.3.0_prettier@3.10.1_react@19.3.1",
+    "npm:temporal-polyfill@^1.0.8": "1.0.8",
     "npm:tsdown@~0.23.7": "0.23.7_typescript@7.0.2",
     "npm:typescript@^7.0.2": "7.0.2",
     "npm:unplugin-solid@3": "3.0.0_@solidjs+web@2.0.0__solid-js@2.0.0_@testing-library+jest-dom@7.0.1__@testing-library+dom@10.4.2__vitest@5.1.0___@types+node@22.20.5___jsdom@31.0.1___vite@8.3.8____@types+node@22.20.5____esbuild@0.28.2____yaml@2.9.0___esbuild@0.28.2___yaml@2.9.0__@types+node@22.20.5__esbuild@0.28.2__jsdom@31.0.1__vite@8.3.8___@types+node@22.20.5___esbuild@0.28.2___yaml@2.9.0__yaml@2.9.0_solid-js@2.0.0_vite@8.3.8__@types+node@22.20.5__esbuild@0.28.2__yaml@2.9.0_@testing-library+dom@10.4.2_@types+node@22.20.5_esbuild@0.28.2_jsdom@31.0.1_rolldown@1.3.2_vitest@5.1.0__@types+node@22.20.5__jsdom@31.0.1__vite@8.3.8___@types+node@22.20.5___esbuild@0.28.2___yaml@2.9.0__esbuild@0.28.2__yaml@2.9.0",
@@ -7920,6 +7921,19 @@
         "whatwg-mimetype@4.0.0"
       ]
     },
+    "temporal-polyfill@1.0.8": {
+      "integrity": "sha512-RCCGa0GddT099XG49ijdD0tDf86L8vfuZun1+JyJiO4Y2NP9PACQsG0OnvNPXwVLisdvhr/zqL2nhKQmXXx08A==",
+      "dependencies": [
+        "temporal-spec",
+        "temporal-utils"
+      ]
+    },
+    "temporal-spec@1.0.1": {
+      "integrity": "sha512-wxVoanmDeavXie1vu2JaQ3WIc3JZnWAOYFBsJyATaVsXsycKYUflGsyBmrRSnoCpZJpwPyr38VpgSUlQ8CbFxg=="
+    },
+    "temporal-utils@1.0.4": {
+      "integrity": "sha512-4mAcgbWlaxe+gn23gk8g0iHxCVGVOhKzSCfF5HM3lfvH8BdT+/pBmH/R/E4CrIse+koUgs8ThkPzCLnui6Fi8w=="
+    },
     "term-size@2.2.1": {
       "integrity": "sha512-wK0Ri4fOGjv/XPy8SBHZChl8CM7uMc5VML7SqiQ0zG7+J5Vr+RMQDoHa2CNT6KHUnTGIXH34UDMkPzAUyapBZg=="
     },
@@ -9357,6 +9371,15 @@
           "dependencies": [
             "npm:@solidjs/web@2.0.0",
             "npm:solid-js@2"
+          ]
+        }
+      },
+      "packages/temporal": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@solidjs/web@2.0.0",
+            "npm:solid-js@2",
+            "npm:temporal-polyfill@^1.0.8"
           ]
         }
       },
