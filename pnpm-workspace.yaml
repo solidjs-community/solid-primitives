@@ -16,6 +16,12 @@ overrides:
   # Dev-tooling advisories fixed by a minor/patch release (lodash, postcss-selector-parser).
   lodash@<4.18.0: ^4.18.0
   postcss-selector-parser@<6.1.5: ^6.1.5
+  # Site (OG images via @vercel/og, markdown via solidbase) and graphql-codegen advisories that are only
+  # fixed on a newer line than their parent asks for. Remove once the parents release with them.
+  fflate@<0.7.5: ^0.7.5
+  satori@<0.33.5: ^0.33.5
+  toml@<5.0.1: ^5.0.1
+  '@graphql-tools/utils@<12.0.2': ^12.0.2
   # `geist` is only used for its font files, but lists `next` as a peer and `auto-install-peers`
   # would install the whole Next.js tree (and its pinned postcss) for it.
   geist>next: '-'
