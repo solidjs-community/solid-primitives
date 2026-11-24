@@ -645,7 +645,7 @@ function Demo() {
 render(() => <Demo />, document.getElementById("app")!);
 ```
 
-`makeAnimationGroup` takes a static array. `createAnimationGroup` takes an accessor and re-derives the group whenever the list changes — each control method always operates on the most recent set of animations.
+`makeAnimationGroup` takes a static array. `createAnimationGroup` takes an accessor and reads it each time a control method is called, so every call operates on the current list of animations (after an upstream signal write, `flush()` first if you call a control synchronously).
 
 ```ts
 // Imperative — static list
@@ -806,7 +806,7 @@ function createMotionPath(
 
 ## `makeSequence`
 
-Chains animation factories into a sequential playlist: each factory is called and its animation allowed to finish before the next factory runs. Factories are invoked **lazily** — each is called only when its turn arrives, so animations are created and started just in time rather than all upfront. A factory returning `null`/`undefined` skips that step without breaking the chain.
+Chains animation factories into a sequential playlist: each factory is called and its animation allowed to finish before the next factory runs. Factories are invoked **lazily** — each is called only when its turn arrives, so animations are created and started just in time rather than all upfront. A factory returning `null`/`undefined`, or an animation that has already finished, skips that step without breaking the chain.
 
 ```tsx repl
 import { render } from "@solidjs/web";
@@ -872,7 +872,7 @@ type AnimationFactory = () => Animation | null | undefined;
 
 type SequenceControls = {
   play: () => void; // starts from the first factory, discarding any in-progress run
-  cancel: () => void; // stops the sequence; the currently-playing animation is cancelled
+  cancel: () => void; // stops the sequence; a running animation is cancelled, a finished one is left alone so its `fill` styles stay
 };
 
 function makeSequence(factories: AnimationFactory[]): SequenceControls;
@@ -915,7 +915,7 @@ function Demo() {
 render(() => <Demo />, document.getElementById("app")!);
 ```
 
-Exit keyframes default to the enter keyframes reversed. If `show` toggles back to `true` while an exit is in progress, the exit is cancelled and the enter restarts.
+Exit keyframes default to the enter keyframes reversed (`offset` values are mirrored and per-keyframe `easing` moves with its segment). If `show` toggles back to `true` while an exit is in progress, the exit is cancelled and the enter restarts. If the exit animation is cancelled externally, the element unmounts instead of staying stuck.
 
 ```tsx
 const [show, setShow] = createSignal(false);
