@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onSettled, Show } from "solid-js";
+import { createEffect, createSignal, flush, For, onSettled, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
   createAnimate,
@@ -353,6 +353,8 @@ export const Flip = meta.story({
     const toggle = () => {
       flipController.snapshot();
       setRight(v => !v);
+      // Solid 2 batches writes; apply the DOM change now so flip() measures the new layout.
+      flush();
       flipController.flip();
     };
 
@@ -386,7 +388,9 @@ export const Flip = meta.story({
         <Button onClick={toggle}>Flip to {right() ? "left" : "right"}</Button>
 
         <p style={{ margin: 0, "font-size": "0.82rem", color: "#64748b" }}>
-          The box jumps instantly in the DOM — FLIP animates back from the old position.
+          The box jumps instantly in the DOM — FLIP animates back from the old position. Call{" "}
+          <code>flush()</code> between the state change and <code>flip()</code> so the new layout is
+          measured.
         </p>
       </Container>
     );

@@ -5,15 +5,21 @@
  * after. `flip()` reads the new geometry, inverts the delta, and plays the
  * animation from the old position/size to the new one.
  *
- * Note: geometry is measured in viewport coordinates via `getBoundingClientRect`.
- * Elements inside `position: fixed/absolute` ancestors will need their own
- * coordinate adjustment.
+ * Solid 2 batches signal writes, so call `flush()` (from `solid-js`) between the
+ * state change and `flip()`; otherwise `flip()` measures the unchanged layout and
+ * is a silent no-op.
+ *
+ * Geometry is measured in viewport coordinates via `getBoundingClientRect`, so
+ * scrolling between `snapshot()` and `flip()` skews the result. Resizing via
+ * `scale()` also stretches the element's children. `fill` defaults to
+ * `"backwards"` so a `delay` doesn't show the final position early.
  */
 export function makeFlip(
   el: Element,
   options?: KeyframeAnimationOptions,
 ): { snapshot: () => void; flip: () => Animation | undefined } {
   let rect: DOMRect | undefined;
+  let current: Animation | undefined;
 
   return {
     snapshot() {
@@ -21,6 +27,10 @@ export function makeFlip(
     },
     flip() {
       if (!rect) return;
+      // Cancel any in-flight flip first so `next` is measured without its transform.
+      // `snapshot()` deliberately measured *with* it, keeping an interrupted motion continuous.
+      current?.cancel();
+      current = undefined;
       const next = el.getBoundingClientRect();
       const prev = rect;
       rect = undefined;
@@ -30,7 +40,7 @@ export function makeFlip(
       const sx = prev.width / next.width;
       const sy = prev.height / next.height;
       if (dx === 0 && dy === 0 && sx === 1 && sy === 1) return;
-      return el.animate(
+      return (current = el.animate(
         [
           {
             transformOrigin: "top left",
@@ -38,8 +48,8 @@ export function makeFlip(
           },
           { transformOrigin: "top left", transform: "none" },
         ],
-        options,
-      );
+        { fill: "backwards", ...options },
+      ));
     },
   };
 }
