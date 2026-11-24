@@ -30,7 +30,11 @@ export type ViewAnimationOptions = Omit<KeyframeAnimationOptions, "timeline"> & 
   rangeEnd?: string;
 };
 
-/** Plays a viewport-driven WAAPI animation on `el` via `ViewTimeline`. */
+/**
+ * Plays a viewport-driven WAAPI animation on `el` via `ViewTimeline`.
+ * Throws a `ReferenceError` where `ViewTimeline` is unsupported; `createViewAnimation`
+ * returns `undefined` there instead.
+ */
 export function makeViewAnimation(
   el: Element,
   keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
@@ -57,7 +61,8 @@ export function makeViewAnimation(
 }
 
 /**
- * Reactive wrapper around {@link makeViewAnimation}. Re-runs whenever
+ * Reactive wrapper around {@link makeViewAnimation}. Yields `undefined` (no animation) when
+ * `ViewTimeline` is unsupported. Re-runs whenever
  * `target`, `keyframes`, or `options` change.
  */
 export function createViewAnimation(
@@ -75,7 +80,7 @@ export function createViewAnimation(
   createEffect(
     () => ({ el: target(), kf: getKf(), opts: getOpts() }),
     ({ el, kf, opts }) => {
-      if (!el) {
+      if (!el || typeof ViewTimeline === "undefined") {
         setAnimation(undefined);
         return;
       }

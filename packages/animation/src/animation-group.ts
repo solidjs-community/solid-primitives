@@ -1,4 +1,4 @@
-import { createMemo, type Accessor } from "solid-js";
+import { type Accessor } from "solid-js";
 
 export type AnimationGroupControls = {
   play: () => void;
@@ -28,8 +28,8 @@ export function makeAnimationGroup(
 }
 
 /**
- * Reactive wrapper around {@link makeAnimationGroup}. Re-derives the group
- * controls whenever the `animations` accessor returns a new list.
+ * Reactive wrapper around {@link makeAnimationGroup}. Reads the
+ * `animations` accessor each time a control is called.
  *
  * Each method on the returned object always operates on the most recent set of
  * animations — calling `play()` after the list changes will target the new
@@ -38,7 +38,7 @@ export function makeAnimationGroup(
 export function createAnimationGroup(
   animations: Accessor<(Animation | null | undefined)[]>,
 ): AnimationGroupControls {
-  const group = createMemo(() => makeAnimationGroup(animations()));
+  const group = () => makeAnimationGroup(animations());
   return {
     play: () => group().play(),
     pause: () => group().pause(),

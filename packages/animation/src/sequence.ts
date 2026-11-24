@@ -4,7 +4,10 @@ export type AnimationFactory = () => Animation | null | undefined;
 export type SequenceControls = {
   /** Starts the sequence from the first factory. Discards any in-progress run. */
   play: () => void;
-  /** Stops the sequence. The currently-playing animation is cancelled. */
+  /**
+   * Stops the sequence. The currently-playing animation is cancelled; an animation
+   * that already finished is left alone so its `fill` styles stay applied.
+   */
   cancel: () => void;
 };
 
@@ -51,6 +54,11 @@ export function makeSequence(factories: AnimationFactory[]): SequenceControls {
           return;
         }
         current = anim;
+        // An already-finished animation will never fire `finish` again.
+        if (anim.playState === "finished") {
+          next();
+          return;
+        }
         anim.addEventListener("finish", next, { once: true });
       };
 
@@ -58,7 +66,8 @@ export function makeSequence(factories: AnimationFactory[]): SequenceControls {
     },
     cancel() {
       generation++;
-      current?.cancel();
+      // Cancelling a finished animation would drop its `fill: "forwards"` styles.
+      if (current && current.playState !== "finished") current.cancel();
       current = null;
     },
   };

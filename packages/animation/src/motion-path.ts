@@ -9,11 +9,16 @@ export type MotionPathOptions = KeyframeAnimationOptions & {
    * Default: `"auto"`.
    */
   rotate?: string;
+  /**
+   * CSS `offset-anchor` value: the point of the element that follows the path.
+   * Default: `"center"`.
+   */
+  anchor?: string;
 };
 
 /**
- * Animates `el` along a CSS Motion Path using WAAPI. Sets `offset-path` and
- * `offset-rotate` on the element as a side effect; these are left in place
+ * Animates `el` along a CSS Motion Path using WAAPI. Sets `offset-path`,
+ * `offset-rotate` and `offset-anchor` on the element as a side effect; these are left in place
  * after the animation so `fill: "forwards"` works correctly.
  *
  * @param path  SVG path string passed to `path("…")`, or any valid
@@ -24,10 +29,10 @@ export function makeMotionPath(
   path: string,
   options?: MotionPathOptions,
 ): Animation {
-  const { rotate = "auto", ...animOptions } = options ?? {};
+  const { rotate = "auto", anchor = "center", ...animOptions } = options ?? {};
   el.style.offsetPath = path.includes("(") ? path : `path("${path}")`;
   el.style.offsetRotate = rotate;
-  el.style.offsetAnchor = "center";
+  el.style.offsetAnchor = anchor;
   return el.animate([{ offsetDistance: "0%" }, { offsetDistance: "100%" }], animOptions);
 }
 

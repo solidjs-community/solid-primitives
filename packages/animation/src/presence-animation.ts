@@ -23,17 +23,50 @@ export type PresenceAnimationOptions = {
   initialEnter?: boolean;
 };
 
+const mirrorOffset = (o: unknown) => (typeof o === "number" ? 1 - o : o);
+
+/**
+ * Reverses keyframes for the default exit animation. Offsets are mirrored
+ * (`1 - offset`) so they stay non-decreasing, and per-keyframe easings are
+ * shifted so each segment keeps its own easing.
+ */
 function reverseKeyframes(
   kf: Keyframe[] | PropertyIndexedKeyframes | null,
 ): Keyframe[] | PropertyIndexedKeyframes | null {
   if (!kf) return kf;
-  if (Array.isArray(kf)) return [...kf].reverse();
-  const reversed: PropertyIndexedKeyframes = {};
-  for (const key in kf as PropertyIndexedKeyframes) {
-    const val = (kf as PropertyIndexedKeyframes)[key];
-    (reversed as Record<string, unknown>)[key] = Array.isArray(val) ? [...val].reverse() : val;
+  if (Array.isArray(kf)) {
+    const n = kf.length;
+    return [...kf].reverse().map((frame, j) => {
+      const out: Keyframe = { ...frame };
+      if (out.offset != null) out.offset = 1 - out.offset;
+      // Easing of original frame i drives segment i → i+1; reversed, that is (n-2-j) → (n-1-j).
+      const easing = j < n - 1 ? kf[n - 2 - j]!.easing : undefined;
+      if (easing !== undefined) out.easing = easing;
+      else delete out.easing;
+      return out;
+    });
   }
-  return reversed;
+  const src = kf as Record<string, unknown>;
+  const count = Math.max(
+    0,
+    ...Object.entries(src).map(([k, v]) =>
+      k !== "offset" && k !== "easing" && Array.isArray(v) ? v.length : 0,
+    ),
+  );
+  const reversed: Record<string, unknown> = {};
+  for (const key in src) {
+    const val = src[key];
+    if (key === "offset") {
+      reversed[key] = Array.isArray(val) ? [...val].reverse().map(mirrorOffset) : val;
+    } else if (key === "easing" && Array.isArray(val) && count > 1) {
+      const eased: unknown[] = [];
+      for (let j = 0; j < count - 1; j++) eased.push(val[(count - 2 - j) % val.length]);
+      reversed[key] = eased;
+    } else {
+      reversed[key] = Array.isArray(val) ? [...val].reverse() : val;
+    }
+  }
+  return reversed as PropertyIndexedKeyframes;
 }
 
 // ─── createPresenceAnimation ─────────────────────────────────────────────────
@@ -79,6 +112,7 @@ export function createPresenceAnimation(
   const [isMounted, setIsMounted] = createSignal(untrack(getShow), INTERNAL_OPTIONS);
 
   let enterGen = 0;
+  let enterAnim: Animation | undefined;
 
   const scheduleEnter = () => {
     const gen = ++enterGen;
@@ -86,7 +120,9 @@ export function createPresenceAnimation(
       if (gen !== enterGen) return;
       const el = untrack(target);
       if (!el) return;
-      el.animate(options.enter, options.enterOptions);
+      // Drop the previous enter so finished `fill` animations don't stack on a reused element.
+      enterAnim?.cancel();
+      enterAnim = el.animate(options.enter, options.enterOptions);
     });
   };
 
@@ -110,16 +146,19 @@ export function createPresenceAnimation(
         const exitKf = options.exit ?? reverseKeyframes(options.enter);
         const anim = el.animate(exitKf, options.exitOptions ?? options.enterOptions);
         let done = false;
-        anim.addEventListener(
-          "finish",
-          () => {
-            done = true;
-            setIsMounted(false);
-          },
-          { once: true },
-        );
+        const finish = () => {
+          if (done) return;
+          done = true;
+          setIsMounted(false);
+        };
+        // An externally cancelled exit (e.g. `display: none`) would otherwise never unmount.
+        anim.addEventListener("finish", finish, { once: true });
+        anim.addEventListener("cancel", finish, { once: true });
         return () => {
-          if (!done) anim.cancel();
+          // Mark done first so our own cancel() doesn't unmount (show toggled back / disposed).
+          if (done) return;
+          done = true;
+          anim.cancel();
         };
       }
     },

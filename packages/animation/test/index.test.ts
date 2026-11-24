@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { createRoot, createSignal, flush } from "solid-js";
+import { createRoot, createRenderEffect, createSignal, flush } from "solid-js";
 import {
   makeAnimate,
   createAnimate,
@@ -11,6 +11,11 @@ import {
   makeStagger,
   createStagger,
   makeAnimationGroup,
+  createPresenceAnimation,
+  makeSequence,
+  makeMotionPath,
+  createMotionPath,
+  createAnimationGroup,
 } from "../src/index.js";
 
 // Helpers
@@ -52,6 +57,7 @@ declare global {
 
 const KF: Keyframe[] = [{ opacity: "0" }, { opacity: "1" }];
 const OPTS: KeyframeAnimationOptions = { duration: 300 };
+const FLIP_OPTS = { fill: "backwards", ...OPTS };
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -325,7 +331,7 @@ describe("makeFlip", () => {
         { transformOrigin: "top left", transform: "translate(-20px, -10px) scale(1, 1)" },
         { transformOrigin: "top left", transform: "none" },
       ],
-      OPTS,
+      FLIP_OPTS,
     );
   });
 
@@ -367,8 +373,205 @@ describe("makeFlip", () => {
         { transformOrigin: "top left", transform: "translate(0px, 0px) scale(2, 2)" },
         { transformOrigin: "top left", transform: "none" },
       ],
+      { fill: "backwards" },
+    );
+  });
+});
+
+describe("makeFlip interruption", () => {
+  it("cancels the in-flight flip before measuring the new layout", () => {
+    const { el, anim } = makeEl();
+    const order: string[] = [];
+    (anim.cancel as ReturnType<typeof vi.fn>).mockImplementation(() => order.push("cancel"));
+    vi.spyOn(el, "getBoundingClientRect")
+      .mockImplementationOnce(() => (order.push("measure"), rect(0, 0, 100, 50))) // snapshot 1
+      .mockImplementationOnce(() => (order.push("measure"), rect(20, 0, 100, 50))) // flip 1
+      .mockImplementationOnce(() => (order.push("measure"), rect(10, 0, 100, 50))) // snapshot 2 (mid-flight)
+      .mockImplementationOnce(() => (order.push("measure"), rect(60, 0, 100, 50))); // flip 2
+
+    const { snapshot, flip } = makeFlip(el, OPTS);
+    snapshot();
+    flip();
+    snapshot();
+    flip();
+
+    // snapshot 2 measures while animating; flip 2 cancels first, then measures.
+    expect(order).toEqual(["measure", "measure", "measure", "cancel", "measure"]);
+    expect(el.animate).toHaveBeenLastCalledWith(
+      [
+        { transformOrigin: "top left", transform: "translate(-50px, 0px) scale(1, 1)" },
+        { transformOrigin: "top left", transform: "none" },
+      ],
+      FLIP_OPTS,
+    );
+  });
+});
+
+describe("createPresenceAnimation", () => {
+  function listenerAnim() {
+    const listeners: Record<string, () => void> = {};
+    const anim = {
+      cancel: vi.fn(() => listeners.cancel?.()),
+      addEventListener: vi.fn((type: string, fn: () => void) => (listeners[type] = fn)),
+    };
+    return { anim, listeners };
+  }
+
+  function setup(options: Parameters<typeof createPresenceAnimation>[2]) {
+    const el = document.createElement("div");
+    const exit = listenerAnim();
+    el.animate = vi.fn(() => exit.anim) as unknown as typeof el.animate;
+    const [show, setShow] = createSignal(true);
+    const { isMounted, dispose } = createRoot(dispose => ({
+      ...createPresenceAnimation(() => el, show, options),
+      dispose,
+    }));
+    flush();
+    return { el, exit, show, setShow, isMounted, dispose };
+  }
+
+  it("mirrors offsets and shifts easings in the default exit keyframes", () => {
+    const { el, setShow, dispose } = setup({
+      enter: [
+        { opacity: 0, offset: 0, easing: "ease-in" },
+        { opacity: 0.5, offset: 0.2, easing: "linear" },
+        { opacity: 1, offset: 1 },
+      ],
+    });
+    setShow(false);
+    flush();
+    expect(el.animate).toHaveBeenCalledWith(
+      [
+        { opacity: 1, offset: 0, easing: "linear" },
+        { opacity: 0.5, offset: 0.8, easing: "ease-in" },
+        { opacity: 0, offset: 1 },
+      ],
       undefined,
     );
+    dispose();
+  });
+
+  it("mirrors offsets for property-indexed keyframes", () => {
+    const { el, setShow, dispose } = setup({
+      enter: { opacity: [0, 0.5, 1], offset: [0, 0.2, 1] },
+    });
+    setShow(false);
+    flush();
+    expect(el.animate).toHaveBeenCalledWith(
+      { opacity: [1, 0.5, 0], offset: [0, 0.8, 1] },
+      undefined,
+    );
+    dispose();
+  });
+
+  it("unmounts when the exit animation finishes", () => {
+    const { exit, setShow, isMounted, dispose } = setup({
+      enter: [{ opacity: 0 }, { opacity: 1 }],
+    });
+    setShow(false);
+    flush();
+    expect(isMounted()).toBe(true);
+    exit.listeners.finish!();
+    flush();
+    expect(isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("unmounts when the exit animation is cancelled externally", () => {
+    const { exit, setShow, isMounted, dispose } = setup({
+      enter: [{ opacity: 0 }, { opacity: 1 }],
+    });
+    setShow(false);
+    flush();
+    exit.listeners.cancel!();
+    flush();
+    expect(isMounted()).toBe(false);
+    dispose();
+  });
+
+  it("cancels the previous enter animation when entering again", async () => {
+    const el = document.createElement("div");
+    const anims = [listenerAnim(), listenerAnim(), listenerAnim()];
+    let i = 0;
+    el.animate = vi.fn(() => anims[i++]!.anim) as unknown as typeof el.animate;
+    const [show, setShow] = createSignal(false);
+    const dispose = createRoot(dispose => {
+      createPresenceAnimation(() => el, show, { enter: [{ opacity: 0 }, { opacity: 1 }] });
+      return dispose;
+    });
+    flush();
+    setShow(true);
+    flush();
+    await Promise.resolve(); // enter #1 (microtask)
+    setShow(false);
+    flush();
+    setShow(true);
+    flush();
+    await Promise.resolve(); // enter #2
+    // anims[0] = enter #1, anims[1] = exit, anims[2] = enter #2
+    expect(anims[0]!.anim.cancel).toHaveBeenCalledTimes(1);
+    expect(anims[2]!.anim.cancel).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it("stays mounted when show toggles back and the exit is cancelled by cleanup", () => {
+    const { exit, setShow, isMounted, dispose } = setup({
+      enter: [{ opacity: 0 }, { opacity: 1 }],
+    });
+    setShow(false);
+    flush();
+    setShow(true);
+    flush();
+    expect(exit.anim.cancel).toHaveBeenCalled();
+    expect(isMounted()).toBe(true);
+    dispose();
+  });
+});
+
+describe("makeFlip with batched Solid writes", () => {
+  function setup() {
+    const { el } = makeEl();
+    // Geometry follows a DOM attribute that is only written when the render effect runs.
+    el.dataset.x = "0";
+    vi.spyOn(el, "getBoundingClientRect").mockImplementation(() =>
+      rect(Number(el.dataset.x), 0, 100, 50),
+    );
+    const [x, setX] = createSignal(0);
+    const dispose = createRoot(dispose => {
+      createRenderEffect(x, v => {
+        el.dataset.x = String(v);
+      });
+      return dispose;
+    });
+    flush();
+    return { el, setX, dispose };
+  }
+
+  it("is a no-op when flip() runs before the DOM update is flushed", () => {
+    const { el, setX, dispose } = setup();
+    const { snapshot, flip } = makeFlip(el, OPTS);
+    snapshot();
+    setX(40);
+    expect(flip()).toBeUndefined();
+    expect(el.animate).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it("animates when flush() is called between the write and flip()", () => {
+    const { el, setX, dispose } = setup();
+    const { snapshot, flip } = makeFlip(el, OPTS);
+    snapshot();
+    setX(40);
+    flush();
+    expect(flip()).toBeDefined();
+    expect(el.animate).toHaveBeenCalledWith(
+      [
+        { transformOrigin: "top left", transform: "translate(-40px, 0px) scale(1, 1)" },
+        { transformOrigin: "top left", transform: "none" },
+      ],
+      FLIP_OPTS,
+    );
+    dispose();
   });
 });
 
@@ -543,5 +746,153 @@ describe("makeAnimationGroup", () => {
 
   it("does nothing when the list is empty", () => {
     expect(() => makeAnimationGroup([]).play()).not.toThrow();
+  });
+});
+
+// makeSequence
+
+describe("makeSequence", () => {
+  function seqAnim(playState?: string) {
+    const listeners: Record<string, () => void> = {};
+    const anim = {
+      playState,
+      cancel: vi.fn(),
+      addEventListener: vi.fn((t: string, fn: () => void) => (listeners[t] = fn)),
+    };
+    return { anim: anim as unknown as Animation, raw: anim, listeners };
+  }
+
+  it("runs factories lazily, one after another", () => {
+    const a = seqAnim();
+    const f1 = vi.fn(() => a.anim);
+    const f2 = vi.fn(() => null);
+    makeSequence([f1, f2]).play();
+    expect(f1).toHaveBeenCalledTimes(1);
+    expect(f2).not.toHaveBeenCalled();
+    a.listeners.finish!();
+    expect(f2).toHaveBeenCalledTimes(1);
+  });
+
+  it("advances past an already-finished animation", () => {
+    const f2 = vi.fn(() => null);
+    makeSequence([() => seqAnim("finished").anim, f2]).play();
+    expect(f2).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not cancel a finished animation on cancel()", () => {
+    const a = seqAnim("running");
+    const seq = makeSequence([() => a.anim]);
+    seq.play();
+    a.raw.playState = "finished";
+    seq.cancel();
+    expect(a.raw.cancel).not.toHaveBeenCalled();
+  });
+
+  it("cancels a running animation and stops the chain on cancel()", () => {
+    const a = seqAnim("running");
+    const f2 = vi.fn(() => null);
+    const seq = makeSequence([() => a.anim, f2]);
+    seq.play();
+    seq.cancel();
+    expect(a.raw.cancel).toHaveBeenCalledTimes(1);
+    a.listeners.finish!();
+    expect(f2).not.toHaveBeenCalled();
+  });
+
+  it("restarts from the beginning when play() is called again", () => {
+    const a = seqAnim("running");
+    const f1 = vi.fn(() => a.anim);
+    const seq = makeSequence([f1]);
+    seq.play();
+    seq.play();
+    expect(f1).toHaveBeenCalledTimes(2);
+    expect(a.raw.cancel).toHaveBeenCalledTimes(1);
+  });
+});
+
+// makeMotionPath / createMotionPath
+
+describe("makeMotionPath", () => {
+  it("wraps SVG path data in path() and animates offsetDistance", () => {
+    const { el } = makeEl();
+    makeMotionPath(el, "M0,0 L10,10", { duration: 100 });
+    expect(el.style.offsetPath).toContain("path(");
+    expect(el.style.offsetRotate).toBe("auto");
+    expect(el.style.offsetAnchor).toBe("center center"); // normalised by jsdom
+    expect(el.animate).toHaveBeenCalledWith(
+      [{ offsetDistance: "0%" }, { offsetDistance: "100%" }],
+      { duration: 100 },
+    );
+  });
+
+  it("passes functional offset-path values through and honours rotate/anchor", () => {
+    const { el } = makeEl();
+    makeMotionPath(el, "circle(50%)", { rotate: "0deg", anchor: "top left", duration: 1 });
+    expect(el.style.offsetPath).toBe("circle(50%)");
+    expect(el.style.offsetRotate).toBe("0deg");
+    expect(el.style.offsetAnchor).toBe("left top"); // normalised by jsdom
+  });
+});
+
+describe("createMotionPath", () => {
+  it("animates when the target appears and cancels on dispose", () => {
+    const { el, anim } = makeEl();
+    const [target, setTarget] = createSignal<HTMLElement | null>(null);
+    let result!: ReturnType<typeof createMotionPath>;
+    const dispose = createRoot(dispose => {
+      result = createMotionPath(target, "circle(50%)");
+      return dispose;
+    });
+    flush();
+    expect(result()).toBeUndefined();
+    setTarget(el);
+    flush();
+    expect(result()).toBe(anim);
+    dispose();
+    expect(anim.cancel).toHaveBeenCalled();
+  });
+});
+
+// createAnimationGroup
+
+describe("createAnimationGroup", () => {
+  it("forwards controls to the current list of animations", () => {
+    const a = mockAnim();
+    const b = mockAnim();
+    const [list, setList] = createSignal<(Animation | null)[]>([a]);
+    let group!: ReturnType<typeof createAnimationGroup>;
+    const dispose = createRoot(dispose => {
+      group = createAnimationGroup(list);
+      return dispose;
+    });
+    group.play();
+    expect(a.play).toHaveBeenCalledTimes(1);
+    setList([b, null]);
+    flush();
+    group.pause();
+    expect(b.pause).toHaveBeenCalledTimes(1);
+    expect(a.pause).not.toHaveBeenCalled();
+    dispose();
+  });
+});
+
+// Unsupported timelines
+
+describe("scroll/view animation without timeline support", () => {
+  it("createScrollAnimation and createViewAnimation yield undefined", () => {
+    vi.unstubAllGlobals();
+    const { el } = makeEl();
+    let scroll!: ReturnType<typeof createScrollAnimation>;
+    let view!: ReturnType<typeof createViewAnimation>;
+    const dispose = createRoot(dispose => {
+      scroll = createScrollAnimation(() => el, KF);
+      view = createViewAnimation(() => el, KF);
+      return dispose;
+    });
+    flush();
+    expect(scroll()).toBeUndefined();
+    expect(view()).toBeUndefined();
+    expect(el.animate).not.toHaveBeenCalled();
+    dispose();
   });
 });

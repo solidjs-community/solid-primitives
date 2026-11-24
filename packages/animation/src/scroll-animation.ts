@@ -13,7 +13,11 @@ export type ScrollAnimationOptions = Omit<KeyframeAnimationOptions, "timeline"> 
   axis?: ScrollAxis;
 };
 
-/** Plays a scroll-driven WAAPI animation on `el` via `ScrollTimeline`. */
+/**
+ * Plays a scroll-driven WAAPI animation on `el` via `ScrollTimeline`.
+ * Throws a `ReferenceError` where `ScrollTimeline` is unsupported; `createScrollAnimation`
+ * returns `undefined` there instead.
+ */
 export function makeScrollAnimation(
   el: Element,
   keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
@@ -30,7 +34,8 @@ export function makeScrollAnimation(
 }
 
 /**
- * Reactive wrapper around {@link makeScrollAnimation}. Re-runs whenever
+ * Reactive wrapper around {@link makeScrollAnimation}. Yields `undefined` (no animation) when
+ * `ScrollTimeline` is unsupported. Re-runs whenever
  * `target`, `keyframes`, or `options` change.
  */
 export function createScrollAnimation(
@@ -48,7 +53,7 @@ export function createScrollAnimation(
   createEffect(
     () => ({ el: target(), kf: getKf(), opts: getOpts() }),
     ({ el, kf, opts }) => {
-      if (!el) {
+      if (!el || typeof ScrollTimeline === "undefined") {
         setAnimation(undefined);
         return;
       }

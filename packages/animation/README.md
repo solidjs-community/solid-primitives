@@ -133,6 +133,8 @@ function createAnimate(
 
 Plays a WAAPI animation whose progress is driven by scroll position via [`ScrollTimeline`](https://developer.mozilla.org/en-US/docs/Web/API/ScrollTimeline). No scroll listeners or RAF loops needed.
 
+> **Note:** `makeScrollAnimation` throws a `ReferenceError` where `ScrollTimeline` is unsupported; `createScrollAnimation` returns `undefined` instead. Set `fill: "both"` so the element doesn't show its un-animated style outside the scroll range.
+
 ```tsx repl
 import { render } from "@solidjs/web";
 import { onSettled } from "solid-js";
@@ -249,6 +251,8 @@ function createScrollAnimation(
 ## `makeViewAnimation` / `createViewAnimation`
 
 Plays a WAAPI animation whose progress is driven by an element's intersection with the scroll port via [`ViewTimeline`](https://developer.mozilla.org/en-US/docs/Web/API/ViewTimeline). Replaces the IntersectionObserver + class-toggle pattern.
+
+> **Note:** `makeViewAnimation` throws a `ReferenceError` where `ViewTimeline` is unsupported; `createViewAnimation` returns `undefined` instead. Set `fill: "both"` so the element doesn't flash its un-animated style before entering the range.
 
 ```tsx repl
 import { render } from "@solidjs/web";
@@ -418,7 +422,8 @@ const { snapshot, flip } = makeFlip(el, { duration: 300, easing: "ease" });
 
 const handleReorder = () => {
   snapshot();
-  setItems(prev => [...prev].reverse()); // DOM updates synchronously
+  setItems(prev => [...prev].reverse());
+  flush(); // Solid 2 batches writes — apply the DOM change before measuring
   flip();
 };
 
@@ -427,7 +432,7 @@ return <ul ref={el}>...</ul>;
 
 `flip()` is a no-op if `snapshot()` was never called or if the geometry didn't change. It resets the captured rect after each call, so a second `flip()` without a new `snapshot()` is always a no-op.
 
-> **Note:** geometry is measured via `getBoundingClientRect` (viewport coordinates). Elements inside `position: fixed` or `position: absolute` ancestors may need coordinate adjustment.
+> **Note:** geometry is measured via `getBoundingClientRect` (viewport coordinates), so scrolling between `snapshot()` and `flip()` skews the result. Size changes are animated with `scale()`, which also stretches the element's children. `fill` defaults to `"backwards"` so a `delay` doesn't show the final position early.
 
 ```ts
 function makeFlip(
@@ -441,6 +446,8 @@ function makeFlip(
 ## `makeStagger` / `createStagger`
 
 Applies a WAAPI animation to a list of elements with a per-element delay offset. The `stagger` option is added on top of the base `delay`.
+
+> **Tip:** set `fill: "backwards"` (or `"both"`) so items stay in their first keyframe during their delay instead of flashing their natural style.
 
 ```tsx repl
 import { render } from "@solidjs/web";
@@ -638,7 +645,7 @@ function Demo() {
 render(() => <Demo />, document.getElementById("app")!);
 ```
 
-`makeAnimationGroup` takes a static array. `createAnimationGroup` takes an accessor and re-derives the group whenever the list changes — each control method always operates on the most recent set of animations.
+`makeAnimationGroup` takes a static array. `createAnimationGroup` takes an accessor and reads it each time a control method is called, so every call operates on the current list of animations (after an upstream signal write, `flush()` first if you call a control synchronously).
 
 ```ts
 // Imperative — static list
@@ -697,7 +704,7 @@ function createAnimationGroup(
 
 ## `makeMotionPath` / `createMotionPath`
 
-Animates an element along a [CSS Motion Path](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_motion_path) using WAAPI — sets `offset-path` and `offset-rotate` on the element and animates `offsetDistance` from `0%` to `100%`. The path/rotation styles are left in place after the animation so `fill: "forwards"` works correctly.
+Animates an element along a [CSS Motion Path](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_motion_path) using WAAPI — sets `offset-path`, `offset-rotate` and `offset-anchor` on the element and animates `offsetDistance` from `0%` to `100%`. The path/rotation styles are left in place after the animation so `fill: "forwards"` works correctly.
 
 ```tsx repl
 import { render } from "@solidjs/web";
@@ -783,6 +790,7 @@ anim()?.pause();
 ```ts
 type MotionPathOptions = KeyframeAnimationOptions & {
   rotate?: string; // offset-rotate — "auto", "0deg", "reverse", etc. Default: "auto"
+  anchor?: string; // offset-anchor — the point of the element that follows the path. Default: "center"
 };
 
 function makeMotionPath(el: HTMLElement, path: string, options?: MotionPathOptions): Animation;
@@ -798,7 +806,7 @@ function createMotionPath(
 
 ## `makeSequence`
 
-Chains animation factories into a sequential playlist: each factory is called and its animation allowed to finish before the next factory runs. Factories are invoked **lazily** — each is called only when its turn arrives, so animations are created and started just in time rather than all upfront. A factory returning `null`/`undefined` skips that step without breaking the chain.
+Chains animation factories into a sequential playlist: each factory is called and its animation allowed to finish before the next factory runs. Factories are invoked **lazily** — each is called only when its turn arrives, so animations are created and started just in time rather than all upfront. A factory returning `null`/`undefined`, or an animation that has already finished, skips that step without breaking the chain.
 
 ```tsx repl
 import { render } from "@solidjs/web";
@@ -864,7 +872,7 @@ type AnimationFactory = () => Animation | null | undefined;
 
 type SequenceControls = {
   play: () => void; // starts from the first factory, discarding any in-progress run
-  cancel: () => void; // stops the sequence; the currently-playing animation is cancelled
+  cancel: () => void; // stops the sequence; a running animation is cancelled, a finished one is left alone so its `fill` styles stay
 };
 
 function makeSequence(factories: AnimationFactory[]): SequenceControls;
@@ -907,7 +915,7 @@ function Demo() {
 render(() => <Demo />, document.getElementById("app")!);
 ```
 
-Exit keyframes default to the enter keyframes reversed. If `show` toggles back to `true` while an exit is in progress, the exit is cancelled and the enter restarts.
+Exit keyframes default to the enter keyframes reversed (`offset` values are mirrored and per-keyframe `easing` moves with its segment). If `show` toggles back to `true` while an exit is in progress, the exit is cancelled and the enter restarts. If the exit animation is cancelled externally, the element unmounts instead of staying stuck.
 
 ```tsx
 const [show, setShow] = createSignal(false);
