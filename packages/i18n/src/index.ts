@@ -238,7 +238,8 @@ export const resolveRichTemplate: TemplateResolver<string | JSX.Element> = (
 
 export type RichTextTags = Record<string, (children: JSX.Element) => JSX.Element>;
 
-const RICH_TEXT_TAG_RE = /<(\w+)>([\s\S]*?)<\/\1>/;
+const RICH_TEXT_OPEN_TAG_RE = /<(\w+)>/g;
+const RICH_TEXT_CLOSE_TAG_RE = /<\/(\w+)>/g;
 
 /**
  * Resolves `<tag>content</tag>` markup in an already-resolved translation string into JSX, by
@@ -268,16 +269,38 @@ const RICH_TEXT_TAG_RE = /<(\w+)>([\s\S]*?)<\/\1>/;
  */
 export function richText(string: string, tags: RichTextTags): JSX.Element {
   const parts: JSX.Element[] = [];
-  let rest = string;
+
+  // Index every closing tag once, grouped by name. Opening tags are visited in increasing order, so
+  // each name's cursor only ever moves forward and the whole pass is linear. A regex like
+  // `<(\w+)>[\s\S]*?</\1>`, or an `indexOf` per opening tag, rescans the rest of the string for
+  // every unclosed tag, which is quadratic on input like `<a><a><a>…` or `<a1><a2><a3>…`.
+  const closers = new Map<string, { at: number[]; next: number }>();
+  for (const m of string.matchAll(RICH_TEXT_CLOSE_TAG_RE)) {
+    const name = m[1]!;
+    const entry = closers.get(name);
+    if (entry) entry.at.push(m.index!);
+    else closers.set(name, { at: [m.index!], next: 0 });
+  }
+
+  const openTag = new RegExp(RICH_TEXT_OPEN_TAG_RE);
+  let last = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = RICH_TEXT_TAG_RE.exec(rest))) {
-    const full = match[0];
+  while ((match = openTag.exec(string))) {
     const tag = match[1]!;
-    const inner = match[2]!;
-    parts.push(rest.slice(0, match.index));
+    const entry = closers.get(tag);
+    if (!entry) continue;
 
-    const render = tags[tag];
+    // First closer for this tag that starts after the opening tag.
+    const innerStart = match.index + match[0].length;
+    while (entry.next < entry.at.length && entry.at[entry.next]! < innerStart) entry.next++;
+    if (entry.next === entry.at.length) continue;
+    const closeStart = entry.at[entry.next]!;
+
+    parts.push(string.slice(last, match.index));
+    const inner = string.slice(innerStart, closeStart);
+
+    const render = hasOwn.call(tags, tag) ? tags[tag] : undefined;
     if (render) {
       parts.push(render(inner));
     } else {
@@ -289,9 +312,10 @@ export function richText(string: string, tags: RichTextTags): JSX.Element {
       parts.push(inner);
     }
 
-    rest = rest.slice(match.index + full.length);
+    last = closeStart + tag.length + 3; // "</" + tag + ">"
+    openTag.lastIndex = last;
   }
-  parts.push(rest);
+  parts.push(string.slice(last));
 
   return parts;
 }
