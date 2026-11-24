@@ -51,7 +51,9 @@ function handleMessage(data: SSEWorkerMessage, postBack: (msg: SSEWorkerMessage)
   }
 
   if (data.type === "disconnect") {
-    connections.get(data.id)?.();
+    // `id` comes from the posting thread, so only ever call what we stored ourselves.
+    const cleanup = connections.get(data.id);
+    if (typeof cleanup === "function") cleanup();
     connections.delete(data.id);
   }
 }

@@ -238,7 +238,7 @@ export const resolveRichTemplate: TemplateResolver<string | JSX.Element> = (
 
 export type RichTextTags = Record<string, (children: JSX.Element) => JSX.Element>;
 
-const RICH_TEXT_TAG_RE = /<(\w+)>([\s\S]*?)<\/\1>/;
+const RICH_TEXT_OPEN_TAG_RE = /<(\w+)>/g;
 
 /**
  * Resolves `<tag>content</tag>` markup in an already-resolved translation string into JSX, by
@@ -268,16 +268,30 @@ const RICH_TEXT_TAG_RE = /<(\w+)>([\s\S]*?)<\/\1>/;
  */
 export function richText(string: string, tags: RichTextTags): JSX.Element {
   const parts: JSX.Element[] = [];
-  let rest = string;
+  // Find opening tags with a linear regex, then look for the closer with `indexOf`. A single
+  // `<(\w+)>[\s\S]*?</\1>` regex rescans to the end of the string for every unclosed tag, which
+  // is quadratic on input like `<a><a><a>…`.
+  const openTag = new RegExp(RICH_TEXT_OPEN_TAG_RE);
+  // A tag name with no closer after some point has none after any later point either.
+  const unclosed = new Set<string>();
+  let last = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = RICH_TEXT_TAG_RE.exec(rest))) {
-    const full = match[0];
+  while ((match = openTag.exec(string))) {
     const tag = match[1]!;
-    const inner = match[2]!;
-    parts.push(rest.slice(0, match.index));
+    if (unclosed.has(tag)) continue;
 
-    const render = tags[tag];
+    const innerStart = match.index + match[0].length;
+    const closeStart = string.indexOf(`</${tag}>`, innerStart);
+    if (closeStart === -1) {
+      unclosed.add(tag);
+      continue;
+    }
+
+    parts.push(string.slice(last, match.index));
+    const inner = string.slice(innerStart, closeStart);
+
+    const render = hasOwn.call(tags, tag) ? tags[tag] : undefined;
     if (render) {
       parts.push(render(inner));
     } else {
@@ -289,9 +303,10 @@ export function richText(string: string, tags: RichTextTags): JSX.Element {
       parts.push(inner);
     }
 
-    rest = rest.slice(match.index + full.length);
+    last = closeStart + tag.length + 3; // "</" + tag + ">"
+    openTag.lastIndex = last;
   }
-  parts.push(rest);
+  parts.push(string.slice(last));
 
   return parts;
 }

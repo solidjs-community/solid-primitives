@@ -85,4 +85,53 @@ describe("richText", () => {
 
     warn.mockRestore();
   });
+  test("unclosed tags are left as literal text", () => {
+    expect(i18n.richText("a <b>b and <i>c</i>", { i: t => t }) as unknown as unknown[]).toEqual([
+      "a <b>b and ",
+      "c",
+      "",
+    ]);
+    expect(i18n.richText("1 < 2 > 0", {}) as unknown as unknown[]).toEqual(["1 < 2 > 0"]);
+  });
+
+  test("handles adjacent and repeated tags", () => {
+    const t = { b: (c: any) => `[${c}]` };
+    expect(i18n.richText("<b>x</b><b>y</b> <b>z</b>", t) as unknown as unknown[]).toEqual([
+      "",
+      "[x]",
+      "",
+      "[y]",
+      " ",
+      "[z]",
+      "",
+    ]);
+  });
+
+  test("a closer only counts for the matching tag name", () => {
+    const t = { b: (c: any) => `[${c}]` };
+    expect(i18n.richText("<b>x</i></b>", t) as unknown as unknown[]).toEqual(["", "[x</i>]", ""]);
+  });
+
+  test("does not call inherited Object properties as tag renderers", () => {
+    const result = i18n.richText("<constructor>x</constructor>", {}) as unknown as unknown[];
+    expect(result).toEqual(["", "x", ""]);
+  });
+
+  test("runs in linear time on many unclosed tags", () => {
+    const evil = "<a>".repeat(60_000) + "a";
+    const start = performance.now();
+    const result = i18n.richText(evil, {}) as unknown as unknown[];
+    const elapsed = performance.now() - start;
+    expect(result).toEqual([evil]);
+    // A rescan-per-tag regex needs several seconds here; the linear version needs milliseconds.
+    expect(elapsed).toBeLessThan(500);
+  });
+
+  test("runs in linear time on many unclosed tags with a closer for one other tag", () => {
+    const evil = "<a>".repeat(30_000) + "<b>x</b>";
+    const start = performance.now();
+    const result = i18n.richText(evil, { b: c => c }) as unknown as unknown[];
+    expect(performance.now() - start).toBeLessThan(500);
+    expect(result.at(-2)).toBe("x");
+  });
 });
