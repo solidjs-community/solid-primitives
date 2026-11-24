@@ -16,6 +16,14 @@ overrides:
   # Dev-tooling advisories fixed by a minor/patch release (lodash, postcss-selector-parser).
   lodash@<4.18.0: ^4.18.0
   postcss-selector-parser@<6.1.5: ^6.1.5
+  # Advisories that are only fixed on a newer line than the parent asks for (markdown frontmatter in
+  # solidbase, graphql-codegen). Remove once the parents release with them.
+  #
+  # Not overridden on purpose: satori and fflate. @vercel/og bundles its own copies into dist, so a
+  # lockfile override would not change the code that runs. 1.0.3 (patched satori) still crashes under
+  # plain Node ESM like 1.0.2 (harfbuzzjs `require("fs")`), so we stay on 1.0.1 until that is fixed.
+  toml@<5.0.1: ^5.0.1
+  '@graphql-tools/utils@<12.0.2': ^12.0.2
   # `geist` is only used for its font files, but lists `next` as a peer and `auto-install-peers`
   # would install the whole Next.js tree (and its pinned postcss) for it.
   geist>next: '-'
