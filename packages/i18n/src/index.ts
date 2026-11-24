@@ -239,6 +239,7 @@ export const resolveRichTemplate: TemplateResolver<string | JSX.Element> = (
 export type RichTextTags = Record<string, (children: JSX.Element) => JSX.Element>;
 
 const RICH_TEXT_OPEN_TAG_RE = /<(\w+)>/g;
+const RICH_TEXT_CLOSE_TAG_RE = /<\/(\w+)>/g;
 
 /**
  * Resolves `<tag>content</tag>` markup in an already-resolved translation string into JSX, by
@@ -268,25 +269,33 @@ const RICH_TEXT_OPEN_TAG_RE = /<(\w+)>/g;
  */
 export function richText(string: string, tags: RichTextTags): JSX.Element {
   const parts: JSX.Element[] = [];
-  // Find opening tags with a linear regex, then look for the closer with `indexOf`. A single
-  // `<(\w+)>[\s\S]*?</\1>` regex rescans to the end of the string for every unclosed tag, which
-  // is quadratic on input like `<a><a><a>…`.
+
+  // Index every closing tag once, grouped by name. Opening tags are visited in increasing order, so
+  // each name's cursor only ever moves forward and the whole pass is linear. A regex like
+  // `<(\w+)>[\s\S]*?</\1>`, or an `indexOf` per opening tag, rescans the rest of the string for
+  // every unclosed tag, which is quadratic on input like `<a><a><a>…` or `<a1><a2><a3>…`.
+  const closers = new Map<string, { at: number[]; next: number }>();
+  for (const m of string.matchAll(RICH_TEXT_CLOSE_TAG_RE)) {
+    const name = m[1]!;
+    const entry = closers.get(name);
+    if (entry) entry.at.push(m.index!);
+    else closers.set(name, { at: [m.index!], next: 0 });
+  }
+
   const openTag = new RegExp(RICH_TEXT_OPEN_TAG_RE);
-  // A tag name with no closer after some point has none after any later point either.
-  const unclosed = new Set<string>();
   let last = 0;
   let match: RegExpExecArray | null;
 
   while ((match = openTag.exec(string))) {
     const tag = match[1]!;
-    if (unclosed.has(tag)) continue;
+    const entry = closers.get(tag);
+    if (!entry) continue;
 
+    // First closer for this tag that starts after the opening tag.
     const innerStart = match.index + match[0].length;
-    const closeStart = string.indexOf(`</${tag}>`, innerStart);
-    if (closeStart === -1) {
-      unclosed.add(tag);
-      continue;
-    }
+    while (entry.next < entry.at.length && entry.at[entry.next]! < innerStart) entry.next++;
+    if (entry.next === entry.at.length) continue;
+    const closeStart = entry.at[entry.next]!;
 
     parts.push(string.slice(last, match.index));
     const inner = string.slice(innerStart, closeStart);
