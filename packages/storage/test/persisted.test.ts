@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   createEffect,
   createRoot,
@@ -9,7 +9,9 @@ import {
   latest,
   refresh,
   snapshot,
+  OBSERVE,
 } from "solid-js";
+import { attribution } from "solid-js/attribution";
 import {
   makePersisted,
   messageSync,
@@ -551,6 +553,84 @@ describe("makePersisted", () => {
     await new Promise(r => setTimeout(r, 200));
     flush();
     expect(signal()).toBe("init");
+  });
+
+  describe("hydration inside an owned scope", () => {
+    /** Runs `scenario` while collecting the diagnostics Solid reports and the console warnings. */
+    const withDiagnostics = <T>(
+      scenario: () => T,
+    ): [result: T, codes: string[], warnings: unknown[][]] => {
+      const warnings: unknown[][] = [];
+      const warn = vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+        warnings.push(args);
+      });
+      const release = attribution.enable();
+      const capture = OBSERVE!.diagnostics.capture();
+      try {
+        const result = scenario();
+        return [result, capture.stop().map(event => event.code as string), warnings];
+      } finally {
+        release();
+        warn.mockRestore();
+      }
+    };
+
+    it("restores a signal created in a component body or createRoot", () => {
+      mockStorage.setItem("owned1", '"persisted"');
+      const [[signal, dispose], codes, warnings] = withDiagnostics(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createSignal("default"), {
+            storage: mockStorage,
+            name: "owned1",
+          });
+          return [value, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(codes).not.toContain("REACTIVE_WRITE_IN_OWNED_SCOPE");
+      expect(warnings).toEqual([]);
+      expect(signal()).toBe("persisted");
+      dispose();
+    });
+
+    it("restores a store created in a component body or createRoot", () => {
+      mockStorage.setItem("owned2", JSON.stringify({ test: "persisted" }));
+      const [[store, dispose], codes, warnings] = withDiagnostics(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createStore({ test: "default" }), {
+            storage: mockStorage,
+            name: "owned2",
+          });
+          return [value, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(codes).not.toContain("REACTIVE_WRITE_IN_OWNED_SCOPE");
+      expect(warnings).toEqual([]);
+      expect(store.test).toBe("persisted");
+      dispose();
+    });
+
+    it("restores a value received from the sync API inside an owned scope", () => {
+      const [[signal, dispose], codes, warnings] = withDiagnostics(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createSignal("default"), {
+            storage: mockStorage,
+            name: "owned3",
+            sync: storageSync,
+          });
+          window.dispatchEvent(
+            new StorageEvent("storage", { key: "owned3", newValue: '"synced"' }),
+          );
+          return [value, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(codes).not.toContain("REACTIVE_WRITE_IN_OWNED_SCOPE");
+      expect(warnings).toEqual([]);
+      expect(signal()).toBe("synced");
+      dispose();
+    });
   });
 });
 
