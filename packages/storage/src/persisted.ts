@@ -253,9 +253,17 @@ export function makePersisted<
     let value: T;
     try {
       value = read(data);
+      // A store can only be restored from an object or an array: `reconcile` assigns the
+      // incoming value into the store's backing before it finds out that `null` or a primitive
+      // cannot be a store root, which would leave the store unreadable, so data of the wrong
+      // shape is rejected here. `null` stays valid for a signal and inside a store.
+      if (!isSignal && (typeof value !== "object" || value === null))
+        throw new TypeError(
+          `a store cannot be restored from the ${value === null ? "null" : typeof value} stored under "${name}"`,
+        );
     } catch (e) {
-      // Malformed data in the storage must not take the application down, so only deserializing
-      // (and merging) is guarded here; errors from the write itself are left to propagate.
+      // Data in the storage an app cannot use must not take it down, so deserializing, merging
+      // and the shape check are guarded here; errors from the write itself are left to propagate.
       // oxlint-disable-next-line no-console
       if (DEV) console.warn(e);
       return;
