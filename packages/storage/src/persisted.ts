@@ -8,6 +8,7 @@ import {
   snapshot,
   DEV,
   NotReadyError,
+  runWithOwner,
 } from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
@@ -237,25 +238,30 @@ export function makePersisted<
     const value = deserialize(data);
     return merge ? merge(value) : value;
   };
-  const set = isSignal
-    ? (data: string) => {
-        try {
-          const value = read(data);
-          (signal[1] as any)(() => value);
-        } catch (e) {
-          // oxlint-disable-next-line no-console
-          if (DEV) console.warn(e);
-        }
-      }
-    : (data: string) => {
-        try {
-          const value = read(data);
-          (signal[1] as any)(reconcile(value, () => true));
-        } catch (e) {
-          // oxlint-disable-next-line no-console
-          if (DEV) console.warn(e);
-        }
-      };
+  /**
+   * Stored data lands through the caller's setter, but the write is the library's own, not the
+   * caller's: `makePersisted` is usually called in a component body, and Solid 2 rejects a write
+   * made in an owned scope (`REACTIVE_WRITE_IN_OWNED_SCOPE`) - a store cannot even opt out of
+   * that rule. Detaching the owner makes the write what it already is: an external one, like a
+   * write from an event listener. Writes the caller makes through the returned setter are
+   * untouched and still have to follow the rule.
+   */
+  const write: (value: T) => void = isSignal
+    ? value => runWithOwner(null, () => (signal[1] as any)(() => value))
+    : value => runWithOwner(null, () => (signal[1] as any)(reconcile(value, () => true)));
+  const set = (data: string) => {
+    let value: T;
+    try {
+      value = read(data);
+    } catch (e) {
+      // Malformed data in the storage must not take the application down, so only deserializing
+      // (and merging) is guarded here; errors from the write itself are left to propagate.
+      // oxlint-disable-next-line no-console
+      if (DEV) console.warn(e);
+      return;
+    }
+    write(value);
+  };
   let unchanged = true;
   let timer: ReturnType<typeof setTimeout> | undefined;
 

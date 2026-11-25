@@ -33,7 +33,7 @@ import { render } from "@solidjs/web";
 import { createSignal, createStore } from "solid-js";
 import { makePersisted } from "@solid-primitives/storage";
 
-// created outside the component: restoring a stored value writes to the signal/store
+// at module scope or inside a component - restoring a stored value works in both
 const [name, setName] = makePersisted(createSignal("world"), { name: "demo-name" });
 const [counter, setCounter] = makePersisted(createStore({ clicks: 0 }), { name: "demo-clicks" });
 
@@ -91,6 +91,7 @@ type PersistedOptions<Type, StorageOptions> = {
 - to use `makePersisted` with other state management APIs, you need some adapter that will project your API to either
   the output of `createSignal` or `createStore`
 - using `makePersisted` in an SSR scenario where you have different values on the server and the client might lead to hydration mismatches; use the `hydrated` option to defer the initialization so both values are the same
+- `makePersisted` can be called anywhere, including inside a component body: restoring a stored value is an external write, so the signal does not have to be created with the `ownedWrite` option
 
 The fourth returned value is a `dispose` function. Call it to unsubscribe from sync events and cancel pending initialization. Cleanup is explicit; to tie it to a Solid owner, register it with `onCleanup`:
 
