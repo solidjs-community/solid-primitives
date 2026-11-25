@@ -632,6 +632,71 @@ describe("makePersisted", () => {
       dispose();
     });
   });
+
+  describe("stored data a store cannot be restored from", () => {
+    /** Runs `scenario` while collecting the console warnings. */
+    const withWarnings = <T>(scenario: () => T): [result: T, warnings: unknown[][]] => {
+      const warnings: unknown[][] = [];
+      const warn = vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+        warnings.push(args);
+      });
+      try {
+        return [scenario(), warnings];
+      } finally {
+        warn.mockRestore();
+      }
+    };
+
+    const persistStore = (name: string) =>
+      createRoot(disposeRoot => {
+        const [store] = makePersisted(createStore<Record<string, unknown>>({ test: "default" }), {
+          storage: mockStorage,
+          name,
+        });
+        return [store, disposeRoot] as const;
+      });
+
+    it("keeps the default when the storage holds null", () => {
+      mockStorage.setItem("invalid1", "null");
+      const [[store, dispose], warnings] = withWarnings(() => persistStore("invalid1"));
+      flush();
+      expect(snapshot(store)).toEqual({ test: "default" });
+      expect(warnings).toHaveLength(1);
+      dispose();
+    });
+
+    it("keeps the default when the storage holds a primitive", () => {
+      mockStorage.setItem("invalid2", '"not a store"');
+      const [[store, dispose], warnings] = withWarnings(() => persistStore("invalid2"));
+      flush();
+      expect(snapshot(store)).toEqual({ test: "default" });
+      expect(warnings).toHaveLength(1);
+      dispose();
+    });
+
+    it("still restores null inside a store and into a signal", () => {
+      mockStorage.setItem("invalid3", JSON.stringify({ test: null }));
+      mockStorage.setItem("invalid4", "null");
+      const [[store, signal, dispose], warnings] = withWarnings(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createStore<Record<string, unknown>>({ test: "default" }), {
+            storage: mockStorage,
+            name: "invalid3",
+          });
+          const [nullable] = makePersisted(createSignal<string | null>("default"), {
+            storage: mockStorage,
+            name: "invalid4",
+          });
+          return [value, nullable, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(store.test).toBeNull();
+      expect(signal()).toBeNull();
+      expect(warnings).toEqual([]);
+      dispose();
+    });
+  });
 });
 
 describe("storageSync", () => {
