@@ -238,14 +238,7 @@ export function makePersisted<
     const value = deserialize(data);
     return merge ? merge(value) : value;
   };
-  /**
-   * Stored data lands through the caller's setter, but the write is the library's own, not the
-   * caller's: `makePersisted` is usually called in a component body, and Solid 2 rejects a write
-   * made in an owned scope (`REACTIVE_WRITE_IN_OWNED_SCOPE`) - a store cannot even opt out of
-   * that rule. Detaching the owner makes the write what it already is: an external one, like a
-   * write from an event listener. Writes the caller makes through the returned setter are
-   * untouched and still have to follow the rule.
-   */
+  /* use runWithOwner(null, () => ...) to avoid the REACTIVE_WRITE_IN_OWNED_SCOPE error */
   const write: (value: T) => void = isSignal
     ? value => runWithOwner(null, () => (signal[1] as any)(() => value))
     : value => runWithOwner(null, () => (signal[1] as any)(reconcile(value, () => true)));
@@ -253,17 +246,11 @@ export function makePersisted<
     let value: T;
     try {
       value = read(data);
-      // A store can only be restored from an object or an array: `reconcile` assigns the
-      // incoming value into the store's backing before it finds out that `null` or a primitive
-      // cannot be a store root, which would leave the store unreadable, so data of the wrong
-      // shape is rejected here. `null` stays valid for a signal and inside a store.
       if (!isSignal && (typeof value !== "object" || value === null))
         throw new TypeError(
           `a store cannot be restored from the ${value === null ? "null" : typeof value} stored under "${name}"`,
         );
     } catch (e) {
-      // Data in the storage an app cannot use must not take it down, so deserializing, merging
-      // and the shape check are guarded here; errors from the write itself are left to propagate.
       // oxlint-disable-next-line no-console
       if (DEV) console.warn(e);
       return;
