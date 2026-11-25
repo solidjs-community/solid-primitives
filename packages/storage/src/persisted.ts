@@ -8,6 +8,7 @@ import {
   snapshot,
   DEV,
   NotReadyError,
+  runWithOwner,
 } from "solid-js";
 import { isServer } from "@solid-primitives/utils";
 
@@ -237,25 +238,25 @@ export function makePersisted<
     const value = deserialize(data);
     return merge ? merge(value) : value;
   };
-  const set = isSignal
-    ? (data: string) => {
-        try {
-          const value = read(data);
-          (signal[1] as any)(() => value);
-        } catch (e) {
-          // oxlint-disable-next-line no-console
-          if (DEV) console.warn(e);
-        }
-      }
-    : (data: string) => {
-        try {
-          const value = read(data);
-          (signal[1] as any)(reconcile(value, () => true));
-        } catch (e) {
-          // oxlint-disable-next-line no-console
-          if (DEV) console.warn(e);
-        }
-      };
+  /* use runWithOwner(null, () => ...) to avoid the REACTIVE_WRITE_IN_OWNED_SCOPE error */
+  const write: (value: T) => void = isSignal
+    ? value => runWithOwner(null, () => (signal[1] as any)(() => value))
+    : value => runWithOwner(null, () => (signal[1] as any)(reconcile(value, () => true)));
+  const set = (data: string) => {
+    let value: T;
+    try {
+      value = read(data);
+      if (!isSignal && (typeof value !== "object" || value === null))
+        throw new TypeError(
+          `a store cannot be restored from the ${value === null ? "null" : typeof value} stored under "${name}"`,
+        );
+    } catch (e) {
+      // oxlint-disable-next-line no-console
+      if (DEV) console.warn(e);
+      return;
+    }
+    write(value);
+  };
   let unchanged = true;
   let timer: ReturnType<typeof setTimeout> | undefined;
 

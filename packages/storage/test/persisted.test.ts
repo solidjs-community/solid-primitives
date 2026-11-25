@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   createEffect,
   createRoot,
@@ -9,7 +9,9 @@ import {
   latest,
   refresh,
   snapshot,
+  OBSERVE,
 } from "solid-js";
+import { attribution } from "solid-js/attribution";
 import {
   makePersisted,
   messageSync,
@@ -551,6 +553,149 @@ describe("makePersisted", () => {
     await new Promise(r => setTimeout(r, 200));
     flush();
     expect(signal()).toBe("init");
+  });
+
+  describe("hydration inside an owned scope", () => {
+    /** Runs `scenario` while collecting the diagnostics Solid reports and the console warnings. */
+    const withDiagnostics = <T>(
+      scenario: () => T,
+    ): [result: T, codes: string[], warnings: unknown[][]] => {
+      const warnings: unknown[][] = [];
+      const warn = vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+        warnings.push(args);
+      });
+      const release = attribution.enable();
+      const capture = OBSERVE!.diagnostics.capture();
+      try {
+        const result = scenario();
+        return [result, capture.stop().map(event => event.code as string), warnings];
+      } finally {
+        release();
+        warn.mockRestore();
+      }
+    };
+
+    it("restores a signal created in a component body or createRoot", () => {
+      mockStorage.setItem("owned1", '"persisted"');
+      const [[signal, dispose], codes, warnings] = withDiagnostics(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createSignal("default"), {
+            storage: mockStorage,
+            name: "owned1",
+          });
+          return [value, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(codes).not.toContain("REACTIVE_WRITE_IN_OWNED_SCOPE");
+      expect(warnings).toEqual([]);
+      expect(signal()).toBe("persisted");
+      dispose();
+    });
+
+    it("restores a store created in a component body or createRoot", () => {
+      mockStorage.setItem("owned2", JSON.stringify({ test: "persisted" }));
+      const [[store, dispose], codes, warnings] = withDiagnostics(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createStore({ test: "default" }), {
+            storage: mockStorage,
+            name: "owned2",
+          });
+          return [value, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(codes).not.toContain("REACTIVE_WRITE_IN_OWNED_SCOPE");
+      expect(warnings).toEqual([]);
+      expect(store.test).toBe("persisted");
+      dispose();
+    });
+
+    it("restores a value received from the sync API inside an owned scope", () => {
+      const [[signal, dispose], codes, warnings] = withDiagnostics(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createSignal("default"), {
+            storage: mockStorage,
+            name: "owned3",
+            sync: storageSync,
+          });
+          window.dispatchEvent(
+            new StorageEvent("storage", { key: "owned3", newValue: '"synced"' }),
+          );
+          return [value, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(codes).not.toContain("REACTIVE_WRITE_IN_OWNED_SCOPE");
+      expect(warnings).toEqual([]);
+      expect(signal()).toBe("synced");
+      dispose();
+    });
+  });
+
+  describe("stored data a store cannot be restored from", () => {
+    /** Runs `scenario` while collecting the console warnings. */
+    const withWarnings = <T>(scenario: () => T): [result: T, warnings: unknown[][]] => {
+      const warnings: unknown[][] = [];
+      const warn = vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+        warnings.push(args);
+      });
+      try {
+        return [scenario(), warnings];
+      } finally {
+        warn.mockRestore();
+      }
+    };
+
+    const persistStore = (name: string) =>
+      createRoot(disposeRoot => {
+        const [store] = makePersisted(createStore<Record<string, unknown>>({ test: "default" }), {
+          storage: mockStorage,
+          name,
+        });
+        return [store, disposeRoot] as const;
+      });
+
+    it("keeps the default when the storage holds null", () => {
+      mockStorage.setItem("invalid1", "null");
+      const [[store, dispose], warnings] = withWarnings(() => persistStore("invalid1"));
+      flush();
+      expect(snapshot(store)).toEqual({ test: "default" });
+      expect(warnings).toHaveLength(1);
+      dispose();
+    });
+
+    it("keeps the default when the storage holds a primitive", () => {
+      mockStorage.setItem("invalid2", '"not a store"');
+      const [[store, dispose], warnings] = withWarnings(() => persistStore("invalid2"));
+      flush();
+      expect(snapshot(store)).toEqual({ test: "default" });
+      expect(warnings).toHaveLength(1);
+      dispose();
+    });
+
+    it("still restores null inside a store and into a signal", () => {
+      mockStorage.setItem("invalid3", JSON.stringify({ test: null }));
+      mockStorage.setItem("invalid4", "null");
+      const [[store, signal, dispose], warnings] = withWarnings(() =>
+        createRoot(disposeRoot => {
+          const [value] = makePersisted(createStore<Record<string, unknown>>({ test: "default" }), {
+            storage: mockStorage,
+            name: "invalid3",
+          });
+          const [nullable] = makePersisted(createSignal<string | null>("default"), {
+            storage: mockStorage,
+            name: "invalid4",
+          });
+          return [value, nullable, disposeRoot] as const;
+        }),
+      );
+      flush();
+      expect(store.test).toBeNull();
+      expect(signal()).toBeNull();
+      expect(warnings).toEqual([]);
+      dispose();
+    });
   });
 });
 
