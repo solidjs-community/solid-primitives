@@ -1,0 +1,79 @@
+{
+  "name": "@solid-primitives/dismissable",
+  "version": "0.0.1",
+  "description": "Dismissable layers with a shared layer stack — Escape, outside press and outside focus handling",
+  "author": "David Di Biase <dave@solidjs.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/dismissable",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "dismissable",
+    "stage": 0,
+    "list": [
+      "makeDismissableLayer",
+      "createDismissableLayer",
+      "getLayerStack",
+      "useLayerStack",
+      "isTopLayer",
+      "getTopLayer"
+    ],
+    "category": "UI Patterns",
+    "gzip": 2557
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "dismissable",
+    "layer",
+    "overlay",
+    "escape",
+    "outside",
+    "click-outside"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "@solid-primitives/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "tsdown": {
+    "entry": "src/**/*.{ts,tsx}",
+    "outDir": "dist"
+  },
+  "scripts": {
+    "dev": "node --import=@nothing-but/node-resolve-ts ../../scripts/dev.ts",
+    "build": "pnpm -w build",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/interaction": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "solid-js": "catalog:peer"
+  },
+  "devDependencies": {
+    "solid-js": "catalog:peer"
+  }
+}
