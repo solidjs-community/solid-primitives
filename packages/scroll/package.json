@@ -25,6 +25,8 @@
     "list": [
       "createScrollPosition",
       "useWindowScrollPosition",
+      "useWindowScrollPositionRaf",
+      "makeScrollPositionListener",
       "createPreventScroll"
     ],
     "category": "Inputs",

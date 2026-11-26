@@ -13,6 +13,7 @@ Reactive primitives for observing resizing of HTML elements.
 
 - [`makeResizeObserver`](#makeresizeobserver) — Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
 - [`createResizeObserver`](#createresizeobserver) — Create resize observer instance, listening for changes to size of reactive element targets array.
+- [`createVisualViewport`](#createvisualviewport) — Reactive visual viewport size, offsets and pinch-zoom scale.
 - [`createWindowSize`](#createwindowsize) — Creates a reactive store-like object of current width and height dimensions of the browser window.
 - [`createElementSize`](#createelementsize) — Creates a reactive store-like object of current width and height dimensions of html element.
 
@@ -132,6 +133,38 @@ const [targets, setTargets] = createStore([document.body]);
 createResizeObserver(targets, ({ width, height }, el) => {});
 setTargets(prev => [...prev, element]);
 ```
+
+## `createVisualViewport`
+
+Tracks `window.visualViewport`: size, offsets and pinch-zoom scale. Useful for on-screen keyboard avoidance and pinch-zoom aware overlays. Falls back to `window.innerWidth`/`innerHeight` (scale `1`, zero offsets) when the Visual Viewport API is unsupported.
+
+```ts
+// Type
+// getVisualViewport(): VisualViewportState
+// makeVisualViewportListener(cb: (state) => void, options?: { raf?: boolean }): VoidFunction
+// createVisualViewport(options?: { raf?: boolean }): Readonly<VisualViewportState>
+// useVisualViewport(): Readonly<VisualViewportState>   (singleton root)
+
+// Example
+import { createVisualViewport } from "@solid-primitives/resize-observer";
+
+const vv = createVisualViewport({ raf: true });
+
+// keyboard height estimate: layout viewport minus visual viewport
+createEffect(
+  () => window.innerHeight - vv.height - vv.offsetTop,
+  inset => console.log("keyboard inset", inset),
+);
+vv.width;
+vv.height;
+vv.offsetTop;
+vv.offsetLeft;
+vv.pageTop;
+vv.pageLeft;
+vv.scale;
+```
+
+On the server (and during hydration) the values are `0` with `scale: 1`, and are updated after hydration settles.
 
 ## `createWindowSize`
 

@@ -48,9 +48,52 @@ export function getScrollPosition(target: Element | Window | undefined): Positio
   };
 }
 
+export type ScrollPositionOptions = {
+  /**
+   * Opt-in throttling of scroll updates.
+   * - `false` (default): every `scroll` event is delivered immediately.
+   * - `"raf"`: events are coalesced to at most one update per animation frame. The frame reads
+   *   the position at the time it fires, so the final settled position is always delivered.
+   */
+  throttle?: "raf" | false;
+};
+
+/**
+ * Non-reactive scroll listener. Calls {@link callback} with the current position on `scroll` events
+ * of {@link target}, optionally coalesced to one call per animation frame.
+ * @returns a cleanup function removing the listener and cancelling any pending frame.
+ * @example
+ * const stop = makeScrollPositionListener(el, ({ x, y }) => console.log(x, y), { throttle: "raf" });
+ */
+export function makeScrollPositionListener(
+  target: Element | Window,
+  callback: (position: Position) => void,
+  options: ScrollPositionOptions = {},
+): VoidFunction {
+  if (isServer) return () => {};
+  let frame: number | undefined;
+  const run = () => {
+    frame = undefined;
+    callback(getScrollPosition(target));
+  };
+  const handler =
+    options.throttle === "raf"
+      ? () => {
+          frame ??= requestAnimationFrame(run);
+        }
+      : run;
+  target.addEventListener("scroll", handler, { passive: true });
+  return () => {
+    target.removeEventListener("scroll", handler);
+    if (frame !== undefined) cancelAnimationFrame(frame);
+    frame = undefined;
+  };
+}
+
 /**
  * Reactive primitive providing a store-like object with current scroll position of specified target.
  * @param target element/window to listen to scroll events. can be a reactive singal.
+ * @param options `{ throttle: "raf" }` coalesces updates to one per animation frame.
  * @returns a store-like reactive object `{ x: number, y: number }` of current scroll position of {@link target}
  * @example
  * // target will be window by default
@@ -64,6 +107,7 @@ export function getScrollPosition(target: Element | Window | undefined): Positio
  */
 export function createScrollPosition(
   target?: Accessor<Element | Window | undefined> | Element | Window,
+  options: ScrollPositionOptions = {},
 ): Readonly<Position> {
   // Reactive primitives must be created on both server and client to keep Solid 2.0
   // hydration child IDs consistent — all component scopes are transparent and share
@@ -95,6 +139,8 @@ export function createScrollPosition(
     return isHydrating && v === 0 ? { ...FALLBACK_SCROLL_POSITION } : getPos();
   });
 
+  const listen = (el: Element | Window) => makeScrollPositionListener(el, trigger, options);
+
   // Refs aren't populated until mount; also refreshes position post-hydration.
   if (!isServer && (isHydrating || isFn)) onSettled(trigger);
 
@@ -107,8 +153,7 @@ export function createScrollPosition(
       () => fnTarget(),
       el => {
         if (isServer || !el) return;
-        el.addEventListener("scroll", trigger, { passive: true });
-        return () => el.removeEventListener("scroll", trigger);
+        return listen(el);
       },
     );
   } else {
@@ -117,8 +162,7 @@ export function createScrollPosition(
       () => elTarget,
       el => {
         if (isServer || !el) return;
-        el.addEventListener("scroll", trigger, { passive: true });
-        return () => el.removeEventListener("scroll", trigger);
+        return listen(el);
       },
     );
   }
@@ -141,4 +185,13 @@ export function createScrollPosition(
 export const useWindowScrollPosition: ReturnType<typeof createHydratableSingletonRoot> =
   /*#__PURE__*/ createHydratableSingletonRoot(() =>
     createScrollPosition(isServer ? () => undefined : window),
+  );
+
+/**
+ * Like {@link useWindowScrollPosition}, but updates are coalesced to one per animation frame.
+ * Singleton root: shared between dependents.
+ */
+export const useWindowScrollPositionRaf: ReturnType<typeof createHydratableSingletonRoot> =
+  /*#__PURE__*/ createHydratableSingletonRoot(() =>
+    createScrollPosition(isServer ? () => undefined : window, { throttle: "raf" }),
   );

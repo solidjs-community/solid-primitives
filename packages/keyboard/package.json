@@ -22,7 +22,9 @@
       "useCurrentlyHeldKey",
       "useKeyDownSequence",
       "createKeyHold",
-      "createShortcut"
+      "createShortcut",
+      "createShortcuts",
+      "makeShortcutRegistry"
     ],
     "category": "Inputs",
     "gzip": 1767

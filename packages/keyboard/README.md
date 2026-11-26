@@ -19,6 +19,7 @@ A library of reactive primitives for handling user keyboard input.
 - [`createKeyHold`](#createkeyhold) — Provides a signal indicating if provided key is currently being held down.
 - [`createShortcut`](#createshortcut) — Creates a keyboard shortcut observer.
 - [`createKeyDown`](#createkeydown) — Listens for a keydown event for a specific key on a document.
+- [`createShortcuts`](#createshortcuts) / [`makeShortcutRegistry`](#makeshortcutregistry) — Register many shortcuts through a single listener pair, with dynamic add/remove and a deterministic conflict policy.
 
 ## Installation
 
@@ -327,6 +328,64 @@ createKeyDown("Escape", e => close(), {
   disabled: () => !isOpen(),
   ownerDocument: () => iframeEl.contentDocument ?? document,
 });
+```
+
+## `createShortcuts`
+
+Registers many shortcuts at once through a single `keydown`/`keyup` listener pair. Accepts a list, a map of key combination to handler, or an accessor of either; when the accessor changes, the shortcuts are re-registered. `createShortcut` is unchanged.
+
+```ts
+// Type
+function createShortcuts(
+  shortcuts: MaybeAccessor<
+    ShortcutDefinition[] | Record<string, Handler | (Options & { handler: Handler })>
+  >,
+  options?: { scope?: MaybeAccessor<EventTarget | undefined> },
+): void;
+
+// Example
+createShortcuts({
+  "Control+K": () => openPalette(),
+  Escape: { handler: () => close(), enabled: isOpen, preventDefault: false },
+});
+
+createShortcuts(
+  () => [{ keys: ["Control", "S"], handler: save, ignoreInputs: false }],
+  { scope: () => panelEl }, // only while focus is inside the element
+);
+```
+
+Each definition is `{ keys, handler, preventDefault?, requireReset?, ignoreInputs?, enabled? }`:
+
+- `keys` — an array (`["Control", "K"]`) or a `+`-joined string (`"Ctrl+Shift+K"`, `"Control++"` for the plus key). Case-insensitive; `Ctrl`, `Cmd`/`Command`, `Option` and `Space` are aliases. Matching is **exact and order-independent**: `Control+K` does not fire for `Control+Shift+K`.
+- `handler(event)` — called with the `KeyboardEvent`.
+- `preventDefault` — defaults to `true`.
+- `requireReset` — fire once until all keys are released. Defaults to `false`.
+- `ignoreInputs` — skip while focus is in an `input`, `textarea`, `select` or `contenteditable`. Defaults to `false` (same as `createShortcut`'s `ignoreWithinInputs`).
+- `enabled` — boolean or accessor, read at key time. A disabled shortcut never matches.
+
+Key repeat is ignored. Modifier state is taken from the event's `ctrlKey`/`shiftKey`/`altKey`/`metaKey` flags, and releasing `Meta` clears all held keys (macOS sends no keyup for keys held with Meta).
+
+### Conflict policy
+
+At most **one** shortcut fires per keydown. Because matching is on the exact key set, all candidates are equally specific, so the **most recently registered eligible shortcut wins** (for lists and maps: the last matching entry). "Eligible" means enabled, not suppressed by `ignoreInputs` and not blocked by `requireReset`, so a disabled or input-ignoring newer shortcut never shadows an older one. Only the winner's `preventDefault` applies.
+
+## `makeShortcutRegistry`
+
+The non-reactive base of `createShortcuts`. Listeners are attached when the first shortcut is registered and removed when the last is unregistered or on `clear()`. It also clears itself when its owner is disposed. On the server it returns an inert registry.
+
+```ts
+// Type
+function makeShortcutRegistry(options?: { scope?: EventTarget }): {
+  register(definition: ShortcutDefinition): VoidFunction; // returns unregister
+  clear(): void;
+};
+
+// Example
+const registry = makeShortcutRegistry({ scope: dialogEl });
+const unregister = registry.register({ keys: "Escape", handler: close });
+unregister(); // remove one
+registry.clear(); // remove all and detach listeners
 ```
 
 ## Changelog

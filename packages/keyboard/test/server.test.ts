@@ -51,3 +51,23 @@ describe("SSR", () => {
       dispose();
     }));
 });
+
+describe("SSR shortcut registry", async () => {
+  const { createShortcuts, makeShortcutRegistry } = await import("../src/index.js");
+
+  it("makeShortcutRegistry returns an inert registry", () => {
+    const registry = makeShortcutRegistry();
+    const off = registry.register({ keys: "Control+K", handler: () => {} });
+    expect(typeof off).toBe("function");
+    expect(() => {
+      off();
+      registry.clear();
+    }).not.toThrow();
+  });
+
+  it("createShortcuts is a no-op on the server", () =>
+    createRoot(dispose => {
+      expect(() => createShortcuts({ "Control+K": () => {} })).not.toThrow();
+      dispose();
+    }));
+});

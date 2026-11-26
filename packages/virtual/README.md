@@ -123,6 +123,46 @@ function MyComp(): JSX.Element {
 }
 ```
 
+### Variable row heights
+
+`rowHeight` may also be a function `(index) => number` for rows whose heights are known up front. The fixed numeric path is untouched; the function form uses prefix sums and a binary search to find the visible range.
+
+```ts
+// Type
+type RowHeight = number | ((index: number) => number);
+// Example
+const [virtual, onScroll, helpers] = createVirtualList({
+  items,
+  rootHeight: 400,
+  rowHeight: i => (items[i].expanded ? 120 : 40),
+});
+virtual().offsets; // offset of each row in visibleItems, in the same order
+helpers.getRowOffset(25); // offset of any row; getRowOffset(items.length) is the total height
+helpers.scrollToIndex(25); // scrolls the container seen by onScroll (or pass one explicitly)
+```
+
+A function must declare its `index` parameter. A zero-parameter function is read as an accessor of a fixed height, as before.
+
+### Measured row heights
+
+For unknown heights, pass `estimatedRowHeight`. Rows are assumed to be that tall until you report their real height with `helpers.measureElement`, which reads the row index from the element's `data-index` attribute (or takes it as a second argument), measures it and keeps it up to date with a `ResizeObserver` where available. Offsets, total height and the visible range update as measurements arrive. Elements with no layout (height 0) are ignored, and measurements are cleared for indexes beyond a shrunken list.
+
+```tsx
+// Type
+type MeasureElement = (el: Element | null | undefined, index?: number) => void;
+// Example
+const [virtual, onScroll, { measureElement }] = createVirtualList({
+  items,
+  rootHeight: 400,
+  estimatedRowHeight: 48,
+});
+// <For each={virtual().visibleItems} keyed={false}>
+//   {(item, i) => <div data-index={virtual().firstIndex + i} ref={measureElement}>{item()}</div>}
+// </For>
+```
+
+Other helpers: `getRowHeight(index)`, `unmeasureElement(el)` (also done automatically for disconnected elements) and `resetMeasurements()`. `<VirtualList estimatedRowHeight={48}>` does all of this for you by wrapping each row in a measured element.
+
 ### `<VirtualList />`
 
 `<VirtualList />` is a basic, unstyled virtual list component you can drop into projects without modification.
@@ -173,7 +213,7 @@ render(() => <Demo />, document.getElementById("app")!);
 ```
 
 The tests describe the exact behavior and how overscanCount handles the start/end of the list in more detail.
-Note that the component only handles vertical lists where the number of items is known and the height of an individual item is fixed.
+Note that the component only handles vertical lists where the number of items is known. Row heights can be fixed, given by a function, or measured (see above).
 
 #### Styling the rows with `class`
 

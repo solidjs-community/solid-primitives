@@ -1,6 +1,12 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSingletonRoot } from "@solid-primitives/rootless";
-import { arrayEquals, INTERNAL_OPTIONS, type MaybeAccessor, access } from "@solid-primitives/utils";
+import {
+  arrayEquals,
+  INTERNAL_OPTIONS,
+  type MaybeAccessor,
+  access,
+  tryOnCleanup,
+} from "@solid-primitives/utils";
 import { type Accessor, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 
@@ -504,6 +510,255 @@ export function createKeyDown(
       };
       document.addEventListener("keydown", handler);
       return () => document.removeEventListener("keydown", handler);
+    },
+    { transparent: true },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shortcut registry
+// ---------------------------------------------------------------------------
+
+/** A shortcut definition accepted by {@link makeShortcutRegistry} and {@link createShortcuts}. */
+export interface ShortcutDefinition {
+  /**
+   * The keys that make up the shortcut, as an array (`["Control", "K"]`) or a `+`-joined string
+   * (`"Control+K"`, `"Ctrl+Shift++"`). Matching is case-insensitive, order-independent and exact:
+   * the held keys must be the same set. `Ctrl`, `Cmd`/`Command`, `Option` and `Space` are aliases.
+   */
+  keys: KbdKey[] | string;
+  /** Called when the shortcut is triggered. */
+  handler: (event: KeyboardEvent) => void;
+  /** Call `preventDefault()` on the triggering event. Defaults to `true`. */
+  preventDefault?: boolean;
+  /** Fire only once until all keys have been released. Defaults to `false`. */
+  requireReset?: boolean;
+  /** Ignore the shortcut while focus is in an input, textarea, select or contenteditable. Defaults to `false`. */
+  ignoreInputs?: boolean;
+  /** Read when a key is pressed; a disabled shortcut does not match and does not block others. Defaults to `true`. */
+  enabled?: MaybeAccessor<boolean | undefined>;
+}
+
+export interface ShortcutRegistryOptions {
+  /** Element (or any event target) to listen on. Defaults to `window`. An element only sees keys while focus is inside it. */
+  scope?: EventTarget;
+}
+
+export interface ShortcutRegistry {
+  /** Registers a shortcut. Returns a function that unregisters it. */
+  register(definition: ShortcutDefinition): VoidFunction;
+  /** Unregisters every shortcut and removes the underlying listeners. */
+  clear(): void;
+}
+
+const KEY_ALIASES: Record<string, string> = {
+  CTRL: "CONTROL",
+  CMD: "META",
+  COMMAND: "META",
+  OPTION: "ALT",
+  SPACE: " ",
+};
+
+/** Normalises a key list or `+`-joined string to a de-duplicated list of upper-cased keys. */
+function normalizeShortcutKeys(keys: KbdKey[] | string): string[] {
+  const list = typeof keys === "string" ? keys.split(/(?<=.)\+(?=.)/) : keys;
+  const out = new Set<string>();
+  for (const k of list) {
+    const key = k === " " ? k : k.trim();
+    if (!key) continue;
+    const upper = key.toUpperCase();
+    out.add(KEY_ALIASES[upper] ?? upper);
+  }
+  return [...out];
+}
+
+const MODIFIER_FLAGS = [
+  ["SHIFT", "shiftKey"],
+  ["ALT", "altKey"],
+  ["CONTROL", "ctrlKey"],
+  ["META", "metaKey"],
+] as const;
+
+interface RegistryEntry {
+  keys: Set<string>;
+  def: ShortcutDefinition;
+  fired: boolean;
+}
+
+/**
+ * Creates a registry of keyboard shortcuts that shares ONE `keydown`/`keyup` listener pair
+ * (plus `blur`/`contextmenu` resets) between all of them. Listeners are attached when the first
+ * shortcut is registered and removed when the last one is unregistered, or on `clear()`.
+ *
+ * **Conflict policy:** at most one shortcut fires per keydown. Shortcuts are matched on the exact
+ * key set, so all candidates are equally specific; among the *eligible* ones (enabled, not
+ * suppressed by `ignoreInputs`, not blocked by `requireReset`) the **most recently registered wins**.
+ * An ineligible shortcut never shadows an earlier one. Only the winner's `preventDefault` applies.
+ *
+ * If called inside an owner, the registry is cleared automatically on cleanup. Returns an inert
+ * registry on the server.
+ *
+ * @example
+ * ```ts
+ * const registry = makeShortcutRegistry();
+ * const off = registry.register({ keys: "Control+K", handler: () => openPalette() });
+ * off(); // unregister one
+ * registry.clear(); // remove everything
+ * ```
+ */
+export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): ShortcutRegistry {
+  if (isServer) {
+    return { register: () => () => {}, clear: () => {} };
+  }
+
+  const entries: RegistryEntry[] = [];
+  let removeListeners: VoidFunction | undefined;
+  let pressed: string[] = [];
+
+  const resetState = () => {
+    pressed = [];
+    for (const entry of entries) entry.fired = false;
+  };
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.repeat || typeof e.key !== "string") return;
+    const key = e.key.toUpperCase();
+
+    // modifier flags on the event are authoritative: adds modifiers held before we started
+    // listening and drops stale ones (e.g. a missed keyup on macOS)
+    const next = pressed.filter(k => !MODIFIER_FLAGS.some(([name]) => name === k));
+    const isModifier = MODIFIER_FLAGS.some(([name]) => name === key);
+    const mods = MODIFIER_FLAGS.filter(
+      ([name, flag]) => e[flag] || (isModifier && name === key),
+    ).map(([name]) => name);
+    pressed = [...mods, ...next.filter(k => !mods.includes(k as never))];
+    if (!pressed.includes(key)) pressed.push(key);
+
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const entry = entries[i]!;
+      const { def } = entry;
+      if (entry.keys.size !== pressed.length || !entry.keys.has(key)) continue;
+      if (!pressed.every(k => entry.keys.has(k))) continue;
+      if (def.requireReset && entry.fired) continue;
+      if (def.ignoreInputs && isEditableTarget(e.target)) continue;
+      if (access(def.enabled) === false) continue;
+
+      entry.fired = true;
+      if (def.preventDefault !== false) e.preventDefault();
+      def.handler(e);
+      return; // the winner takes it all
+    }
+  };
+
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (typeof e.key !== "string") return;
+    const key = e.key.toUpperCase();
+    // macOS fires no keyup for keys held together with Meta; its release clears everything
+    // (https://github.com/solidjs-community/solid-primitives/issues/269)
+    if (key === "META") return resetState();
+    pressed = pressed.filter(k => k !== key);
+    if (pressed.length === 0) for (const entry of entries) entry.fired = false;
+  };
+
+  const attach = () => {
+    const scope = options.scope ?? window;
+    // Raw listeners: makeEventListener would bind cleanup to whichever owner happens to call
+    // register() first, silently killing the registry when that owner is disposed.
+    const onContextMenu = (e: MouseEvent) => {
+      e.defaultPrevented || resetState();
+    };
+    scope.addEventListener("keydown", onKeyDown as (e: Event) => void);
+    scope.addEventListener("keyup", onKeyUp as (e: Event) => void);
+    window.addEventListener("blur", resetState);
+    window.addEventListener("contextmenu", onContextMenu as (e: Event) => void);
+    const offs = [
+      () => scope.removeEventListener("keydown", onKeyDown as (e: Event) => void),
+      () => scope.removeEventListener("keyup", onKeyUp as (e: Event) => void),
+      () => window.removeEventListener("blur", resetState),
+      () => window.removeEventListener("contextmenu", onContextMenu as (e: Event) => void),
+    ];
+    removeListeners = () => offs.forEach(off => off());
+  };
+
+  const detach = () => {
+    removeListeners?.();
+    removeListeners = undefined;
+    resetState();
+  };
+
+  const clear = () => {
+    entries.length = 0;
+    detach();
+  };
+
+  const register = (def: ShortcutDefinition): VoidFunction => {
+    const keys = normalizeShortcutKeys(def.keys);
+    if (!keys.length) return () => {};
+    const entry: RegistryEntry = { keys: new Set(keys), def, fired: false };
+    entries.push(entry);
+    if (!removeListeners) attach();
+    return () => {
+      const i = entries.indexOf(entry);
+      if (i === -1) return;
+      entries.splice(i, 1);
+      if (!entries.length) detach();
+    };
+  };
+
+  tryOnCleanup(clear);
+
+  return { register, clear };
+}
+
+export type ShortcutOptions = Omit<ShortcutDefinition, "keys" | "handler">;
+/** Shortcuts as a list, or as a map of key combination to handler / handler + options. */
+export type ShortcutsInput =
+  | ShortcutDefinition[]
+  | Record<
+      string,
+      ShortcutDefinition["handler"] | (ShortcutOptions & Pick<ShortcutDefinition, "handler">)
+    >;
+
+function toDefinitions(input: ShortcutsInput | undefined): ShortcutDefinition[] {
+  if (!input) return [];
+  if (Array.isArray(input)) return input;
+  return Object.entries(input).map(([keys, value]) =>
+    typeof value === "function" ? { keys, handler: value } : { ...value, keys },
+  );
+}
+
+/**
+ * Registers many keyboard shortcuts at once through a single listener pair
+ * (see {@link makeShortcutRegistry} for the conflict policy: most recently registered eligible
+ * shortcut wins, which here means the **last matching entry** of the list / map).
+ *
+ * The shortcuts may be an accessor; when it changes, the shortcuts are re-registered.
+ * Do not read signals from `handler`/`enabled` expecting tracking — they run on key events.
+ * Prefer an `enabled` accessor over swapping the list for toggling a shortcut.
+ *
+ * @param shortcuts A list of {@link ShortcutDefinition}, or a map of `"Control+K"` to handler or `{ handler, ...options }`; or an accessor of either.
+ * @param options `scope` — element to listen on instead of `window` (may be an accessor).
+ *
+ * @example
+ * ```ts
+ * createShortcuts({
+ *   "Control+K": () => openPalette(),
+ *   "Escape": { handler: close, enabled: isOpen },
+ * });
+ * ```
+ */
+export function createShortcuts(
+  shortcuts: MaybeAccessor<ShortcutsInput>,
+  options: { scope?: MaybeAccessor<EventTarget | undefined> } = {},
+): void {
+  if (isServer) return;
+
+  createEffect(
+    () => ({ defs: toDefinitions(access(shortcuts)), scope: access(options.scope) }),
+    ({ defs, scope }) => {
+      const registry = makeShortcutRegistry({ scope });
+      for (const def of defs) registry.register(def);
+      return () => registry.clear();
     },
     { transparent: true },
   );

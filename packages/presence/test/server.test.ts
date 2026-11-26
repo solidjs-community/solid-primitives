@@ -41,3 +41,14 @@ describe("on server", () => {
     expect(second.isVisible()).toBe(false);
   });
 });
+
+describe("on server with animations", () => {
+  test("animations option and attrs are inert", () => {
+    const [show] = createSignal(true);
+    const p = createPresence(show, { transitionDuration: 50, animations: true });
+    p.ref(null);
+    expect(p.isMounted()).toBe(true);
+    expect(p.attrs()["data-ending-style"]).toBeUndefined();
+    expect(p.attrs()["data-starting-style"]).toBeUndefined();
+  });
+});

@@ -31,6 +31,10 @@
       "createFocusTrap",
       "createFocusRestore",
       "createFocusGroup",
+      "makeRovingScope",
+      "createRovingScope",
+      "makePressKeepsFocus",
+      "createPressKeepsFocus",
       "makeFocusListener",
       "createFocusSignal"
     ],

@@ -18,7 +18,8 @@
     "list": [
       "copyClipboard",
       "writeClipboard",
-      "createClipboard"
+      "createClipboard",
+      "createCopyToClipboard"
     ],
     "category": "Browser APIs",
     "gzip": 927

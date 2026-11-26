@@ -18,6 +18,7 @@
     "list": [
       "createResizeObserver",
       "createWindowSize",
+      "createVisualViewport",
       "createElementSize"
     ],
     "category": "Display & Media",

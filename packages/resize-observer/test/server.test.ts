@@ -1,5 +1,13 @@
 import { describe, test, expect, vi } from "vitest";
-import { createResizeObserver, createElementSize, createWindowSize } from "../src/index.js";
+import {
+  createResizeObserver,
+  createElementSize,
+  createWindowSize,
+  createVisualViewport,
+  getVisualViewport,
+  makeVisualViewportListener,
+  useVisualViewport,
+} from "../src/index.js";
 import { renderToString } from "@solidjs/web";
 
 describe("server", () => {
@@ -25,6 +33,24 @@ describe("server", () => {
     const size = createWindowSize();
     expect(size.width).toBe(0);
     expect(size.height).toBe(0);
+  });
+
+  test("visual viewport server defaults", () => {
+    const defaults = {
+      width: 0,
+      height: 0,
+      offsetTop: 0,
+      offsetLeft: 0,
+      pageTop: 0,
+      pageLeft: 0,
+      scale: 1,
+    };
+    expect(getVisualViewport()).toEqual(defaults);
+    expect({ ...createVisualViewport() }).toEqual(defaults);
+    expect(useVisualViewport().scale).toBe(1);
+    const cb = vi.fn();
+    makeVisualViewportListener(cb)();
+    expect(cb).not.toBeCalled();
   });
 
   test("createElementSize does not read targets or construct observers during SSR", () => {
