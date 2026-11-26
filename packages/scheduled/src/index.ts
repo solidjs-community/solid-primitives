@@ -75,8 +75,9 @@ export const throttle: ScheduleCallback = (callback, wait) => {
     if (isThrottled) return;
     isThrottled = true;
     timeoutId = setTimeout(() => {
-      callback(...lastArgs);
+      // reset first, so a throwing callback or a call made from inside it doesn't leave the throttle stuck
       isThrottled = false;
+      callback(...lastArgs);
     }, wait);
   };
 
@@ -124,8 +125,8 @@ export const scheduleIdle: ScheduleCallback = isServer
           isDeferred = true;
           id = requestIdleCallback(
             () => {
-              callback(...lastArgs);
               isDeferred = false;
+              callback(...lastArgs);
             },
             { timeout: maxWait },
           );
@@ -236,8 +237,10 @@ export function leadingAndTrailing<Args extends unknown[]>(
   let state = State.Ready;
 
   const scheduled = schedule((args: Args) => {
-    state === State.Trailing && callback(...args);
+    const isTrailing = state === State.Trailing;
+    // reset first, so a throwing callback or a trigger call made from inside it isn't lost
     state = State.Ready;
+    isTrailing && callback(...args);
   }, wait);
 
   const fn: typeof callback = (...args) => {
