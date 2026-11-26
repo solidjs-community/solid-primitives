@@ -29,6 +29,8 @@ import {
   noop,
 } from "@solid-primitives/utils";
 
+export * from "./inert.ts";
+
 // ---- ariaHideOutside / createHideOutside ----
 
 /**

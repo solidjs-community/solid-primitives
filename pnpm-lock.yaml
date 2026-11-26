@@ -686,19 +686,6 @@ importers:
         specifier: catalog:peer
         version: 2.0.0
 
-  packages/inert:
-    dependencies:
-      '@solid-primitives/utils':
-        specifier: workspace:^
-        version: link:../utils
-    devDependencies:
-      '@solidjs/web':
-        specifier: 'catalog:'
-        version: 2.0.0(solid-js@2.0.0)
-      solid-js:
-        specifier: catalog:peer
-        version: 2.0.0
-
   packages/input-mask:
     devDependencies:
       solid-js:

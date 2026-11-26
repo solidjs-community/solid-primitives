@@ -1,6 +1,11 @@
 import { createEffect } from "solid-js";
-import { isServer } from "@solidjs/web";
-import { access, noop, type MaybeAccessor } from "@solid-primitives/utils";
+import {
+  type MaybeAccessor,
+  access,
+  globalRegistry,
+  isServer,
+  noop,
+} from "@solid-primitives/utils";
 
 /** How outside nodes are hidden. */
 export type InertStrategy = "aria-hidden" | "inert" | "both";
@@ -47,10 +52,21 @@ type Layer = {
   sweep: () => void;
 };
 
-/** Shared per-node ref counts: the reason stacked layers can close in any order. */
-const states = new WeakMap<Element, NodeState>();
-/** Open layers, lowest first. Upper layers' targets are protected from lower layers. */
-const layers: Layer[] = [];
+type InertRegistry = {
+  /** Shared per-node ref counts: the reason stacked layers can close in any order. */
+  states: WeakMap<Element, NodeState>;
+  /** Open layers, lowest first. Upper layers' targets are protected from lower layers. */
+  layers: Layer[];
+};
+
+// Lives on `globalThis` (not in module-scope bindings) so it stays correct when the app's dependency
+// graph ends up with more than one copy of this package: module-scope state would be split across the
+// copies, and one copy's cleanup could then restore attributes another copy still needs.
+const getRegistry = (): InertRegistry =>
+  globalRegistry<InertRegistry>("@solid-primitives/interaction:inert", () => ({
+    states: new WeakMap(),
+    layers: [],
+  }));
 
 function toList<T extends Element>(
   value: T | readonly (T | null | undefined)[] | null | undefined,
@@ -61,6 +77,7 @@ function toList<T extends Element>(
 }
 
 function acquire(el: Element, strategy: InertStrategy): Hold | undefined {
+  const { states } = getRegistry();
   let state = states.get(el);
   if (!state) {
     state = { ariaCount: 0, ariaPrev: null, inertCount: 0, inertPrev: null };
@@ -94,6 +111,7 @@ function acquire(el: Element, strategy: InertStrategy): Hold | undefined {
 }
 
 function release(el: Element, hold: Hold): void {
+  const { states } = getRegistry();
   const state = states.get(el);
   if (!state) return;
   if (hold.aria && state.ariaCount > 0 && --state.ariaCount === 0) {
@@ -135,6 +153,7 @@ export function makeInertOthers(
   options: InertOthersOptions = {},
 ): VoidFunction {
   if (isServer) return noop;
+  const { layers } = getRegistry();
   const own = toList(targets);
   if (own.length === 0) return noop;
 

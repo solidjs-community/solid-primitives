@@ -519,6 +519,76 @@ function Modal(props: { open: boolean; onClose: () => void }) {
 }
 ```
 
+## `makeInertOthers`
+
+Hides everything outside a modal layer from assistive technology and user interaction by marking it `aria-hidden` and/or `inert`. Where [`ariaHideOutside`](#ariahideoutside) tags every node outside the targets, this one walks from each target up to the root and hides only the sibling subtrees that do not contain a target, and it is built for stacked layers.
+
+```ts
+// Type
+type InertStrategy = "aria-hidden" | "inert" | "both";
+
+type InertOthersOptions = {
+  strategy?: InertStrategy; // default "aria-hidden"
+  ignore?: Element | readonly (Element | null | undefined)[] | null;
+  root?: Element; // default: the target's document.body
+};
+
+function makeInertOthers(
+  targets: HTMLElement | readonly HTMLElement[] | null | undefined,
+  options?: InertOthersOptions,
+): VoidFunction;
+
+// Example
+import { makeInertOthers } from "@solid-primitives/interaction";
+
+const restore = makeInertOthers(dialogEl, { strategy: "both", ignore: toastRegionEl });
+// ...when the dialog closes
+restore();
+```
+
+## `createInertOthers`
+
+Reactive, owner-aware version of `makeInertOthers`, toggled by a signal.
+
+```ts
+// Type
+function createInertOthers(
+  targets: MaybeAccessor<HTMLElement | readonly HTMLElement[] | null | undefined>,
+  enabled?: MaybeAccessor<boolean>, // default true
+  options?: Omit<InertOthersOptions, "ignore"> & { ignore?: MaybeAccessor<...> },
+): void;
+
+// Example
+import { createSignal } from "solid-js";
+import { createInertOthers } from "@solid-primitives/interaction";
+
+const [dialog, setDialog] = createSignal<HTMLElement>();
+const [open, setOpen] = createSignal(false);
+
+createInertOthers(dialog, open);
+
+<div ref={setDialog} role="dialog" />;
+```
+
+The layer is applied after render, so a ref signal works as `targets`. Changing `targets`, `enabled` or `ignore` restores the DOM and re-applies it. Disposal of the owner restores it too.
+
+### Behavior
+
+- **Skipped nodes:** `ignore` elements, live regions (`aria-live` other than `off`, and `role` `alert` / `status` / `log`; only with the default `aria-hidden` strategy, and never a live region that contains a lower layer's target), `script` / `style` / `template` / `noscript` / `link` / `meta`, and nodes that were already `aria-hidden="true"` (or `inert`) before the layer opened. A branch that contains a protected element stays exposed and its other children are hidden.
+- **Restore:** a node's previous `aria-hidden` / `inert` value (or absence) is put back when its last holder closes.
+- **Stacking:** opening a second layer hides the first one and exposes the second. Each node keeps a shared per-strategy ref count, so the layers can close in any order and a node stays hidden until every layer that hides it is closed.
+- **Dynamic content:** nodes appended to a walked parent are hidden, and nodes removed from the document are released.
+- **Duplicate copies:** the shared state lives on `globalThis`, so it stays correct if more than one copy of this package ends up installed.
+- **Server:** both are no-ops.
+- **Notes:** `inert` is not supported in every older browser, use `"both"` for the widest coverage. Attributes set by other code on a node while a layer holds it are overwritten on restore.
+
+### `ariaHideOutside` or `makeInertOthers`?
+
+They do not share state. Each one leaves alone a node the other already marked `aria-hidden="true"`, so mixing them will not fight over a node, but they will not stack with each other either. Prefer one per app.
+
+- Use `makeInertOthers` / `createInertOthers` for modal layers that can stack, need `inert`, an `ignore` list, or previous attribute values restored.
+- Use `ariaHideOutside` / `createHideOutside` when you need `alwaysVisibleSelector`, or already rely on its behavior.
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)

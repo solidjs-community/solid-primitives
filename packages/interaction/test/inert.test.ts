@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
 import { createInertOthers, makeInertOthers } from "../src/index.js";
 
@@ -443,5 +443,35 @@ describe("createInertOthers", () => {
     flush();
     for (const n of [app, dialog, upperEl]) expect(n.hasAttribute("aria-hidden")).toBe(false);
     dispose();
+  });
+});
+
+describe("duplicate copies of the package", () => {
+  test("share per-node state, so one copy's cleanup never reveals what another still hides", async () => {
+    const wrapper = el("section");
+    wrapper.appendChild(dialog);
+    const other = el("div", { id: "other" });
+    const extra = el("div", { id: "extra" });
+
+    // a second, independent evaluation of the module, as with two installed copies
+    vi.resetModules();
+    const copy = await import("../src/inert.ts?copy");
+    expect(copy.makeInertOthers).not.toBe(makeInertOthers);
+
+    const cleanupA = makeInertOthers(dialog);
+    const cleanupB = copy.makeInertOthers(extra);
+    // `extra` is the only target of B, so A's target `dialog` is hidden by B while A hides `extra`
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(other.getAttribute("aria-hidden")).toBe("true");
+
+    cleanupA();
+    // B still hides everything that is not `extra`, even though A (another copy) just closed
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(other.getAttribute("aria-hidden")).toBe("true");
+    expect(extra.hasAttribute("aria-hidden")).toBe(false);
+
+    cleanupB();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    expect(other.hasAttribute("aria-hidden")).toBe(false);
   });
 });

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { createInteractOutside } from "../src/index.js";
+import { createRoot } from "solid-js";
+import { createInertOthers, createInteractOutside, makeInertOthers } from "../src/index.js";
 
 describe("createInteractOutside on server", () => {
   it("can be called without error", () => {
@@ -33,5 +34,23 @@ describe("createInteractOutside on server", () => {
     expect(() => {
       createInteractOutside({ shouldExcludeElement: () => true }, () => undefined);
     }).not.toThrow();
+  });
+});
+
+describe("inert on server", () => {
+  it("makeInertOthers returns a no-op cleanup", () => {
+    const cleanup = makeInertOthers({} as any);
+    expect(typeof cleanup).toBe("function");
+    expect(() => cleanup()).not.toThrow();
+    expect(() => makeInertOthers(undefined, { strategy: "both" })()).not.toThrow();
+  });
+
+  it("createInertOthers does nothing", () => {
+    expect(() =>
+      createRoot(dispose => {
+        createInertOthers(() => undefined, true, { strategy: "inert" });
+        dispose();
+      }),
+    ).not.toThrow();
   });
 });
