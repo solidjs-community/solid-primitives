@@ -237,11 +237,10 @@ export function leadingAndTrailing<Args extends unknown[]>(
   let state = State.Ready;
 
   const scheduled = schedule((args: Args) => {
-    try {
-      state === State.Trailing && callback(...args);
-    } finally {
-      state = State.Ready;
-    }
+    const isTrailing = state === State.Trailing;
+    // reset first, so a throwing callback or a trigger call made from inside it isn't lost
+    state = State.Ready;
+    isTrailing && callback(...args);
   }, wait);
 
   const fn: typeof callback = (...args) => {
