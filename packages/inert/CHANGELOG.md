@@ -1,1 +1,0 @@
-# @solid-primitives/inert
