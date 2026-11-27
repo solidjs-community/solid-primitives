@@ -497,6 +497,7 @@ function createScheduledAccessor<T>(
     if (isEqual(value, prev)) {
       clearMaxWait();
       resolve = undefined;
+      if (windowOpen) trigger(value);
       return value;
     }
 

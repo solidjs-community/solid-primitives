@@ -178,6 +178,42 @@ describe("createDebounced", () => {
     dispose();
   });
 
+  test("an equal change still resets the debounce window", async () => {
+    const { setSource, value, dispose } = setup(
+      src => createDebounced(src, 50, { leading: true }),
+      "a",
+    );
+
+    setSource("b");
+    flush();
+    expect(value()).toBe("b");
+    expect(isPending(value)).toBe(false);
+
+    await advance(10);
+    setSource("c");
+    flush();
+    expect(value()).toBe("b");
+    expect(isPending(value)).toBe(true);
+
+    await advance(30);
+    setSource("b");
+    flush();
+    expect(value()).toBe("b");
+    expect(isPending(value)).toBe(false);
+
+    await advance(30);
+    setSource("d");
+    flush();
+    expect(value()).toBe("b");
+    expect(isPending(value)).toBe(true);
+
+    await advance(50);
+    expect(value()).toBe("d");
+    expect(isPending(value)).toBe(false);
+
+    dispose();
+  });
+
   test("supports leading only", async () => {
     const { setSource, value, dispose } = setup(
       src => createDebounced(src, 50, { leading: true, trailing: false }),
