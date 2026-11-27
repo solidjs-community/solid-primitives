@@ -1,5 +1,14 @@
+import { createSignal, flush } from "solid-js";
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
-import { debounce, leading, leadingAndTrailing, scheduleIdle, throttle } from "../src/index.js";
+import {
+  createDebounced,
+  createThrottled,
+  debounce,
+  leading,
+  leadingAndTrailing,
+  scheduleIdle,
+  throttle,
+} from "../src/index.js";
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -51,5 +60,29 @@ describe("on server", () => {
     vi.runAllTimers();
     trigger("baz");
     expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  test("createDebounced passes through without scheduling", () => {
+    const [source, setSource] = createSignal("a");
+    const value = createDebounced(source, 100, { maxWait: 1_000 });
+
+    expect(value()).toBe("a");
+
+    setSource("b");
+    flush();
+
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  test("createThrottled passes through without scheduling", () => {
+    const [source, setSource] = createSignal("a");
+    const value = createThrottled(source, 100);
+
+    expect(value()).toBe("a");
+
+    setSource("b");
+    flush();
+
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

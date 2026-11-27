@@ -1,4 +1,12 @@
-import { type Accessor, createSignal, getObserver, getOwner, onCleanup } from "solid-js";
+import {
+  type Accessor,
+  createDeferred,
+  createSignal,
+  getObserver,
+  getOwner,
+  isEqual,
+  onCleanup,
+} from "solid-js";
 import { isServer } from "@solidjs/web";
 
 export type ScheduleCallback = <Args extends unknown[]>(
@@ -313,4 +321,198 @@ export function createScheduled(
 
     return false;
   };
+}
+
+// ---- Derived scheduled accessors ----
+
+/**
+ * Whether to emit on the leading edge, the trailing edge, or both.
+ */
+export type ScheduleEdgeOptions =
+  | {
+      /** Emit the first change immediately. Defaults to `false`. */
+      leading?: false;
+      /** Emit the latest value at the end of the window. Defaults to `true`. */
+      trailing?: true;
+    }
+  | {
+      /** Emit the first change immediately. */
+      leading: true;
+      /** Emit the latest value at the end of the window. Defaults to `true`. */
+      trailing?: boolean;
+    };
+
+/**
+ * Maximum time a debounced value may be held back while changes continue.
+ */
+export type MaxWaitOptions = {
+  /**
+   * Maximum time to hold the value back, in milliseconds. Without this, a
+   * continuous stream of changes can defer the landing indefinitely.
+   */
+  maxWait?: number;
+};
+
+/**
+ * Creates an accessor whose value is **debounced** on the trailing edge.
+ *
+ * A change is held back until the source has been quiet for `wait` milliseconds.
+ * While it is held back readers keep the last value and `isPending()` is `true`;
+ * the initial value is available synchronously.
+ *
+ * @param source The reactive value to debounce
+ * @param wait The debounce duration in milliseconds
+ * @param options {@link ScheduleEdgeOptions} and optional {@link MaxWaitOptions}
+ * @returns An accessor with the debounced value
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#createdebounced
+ *
+ * @example
+ * ```ts
+ * const debouncedQuery = createDebounced(query, 250);
+ *
+ * createEffect(
+ *   () => debouncedQuery(),
+ *   value => fetchResults(value),
+ * );
+ * ```
+ */
+export function createDebounced<T>(
+  source: Accessor<T>,
+  wait: number,
+  options?: ScheduleEdgeOptions & MaxWaitOptions,
+): Accessor<T> {
+  return createScheduledAccessor(
+    source,
+    emit => debounce(emit, wait),
+    options?.leading ?? false,
+    options?.trailing ?? true,
+    options?.maxWait,
+  );
+}
+
+/**
+ * Creates an accessor whose value is **throttled** on the trailing edge.
+ *
+ * The first change opens a fixed window of `wait` milliseconds. Changes during
+ * that window are coalesced into its trailing value and don't reset the timer.
+ * While the value is held back readers keep the last value and `isPending()` is
+ * `true`.
+ *
+ * @param source The reactive value to throttle
+ * @param wait The throttle duration in milliseconds
+ * @param options {@link ScheduleEdgeOptions}
+ * @returns An accessor with the throttled value
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#createthrottled
+ *
+ * @example
+ * ```ts
+ * const throttledScroll = createThrottled(scrollY, 100);
+ * ```
+ */
+export function createThrottled<T>(
+  source: Accessor<T>,
+  wait: number,
+  options?: ScheduleEdgeOptions,
+): Accessor<T> {
+  return createScheduledAccessor(
+    source,
+    emit => throttle(emit, wait),
+    options?.leading ?? false,
+    options?.trailing ?? true,
+  );
+}
+
+type TriggerFactory = (emit: (value: any) => void) => Scheduled<any[]>;
+
+function createScheduledAccessor<T>(
+  source: Accessor<T>,
+  createTrigger: TriggerFactory,
+  leading: boolean,
+  trailing: boolean,
+  maxWait?: number,
+): Accessor<T> {
+  if (!leading && !trailing) {
+    throw new Error("at least one of `leading` or `trailing` must be true");
+  }
+
+  let first = true;
+  let windowOpen = false;
+  let resolve: ((value: T) => void) | undefined;
+  let latest!: T;
+  let maxTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const clearMaxWait = (): void => {
+    if (maxTimer !== undefined) clearTimeout(maxTimer);
+    maxTimer = undefined;
+  };
+
+  const emit = (value: T): void => {
+    windowOpen = false;
+    clearMaxWait();
+    const settle = resolve;
+    resolve = undefined;
+    settle?.(value);
+  };
+
+  const trigger = createTrigger(emit);
+
+  // `maxWait` is layered on top of the base debounce/throttle timer: when it
+  // fires it settles the current pending promise and resets the window.
+  const armMaxWait = (value: T): void => {
+    if (!trailing || maxWait === undefined) return;
+    latest = value;
+    if (maxTimer !== undefined) return;
+    maxTimer = setTimeout(() => {
+      maxTimer = undefined;
+      trigger.clear();
+      emit(latest);
+    }, maxWait);
+  };
+
+  const cleanup = (): void => {
+    windowOpen = false;
+    clearMaxWait();
+    resolve = undefined;
+    trigger.clear();
+  };
+
+  const accessor = createDeferred<T>((prev?: T) => {
+    let value: T;
+    try {
+      value = source();
+    } catch (error) {
+      cleanup();
+      throw error;
+    }
+
+    if (isServer) return value;
+
+    if (first) {
+      first = false;
+      return value;
+    }
+
+    if (isEqual(value, prev)) {
+      clearMaxWait();
+      resolve = undefined;
+      return value;
+    }
+
+    const opening = !windowOpen;
+    if (opening) windowOpen = true;
+    armMaxWait(value);
+    trigger(value);
+
+    if (opening && leading) return value;
+    if (!trailing) return prev as T;
+
+    return new Promise<T>(settle => {
+      resolve = settle;
+    });
+  });
+
+  if (getOwner()) onCleanup(cleanup);
+  return accessor;
 }

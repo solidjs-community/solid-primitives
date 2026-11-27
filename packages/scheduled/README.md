@@ -4,17 +4,20 @@
 
 # @solid-primitives/scheduled
 
-[![size](https://img.shields.io/badge/size-677_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scheduled)
+[![size](https://img.shields.io/badge/size-1.01_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scheduled)
 [![version](https://img.shields.io/npm/v/@solid-primitives/scheduled?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scheduled)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
 
-Primitives for creating scheduled — throttled or debounced — callbacks.
+Primitives for creating scheduled — throttled or debounced — callbacks and derived values.
 
 - [`debounce`](#debounce) - Creates a callback that is **debounced** and cancellable.
 - [`throttle`](#throttle) - Creates a callback that is **throttled** and cancellable.
 - [`scheduleIdle`](#scheduleidle) - Creates a callback throttled using `window.requestIdleCallback()`.
 - [`leading`](#leading) - Creates a scheduled and cancellable callback that will be called on **leading** edge.
+- [`leadingAndTrailing`](#leadingandtrailing) - Calls on the leading edge once, then on the trailing edge.
+- [`createDebounced`](#createdebounced) - Creates a derived accessor with a **debounced** value.
+- [`createThrottled`](#createthrottled) - Creates a derived accessor with a **throttled** value.
 - [`createScheduled`](#createscheduled) - Creates a signal used for scheduling execution of solid computations by tracking.
 - [Scheduling explanation](#scheduling-explanation)
 
@@ -263,6 +266,116 @@ const trigger = leadingAndTrailing(throttle, (message: string) => console.log(me
 trigger("Hello!");
 trigger.clear(); // clears a timeout in progress
 ```
+
+## `createDebounced`
+
+Creates a derived accessor whose value is **debounced** on the trailing edge.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, isPending } from "solid-js";
+import { createDebounced } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [query, setQuery] = createSignal("");
+  const debouncedQuery = createDebounced(query, 500);
+  return (
+    <>
+      <input placeholder="Type something…" onInput={e => setQuery(e.currentTarget.value)} />
+      <p>query: {query()}</p>
+      <p>debounced: {debouncedQuery()}</p>
+      <p>pending: {String(isPending(debouncedQuery))}</p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+The initial value is available synchronously. While a change is held back, the accessor keeps returning the previous value and `isPending(debouncedQuery)` is `true`. When the source has been quiet for `wait` milliseconds, the latest value lands through the reactive graph. If the source is itself async, its first answer follows Solid's normal `Loading` path; subsequent changes use the normal pending machinery.
+
+### Definition
+
+```ts
+type ScheduleEdgeOptions =
+  { leading?: false; trailing?: true } | { leading: true; trailing?: boolean };
+
+type MaxWaitOptions = {
+  maxWait?: number;
+};
+
+function createDebounced<T>(
+  source: Accessor<T>,
+  wait: number,
+  options?: ScheduleEdgeOptions & MaxWaitOptions,
+): Accessor<T>;
+```
+
+### Options
+
+The default is trailing-only (`leading: false`, `trailing: true`).
+
+| Option     | Type      | Default | Description                                                                                                             |
+| ---------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `wait`     | `number`  | —       | Debounce duration in milliseconds.                                                                                      |
+| `leading`  | `boolean` | `false` | Emit the first change immediately.                                                                                      |
+| `trailing` | `boolean` | `true`  | Emit the latest value at the end of the window.                                                                         |
+| `maxWait`  | `number`  | —       | Maximum time to hold a value back while changes continue. Without it, continuous changes can defer the landing forever. |
+
+`leading: false, trailing: false` is a type error.
+
+## `createThrottled`
+
+Creates a derived accessor whose value is **throttled** on the trailing edge.
+
+```tsx repl
+import { render } from "@solidjs/web";
+import { createSignal, isPending } from "solid-js";
+import { createThrottled } from "@solid-primitives/scheduled";
+
+function Demo() {
+  const [clicks, setClicks] = createSignal(0);
+  const throttledClicks = createThrottled(clicks, 1_000);
+  return (
+    <>
+      <button onClick={() => setClicks(n => n + 1)}>Click rapidly</button>
+      <p>
+        clicks: {clicks()} / throttled: {throttledClicks()} / pending:{" "}
+        {String(isPending(throttledClicks))}
+      </p>
+    </>
+  );
+}
+
+render(() => <Demo />, document.getElementById("app")!);
+```
+
+The first change opens a fixed window of `wait` milliseconds. Changes made during that window are coalesced into its trailing value and do not reset the timer. While the value is held back, the accessor keeps returning the previous value and `isPending(throttledClicks)` is `true`.
+
+### Definition
+
+```ts
+type ScheduleEdgeOptions =
+  { leading?: false; trailing?: true } | { leading: true; trailing?: boolean };
+
+function createThrottled<T>(
+  source: Accessor<T>,
+  wait: number,
+  options?: ScheduleEdgeOptions,
+): Accessor<T>;
+```
+
+### Options
+
+The default is trailing-only (`leading: false`, `trailing: true`).
+
+| Option     | Type      | Default | Description                                     |
+| ---------- | --------- | ------- | ----------------------------------------------- |
+| `wait`     | `number`  | —       | Throttle window in milliseconds.                |
+| `leading`  | `boolean` | `false` | Emit the first change immediately.              |
+| `trailing` | `boolean` | `true`  | Emit the latest value at the end of the window. |
+
+`leading: false, trailing: false` is a type error.
 
 ## `createScheduled`
 
