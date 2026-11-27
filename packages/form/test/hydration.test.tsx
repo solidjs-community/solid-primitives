@@ -56,9 +56,8 @@ describe("createForm hydration round trip", () => {
   });
 });
 
-// Regression for https://github.com/solidjs-community/solid-primitives/issues/1143: the README
-// usage threw CLEANUP_IN_FORBIDDEN_SCOPE from the `ref` callbacks, which aborted hydration. The
-// form's submit handler was then never attached, so submitting navigated with the fields in the URL.
+// Regression for #1143: the ref callbacks threw CLEANUP_IN_FORBIDDEN_SCOPE and aborted hydration,
+// so the submit handler was never attached and submitting navigated with the fields in the URL.
 const REF_APP_SOURCE = `
 import { createForm } from "@solid-primitives/form";
 

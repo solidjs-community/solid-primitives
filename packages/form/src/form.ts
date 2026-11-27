@@ -393,15 +393,13 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     }
   };
 
-  // Solid 2 runs a ref callback in a restricted context: it may not call onCleanup or create
-  // roots, memos or effects, it can only return its cleanup (see issue #1143). So bind() does
-  // everything reactive here, in the factory (the component body: `ref={form.bind("x")}` is
-  // evaluated there), and the ref callback it returns only touches the DOM and returns its cleanup.
+  // A ref callback can't use onCleanup or create primitives (#1143), so bind() sets up everything
+  // reactive here, in the component body; the callback it returns only touches the DOM.
   const bind = (name: string) => {
     const f = internalFields[name];
     if (!f) throw new Error(`createForm: unknown field "${name}"`);
 
-    // One callback may be applied to several elements; each keeps its own state.
+    // One callback can be attached to several elements; each keeps its own state.
     type Attachment = {
       input: HTMLInputElement;
       checkable: boolean;
@@ -409,17 +407,14 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     };
     const active = new Set<Attachment>();
 
-    // field -> DOM, for every element this callback is currently attached to.
+    // field -> DOM for every attached element
     const syncOne = (a: Attachment, v: unknown) => {
       if (a.checkable) a.input.checked = Boolean(v);
       else if (a.input.value !== String(v ?? "")) a.input.value = String(v ?? "");
     };
     const syncAll = (v: unknown) => active.forEach(a => syncOne(a, v));
 
-    // The effect is created in the factory so it is owned by (and disposed with) the component.
-    // Called outside any owner (an event handler, a plain function) nothing can own it, so it
-    // gets a root that lives while at least one element is attached and is disposed with the
-    // last one's cleanup (and recreated if the callback is attached again).
+    // Owned by the component; with no owner, a root that lives while an element is attached.
     const owned = !!getOwner();
     let disposeRoot: (() => void) | undefined;
     if (owned) createEffect(f.value, syncAll);
@@ -428,8 +423,7 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       const input = nextEl as HTMLInputElement;
       const checkable = input.type === "checkbox" || input.type === "radio";
 
-      // Plain listeners, removed by the cleanup: makeEventListener would register its removal
-      // with onCleanup, which is forbidden inside a ref callback.
+      // Plain listeners: makeEventListener would call onCleanup, forbidden in a ref callback.
       const valueEvent = checkable ? "change" : "input";
       const onValue = () => f._setValue(checkable ? input.checked : input.value);
       const onBlur = () => f._setTouched(true);
@@ -462,15 +456,12 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       return attachment.teardown;
     };
 
-    // The runtime does not call a ref callback's returned cleanup (it ignores the return value),
-    // so also tear every attachment down with the owner that evaluated bind(). Registered here
-    // in the factory, where onCleanup is allowed (it is forbidden inside the ref callback).
+    // The runtime ignores a ref's returned cleanup, so also tear down with the owner.
     if (owned) onCleanup(() => [...active].forEach(a => a.teardown()));
     return refCallback;
   };
 
-  // Same constraint as bind(): the ref callback may not call onCleanup and the runtime ignores
-  // its return value, so the submit listeners are also removed when createForm's owner is disposed.
+  // Same as bind(): also remove the submit listeners with createForm's owner.
   const submitTeardowns = new Set<() => void>();
   const ref = (el: HTMLFormElement) => {
     const onSubmit = (e: SubmitEvent) => {

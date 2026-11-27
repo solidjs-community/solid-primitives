@@ -3,13 +3,8 @@ import { flush } from "solid-js";
 import { render } from "@solidjs/web";
 import { createForm } from "../src/index.js";
 
-// Regression tests for https://github.com/solidjs-community/solid-primitives/issues/1143
-//
-// The other tests call `form.bind("x")(el)` / `form.ref(el)` directly, which bypasses the context
-// Solid runs real JSX `ref` callbacks in. In that context Solid 2 forbids `onCleanup`
-// (CLEANUP_IN_FORBIDDEN_SCOPE) and creating roots, memos or effects (PRIMITIVE_IN_EFFECT_CALLBACK):
-// a ref callback may only return its cleanup. These tests mount the documented usage through the
-// compiled JSX so those guards are active.
+// Regression for #1143. Calling form.bind("x")(el) directly bypasses the context where Solid 2
+// forbids onCleanup and creating primitives in a ref callback, so these tests mount real JSX refs.
 
 let disposers: Array<() => void> = [];
 
@@ -91,7 +86,7 @@ describe("createForm as JSX ref callbacks", () => {
     flush();
     expect(form.fields.email.value()).toBe("typed");
 
-    // field -> DOM (the sync effect is created in the component body, not in the ref callback)
+    // field -> DOM
     form.fields.email.setValue("from-code");
     flush();
     expect(input.value).toBe("from-code");

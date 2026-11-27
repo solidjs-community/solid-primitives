@@ -2,9 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createRoot, flush } from "solid-js";
 import { createForm } from "../src/index.js";
 
-// One `form.bind("x")` callback may be attached to several elements (a callback kept in a
-// variable and reused, an array of refs...). Each attachment must keep its own state and
-// lifetime: they must not overwrite each other or dispose each other's synchronization.
+// One bind() callback attached to several elements: each keeps its own state and lifetime.
 
 const input = (type?: string) => {
   const el = document.createElement("input");
@@ -122,8 +120,7 @@ describe("one bind() callback attached to several elements", () => {
   });
 
   describe("without an owner", () => {
-    // The factory is called outside any owner (an event handler, a plain function), so the
-    // field -> DOM effect lives in a root that follows the attachments.
+    // bind() called with no owner: the field -> DOM effect lives in a root tied to the attachments.
     const ownerless = () => {
       let form!: ReturnType<typeof createForm<{ email: { initial: string } }>>;
       const dispose = createRoot(d => {
