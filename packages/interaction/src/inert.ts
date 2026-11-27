@@ -46,23 +46,24 @@ type NodeState = {
   inertCount: number;
   inertPrev: string | null;
 };
-type Hold = { aria: boolean; inert: boolean };
+type Hold = {
+  aria: boolean;
+  inert: boolean;
+  /** aria-hidden is wanted but postponed because the node contains the focused element. */
+  pendingAria: boolean;
+};
 type Layer = {
-  /** Creation order; the stack is kept sorted by it. */
-  id: number;
   targets: HTMLElement[];
   /** Elements the layer keeps exposed besides its targets; lower layers must not hide them either. */
   ignore: Element[];
-  sweep: () => void;
+  sweep: (force?: boolean) => void;
 };
 
 type InertRegistry = {
   /** Shared per-node ref counts: the reason stacked layers can close in any order. */
   states: WeakMap<Element, NodeState>;
-  /** Open layers, lowest first. Upper layers' targets are protected from lower layers. */
+  /** Open layers in the order they opened, lowest first. Upper layers' targets are protected from lower layers. */
   layers: Layer[];
-  /** Last issued layer id. */
-  lastId: number;
 };
 
 // Lives on `globalThis` (not in module-scope bindings) so it stays correct when the app's dependency
@@ -72,7 +73,6 @@ const getRegistry = (): InertRegistry =>
   globalRegistry<InertRegistry>("@solid-primitives/interaction:inert", () => ({
     states: new WeakMap(),
     layers: [],
-    lastId: 0,
   }));
 
 function toList<T extends Element>(
@@ -83,27 +83,54 @@ function toList<T extends Element>(
   return list.filter((el): el is T => el != null);
 }
 
-function acquire(el: Element, strategy: InertStrategy): Hold | undefined {
+/** True when `el` contains the focused element, looking through open shadow roots. */
+function containsFocus(el: Element): boolean {
+  let active: Element | null = el.ownerDocument.activeElement;
+  while (active) {
+    if (el.contains(active)) return true;
+    active = active.shadowRoot?.activeElement ?? null;
+  }
+  return false;
+}
+
+function getState(el: Element): NodeState {
   const { states } = getRegistry();
   let state = states.get(el);
   if (!state) {
     state = { ariaCount: 0, ariaPrev: null, inertCount: 0, inertPrev: null };
     states.set(el, state);
   }
-  const hold: Hold = { aria: false, inert: false };
-  if (strategy !== "inert") {
-    if (state.ariaCount > 0) {
-      state.ariaCount++;
-      hold.aria = true;
-    } else if (el.getAttribute("aria-hidden") !== "true") {
-      // an element that was already aria-hidden by someone else is left alone
-      state.ariaPrev = el.getAttribute("aria-hidden");
-      el.setAttribute("aria-hidden", "true");
-      state.ariaCount = 1;
-      hold.aria = true;
+  return state;
+}
+
+/**
+ * Takes the aria-hidden part of a hold. Chrome refuses `aria-hidden` on an ancestor of the focused
+ * element (the attribute is set but the accessibility tree keeps exposing the node), so in that case
+ * the hold stays `pendingAria` and is retried once focus has left the node.
+ */
+function acquireAria(el: Element, hold: Hold): void {
+  const state = getState(el);
+  hold.pendingAria = false;
+  if (state.ariaCount > 0) {
+    state.ariaCount++;
+    hold.aria = true;
+  } else if (el.getAttribute("aria-hidden") !== "true") {
+    // an element that was already aria-hidden by someone else is left alone
+    if (containsFocus(el)) {
+      hold.pendingAria = true;
+      return;
     }
+    state.ariaPrev = el.getAttribute("aria-hidden");
+    el.setAttribute("aria-hidden", "true");
+    state.ariaCount = 1;
+    hold.aria = true;
   }
+}
+
+function acquire(el: Element, strategy: InertStrategy): Hold | undefined {
+  const hold: Hold = { aria: false, inert: false, pendingAria: false };
   if (strategy !== "aria-hidden") {
+    const state = getState(el);
     if (state.inertCount > 0) {
       state.inertCount++;
       hold.inert = true;
@@ -114,13 +141,17 @@ function acquire(el: Element, strategy: InertStrategy): Hold | undefined {
       hold.inert = true;
     }
   }
-  return hold.aria || hold.inert ? hold : undefined;
+  if (strategy !== "inert") acquireAria(el, hold);
+  return hold.aria || hold.inert || hold.pendingAria ? hold : undefined;
 }
 
 function release(el: Element, hold: Hold): void {
   const { states } = getRegistry();
   const state = states.get(el);
-  if (!state) return;
+  if (!state) {
+    hold.pendingAria = false;
+    return;
+  }
   if (hold.aria && state.ariaCount > 0 && --state.ariaCount === 0) {
     if (state.ariaPrev === null) el.removeAttribute("aria-hidden");
     else el.setAttribute("aria-hidden", state.ariaPrev);
@@ -131,6 +162,7 @@ function release(el: Element, hold: Hold): void {
     else el.setAttribute("inert", state.inertPrev);
     state.inertPrev = null;
   }
+  hold.pendingAria = false;
   if (state.ariaCount === 0 && state.inertCount === 0) states.delete(el);
 }
 
@@ -162,7 +194,7 @@ export function makeInertOthers(
   if (isServer) return noop;
   const own = toList(targets);
   if (own.length === 0) return noop;
-  return openLayer(nextLayerId(), own, toList(options.ignore), options).close;
+  return openLayer(own, toList(options.ignore), options).close;
 }
 
 type LayerHandle = {
@@ -171,10 +203,7 @@ type LayerHandle = {
   close: VoidFunction;
 };
 
-const nextLayerId = (): number => ++getRegistry().lastId;
-
 function openLayer(
-  id: number,
   initialTargets: HTMLElement[],
   initialIgnore: Element[],
   options: { strategy?: InertStrategy; root?: Element },
@@ -218,16 +247,54 @@ function openLayer(
     if (found) layer.sweep();
   });
 
+  // Hold on to aria-hidden for nodes that contain focus until focus leaves them (see acquireAria).
+  let focusDoc: Document | undefined;
+  let focusTimer: ReturnType<typeof setTimeout> | undefined;
+  const retryPending = () => {
+    if (disposed) return;
+    let changed = false;
+    for (const [el, hold] of held)
+      if (hold.pendingAria && !containsFocus(el)) {
+        acquireAria(el, hold);
+        changed = true;
+      }
+    if (changed) syncFocusListeners();
+  };
+  const onFocusIn = () => retryPending();
+  // during focusout the next focus target is not known yet, so look again afterwards
+  const onFocusOut = () => {
+    clearTimeout(focusTimer);
+    focusTimer = setTimeout(retryPending, 0);
+  };
+  const syncFocusListeners = () => {
+    const needed = Array.from(held.values()).some(h => h.pendingAria);
+    const doc = root.ownerDocument;
+    if (focusDoc && (!needed || focusDoc !== doc)) {
+      focusDoc.removeEventListener("focusin", onFocusIn, true);
+      focusDoc.removeEventListener("focusout", onFocusOut, true);
+      clearTimeout(focusTimer);
+      focusDoc = undefined;
+    }
+    if (needed && !focusDoc) {
+      focusDoc = doc;
+      doc.addEventListener("focusin", onFocusIn, true);
+      doc.addEventListener("focusout", onFocusOut, true);
+    }
+  };
+
   const layer: Layer = {
-    id,
     get targets() {
       return own;
     },
     get ignore() {
       return ignore;
     },
-    sweep() {
+    sweep(force) {
       if (disposed) return;
+      // Every target was removed from the document while the layer is open: keep what is held until the
+      // layer is updated or closed (a modal unmounting a moment before its owner cleans up must not flash
+      // the page to assistive technology) instead of releasing the whole page.
+      if (!force && held.size > 0 && own.every(t => !t.isConnected)) return;
       // protected = own targets + ignore + live regions + targets of layers opened above this one
       const protectedEls: Element[] = [...own, ...ignore];
       // Live regions stay exposed only for aria-hidden (announcements still reach AT). With `inert` they
@@ -279,13 +346,12 @@ function openLayer(
       deepObserver.disconnect();
       if (strategy === "aria-hidden")
         for (const el of held.keys()) deepObserver.observe(el, { childList: true, subtree: true });
+      syncFocusListeners();
     },
   };
 
-  // sorted insertion by creation id keeps a layer's stack position stable
-  let at = layers.length;
-  while (at > 0 && layers[at - 1]!.id > id) at--;
-  layers.splice(at, 0, layer);
+  // the stack is the order in which layers open; update() keeps the position, a re-open goes on top
+  layers.push(layer);
   for (const l of [...layers]) l.sweep();
 
   return {
@@ -294,7 +360,7 @@ function openLayer(
       own = nextTargets;
       ignore = nextIgnore;
       if (!explicitRoot) root = own[0]!.ownerDocument.body;
-      for (const l of [...layers]) l.sweep();
+      for (const l of [...layers]) l.sweep(l === layer);
     },
     close() {
       if (disposed) return;
@@ -303,6 +369,7 @@ function openLayer(
       for (const [el, hold] of held) release(el, hold);
       held.clear();
       disposed = true;
+      syncFocusListeners();
       const index = layers.indexOf(layer);
       if (index !== -1) layers.splice(index, 1);
       // layers below can now hide whatever this layer used to protect
@@ -332,9 +399,8 @@ export function createInertOthers(
   options: CreateInertOthersOptions = {},
 ): void {
   if (isServer) return;
-  // The id is taken now, so the layer keeps its stack position however often its inputs change or it is
-  // toggled. The layer itself is updated in place instead of being closed and reopened.
-  const id = nextLayerId();
+  // The layer is updated in place while it stays open, so it keeps its stack position when its inputs
+  // change. Disabling and enabling again is a new open and goes on top, like a real modal stack.
   let handle: LayerHandle | undefined;
   createEffect(
     () => {
@@ -350,7 +416,7 @@ export function createInertOthers(
         handle?.close();
         handle = undefined;
       } else if (handle) handle.update(state.list, state.ignore);
-      else handle = openLayer(id, state.list, state.ignore, options);
+      else handle = openLayer(state.list, state.ignore, options);
     },
   );
   onCleanup(() => {

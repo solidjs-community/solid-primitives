@@ -437,6 +437,11 @@ export interface CreateInteractOutsideOptions {
 /** {@link CreateInteractOutsideOptions} without `disabled` — for use with {@link makeInteractOutside} and {@link interactOutside}. */
 export type MakeInteractOutsideOptions = Omit<CreateInteractOutsideOptions, "disabled">;
 
+/** Pixels a touch may drift before it counts as a scroll/drag rather than a tap. */
+const TOUCH_MOVE_THRESHOLD = 10;
+/** How long after the touch is released its `click` may still arrive (ms). */
+const TOUCH_CLICK_TIMEOUT = 700;
+
 const POINTER_DOWN_OUTSIDE_EVENT = "interactOutside.pointerDownOutside";
 const FOCUS_OUTSIDE_EVENT = "interactOutside.focusOutside";
 
@@ -481,7 +486,20 @@ export function makeInteractOutside<T extends Element>(
 ): () => void {
   if (isServer) return noop;
 
-  let clickHandler: () => void = noop;
+  // The touch press whose outside check is waiting for its `click`. `null` when none is pending.
+  let pending: {
+    handler: () => void;
+    pointerId: number;
+    x: number;
+    y: number;
+    target: EventTarget | null;
+    timer: number | undefined;
+  } | null = null;
+
+  const dropPending = () => {
+    if (pending) window.clearTimeout(pending.timer);
+    pending = null;
+  };
 
   // el.ownerDocument may be an about:blank document at ref-apply time if the element was
   // created by a renderer whose `document` global resolved before the real document was ready
@@ -553,13 +571,60 @@ export function makeInteractOutside<T extends Element>(
     };
 
     if (e.pointerType === "touch") {
-      ownerDoc.removeEventListener("click", clickHandler);
-      clickHandler = handler;
-      ownerDoc.addEventListener("click", clickHandler, { once: true });
+      // Held until the tap's `click` arrives (see `onClick`). Anything that proves no click is coming
+      // for this press (scroll / cancel / drift / a key press) drops it so it can't fire on a later,
+      // unrelated click.
+      dropPending();
+      pending = {
+        handler,
+        pointerId: e.pointerId,
+        x: e.clientX,
+        y: e.clientY,
+        target: origin?.target ?? null,
+        timer: undefined,
+      };
     } else {
       handler();
     }
   };
+
+  const onClick = (e: MouseEvent) => {
+    const p = pending;
+    dropPending();
+    if (!p) return;
+    // The click must belong to the stored press: same target, or at (nearly) the same position.
+    const sameTarget = e.target === p.target;
+    const nearby =
+      Math.abs(e.clientX - p.x) <= TOUCH_MOVE_THRESHOLD &&
+      Math.abs(e.clientY - p.y) <= TOUCH_MOVE_THRESHOLD;
+    if (sameTarget || nearby) p.handler();
+  };
+
+  const onPointerMove = (e: PointerEvent) => {
+    if (
+      pending &&
+      e.pointerId === pending.pointerId &&
+      (Math.abs(e.clientX - pending.x) > TOUCH_MOVE_THRESHOLD ||
+        Math.abs(e.clientY - pending.y) > TOUCH_MOVE_THRESHOLD)
+    )
+      dropPending();
+  };
+
+  const onPointerUp = (e: PointerEvent) => {
+    if (!pending || e.pointerId !== pending.pointerId) return;
+    // The click follows the release immediately; if it hasn't arrived shortly, it never will.
+    window.clearTimeout(pending.timer);
+    pending.timer = window.setTimeout(dropPending, TOUCH_CLICK_TIMEOUT);
+  };
+
+  const onPointerCancel = (e: PointerEvent) => {
+    if (pending && e.pointerId === pending.pointerId) dropPending();
+  };
+
+  const onTouchCancel = () => dropPending();
+
+  // A key press between the touch and the next click means that click is keyboard-generated.
+  const onKeyDown = () => dropPending();
 
   const onFocusIn = (e: FocusEvent) => {
     const target = getOutsideTarget(getEventOrigin(e));
@@ -590,13 +655,25 @@ export function makeInteractOutside<T extends Element>(
     ownerDoc = el.ownerDocument;
     ownerDoc.addEventListener("pointerdown", onPointerDown, true);
     ownerDoc.addEventListener("focusin", onFocusIn, true);
+    ownerDoc.addEventListener("click", onClick);
+    ownerDoc.addEventListener("pointermove", onPointerMove, true);
+    ownerDoc.addEventListener("pointerup", onPointerUp, true);
+    ownerDoc.addEventListener("pointercancel", onPointerCancel, true);
+    ownerDoc.addEventListener("touchcancel", onTouchCancel, true);
+    ownerDoc.addEventListener("keydown", onKeyDown, true);
   }, 0);
 
   return () => {
     window.clearTimeout(pointerDownTimeoutId);
-    ownerDoc.removeEventListener("click", clickHandler);
+    dropPending();
     ownerDoc.removeEventListener("pointerdown", onPointerDown, true);
     ownerDoc.removeEventListener("focusin", onFocusIn, true);
+    ownerDoc.removeEventListener("click", onClick);
+    ownerDoc.removeEventListener("pointermove", onPointerMove, true);
+    ownerDoc.removeEventListener("pointerup", onPointerUp, true);
+    ownerDoc.removeEventListener("pointercancel", onPointerCancel, true);
+    ownerDoc.removeEventListener("touchcancel", onTouchCancel, true);
+    ownerDoc.removeEventListener("keydown", onKeyDown, true);
   };
 }
 

@@ -668,3 +668,172 @@ describe("createDismissableLayer", () => {
     expect(getLayerStack()[0]).toBe(first);
   });
 });
+
+describe("one press is one interaction", () => {
+  const down = (target: Element, pointerType: string) =>
+    target.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        cancelable: true,
+        pointerType,
+        pointerId: 1,
+      }),
+    );
+  const up = (target: Element) =>
+    target.dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true, pointerType: "touch", pointerId: 1 }),
+    );
+  const click = (target: Element) =>
+    target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+
+  it("mouse: pointerdown + the focusin it causes dismiss once while the layer stays registered", () => {
+    const [inside, input] = [mount("in"), mount("input")];
+    const l = layerAt(inside);
+    ready();
+    down(input, "mouse");
+    input.focus();
+    expect(l.onDismiss).toHaveBeenCalledTimes(1);
+    expect(l.onDismiss.mock.calls[0]![0]).toBe("outside-pointer");
+  });
+
+  it("mouse: onDismissAttempt fires once for a non-dismissible layer", () => {
+    const [inside, input] = [mount("in"), mount("input")];
+    const onDismissAttempt = vi.fn();
+    const l = layerAt(inside, { dismissible: false, onDismissAttempt });
+    ready();
+    down(input, "mouse");
+    input.focus();
+    expect(onDismissAttempt).toHaveBeenCalledTimes(1);
+    expect(l.onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("a keyboard focus move after the press still dismisses with outside-focus", () => {
+    const [inside, input, other] = [mount("in"), mount("input"), mount("other")];
+    const l = layerAt(inside);
+    ready();
+    down(input, "mouse");
+    input.focus();
+    vi.advanceTimersByTime(1);
+    other.focus(); // e.g. Tab
+    expect(l.onDismiss).toHaveBeenCalledTimes(2);
+    expect(l.onDismiss.mock.calls[1]![0]).toBe("outside-focus");
+  });
+
+  it("focus moving to a different element during the press still counts", () => {
+    const [inside, input, other] = [mount("in"), mount("input"), mount("other")];
+    const l = layerAt(inside);
+    ready();
+    down(input, "mouse");
+    other.focus();
+    expect(l.onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it("touch: the focusin before the click and the click dismiss once", () => {
+    const [inside, input] = [mount("in"), mount("input")];
+    const l = layerAt(inside);
+    ready();
+    down(input, "touch");
+    up(input);
+    input.focus();
+    click(input);
+    expect(l.onDismiss).toHaveBeenCalledTimes(1);
+    expect(l.onDismiss.mock.calls[0]![0]).toBe("outside-pointer");
+  });
+
+  const labelPair = () => {
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+    input.id = "lbl-input";
+    label.htmlFor = "lbl-input";
+    document.body.append(label, input);
+    return [label, input] as const;
+  };
+  const upAs = (target: Element, pointerType: string) =>
+    target.dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true, pointerType, pointerId: 1 }),
+    );
+
+  for (const type of ["mouse", "touch"]) {
+    it(`${type}: pressing a label whose control takes focus on click dismisses once`, () => {
+      const inside = mount("in");
+      const [label, input] = labelPair();
+      const l = layerAt(inside);
+      ready();
+      down(label, type);
+      upAs(label, type);
+      vi.advanceTimersByTime(50); // mouse: past the same-task window
+      input.focus(); // label activation moves focus at click time
+      click(label);
+      expect(l.onDismiss).toHaveBeenCalledTimes(1);
+      expect(l.onDismiss.mock.calls[0]![0]).toBe("outside-pointer");
+    });
+  }
+
+  it("mouse: a Tab move well after a label press dismisses again", () => {
+    const [inside, other] = [mount("in"), mount("other")];
+    const [label, input] = labelPair();
+    const l = layerAt(inside);
+    ready();
+    down(label, "mouse");
+    upAs(label, "mouse");
+    input.focus();
+    vi.advanceTimersByTime(2000);
+    other.focus();
+    expect(l.onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it("touch: a Tab focus move well after the tap dismisses again", () => {
+    const [inside, input, other] = [mount("in"), mount("input"), mount("other")];
+    const l = layerAt(inside);
+    ready();
+    down(input, "touch");
+    up(input);
+    input.focus();
+    click(input);
+    vi.advanceTimersByTime(2000);
+    other.focus();
+    expect(l.onDismiss).toHaveBeenCalledTimes(2);
+    expect(l.onDismiss.mock.calls[1]![0]).toBe("outside-focus");
+  });
+
+  it("touch: a tap on a trigger that opens a new layer still dismisses the layer below once", () => {
+    const [c, trigger, d] = [mount("c"), mount("trigger"), mount("d")];
+    const lc = layerAt(c);
+    ready();
+    let ld: ReturnType<typeof layerAt> | undefined;
+    trigger.addEventListener("click", () => {
+      ld = layerAt(d);
+    });
+    down(trigger, "touch");
+    up(trigger);
+    click(trigger);
+    expect(lc.onDismiss).toHaveBeenCalledTimes(1);
+    expect(lc.onDismiss.mock.calls[0]![0]).toBe("outside-pointer");
+    expect(ld!.onDismiss).not.toHaveBeenCalled();
+    expect(getTopLayer()).toBe(ld!.layer);
+  });
+
+  it("touch: a layer that was not top at press time is not dismissed by that tap", () => {
+    const [c, d, out] = [mount("c"), mount("d"), mount("out")];
+    const lc = layerAt(c);
+    const ld = layerAt(d);
+    ready();
+    down(out, "touch");
+    up(out);
+    click(out);
+    expect(ld.onDismiss).toHaveBeenCalledTimes(1);
+    expect(lc.onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("mouse: dismissal still precedes the target's own click handler", () => {
+    const [c, trigger] = [mount("c"), mount("trigger")];
+    const lc = layerAt(c);
+    ready();
+    const order: string[] = [];
+    lc.onDismiss.mockImplementation(() => order.push("dismiss"));
+    trigger.addEventListener("click", () => order.push("click"));
+    down(trigger, "mouse");
+    click(trigger);
+    expect(order).toEqual(["dismiss", "click"]);
+  });
+});

@@ -64,6 +64,9 @@ export interface DismissableLayerControls {
 // act on it wins, so a handler that removes its layer synchronously can't cascade to the parent.
 const handled = new WeakSet<Event>();
 
+/** How long after a touch is released the focus move it causes may still arrive (ms). */
+const TOUCH_FOCUS_WINDOW = 700;
+
 const matchesExclude = (exclude: DismissableExclude | undefined, el: Element): boolean => {
   if (!exclude) return false;
   if (typeof exclude === "function") return exclude(el);
@@ -110,14 +113,74 @@ export function makeDismissableLayer(
     else options.onDismiss(reason, event);
   };
 
+  // Presses that started while this layer was the top one. A touch press is only reported on its
+  // `click`, after the tapped element's own handler may already have opened a new layer above this
+  // one; the layer must still be dismissed by the tap it was top for.
+  const pressedAsTop = new WeakSet<Event>();
+  // The element a press landed on while that press (and the focus move it causes) is still being
+  // dispatched: the browser reports a click on an input as pointerdown then focusin (or, for touch,
+  // focusin then click). That is one interaction, so only the first report may dismiss.
+  let pressTarget: Element | null = null;
+  // The control a pressed <label> forwards focus to (on click, after the press task ended).
+  let pressControl: Element | null = null;
+  let pressTimer: number | undefined;
+
+  const clearPress = () => {
+    window.clearTimeout(pressTimer);
+    pressTimer = undefined;
+    pressTarget = null;
+    pressControl = null;
+  };
+
   /** Handles an automatic dismissal source, only for the layer that is currently on top. */
   const auto = (reason: DismissReason, event: Event) => {
-    if (handled.has(event) || getTopLayer() !== layer) return;
+    if (handled.has(event)) return;
+    if (getTopLayer() !== layer && !(reason === "outside-pointer" && pressedAsTop.has(event)))
+      return;
     handled.add(event);
     request(reason, event);
   };
 
+  const isFocusOfPress = (event: Event): boolean => {
+    if (!pressTarget) return false;
+    const target = (event.composedPath()[0] as Element | undefined) ?? (event.target as Element);
+    return (
+      !!target &&
+      (target === pressControl ||
+        target === pressTarget ||
+        (target instanceof Node && (target.contains(pressTarget) || pressTarget.contains(target))))
+    );
+  };
+
   const unregister = registerLayer(layer);
+
+  const onPress = (e: PointerEvent) => {
+    if (getTopLayer() === layer) pressedAsTop.add(e);
+    clearPress();
+    pressTarget = (e.composedPath()[0] as Element | undefined) ?? (e.target as Element | null);
+    pressControl = (pressTarget as Element | null)?.closest?.("label")?.control ?? null;
+    // Mouse / pen: the focus move is dispatched in the same task as the press, except when a
+    // label forwards focus to its control on click (handled from pointerup).
+    if (e.pointerType !== "touch" && !pressControl) pressTimer = window.setTimeout(clearPress, 0);
+  };
+  // Touch / label: the focus move comes after release, with the compatibility mouse events.
+  const onRelease = (e: PointerEvent) => {
+    if (!pressTarget || (e.pointerType !== "touch" && !pressControl)) return;
+    window.clearTimeout(pressTimer);
+    pressTimer = window.setTimeout(clearPress, TOUCH_FOCUS_WINDOW);
+  };
+  const onCancel = () => clearPress();
+
+  // Registered after a tick, like `makeInteractOutside`, so that `element.ownerDocument` is final
+  // and the event that created the layer is not observed. Registered before it, so the snapshot
+  // listener runs first.
+  let pressDoc: Document | undefined;
+  const pressTimerId = window.setTimeout(() => {
+    pressDoc = element.ownerDocument;
+    pressDoc.addEventListener("pointerdown", onPress, true);
+    pressDoc.addEventListener("pointerup", onRelease, true);
+    pressDoc.addEventListener("pointercancel", onCancel, true);
+  }, 0);
 
   const stopEscape = makeEventListener(
     element.ownerDocument,
@@ -132,7 +195,10 @@ export function makeDismissableLayer(
   const stopOutside = makeInteractOutside(element, {
     shouldExcludeElement: el => matchesExclude(options.exclude, el) || isInsideLayer(layer, el),
     onPointerDownOutside: e => auto("outside-pointer", e.detail.originalEvent),
-    onFocusOutside: e => auto("outside-focus", e.detail.originalEvent),
+    onFocusOutside: e => {
+      if (isFocusOfPress(e.detail.originalEvent)) return;
+      auto("outside-focus", e.detail.originalEvent);
+    },
   });
 
   let cleaned = false;
@@ -141,6 +207,11 @@ export function makeDismissableLayer(
     cleaned = true;
     stopEscape();
     stopOutside();
+    window.clearTimeout(pressTimerId);
+    clearPress();
+    pressDoc?.removeEventListener("pointerdown", onPress, true);
+    pressDoc?.removeEventListener("pointerup", onRelease, true);
+    pressDoc?.removeEventListener("pointercancel", onCancel, true);
     unregister();
   };
 

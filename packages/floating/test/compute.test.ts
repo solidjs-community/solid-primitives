@@ -793,6 +793,256 @@ describe("computePosition (DOM)", () => {
       expect(bottom(reference, floating, "absolute").x).toBe(90);
     });
 
+    describe("top layer", () => {
+      const topLayer = (floating: HTMLElement, matching: string[], throwing: string[] = []) => {
+        const real = floating.matches.bind(floating);
+        floating.matches = ((selector: string) => {
+          if (throwing.includes(selector)) throw new SyntaxError(`unknown pseudo ${selector}`);
+          return matching.includes(selector) || (!selector.startsWith(":") && real(selector));
+        }) as never;
+      };
+      const transformedAncestor = (floating: HTMLElement) => {
+        const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+        ancestor.append(floating);
+        document.body.append(ancestor);
+        mockStyles(new Map([[ancestor, { transform: "translateZ(0)" }]]));
+      };
+
+      test.each([":popover-open", ":modal", ":fullscreen"])(
+        "fixed: %s ignores a transformed ancestor",
+        selector => {
+          const { reference, floating } = setup(rect(200, 100, 40, 20));
+          transformedAncestor(floating);
+          topLayer(floating, [selector]);
+          expect(bottom(reference, floating, "fixed")).toMatchObject({ x: 190, y: 120 });
+        },
+      );
+
+      test("fixed: a browser that throws on one pseudo-class still detects the others", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        transformedAncestor(floating);
+        topLayer(floating, [":modal"], [":popover-open", ":fullscreen"]);
+        expect(bottom(reference, floating, "fixed")).toMatchObject({ x: 190, y: 120 });
+      });
+
+      test("fixed: a browser that throws on every pseudo-class falls back to the ancestor walk", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        transformedAncestor(floating);
+        topLayer(floating, [], [":popover-open", ":modal", ":fullscreen"]);
+        expect(bottom(reference, floating, "fixed")).toMatchObject({ x: 90, y: 70 });
+      });
+
+      test("absolute: a top-layer element measures from the document, not a transformed html", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const html = document.documentElement;
+        global(window, "scrollX", 0);
+        global(window, "scrollY", 300);
+        global(
+          html,
+          "getBoundingClientRect",
+          mockRect(document.createElement("i"), rect(11, -293, 1000, 3000)).getBoundingClientRect,
+        );
+        mockStyles(new Map([[html, { transform: "translate(11px, 7px)" }]]));
+        topLayer(floating, [":popover-open"]);
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([190, 120 + 300]);
+      });
+    });
+
+    describe("positioned documentElement with a static body", () => {
+      const withHtml = (
+        htmlRect: ReturnType<typeof rect>,
+        style: Record<string, string>,
+        extra: { clientLeft?: number; clientTop?: number } = {},
+      ) => {
+        const html = document.documentElement;
+        global(
+          html,
+          "getBoundingClientRect",
+          mockRect(document.createElement("i"), htmlRect).getBoundingClientRect,
+        );
+        global(html, "clientLeft", extra.clientLeft ?? 0);
+        global(html, "clientTop", extra.clientTop ?? 0);
+        mockStyles(
+          new Map<Element, Record<string, string>>([
+            [document.body, { position: "static" }],
+            [html, style],
+          ]),
+        );
+      };
+
+      test("html relative with margin: origin is the html box, not the document", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        global(floating, "offsetParent", document.body);
+        withHtml(rect(13, 13, 1000, 2000), { position: "relative" });
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([190 - 13, 120 - 13]);
+      });
+
+      test("html relative with border: the padding box is the origin", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        global(floating, "offsetParent", document.body);
+        withHtml(rect(3, 3, 1000, 2000), { position: "relative" }, { clientLeft: 6, clientTop: 6 });
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([190 - 9, 120 - 9]);
+      });
+
+      test("html relative with left/top offsets and a scrolled page", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        global(floating, "offsetParent", document.body);
+        // scrollY 300: html border box is at (17, 9 - 300)
+        withHtml(rect(17, -291, 1000, 3000), { position: "absolute" });
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([190 - 17, 120 + 291]);
+      });
+
+      test("html with a static position and a margin keeps the document origin", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        global(floating, "offsetParent", document.body);
+        global(window, "scrollX", 0);
+        global(window, "scrollY", 0);
+        withHtml(rect(13, 13, 1000, 2000), { position: "static" });
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([190, 120]);
+      });
+    });
+
+    describe("root element exceptions and extra containing-block triggers", () => {
+      const rootFixed = (html: Record<string, string>, body: Record<string, string> = {}) => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const root = document.documentElement;
+        // scrollY 300: the html rect has moved up with the page
+        global(
+          root,
+          "getBoundingClientRect",
+          mockRect(document.createElement("i"), rect(0, -300, 1000, 3000)).getBoundingClientRect,
+        );
+        mockStyles(
+          new Map<Element, Record<string, string>>([
+            [root, html],
+            [document.body, body],
+          ]),
+        );
+        return bottom(reference, floating, "fixed");
+      };
+
+      test.each([
+        ["filter", { filter: "blur(1px)" }],
+        ["backdrop-filter", { backdropFilter: "blur(1px)" }],
+        ["will-change filter", { willChange: "filter" }],
+        ["will-change backdrop-filter", { willChange: "opacity, backdrop-filter" }],
+      ])("fixed: %s on the root element is not a containing block", (_n, style) => {
+        expect(rootFixed(style)).toMatchObject({ x: 190, y: 120 });
+      });
+
+      test.each([
+        ["filter", { filter: "blur(1px)" }],
+        ["backdrop-filter", { backdropFilter: "blur(1px)" }],
+        ["will-change filter", { willChange: "filter" }],
+      ])("fixed: %s on body is a containing block", (_n, style) => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        global(
+          document.body,
+          "getBoundingClientRect",
+          mockRect(document.createElement("i"), rect(20, -280, 1000, 3000)).getBoundingClientRect,
+        );
+        mockStyles(new Map([[document.body, style]]));
+        expect(bottom(reference, floating, "fixed")).toMatchObject({ x: 170, y: 400 });
+      });
+
+      test.each([
+        ["transform", { transform: "translateZ(0)" }],
+        ["perspective", { perspective: "100px" }],
+        ["contain paint", { contain: "paint" }],
+        ["will-change transform", { willChange: "transform" }],
+        ["offset-path path()", { offsetPath: 'path("M0 0 L10 10")' }],
+        ["offset-path ray()", { offsetPath: "ray(45deg)" }],
+        ["will-change contain", { willChange: "contain" }],
+        ["will-change offset-path", { willChange: "offset-path" }],
+        ["will-change offset", { willChange: "opacity, offset" }],
+        ["will-change transform-style", { willChange: "transform-style" }],
+        ["content-visibility auto", { contentVisibility: "auto" }],
+        ["content-visibility hidden", { contentVisibility: "hidden" }],
+        ["transform-style preserve-3d", { transformStyle: "preserve-3d" }],
+      ])("fixed: %s on the root element is a containing block", (_n, style) => {
+        expect(rootFixed(style)).toMatchObject({ x: 190, y: 120 + 300 });
+      });
+
+      test.each([
+        ["offset-path none", { offsetPath: "none" }],
+        ["content-visibility visible", { contentVisibility: "visible" }],
+        ["transform-style flat", { transformStyle: "flat" }],
+        ["will-change transform-origin", { willChange: "transform-origin" }],
+        ["will-change perspective-origin", { willChange: "perspective-origin" }],
+        ["will-change opacity transform-origin", { willChange: "opacity, transform-origin" }],
+        ["-webkit-backdrop-filter", { webkitBackdropFilter: "blur(1px)" }],
+        ["contain size style", { contain: "size style" }],
+      ])("fixed: %s is not a containing block", (_n, style) => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+        ancestor.append(floating);
+        document.body.append(ancestor);
+        mockStyles(new Map([[ancestor, style]]));
+        expect(bottom(reference, floating, "fixed")).toMatchObject({ x: 190, y: 120 });
+      });
+    });
+
+    describe("shadow boundaries", () => {
+      test("absolute: a slotted element finds the positioned wrapper in the shadow tree", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const host = document.createElement("div");
+        const shadow = host.attachShadow({ mode: "open" });
+        const wrapper = mockRect(document.createElement("div"), rect(100, 50, 400, 400));
+        wrapper.append(document.createElement("slot"));
+        shadow.append(wrapper);
+        host.append(floating);
+        document.body.append(host);
+        // Chrome retargets offsetParent out of the shadow tree
+        global(floating, "offsetParent", document.body);
+        mockStyles(new Map([[wrapper, { position: "relative" }]]));
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([190 - 100, 120 - 50]);
+      });
+
+      test("absolute: a slotted element finds a transformed wrapper (containing block, not positioned)", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const host = document.createElement("div");
+        const shadow = host.attachShadow({ mode: "open" });
+        const wrapper = mockRect(document.createElement("div"), rect(100, 50, 400, 400));
+        wrapper.append(document.createElement("slot"));
+        shadow.append(wrapper);
+        host.append(floating);
+        document.body.append(host);
+        global(floating, "offsetParent", document.body);
+        mockStyles(new Map([[wrapper, { transform: "translateZ(0)" }]]));
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([90, 70]);
+      });
+
+      test("absolute: an element inside a shadow tree uses the positioned host", () => {
+        const { reference } = setup(rect(200, 100, 40, 20));
+        const host = mockRect(document.createElement("div"), rect(60, 40, 400, 400));
+        const shadow = host.attachShadow({ mode: "open" });
+        const floating = mockRect(document.createElement("div"), rect(0, 0, 60, 30));
+        shadow.append(floating);
+        document.body.append(host);
+        global(floating, "offsetParent", document.body);
+        mockStyles(new Map([[host, { position: "relative" }]]));
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([190 - 60, 120 - 40]);
+      });
+
+      test("absolute: no shadow boundary keeps using offsetParent", () => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const parent = mockRect(document.createElement("div"), rect(100, 50, 400, 400));
+        global(floating, "offsetParent", parent);
+        const spy = vi.spyOn(window, "getComputedStyle");
+        const r = bottom(reference, floating, "absolute");
+        expect([r.x, r.y]).toEqual([90, 70]);
+        expect(spy).not.toHaveBeenCalledWith(document.body);
+      });
+    });
+
     test("absolute: a zero offset size falls back to scale 1", () => {
       const { reference, floating } = setup(rect(200, 100, 40, 20));
       const parent = mockRect(document.createElement("div"), rect(0, 0, 400, 400));
@@ -810,6 +1060,67 @@ describe("computePosition (DOM)", () => {
       const r = computePosition(reference, floating, { placement: "bottom", shift: true });
       // viewport right edge is 310 -> floating x max 250
       expect(r.x).toBe(250);
+    });
+
+    describe("RTL root with a scrollbar on the left", () => {
+      const rtlRoot = (
+        options: {
+          rtl?: boolean;
+          clientWidth?: number;
+          vv?: { width: number; scale: number } | null;
+        } = {},
+      ) => {
+        const { rtl = true, clientWidth = 985, vv = { width: 985, scale: 1 } } = options;
+        const html = document.documentElement;
+        global(html, "clientWidth", clientWidth);
+        global(html, "clientHeight", 800);
+        global(
+          window,
+          "visualViewport",
+          vv ? { offsetLeft: 0, offsetTop: 0, height: 800, ...vv } : undefined,
+        );
+        const real = window.getComputedStyle.bind(window);
+        vi.spyOn(window, "getComputedStyle").mockImplementation(((el: Element) =>
+          el === html
+            ? ({ direction: rtl ? "rtl" : "ltr" } as CSSStyleDeclaration)
+            : real(el)) as never);
+      };
+      const shifted = () => {
+        const { reference, floating } = setup(rect(5, 300, 10, 20));
+        return () =>
+          computePosition(reference, floating, { placement: "top", shift: true, rtl: true }).x;
+      };
+
+      test("the visible area starts after the scrollbar (visualViewport)", () => {
+        const x = shifted();
+        rtlRoot();
+        // clip x range is [15, 1000]
+        expect(x()).toBe(15);
+      });
+
+      test("the visible area starts after the scrollbar (no visualViewport)", () => {
+        const x = shifted();
+        rtlRoot({ vv: null });
+        expect(x()).toBe(15);
+      });
+
+      test("LTR roots are unaffected", () => {
+        const x = shifted();
+        rtlRoot({ rtl: false });
+        expect(x()).toBe(0);
+      });
+
+      test("a pinch-zoomed viewport is unaffected", () => {
+        const x = shifted();
+        rtlRoot({ vv: { width: 500, scale: 2 } });
+        expect(x()).toBe(0);
+      });
+
+      test("an overlay scrollbar (innerWidth equals clientWidth) changes nothing", () => {
+        const x = shifted();
+        rtlRoot({ clientWidth: 1000, vv: { width: 1000, scale: 1 } });
+        expect(x()).toBe(0);
+      });
     });
 
     test("falls back to documentElement client size", () => {

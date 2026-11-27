@@ -15,7 +15,7 @@ Dismissable layers (dialogs, popovers, menus) that share one layer stack, so Esc
 - **`createDismissableLayer`** — reactive layer, registers when `ref` resolves and unregisters on cleanup.
 - **`getLayerStack` / `useLayerStack` / `getTopLayer` / `isTopLayer`** — read the shared stack.
 
-Outside press and outside focus detection is delegated to [`@solid-primitives/interaction`](../interaction#readme) (`makeInteractOutside`, shadow-DOM aware, touch-safe); the Escape listener uses [`@solid-primitives/event-listener`](../event-listener#readme).
+Outside press and outside focus detection is delegated to [`@solid-primitives/interaction`](../interaction#readme) (`makeInteractOutside`, shadow-DOM aware; a touch that turns into a scroll or drag never dismisses); the Escape listener uses [`@solid-primitives/event-listener`](../event-listener#readme).
 
 ## Installation
 
@@ -36,6 +36,18 @@ pnpm add @solid-primitives/dismissable
 - When a layer is not `dismissible`, the request goes to `onDismissAttempt` and does **not** fall through to the layer below.
 
 Dismiss reasons: `"escape" | "outside-pointer" | "outside-focus" | "programmatic"`.
+
+### Mouse vs touch ordering
+
+- **Mouse / pen:** an outside press dismisses on `pointerdown`, _before_ the pressed element's own `click` handlers run.
+- **Touch:** the outside check is deferred to the tap's `click` (so a scroll or drag never dismisses), which means the dismissal runs _after_ the tapped element's own `click` handler. Whether a layer reacts is decided when the press **starts**: a layer that was the top layer at that moment is still dismissed by the tap even if the tapped trigger opened a new layer in its click handler. The newly opened layer is not dismissed by that same tap.
+- A press that lands on a focusable element and the focus move it causes count as **one** interaction: the layer gets a single `outside-pointer` request (and a single `onDismissAttempt` when it is not `dismissible`), not an extra `outside-focus` one. This includes pressing a `<label>` whose associated control takes focus on click. A later keyboard focus move (e.g. Tab) to an outside element still reports `outside-focus`.
+- A touch that is cancelled (scroll), drifts more than a few pixels, is followed by a key press, or whose `click` does not arrive shortly after release is dropped and cannot dismiss on a later click.
+
+### Documents and cleanup
+
+- A layer observes events of **its own document only**. A press or Escape inside a same-origin iframe does not dismiss a main-document layer, and the other way around. Cross-document dismissal is not supported. Workaround: from inside the iframe, forward the event yourself, e.g. `iframe.contentDocument.addEventListener("pointerdown", () => layer.dismiss("outside-pointer"))`, or register a layer in the iframe's document for its own content.
+- A layer whose element is removed from the DOM without calling `cleanup` **stays in the stack** (and keeps blocking the layers below it). Always call `cleanup` (e.g. in `onCleanup`) or use `createDismissableLayer`, which does so through its owner.
 
 ## `makeDismissableLayer`
 

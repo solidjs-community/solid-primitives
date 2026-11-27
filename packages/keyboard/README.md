@@ -295,6 +295,15 @@ createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: 
 
 Combos that include a modifier (e.g. `Control + S`) don't have this problem, since the modifier itself prevents a character from being typed — `ignoreWithinInputs` is usually unnecessary for those.
 
+The check also works for inputs inside iframes and **open** shadow roots (the real target is taken from `event.composedPath()`). **Closed** shadow roots hide their contents from the page, so inputs inside them cannot be detected.
+
+### Ignored keys and platform quirks
+
+- **Lock keys are ignored.** `CapsLock`, `NumLock` and `ScrollLock` are skipped by `useKeyDownList`, `createShortcut` and the shortcut registry (keydown and keyup). On macOS CapsLock sends only a keydown when switched on and only a keyup when switched off, so tracking it would leave it "held" and stop every exact-match shortcut from firing. They cannot be part of a shortcut.
+- **Option/Alt on macOS.** Matching uses `event.key`, and with Option held macOS reports the composed character (`Option+E` gives `Dead`, `Option+S` gives `ß`) instead of the letter. A shortcut written as `["Alt", "S"]` therefore does not match on macOS. If you need such a shortcut, match the composed character, or use `createKeyDown`/your own listener and compare `event.code` (`"KeyS"`).
+- **Meta keyup.** macOS never sends keyup for keys pressed while Meta (Cmd) is held, only Meta's own. Releasing Meta therefore clears every tracked key.
+- **Keyup is always observed on `window` in the capture phase**, so an app handler calling `stopPropagation()` on keyup cannot leave a key stuck.
+
 ### Matching keys in any order
 
 By default, `keys` must be pressed in the order given — `["Control", "Shift", "M"]` only matches Control, then Shift, then M. Set `anyOrder: true` to match the combo regardless of press order, similar to how most editors handle shortcuts:
@@ -372,7 +381,7 @@ At most **one** shortcut fires per keydown. Because matching is on the exact key
 
 ## `makeShortcutRegistry`
 
-The non-reactive base of `createShortcuts`. Listeners are attached when the first shortcut is registered and removed when the last is unregistered or on `clear()`. When `scope` is set, key releases are also observed on `window` (so a release after focus leaves the scope is seen) and on the scope itself (so a scope whose events never reach `window` still sees them). It also clears itself when its owner is disposed. On the server it returns an inert registry.
+The non-reactive base of `createShortcuts`. Listeners are attached when the first shortcut is registered and removed when the last is unregistered or on `clear()`. When `scope` is set, key releases are also observed on `window` (so a release after focus leaves the scope is seen) and on the scope itself, also in the capture phase (so a scope whose events never reach `window`, such as an iframe, still sees them even when an app handler stops keyup propagation). A `scope` may also be an iframe's `contentDocument` or `contentWindow`. It also clears itself when its owner is disposed. On the server it returns an inert registry.
 
 ```ts
 // Type

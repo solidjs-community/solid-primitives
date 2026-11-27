@@ -53,16 +53,49 @@ function createKeyRecorder() {
   };
 }
 
-/** Is the event target an editable form control, or inside a `contenteditable` element? */
+/**
+ * Lock keys. macOS sends only a keydown when CapsLock is switched on and only a keyup when it is
+ * switched off, so they can never be tracked as "held". They are ignored entirely.
+ */
+function isLockKey(key: string): boolean {
+  switch (key.toUpperCase()) {
+    case "CAPSLOCK":
+    case "NUMLOCK":
+    case "SCROLLLOCK":
+      return true;
+    default:
+      return false;
+  }
+}
+
+/**
+ * The element an event really originated from. `event.target` is retargeted to the shadow host
+ * when the listener sits outside an open shadow root; `composedPath()[0]` is the inner element.
+ */
+function getRealTarget(e: Event): EventTarget | null {
+  const path = typeof e.composedPath === "function" ? e.composedPath() : undefined;
+  return path && path.length ? path[0]! : e.target;
+}
+
+/** Realm-safe `instanceof Node` (an iframe's nodes are not instances of this window's `Node`). */
+function isNode(value: unknown): value is Node {
+  return !!value && typeof (value as Node).nodeType === "number";
+}
+
+/**
+ * Is the event target an editable form control, or inside a `contenteditable` element?
+ * Duck-typed, so it also works for elements that belong to another realm (iframes).
+ */
 function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  switch (target.tagName) {
+  if (!isNode(target) || target.nodeType !== 1) return false;
+  const el = target as HTMLElement;
+  switch (typeof el.tagName === "string" ? el.tagName.toUpperCase() : "") {
     case "INPUT":
     case "TEXTAREA":
     case "SELECT":
       return true;
     default:
-      return target.isContentEditable;
+      return !!el.isContentEditable;
   }
 }
 
@@ -150,7 +183,7 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
     makeEventListener(window, "keydown", e => {
       // e.key may be undefined when used with <datalist> el
       // gh issue: https://github.com/solidjs-community/solid-primitives/issues/246
-      if (e.repeat || typeof e.key !== "string") return;
+      if (e.repeat || typeof e.key !== "string" || isLockKey(e.key)) return;
 
       const key = e.key.toUpperCase(),
         currentKeys = pressedKeys();
@@ -178,19 +211,25 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
       setPressedKeys(keys);
     });
 
-    makeEventListener(window, "keyup", e => {
-      if (typeof e.key !== "string") return;
-      const key = recorder.up(e);
-      // macOS never fires keyup for other keys held down together with Meta —
-      // only Meta's own keyup arrives — so its release must clear everything,
-      // or the other keys' stale state corrupts the next press.
-      // See https://github.com/solidjs-community/solid-primitives/issues/269
-      if (key === "META") {
-        reset();
-      } else {
-        setPressedKeys(prev => prev.filter(_key => _key !== key));
-      }
-    });
+    // Capture phase: an app handler calling stopPropagation() on keyup must not leave keys stuck.
+    makeEventListener(
+      window,
+      "keyup",
+      e => {
+        if (typeof e.key !== "string" || isLockKey(e.key)) return;
+        const key = recorder.up(e);
+        // macOS never fires keyup for other keys held down together with Meta —
+        // only Meta's own keyup arrives — so its release must clear everything,
+        // or the other keys' stale state corrupts the next press.
+        // See https://github.com/solidjs-community/solid-primitives/issues/269
+        if (key === "META") {
+          reset();
+        } else {
+          setPressedKeys(prev => prev.filter(_key => _key !== key));
+        }
+      },
+      { capture: true },
+    );
 
     makeEventListener(window, "blur", reset);
     makeEventListener(window, "contextmenu", e => {
@@ -394,8 +433,8 @@ export function createShortcut(
   };
 
   makeEventListener(window, "keydown", (e: KeyboardEvent) => {
-    if (e.repeat || typeof e.key !== "string") return;
-    if (ignoreWithinInputs && isEditableTarget(e.target)) return;
+    if (e.repeat || typeof e.key !== "string" || isLockKey(e.key)) return;
+    if (ignoreWithinInputs && isEditableTarget(getRealTarget(e))) return;
     const key = e.key.toUpperCase();
 
     if (!pressedKeys.includes(key)) {
@@ -469,8 +508,9 @@ export function createShortcut(
     }
   });
 
-  makeEventListener(window, "keyup", (e: KeyboardEvent) => {
-    if (typeof e.key !== "string") return;
+  // Capture phase: an app handler calling stopPropagation() on keyup must not leave keys stuck.
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (typeof e.key !== "string" || isLockKey(e.key)) return;
     const key = recorder.up(e);
 
     // macOS never fires keyup for other keys held down together with Meta —
@@ -491,7 +531,8 @@ export function createShortcut(
       // key can re-trigger the shortcut while modifier keys stay held.
       sequence = [[...pressedKeys]];
     }
-  });
+  };
+  makeEventListener(window, "keyup", onKeyUp, { capture: true });
 
   makeEventListener(window, "blur", resetAll);
   makeEventListener(window, "contextmenu", (e: MouseEvent) => {
@@ -653,7 +694,7 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.repeat || typeof e.key !== "string") return;
+    if (e.repeat || typeof e.key !== "string" || isLockKey(e.key)) return;
     const key = e.key.toUpperCase();
 
     // modifier flags on the event are authoritative: adds modifiers held before we started
@@ -673,7 +714,7 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
       if (entry.keys.size !== pressed.length || !entry.keys.has(key)) continue;
       if (!pressed.every(k => entry.keys.has(k))) continue;
       if (def.requireReset && entry.fired) continue;
-      if (def.ignoreInputs && isEditableTarget(e.target)) continue;
+      if (def.ignoreInputs && isEditableTarget(getRealTarget(e))) continue;
       if (access(def.enabled) === false) continue;
 
       entry.fired = true;
@@ -684,7 +725,7 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
   };
 
   const onKeyUp = (e: KeyboardEvent) => {
-    if (typeof e.key !== "string") return;
+    if (typeof e.key !== "string" || isLockKey(e.key)) return;
     const key = recorder.up(e);
     // macOS fires no keyup for keys held together with Meta; its release clears everything
     // (https://github.com/solidjs-community/solid-primitives/issues/269)
@@ -705,14 +746,17 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
     // A null relatedTarget is the blur / window-switch case, which is reset by window "blur".
     const onFocusOut = (e: FocusEvent) => {
       const next = e.relatedTarget;
-      if (scope instanceof Node && next instanceof Node && !scope.contains(next)) resetState();
+      // duck-typed: scopes and focus targets may belong to another realm (iframe document)
+      if (isNode(scope) && isNode(next) && !scope.contains(next)) resetState();
     };
     keydownTarget.addEventListener("keydown", onKeyDown as (e: Event) => void);
-    // Activation is scoped, but releases are tracked on window (capture) even when a scope is set,
-    // so a key released after focus has moved outside the scope doesn't stay "pressed".
-    const keyupCapture = !!scope;
+    // Activation is scoped, but releases are always tracked on window in the capture phase, so a
+    // key released after focus has moved outside the scope, or whose keyup an app handler stops
+    // from propagating, doesn't stay "pressed".
+    const keyupCapture = true;
     // A scope whose events never reach window (bare EventTarget) needs its own keyup listener.
-    // One event bubbling scope -> window would hit both, so each event is handled only once.
+    // Registered in the capture phase too, so an app handler stopping keyup inside an iframe scope
+    // cannot leave a key stuck. One event reaching both listeners is handled only once.
     const ownKeyUp = !!scope && (scope as unknown) !== window;
     let lastKeyUp: Event | undefined;
     const handleKeyUp = (e: Event) => {
@@ -723,14 +767,14 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
       onKeyUp(e as KeyboardEvent);
     };
     window.addEventListener("keyup", handleKeyUp, keyupCapture);
-    if (ownKeyUp) scope!.addEventListener("keyup", handleKeyUp);
+    if (ownKeyUp) scope!.addEventListener("keyup", handleKeyUp, keyupCapture);
     scope?.addEventListener("focusout", onFocusOut as (e: Event) => void);
     window.addEventListener("blur", resetState);
     window.addEventListener("contextmenu", onContextMenu as (e: Event) => void);
     removeListeners = () => {
       keydownTarget.removeEventListener("keydown", onKeyDown as (e: Event) => void);
       window.removeEventListener("keyup", handleKeyUp, keyupCapture);
-      if (ownKeyUp) scope!.removeEventListener("keyup", handleKeyUp);
+      if (ownKeyUp) scope!.removeEventListener("keyup", handleKeyUp, keyupCapture);
       scope?.removeEventListener("focusout", onFocusOut as (e: Event) => void);
       window.removeEventListener("blur", resetState);
       window.removeEventListener("contextmenu", onContextMenu as (e: Event) => void);

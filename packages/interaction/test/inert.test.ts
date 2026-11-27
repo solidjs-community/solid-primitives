@@ -553,19 +553,66 @@ describe("createInertOthers", () => {
     flush();
     upperExposed();
     expect(app.getAttribute("aria-hidden")).toBe("true");
+    // Stacking order is opening order, like a real modal stack: disabling and enabling again is a NEW
+    // open, so the re-enabled layer goes on top and now hides the layer that opened in between.
     setLowerOn(true);
     flush();
-    upperExposed();
-    expect(app.getAttribute("aria-hidden")).toBe("true");
-    expect(lowerAlt.getAttribute("aria-hidden")).toBe("true");
+    expect(upperEl.getAttribute("aria-hidden")).toBe("true");
+    expect(lowerAlt.hasAttribute("aria-hidden")).toBe(false);
+    // and it keeps that position across further input changes
     setLowerIgnore(undefined);
     flush();
-    upperExposed();
-    expect(lowerAlt.getAttribute("aria-hidden")).toBe("true");
+    expect(upperEl.getAttribute("aria-hidden")).toBe("true");
+    expect(lowerAlt.hasAttribute("aria-hidden")).toBe(false);
     dispose();
     flush();
     for (const n of [app, dialog, lowerAlt, upperEl, upperChild, toast])
       expect(n.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("the stack order is the order layers open, not the order they were created", () => {
+    // hi is created first but disabled; low opens; then hi opens on top of low
+    const hiEl = el("div", { id: "hi" });
+    const hiChild = el("button", {}, hiEl);
+    const lowEl = el("div", { id: "low" });
+    const [hiOn, setHiOn] = createSignal(false);
+    const run = (close: "hi-first" | "low-first") => {
+      let disposeHi!: VoidFunction;
+      createRoot(d => {
+        disposeHi = d;
+        createInertOthers(hiEl, hiOn);
+      });
+      flush();
+      const closeLow = makeInertOthers(lowEl);
+      expect(hiEl.getAttribute("aria-hidden")).toBe("true");
+      setHiOn(true);
+      flush();
+      for (const n of [hiEl, hiChild, document.body])
+        expect(n.hasAttribute("aria-hidden")).toBe(false);
+      expect(lowEl.getAttribute("aria-hidden")).toBe("true");
+      expect(app.getAttribute("aria-hidden")).toBe("true");
+      if (close === "hi-first") {
+        setHiOn(false);
+        flush();
+        expect(hiEl.getAttribute("aria-hidden")).toBe("true");
+        expect(lowEl.hasAttribute("aria-hidden")).toBe(false);
+        closeLow();
+      } else {
+        closeLow();
+        expect(hiEl.hasAttribute("aria-hidden")).toBe(false);
+        expect(lowEl.getAttribute("aria-hidden")).toBe("true");
+        disposeHi();
+        flush();
+      }
+      disposeHi();
+      flush();
+      for (const n of [app, dialog, hiEl, hiChild, lowEl])
+        expect(n.hasAttribute("aria-hidden")).toBe(false);
+      setHiOn(false);
+      flush();
+    };
+    run("hi-first");
+    run("low-first");
   });
 
   test("layers closed in either order restore the original attributes after input changes", () => {
@@ -593,6 +640,192 @@ describe("createInertOthers", () => {
     disposeUpper();
     flush();
     for (const n of [app, dialog, upperEl]) expect(n.hasAttribute("aria-hidden")).toBe(false);
+  });
+});
+
+describe("focus inside a branch that is about to be hidden", () => {
+  // Chrome ignores aria-hidden on an ancestor of the focused element (the attribute is set but the
+  // accessibility tree keeps exposing it, and it is never re-applied), so the attribute is deferred.
+  let bgButton: HTMLButtonElement, dialogButton: HTMLButtonElement;
+  beforeEach(() => {
+    bgButton = el("button", {}, app) as HTMLButtonElement;
+    dialogButton = el("button", {}, dialog) as HTMLButtonElement;
+  });
+
+  test("aria-hidden waits until focus leaves the branch, then applies", async () => {
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog);
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    dialogButton.focus();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("focus leaving to nothing (blur) also applies it", async () => {
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog);
+    bgButton.blur();
+    await tick();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("moving focus within the branch keeps it deferred", async () => {
+    const second = el("button", {}, app);
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog);
+    second.focus();
+    await tick();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    dialogButton.focus();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+  });
+
+  test("closing before it was ever applied leaves the node untouched and drops the listeners", () => {
+    const add = vi.spyOn(document, "addEventListener");
+    const remove = vi.spyOn(document, "removeEventListener");
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog);
+    expect(add.mock.calls.filter(c => c[0] === "focusin")).toHaveLength(1);
+    cleanup();
+    expect(remove.mock.calls.filter(c => c[0] === "focusin")).toHaveLength(1);
+    dialogButton.focus();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    add.mockRestore();
+    remove.mockRestore();
+  });
+
+  test("a deferred node restores its previous value exactly, with stacked layers closed in either order", () => {
+    for (const order of ["upper-first", "lower-first"]) {
+      app.setAttribute("aria-hidden", "false");
+      const upperEl = el("div");
+      const upperButton = el("button", {}, upperEl);
+      bgButton.focus();
+      const lower = makeInertOthers(dialog);
+      const upper = makeInertOthers(upperEl);
+      expect(app.getAttribute("aria-hidden")).toBe("false");
+      upperButton.focus();
+      expect(app.getAttribute("aria-hidden")).toBe("true");
+      expect(dialog.getAttribute("aria-hidden")).toBe("true");
+      if (order === "upper-first") {
+        upper();
+        expect(app.getAttribute("aria-hidden")).toBe("true");
+        lower();
+      } else {
+        lower();
+        expect(app.getAttribute("aria-hidden")).toBe("true");
+        upper();
+      }
+      expect(app.getAttribute("aria-hidden")).toBe("false");
+      expect(dialog.hasAttribute("aria-hidden")).toBe(false);
+      app.removeAttribute("aria-hidden");
+      upperEl.remove();
+    }
+  });
+
+  test("a node already hidden by another layer is counted at once even if focus is inside", () => {
+    const upperEl = el("div");
+    const upperButton = el("button", {}, upperEl);
+    dialogButton.focus();
+    const lower = makeInertOthers(upperEl); // hides app and dialog (dialog contains focus: deferred)
+    upperButton.focus();
+    expect(dialog.getAttribute("aria-hidden")).toBe("true");
+    const upper = makeInertOthers(dialog);
+    // a second layer hides upperEl (focus is inside it: deferred) and app (already held: counted)
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    dialogButton.focus();
+    expect(upperEl.getAttribute("aria-hidden")).toBe("true");
+    lower();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    upper();
+    for (const n of [app, dialog, upperEl]) expect(n.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("the inert attribute is applied immediately even while focus is inside", () => {
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog, { strategy: "inert" });
+    expect(app.hasAttribute("inert")).toBe(true);
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    cleanup();
+  });
+
+  test("strategy both: inert at once, aria-hidden once focus has left", () => {
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog, { strategy: "both" });
+    expect(app.hasAttribute("inert")).toBe(true);
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    dialogButton.focus();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+    expect(app.hasAttribute("inert")).toBe(false);
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("focus inside an open shadow root counts for its host", () => {
+    const host = el("div", {}, app);
+    const input = document.createElement("input");
+    host.attachShadow({ mode: "open" }).appendChild(input);
+    input.focus();
+    expect(document.activeElement).toBe(host);
+    const cleanup = makeInertOthers(dialog);
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    dialogButton.focus();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+  });
+
+  test("createInertOthers defers the same way", () => {
+    bgButton.focus();
+    const [on, setOn] = createSignal(true);
+    const dispose = createRoot(d => {
+      createInertOthers(dialog, on);
+      return d;
+    });
+    flush();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    dialogButton.focus();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    setOn(false);
+    flush();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    dispose();
+  });
+});
+
+describe("all targets removed while the layer is open", () => {
+  test("held nodes stay held until the layer is updated or closed", async () => {
+    const [target, setTarget] = createSignal<HTMLElement>(dialog);
+    const dispose = createRoot(d => {
+      createInertOthers(target);
+      return d;
+    });
+    flush();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    dialog.remove();
+    await tick();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    const next = el("div");
+    setTarget(next);
+    flush();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(next.hasAttribute("aria-hidden")).toBe(false);
+    next.remove();
+    await tick();
+    dispose();
+    flush();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("makeInertOthers: cleanup restores after the target was removed", async () => {
+    const cleanup = makeInertOthers(dialog);
+    dialog.remove();
+    await tick();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
   });
 });
 

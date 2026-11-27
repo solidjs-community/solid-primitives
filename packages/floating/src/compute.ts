@@ -323,11 +323,24 @@ export function computePositionFromRects(
 
 function getViewportRect(doc: Document): Rect {
   const win = doc.defaultView;
-  const vv = win?.visualViewport;
-  if (vv) return { x: vv.offsetLeft, y: vv.offsetTop, width: vv.width, height: vv.height };
   const el = doc.documentElement;
+  const vv = win?.visualViewport;
+  // A classic (non-overlay) scrollbar sits on the left in an RTL root, so the visible area starts
+  // after it. Neither `visualViewport.offsetLeft` nor `0` accounts for that. Skipped while pinch
+  // zoomed, where innerWidth - clientWidth is not the scrollbar width. Overlay scrollbars: 0.
+  let scrollbarLeft = 0;
+  if (win && (!vv || vv.scale === 1) && safeStyle(win, el)?.direction === "rtl") {
+    if (el.clientWidth) scrollbarLeft = Math.max(0, win.innerWidth - el.clientWidth);
+  }
+  if (vv)
+    return {
+      x: vv.offsetLeft + scrollbarLeft,
+      y: vv.offsetTop,
+      width: vv.width,
+      height: vv.height,
+    };
   return {
-    x: 0,
+    x: scrollbarLeft,
     y: 0,
     width: el.clientWidth || win?.innerWidth || 0,
     height: el.clientHeight || win?.innerHeight || 0,
@@ -387,27 +400,71 @@ function getParentElement(el: Element): Element | null {
 }
 
 /**
- * Whether an element is the containing block of its `position: fixed` and `position: absolute`
- * descendants without being positioned itself: transform (including the individual `translate`,
- * `rotate`, `scale` properties), perspective, filter, backdrop-filter, a matching `will-change`,
- * or paint / layout containment. `container-type` is deliberately absent: it only applies style
- * and size containment (css-conditional-5), not layout containment.
+ * `will-change` tokens that make an element the containing block of its `position: fixed` and
+ * `position: absolute` descendants (the same properties as when they are actually set).
  */
-const establishesContainingBlock = (style: CSSStyleDeclaration): boolean => {
-  const none = (v: string | undefined) => !v || v === "none";
-  const s = style as CSSStyleDeclaration & { webkitBackdropFilter?: string };
-  return (
-    !none(s.transform) ||
-    !none(s.translate) ||
-    !none(s.rotate) ||
-    !none(s.scale) ||
-    !none(s.perspective) ||
-    !none(s.filter) ||
-    !none(s.backdropFilter) ||
-    !none(s.webkitBackdropFilter) ||
-    /transform|translate|rotate|scale|perspective|filter/.test(s.willChange || "") ||
-    /paint|layout|strict|content/.test(s.contain || "")
-  );
+const CONTAINING_BLOCK_WILL_CHANGE = new Set([
+  "transform",
+  "translate",
+  "rotate",
+  "scale",
+  "perspective",
+  "filter",
+  "backdrop-filter",
+  "contain",
+  "offset-path",
+  "offset",
+  "offset-position",
+  "transform-style",
+]);
+/** Tokens that do not count for the root element (see below). */
+const ROOT_IGNORED_WILL_CHANGE = new Set(["filter", "backdrop-filter"]);
+
+const isSet = (v: string | undefined) => !!v && v !== "none";
+
+/**
+ * Whether an element is the containing block of its `position: fixed` and `position: absolute`
+ * descendants without being positioned itself.
+ *
+ * Triggers: transform (including the individual `translate`, `rotate`, `scale` properties),
+ * perspective, filter, backdrop-filter, paint / layout / strict / content containment,
+ * `offset-path` other than `none` (including `ray()`), `content-visibility: auto | hidden`,
+ * `transform-style: preserve-3d`, and a `will-change` naming one of those (matched per token, so
+ * `transform-origin` or `perspective-origin` do not count). `container-type` is deliberately
+ * absent: it only applies style and size containment, not layout containment. Prefixed
+ * `-webkit-backdrop-filter` is not a trigger either.
+ *
+ * Exception for the root element: `filter`, `backdrop-filter` and `will-change` naming them do
+ * NOT make `<html>` a containing block (they do for `<body>` and any other element).
+ *
+ * This table was verified empirically in Chrome 158 (html and body, fixed and absolute
+ * descendants, one property at a time). It may differ in Safari and Firefox.
+ */
+const establishesContainingBlock = (style: CSSStyleDeclaration, isRoot = false): boolean => {
+  if (
+    isSet(style.transform) ||
+    isSet(style.translate) ||
+    isSet(style.rotate) ||
+    isSet(style.scale) ||
+    isSet(style.perspective) ||
+    (!isRoot && (isSet(style.filter) || isSet(style.backdropFilter)))
+  )
+    return true;
+  const s = style as CSSStyleDeclaration & { offsetPath?: string; contentVisibility?: string };
+  if (
+    isSet(s.offsetPath) ||
+    s.contentVisibility === "auto" ||
+    s.contentVisibility === "hidden" ||
+    s.transformStyle === "preserve-3d"
+  )
+    return true;
+  for (const token of (s.contain || "").split(/[\s,]+/))
+    if (token === "paint" || token === "layout" || token === "strict" || token === "content")
+      return true;
+  for (const token of (s.willChange || "").split(/[\s,]+/))
+    if (CONTAINING_BLOCK_WILL_CHANGE.has(token) && !(isRoot && ROOT_IGNORED_WILL_CHANGE.has(token)))
+      return true;
+  return false;
 };
 
 const safeStyle = (win: Window, el: Element): CSSStyleDeclaration | undefined => {
@@ -429,10 +486,53 @@ function getFixedContainingBlock(floating: Element): Element | null {
     } catch {
       return null;
     }
-    if (style && establishesContainingBlock(style)) return el;
+    if (style && establishesContainingBlock(style, el === floating.ownerDocument.documentElement))
+      return el;
   }
   return null;
 }
+
+/** Elements rendered in the top layer (open popover / modal dialog / fullscreen). */
+const TOP_LAYER_SELECTORS = [":popover-open", ":modal", ":fullscreen"];
+const isTopLayer = (el: Element): boolean =>
+  TOP_LAYER_SELECTORS.some(selector => {
+    try {
+      return el.matches(selector);
+    } catch {
+      // Unknown pseudo-class in this browser: only that selector is skipped.
+      return false;
+    }
+  });
+
+/** Whether the flat-tree path from `el` to the root crosses a slot or a shadow root. */
+function crossesShadowBoundary(el: Element): boolean {
+  for (let node: Element | null = el; node;) {
+    if (node.assignedSlot) return true;
+    if (node.parentElement) node = node.parentElement;
+    else return !!node.parentNode && node.parentNode.nodeType !== 9; /* document */
+  }
+  return false;
+}
+
+/**
+ * The nearest flat-tree ancestor that is the containing block of an absolutely positioned
+ * element: positioned, or one of the `establishesContainingBlock` triggers. Unlike `offsetParent`
+ * this sees through slots and shadow roots. `null` means the initial containing block.
+ */
+function getAbsoluteContainingBlock(floating: Element): Element | null {
+  const doc = floating.ownerDocument;
+  const win = doc.defaultView;
+  if (!win?.getComputedStyle) return null;
+  for (let el = getParentElement(floating); el; el = getParentElement(el)) {
+    const style = safeStyle(win, el);
+    if (!style) return null;
+    if (isPositionedOrContainingBlock(style, el === doc.documentElement)) return el;
+  }
+  return null;
+}
+
+const isPositionedOrContainingBlock = (style: CSSStyleDeclaration, isRoot: boolean): boolean =>
+  (!!style.position && style.position !== "static") || establishesContainingBlock(style, isRoot);
 
 /**
  * Viewport px per local CSS px; `1` when the element has no layout size or is not scaled.
@@ -484,24 +584,39 @@ export function getOriginAndScale(
 ): { origin: Point; scale: Point } {
   const doc = floating.ownerDocument;
   const win = doc.defaultView;
+  // Top-layer elements (open popover, modal dialog, fullscreen) ignore every ancestor's transform,
+  // filter, containment and positioning: `fixed` lays out against the viewport (zero origin) and
+  // `absolute` against the initial containing block (the document, scrolled).
+  if (isTopLayer(floating))
+    return strategy === "fixed"
+      ? { origin: ORIGIN_ZERO, scale: SCALE_ONE }
+      : { origin: { x: -(win?.scrollX ?? 0), y: -(win?.scrollY ?? 0) }, scale: SCALE_ONE };
   if (strategy === "fixed") {
     const block = getFixedContainingBlock(floating);
     return block ? getBlockOriginAndScale(block) : { origin: ORIGIN_ZERO, scale: SCALE_ONE };
   }
-  const parent = floating.offsetParent;
   const root = doc.documentElement;
+  const ICB = { origin: { x: -(win?.scrollX ?? 0), y: -(win?.scrollY ?? 0) }, scale: SCALE_ONE };
+  // `offsetParent` is retargeted across shadow boundaries (and skips slots), so walk the flat tree.
+  if (crossesShadowBoundary(floating)) {
+    const block = getAbsoluteContainingBlock(floating);
+    return block ? getBlockOriginAndScale(block) : ICB;
+  }
+  const parent = floating.offsetParent;
   const staticBody =
     !!parent && !!win && parent === doc.body && safeStyle(win, parent)?.position === "static";
   if (!parent || parent === root || staticBody) {
     // No positioned ancestor: the initial containing block (the document), unless body (when it
-    // is the static offset parent) or the root element itself establishes a containing block.
+    // is the static offset parent) or the root element itself is a containing block: it
+    // establishes one by the triggers above, or by being positioned (then its padding box is it).
     if (win) {
       for (const el of staticBody && parent ? [parent, root] : [root]) {
         const style = safeStyle(win, el);
-        if (style && establishesContainingBlock(style)) return getBlockOriginAndScale(el);
+        if (style && isPositionedOrContainingBlock(style, el === root))
+          return getBlockOriginAndScale(el);
       }
     }
-    return { origin: { x: -(win?.scrollX ?? 0), y: -(win?.scrollY ?? 0) }, scale: SCALE_ONE };
+    return ICB;
   }
   return getBlockOriginAndScale(parent);
 }
