@@ -574,6 +574,7 @@ The layer is applied after render, so a ref signal works as `targets`. Changing 
 
 ### Behavior
 
+- **Root and ignore:** without an explicit `root`, the root follows the first target's document `body` (re-evaluated when reactive targets change). A layer's `ignore` elements also stay exposed to the layers below it.
 - **Skipped nodes:** `ignore` elements, live regions (`aria-live` other than `off`, and `role` `alert` / `status` / `log`; only with the default `aria-hidden` strategy, and never a live region that contains a lower layer's target), `script` / `style` / `template` / `noscript` / `link` / `meta`, and nodes that were already `aria-hidden="true"` (or `inert`) before the layer opened. A branch that contains a protected element stays exposed and its other children are hidden.
 - **Restore:** a node's previous `aria-hidden` / `inert` value (or absence) is put back when its last holder closes.
 - **Stacking:** opening a second layer hides the first one and exposes the second. Each node keeps a shared per-strategy ref count, so the layers can close in any order and a node stays hidden until every layer that hides it is closed.

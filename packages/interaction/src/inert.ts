@@ -51,6 +51,8 @@ type Layer = {
   /** Creation order; the stack is kept sorted by it. */
   id: number;
   targets: HTMLElement[];
+  /** Elements the layer keeps exposed besides its targets; lower layers must not hide them either. */
+  ignore: Element[];
   sweep: () => void;
 };
 
@@ -182,7 +184,9 @@ function openLayer(
   let ignore = initialIgnore;
 
   const strategy = options.strategy ?? "aria-hidden";
-  const root = options.root ?? own[0]!.ownerDocument.body;
+  const explicitRoot = options.root;
+  // without an explicit root it follows the first target (which may move to another document)
+  let root = explicitRoot ?? own[0]!.ownerDocument.body;
   const held = new Map<Element, Hold>();
   let disposed = false;
 
@@ -219,6 +223,9 @@ function openLayer(
     get targets() {
       return own;
     },
+    get ignore() {
+      return ignore;
+    },
     sweep() {
       if (disposed) return;
       // protected = own targets + ignore + live regions + targets of layers opened above this one
@@ -232,7 +239,8 @@ function openLayer(
         for (const live of root.querySelectorAll(LIVE_SELECTOR))
           if (!lower.some(t => live.contains(t))) protectedEls.push(live);
       }
-      for (let i = index + 1; i < layers.length; i++) protectedEls.push(...layers[i]!.targets);
+      for (let i = index + 1; i < layers.length; i++)
+        protectedEls.push(...layers[i]!.targets, ...layers[i]!.ignore);
       const inRoot = protectedEls.filter(el => root.contains(el));
 
       const parents = new Set<Element>();
@@ -285,6 +293,7 @@ function openLayer(
       if (disposed) return;
       own = nextTargets;
       ignore = nextIgnore;
+      if (!explicitRoot) root = own[0]!.ownerDocument.body;
       for (const l of [...layers]) l.sweep();
     },
     close() {

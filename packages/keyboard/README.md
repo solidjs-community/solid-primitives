@@ -372,7 +372,7 @@ At most **one** shortcut fires per keydown. Because matching is on the exact key
 
 ## `makeShortcutRegistry`
 
-The non-reactive base of `createShortcuts`. Listeners are attached when the first shortcut is registered and removed when the last is unregistered or on `clear()`. It also clears itself when its owner is disposed. On the server it returns an inert registry.
+The non-reactive base of `createShortcuts`. Listeners are attached when the first shortcut is registered and removed when the last is unregistered or on `clear()`. When `scope` is set, key releases are also observed on `window` (so a release after focus leaves the scope is seen) and on the scope itself (so a scope whose events never reach `window` still sees them). It also clears itself when its owner is disposed. On the server it returns an inert registry.
 
 ```ts
 // Type

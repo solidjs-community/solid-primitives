@@ -625,3 +625,113 @@ describe("duplicate copies of the package", () => {
     expect(other.hasAttribute("aria-hidden")).toBe(false);
   });
 });
+
+describe("inferred root follows the first target", () => {
+  test("a reactive target moving into an iframe document re-roots the layer", () => {
+    const iframe = el("iframe") as HTMLIFrameElement;
+    const idoc = iframe.contentDocument!;
+    const iTarget = idoc.createElement("div");
+    const iOther = idoc.createElement("div");
+    idoc.body.append(iTarget, iOther);
+    const [target, setTarget] = createSignal<HTMLElement>(dialog);
+    const dispose = createRoot(d => {
+      createInertOthers(target);
+      return d;
+    });
+    flush();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(iOther.hasAttribute("aria-hidden")).toBe(false);
+    setTarget(iTarget);
+    flush();
+    expect(iOther.getAttribute("aria-hidden")).toBe("true");
+    expect(iTarget.hasAttribute("aria-hidden")).toBe(false);
+    // the old document's holds are released
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    dispose();
+    flush();
+    expect(iOther.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("an explicit root is preserved across updates", () => {
+    const container = el("div");
+    const a = el("div", {}, container);
+    const b = el("div", {}, container);
+    const outside = el("div");
+    const [target, setTarget] = createSignal<HTMLElement>(a);
+    const dispose = createRoot(d => {
+      createInertOthers(target, true, { root: container });
+      return d;
+    });
+    flush();
+    expect(b.getAttribute("aria-hidden")).toBe("true");
+    setTarget(b);
+    flush();
+    expect(a.getAttribute("aria-hidden")).toBe("true");
+    expect(outside.hasAttribute("aria-hidden")).toBe(false);
+    dispose();
+  });
+});
+
+describe("ignore elements of upper layers", () => {
+  for (const strategy of ["aria-hidden", "inert", "both"] as const) {
+    const hidden = (n: Element) =>
+      strategy === "aria-hidden"
+        ? n.getAttribute("aria-hidden") === "true"
+        : n.hasAttribute("inert");
+    const clean = (n: Element) => !n.hasAttribute("aria-hidden") && !n.hasAttribute("inert");
+
+    for (const order of ["upper first", "lower first"]) {
+      test(`makeInertOthers (${strategy}), closing ${order}`, () => {
+        const lower = el("div");
+        const upper = el("div");
+        const control = el("div");
+        const unrelated = el("div");
+        const closeA = makeInertOthers(lower, { strategy });
+        expect(hidden(control)).toBe(true);
+        const closeB = makeInertOthers(upper, { strategy, ignore: control });
+        expect(clean(control)).toBe(true);
+        expect(hidden(unrelated)).toBe(true);
+        expect(hidden(lower)).toBe(true);
+        if (order === "upper first") {
+          closeB();
+          closeA();
+        } else {
+          closeA();
+          closeB();
+        }
+        for (const n of [app, dialog, lower, upper, control, unrelated])
+          expect(clean(n)).toBe(true);
+      });
+
+      test(`createInertOthers (${strategy}) with reactive ignore, closing ${order}`, () => {
+        const lower = el("div");
+        const upper = el("div");
+        const c1 = el("div");
+        const c2 = el("div");
+        const [ignore, setIgnore] = createSignal<Element>(c1);
+        const closeA = makeInertOthers(lower, { strategy });
+        const disposeB = createRoot(d => {
+          createInertOthers(upper, true, { strategy, ignore });
+          return d;
+        });
+        flush();
+        expect(clean(c1)).toBe(true);
+        expect(hidden(c2)).toBe(true);
+        setIgnore(c2);
+        flush();
+        expect(clean(c2)).toBe(true);
+        expect(hidden(c1)).toBe(true);
+        if (order === "upper first") {
+          disposeB();
+          flush();
+          closeA();
+        } else {
+          closeA();
+          disposeB();
+          flush();
+        }
+        for (const n of [app, dialog, lower, upper, c1, c2]) expect(clean(n)).toBe(true);
+      });
+    }
+  }
+});

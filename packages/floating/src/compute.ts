@@ -275,9 +275,13 @@ export function computePositionFromRects(
     const axis = vertical ? "x" : "y";
     const len = vertical ? "width" : "height";
     const arrowLen = extras.arrow[len];
-    const padding = extras.arrow.padding ?? 0;
     const desired = reference[axis] + reference[len] / 2 - coords[axis] - arrowLen / 2;
-    const clamped = clamp(padding, desired, floating[len] - arrowLen - padding);
+    // Padding never exceeds half the free space, or the clamp range would invert and pin the
+    // arrow to the start edge. With no free space (arrow bigger than the box) it overflows from
+    // the start edge.
+    const space = floating[len] - arrowLen;
+    const pad = Math.max(0, Math.min(extras.arrow.padding ?? 0, space / 2));
+    const clamped = clamp(pad, desired, space - pad);
     const k = scale[axis];
     arrow = { [axis]: clamped / k, centerOffset: (desired - clamped) / k } as ArrowData;
     arrowCenter = clamped + arrowLen / 2;
@@ -382,19 +386,36 @@ function getParentElement(el: Element): Element | null {
   return root?.host ?? null;
 }
 
-const createsFixedContainingBlock = (style: CSSStyleDeclaration): boolean => {
+/**
+ * Whether an element is the containing block of its `position: fixed` and `position: absolute`
+ * descendants without being positioned itself: transform (including the individual `translate`,
+ * `rotate`, `scale` properties), perspective, filter, backdrop-filter, a matching `will-change`,
+ * or paint / layout containment. `container-type` is deliberately absent: it only applies style
+ * and size containment (css-conditional-5), not layout containment.
+ */
+const establishesContainingBlock = (style: CSSStyleDeclaration): boolean => {
   const none = (v: string | undefined) => !v || v === "none";
   const s = style as CSSStyleDeclaration & { webkitBackdropFilter?: string };
   return (
     !none(s.transform) ||
+    !none(s.translate) ||
+    !none(s.rotate) ||
+    !none(s.scale) ||
     !none(s.perspective) ||
     !none(s.filter) ||
     !none(s.backdropFilter) ||
     !none(s.webkitBackdropFilter) ||
-    /transform|perspective|filter/.test(s.willChange || "") ||
-    /paint|layout|strict|content/.test(s.contain || "") ||
-    /size|inline-size/.test(s.containerType || "")
+    /transform|translate|rotate|scale|perspective|filter/.test(s.willChange || "") ||
+    /paint|layout|strict|content/.test(s.contain || "")
   );
+};
+
+const safeStyle = (win: Window, el: Element): CSSStyleDeclaration | undefined => {
+  try {
+    return win.getComputedStyle(el);
+  } catch {
+    return undefined;
+  }
 };
 
 /** The nearest ancestor that is the containing block of `position: fixed` descendants. */
@@ -408,19 +429,48 @@ function getFixedContainingBlock(floating: Element): Element | null {
     } catch {
       return null;
     }
-    if (style && createsFixedContainingBlock(style)) return el;
+    if (style && establishesContainingBlock(style)) return el;
   }
   return null;
 }
 
-/** Viewport px per local CSS px; `1` when the element has no layout size or is not scaled. */
+/**
+ * Viewport px per local CSS px; `1` when the element has no layout size or is not scaled.
+ *
+ * Scale is inferred from `rect.width / offsetWidth`. `offsetWidth` is rounded to an integer, so a
+ * difference of up to 1px is treated as rounding (fractional layout) and snaps to 1. Limitation:
+ * a real transform that changes the size by 1px or less is indistinguishable from rounding.
+ */
 function getScale(el: Element, rect: DOMRect): Point {
   const { offsetWidth, offsetHeight } = el as HTMLElement;
   const ratio = (measured: number, css: number) => {
+    if (!css || Math.abs(measured - css) <= 1) return 1;
     const r = measured / css;
-    return css && Number.isFinite(r) && r > 0 ? r : 1;
+    return Number.isFinite(r) && r > 0 ? r : 1;
   };
   return { x: ratio(rect.width, offsetWidth), y: ratio(rect.height, offsetHeight) };
+}
+
+/**
+ * Viewport origin (and scale) of a block's padding box content, scroll included. The scroll offsets
+ * of `documentElement` (and of `body` in quirks mode) are the viewport's scroll: that is not box
+ * scrolling, and the box's rect has already moved with it, so they are not subtracted.
+ */
+function getBlockOriginAndScale(block: Element): { origin: Point; scale: Point } {
+  const doc = block.ownerDocument;
+  const rect = block.getBoundingClientRect();
+  const scale = getScale(block, rect);
+  const viewportScroller =
+    block === doc.documentElement || (block === doc.body && doc.compatMode === "BackCompat");
+  const scrollLeft = viewportScroller ? 0 : block.scrollLeft;
+  const scrollTop = viewportScroller ? 0 : block.scrollTop;
+  return {
+    origin: {
+      x: rect.left + (block.clientLeft - scrollLeft) * scale.x,
+      y: rect.top + (block.clientTop - scrollTop) * scale.y,
+    },
+    scale,
+  };
 }
 
 /**
@@ -436,34 +486,24 @@ export function getOriginAndScale(
   const win = doc.defaultView;
   if (strategy === "fixed") {
     const block = getFixedContainingBlock(floating);
-    if (!block) return { origin: ORIGIN_ZERO, scale: SCALE_ONE };
-    const rect = block.getBoundingClientRect();
-    const scale = getScale(block, rect);
-    return {
-      origin: {
-        x: rect.left + block.clientLeft * scale.x,
-        y: rect.top + block.clientTop * scale.y,
-      },
-      scale,
-    };
+    return block ? getBlockOriginAndScale(block) : { origin: ORIGIN_ZERO, scale: SCALE_ONE };
   }
   const parent = floating.offsetParent;
-  if (
-    !parent ||
-    parent === doc.documentElement ||
-    (parent === doc.body && win?.getComputedStyle(parent).position === "static")
-  ) {
+  const root = doc.documentElement;
+  const staticBody =
+    !!parent && !!win && parent === doc.body && safeStyle(win, parent)?.position === "static";
+  if (!parent || parent === root || staticBody) {
+    // No positioned ancestor: the initial containing block (the document), unless body (when it
+    // is the static offset parent) or the root element itself establishes a containing block.
+    if (win) {
+      for (const el of staticBody && parent ? [parent, root] : [root]) {
+        const style = safeStyle(win, el);
+        if (style && establishesContainingBlock(style)) return getBlockOriginAndScale(el);
+      }
+    }
     return { origin: { x: -(win?.scrollX ?? 0), y: -(win?.scrollY ?? 0) }, scale: SCALE_ONE };
   }
-  const rect = parent.getBoundingClientRect();
-  const scale = getScale(parent, rect);
-  return {
-    origin: {
-      x: rect.left + (parent.clientLeft - parent.scrollLeft) * scale.x,
-      y: rect.top + (parent.clientTop - parent.scrollTop) * scale.y,
-    },
-    scale,
-  };
+  return getBlockOriginAndScale(parent);
 }
 
 /** Viewport coordinates of the point that `x` / `y` are measured from. */

@@ -39,35 +39,36 @@ const notify = () => getSignal()[1](layers.slice());
 const lockedDocs = new Map<Document, string>();
 
 function updatePointerEvents(): void {
-  // Documents that need their body locked, and the lowest disabling layer index per document.
-  const firstDisabling = new Map<Document, number>();
+  // Documents that need their body locked, and the highest disabling layer index per document (the boundary).
+  const boundaries = new Map<Document, number>();
   layers.forEach((l, i) => {
     if (l.disableOutsidePointerEvents) {
       const doc = l.element.ownerDocument;
-      if (doc && !firstDisabling.has(doc)) firstDisabling.set(doc, i);
+      if (doc) boundaries.set(doc, i);
     }
   });
   // Restore documents that no longer need a lock.
   for (const [doc, saved] of lockedDocs) {
-    if (firstDisabling.has(doc)) continue;
+    if (boundaries.has(doc)) continue;
     if (doc.body) doc.body.style.pointerEvents = saved;
     lockedDocs.delete(doc);
   }
   // Lock newly needed documents.
-  for (const doc of firstDisabling.keys()) {
+  for (const doc of boundaries.keys()) {
     const body = doc.body;
     if (!body) continue;
     if (!lockedDocs.has(doc)) lockedDocs.set(doc, body.style.pointerEvents);
     body.style.pointerEvents = "none";
   }
-  // Layers at or above the lowest disabling layer of their document must stay interactive.
+  // Radix/Kobalte semantics: the highest disabling layer of a document is the boundary. Layers
+  // below it (same document) get "none"; the boundary and everything above it get "auto".
   layers.forEach((layer, i) => {
     const el = layer.element as HTMLElement;
     if (!el.style) return;
-    const first = firstDisabling.get(layer.element.ownerDocument);
-    if (first !== undefined && i >= first) {
+    const boundary = boundaries.get(layer.element.ownerDocument);
+    if (boundary !== undefined) {
       if (layer.prevPointerEvents === undefined) layer.prevPointerEvents = el.style.pointerEvents;
-      el.style.pointerEvents = "auto";
+      el.style.pointerEvents = i >= boundary ? "auto" : "none";
     } else if (layer.prevPointerEvents !== undefined) {
       el.style.pointerEvents = layer.prevPointerEvents;
       layer.prevPointerEvents = undefined;

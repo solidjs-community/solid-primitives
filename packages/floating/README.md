@@ -28,7 +28,7 @@ pnpm add @solid-primitives/floating
 
 ## `computePosition`
 
-Computes where `floating` goes relative to `reference`. It measures with `getBoundingClientRect`, applies no styles and keeps no state. `x` / `y` are relative to the floating element's offset parent for `strategy: "absolute"` and to the viewport for `"fixed"`. A `"fixed"` element inside a transformed ancestor (`transform`, `perspective`, `filter`, `backdrop-filter`, `will-change` naming one of those, or `contain` / `container-type` that includes paint, layout, size) is positioned relative to that ancestor instead, since it is the containing block; the viewport is used when there is none. If the offset parent or containing block is scaled (e.g. `transform: scale(2)`), `x` / `y`, `availableWidth` / `availableHeight`, shift, arrow and `transformOrigin` px values are converted to its local CSS px, so they render at the same viewport place.
+Computes where `floating` goes relative to `reference`. It measures with `getBoundingClientRect`, applies no styles and keeps no state. `x` / `y` are relative to the floating element's offset parent for `strategy: "absolute"` and to the viewport for `"fixed"`. A `"fixed"` element inside a transformed ancestor (`transform`, the individual `translate` / `rotate` / `scale` properties, `perspective`, `filter`, `backdrop-filter`, `will-change` naming one of those, or `contain` with paint or layout, including `strict` and `content`) is positioned relative to that ancestor instead, since it is the containing block, and the ancestor's own scroll offset is taken into account; the viewport is used when there is none. The same properties on a static `body` or on `html` make it the containing block for `"absolute"` elements. `container-type` does not count: it applies style and size containment only, not layout containment. The scale is inferred from the ancestor's bounding box versus its `offsetWidth` / `offsetHeight`; a difference of 1px or less is treated as rounding, so a real transform that changes the size by 1px or less is not detected. If the offset parent or containing block is scaled (e.g. `transform: scale(2)`), `x` / `y`, `availableWidth` / `availableHeight`, shift, arrow and `transformOrigin` px values are converted to its local CSS px, so they render at the same viewport place.
 
 `flip` and `shift` are opt-in. `rootBoundary` defaults to the viewport (`visualViewport` when the browser has it); `boundary` narrows that further and is intersected with it.
 
@@ -75,13 +75,15 @@ function computePosition(
 // Example
 import { computePosition } from "@solid-primitives/floating";
 
+// Position it before measuring, so the measurement and the applied coordinates share a context
+Object.assign(tooltip.style, { position: "absolute", left: "0", top: "0" });
 const { x, y, placement } = computePosition(button, tooltip, {
   placement: "top",
   offset: 8,
   flip: true,
   shift: { padding: 8 },
 });
-Object.assign(tooltip.style, { position: "absolute", left: `${x}px`, top: `${y}px` });
+Object.assign(tooltip.style, { left: `${x}px`, top: `${y}px` });
 ```
 
 ### Notes
@@ -91,7 +93,7 @@ Object.assign(tooltip.style, { position: "absolute", left: `${x}px`, top: `${y}p
 - `shift.limit` keeps the floating element attached to the reference when the reference is scrolled out of the boundary.
 - In RTL, `-start` / `-end` on `top` and `bottom` are mirrored. `left` and `right` placements are not affected.
 - `size.apply` runs after the position is solved. If it changes the floating element's size, the position is solved once more.
-- `arrow.x` / `arrow.y` are offsets inside the floating element along the cross axis; the arrow sits on the side opposite `placement`. `centerOffset` is non-zero when padding stopped it from pointing at the reference center.
+- `arrow.x` / `arrow.y` are offsets inside the floating element along the cross axis; the arrow sits on the side opposite `placement`. `centerOffset` is non-zero when padding stopped it from pointing at the reference center. The padding never exceeds half of the room left by the arrow, so on a floating element smaller than the arrow plus twice the padding the arrow still sits inside it.
 - `availableWidth` / `availableHeight` are the room the floating element has before it hits the boundary, minus `size.padding`: on top/bottom placements the height is measured on the placement side, and the width towards the side the element can grow.
 
 ## `computePositionFromRects`
@@ -142,10 +144,13 @@ function makeAutoUpdate(
 // Example
 import { makeAutoUpdate, computePosition } from "@solid-primitives/floating";
 
-const stop = makeAutoUpdate(button, tooltip, () => {
+Object.assign(tooltip.style, { position: "absolute", left: "0", top: "0" });
+const update = () => {
   const { x, y } = computePosition(button, tooltip, { placement: "top" });
   Object.assign(tooltip.style, { left: `${x}px`, top: `${y}px` });
-});
+};
+update(); // makeAutoUpdate does not call update on setup
+const stop = makeAutoUpdate(button, tooltip, update);
 // later
 stop();
 ```
@@ -153,7 +158,7 @@ stop();
 ### Notes
 
 - `animationFrame: true` checks the reference and floating boxes every frame and calls `update` only when they changed. Use it when the reference is animated, as scroll and resize events cannot see that.
-- A `ResizeObserver` firing right after it starts observing triggers one extra `update`.
+- A `ResizeObserver` firing right after it starts observing may trigger one extra `update`, but that is not guaranteed (`elementResize: false`, a hidden element, no `ResizeObserver`), so call `update` once yourself.
 
 ## `createFloating`
 

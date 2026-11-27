@@ -408,6 +408,86 @@ describe("disableOutsidePointerEvents", () => {
   });
 });
 
+describe("disableOutsidePointerEvents highest-boundary semantics", () => {
+  const pe = (el: HTMLElement) => el.style.pointerEvents;
+
+  it("sibling disabling layers: lower is none, highest is auto, body none", () => {
+    const [a, b] = [mount("a"), mount("b")];
+    a.style.pointerEvents = "";
+    b.style.pointerEvents = "";
+    layerAt(a, { disableOutsidePointerEvents: true });
+    layerAt(b, { disableOutsidePointerEvents: true });
+    expect(pe(a)).toBe("none");
+    expect(pe(b)).toBe("auto");
+    expect(document.body.style.pointerEvents).toBe("none");
+  });
+
+  it("removing the top sibling restores the lower layer to auto and the original of the top", () => {
+    const [a, b] = [mount("a"), mount("b")];
+    b.style.pointerEvents = "inherit";
+    layerAt(a, { disableOutsidePointerEvents: true });
+    const lb = layerAt(b, { disableOutsidePointerEvents: true });
+    lb.cleanup();
+    expect(pe(a)).toBe("auto");
+    expect(pe(b)).toBe("inherit");
+  });
+
+  it("removing the lower sibling first keeps the top auto and restores the lower original", () => {
+    const [a, b] = [mount("a"), mount("b")];
+    a.style.pointerEvents = "inherit";
+    const la = layerAt(a, { disableOutsidePointerEvents: true });
+    const lb = layerAt(b, { disableOutsidePointerEvents: true });
+    la.cleanup();
+    expect(pe(a)).toBe("inherit");
+    expect(pe(b)).toBe("auto");
+    lb.cleanup();
+    expect(pe(b)).toBe("");
+    expect(document.body.style.pointerEvents).toBe("");
+  });
+
+  it("disabling A, non-disabling C, disabling B: A and C none, B auto", () => {
+    const [a, c, b] = [mount("a"), mount("c"), mount("b")];
+    const la = layerAt(a, { disableOutsidePointerEvents: true });
+    layerAt(c);
+    const lb = layerAt(b, { disableOutsidePointerEvents: true });
+    expect(pe(a)).toBe("none");
+    expect(pe(c)).toBe("none");
+    expect(pe(b)).toBe("auto");
+    lb.cleanup();
+    expect(pe(a)).toBe("auto");
+    expect(pe(c)).toBe("auto");
+    la.cleanup();
+    expect(pe(a)).toBe("");
+    expect(pe(c)).toBe("");
+  });
+
+  it("a disabling layer with a non-disabling layer above stays auto", () => {
+    const [a, c] = [mount("a"), mount("c")];
+    layerAt(a, { disableOutsidePointerEvents: true });
+    layerAt(c);
+    expect(pe(a)).toBe("auto");
+    expect(pe(c)).toBe("auto");
+  });
+
+  it("boundaries are independent per document", () => {
+    const iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument!;
+    const fel = doc.createElement("div");
+    doc.body.appendChild(fel);
+    const m1 = mount("m1");
+    layerAt(m1, { disableOutsidePointerEvents: true });
+    layerAt(fel, { disableOutsidePointerEvents: true });
+    const m2 = mount("m2");
+    layerAt(m2, { disableOutsidePointerEvents: true });
+    // main-document boundary is m2; m1 is below it. The iframe layer is its own boundary.
+    expect(pe(m1)).toBe("none");
+    expect(pe(m2)).toBe("auto");
+    expect(pe(fel)).toBe("auto");
+    expect(iframe.contentDocument!.body.style.pointerEvents).toBe("none");
+  });
+});
+
 describe("disableOutsidePointerEvents across documents", () => {
   const makeFrame = () => {
     const iframe = document.createElement("iframe");

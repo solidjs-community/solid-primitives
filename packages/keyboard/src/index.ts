@@ -711,13 +711,26 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
     // Activation is scoped, but releases are tracked on window (capture) even when a scope is set,
     // so a key released after focus has moved outside the scope doesn't stay "pressed".
     const keyupCapture = !!scope;
-    window.addEventListener("keyup", onKeyUp as (e: Event) => void, keyupCapture);
+    // A scope whose events never reach window (bare EventTarget) needs its own keyup listener.
+    // One event bubbling scope -> window would hit both, so each event is handled only once.
+    const ownKeyUp = !!scope && (scope as unknown) !== window;
+    let lastKeyUp: Event | undefined;
+    const handleKeyUp = (e: Event) => {
+      if (ownKeyUp) {
+        if (e === lastKeyUp) return;
+        lastKeyUp = e;
+      }
+      onKeyUp(e as KeyboardEvent);
+    };
+    window.addEventListener("keyup", handleKeyUp, keyupCapture);
+    if (ownKeyUp) scope!.addEventListener("keyup", handleKeyUp);
     scope?.addEventListener("focusout", onFocusOut as (e: Event) => void);
     window.addEventListener("blur", resetState);
     window.addEventListener("contextmenu", onContextMenu as (e: Event) => void);
     removeListeners = () => {
       keydownTarget.removeEventListener("keydown", onKeyDown as (e: Event) => void);
-      window.removeEventListener("keyup", onKeyUp as (e: Event) => void, keyupCapture);
+      window.removeEventListener("keyup", handleKeyUp, keyupCapture);
+      if (ownKeyUp) scope!.removeEventListener("keyup", handleKeyUp);
       scope?.removeEventListener("focusout", onFocusOut as (e: Event) => void);
       window.removeEventListener("blur", resetState);
       window.removeEventListener("contextmenu", onContextMenu as (e: Event) => void);

@@ -333,6 +333,44 @@ describe("arrow", () => {
     expect(solve("bottom-start").middlewareData.transformOrigin).toBe("50px 0px");
   });
 
+  test("padding larger than the free space centers the arrow instead of pinning it to the start", () => {
+    // 20px box, 10px arrow, 15px padding: floating x = 440, desired = 450 - 440 - 5 = 5
+    const r = computePositionFromRects(
+      ref,
+      { width: 20, height: 30 },
+      clip,
+      { placement: "bottom" },
+      { arrow: { ...arrow, padding: 15 } },
+    );
+    expect(r.middlewareData.arrow).toEqual({ x: 5, centerOffset: 0 });
+    expect(r.middlewareData.transformOrigin).toBe("10px 0px");
+  });
+
+  test("padding is capped at half the free space and the transform origin follows the clamped arrow", () => {
+    // 40px box, 10px arrow, free space 30, padding 20 -> capped to 15. bottom-end: x = 440 - 20 + ...
+    const r = computePositionFromRects(
+      rect(400, 300, 100, 40),
+      { width: 40, height: 30 },
+      clip,
+      { placement: "bottom-end" },
+      { arrow: { ...arrow, padding: 20 } },
+    );
+    // floating x = 450 + 50 - 40 = 460 -> wait: end aligns right edges: 400 + 100 - 40 = 460; desired = 450 - 460 - 5 = -15
+    expect(r.middlewareData.arrow).toEqual({ x: 15, centerOffset: -30 });
+    expect(r.middlewareData.transformOrigin).toBe("20px 0px");
+  });
+
+  test("an arrow wider than the floating element overflows from the start edge", () => {
+    const r = computePositionFromRects(
+      ref,
+      { width: 8, height: 30 },
+      clip,
+      { placement: "bottom" },
+      { arrow: { ...arrow, padding: 4 } },
+    );
+    expect(r.middlewareData.arrow!.x).toBe(0);
+  });
+
   test("rtl", () => {
     // bottom-start in rtl: floating x = 440, center 450 -> 5
     expect(solve("bottom-start", { rtl: true }).middlewareData.arrow).toEqual({
@@ -426,11 +464,24 @@ describe("computePosition (DOM)", () => {
 
     test("a positioned body is the offset parent", () => {
       const { reference, floating } = setup();
-      mockRect(document.body, rect(0, -100, 1000, 2000));
+      // registered before the assertion so a failure cannot leak the overrides
+      global(
+        document.body,
+        "getBoundingClientRect",
+        mockRect(document.createElement("i"), rect(0, -100, 1000, 2000)).getBoundingClientRect,
+      );
+      cleanups.push(() => {
+        document.body.style.position = "";
+      });
       document.body.style.position = "relative";
       global(floating, "offsetParent", document.body);
       expect(computePosition(reference, floating).y).toBe(440);
-      document.body.style.position = "";
+    });
+
+    test("overrides of a previous test do not leak (probe)", () => {
+      expect(Object.hasOwn(document.body, "getBoundingClientRect")).toBe(false);
+      expect(document.body.style.position).toBe("");
+      expect(document.body.getBoundingClientRect().y).toBe(0);
     });
 
     test("fixed and absolute agree on size and flip results", () => {
@@ -475,6 +526,12 @@ describe("computePosition (DOM)", () => {
       ["filter", { filter: "blur(1px)" }],
       ["backdrop-filter", { backdropFilter: "blur(1px)" }],
       ["will-change transform", { willChange: "opacity, transform" }],
+      ["will-change translate", { willChange: "translate" }],
+      ["will-change rotate", { willChange: "rotate" }],
+      ["will-change scale", { willChange: "scale" }],
+      ["translate", { translate: "10px 0px" }],
+      ["rotate", { rotate: "10deg" }],
+      ["scale", { scale: "1.5" }],
       ["contain paint", { contain: "paint" }],
       ["contain layout", { contain: "layout" }],
       ["contain strict", { contain: "strict" }],
@@ -487,6 +544,46 @@ describe("computePosition (DOM)", () => {
       mockStyles(new Map([[ancestor, { transform: "none", ...style }]]));
       const r = bottom(reference, floating, "fixed");
       expect([r.x, r.y]).toEqual([90, 70]);
+    });
+
+    test.each(["inline-size", "size"])(
+      "fixed: container-type %s alone does not create a containing block",
+      containerType => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+        ancestor.append(floating);
+        document.body.append(ancestor);
+        mockStyles(new Map([[ancestor, { transform: "none", containerType }]]));
+        expect(bottom(reference, floating, "fixed").x).toBe(190);
+      },
+    );
+
+    test("fixed: scroll offsets of the containing block are subtracted", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      global(ancestor, "scrollTop", 40);
+      global(ancestor, "scrollLeft", 10);
+      ancestor.append(floating);
+      document.body.append(ancestor);
+      mockStyles(new Map([[ancestor, { transform: "translateZ(0)" }]]));
+      const r = bottom(reference, floating, "fixed");
+      // target (190, 120); origin (100 - 10, 50 - 40)
+      expect([r.x, r.y]).toEqual([100, 110]);
+    });
+
+    test("fixed: a transformed documentElement does not subtract viewport scroll", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const html = document.documentElement;
+      // viewport scrolling is not box scrolling: the box rect already moved with it
+      global(html, "scrollTop", 300);
+      global(
+        html,
+        "getBoundingClientRect",
+        mockRect(document.createElement("i"), rect(0, -300, 1000, 3000)).getBoundingClientRect,
+      );
+      mockStyles(new Map([[html, { transform: "translateZ(0)" }]]));
+      const r = bottom(reference, floating, "fixed");
+      expect([r.x, r.y]).toEqual([190, 120 + 300]);
     });
 
     test("fixed: unrelated styles do not create a containing block", () => {
@@ -625,6 +722,75 @@ describe("computePosition (DOM)", () => {
       global(floating, "offsetParent", parent);
       const r = bottom(reference, floating, "absolute");
       expect([r.x, r.y]).toEqual([170, 110]);
+    });
+
+    test("absolute: fractional layout rounding is not mistaken for a scale", () => {
+      // reference at 410 -> floating x = 400
+      const { reference, floating } = setup(rect(410, 100, 40, 20));
+      const parent = mockRect(document.createElement("div"), rect(0, 0, 100.25, 100.25));
+      scaled(parent, 100, 100);
+      global(floating, "offsetParent", parent);
+      const r = bottom(reference, floating, "absolute");
+      expect([r.x, r.y]).toEqual([400, 120]);
+    });
+
+    test.each([
+      ["2", 400, 200],
+      ["1.5", 300, 200],
+      ["0.5", 100, 200],
+      ["1.05 on a large parent", 1050, 1000],
+    ])("absolute: genuinely scaled parent (%s) still converts", (_n, measured, css) => {
+      const { reference, floating } = setup(rect(410, 100, 40, 20));
+      const parent = mockRect(document.createElement("div"), rect(0, 0, measured, measured));
+      scaled(parent, css, css);
+      global(floating, "offsetParent", parent);
+      const k = measured / css;
+      const r = bottom(reference, floating, "absolute");
+      expect(r.x).toBeCloseTo(400 / k, 6);
+      expect(r.y).toBeCloseTo(120 / k, 6);
+    });
+
+    test("absolute: a transformed static body is the containing block", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      global(
+        document.body,
+        "getBoundingClientRect",
+        mockRect(document.createElement("i"), rect(100, 0, 1000, 2000)).getBoundingClientRect,
+      );
+      global(floating, "offsetParent", document.body);
+      mockStyles(new Map([[document.body, { position: "static", transform: "translateZ(0)" }]]));
+      const r = bottom(reference, floating, "absolute");
+      expect([r.x, r.y]).toEqual([90, 120]);
+    });
+
+    test("absolute: a static body with a will-change containing block is respected too", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      global(
+        document.body,
+        "getBoundingClientRect",
+        mockRect(document.createElement("i"), rect(100, 0, 1000, 2000)).getBoundingClientRect,
+      );
+      global(floating, "offsetParent", document.body);
+      mockStyles(new Map([[document.body, { position: "static", willChange: "translate" }]]));
+      expect(bottom(reference, floating, "absolute").x).toBe(90);
+    });
+
+    test("absolute: a transformed documentElement is the containing block when body is static", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const html = document.documentElement;
+      global(
+        html,
+        "getBoundingClientRect",
+        mockRect(document.createElement("i"), rect(100, 0, 1000, 2000)).getBoundingClientRect,
+      );
+      global(floating, "offsetParent", document.body);
+      mockStyles(
+        new Map([
+          [document.body, { position: "static" }],
+          [html, { transform: "translateZ(0)" }],
+        ]),
+      );
+      expect(bottom(reference, floating, "absolute").x).toBe(90);
     });
 
     test("absolute: a zero offset size falls back to scale 1", () => {

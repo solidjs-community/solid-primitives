@@ -118,7 +118,7 @@ const hasOpenLayers = () => stack().length > 0;
 
 ### Notes
 
-- `disableOutsidePointerEvents` sets `pointer-events: none` on `document.body` while any such layer is registered and `auto` on the layers at or above it; previous values are restored when the last one is removed.
+- `disableOutsidePointerEvents` sets `pointer-events: none` on `document.body` while any such layer is registered and `none` on every layer below the topmost such layer (per document); that topmost disabling layer and any layer above it get `auto`; previous values are restored when the last one is removed.
 - Listeners are attached on the next tick (by `makeInteractOutside`) so the event that opened a layer does not immediately dismiss it.
 - On the server, everything is a no-op: layers are not registered and the stack is always empty.
 

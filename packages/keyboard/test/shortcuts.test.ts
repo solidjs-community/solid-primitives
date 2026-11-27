@@ -102,8 +102,9 @@ describe("makeShortcutRegistry", () => {
     registry.register({ keys: "a", handler: () => {} });
     registry.register({ keys: "b", handler: () => {} });
     registry.register({ keys: "c", handler: () => {} });
-    // keyup is tracked on window (capture) so releases outside the scope are seen
-    expect(add.mock.calls.map(c => c[0])).toEqual(["keydown", "focusout"]);
+    // keyup is tracked on window (capture) so releases outside the scope are seen, and on the
+    // scope itself so a scope whose events never reach window still sees releases
+    expect(add.mock.calls.map(c => c[0]).sort()).toEqual(["focusout", "keydown", "keyup"]);
     registry.clear();
   });
 
@@ -348,6 +349,70 @@ describe("makeShortcutRegistry", () => {
     });
   });
 
+  describe("scope keyup tracking", () => {
+    test("a bare EventTarget scope (events never reach window) sees key releases", () => {
+      const scope = new EventTarget();
+      const registry = makeShortcutRegistry({ scope });
+      const a = vi.fn();
+      const b = vi.fn();
+      registry.register({ keys: "a", handler: a });
+      registry.register({ keys: "b", handler: b });
+      fire(scope, "a", "keydown");
+      fire(scope, "a", "keyup");
+      fire(scope, "b", "keydown");
+      expect(a).toHaveBeenCalledTimes(1);
+      expect(b).toHaveBeenCalledTimes(1);
+      registry.clear();
+    });
+
+    test("a keyup bubbling from the scope to window is processed exactly once", () => {
+      // count how often the registry reads `key` while handling one keyup event
+      const keyReads = (scope?: HTMLElement) => {
+        if (scope) document.body.append(scope);
+        const registry = makeShortcutRegistry({ scope });
+        registry.register({ keys: "a", handler: () => {} });
+        fire(scope ?? window, "a", "keydown");
+        const up = new Event("keyup", { bubbles: true }) as any;
+        let reads = 0;
+        Object.defineProperty(up, "key", {
+          get() {
+            reads++;
+            return "a";
+          },
+        });
+        (scope ?? window).dispatchEvent(up);
+        registry.clear();
+        scope?.remove();
+        return reads;
+      };
+      const baseline = keyReads();
+      expect(baseline).toBeGreaterThan(0);
+      expect(keyReads(document.createElement("div"))).toBe(baseline);
+    });
+
+    test("removes both keyup listeners on cleanup", () => {
+      const scope = new EventTarget();
+      const sAdd = vi.spyOn(scope, "addEventListener");
+      const sRemove = vi.spyOn(scope, "removeEventListener");
+      const wAdd = vi.spyOn(window, "addEventListener");
+      const wRemove = vi.spyOn(window, "removeEventListener");
+      const registry = makeShortcutRegistry({ scope });
+      registry.register({ keys: "a", handler: () => {} });
+      const sUp = sAdd.mock.calls.filter(c => c[0] === "keyup");
+      const wUp = wAdd.mock.calls.filter(c => c[0] === "keyup");
+      expect(sUp).toHaveLength(1);
+      expect(wUp).toHaveLength(1);
+      registry.clear();
+      expect(sRemove.mock.calls.filter(c => c[0] === "keyup" && c[1] === sUp[0]![1])).toHaveLength(
+        1,
+      );
+      expect(wRemove.mock.calls.filter(c => c[0] === "keyup" && c[1] === wUp[0]![1])).toHaveLength(
+        1,
+      );
+      vi.restoreAllMocks();
+    });
+  });
+
   describe("scope element: focus leaving the scope", () => {
     const setup = () => {
       const scope = document.createElement("div");
@@ -517,7 +582,7 @@ describe("makeShortcutRegistry", () => {
       off1();
       expect(rem).not.toHaveBeenCalled();
       off2();
-      expect(rem).toHaveBeenCalledTimes(2);
+      expect(rem).toHaveBeenCalledTimes(3);
       vi.restoreAllMocks();
     });
 
