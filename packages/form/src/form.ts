@@ -401,60 +401,71 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     const f = internalFields[name];
     if (!f) throw new Error(`createForm: unknown field "${name}"`);
 
-    let el: HTMLInputElement | undefined;
-    let checkable = false;
-    // Teardowns of every element this bind() was applied to. The runtime does not call a ref
-    // callback's returned cleanup (it ignores the return value), so they also run when the
-    // owner that evaluated bind() is disposed; each is idempotent.
-    const teardowns = new Set<() => void>();
-
-    // field -> DOM. Created in the factory so it is owned by (and disposed with) the component.
-    const syncDom = (v: unknown) => {
-      if (!el) return;
-      if (checkable) el.checked = Boolean(v);
-      else if (el.value !== String(v ?? "")) el.value = String(v ?? "");
+    // One callback may be applied to several elements; each keeps its own state.
+    type Attachment = {
+      input: HTMLInputElement;
+      checkable: boolean;
+      teardown: () => void;
     };
-    // Called outside any owner (e.g. in an event handler or a plain function) there is nothing to
-    // own the effect, so give it a root that is disposed together with the ref cleanup below.
+    const active = new Set<Attachment>();
+
+    // field -> DOM, for every element this callback is currently attached to.
+    const syncOne = (a: Attachment, v: unknown) => {
+      if (a.checkable) a.input.checked = Boolean(v);
+      else if (a.input.value !== String(v ?? "")) a.input.value = String(v ?? "");
+    };
+    const syncAll = (v: unknown) => active.forEach(a => syncOne(a, v));
+
+    // The effect is created in the factory so it is owned by (and disposed with) the component.
+    // Called outside any owner (an event handler, a plain function) nothing can own it, so it
+    // gets a root that lives while at least one element is attached and is disposed with the
+    // last one's cleanup (and recreated if the callback is attached again).
+    const owned = !!getOwner();
     let disposeRoot: (() => void) | undefined;
-    if (getOwner()) createEffect(f.value, syncDom);
-    else
-      disposeRoot = createRoot(d => {
-        createEffect(f.value, syncDom);
-        return d;
-      });
+    if (owned) createEffect(f.value, syncAll);
 
     const refCallback = (nextEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => {
       const input = nextEl as HTMLInputElement;
-      el = input;
-      checkable = input.type === "checkbox" || input.type === "radio";
+      const checkable = input.type === "checkbox" || input.type === "radio";
 
-      syncDom(untrack(f.value));
-
-      // Plain listeners, removed by the returned cleanup: makeEventListener would register its
-      // removal with onCleanup, which is forbidden inside a ref callback.
+      // Plain listeners, removed by the cleanup: makeEventListener would register its removal
+      // with onCleanup, which is forbidden inside a ref callback.
       const valueEvent = checkable ? "change" : "input";
       const onValue = () => f._setValue(checkable ? input.checked : input.value);
       const onBlur = () => f._setTouched(true);
       input.addEventListener(valueEvent, onValue);
       input.addEventListener("blur", onBlur);
 
-      const teardown = () => {
-        if (!teardowns.delete(teardown)) return;
-        input.removeEventListener(valueEvent, onValue);
-        input.removeEventListener("blur", onBlur);
-        if (el === input) el = undefined;
+      const attachment: Attachment = {
+        input,
+        checkable,
+        teardown: () => {
+          if (!active.delete(attachment)) return;
+          input.removeEventListener(valueEvent, onValue);
+          input.removeEventListener("blur", onBlur);
+          if (!owned && active.size === 0) {
+            disposeRoot?.();
+            disposeRoot = undefined;
+          }
+        },
       };
-      teardowns.add(teardown);
+      active.add(attachment);
 
-      return () => {
-        teardown();
-        disposeRoot?.();
-      };
+      if (!owned && !disposeRoot)
+        disposeRoot = createRoot(d => {
+          createEffect(f.value, syncAll);
+          return d;
+        });
+
+      syncOne(attachment, untrack(f.value));
+
+      return attachment.teardown;
     };
 
-    // Register in the factory (allowed here, forbidden inside the ref callback below).
-    if (getOwner()) onCleanup(() => [...teardowns].forEach(t => t()));
+    // The runtime does not call a ref callback's returned cleanup (it ignores the return value),
+    // so also tear every attachment down with the owner that evaluated bind(). Registered here
+    // in the factory, where onCleanup is allowed (it is forbidden inside the ref callback).
+    if (owned) onCleanup(() => [...active].forEach(a => a.teardown()));
     return refCallback;
   };
 
