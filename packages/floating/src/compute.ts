@@ -553,15 +553,16 @@ function getScale(el: Element, rect: DOMRect): Point {
 
 /**
  * Viewport origin (and scale) of a block's padding box content, scroll included. The scroll offsets
- * of `documentElement` (and of `body` in quirks mode) are the viewport's scroll: that is not box
+ * of `documentElement` (and of `body` when it is the document's `scrollingElement`, i.e. in quirks mode) are the viewport's scroll: that is not box
  * scrolling, and the box's rect has already moved with it, so they are not subtracted.
  */
 function getBlockOriginAndScale(block: Element): { origin: Point; scale: Point } {
   const doc = block.ownerDocument;
   const rect = block.getBoundingClientRect();
   const scale = getScale(block, rect);
-  const viewportScroller =
-    block === doc.documentElement || (block === doc.body && doc.compatMode === "BackCompat");
+  // In quirks mode `scrollingElement` is `body` only when body is the real viewport scroller (it is
+  // `null` when html has a non-visible overflow and body box-scrolls on its own).
+  const viewportScroller = block === doc.documentElement || block === doc.scrollingElement;
   const scrollLeft = viewportScroller ? 0 : block.scrollLeft;
   const scrollTop = viewportScroller ? 0 : block.scrollTop;
   return {

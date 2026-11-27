@@ -54,6 +54,26 @@ function createKeyRecorder() {
 }
 
 /**
+ * True when `key` (a normalized key name) is a modifier whose event flag is still set after its
+ * keyup, meaning another physical key of the same modifier (e.g. ControlRight after ControlLeft)
+ * is still held. The modifier must then stay in the pressed list.
+ */
+function isModifierStillHeld(key: string, e: KeyboardEvent): boolean {
+  switch (key) {
+    case "CONTROL":
+      return e.ctrlKey;
+    case "SHIFT":
+      return e.shiftKey;
+    case "ALT":
+      return e.altKey;
+    case "META":
+      return e.metaKey;
+    default:
+      return false;
+  }
+}
+
+/**
  * Lock keys. macOS sends only a keydown when CapsLock is switched on and only a keyup when it is
  * switched off, so they can never be tracked as "held". They are ignored entirely.
  */
@@ -222,6 +242,7 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
         // only Meta's own keyup arrives — so its release must clear everything,
         // or the other keys' stale state corrupts the next press.
         // See https://github.com/solidjs-community/solid-primitives/issues/269
+        if (isModifierStillHeld(key, e)) return;
         if (key === "META") {
           reset();
         } else {
@@ -517,6 +538,7 @@ export function createShortcut(
     // only Meta's own keyup arrives. Treat it as a signal that every other
     // tracked key must have been released too, or their stale state corrupts
     // the next press (see https://github.com/solidjs-community/solid-primitives/issues/269).
+    if (isModifierStillHeld(key, e)) return;
     if (key === "META") {
       resetAll();
       return;
@@ -729,6 +751,7 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
     const key = recorder.up(e);
     // macOS fires no keyup for keys held together with Meta; its release clears everything
     // (https://github.com/solidjs-community/solid-primitives/issues/269)
+    if (isModifierStillHeld(key, e)) return;
     if (key === "META") return resetState();
     pressed = pressed.filter(k => k !== key);
     if (pressed.length === 0) for (const entry of entries) entry.fired = false;

@@ -586,6 +586,34 @@ describe("computePosition (DOM)", () => {
       expect([r.x, r.y]).toEqual([190, 120 + 300]);
     });
 
+    describe("quirks mode body scroll", () => {
+      const quirksBody = (scrollingElement: Element | null) => {
+        const { reference, floating } = setup(rect(200, 100, 40, 20));
+        const body = document.body;
+        global(document, "compatMode", "BackCompat");
+        global(document, "scrollingElement", scrollingElement);
+        global(body, "scrollTop", 40);
+        global(
+          body,
+          "getBoundingClientRect",
+          mockRect(document.createElement("i"), rect(0, 0, 1000, 300)).getBoundingClientRect,
+        );
+        mockStyles(new Map([[body, { transform: "translateZ(0)" }]]));
+        return bottom(reference, floating, "fixed");
+      };
+
+      test("scrollingElement is null: a scrollable body box-scrolls, so scrollTop is subtracted", () => {
+        // target (190, 120); origin (0, 0 - 40)
+        const r = quirksBody(null);
+        expect([r.x, r.y]).toEqual([190, 160]);
+      });
+
+      test("scrollingElement is body: it is the viewport scroller, scrollTop is not subtracted", () => {
+        const r = quirksBody(document.body);
+        expect([r.x, r.y]).toEqual([190, 120]);
+      });
+    });
+
     test("fixed: unrelated styles do not create a containing block", () => {
       const { reference, floating } = setup(rect(200, 100, 40, 20));
       const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
