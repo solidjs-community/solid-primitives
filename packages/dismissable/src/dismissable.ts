@@ -135,8 +135,11 @@ export function makeDismissableLayer(
   /** Handles an automatic dismissal source, only for the layer that is currently on top. */
   const auto = (reason: DismissReason, event: Event) => {
     if (handled.has(event)) return;
-    if (getTopLayer() !== layer && !(reason === "outside-pointer" && pressedAsTop.has(event)))
-      return;
+    // A layer that turned persistent (even during the tap that is being reported) never reacts.
+    if (layer.persistent) return;
+    // An outside press belongs to the layer that was on top when the press started: a touch press is
+    // reported on its click, by which time the tap's own handler may have changed the stack.
+    if (reason === "outside-pointer" ? !pressedAsTop.has(event) : getTopLayer() !== layer) return;
     handled.add(event);
     request(reason, event);
   };
@@ -144,11 +147,14 @@ export function makeDismissableLayer(
   const isFocusOfPress = (event: Event): boolean => {
     if (!pressTarget) return false;
     const target = (event.composedPath()[0] as Element | undefined) ?? (event.target as Element);
+    // Realm-independent node check: `instanceof Node` fails for elements of an iframe's document.
+    const isNode = (n: unknown): n is Node =>
+      !!n && typeof (n as Node).nodeType === "number" && typeof (n as Node).contains === "function";
     return (
       !!target &&
       (target === pressControl ||
         target === pressTarget ||
-        (target instanceof Node && (target.contains(pressTarget) || pressTarget.contains(target))))
+        (isNode(target) && (target.contains(pressTarget) || pressTarget.contains(target))))
     );
   };
 

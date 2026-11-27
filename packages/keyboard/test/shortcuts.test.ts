@@ -86,6 +86,64 @@ describe("makeShortcutRegistry", () => {
     registry.clear();
   });
 
+  test("keys with an Unidentified code do not get stuck (both release orders)", () => {
+    for (const order of ["same", "reverse"]) {
+      const registry = makeShortcutRegistry();
+      const b = vi.fn();
+      registry.register({ keys: "B", handler: b });
+      const code = "Unidentified";
+      fire(window, "a", "keydown", { code });
+      fire(window, "b", "keydown", { code });
+      const [first, second] = order === "same" ? ["a", "b"] : ["b", "a"];
+      fire(window, first!, "keyup", { code });
+      fire(window, second!, "keyup", { code });
+      b.mockClear();
+      // a stuck "A" would make the held set [A, B] and block a lone B
+      fire(window, "b", "keydown", { code });
+      fire(window, "b", "keyup", { code });
+      expect(b).toHaveBeenCalledTimes(1);
+      registry.clear();
+    }
+  });
+
+  test("literal plus key in any position of a key string", () => {
+    const registry = makeShortcutRegistry();
+    const mid = vi.fn();
+    const shiftPlus = vi.fn();
+    registry.register({ keys: "Control+++K", handler: mid });
+    registry.register({ keys: "Shift+++", handler: shiftPlus });
+    // Control, +, K held together (chord of non-modifiers + and K)
+    fire(window, "Control", "keydown", { ctrlKey: true, code: "ControlLeft" });
+    fire(window, "+", "keydown", { ctrlKey: true, code: "Equal" });
+    fire(window, "K", "keydown", { ctrlKey: true, code: "KeyK" });
+    expect(mid).toHaveBeenCalledTimes(1);
+    for (const [k, c] of [
+      ["K", "KeyK"],
+      ["+", "Equal"],
+      ["Control", "ControlLeft"],
+    ] as const)
+      fire(window, k, "keyup", { code: c });
+    fire(window, "Shift", "keydown", { shiftKey: true, code: "ShiftLeft" });
+    fire(window, "+", "keydown", { shiftKey: true, code: "Equal" });
+    expect(shiftPlus).toHaveBeenCalledTimes(1);
+    registry.clear();
+  });
+
+  test("a+++b registers a, + and b; malformed strings do not throw", () => {
+    const registry = makeShortcutRegistry();
+    const h = vi.fn();
+    registry.register({ keys: "a+++b", handler: h });
+    fire(window, "a");
+    fire(window, "+");
+    fire(window, "b");
+    expect(h).toHaveBeenCalledTimes(1);
+    for (const k of ["b", "+", "a"]) fire(window, k, "keyup");
+    for (const bad of ["", "+", "++", "+++", "a+", "+a", "a++b+", " ", "a+ +b"]) {
+      expect(() => registry.register({ keys: bad, handler: vi.fn() })()).not.toThrow();
+    }
+    registry.clear();
+  });
+
   test("preventDefault defaults to true and can be disabled", () => {
     const registry = makeShortcutRegistry();
     registry.register({ keys: "x", handler: () => {} });

@@ -441,6 +441,8 @@ const isSet = (v: string | undefined) => !!v && v !== "none";
  * descendants, one property at a time). It may differ in Safari and Firefox.
  */
 const establishesContainingBlock = (style: CSSStyleDeclaration, isRoot = false): boolean => {
+  // `display: contents` generates no box, so none of the properties below have any effect.
+  if (style.display === "contents") return false;
   if (
     isSet(style.transform) ||
     isSet(style.translate) ||
@@ -532,7 +534,8 @@ function getAbsoluteContainingBlock(floating: Element): Element | null {
 }
 
 const isPositionedOrContainingBlock = (style: CSSStyleDeclaration, isRoot: boolean): boolean =>
-  (!!style.position && style.position !== "static") || establishesContainingBlock(style, isRoot);
+  style.display !== "contents" &&
+  ((!!style.position && style.position !== "static") || establishesContainingBlock(style, isRoot));
 
 /**
  * Viewport px per local CSS px; `1` when the element has no layout size or is not scaled.

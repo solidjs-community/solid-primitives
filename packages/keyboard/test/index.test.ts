@@ -38,6 +38,59 @@ const dispatchKeyEventOn = (
   return ev as KeyboardEvent;
 };
 
+describe("keys with an unavailable physical code (virtual/IME keyboards)", () => {
+  for (const code of ["Unidentified", ""]) {
+    for (const order of ["same", "reverse"] as const) {
+      const tag = `code=${JSON.stringify(code)}, release ${order}`;
+      const release = () => {
+        if (order === "same") {
+          dispatchKeyEvent("a", "keyup", { code });
+          dispatchKeyEvent("b", "keyup", { code });
+        } else {
+          dispatchKeyEvent("b", "keyup", { code });
+          dispatchKeyEvent("a", "keyup", { code });
+        }
+      };
+
+      test(`useKeyDownList leaves an empty list: ${tag}`, () =>
+        createRoot(dispose => {
+          const keys = useKeyDownList();
+          dispatchKeyEvent("a", "keydown", { code });
+          flush();
+          dispatchKeyEvent("b", "keydown", { code });
+          flush();
+          expect(keys()).toEqual(["A", "B"]);
+          if (order === "same") {
+            dispatchKeyEvent("a", "keyup", { code });
+            flush();
+            dispatchKeyEvent("b", "keyup", { code });
+          } else {
+            dispatchKeyEvent("b", "keyup", { code });
+            flush();
+            dispatchKeyEvent("a", "keyup", { code });
+          }
+          flush();
+          expect(keys()).toEqual([]);
+          dispose();
+        }));
+
+      test(`createShortcut state is clean afterwards: ${tag}`, () =>
+        createRoot(dispose => {
+          let fired = 0;
+          createShortcut(["B"], () => fired++);
+          dispatchKeyEvent("a", "keydown", { code });
+          dispatchKeyEvent("b", "keydown", { code });
+          release();
+          // a stuck "A" would make the held set [A, B] and block a lone B
+          dispatchKeyEvent("b", "keydown", { code });
+          dispatchKeyEvent("b", "keyup", { code });
+          expect(fired).toBe(1);
+          dispose();
+        }));
+    }
+  }
+});
+
 describe("key value changes between keydown and keyup", () => {
   const releaseCases: [string, "shift-first" | "digit-first", string, string, string, string][] = [
     ["Shift+1", "shift-first", "!", "1", "Digit1", "!"],

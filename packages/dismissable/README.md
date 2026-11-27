@@ -32,7 +32,8 @@ pnpm add @solid-primitives/dismissable
 - Layers are pushed on registration and removed on cleanup, in any order.
 - Only the **topmost non-persistent** layer reacts to Escape, an outside pointer press and outside focus. Nested layers therefore close one at a time, even if a handler removes its layer synchronously.
 - A press inside any layer opened after a layer (or registered with it as `parent`) is never "outside" that layer, so portaled children do not dismiss their parent.
-- A **persistent** layer stays in the stack but is never auto-dismissed and never steals the top position.
+- A **persistent** layer stays in the stack but is never auto-dismissed and never steals the top position. A layer that turns persistent while a press is being handled (for example in the tapped element's click handler) is not dismissed by that press.
+- An outside press is attributed to the layer that was on top when the press started, so a touch tap that closes the layer above (in a click handler) does not also dismiss the layer below.
 - When a layer is not `dismissible`, the request goes to `onDismissAttempt` and does **not** fall through to the layer below.
 
 Dismiss reasons: `"escape" | "outside-pointer" | "outside-focus" | "programmatic"`.

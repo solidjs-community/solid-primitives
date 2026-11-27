@@ -825,6 +825,70 @@ describe("one press is one interaction", () => {
     expect(lc.onDismiss).not.toHaveBeenCalled();
   });
 
+  it("touch: a layer that turns persistent during the tap is not dismissed", () => {
+    const [c, trigger] = [mount("c"), mount("trigger")];
+    const [persistent, setPersistent] = createSignal(false);
+    const lc = layerAt(c, { persistent });
+    ready();
+    trigger.addEventListener("click", () => {
+      setPersistent(true);
+      flush();
+    });
+    down(trigger, "touch");
+    up(trigger);
+    click(trigger);
+    expect(persistent()).toBe(true);
+    expect(lc.onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("touch: closing the layer above during the tap does not dismiss the layer below", () => {
+    const [a, b, out] = [mount("a"), mount("b"), mount("out")];
+    const la = layerAt(a);
+    const lb = layerAt(b);
+    ready();
+    out.addEventListener("click", () => lb.cleanup());
+    down(out, "touch");
+    up(out);
+    click(out);
+    expect(la.onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("mouse: a press while the layer is top but persistent does not dismiss it", () => {
+    const [b, out] = [mount("b"), mount("out")];
+    const lb = layerAt(b, { persistent: true });
+    ready();
+    down(out, "mouse");
+    click(out);
+    expect(lb.onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("mouse: the top layer still dismisses on pointerdown", () => {
+    const [b, out] = [mount("b"), mount("out")];
+    const lb = layerAt(b);
+    ready();
+    down(out, "mouse");
+    expect(lb.onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("outside press inside a same-origin iframe: one dismissal for a span inside a button", () => {
+    const frame = document.createElement("iframe");
+    document.body.appendChild(frame);
+    const doc = frame.contentDocument!;
+    const el = doc.createElement("div");
+    const button = doc.createElement("button");
+    const span = doc.createElement("span");
+    button.appendChild(span);
+    doc.body.append(el, button);
+    const l = layerAt(el);
+    ready();
+    span.dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true, pointerType: "mouse", pointerId: 1 }),
+    );
+    button.focus();
+    expect(l.onDismiss).toHaveBeenCalledTimes(1);
+    expect(l.onDismiss.mock.calls[0]![0]).toBe("outside-pointer");
+  });
+
   it("mouse: dismissal still precedes the target's own click handler", () => {
     const [c, trigger] = [mount("c"), mount("trigger")];
     const lc = layerAt(c);

@@ -113,6 +113,8 @@ An element with one of these styles is the containing block of its `position: fi
 
 `container-type` and the prefixed `-webkit-backdrop-filter` are not triggers. This table was verified in Chrome 158 only (`html` and `body`, one property at a time) and may differ in Safari and Firefox.
 
+An element with `display: contents` generates no box, so none of these styles (and not `position` either) make it a containing block; it is skipped and the next ancestor is used. A `display: contents` slot wrapper around a positioned host therefore resolves to the host.
+
 Elements in the top layer (an open `popover`, a modal `dialog`, a fullscreen element) ignore all of this: with `strategy: "fixed"` they are measured from the viewport, with `"absolute"` from the document, whatever their ancestors are styled with.
 
 ### Limitations

@@ -572,14 +572,14 @@ createInertOthers(dialog, open);
 <div ref={setDialog} role="dialog" />;
 ```
 
-The layer is applied after render, so a ref signal works as `targets`. Changing `targets` or `ignore` updates the layer in place (it keeps its stack position); turning `enabled` off restores the DOM, and turning it on again opens a new layer on top. Disposal of the owner restores it too.
+The layer is applied after render, so a ref signal works as `targets`. Changing `targets` or `ignore` updates the layer in place (it keeps its stack position); turning `enabled` off restores the DOM, and turning it on again opens a new layer on top. Disposal of the owner restores it too. Only `enabled`, `targets` and `ignore` are reactive: `strategy` and `root` are read once when the layer opens, so to change them disable and re-enable (which opens a new layer on top).
 
 ### Behavior
 
 - **Root and ignore:** without an explicit `root`, the root follows the first target's document `body` (re-evaluated when reactive targets change). A layer's `ignore` elements also stay exposed to the layers below it.
 - **Skipped nodes:** `ignore` elements, live regions (`aria-live` other than `off`, and `role` `alert` / `status` / `log`; only with the default `aria-hidden` strategy, and never a live region that contains a lower layer's target), `script` / `style` / `template` / `noscript` / `link` / `meta`, and nodes that were already `aria-hidden="true"` (or `inert`) before the layer opened. A branch that contains a protected element stays exposed and its other children are hidden.
 - **Restore:** a node's previous `aria-hidden` / `inert` value (or absence) is put back when its last holder closes.
-- **Stacking:** opening a second layer hides the first one and exposes the second. Stacking order is opening order, like a real modal stack: the layer that opened last is on top. A `createInertOthers` layer keeps its position while it stays open, however its `targets`, `ignore` or `strategy` change, but disabling it and enabling it again is a new open and puts it on top (a layer that was created first but enabled later is above the layers that opened before it, and the layers that were open in between are hidden by it). Each node keeps a shared per-strategy ref count, so the layers can close in any order and a node stays hidden until every layer that hides it is closed. A lower layer's `ignore` elements are still hidden by an upper layer, on purpose.
+- **Stacking:** opening a second layer hides the first one and exposes the second. Stacking order is opening order, like a real modal stack: the layer that opened last is on top. A `createInertOthers` layer keeps its position while it stays open, however its `targets` or `ignore` change, but disabling it and enabling it again is a new open and puts it on top (a layer that was created first but enabled later is above the layers that opened before it, and the layers that were open in between are hidden by it). Each node keeps a shared per-strategy ref count, so the layers can close in any order and a node stays hidden until every layer that hides it is closed. A lower layer's `ignore` elements are still hidden by an upper layer, on purpose.
 - **Dynamic content:** nodes appended to a walked parent are hidden, and nodes removed from the document are released.
 - **Duplicate copies:** the shared state lives on `globalThis`, so it stays correct if more than one copy of this package ends up installed.
 - **Server:** both are no-ops.
@@ -587,7 +587,7 @@ The layer is applied after render, so a ref signal works as `targets`. Changing 
 
 #### Focus and `aria-hidden`
 
-Browsers (Chrome logs "Blocked aria-hidden on an element because its descendant retained focus") do not apply `aria-hidden` to an ancestor of the focused element: after about 100ms the attribute is in the DOM but the accessibility tree keeps exposing the node, and it is not applied again later. So when a node to hide contains the focused element (open shadow roots included), the `aria-hidden` part of the hold is deferred until focus leaves that node (`focusin` / `focusout` on its document), and applied then. Closing the layer before that simply drops the deferred hold; ref counts and restored values stay exact. The `inert` part is never deferred, because `inert` blurs the focused element itself.
+Browsers (Chrome logs "Blocked aria-hidden on an element because its descendant retained focus") do not apply `aria-hidden` to an ancestor of the focused element: after about 100ms the attribute is in the DOM but the accessibility tree keeps exposing the node, and it is not applied again later. So when a node to hide contains the focused element (open shadow roots included), the `aria-hidden` part of the hold is deferred until focus leaves that node (`focusin` / `focusout` on its document, or removal of the focused element from the node, for browsers that fire no blur on removal), and applied then. Closing the layer before that simply drops the deferred hold; ref counts and restored values stay exact. The `inert` part is never deferred, because `inert` blurs the focused element itself.
 
 - Prefer `strategy: "both"` or `"inert"` for modals.
 - Move focus into the dialog right after opening it. The library never moves focus itself.
@@ -596,7 +596,7 @@ Browsers (Chrome logs "Blocked aria-hidden on an element because its descendant 
 
 - Only element children are hidden. Direct text nodes of a walked ancestor stay exposed.
 - Nodes appended to the root after the layer opened (for example a select or popover dropdown portaled to `body` out of a modal) are hidden too, until they get their own layer or are passed in `ignore`. This is a common trap with portaled dropdowns inside a modal.
-- If every target is removed from the document while the layer is open, what the layer already holds stays held until the layer is updated (new targets) or closed, instead of releasing the whole page.
+- If every target is removed from the document while the layer is open, what the layer already holds stays held until the layer is updated (new targets) or closed, instead of releasing the whole page. The one exception is a layer opened above it: holds that cover that upper layer's targets or `ignore` elements are released, and the frozen layer never adds new holds.
 - The root is a single document: a target inside an iframe does not hide the parent document. A target moved to another document re-roots the layer there.
 - Any value of the `inert` attribute counts as already inert, and such a node is left alone.
 

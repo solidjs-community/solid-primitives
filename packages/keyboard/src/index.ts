@@ -38,7 +38,10 @@ function isSameKeySet(a: string[], b: string[]): boolean {
  */
 function createKeyRecorder() {
   const recorded = new Map<string, string>();
-  const id = (e: KeyboardEvent) => e.code || e.key;
+  // `code` is the physical key; virtual/IME keyboards may report "" or "Unidentified" for every key,
+  // which would make all of them share one slot. Fall back to a key-based id that cannot collide
+  // with a real code name.
+  const id = (e: KeyboardEvent) => (e.code && e.code !== "Unidentified" ? e.code : `key:${e.key}`);
   return {
     /** Records the normalized `key` for the physical key of `e`. */
     down: (e: KeyboardEvent, key: string) => void recorded.set(id(e), key),
@@ -681,9 +684,33 @@ const KEY_ALIASES: Record<string, string> = {
   SPACE: " ",
 };
 
+/**
+ * Splits a `+`-joined key string. The first character always starts a token; a `+` right after a
+ * token is a separator; a `+` right after a separator is a literal plus key (`"Control+++K"` is
+ * Control, `+`, K); a trailing `+` after a separator is a literal plus key (`"Control++"`).
+ */
+function splitKeyString(str: string): string[] {
+  const out: string[] = [];
+  let token = "";
+  let afterSeparator = false;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i]!;
+    if (ch === "+" && token !== "" && !afterSeparator) {
+      out.push(token);
+      token = "";
+      afterSeparator = true;
+    } else {
+      token += ch;
+      afterSeparator = false;
+    }
+  }
+  if (token !== "") out.push(token);
+  return out;
+}
+
 /** Normalises a key list or `+`-joined string to a de-duplicated list of upper-cased keys. */
 function normalizeShortcutKeys(keys: KbdKey[] | string): string[] {
-  const list = typeof keys === "string" ? keys.split(/(?<=.)\+(?=.)/) : keys;
+  const list = typeof keys === "string" ? splitKeyString(keys) : keys;
   const out = new Set<string>();
   for (const k of list) {
     const key = k === " " ? k : k.trim();

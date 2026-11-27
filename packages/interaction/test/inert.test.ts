@@ -968,3 +968,138 @@ describe("ignore elements of upper layers", () => {
     }
   }
 });
+
+describe("deferred aria-hidden when the focused element is removed without focus events", () => {
+  // Firefox and Safari dispatch no blur/focusout when the focused element leaves the DOM, jsdom neither.
+  let bgButton: HTMLButtonElement, dialogButton: HTMLButtonElement;
+  beforeEach(() => {
+    bgButton = el("button", {}, app) as HTMLButtonElement;
+    dialogButton = el("button", {}, dialog) as HTMLButtonElement;
+  });
+
+  test("removing the focused element applies the deferred aria-hidden", async () => {
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog);
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    bgButton.remove();
+    await tick();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("an unrelated removal keeps the hold deferred while focus is still inside", async () => {
+    const other = el("span", {}, app);
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog);
+    other.remove();
+    await tick();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    bgButton.remove();
+    await tick();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("removing an ancestor of the focused element in a nested branch applies it", async () => {
+    const wrap = el("div", {}, app);
+    const inner = el("button", {}, wrap) as HTMLButtonElement;
+    inner.focus();
+    const cleanup = makeInertOthers(dialog);
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    wrap.remove();
+    await tick();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    cleanup();
+  });
+
+  test("cleanup before removal leaves nothing applied and ignores later removals", async () => {
+    bgButton.focus();
+    const cleanup = makeInertOthers(dialog);
+    cleanup();
+    bgButton.remove();
+    await tick();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+});
+
+describe("a layer whose targets are all detached", () => {
+  test("a newly opened upper layer exposes a held sibling (repro)", async () => {
+    const a = el("div");
+    const b = el("div");
+    const closeA = makeInertOthers(a);
+    expect(b.getAttribute("aria-hidden")).toBe("true");
+    a.remove();
+    await tick();
+    expect(b.getAttribute("aria-hidden")).toBe("true");
+    const closeB = makeInertOthers(b);
+    expect(b.hasAttribute("aria-hidden")).toBe(false);
+    // the frozen layer adds no new holds: app stays held by A (and now B)
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    closeB();
+    closeA();
+    for (const n of [app, dialog, b]) expect(n.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("closing in the other order restores exact attributes", async () => {
+    const a = el("div");
+    const b = el("div", { "aria-hidden": "false" });
+    const closeA = makeInertOthers(a);
+    a.remove();
+    await tick();
+    const closeB = makeInertOthers(b);
+    closeA();
+    closeB();
+    expect(b.getAttribute("aria-hidden")).toBe("false");
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+    expect(dialog.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("without an upper layer every hold stays, even after unrelated churn", async () => {
+    const a = el("div");
+    const b = el("div");
+    const closeA = makeInertOthers(a);
+    a.remove();
+    await tick();
+    const extra = el("div");
+    await tick();
+    expect(b.getAttribute("aria-hidden")).toBe("true");
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(extra.hasAttribute("aria-hidden")).toBe(false);
+    closeA();
+    expect(b.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("a held element that contains the upper layer target is released", async () => {
+    const a = el("div");
+    const b = el("section");
+    const bInner = el("div", {}, b);
+    const closeA = makeInertOthers(a);
+    a.remove();
+    await tick();
+    expect(b.getAttribute("aria-hidden")).toBe("true");
+    const closeB = makeInertOthers(bInner);
+    expect(b.hasAttribute("aria-hidden")).toBe(false);
+    closeB();
+    closeA();
+    expect(app.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("re-sweeps normally once a target is reconnected", async () => {
+    const a = el("div");
+    const b = el("div");
+    const closeA = makeInertOthers(a);
+    a.remove();
+    await tick();
+    const late = el("div");
+    await tick();
+    expect(late.hasAttribute("aria-hidden")).toBe(false);
+    document.body.appendChild(a);
+    await tick();
+    expect(late.getAttribute("aria-hidden")).toBe("true");
+    expect(b.getAttribute("aria-hidden")).toBe("true");
+    closeA();
+    expect(late.hasAttribute("aria-hidden")).toBe(false);
+  });
+});

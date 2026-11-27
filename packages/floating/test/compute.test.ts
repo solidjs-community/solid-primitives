@@ -1047,6 +1047,85 @@ describe("computePosition (DOM)", () => {
         expect([r.x, r.y]).toEqual([90, 70]);
       });
 
+      describe("display: contents wrappers generate no box", () => {
+        const slotted = (wrapperStyle: Record<string, string>) => {
+          const { reference, floating } = setup(rect(200, 100, 40, 20));
+          const host = mockRect(document.createElement("div"), rect(100, 50, 400, 400));
+          const shadow = host.attachShadow({ mode: "open" });
+          // the wrapper's rect is all zeros in a real browser: it has no box
+          const wrapper = mockRect(document.createElement("div"), rect(0, 0, 0, 0));
+          wrapper.append(document.createElement("slot"));
+          shadow.append(wrapper);
+          host.append(floating);
+          document.body.append(host);
+          global(floating, "offsetParent", host);
+          mockStyles(
+            new Map([
+              [host, { position: "relative" }],
+              [wrapper, wrapperStyle],
+            ]),
+          );
+          return bottom(reference, floating, "absolute");
+        };
+
+        test.each([
+          ["positioned", { display: "contents", position: "relative" }],
+          ["transformed", { display: "contents", transform: "translateZ(0)" }],
+          ["will-change", { display: "contents", willChange: "transform" }],
+          ["contain", { display: "contents", contain: "layout" }],
+        ])("absolute: a %s display: contents wrapper is skipped for the host", (_, style) => {
+          const r = slotted(style);
+          expect([r.x, r.y]).toEqual([190 - 100, 120 - 50]);
+        });
+
+        test("absolute: an unpositioned display: contents wrapper keeps working", () => {
+          const r = slotted({ display: "contents" });
+          expect([r.x, r.y]).toEqual([90, 70]);
+        });
+
+        test("absolute: an ordinary positioned wrapper stays eligible", () => {
+          const { reference, floating } = setup(rect(200, 100, 40, 20));
+          const host = document.createElement("div");
+          const shadow = host.attachShadow({ mode: "open" });
+          const wrapper = mockRect(document.createElement("div"), rect(120, 80, 400, 400));
+          wrapper.append(document.createElement("slot"));
+          shadow.append(wrapper);
+          host.append(floating);
+          document.body.append(host);
+          global(floating, "offsetParent", document.body);
+          mockStyles(new Map([[wrapper, { display: "block", position: "relative" }]]));
+          const r = bottom(reference, floating, "absolute");
+          expect([r.x, r.y]).toEqual([190 - 120, 120 - 80]);
+        });
+
+        test("fixed: a transformed display: contents ancestor is not a containing block", () => {
+          const { reference, floating } = setup(rect(200, 100, 40, 20));
+          const wrapper = mockRect(document.createElement("div"), rect(0, 0, 0, 0));
+          wrapper.append(floating);
+          document.body.append(wrapper);
+          mockStyles(new Map([[wrapper, { display: "contents", transform: "translateZ(0)" }]]));
+          const r = bottom(reference, floating, "fixed");
+          expect([r.x, r.y]).toEqual([190, 120]);
+        });
+
+        test("fixed: the next real containing block above a display: contents one is used", () => {
+          const { reference, floating } = setup(rect(200, 100, 40, 20));
+          const outer = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+          const wrapper = mockRect(document.createElement("div"), rect(0, 0, 0, 0));
+          wrapper.append(floating);
+          outer.append(wrapper);
+          document.body.append(outer);
+          mockStyles(
+            new Map([
+              [outer, { transform: "translateZ(0)" }],
+              [wrapper, { display: "contents", filter: "blur(1px)" }],
+            ]),
+          );
+          const r = bottom(reference, floating, "fixed");
+          expect([r.x, r.y]).toEqual([90, 70]);
+        });
+      });
+
       test("absolute: an element inside a shadow tree uses the positioned host", () => {
         const { reference } = setup(rect(200, 100, 40, 20));
         const host = mockRect(document.createElement("div"), rect(60, 40, 400, 400));

@@ -297,12 +297,12 @@ Combos that include a modifier (e.g. `Control + S`) don't have this problem, sin
 
 Inputs whose `type` never accepts typed characters (`checkbox`, `button`, `submit`, `reset`, `image`; case-insensitive) are **not** treated as editable, so a plain-key shortcut still fires while one of them has focus. All other inputs stay ignored: text-like types (`text`, `search`, `email`, `url`, `tel`, `password`, `number`, the date and time types, and an input with a missing or unknown `type`) as well as `radio`, `range`, `file` and `color`, which consume arrow and other keys. `textarea`, `select` and `contenteditable` are always ignored. The same rules apply to the registry's `ignoreInputs`.
 
-The check also works for inputs inside iframes and **open** shadow roots (the real target is taken from `event.composedPath()`). **Closed** shadow roots hide their contents from the page, so inputs inside them cannot be detected.
+The check works for inputs inside **open** shadow roots (the real target is taken from `event.composedPath()`), and for inputs inside iframes whenever the key event reaches the listener's scope. Note that `createShortcut` listens for `keydown` on the calling `window` only: keys pressed while focus is inside an iframe never reach the parent window, so the shortcut does not fire there at all. For shortcuts that must work inside an iframe, use `createShortcuts` or `makeShortcutRegistry` with `scope` set to the iframe's `contentDocument` or `contentWindow`. **Closed** shadow roots hide their contents from the page, so inputs inside them cannot be detected.
 
 ### Ignored keys and platform quirks
 
 - **Lock keys are ignored.** `CapsLock`, `NumLock` and `ScrollLock` are skipped by `useKeyDownList`, `createShortcut` and the shortcut registry (keydown and keyup). On macOS CapsLock sends only a keydown when switched on and only a keyup when switched off, so tracking it would leave it "held" and stop every exact-match shortcut from firing. They cannot be part of a shortcut.
-- **Option/Alt on macOS.** Matching uses `event.key`, and with Option held macOS reports the composed character (`Option+E` gives `Dead`, `Option+S` gives `ß`) instead of the letter. A shortcut written as `["Alt", "S"]` therefore does not match on macOS. If you need such a shortcut, match the composed character, or use `createKeyDown`/your own listener and compare `event.code` (`"KeyS"`).
+- **Option/Alt on macOS.** Matching uses `event.key`, and with Option held macOS reports the composed character (`Option+E` gives `Dead`, `Option+S` gives `ß`) instead of the letter. A shortcut written as `["Alt", "S"]` therefore does not match on macOS. If you need such a shortcut, match the composed character, or use your own `keydown` listener and compare `event.code` (`"KeyS"`). `createKeyDown` is not an option here: it matches `event.key` too, so its callback never runs for `Option+S`.
 - **Meta keyup.** macOS never sends keyup for keys pressed while Meta (Cmd) is held, only Meta's own. Releasing Meta therefore clears every tracked key.
 - **Keyup is always observed on `window` in the capture phase**, so an app handler calling `stopPropagation()` on keyup cannot leave a key stuck.
 
@@ -368,7 +368,7 @@ createShortcuts(
 
 Each definition is `{ keys, handler, preventDefault?, requireReset?, ignoreInputs?, enabled? }`:
 
-- `keys` — an array (`["Control", "K"]`) or a `+`-joined string (`"Ctrl+Shift+K"`, `"Control++"` for the plus key). Case-insensitive; `Ctrl`, `Cmd`/`Command`, `Option` and `Space` are aliases. Matching is **exact and order-independent**: `Control+K` does not fire for `Control+Shift+K`.
+- `keys` — an array (`["Control", "K"]`) or a `+`-joined string (`"Ctrl+Shift+K"`, `"Control++"` for the plus key). A `+` right after a key name is a separator; a `+` right after a separator is the literal plus key, so `"Control+++K"` is Control, `+` and K, and `"+"` alone is the plus key. Case-insensitive; `Ctrl`, `Cmd`/`Command`, `Option` and `Space` are aliases. Matching is **exact and order-independent**: `Control+K` does not fire for `Control+Shift+K`.
 - `handler(event)` — called with the `KeyboardEvent`.
 - `preventDefault` — defaults to `true`.
 - `requireReset` — fire once until all keys are released. Defaults to `false`.

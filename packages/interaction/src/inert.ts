@@ -15,7 +15,8 @@ export type InertTargets = HTMLElement | readonly HTMLElement[] | null | undefin
 
 export type InertOthersOptions = {
   /**
-   * Which attribute(s) to apply to outside nodes.
+   * Which attribute(s) to apply to outside nodes. Read once when the layer opens; to change it
+   * with `createInertOthers`, disable and re-enable (a new layer on top).
    * @default "aria-hidden"
    */
   strategy?: InertStrategy;
@@ -26,6 +27,7 @@ export type InertOthersOptions = {
   ignore?: Element | readonly (Element | null | undefined)[] | null;
   /**
    * Element whose subtree is walked. Everything outside the targets but inside this root is hidden.
+   * Read once when the layer opens. When omitted it follows the first target's document.
    * @default the `body` of the first target's document
    */
   root?: Element;
@@ -232,19 +234,32 @@ function openLayer(
     layer.sweep();
   });
 
-  // Watches the hidden branches (aria-hidden strategy only) for live regions added later. childList only,
-  // so our own attribute writes never retrigger it, and only a live-region node causes a re-sweep.
+  // Watches the hidden branches for two things. childList only, so our own attribute writes never
+  // retrigger it:
+  // - live regions added later (aria-hidden strategy only): only a live-region node causes a re-sweep;
+  // - removals inside a branch whose aria-hidden is deferred because it contains focus: Firefox and Safari
+  //   dispatch no blur/focusout when the focused element leaves the DOM, so retry the pending holds here.
   const deepObserver = new MutationObserver(records => {
     if (disposed) return;
-    const found = records.some(record =>
-      Array.from(record.addedNodes).some(
-        node =>
-          node.nodeType === 1 &&
-          ((node as Element).matches(LIVE_SELECTOR) ||
-            (node as Element).querySelector(LIVE_SELECTOR) !== null),
-      ),
-    );
-    if (found) layer.sweep();
+    if (
+      strategy === "aria-hidden" &&
+      records.some(record =>
+        Array.from(record.addedNodes).some(
+          node =>
+            node.nodeType === 1 &&
+            ((node as Element).matches(LIVE_SELECTOR) ||
+              (node as Element).querySelector(LIVE_SELECTOR) !== null),
+        ),
+      )
+    ) {
+      layer.sweep();
+      return;
+    }
+    if (
+      records.some(record => record.removedNodes.length > 0) &&
+      Array.from(held.values()).some(h => h.pendingAria)
+    )
+      retryPending();
   });
 
   // Hold on to aria-hidden for nodes that contain focus until focus leaves them (see acquireAria).
@@ -291,17 +306,18 @@ function openLayer(
     },
     sweep(force) {
       if (disposed) return;
-      // Every target was removed from the document while the layer is open: keep what is held until the
+      // Every target was removed from the document while the layer is open: freeze what is held until the
       // layer is updated or closed (a modal unmounting a moment before its owner cleans up must not flash
-      // the page to assistive technology) instead of releasing the whole page.
-      if (!force && held.size > 0 && own.every(t => !t.isConnected)) return;
+      // the page to assistive technology) instead of releasing the whole page. A frozen layer adds no holds
+      // and only lets go of holds that cover something an upper layer needs exposed.
+      const frozen = !force && held.size > 0 && own.every(t => !t.isConnected);
       // protected = own targets + ignore + live regions + targets of layers opened above this one
       const protectedEls: Element[] = [...own, ...ignore];
       // Live regions stay exposed only for aria-hidden (announcements still reach AT). With `inert` they
       // would stay interactive behind the modal, so they are hidden like everything else. A live region
       // that contains a lower layer's targets is never protected, so lower layers are always hidden.
       const index = layers.indexOf(layer);
-      if (strategy === "aria-hidden") {
+      if (strategy === "aria-hidden" && !frozen) {
         const lower = layers.slice(0, index).flatMap(l => l.targets);
         for (const live of root.querySelectorAll(LIVE_SELECTOR))
           if (!lower.some(t => live.contains(t))) protectedEls.push(live);
@@ -309,6 +325,16 @@ function openLayer(
       for (let i = index + 1; i < layers.length; i++)
         protectedEls.push(...layers[i]!.targets, ...layers[i]!.ignore);
       const inRoot = protectedEls.filter(el => root.contains(el));
+
+      if (frozen) {
+        for (const [el, hold] of held)
+          if (inRoot.some(p => el.contains(p) || p.contains(el))) {
+            release(el, hold);
+            held.delete(el);
+          }
+        syncFocusListeners();
+        return;
+      }
 
       const parents = new Set<Element>();
       const desired = new Set<Element>();
@@ -344,8 +370,10 @@ function openLayer(
       observer.disconnect();
       for (const parent of parents) observer.observe(parent, { childList: true });
       deepObserver.disconnect();
-      if (strategy === "aria-hidden")
-        for (const el of held.keys()) deepObserver.observe(el, { childList: true, subtree: true });
+      // aria-hidden: every held branch (live regions); otherwise only branches with a deferred aria-hidden
+      for (const [el, hold] of held)
+        if (strategy === "aria-hidden" || hold.pendingAria)
+          deepObserver.observe(el, { childList: true, subtree: true });
       syncFocusListeners();
     },
   };
@@ -380,7 +408,9 @@ function openLayer(
 
 /**
  * Reactive {@link makeInertOthers}: hides everything outside the target(s) while `enabled` is true,
- * and restores it when disabled, when the targets change, or when the owner is disposed.
+ * and restores it when disabled or when the owner is disposed. `enabled`, `targets` and `ignore` are
+ * tracked (changing targets or ignore updates the layer in place); `strategy` and `root` are read when
+ * the layer opens, so changing them requires disabling and re-enabling (a new layer on top).
  *
  * @param targets element(s), or an accessor of them (for example a ref signal); `undefined`/`null` disables it
  * @param enabled toggle, defaults to `true`
