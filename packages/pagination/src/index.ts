@@ -1,7 +1,6 @@
 import {
   access,
   createServerSafeSignal,
-  tryOnCleanup,
   noop,
   wrapSetter,
   type MaybeAccessor,
@@ -443,7 +442,7 @@ export function createInfiniteScroll<T>(
   options?: { initialPageCount?: number },
 ): [
   pages: Accessor<InfiniteScrollPage<T>[]>,
-  loader: (el: Element) => void,
+  loader: (el: Element) => void | (() => void),
   options: {
     pageCount: Accessor<number>;
     setPageCount: Setter<number>;
@@ -555,7 +554,7 @@ export function createInfiniteScroll<T>(
     setPageCount(initialPageCount);
   }
 
-  let add: (el: Element) => void = noop;
+  let add: (el: Element) => void | (() => void) = noop;
   if (!isServer) {
     let sentinelEl: Element | null = null;
     const io = new IntersectionObserver(e => {
@@ -568,12 +567,14 @@ export function createInfiniteScroll<T>(
     });
     onCleanup(() => io.disconnect());
     add = (el: Element) => {
+      // The ref callback can't call onCleanup; io.disconnect() above covers owner disposal.
+      if (sentinelEl && sentinelEl !== el) io.unobserve(sentinelEl);
       sentinelEl = el;
       io.observe(el);
-      tryOnCleanup(() => {
+      return () => {
         io.unobserve(el);
         if (sentinelEl === el) sentinelEl = null;
-      });
+      };
     };
     reobserve = () => {
       const el = sentinelEl;

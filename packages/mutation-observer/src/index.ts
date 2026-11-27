@@ -119,9 +119,12 @@ export function createMutationObserver(
  * <div ref={mutationObserver({ childList: true }, records => console.log(records))} />
  * ```
  */
-export const mutationObserver =
-  (options: MutationObserverInit, callback: MutationCallback) =>
-  (target: Element): void => {
-    const [add] = createMutationObserver([], callback);
-    add(target, options);
-  };
+export const mutationObserver = (
+  options: MutationObserverInit,
+  callback: MutationCallback,
+): ((target: Element) => void) => {
+  // Created here, not in the ref callback, where Solid 2 forbids primitives (#1143).
+  // Disconnects with the factory's owner; the ref's return value is ignored by the runtime.
+  const [add] = createMutationObserver([], callback);
+  return target => add(target, options);
+};

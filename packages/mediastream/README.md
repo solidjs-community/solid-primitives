@@ -44,19 +44,25 @@ const [stream, { mute, stop }] = createStream(streamSource);
 The stream stops automatically when the reactive owner is disposed. Wrap in `<Loading>` to handle the loading state:
 
 ```tsx
-import { Loading } from "@solidjs/web";
+import { createEffect, createSignal, Loading } from "solid-js";
 
-const [stream] = createStream({ video: true });
+function Camera() {
+  const [stream] = createStream({ video: true });
+  const [video, setVideo] = createSignal<HTMLVideoElement>();
+
+  // a ref callback can't create effects, so keep the element in a signal
+  createEffect(
+    () => [video(), stream()] as const,
+    ([el, s]) => {
+      if (el) el.srcObject = s ?? null;
+    },
+  );
+
+  return <video ref={setVideo} autoplay />;
+}
 
 <Loading fallback={<p>Requesting camera...</p>}>
-  <video
-    ref={el =>
-      createEffect(stream, s => {
-        el.srcObject = s ?? null;
-      })
-    }
-    autoplay
-  />
+  <Camera />
 </Loading>;
 ```
 
@@ -75,17 +81,22 @@ const [stream, { mute, stop }] = createScreen(screenSource);
 Same controls as `createStream` but uses `getDisplayMedia` instead of `getUserMedia`. The stream stops automatically when the reactive owner is disposed.
 
 ```tsx
-const [stream] = createScreen({ video: true });
+function Screen() {
+  const [stream] = createScreen({ video: true });
+  const [video, setVideo] = createSignal<HTMLVideoElement>();
+
+  createEffect(
+    () => [video(), stream()] as const,
+    ([el, s]) => {
+      if (el) el.srcObject = s ?? null;
+    },
+  );
+
+  return <video ref={setVideo} autoplay />;
+}
 
 <Loading fallback={<p>Requesting screen capture...</p>}>
-  <video
-    ref={el =>
-      createEffect(stream, s => {
-        el.srcObject = s ?? null;
-      })
-    }
-    autoplay
-  />
+  <Screen />
 </Loading>;
 ```
 

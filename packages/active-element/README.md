@@ -169,7 +169,7 @@ const [active, setActive] = createSignal(false)
 #### Definition
 
 ```ts
-function focus(callback: (isActive: boolean) => void): (target: Element) => void;
+function focus(callback: (isActive: boolean) => void): (target: Element) => VoidFunction;
 ```
 
 ## Changelog

@@ -229,7 +229,7 @@ createDragCursor(el, { grab: "crosshair", grabbing: "move" });
 
 ## `cursorRef`
 
-A ref factory for setting a cursor inline in JSX. Accepts a static cursor value or a reactive signal. The cursor is removed when the component unmounts.
+A ref factory for setting a cursor inline in JSX. Accepts a static cursor value or a reactive signal. Call it in the component body. The cursor is restored when the element unmounts or the component is disposed, and one `cursorRef` value can be attached to several elements.
 
 ```tsx repl
 import { render } from "@solidjs/web";

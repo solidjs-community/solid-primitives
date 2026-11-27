@@ -186,10 +186,11 @@ export function createDragCursor(
 }
 
 /**
- * Returns a ref callback that sets a cursor on the element it is attached to.
+ * Returns a ref callback that sets a cursor on the element(s) it is attached to.
  *
- * Accepts a static cursor value or a reactive signal. The cursor is removed when the
- * component unmounts.
+ * Accepts a static cursor value or a reactive signal. Call it in the component body: the
+ * cursor is restored when the element unmounts or the component is disposed. One returned
+ * callback can be attached to several elements.
  *
  * @example
  * ```tsx
@@ -201,6 +202,25 @@ export function createDragCursor(
  * <div ref={cursorRef(cursor)}>...</div>
  * ```
  */
-export function cursorRef(cursor: MaybeAccessor<CursorProperty>): (el: HTMLElement) => void {
-  return el => createElementCursor(el, cursor);
+export function cursorRef(
+  cursor: MaybeAccessor<CursorProperty>,
+): (el: HTMLElement) => VoidFunction {
+  if (isServer) return () => noop;
+
+  // The ref callback can't create primitives, so the effect lives here and the callback only edits this list.
+  const [els, setEls] = createSignal<HTMLElement[]>([], { ownedWrite: true });
+
+  createEffect(
+    () => ({ list: els(), cursorValue: access(cursor) }),
+    ({ list, cursorValue }) => {
+      const restores = list.map(el => makeElementCursor(el, cursorValue));
+      return () => restores.reverse().forEach(restore => restore());
+    },
+  );
+
+  return el => {
+    setEls(list => [...list, el]);
+    // The runtime ignores this return value; the owner disposal above restores the cursor.
+    return () => setEls(list => list.filter(item => item !== el));
+  };
 }
