@@ -443,6 +443,200 @@ describe("computePosition (DOM)", () => {
     });
   });
 
+  describe("containing block and scale", () => {
+    /** Mocks getComputedStyle per element; unlisted elements get empty styles. */
+    const mockStyles = (styles: Map<Element, Record<string, string>>) => {
+      const real = window.getComputedStyle.bind(window);
+      vi.spyOn(window, "getComputedStyle").mockImplementation(((el: Element) => {
+        const extra = styles.get(el);
+        return extra ? ({ ...extra } as unknown as CSSStyleDeclaration) : real(el);
+      }) as never);
+    };
+    const scaled = (el: HTMLElement, w: number, h: number) => {
+      global(el, "offsetWidth", w);
+      global(el, "offsetHeight", h);
+    };
+    const bottom = (reference: Element, floating: HTMLElement, strategy: "fixed" | "absolute") =>
+      computePosition(reference, floating, { placement: "bottom", strategy });
+
+    test("fixed: a transformed ancestor is the containing block", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20), rect(0, 0, 60, 30));
+      const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      ancestor.append(floating);
+      document.body.append(ancestor);
+      mockStyles(new Map([[ancestor, { transform: "translateZ(0)" }]]));
+      const r = bottom(reference, floating, "fixed");
+      // viewport position (190, 120) minus the ancestor origin (100, 50)
+      expect([r.x, r.y]).toEqual([90, 70]);
+    });
+
+    test.each([
+      ["perspective", { perspective: "100px" }],
+      ["filter", { filter: "blur(1px)" }],
+      ["backdrop-filter", { backdropFilter: "blur(1px)" }],
+      ["will-change transform", { willChange: "opacity, transform" }],
+      ["contain paint", { contain: "paint" }],
+      ["contain layout", { contain: "layout" }],
+      ["contain strict", { contain: "strict" }],
+      ["contain content", { contain: "content" }],
+    ])("fixed: %s creates a containing block", (_name, style) => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      ancestor.append(floating);
+      document.body.append(ancestor);
+      mockStyles(new Map([[ancestor, { transform: "none", ...style }]]));
+      const r = bottom(reference, floating, "fixed");
+      expect([r.x, r.y]).toEqual([90, 70]);
+    });
+
+    test("fixed: unrelated styles do not create a containing block", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      ancestor.append(floating);
+      document.body.append(ancestor);
+      mockStyles(
+        new Map([
+          [ancestor, { transform: "none", filter: "none", willChange: "opacity", contain: "none" }],
+        ]),
+      );
+      const r = bottom(reference, floating, "fixed");
+      expect([r.x, r.y]).toEqual([190, 120]);
+    });
+
+    test("fixed: border of the containing block is accounted for", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      global(ancestor, "clientLeft", 4);
+      global(ancestor, "clientTop", 6);
+      ancestor.append(floating);
+      document.body.append(ancestor);
+      mockStyles(new Map([[ancestor, { transform: "scale(1)" }]]));
+      const r = bottom(reference, floating, "fixed");
+      expect([r.x, r.y]).toEqual([190 - 104, 120 - 56]);
+    });
+
+    test("fixed: the nearest transformed ancestor wins when nested", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const outer = mockRect(document.createElement("div"), rect(10, 10, 800, 800));
+      const inner = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      const plain = mockRect(document.createElement("div"), rect(300, 300, 50, 50));
+      plain.append(floating);
+      inner.append(plain);
+      outer.append(inner);
+      document.body.append(outer);
+      mockStyles(
+        new Map([
+          [outer, { transform: "rotate(0deg)" }],
+          [inner, { filter: "blur(2px)" }],
+        ]),
+      );
+      const r = bottom(reference, floating, "fixed");
+      expect([r.x, r.y]).toEqual([90, 70]);
+    });
+
+    test("fixed: ignores a transformed element that is not an ancestor", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const sibling = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      document.body.append(sibling);
+      mockStyles(new Map([[sibling, { transform: "translateZ(0)" }]]));
+      expect(bottom(reference, floating, "fixed").x).toBe(190);
+    });
+
+    test("fixed: follows shadow hosts and slots", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const host = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      const shadow = host.attachShadow({ mode: "open" });
+      const wrapper = document.createElement("div");
+      shadow.append(wrapper);
+      wrapper.append(floating);
+      document.body.append(host);
+      mockStyles(new Map([[host, { transform: "translateZ(0)" }]]));
+      expect([bottom(reference, floating, "fixed").x]).toEqual([90]);
+    });
+
+    test("fixed: a throwing getComputedStyle falls back to the viewport", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const ancestor = document.createElement("div");
+      ancestor.append(floating);
+      document.body.append(ancestor);
+      vi.spyOn(window, "getComputedStyle").mockImplementation(() => {
+        throw new Error("boom");
+      });
+      // direction lookup is skipped by passing rtl
+      const r = computePosition(reference, floating, {
+        placement: "bottom",
+        strategy: "fixed",
+        rtl: false,
+      });
+      expect(r.x).toBe(190);
+    });
+
+    test("fixed: scale of the containing block is applied", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const ancestor = mockRect(document.createElement("div"), rect(100, 50, 500, 500));
+      scaled(ancestor, 250, 250);
+      ancestor.append(floating);
+      document.body.append(ancestor);
+      mockStyles(new Map([[ancestor, { transform: "scale(2)" }]]));
+      const r = bottom(reference, floating, "fixed");
+      expect([r.x, r.y]).toEqual([(190 - 100) / 2, (120 - 50) / 2]);
+    });
+
+    test("absolute: uniform scale converts to local CSS px", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const parent = mockRect(document.createElement("div"), rect(0, 0, 400, 400));
+      scaled(parent, 200, 200);
+      global(floating, "offsetParent", parent);
+      const r = computePosition(reference, floating, {
+        placement: "bottom",
+        strategy: "absolute",
+        size: { padding: 0 },
+      });
+      // unscaled solver: (190, 120)
+      expect([r.x, r.y]).toEqual([95, 60]);
+      expect(r.middlewareData.availableWidth).toBe(
+        computePosition(reference, floating, { placement: "bottom", strategy: "fixed" })
+          .middlewareData.availableWidth / 2,
+      );
+    });
+
+    test("absolute: non-uniform scale", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const parent = mockRect(document.createElement("div"), rect(0, 0, 400, 400));
+      scaled(parent, 200, 100);
+      global(floating, "offsetParent", parent);
+      const r = bottom(reference, floating, "absolute");
+      expect([r.x, r.y]).toEqual([95, 30]);
+    });
+
+    test("absolute: a scaled parent with an offset keeps the same viewport place", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const parent = mockRect(document.createElement("div"), rect(20, 10, 400, 400));
+      scaled(parent, 200, 200);
+      global(floating, "offsetParent", parent);
+      const r = bottom(reference, floating, "absolute");
+      expect([20 + r.x * 2, 10 + r.y * 2]).toEqual([190, 120]);
+    });
+
+    test("absolute: scale 1 is unchanged", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const parent = mockRect(document.createElement("div"), rect(20, 10, 400, 400));
+      scaled(parent, 400, 400);
+      global(floating, "offsetParent", parent);
+      const r = bottom(reference, floating, "absolute");
+      expect([r.x, r.y]).toEqual([170, 110]);
+    });
+
+    test("absolute: a zero offset size falls back to scale 1", () => {
+      const { reference, floating } = setup(rect(200, 100, 40, 20));
+      const parent = mockRect(document.createElement("div"), rect(0, 0, 400, 400));
+      scaled(parent, 0, 0);
+      global(floating, "offsetParent", parent);
+      const r = bottom(reference, floating, "absolute");
+      expect([r.x, r.y]).toEqual([190, 120]);
+    });
+  });
+
   describe("boundaries", () => {
     test("uses visualViewport when available", () => {
       const { reference, floating } = setup(rect(280, 300, 10, 20));

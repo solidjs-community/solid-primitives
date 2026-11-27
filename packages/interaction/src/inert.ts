@@ -1,4 +1,4 @@
-import { createEffect } from "solid-js";
+import { createEffect, onCleanup } from "solid-js";
 import {
   type MaybeAccessor,
   access,
@@ -48,6 +48,8 @@ type NodeState = {
 };
 type Hold = { aria: boolean; inert: boolean };
 type Layer = {
+  /** Creation order; the stack is kept sorted by it. */
+  id: number;
   targets: HTMLElement[];
   sweep: () => void;
 };
@@ -57,6 +59,8 @@ type InertRegistry = {
   states: WeakMap<Element, NodeState>;
   /** Open layers, lowest first. Upper layers' targets are protected from lower layers. */
   layers: Layer[];
+  /** Last issued layer id. */
+  lastId: number;
 };
 
 // Lives on `globalThis` (not in module-scope bindings) so it stays correct when the app's dependency
@@ -66,6 +70,7 @@ const getRegistry = (): InertRegistry =>
   globalRegistry<InertRegistry>("@solid-primitives/interaction:inert", () => ({
     states: new WeakMap(),
     layers: [],
+    lastId: 0,
   }));
 
 function toList<T extends Element>(
@@ -153,9 +158,28 @@ export function makeInertOthers(
   options: InertOthersOptions = {},
 ): VoidFunction {
   if (isServer) return noop;
-  const { layers } = getRegistry();
   const own = toList(targets);
   if (own.length === 0) return noop;
+  return openLayer(nextLayerId(), own, toList(options.ignore), options).close;
+}
+
+type LayerHandle = {
+  /** Replace the targets / ignore list in place (the layer keeps its stack position) and re-sweep. */
+  update: (targets: HTMLElement[], ignore: Element[]) => void;
+  close: VoidFunction;
+};
+
+const nextLayerId = (): number => ++getRegistry().lastId;
+
+function openLayer(
+  id: number,
+  initialTargets: HTMLElement[],
+  initialIgnore: Element[],
+  options: { strategy?: InertStrategy; root?: Element },
+): LayerHandle {
+  const { layers } = getRegistry();
+  let own = initialTargets;
+  let ignore = initialIgnore;
 
   const strategy = options.strategy ?? "aria-hidden";
   const root = options.root ?? own[0]!.ownerDocument.body;
@@ -175,43 +199,58 @@ export function makeInertOthers(
     layer.sweep();
   });
 
+  // Watches the hidden branches (aria-hidden strategy only) for live regions added later. childList only,
+  // so our own attribute writes never retrigger it, and only a live-region node causes a re-sweep.
+  const deepObserver = new MutationObserver(records => {
+    if (disposed) return;
+    const found = records.some(record =>
+      Array.from(record.addedNodes).some(
+        node =>
+          node.nodeType === 1 &&
+          ((node as Element).matches(LIVE_SELECTOR) ||
+            (node as Element).querySelector(LIVE_SELECTOR) !== null),
+      ),
+    );
+    if (found) layer.sweep();
+  });
+
   const layer: Layer = {
-    targets: own,
+    id,
+    get targets() {
+      return own;
+    },
     sweep() {
       if (disposed) return;
       // protected = own targets + ignore + live regions + targets of layers opened above this one
-      const protectedEls: Element[] = [...own, ...toList(options.ignore)];
+      const protectedEls: Element[] = [...own, ...ignore];
       // Live regions stay exposed only for aria-hidden (announcements still reach AT). With `inert` they
       // would stay interactive behind the modal, so they are hidden like everything else. A live region
       // that contains a lower layer's targets is never protected, so lower layers are always hidden.
+      const index = layers.indexOf(layer);
       if (strategy === "aria-hidden") {
-        const lower = layers.slice(0, layers.indexOf(layer)).flatMap(l => l.targets);
+        const lower = layers.slice(0, index).flatMap(l => l.targets);
         for (const live of root.querySelectorAll(LIVE_SELECTOR))
           if (!lower.some(t => live.contains(t))) protectedEls.push(live);
       }
-      for (let i = layers.indexOf(layer) + 1; i < layers.length; i++)
-        protectedEls.push(...layers[i]!.targets);
+      for (let i = index + 1; i < layers.length; i++) protectedEls.push(...layers[i]!.targets);
       const inRoot = protectedEls.filter(el => root.contains(el));
 
       const parents = new Set<Element>();
       const desired = new Set<Element>();
-      for (const el of own) {
-        if (!root.contains(el)) continue;
+      // every protected element (targets included) needs its ancestors walked, up to and including `root`.
+      // An element that is `root` itself has nothing above it to walk.
+      for (const el of inRoot) {
+        if (el === root) continue;
         for (let p = el.parentElement; p; p = p.parentElement) {
           parents.add(p);
           if (p === root) break;
         }
       }
-      // protected elements other than targets also need their own ancestors walked
-      for (const el of inRoot)
-        for (let p = el.parentElement; p; p = p.parentElement) {
-          parents.add(p);
-          if (p === root) break;
-        }
       for (const parent of parents)
         for (const child of Array.from(parent.children)) {
           if (SKIPPED_TAGS.has(child.tagName)) continue;
-          if (inRoot.some(p => child.contains(p))) continue;
+          // skip anything that contains a protected element or lives inside one
+          if (inRoot.some(p => child.contains(p) || p.contains(child))) continue;
           desired.add(child);
         }
 
@@ -229,22 +268,37 @@ export function makeInertOthers(
       // childList changes on the walked parents catch late additions; re-observe because the chain can change
       observer.disconnect();
       for (const parent of parents) observer.observe(parent, { childList: true });
+      deepObserver.disconnect();
+      if (strategy === "aria-hidden")
+        for (const el of held.keys()) deepObserver.observe(el, { childList: true, subtree: true });
     },
   };
 
-  layers.push(layer);
+  // sorted insertion by creation id keeps a layer's stack position stable
+  let at = layers.length;
+  while (at > 0 && layers[at - 1]!.id > id) at--;
+  layers.splice(at, 0, layer);
   for (const l of [...layers]) l.sweep();
 
-  return () => {
-    if (disposed) return;
-    observer.disconnect();
-    for (const [el, hold] of held) release(el, hold);
-    held.clear();
-    disposed = true;
-    const index = layers.indexOf(layer);
-    if (index !== -1) layers.splice(index, 1);
-    // layers below can now hide whatever this layer used to protect
-    for (const l of [...layers]) l.sweep();
+  return {
+    update(nextTargets, nextIgnore) {
+      if (disposed) return;
+      own = nextTargets;
+      ignore = nextIgnore;
+      for (const l of [...layers]) l.sweep();
+    },
+    close() {
+      if (disposed) return;
+      observer.disconnect();
+      deepObserver.disconnect();
+      for (const [el, hold] of held) release(el, hold);
+      held.clear();
+      disposed = true;
+      const index = layers.indexOf(layer);
+      if (index !== -1) layers.splice(index, 1);
+      // layers below can now hide whatever this layer used to protect
+      for (const l of [...layers]) l.sweep();
+    },
   };
 }
 
@@ -269,6 +323,10 @@ export function createInertOthers(
   options: CreateInertOthersOptions = {},
 ): void {
   if (isServer) return;
+  // The id is taken now, so the layer keeps its stack position however often its inputs change or it is
+  // toggled. The layer itself is updated in place instead of being closed and reopened.
+  const id = nextLayerId();
+  let handle: LayerHandle | undefined;
   createEffect(
     () => {
       if (!access(enabled)) return undefined;
@@ -279,12 +337,15 @@ export function createInertOthers(
       return { list, ignore: toList(access(options.ignore)) };
     },
     state => {
-      if (!state) return;
-      return makeInertOthers(state.list, {
-        strategy: options.strategy,
-        root: options.root,
-        ignore: state.ignore,
-      });
+      if (!state) {
+        handle?.close();
+        handle = undefined;
+      } else if (handle) handle.update(state.list, state.ignore);
+      else handle = openLayer(id, state.list, state.ignore, options);
     },
   );
+  onCleanup(() => {
+    handle?.close();
+    handle = undefined;
+  });
 }

@@ -71,9 +71,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
+    "@solidjs/web": "catalog:peer",
     "solid-js": "catalog:peer"
   },
   "devDependencies": {
+    "@solidjs/web": "catalog:",
     "solid-js": "catalog:peer"
   }
 }

@@ -55,9 +55,35 @@ type Envelope = { [ENVELOPE_KEY]: string; data: unknown };
 const isEnvelope = (v: unknown): v is Envelope =>
   typeof v === "object" && v !== null && typeof (v as Envelope)[ENVELOPE_KEY] === "string";
 
-const isIframe = (t: PostMessageTarget): t is HTMLIFrameElement => "contentWindow" in t;
-const isPort = (t: PostMessageTarget): t is MessagePort =>
-  !isIframe(t) && typeof (t as MessagePort).start === "function";
+/**
+ * Cross-origin safe: a cross-origin `WindowProxy` only exposes a small allowlist
+ * of properties (`window` is one of them); any other probe (`in`, `.start`,
+ * `.contentWindow`) throws a `SecurityError`. Windows are therefore detected
+ * first, and nothing else is ever read from them except `postMessage`.
+ */
+const isWindow = (t: PostMessageTarget): t is Window => {
+  try {
+    return (t as Window).window === t;
+  } catch {
+    return false;
+  }
+};
+const isIframe = (t: PostMessageTarget): t is HTMLIFrameElement => {
+  if (isWindow(t)) return false;
+  try {
+    return "contentWindow" in t;
+  } catch {
+    return false;
+  }
+};
+const isPort = (t: PostMessageTarget): t is MessagePort => {
+  if (isWindow(t) || isIframe(t)) return false;
+  try {
+    return typeof (t as MessagePort).start === "function";
+  } catch {
+    return false;
+  }
+};
 
 type AnyOptions<TIn> = PostMessageBaseOptions<TIn> & {
   allowedOrigins?: readonly string[];
@@ -95,7 +121,8 @@ export function makePostMessage<TIn = unknown, TOut = unknown>(
   target: PostMessageTarget,
   options: AnyOptions<TIn> = {},
 ): PostMessageHandle<TIn, TOut> {
-  const port = isPort(target);
+  const iframe = isIframe(target);
+  const port = !iframe && isPort(target);
   const { allowedOrigins, targetOrigin, channel, validate } = options;
 
   if (!port && !Array.isArray(allowedOrigins)) {
@@ -108,7 +135,7 @@ export function makePostMessage<TIn = unknown, TOut = unknown>(
   let closed = false;
 
   const resolveWindow = (): Window | null =>
-    isIframe(target) ? target.contentWindow : (target as Window);
+    iframe ? (target as HTMLIFrameElement).contentWindow : (target as Window);
 
   const handler = (event: Event) => {
     if (closed) return;
@@ -223,8 +250,10 @@ export function createPostMessage<TIn = unknown, TOut = unknown>(
   let closed = false;
 
   createEffect(
-    () => access(options.target),
-    t => {
+    // Boxed: the runtime probes a compute result for `.then` (promise detection),
+    // which throws a SecurityError on a cross-origin WindowProxy.
+    () => ({ t: access(options.target) }),
+    ({ t }) => {
       if (!t || closed) return;
       const handle = (makePostMessage as any)(t, options) as PostMessageHandle<TIn, TOut>;
       const off = handle.onMessage((data, event) => {

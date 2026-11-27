@@ -31,6 +31,28 @@ function isSameKeySet(a: string[], b: string[]): boolean {
   return new Set(a).symmetricDifference(new Set(b)).size === 0;
 }
 
+/**
+ * Remembers which logical key value was recorded at keydown for each PHYSICAL key, so the right
+ * one is removed on keyup. `KeyboardEvent.key` can change between press and release (hold Shift,
+ * press `1` -> `!`, release Shift, release `1` -> `1`), which would otherwise leave `!` stuck.
+ */
+function createKeyRecorder() {
+  const recorded = new Map<string, string>();
+  const id = (e: KeyboardEvent) => e.code || e.key;
+  return {
+    /** Records the normalized `key` for the physical key of `e`. */
+    down: (e: KeyboardEvent, key: string) => void recorded.set(id(e), key),
+    /** Returns the value recorded at keydown (falling back to the upper-cased `e.key`) and forgets it. */
+    up(e: KeyboardEvent): string {
+      const physical = id(e);
+      const key = recorded.get(physical) ?? e.key.toUpperCase();
+      recorded.delete(physical);
+      return key;
+    },
+    clear: () => recorded.clear(),
+  };
+}
+
 /** Is the event target an editable form control, or inside a `contenteditable` element? */
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -119,7 +141,11 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
     }
 
     const [pressedKeys, setPressedKeys] = createSignal<string[]>([], INTERNAL_OPTIONS);
-    const reset = () => setPressedKeys([]);
+    const recorder = createKeyRecorder();
+    const reset = () => {
+      recorder.clear();
+      setPressedKeys([]);
+    };
 
     makeEventListener(window, "keydown", e => {
       // e.key may be undefined when used with <datalist> el
@@ -131,6 +157,7 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
 
       if (currentKeys.includes(key)) return;
 
+      recorder.down(e, key);
       const keys = [...currentKeys, key];
 
       // if the modifier is pressed before we start listening
@@ -153,7 +180,7 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
 
     makeEventListener(window, "keyup", e => {
       if (typeof e.key !== "string") return;
-      const key = e.key.toUpperCase();
+      const key = recorder.up(e);
       // macOS never fires keyup for other keys held down together with Meta —
       // only Meta's own keyup arrives — so its release must clear everything,
       // or the other keys' stale state corrupts the next press.
@@ -357,8 +384,10 @@ export function createShortcut(
   let pressedKeys: string[] = [];
   let sequence: string[][] = [];
   let reset = false;
+  const recorder = createKeyRecorder();
 
   const resetAll = () => {
+    recorder.clear();
     pressedKeys = [];
     sequence = [];
     reset = false;
@@ -385,6 +414,7 @@ export function createShortcut(
         if (e.metaKey && !newKeys.includes("META")) newKeys.unshift("META");
       }
       newKeys.push(key);
+      recorder.down(e, key);
       pressedKeys = newKeys;
       sequence = [...sequence, [...pressedKeys]];
     }
@@ -441,7 +471,7 @@ export function createShortcut(
 
   makeEventListener(window, "keyup", (e: KeyboardEvent) => {
     if (typeof e.key !== "string") return;
-    const key = e.key.toUpperCase();
+    const key = recorder.up(e);
 
     // macOS never fires keyup for other keys held down together with Meta —
     // only Meta's own keyup arrives. Treat it as a signal that every other
@@ -614,8 +644,10 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
   const entries: RegistryEntry[] = [];
   let removeListeners: VoidFunction | undefined;
   let pressed: string[] = [];
+  const recorder = createKeyRecorder();
 
   const resetState = () => {
+    recorder.clear();
     pressed = [];
     for (const entry of entries) entry.fired = false;
   };
@@ -633,6 +665,7 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
     ).map(([name]) => name);
     pressed = [...mods, ...next.filter(k => !mods.includes(k as never))];
     if (!pressed.includes(key)) pressed.push(key);
+    recorder.down(e, key);
 
     for (let i = entries.length - 1; i >= 0; i--) {
       const entry = entries[i]!;
@@ -652,7 +685,7 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
 
   const onKeyUp = (e: KeyboardEvent) => {
     if (typeof e.key !== "string") return;
-    const key = e.key.toUpperCase();
+    const key = recorder.up(e);
     // macOS fires no keyup for keys held together with Meta; its release clears everything
     // (https://github.com/solidjs-community/solid-primitives/issues/269)
     if (key === "META") return resetState();
@@ -661,23 +694,34 @@ export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): Sho
   };
 
   const attach = () => {
-    const scope = options.scope ?? window;
+    const scope = options.scope;
+    const keydownTarget = scope ?? window;
     // Raw listeners: makeEventListener would bind cleanup to whichever owner happens to call
     // register() first, silently killing the registry when that owner is disposed.
     const onContextMenu = (e: MouseEvent) => {
       e.defaultPrevented || resetState();
     };
-    scope.addEventListener("keydown", onKeyDown as (e: Event) => void);
-    scope.addEventListener("keyup", onKeyUp as (e: Event) => void);
+    // Focus moving out of the scope (e.g. Tab) means the matching keyups land elsewhere.
+    // A null relatedTarget is the blur / window-switch case, which is reset by window "blur".
+    const onFocusOut = (e: FocusEvent) => {
+      const next = e.relatedTarget;
+      if (scope instanceof Node && next instanceof Node && !scope.contains(next)) resetState();
+    };
+    keydownTarget.addEventListener("keydown", onKeyDown as (e: Event) => void);
+    // Activation is scoped, but releases are tracked on window (capture) even when a scope is set,
+    // so a key released after focus has moved outside the scope doesn't stay "pressed".
+    const keyupCapture = !!scope;
+    window.addEventListener("keyup", onKeyUp as (e: Event) => void, keyupCapture);
+    scope?.addEventListener("focusout", onFocusOut as (e: Event) => void);
     window.addEventListener("blur", resetState);
     window.addEventListener("contextmenu", onContextMenu as (e: Event) => void);
-    const offs = [
-      () => scope.removeEventListener("keydown", onKeyDown as (e: Event) => void),
-      () => scope.removeEventListener("keyup", onKeyUp as (e: Event) => void),
-      () => window.removeEventListener("blur", resetState),
-      () => window.removeEventListener("contextmenu", onContextMenu as (e: Event) => void),
-    ];
-    removeListeners = () => offs.forEach(off => off());
+    removeListeners = () => {
+      keydownTarget.removeEventListener("keydown", onKeyDown as (e: Event) => void);
+      window.removeEventListener("keyup", onKeyUp as (e: Event) => void, keyupCapture);
+      scope?.removeEventListener("focusout", onFocusOut as (e: Event) => void);
+      window.removeEventListener("blur", resetState);
+      window.removeEventListener("contextmenu", onContextMenu as (e: Event) => void);
+    };
   };
 
   const detach = () => {

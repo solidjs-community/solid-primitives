@@ -102,7 +102,8 @@ describe("makeShortcutRegistry", () => {
     registry.register({ keys: "a", handler: () => {} });
     registry.register({ keys: "b", handler: () => {} });
     registry.register({ keys: "c", handler: () => {} });
-    expect(add.mock.calls.map(c => c[0])).toEqual(["keydown", "keyup"]);
+    // keyup is tracked on window (capture) so releases outside the scope are seen
+    expect(add.mock.calls.map(c => c[0])).toEqual(["keydown", "focusout"]);
     registry.clear();
   });
 
@@ -344,6 +345,145 @@ describe("makeShortcutRegistry", () => {
       expect(h).toHaveBeenCalledTimes(2);
       scope.remove();
       outside.remove();
+    });
+  });
+
+  describe("scope element: focus leaving the scope", () => {
+    const setup = () => {
+      const scope = document.createElement("div");
+      const child = document.createElement("button");
+      const outside = document.createElement("button");
+      scope.append(child);
+      document.body.append(scope, outside);
+      const registry = makeShortcutRegistry({ scope });
+      const h = vi.fn();
+      registry.register({ keys: "a", handler: h });
+      const cleanup = () => {
+        registry.clear();
+        scope.remove();
+        outside.remove();
+      };
+      return { scope, child, outside, registry, h, cleanup };
+    };
+
+    test("a keyup landing on an outside element still releases the key", () => {
+      const { child, outside, h, cleanup } = setup();
+      fire(child, "Tab", "keydown");
+      fire(outside, "Tab", "keyup"); // focus moved out, keyup lands outside
+      press("a", {}, child);
+      expect(h).toHaveBeenCalledTimes(1);
+      cleanup();
+    });
+
+    test("focusout to an element outside the scope resets pressed state", () => {
+      const { child, outside, h, cleanup } = setup();
+      fire(child, "Tab", "keydown");
+      // no keyup is ever delivered (e.g. it was swallowed); focus just leaves the scope
+      const out = new Event("focusout", { bubbles: true }) as any;
+      out.relatedTarget = outside;
+      child.dispatchEvent(out);
+      press("a", {}, child);
+      expect(h).toHaveBeenCalledTimes(1);
+      cleanup();
+    });
+
+    test("focusout to another element inside the scope does not reset, null relatedTarget is ignored", () => {
+      const { scope, child, h, cleanup } = setup();
+      const other = document.createElement("input");
+      scope.append(other);
+      fire(child, "Control", "keydown", { ctrlKey: true });
+      const inside = new Event("focusout", { bubbles: true }) as any;
+      inside.relatedTarget = other;
+      child.dispatchEvent(inside);
+      const nul = new Event("focusout", { bubbles: true }) as any;
+      nul.relatedTarget = null;
+      child.dispatchEvent(nul);
+      // Control still held: Control+a would need a different shortcut; plain "a" must NOT match
+      fire(child, "a", "keydown", { ctrlKey: true });
+      expect(h).not.toHaveBeenCalled();
+      cleanup();
+    });
+
+    test("still does not fire for keydown outside the scope", () => {
+      const { child, outside, h, cleanup } = setup();
+      fire(child, "Tab", "keydown");
+      fire(outside, "Tab", "keyup");
+      fire(outside, "a", "keydown");
+      fire(outside, "a", "keyup");
+      expect(h).not.toHaveBeenCalled();
+      cleanup();
+    });
+
+    test("cleanup removes the window keyup listener with matching capture flag", () => {
+      const scope = document.createElement("div");
+      const addW = vi.spyOn(window, "addEventListener");
+      const remW = vi.spyOn(window, "removeEventListener");
+      const addS = vi.spyOn(scope, "addEventListener");
+      const remS = vi.spyOn(scope, "removeEventListener");
+      const registry = makeShortcutRegistry({ scope });
+      registry.register({ keys: "a", handler: () => {} });
+      registry.clear();
+      const up = (m: typeof addW) => m.mock.calls.filter(c => c[0] === "keyup");
+      expect(up(addW).length).toBe(1);
+      expect(up(remW).length).toBe(1);
+      expect(up(remW)[0]![2]).toBe(up(addW)[0]![2]);
+      expect(up(addW)[0]![2]).toBe(true);
+      expect(addS.mock.calls.map(c => c[0]).sort()).toEqual(remS.mock.calls.map(c => c[0]).sort());
+      press("a");
+      vi.restoreAllMocks();
+    });
+  });
+
+  describe("changing key values between keydown and keyup", () => {
+    test("Shift+1: releasing Shift first, then the digit", () => {
+      const registry = makeShortcutRegistry();
+      const h = vi.fn();
+      registry.register({ keys: "a", handler: h });
+      fire(window, "Shift", "keydown", { code: "ShiftLeft", shiftKey: true });
+      fire(window, "!", "keydown", { code: "Digit1", shiftKey: true });
+      fire(window, "Shift", "keyup", { code: "ShiftLeft" });
+      fire(window, "1", "keyup", { code: "Digit1" });
+      press("a");
+      expect(h).toHaveBeenCalledTimes(1);
+      registry.clear();
+    });
+
+    test("Shift+1: releasing the digit first, then Shift", () => {
+      const registry = makeShortcutRegistry();
+      const h = vi.fn();
+      registry.register({ keys: "a", handler: h });
+      fire(window, "Shift", "keydown", { code: "ShiftLeft", shiftKey: true });
+      fire(window, "!", "keydown", { code: "Digit1", shiftKey: true });
+      fire(window, "!", "keyup", { code: "Digit1", shiftKey: true });
+      fire(window, "Shift", "keyup", { code: "ShiftLeft" });
+      press("a");
+      expect(h).toHaveBeenCalledTimes(1);
+      registry.clear();
+    });
+
+    test("letters: Shift+A released as Shift first then a", () => {
+      const registry = makeShortcutRegistry();
+      const h = vi.fn();
+      registry.register({ keys: "b", handler: h });
+      fire(window, "Shift", "keydown", { code: "ShiftLeft", shiftKey: true });
+      fire(window, "A", "keydown", { code: "KeyA", shiftKey: true });
+      fire(window, "Shift", "keyup", { code: "ShiftLeft" });
+      fire(window, "a", "keyup", { code: "KeyA" });
+      press("b");
+      expect(h).toHaveBeenCalledTimes(1);
+      registry.clear();
+    });
+
+    test("Meta keyup still clears everything", () => {
+      const registry = makeShortcutRegistry();
+      const h = vi.fn();
+      registry.register({ keys: "a", handler: h });
+      fire(window, "Meta", "keydown", { code: "MetaLeft", metaKey: true });
+      fire(window, "x", "keydown", { code: "KeyX", metaKey: true });
+      fire(window, "Meta", "keyup", { code: "MetaLeft" }); // no keyup for x on macOS
+      press("a", { code: "KeyA" });
+      expect(h).toHaveBeenCalledTimes(1);
+      registry.clear();
     });
   });
 

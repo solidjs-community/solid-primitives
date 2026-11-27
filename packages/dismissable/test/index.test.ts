@@ -408,6 +408,79 @@ describe("disableOutsidePointerEvents", () => {
   });
 });
 
+describe("disableOutsidePointerEvents across documents", () => {
+  const makeFrame = () => {
+    const iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument!;
+    const el = doc.createElement("div");
+    doc.body.appendChild(el);
+    return { doc, el };
+  };
+
+  it("locks and restores the iframe body of a single iframe layer", () => {
+    const { doc, el } = makeFrame();
+    doc.body.style.pointerEvents = "auto";
+    document.body.style.pointerEvents = "auto";
+    const l = layerAt(el, { disableOutsidePointerEvents: true });
+    expect(doc.body.style.pointerEvents).toBe("none");
+    expect(document.body.style.pointerEvents).toBe("auto");
+    l.cleanup();
+    expect(doc.body.style.pointerEvents).toBe("auto");
+    expect(document.body.style.pointerEvents).toBe("auto");
+  });
+
+  it.each([["main first"], ["iframe first"]])(
+    "main layer below iframe layer restores both bodies (cleanup: %s)",
+    order => {
+      const { doc, el } = makeFrame();
+      doc.body.style.pointerEvents = "auto";
+      document.body.style.pointerEvents = "";
+      const lm = layerAt(mount("m"), { disableOutsidePointerEvents: true });
+      const lf = layerAt(el, { disableOutsidePointerEvents: true });
+      expect(document.body.style.pointerEvents).toBe("none");
+      expect(doc.body.style.pointerEvents).toBe("none");
+      const [first, second] = order === "main first" ? [lm, lf] : [lf, lm];
+      first.cleanup();
+      if (order === "main first") {
+        expect(document.body.style.pointerEvents).toBe("");
+        expect(doc.body.style.pointerEvents).toBe("none");
+      } else {
+        expect(doc.body.style.pointerEvents).toBe("auto");
+        expect(document.body.style.pointerEvents).toBe("none");
+      }
+      second.cleanup();
+      expect(document.body.style.pointerEvents).toBe("");
+      expect(doc.body.style.pointerEvents).toBe("auto");
+    },
+  );
+
+  it("iframe layer below a main layer restores both bodies", () => {
+    const { doc, el } = makeFrame();
+    doc.body.style.pointerEvents = "auto";
+    const lf = layerAt(el, { disableOutsidePointerEvents: true });
+    const lm = layerAt(mount("m"), { disableOutsidePointerEvents: true });
+    expect(doc.body.style.pointerEvents).toBe("none");
+    expect(document.body.style.pointerEvents).toBe("none");
+    lf.cleanup();
+    expect(doc.body.style.pointerEvents).toBe("auto");
+    expect(document.body.style.pointerEvents).toBe("none");
+    lm.cleanup();
+    expect(document.body.style.pointerEvents).toBe("");
+    expect(doc.body.style.pointerEvents).toBe("auto");
+  });
+
+  it("same-document layers still share one saved value", () => {
+    document.body.style.pointerEvents = "auto";
+    const la = layerAt(mount("a"), { disableOutsidePointerEvents: true });
+    const lb = layerAt(mount("b"), { disableOutsidePointerEvents: true });
+    la.cleanup();
+    expect(document.body.style.pointerEvents).toBe("none");
+    lb.cleanup();
+    expect(document.body.style.pointerEvents).toBe("auto");
+  });
+});
+
 describe("createDismissableLayer", () => {
   it("registers once the ref resolves and unregisters on dispose", () => {
     const [ref, setRef] = createSignal<Element>();

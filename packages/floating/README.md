@@ -28,7 +28,7 @@ pnpm add @solid-primitives/floating
 
 ## `computePosition`
 
-Computes where `floating` goes relative to `reference`. It measures with `getBoundingClientRect`, applies no styles and keeps no state. `x` / `y` are relative to the floating element's offset parent for `strategy: "absolute"` and to the viewport for `"fixed"`.
+Computes where `floating` goes relative to `reference`. It measures with `getBoundingClientRect`, applies no styles and keeps no state. `x` / `y` are relative to the floating element's offset parent for `strategy: "absolute"` and to the viewport for `"fixed"`. A `"fixed"` element inside a transformed ancestor (`transform`, `perspective`, `filter`, `backdrop-filter`, `will-change` naming one of those, or `contain` / `container-type` that includes paint, layout, size) is positioned relative to that ancestor instead, since it is the containing block; the viewport is used when there is none. If the offset parent or containing block is scaled (e.g. `transform: scale(2)`), `x` / `y`, `availableWidth` / `availableHeight`, shift, arrow and `transformOrigin` px values are converted to its local CSS px, so they render at the same viewport place.
 
 `flip` and `shift` are opt-in. `rootBoundary` defaults to the viewport (`visualViewport` when the browser has it); `boundary` narrows that further and is intersected with it.
 

@@ -280,6 +280,47 @@ describe("makeInertOthers", () => {
     });
   });
 
+  describe("protected elements inside a target", () => {
+    test("children of a target that holds a live region / ignore element are not hidden", () => {
+      const button = el("button", {}, dialog);
+      const status = el("div", { role: "status" }, dialog);
+      const toast = el("div", {}, dialog);
+      const c = makeInertOthers(dialog, { strategy: "both", ignore: toast });
+      for (const n of [button, status, toast, dialog]) {
+        expect(n.hasAttribute("aria-hidden")).toBe(false);
+        expect(n.hasAttribute("inert")).toBe(false);
+      }
+      expect(app.hasAttribute("inert")).toBe(true);
+      c();
+      const c2 = makeInertOthers(dialog);
+      expect(button.hasAttribute("aria-hidden")).toBe(false);
+      c2();
+    });
+  });
+
+  describe("root handling", () => {
+    test("a target equal to root does not hide siblings outside root", () => {
+      const container = el("div", { id: "container" });
+      const inside = el("div", {}, container);
+      const outside = el("div", { id: "outside" });
+      const c = makeInertOthers(container, { root: container });
+      for (const n of [container, inside, outside, document.body, app, dialog])
+        expect(n.hasAttribute("aria-hidden")).toBe(false);
+      c();
+    });
+
+    test("an ignored element equal to root does not walk above root", () => {
+      const container = el("div", { id: "container" });
+      const inside = el("div", {}, container);
+      const target = el("div", {}, container);
+      const outside = el("div", { id: "outside" });
+      const c = makeInertOthers(target, { root: container, ignore: container });
+      expect(outside.hasAttribute("aria-hidden")).toBe(false);
+      expect(inside.hasAttribute("aria-hidden")).toBe(false);
+      c();
+    });
+  });
+
   describe("dynamic nodes", () => {
     test("hides nodes added later and restores them on cleanup", async () => {
       const c = makeInertOthers(dialog);
@@ -308,6 +349,36 @@ describe("makeInertOthers", () => {
       await tick();
       expect(live.hasAttribute("aria-hidden")).toBe(false);
       c();
+    });
+
+    test("live regions added later inside an already hidden branch are re-evaluated", async () => {
+      const wrapper = el("div", {}, app);
+      const sibling = el("p", {}, wrapper);
+      const c = makeInertOthers(dialog);
+      expect(app.getAttribute("aria-hidden")).toBe("true");
+      const live = el("div", { role: "status" }, wrapper);
+      await tick();
+      expect(live.hasAttribute("aria-hidden")).toBe(false);
+      expect(wrapper.hasAttribute("aria-hidden")).toBe(false);
+      expect(app.hasAttribute("aria-hidden")).toBe(false);
+      expect(sibling.getAttribute("aria-hidden")).toBe("true");
+      // a subtree that contains a live region counts too
+      const host = el("section", {}, sibling);
+      const nested = document.createElement("div");
+      nested.setAttribute("aria-live", "polite");
+      const deep = el("div");
+      deep.appendChild(nested);
+      host.appendChild(deep);
+      await tick();
+      expect(nested.hasAttribute("aria-hidden")).toBe(false);
+      expect(deep.hasAttribute("aria-hidden")).toBe(false);
+      // plain nodes do not make anything visible, and cleanup restores everything
+      c();
+      for (const n of [app, wrapper, sibling, host, deep])
+        expect(n.hasAttribute("aria-hidden")).toBe(false);
+      const after = el("div", { role: "alert" }, app);
+      await tick();
+      expect(after.hasAttribute("aria-hidden")).toBe(false);
     });
 
     test("removed nodes are released", async () => {
@@ -443,6 +514,85 @@ describe("createInertOthers", () => {
     flush();
     for (const n of [app, dialog, upperEl]) expect(n.hasAttribute("aria-hidden")).toBe(false);
     dispose();
+  });
+
+  test("a lower layer keeps its stack position across reactive input changes", () => {
+    const upperEl = el("div", { id: "upper" });
+    const upperChild = el("button", {}, upperEl);
+    const lowerAlt = el("div", { id: "lower-alt" });
+    const toast = el("div", { id: "toast" });
+    const [lowerTarget, setLowerTarget] = createSignal<HTMLElement>(dialog);
+    const [lowerIgnore, setLowerIgnore] = createSignal<HTMLElement | undefined>(undefined);
+    const [lowerOn, setLowerOn] = createSignal(true);
+    const dispose = createRoot(d => {
+      createInertOthers(lowerTarget, lowerOn, { ignore: lowerIgnore });
+      createInertOthers(upperEl);
+      return d;
+    });
+    const upperExposed = () => {
+      for (const n of [upperEl, upperChild, document.body])
+        expect(n.hasAttribute("aria-hidden")).toBe(false);
+    };
+    flush();
+    upperExposed();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(dialog.getAttribute("aria-hidden")).toBe("true");
+
+    setLowerIgnore(toast);
+    flush();
+    upperExposed();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+
+    setLowerTarget(lowerAlt);
+    flush();
+    upperExposed();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(lowerAlt.getAttribute("aria-hidden")).toBe("true");
+
+    setLowerOn(false);
+    flush();
+    upperExposed();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    setLowerOn(true);
+    flush();
+    upperExposed();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(lowerAlt.getAttribute("aria-hidden")).toBe("true");
+    setLowerIgnore(undefined);
+    flush();
+    upperExposed();
+    expect(lowerAlt.getAttribute("aria-hidden")).toBe("true");
+    dispose();
+    flush();
+    for (const n of [app, dialog, lowerAlt, upperEl, upperChild, toast])
+      expect(n.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  test("layers closed in either order restore the original attributes after input changes", () => {
+    const upperEl = el("div");
+    const [lowerIgnore, setLowerIgnore] = createSignal<HTMLElement | undefined>(undefined);
+    let disposeLower!: VoidFunction;
+    let disposeUpper!: VoidFunction;
+    createRoot(d => {
+      disposeLower = d;
+      createInertOthers(dialog, true, { ignore: lowerIgnore });
+    });
+    createRoot(d => {
+      disposeUpper = d;
+      createInertOthers(upperEl);
+    });
+    flush();
+    setLowerIgnore(el("div"));
+    flush();
+    expect(upperEl.hasAttribute("aria-hidden")).toBe(false);
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    disposeLower();
+    flush();
+    expect(app.getAttribute("aria-hidden")).toBe("true");
+    expect(dialog.getAttribute("aria-hidden")).toBe("true");
+    disposeUpper();
+    flush();
+    for (const n of [app, dialog, upperEl]) expect(n.hasAttribute("aria-hidden")).toBe(false);
   });
 });
 

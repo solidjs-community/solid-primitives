@@ -142,6 +142,11 @@ function getOverflow(coords: Point, fl: Size, clip: Rect, padding: Sides): Sides
 export type SolveExtras = {
   /** Viewport coordinates of the origin that `x`/`y` are measured from. Default `{0, 0}`. */
   origin?: Point;
+  /**
+   * Scale of the coordinate space `x`/`y` are measured in (viewport px per local CSS px).
+   * Default `{1, 1}`. Results and px metadata are converted to local CSS px.
+   */
+  scale?: Point;
   /** Arrow element size and padding; enables `middlewareData.arrow`. */
   arrow?: Size & { padding?: number };
 };
@@ -165,6 +170,7 @@ export function computePositionFromRects(
   const strategy: Strategy = options.strategy ?? "absolute";
   const rtl = options.rtl ?? false;
   const origin = extras.origin ?? { x: 0, y: 0 };
+  const scale = extras.scale ?? { x: 1, y: 1 };
 
   const offset =
     typeof options.offset === "number"
@@ -272,7 +278,8 @@ export function computePositionFromRects(
     const padding = extras.arrow.padding ?? 0;
     const desired = reference[axis] + reference[len] / 2 - coords[axis] - arrowLen / 2;
     const clamped = clamp(padding, desired, floating[len] - arrowLen - padding);
-    arrow = { [axis]: clamped, centerOffset: desired - clamped } as ArrowData;
+    const k = scale[axis];
+    arrow = { [axis]: clamped / k, centerOffset: (desired - clamped) / k } as ArrowData;
     arrowCenter = clamped + arrowLen / 2;
   }
 
@@ -288,21 +295,21 @@ export function computePositionFromRects(
     );
   const mainOrigin = side === "top" ? floating.height : side === "left" ? floating.width : 0;
   const transformOrigin = vertical
-    ? `${crossOrigin}px ${mainOrigin}px`
-    : `${mainOrigin}px ${crossOrigin}px`;
+    ? `${crossOrigin / scale.x}px ${mainOrigin / scale.y}px`
+    : `${mainOrigin / scale.x}px ${crossOrigin / scale.y}px`;
 
   return {
-    x: coords.x - origin.x,
-    y: coords.y - origin.y,
+    x: (coords.x - origin.x) / scale.x,
+    y: (coords.y - origin.y) / scale.y,
     placement,
     strategy,
     middlewareData: {
       ...(arrow && { arrow }),
       flipped: placement !== initialPlacement,
       shifted: shift.x !== 0 || shift.y !== 0,
-      shift,
-      availableWidth,
-      availableHeight,
+      shift: { x: shift.x / scale.x, y: shift.y / scale.y },
+      availableWidth: availableWidth / scale.x,
+      availableHeight: availableHeight / scale.y,
       transformOrigin,
     },
   };
@@ -364,25 +371,104 @@ export function getClippingRect(
   return rect;
 }
 
-/** Viewport coordinates of the point that `position: absolute` coordinates are measured from. */
-export function getOrigin(floating: HTMLElement, strategy: Strategy): Point {
-  if (strategy === "fixed") return { x: 0, y: 0 };
+const ORIGIN_ZERO: Point = { x: 0, y: 0 };
+const SCALE_ONE: Point = { x: 1, y: 1 };
+
+/** Flat-tree parent: slot assignment and shadow hosts are followed, iframes are not. */
+function getParentElement(el: Element): Element | null {
+  if (el.assignedSlot) return el.assignedSlot;
+  if (el.parentElement) return el.parentElement;
+  const root = el.parentNode as (ParentNode & { host?: Element }) | null;
+  return root?.host ?? null;
+}
+
+const createsFixedContainingBlock = (style: CSSStyleDeclaration): boolean => {
+  const none = (v: string | undefined) => !v || v === "none";
+  const s = style as CSSStyleDeclaration & { webkitBackdropFilter?: string };
+  return (
+    !none(s.transform) ||
+    !none(s.perspective) ||
+    !none(s.filter) ||
+    !none(s.backdropFilter) ||
+    !none(s.webkitBackdropFilter) ||
+    /transform|perspective|filter/.test(s.willChange || "") ||
+    /paint|layout|strict|content/.test(s.contain || "") ||
+    /size|inline-size/.test(s.containerType || "")
+  );
+};
+
+/** The nearest ancestor that is the containing block of `position: fixed` descendants. */
+function getFixedContainingBlock(floating: Element): Element | null {
+  const win = floating.ownerDocument.defaultView;
+  if (!win?.getComputedStyle) return null;
+  for (let el = getParentElement(floating); el; el = getParentElement(el)) {
+    let style: CSSStyleDeclaration | undefined;
+    try {
+      style = win.getComputedStyle(el);
+    } catch {
+      return null;
+    }
+    if (style && createsFixedContainingBlock(style)) return el;
+  }
+  return null;
+}
+
+/** Viewport px per local CSS px; `1` when the element has no layout size or is not scaled. */
+function getScale(el: Element, rect: DOMRect): Point {
+  const { offsetWidth, offsetHeight } = el as HTMLElement;
+  const ratio = (measured: number, css: number) => {
+    const r = measured / css;
+    return css && Number.isFinite(r) && r > 0 ? r : 1;
+  };
+  return { x: ratio(rect.width, offsetWidth), y: ratio(rect.height, offsetHeight) };
+}
+
+/**
+ * Viewport coordinates of the point that the floating element's `x` / `y` are measured from, and
+ * the scale of that coordinate space. For `"fixed"` this is the viewport unless a transformed
+ * (or filtered / contained) ancestor is the containing block.
+ */
+export function getOriginAndScale(
+  floating: HTMLElement,
+  strategy: Strategy,
+): { origin: Point; scale: Point } {
   const doc = floating.ownerDocument;
   const win = doc.defaultView;
+  if (strategy === "fixed") {
+    const block = getFixedContainingBlock(floating);
+    if (!block) return { origin: ORIGIN_ZERO, scale: SCALE_ONE };
+    const rect = block.getBoundingClientRect();
+    const scale = getScale(block, rect);
+    return {
+      origin: {
+        x: rect.left + block.clientLeft * scale.x,
+        y: rect.top + block.clientTop * scale.y,
+      },
+      scale,
+    };
+  }
   const parent = floating.offsetParent;
   if (
     !parent ||
     parent === doc.documentElement ||
     (parent === doc.body && win?.getComputedStyle(parent).position === "static")
   ) {
-    return { x: -(win?.scrollX ?? 0), y: -(win?.scrollY ?? 0) };
+    return { origin: { x: -(win?.scrollX ?? 0), y: -(win?.scrollY ?? 0) }, scale: SCALE_ONE };
   }
   const rect = parent.getBoundingClientRect();
+  const scale = getScale(parent, rect);
   return {
-    x: rect.left + parent.clientLeft - parent.scrollLeft,
-    y: rect.top + parent.clientTop - parent.scrollTop,
+    origin: {
+      x: rect.left + (parent.clientLeft - parent.scrollLeft) * scale.x,
+      y: rect.top + (parent.clientTop - parent.scrollTop) * scale.y,
+    },
+    scale,
   };
 }
+
+/** Viewport coordinates of the point that `x` / `y` are measured from. */
+export const getOrigin = (floating: HTMLElement, strategy: Strategy): Point =>
+  getOriginAndScale(floating, strategy).origin;
 
 const measure = (el: HTMLElement | Element): Size => {
   const { width, height } = el.getBoundingClientRect();
@@ -407,19 +493,22 @@ export function computePosition(
     floating.ownerDocument.defaultView?.getComputedStyle(floating).direction === "rtl";
   const solveOptions = { ...options, strategy, rtl };
 
-  const solve = (): ComputePositionResult =>
-    computePositionFromRects(
+  const solve = (): ComputePositionResult => {
+    const { origin, scale } = getOriginAndScale(floating, strategy);
+    return computePositionFromRects(
       toRect(reference.getBoundingClientRect()),
       measure(floating),
       getClippingRect(floating, options.boundary, options.rootBoundary),
       solveOptions,
       {
-        origin: getOrigin(floating, strategy),
+        origin,
+        scale,
         arrow: options.arrow?.element
           ? { ...measure(options.arrow.element), padding: options.arrow.padding }
           : undefined,
       },
     );
+  };
 
   let result = solve();
   const apply = options.size?.apply;

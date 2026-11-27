@@ -341,3 +341,98 @@ describe("createPostMessage", () => {
     port2.close();
   });
 });
+
+/**
+ * Simulates a cross-origin WindowProxy: every operation except the real
+ * cross-origin allowlist throws a SecurityError.
+ */
+const crossOriginWindow = () => {
+  const allowed = new Set([
+    "window",
+    "self",
+    "location",
+    "close",
+    "closed",
+    "focus",
+    "blur",
+    "frames",
+    "length",
+    "top",
+    "opener",
+    "parent",
+    "postMessage",
+  ]);
+  const postMessage = vi.fn();
+  const deny = (key: unknown): never => {
+    throw new DOMException(
+      `Blocked a frame from accessing a cross-origin frame: ${String(key)}`,
+      "SecurityError",
+    );
+  };
+  const proxy: Window = new Proxy({} as any, {
+    has: (_t, k) => (allowed.has(k as string) ? true : deny(k)),
+    get(_t, k) {
+      if (k === "window" || k === "self") return proxy;
+      if (k === "postMessage") return postMessage;
+      // jsdom's MessageEvent#source wrapper lookup reads a symbol key; browsers don't.
+      if (typeof k === "symbol" || allowed.has(k)) return undefined;
+      return deny(k);
+    },
+    getOwnPropertyDescriptor: (_t, k) => deny(k),
+    ownKeys: () => deny("ownKeys"),
+    getPrototypeOf: () => deny("proto"),
+  });
+  return { proxy, postMessage };
+};
+
+describe("makePostMessage (cross-origin Window)", () => {
+  it("creates a channel and sends with the explicit targetOrigin", () => {
+    const { proxy, postMessage } = crossOriginWindow();
+    const h = makePostMessage<any, any>(proxy, opts);
+    const buf = new ArrayBuffer(1);
+    expect(h.send({ a: 1 }, [buf])).toBe(true);
+    expect(postMessage).toHaveBeenCalledWith({ a: 1 }, { targetOrigin: ORIGIN, transfer: [buf] });
+    h.close();
+  });
+
+  it("filters received messages by source and origin", () => {
+    const { proxy } = crossOriginWindow();
+    const h = makePostMessage<any, any>(proxy, opts);
+    const fn = vi.fn();
+    h.onMessage(fn);
+    dispatch({ data: "ok", source: proxy });
+    dispatch({ data: "wrong-source", source: crossOriginWindow().proxy });
+    dispatch({ data: "wrong-origin", origin: "https://evil.example.com", source: proxy });
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn.mock.calls[0]![0]).toBe("ok");
+    h.close();
+  });
+
+  it("works reactively and re-attaches when the target changes", () => {
+    const a = crossOriginWindow();
+    const b = crossOriginWindow();
+    const [target, setTarget] = createSignal<Window | undefined>(a.proxy);
+    let ch!: ReturnType<typeof createPostMessage<any, any>>;
+    const dispose = createRoot(d => {
+      ch = createPostMessage<any, any>({ target, ...opts });
+      return d;
+    });
+    flush();
+    expect(ch.send(1)).toBe(true);
+    expect(a.postMessage).toHaveBeenCalledTimes(1);
+    dispatch({ data: "fromA", source: a.proxy });
+    flush();
+    expect(ch.message()).toBe("fromA");
+    setTarget(b.proxy);
+    flush();
+    expect(ch.send(2)).toBe(true);
+    expect(b.postMessage).toHaveBeenCalledTimes(1);
+    dispatch({ data: "stale", source: a.proxy });
+    flush();
+    expect(ch.message()).toBe("fromA");
+    dispatch({ data: "fromB", source: b.proxy });
+    flush();
+    expect(ch.message()).toBe("fromB");
+    dispose();
+  });
+});

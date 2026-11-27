@@ -35,32 +35,37 @@ const getSignal = () =>
 
 const notify = () => getSignal()[1](layers.slice());
 
-let bodyPointerEvents: string | undefined;
-let bodyLocked = false;
+/** Saved `body.style.pointerEvents` of every document currently locked by a layer. */
+const lockedDocs = new Map<Document, string>();
 
 function updatePointerEvents(): void {
-  const firstDisabling = layers.findIndex(l => l.disableOutsidePointerEvents);
-  const doc =
-    layers[0]?.element.ownerDocument ?? (typeof document !== "undefined" ? document : undefined);
-  const body = doc?.body;
-  if (firstDisabling === -1) {
-    if (bodyLocked && body) {
-      body.style.pointerEvents = bodyPointerEvents ?? "";
+  // Documents that need their body locked, and the lowest disabling layer index per document.
+  const firstDisabling = new Map<Document, number>();
+  layers.forEach((l, i) => {
+    if (l.disableOutsidePointerEvents) {
+      const doc = l.element.ownerDocument;
+      if (doc && !firstDisabling.has(doc)) firstDisabling.set(doc, i);
     }
-    bodyLocked = false;
-    bodyPointerEvents = undefined;
-  } else if (body) {
-    if (!bodyLocked) {
-      bodyPointerEvents = body.style.pointerEvents;
-      bodyLocked = true;
-    }
+  });
+  // Restore documents that no longer need a lock.
+  for (const [doc, saved] of lockedDocs) {
+    if (firstDisabling.has(doc)) continue;
+    if (doc.body) doc.body.style.pointerEvents = saved;
+    lockedDocs.delete(doc);
+  }
+  // Lock newly needed documents.
+  for (const doc of firstDisabling.keys()) {
+    const body = doc.body;
+    if (!body) continue;
+    if (!lockedDocs.has(doc)) lockedDocs.set(doc, body.style.pointerEvents);
     body.style.pointerEvents = "none";
   }
-  // Layers at or above the lowest disabling layer must stay interactive.
+  // Layers at or above the lowest disabling layer of their document must stay interactive.
   layers.forEach((layer, i) => {
     const el = layer.element as HTMLElement;
     if (!el.style) return;
-    if (firstDisabling !== -1 && i >= firstDisabling) {
+    const first = firstDisabling.get(layer.element.ownerDocument);
+    if (first !== undefined && i >= first) {
       if (layer.prevPointerEvents === undefined) layer.prevPointerEvents = el.style.pointerEvents;
       el.style.pointerEvents = "auto";
     } else if (layer.prevPointerEvents !== undefined) {
