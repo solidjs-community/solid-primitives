@@ -524,9 +524,6 @@ importers:
       '@solid-primitives/a11y':
         specifier: workspace:^
         version: link:../a11y
-      '@solid-primitives/event-listener':
-        specifier: workspace:^
-        version: link:../event-listener
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
