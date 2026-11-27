@@ -103,14 +103,37 @@ function isNode(value: unknown): value is Node {
 }
 
 /**
- * Is the event target an editable form control, or inside a `contenteditable` element?
- * Duck-typed, so it also works for elements that belong to another realm (iframes).
+ * `<input>` types that never accept typed characters. Everything else (including a missing or
+ * unknown type, which is a text input) is treated as editable, so types that consume keys such as
+ * arrows or typeahead (radio, range, file, color, ...) stay ignored.
+ */
+const NON_TEXT_INPUT_TYPES: ReadonlySet<string> = new Set([
+  "checkbox",
+  "button",
+  "submit",
+  "reset",
+  "image",
+]);
+
+function getInputType(el: HTMLElement): string {
+  let type: unknown = (el as HTMLInputElement).type;
+  if (typeof type !== "string" && typeof el.getAttribute === "function") {
+    type = el.getAttribute("type");
+  }
+  return typeof type === "string" ? type.toLowerCase() : "";
+}
+
+/**
+ * Is the event target an editable control, or inside a `contenteditable` element?
+ * `<input>` types that never accept typed characters (checkbox, button, submit, reset, image) are
+ * not editable. Duck-typed, so it also works for elements that belong to another realm (iframes).
  */
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!isNode(target) || target.nodeType !== 1) return false;
   const el = target as HTMLElement;
   switch (typeof el.tagName === "string" ? el.tagName.toUpperCase() : "") {
     case "INPUT":
+      return !NON_TEXT_INPUT_TYPES.has(getInputType(el));
     case "TEXTAREA":
     case "SELECT":
       return true;
@@ -396,7 +419,9 @@ export function createKeyHold(
  * - `preventDefault` — Controls if the keydown event should have its default action prevented. Enabled by default.
  * - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
  * - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`,
- *   or `contenteditable` element, so typing isn't interrupted. Disabled by default — enable it for shortcuts
+ *   or `contenteditable` element, so typing isn't interrupted. Inputs that never accept typed characters
+ *   (`type` = `checkbox`, `button`, `submit`, `reset`, `image`) do not count, so the shortcut still fires there;
+ *   `radio`, `range`, `file` and `color` stay ignored because they use arrow and other keys. Disabled by default — enable it for shortcuts
  *   made of plain, unmodified keys (e.g. a single letter); combos like `Control+S` are usually fine either way,
  *   since the modifier prevents a character from being typed.
  * - `anyOrder` — If `true`, the keys can be pressed in any order (e.g. `Shift+Control` as well as `Control+Shift`),
@@ -626,7 +651,11 @@ export interface ShortcutDefinition {
   preventDefault?: boolean;
   /** Fire only once until all keys have been released. Defaults to `false`. */
   requireReset?: boolean;
-  /** Ignore the shortcut while focus is in an input, textarea, select or contenteditable. Defaults to `false`. */
+  /**
+   * Ignore the shortcut while focus is in an input, textarea, select or contenteditable. Inputs that
+   * never accept typed characters (`checkbox`, `button`, `submit`, `reset`, `image`) do not count;
+   * `radio`, `range`, `file` and `color` stay ignored (they use arrow and other keys). Defaults to `false`.
+   */
   ignoreInputs?: boolean;
   /** Read when a key is pressed; a disabled shortcut does not match and does not block others. Defaults to `true`. */
   enabled?: MaybeAccessor<boolean | undefined>;

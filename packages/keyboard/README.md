@@ -263,7 +263,7 @@ render(() => <Demo />, document.getElementById("app")!);
 - `options` — additional configuration:
   - `preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified key is pressed. _(Defaults to `true`)_
   - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default. A modifier with two physical keys (for example both Control keys) counts as held until the last one is released.
-  - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`, or `contenteditable` element, so it doesn't interrupt typing. Disabled by default.
+  - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`, or `contenteditable` element, so it doesn't interrupt typing. Inputs that never accept typed characters (`type` of `checkbox`, `button`, `submit`, `reset` or `image`) are not treated as editable, so the shortcut still fires there. Disabled by default.
   - `anyOrder` — If `true`, the keys can be pressed in any order (e.g. `Shift + Control` as well as `Control + Shift`), as long as they all end up held down together. Disabled by default, requiring `keys` to be pressed in order.
 
 ```tsx
@@ -294,6 +294,8 @@ createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: 
 ```
 
 Combos that include a modifier (e.g. `Control + S`) don't have this problem, since the modifier itself prevents a character from being typed — `ignoreWithinInputs` is usually unnecessary for those.
+
+Inputs whose `type` never accepts typed characters (`checkbox`, `button`, `submit`, `reset`, `image`; case-insensitive) are **not** treated as editable, so a plain-key shortcut still fires while one of them has focus. All other inputs stay ignored: text-like types (`text`, `search`, `email`, `url`, `tel`, `password`, `number`, the date and time types, and an input with a missing or unknown `type`) as well as `radio`, `range`, `file` and `color`, which consume arrow and other keys. `textarea`, `select` and `contenteditable` are always ignored. The same rules apply to the registry's `ignoreInputs`.
 
 The check also works for inputs inside iframes and **open** shadow roots (the real target is taken from `event.composedPath()`). **Closed** shadow roots hide their contents from the page, so inputs inside them cannot be detected.
 
@@ -370,7 +372,7 @@ Each definition is `{ keys, handler, preventDefault?, requireReset?, ignoreInput
 - `handler(event)` — called with the `KeyboardEvent`.
 - `preventDefault` — defaults to `true`.
 - `requireReset` — fire once until all keys are released. Defaults to `false`.
-- `ignoreInputs` — skip while focus is in an `input`, `textarea`, `select` or `contenteditable`. Defaults to `false` (same as `createShortcut`'s `ignoreWithinInputs`).
+- `ignoreInputs` — skip while focus is in an `input`, `textarea`, `select` or `contenteditable`. Like `ignoreWithinInputs`, it does not apply to `checkbox`, `button`, `submit`, `reset` and `image` inputs. Defaults to `false` (same as `createShortcut`'s `ignoreWithinInputs`).
 - `enabled` — boolean or accessor, read at key time. A disabled shortcut never matches.
 
 Key repeat is ignored. Modifier state is taken from the event's `ctrlKey`/`shiftKey`/`altKey`/`metaKey` flags, and releasing `Meta` clears all held keys (macOS sends no keyup for keys held with Meta).
