@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { flush } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { render } from "@solidjs/web";
 import { createForm } from "../src/index.js";
 
@@ -122,6 +122,22 @@ describe("createForm as JSX ref callbacks", () => {
     form.fields.agree.setValue(false);
     flush();
     expect(input.checked).toBe(false);
+  });
+
+  it("works when bind() was evaluated without an owner", () => {
+    let form!: ReturnType<typeof createForm<{ email: { initial: string } }>>;
+    createRoot(d => {
+      form = createForm({ fields: { email: { initial: "x" } } });
+      return d;
+    });
+    const attach = form.bind("email"); // no owner here
+    const { container } = mount(() => <input ref={attach} />);
+    const input = container.querySelector("input")!;
+
+    expect(input.value).toBe("x");
+    form.fields.email.setValue("y");
+    flush();
+    expect(input.value).toBe("y");
   });
 
   it("removes every listener when the ref is cleaned up", () => {

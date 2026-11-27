@@ -4,6 +4,7 @@ import {
   createRoot,
   getOwner,
   onCleanup,
+  runWithOwner,
   untrack,
   createEffect,
   type Accessor,
@@ -445,11 +446,15 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       };
       active.add(attachment);
 
+      // Detached (null owner): a root can't be created under the ref callback's owner, and only
+      // the last teardown should dispose it.
       if (!owned && !disposeRoot)
-        disposeRoot = createRoot(d => {
-          createEffect(f.value, syncAll);
-          return d;
-        });
+        disposeRoot = runWithOwner(null, () =>
+          createRoot(d => {
+            createEffect(f.value, syncAll);
+            return d;
+          }),
+        );
 
       syncOne(attachment, untrack(f.value));
 
