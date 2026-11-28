@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, beforeAll, afterAll } from "vitest";
 import { createSignal, flush, Show } from "solid-js";
 import { render } from "@solidjs/web";
 import { createInfiniteScroll } from "../src/index.js";
@@ -26,8 +26,15 @@ class MockIO {
     this.callback([{ isIntersecting: true } as IntersectionObserverEntry], this as never);
   }
 }
-//@ts-ignore
-global.IntersectionObserver = MockIO;
+// Tests run without isolation: install the mock for this file only.
+const NativeIO = globalThis.IntersectionObserver;
+beforeAll(() => {
+  //@ts-ignore
+  globalThis.IntersectionObserver = MockIO;
+});
+afterAll(() => {
+  globalThis.IntersectionObserver = NativeIO;
+});
 
 let unmounts: Array<() => void> = [];
 function mount(App: () => any) {

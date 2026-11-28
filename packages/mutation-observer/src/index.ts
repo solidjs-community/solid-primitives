@@ -1,3 +1,4 @@
+// @ts-expect-error createOwner is exported at runtime but missing from the solid-js 2.0.0 types
 import { createOwner, onCleanup, onSettled } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, asArray, type MaybeAccessor } from "@solid-primitives/utils";
