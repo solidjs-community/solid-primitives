@@ -60,7 +60,7 @@ export type StreamReturn = [stream: Accessor<MediaStream | undefined>, controls:
  * @method `mute` mutes the stream, or unmutes when called with `false`
  * @method `stop` stops the stream immediately
  *
- * Wrap in `<Loading>` to handle the async pending state. The stream stops automatically on cleanup.
+ * `stream()` is a plain signal (undefined until the request resolves), so `<Loading>` shows no fallback. The stream stops automatically on cleanup.
  */
 export const createStream = (streamSource: StreamSourceDescription): StreamReturn => {
   if (isServer) {
@@ -236,7 +236,7 @@ export interface DisplayMediaStreamConstraints {
  * @method `mute` mutes the stream, or unmutes when called with `false`
  * @method `stop` stops the stream immediately
  *
- * Wrap in `<Loading>` to handle the async pending state. The stream stops automatically on cleanup.
+ * `stream()` is a plain signal (undefined until the request resolves), so `<Loading>` shows no fallback. The stream stops automatically on cleanup.
  */
 export const createScreen = (
   screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>,

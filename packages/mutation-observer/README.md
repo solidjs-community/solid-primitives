@@ -87,6 +87,8 @@ import { mutationObserver } from "@solid-primitives/mutation-observer";
 <div ref={mutationObserver({ childList: true }, records => console.log(records))} />;
 ```
 
+The observer is created when `mutationObserver(...)` is evaluated and disconnects with the surrounding owner, so a single value can be used as the `ref` of several elements.
+
 ### Types
 
 ```ts
