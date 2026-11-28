@@ -18,6 +18,8 @@ The native `autofocus` attribute only works on page load, which makes it incompa
 - [`createFocusTrap`](#createfocustrap) - Traps focus inside a given DOM element.
 - [`createFocusRestore`](#createfocusrestore) - Restores focus to the previously focused element, without trapping.
 - [`createFocusGroup`](#createfocusgroup) - Imperatively moves focus between the focusable elements of a container.
+- [`makeRovingScope` / `createRovingScope`](#makerovingscope--createrovingscope) - Roving tabindex for the items of a container: one tab stop, arrow-key navigation, remembers the last item.
+- [`makePressKeepsFocus` / `createPressKeepsFocus`](#makepresskeepsfocus--createpresskeepsfocus) - Pressing a control (e.g. a toolbar button) does not steal focus from the focused element.
 
 ## Installation
 
@@ -387,6 +389,99 @@ group.focusNext({ tabbable: false }); // overrides the default for this call onl
 | `textDirection`      | `MaybeAccessor<TextDirection>` | `"ltr"`      | The text direction of the focus group (`"ltr"` or `"rtl"`).          |
 | `handleTab`          | `MaybeAccessor<boolean>`       | `true`       | Whether tab key presses should be handled.                           |
 | `keyboardNavigation` | `MaybeAccessor<boolean>`       | `true`       | Whether the `keydown` listener is attached to the ref.               |
+
+## `makeRovingScope` / `createRovingScope`
+
+Manages a [roving tabindex](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#kbd_roving_tabindex) for the items of a container: only the active item has `tabindex="0"`, all others `-1`, so the whole container is a single tab stop. Arrow keys, Home and End move between items.
+
+```ts
+// Type
+function makeRovingScope(container: HTMLElement, options?: RovingScopeOptions): RovingScope;
+function createRovingScope(
+  container: Accessor<HTMLElement | null | undefined>,
+  options?: CreateRovingScopeOptions, // same options, each one may be reactive
+): RovingScopeSignal; // like RovingScope, with `active` as a signal and no `dispose`
+
+// Example
+import { createRovingScope } from "@solid-primitives/focus";
+
+const [ref, setRef] = createSignal<HTMLElement>();
+const scope = createRovingScope(ref, { selector: "button", orientation: "horizontal", loop: true });
+
+<div role="toolbar" ref={setRef}>
+  <button>Bold</button>
+  <button>Italic</button>
+  <button disabled>Underline</button>
+</div>;
+
+scope.active(); // the tabbable item
+scope.focusLast();
+```
+
+### Options
+
+| Option               | Type                                   | Default                | Description                                                                                            |
+| -------------------- | -------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
+| `selector`           | `string`                               | all focusable elements | CSS selector matching the items.                                                                       |
+| `orientation`        | `"horizontal" \| "vertical" \| "both"` | `"both"`               | Which arrow keys navigate. `"both"` accepts all four.                                                  |
+| `loop`               | `boolean`                              | `false`                | Wrap around at the ends.                                                                               |
+| `textDirection`      | `"ltr" \| "rtl"`                       | detected               | Detected from the closest `[dir]` attribute / computed style. In `rtl`, horizontal arrows are flipped. |
+| `skipDisabled`       | `boolean`                              | `true`                 | Skip `aria-disabled="true"` items. Natively `disabled` and hidden items are always skipped.            |
+| `initialActive`      | `(items) => HTMLElement \| undefined`  | first navigable item   | Chooses the initially tabbable item.                                                                   |
+| `keyboardNavigation` | `boolean`                              | `true`                 | Attach the `keydown` handler.                                                                          |
+| `onActiveChange`     | `(item) => void`                       | —                      | `makeRovingScope` only. `createRovingScope` exposes `active` as a signal instead.                      |
+| `enabled`            | `MaybeAccessor<boolean>`               | `true`                 | `createRovingScope` only. When `false`, original `tabindex` values are restored.                       |
+
+### Behavior
+
+- The last active item is remembered: when focus leaves the container, that item keeps `tabindex="0"`, so Tab returns to it.
+- Items added, removed, disabled or hidden later are picked up with a `MutationObserver`; if the active item disappears the closest navigable neighbour becomes active.
+- Nested scopes are independent. An item belongs to the closest scope container above it, and outer scopes release the items of inner scopes (and re-adopt them when the inner scope is disposed).
+- Arrow/Home/End are ignored inside text fields, with modifier keys held, and for events that were already `preventDefault`ed. Original `tabindex` attributes are restored on `dispose()` / cleanup.
+- `makeRovingScope` returns the scope including `dispose()`; use it when you manage the lifetime yourself. On the server both are inert.
+
+### Difference to `createFocusGroup`
+
+|                  | `createFocusGroup`                                        | `createRovingScope`                                                   |
+| ---------------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
+| Tab order        | Untouched: every focusable child stays a tab stop.        | Container becomes a single tab stop (roving `tabindex`).              |
+| Items            | Everything focusable (or tabbable) found by a TreeWalker. | Elements matching `selector`, skipping disabled/hidden, nested-aware. |
+| Remembers item   | No (starts from the focused element).                     | Yes, the active item stays tabbable.                                  |
+| Dynamic children | Looked up on every call.                                  | Tracked with a `MutationObserver`.                                    |
+
+Use `createFocusGroup` for imperative "move focus from here" helpers or when tab order should stay as-is; use `createRovingScope` for composite widgets (toolbars, tab lists, menus, radio groups).
+
+## `makePressKeepsFocus` / `createPressKeepsFocus`
+
+Stops presses on non-text controls from moving focus away from the element that currently has it, for example toolbar buttons that must keep a rich text editor focused. `pointerdown` and `mousedown` are `preventDefault`ed; `click` still fires normally.
+
+```ts
+// Type
+function makePressKeepsFocus(element: HTMLElement, options?: PressKeepsFocusOptions): VoidFunction;
+function createPressKeepsFocus(options?: PressKeepsFocusOptions): (element: HTMLElement) => void;
+
+interface PressKeepsFocusOptions {
+  enabled?: MaybeAccessor<boolean>; // default true
+  ignore?: (target: Element) => boolean; // keep native behavior for these targets
+  onlyWhenFocused?: boolean; // default true: do nothing while nothing is focused
+}
+
+// Example
+import { createPressKeepsFocus } from "@solid-primitives/focus";
+
+<div role="toolbar" ref={createPressKeepsFocus()}>
+  <button onClick={() => document.execCommand("bold")}>B</button>
+</div>;
+
+// imperative, returns a cleanup function
+const clear = makePressKeepsFocus(toolbarEl);
+```
+
+### Notes
+
+- Text inputs, `<textarea>`, `<select>` and `contenteditable` hosts always keep the native behavior so they can still be focused, as does anything matched by `ignore`.
+- With nothing focused (`document.activeElement` is `<body>`), presses behave natively, so buttons can still take focus. Pass `onlyWhenFocused: false` to always prevent.
+- `createPressKeepsFocus` registers cleanup with the current owner; one factory can be passed to several elements.
 
 ## `makeFocusListener`
 

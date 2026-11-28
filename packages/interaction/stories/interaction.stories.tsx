@@ -1,6 +1,7 @@
 import { createSignal, Show } from "solid-js";
 import preview from "../../../.storybook/preview.js";
 import {
+  createInertOthers,
   createInteractOutside,
   interactOutside,
   makeInteractOutside,
@@ -304,6 +305,28 @@ export const MakeInteractOutsideStory = meta.story({
           or when lifecycle hooks are unavailable.
         </p>
       </Container>
+    );
+  },
+});
+
+export const InertOthersStory = meta.story({
+  name: "createInertOthers",
+  render: () => {
+    const [dialog, setDialog] = createSignal<HTMLElement>();
+    const [open, setOpen] = createSignal(false);
+    createInertOthers(dialog, open, { strategy: "both" });
+    return (
+      <div style={{ display: "flex", gap: "16px", "align-items": "flex-start" }}>
+        <div>
+          <button onClick={() => setOpen(o => !o)}>{open() ? "Close" : "Open"} layer</button>
+          <p>Outside content: inert and aria-hidden while the layer is open.</p>
+          <button>Outside button</button>
+        </div>
+        <div ref={setDialog} role="dialog" style={{ border: "1px solid gray", padding: "8px" }}>
+          <p>Layer content stays interactive.</p>
+          <button onClick={() => setOpen(false)}>Dismiss</button>
+        </div>
+      </div>
     );
   },
 });

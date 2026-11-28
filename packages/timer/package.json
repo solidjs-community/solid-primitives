@@ -24,7 +24,9 @@
       "createTimer",
       "createTimeoutLoop",
       "createPolled",
-      "createIntervalCounter"
+      "createIntervalCounter",
+      "makePausableTimer",
+      "createPausableTimer"
     ],
     "category": "Browser APIs",
     "gzip": 577

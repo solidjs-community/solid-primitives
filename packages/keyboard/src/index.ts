@@ -1,6 +1,12 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSingletonRoot } from "@solid-primitives/rootless";
-import { arrayEquals, INTERNAL_OPTIONS, type MaybeAccessor, access } from "@solid-primitives/utils";
+import {
+  arrayEquals,
+  INTERNAL_OPTIONS,
+  type MaybeAccessor,
+  access,
+  tryOnCleanup,
+} from "@solid-primitives/utils";
 import { type Accessor, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { isServer } from "@solidjs/web";
 
@@ -25,16 +31,117 @@ function isSameKeySet(a: string[], b: string[]): boolean {
   return new Set(a).symmetricDifference(new Set(b)).size === 0;
 }
 
-/** Is the event target an editable form control, or inside a `contenteditable` element? */
+/**
+ * Remembers which logical key value was recorded at keydown for each PHYSICAL key, so the right
+ * one is removed on keyup. `KeyboardEvent.key` can change between press and release (hold Shift,
+ * press `1` -> `!`, release Shift, release `1` -> `1`), which would otherwise leave `!` stuck.
+ */
+function createKeyRecorder() {
+  const recorded = new Map<string, string>();
+  // `code` is the physical key; virtual/IME keyboards may report "" or "Unidentified" for every key,
+  // which would make all of them share one slot. Fall back to a key-based id that cannot collide
+  // with a real code name.
+  const id = (e: KeyboardEvent) => (e.code && e.code !== "Unidentified" ? e.code : `key:${e.key}`);
+  return {
+    /** Records the normalized `key` for the physical key of `e`. */
+    down: (e: KeyboardEvent, key: string) => void recorded.set(id(e), key),
+    /** Returns the value recorded at keydown (falling back to the upper-cased `e.key`) and forgets it. */
+    up(e: KeyboardEvent): string {
+      const physical = id(e);
+      const key = recorded.get(physical) ?? e.key.toUpperCase();
+      recorded.delete(physical);
+      return key;
+    },
+    clear: () => recorded.clear(),
+  };
+}
+
+/**
+ * True when `key` (a normalized key name) is a modifier whose event flag is still set after its
+ * keyup, meaning another physical key of the same modifier (e.g. ControlRight after ControlLeft)
+ * is still held. The modifier must then stay in the pressed list.
+ */
+function isModifierStillHeld(key: string, e: KeyboardEvent): boolean {
+  switch (key) {
+    case "CONTROL":
+      return e.ctrlKey;
+    case "SHIFT":
+      return e.shiftKey;
+    case "ALT":
+      return e.altKey;
+    case "META":
+      return e.metaKey;
+    default:
+      return false;
+  }
+}
+
+/**
+ * Lock keys. macOS sends only a keydown when CapsLock is switched on and only a keyup when it is
+ * switched off, so they can never be tracked as "held". They are ignored entirely.
+ */
+function isLockKey(key: string): boolean {
+  switch (key.toUpperCase()) {
+    case "CAPSLOCK":
+    case "NUMLOCK":
+    case "SCROLLLOCK":
+      return true;
+    default:
+      return false;
+  }
+}
+
+/**
+ * The element an event really originated from. `event.target` is retargeted to the shadow host
+ * when the listener sits outside an open shadow root; `composedPath()[0]` is the inner element.
+ */
+function getRealTarget(e: Event): EventTarget | null {
+  const path = typeof e.composedPath === "function" ? e.composedPath() : undefined;
+  return path && path.length ? path[0]! : e.target;
+}
+
+/** Realm-safe `instanceof Node` (an iframe's nodes are not instances of this window's `Node`). */
+function isNode(value: unknown): value is Node {
+  return !!value && typeof (value as Node).nodeType === "number";
+}
+
+/**
+ * `<input>` types that never accept typed characters. Everything else (including a missing or
+ * unknown type, which is a text input) is treated as editable, so types that consume keys such as
+ * arrows or typeahead (radio, range, file, color, ...) stay ignored.
+ */
+const NON_TEXT_INPUT_TYPES: ReadonlySet<string> = new Set([
+  "checkbox",
+  "button",
+  "submit",
+  "reset",
+  "image",
+]);
+
+function getInputType(el: HTMLElement): string {
+  let type: unknown = (el as HTMLInputElement).type;
+  if (typeof type !== "string" && typeof el.getAttribute === "function") {
+    type = el.getAttribute("type");
+  }
+  return typeof type === "string" ? type.toLowerCase() : "";
+}
+
+/**
+ * Is the event target an editable control, or inside a `contenteditable` element?
+ * `<input>` types that never accept typed characters (checkbox, button, submit, reset, image) are
+ * not editable. Duck-typed, so it also works for elements that belong to another realm (iframes).
+ */
 function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  switch (target.tagName) {
+  if (!isNode(target) || target.nodeType !== 1) return false;
+  const el = target as HTMLElement;
+  switch (typeof el.tagName === "string" ? el.tagName.toUpperCase() : "") {
     case "INPUT":
+      return !NON_TEXT_INPUT_TYPES.has(getInputType(el));
     case "TEXTAREA":
     case "SELECT":
       return true;
     default:
-      return target.isContentEditable;
+      return !!el.isContentEditable;
   }
 }
 
@@ -113,18 +220,23 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
     }
 
     const [pressedKeys, setPressedKeys] = createSignal<string[]>([], INTERNAL_OPTIONS);
-    const reset = () => setPressedKeys([]);
+    const recorder = createKeyRecorder();
+    const reset = () => {
+      recorder.clear();
+      setPressedKeys([]);
+    };
 
     makeEventListener(window, "keydown", e => {
       // e.key may be undefined when used with <datalist> el
       // gh issue: https://github.com/solidjs-community/solid-primitives/issues/246
-      if (e.repeat || typeof e.key !== "string") return;
+      if (e.repeat || typeof e.key !== "string" || isLockKey(e.key)) return;
 
       const key = e.key.toUpperCase(),
         currentKeys = pressedKeys();
 
       if (currentKeys.includes(key)) return;
 
+      recorder.down(e, key);
       const keys = [...currentKeys, key];
 
       // if the modifier is pressed before we start listening
@@ -145,19 +257,26 @@ export const useKeyDownList: ReturnType<typeof createSingletonRoot<Accessor<stri
       setPressedKeys(keys);
     });
 
-    makeEventListener(window, "keyup", e => {
-      if (typeof e.key !== "string") return;
-      const key = e.key.toUpperCase();
-      // macOS never fires keyup for other keys held down together with Meta —
-      // only Meta's own keyup arrives — so its release must clear everything,
-      // or the other keys' stale state corrupts the next press.
-      // See https://github.com/solidjs-community/solid-primitives/issues/269
-      if (key === "META") {
-        reset();
-      } else {
-        setPressedKeys(prev => prev.filter(_key => _key !== key));
-      }
-    });
+    // Capture phase: an app handler calling stopPropagation() on keyup must not leave keys stuck.
+    makeEventListener(
+      window,
+      "keyup",
+      e => {
+        if (typeof e.key !== "string" || isLockKey(e.key)) return;
+        const key = recorder.up(e);
+        // macOS never fires keyup for other keys held down together with Meta —
+        // only Meta's own keyup arrives — so its release must clear everything,
+        // or the other keys' stale state corrupts the next press.
+        // See https://github.com/solidjs-community/solid-primitives/issues/269
+        if (isModifierStillHeld(key, e)) return;
+        if (key === "META") {
+          reset();
+        } else {
+          setPressedKeys(prev => prev.filter(_key => _key !== key));
+        }
+      },
+      { capture: true },
+    );
 
     makeEventListener(window, "blur", reset);
     makeEventListener(window, "contextmenu", e => {
@@ -303,7 +422,9 @@ export function createKeyHold(
  * - `preventDefault` — Controls if the keydown event should have its default action prevented. Enabled by default.
  * - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
  * - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`,
- *   or `contenteditable` element, so typing isn't interrupted. Disabled by default — enable it for shortcuts
+ *   or `contenteditable` element, so typing isn't interrupted. Inputs that never accept typed characters
+ *   (`type` = `checkbox`, `button`, `submit`, `reset`, `image`) do not count, so the shortcut still fires there;
+ *   `radio`, `range`, `file` and `color` stay ignored because they use arrow and other keys. Disabled by default — enable it for shortcuts
  *   made of plain, unmodified keys (e.g. a single letter); combos like `Control+S` are usually fine either way,
  *   since the modifier prevents a character from being typed.
  * - `anyOrder` — If `true`, the keys can be pressed in any order (e.g. `Shift+Control` as well as `Control+Shift`),
@@ -351,16 +472,18 @@ export function createShortcut(
   let pressedKeys: string[] = [];
   let sequence: string[][] = [];
   let reset = false;
+  const recorder = createKeyRecorder();
 
   const resetAll = () => {
+    recorder.clear();
     pressedKeys = [];
     sequence = [];
     reset = false;
   };
 
   makeEventListener(window, "keydown", (e: KeyboardEvent) => {
-    if (e.repeat || typeof e.key !== "string") return;
-    if (ignoreWithinInputs && isEditableTarget(e.target)) return;
+    if (e.repeat || typeof e.key !== "string" || isLockKey(e.key)) return;
+    if (ignoreWithinInputs && isEditableTarget(getRealTarget(e))) return;
     const key = e.key.toUpperCase();
 
     if (!pressedKeys.includes(key)) {
@@ -379,6 +502,7 @@ export function createShortcut(
         if (e.metaKey && !newKeys.includes("META")) newKeys.unshift("META");
       }
       newKeys.push(key);
+      recorder.down(e, key);
       pressedKeys = newKeys;
       sequence = [...sequence, [...pressedKeys]];
     }
@@ -433,14 +557,16 @@ export function createShortcut(
     }
   });
 
-  makeEventListener(window, "keyup", (e: KeyboardEvent) => {
-    if (typeof e.key !== "string") return;
-    const key = e.key.toUpperCase();
+  // Capture phase: an app handler calling stopPropagation() on keyup must not leave keys stuck.
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (typeof e.key !== "string" || isLockKey(e.key)) return;
+    const key = recorder.up(e);
 
     // macOS never fires keyup for other keys held down together with Meta —
     // only Meta's own keyup arrives. Treat it as a signal that every other
     // tracked key must have been released too, or their stale state corrupts
     // the next press (see https://github.com/solidjs-community/solid-primitives/issues/269).
+    if (isModifierStillHeld(key, e)) return;
     if (key === "META") {
       resetAll();
       return;
@@ -455,7 +581,8 @@ export function createShortcut(
       // key can re-trigger the shortcut while modifier keys stay held.
       sequence = [[...pressedKeys]];
     }
-  });
+  };
+  makeEventListener(window, "keyup", onKeyUp, { capture: true });
 
   makeEventListener(window, "blur", resetAll);
   makeEventListener(window, "contextmenu", (e: MouseEvent) => {
@@ -504,6 +631,314 @@ export function createKeyDown(
       };
       document.addEventListener("keydown", handler);
       return () => document.removeEventListener("keydown", handler);
+    },
+    { transparent: true },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shortcut registry
+// ---------------------------------------------------------------------------
+
+/** A shortcut definition accepted by {@link makeShortcutRegistry} and {@link createShortcuts}. */
+export interface ShortcutDefinition {
+  /**
+   * The keys that make up the shortcut, as an array (`["Control", "K"]`) or a `+`-joined string
+   * (`"Control+K"`, `"Ctrl+Shift++"`). Matching is case-insensitive, order-independent and exact:
+   * the held keys must be the same set. `Ctrl`, `Cmd`/`Command`, `Option` and `Space` are aliases.
+   */
+  keys: KbdKey[] | string;
+  /** Called when the shortcut is triggered. */
+  handler: (event: KeyboardEvent) => void;
+  /** Call `preventDefault()` on the triggering event. Defaults to `true`. */
+  preventDefault?: boolean;
+  /** Fire only once until all keys have been released. Defaults to `false`. */
+  requireReset?: boolean;
+  /**
+   * Ignore the shortcut while focus is in an input, textarea, select or contenteditable. Inputs that
+   * never accept typed characters (`checkbox`, `button`, `submit`, `reset`, `image`) do not count;
+   * `radio`, `range`, `file` and `color` stay ignored (they use arrow and other keys). Defaults to `false`.
+   */
+  ignoreInputs?: boolean;
+  /** Read when a key is pressed; a disabled shortcut does not match and does not block others. Defaults to `true`. */
+  enabled?: MaybeAccessor<boolean | undefined>;
+}
+
+export interface ShortcutRegistryOptions {
+  /** Element (or any event target) to listen on. Defaults to `window`. An element only sees keys while focus is inside it. */
+  scope?: EventTarget;
+}
+
+export interface ShortcutRegistry {
+  /** Registers a shortcut. Returns a function that unregisters it. */
+  register(definition: ShortcutDefinition): VoidFunction;
+  /** Unregisters every shortcut and removes the underlying listeners. */
+  clear(): void;
+}
+
+const KEY_ALIASES: Record<string, string> = {
+  CTRL: "CONTROL",
+  CMD: "META",
+  COMMAND: "META",
+  OPTION: "ALT",
+  SPACE: " ",
+};
+
+/**
+ * Splits a `+`-joined key string. The first character always starts a token; a `+` right after a
+ * token is a separator; a `+` right after a separator is a literal plus key (`"Control+++K"` is
+ * Control, `+`, K); a trailing `+` after a separator is a literal plus key (`"Control++"`).
+ */
+function splitKeyString(str: string): string[] {
+  const out: string[] = [];
+  let token = "";
+  let afterSeparator = false;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i]!;
+    if (ch === "+" && token !== "" && !afterSeparator) {
+      out.push(token);
+      token = "";
+      afterSeparator = true;
+    } else {
+      token += ch;
+      afterSeparator = false;
+    }
+  }
+  if (token !== "") out.push(token);
+  return out;
+}
+
+/** Normalises a key list or `+`-joined string to a de-duplicated list of upper-cased keys. */
+function normalizeShortcutKeys(keys: KbdKey[] | string): string[] {
+  const list = typeof keys === "string" ? splitKeyString(keys) : keys;
+  const out = new Set<string>();
+  for (const k of list) {
+    const key = k === " " ? k : k.trim();
+    if (!key) continue;
+    const upper = key.toUpperCase();
+    out.add(KEY_ALIASES[upper] ?? upper);
+  }
+  return [...out];
+}
+
+const MODIFIER_FLAGS = [
+  ["SHIFT", "shiftKey"],
+  ["ALT", "altKey"],
+  ["CONTROL", "ctrlKey"],
+  ["META", "metaKey"],
+] as const;
+
+interface RegistryEntry {
+  keys: Set<string>;
+  def: ShortcutDefinition;
+  fired: boolean;
+}
+
+/**
+ * Creates a registry of keyboard shortcuts that shares ONE `keydown`/`keyup` listener pair
+ * (plus `blur`/`contextmenu` resets) between all of them. Listeners are attached when the first
+ * shortcut is registered and removed when the last one is unregistered, or on `clear()`.
+ *
+ * **Conflict policy:** at most one shortcut fires per keydown. Shortcuts are matched on the exact
+ * key set, so all candidates are equally specific; among the *eligible* ones (enabled, not
+ * suppressed by `ignoreInputs`, not blocked by `requireReset`) the **most recently registered wins**.
+ * An ineligible shortcut never shadows an earlier one. Only the winner's `preventDefault` applies.
+ *
+ * If called inside an owner, the registry is cleared automatically on cleanup. Returns an inert
+ * registry on the server.
+ *
+ * @example
+ * ```ts
+ * const registry = makeShortcutRegistry();
+ * const off = registry.register({ keys: "Control+K", handler: () => openPalette() });
+ * off(); // unregister one
+ * registry.clear(); // remove everything
+ * ```
+ */
+export function makeShortcutRegistry(options: ShortcutRegistryOptions = {}): ShortcutRegistry {
+  if (isServer) {
+    return { register: () => () => {}, clear: () => {} };
+  }
+
+  const entries: RegistryEntry[] = [];
+  let removeListeners: VoidFunction | undefined;
+  let pressed: string[] = [];
+  const recorder = createKeyRecorder();
+
+  const resetState = () => {
+    recorder.clear();
+    pressed = [];
+    for (const entry of entries) entry.fired = false;
+  };
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.repeat || typeof e.key !== "string" || isLockKey(e.key)) return;
+    const key = e.key.toUpperCase();
+
+    // modifier flags on the event are authoritative: adds modifiers held before we started
+    // listening and drops stale ones (e.g. a missed keyup on macOS)
+    const next = pressed.filter(k => !MODIFIER_FLAGS.some(([name]) => name === k));
+    const isModifier = MODIFIER_FLAGS.some(([name]) => name === key);
+    const mods = MODIFIER_FLAGS.filter(
+      ([name, flag]) => e[flag] || (isModifier && name === key),
+    ).map(([name]) => name);
+    pressed = [...mods, ...next.filter(k => !mods.includes(k as never))];
+    if (!pressed.includes(key)) pressed.push(key);
+    recorder.down(e, key);
+
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const entry = entries[i]!;
+      const { def } = entry;
+      if (entry.keys.size !== pressed.length || !entry.keys.has(key)) continue;
+      if (!pressed.every(k => entry.keys.has(k))) continue;
+      if (def.requireReset && entry.fired) continue;
+      if (def.ignoreInputs && isEditableTarget(getRealTarget(e))) continue;
+      if (access(def.enabled) === false) continue;
+
+      entry.fired = true;
+      if (def.preventDefault !== false) e.preventDefault();
+      def.handler(e);
+      return; // the winner takes it all
+    }
+  };
+
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (typeof e.key !== "string" || isLockKey(e.key)) return;
+    const key = recorder.up(e);
+    // macOS fires no keyup for keys held together with Meta; its release clears everything
+    // (https://github.com/solidjs-community/solid-primitives/issues/269)
+    if (isModifierStillHeld(key, e)) return;
+    if (key === "META") return resetState();
+    pressed = pressed.filter(k => k !== key);
+    if (pressed.length === 0) for (const entry of entries) entry.fired = false;
+  };
+
+  const attach = () => {
+    const scope = options.scope;
+    const keydownTarget = scope ?? window;
+    // Raw listeners: makeEventListener would bind cleanup to whichever owner happens to call
+    // register() first, silently killing the registry when that owner is disposed.
+    const onContextMenu = (e: MouseEvent) => {
+      e.defaultPrevented || resetState();
+    };
+    // Focus moving out of the scope (e.g. Tab) means the matching keyups land elsewhere.
+    // A null relatedTarget is the blur / window-switch case, which is reset by window "blur".
+    const onFocusOut = (e: FocusEvent) => {
+      const next = e.relatedTarget;
+      // duck-typed: scopes and focus targets may belong to another realm (iframe document)
+      if (isNode(scope) && isNode(next) && !scope.contains(next)) resetState();
+    };
+    keydownTarget.addEventListener("keydown", onKeyDown as (e: Event) => void);
+    // Activation is scoped, but releases are always tracked on window in the capture phase, so a
+    // key released after focus has moved outside the scope, or whose keyup an app handler stops
+    // from propagating, doesn't stay "pressed".
+    const keyupCapture = true;
+    // A scope whose events never reach window (bare EventTarget) needs its own keyup listener.
+    // Registered in the capture phase too, so an app handler stopping keyup inside an iframe scope
+    // cannot leave a key stuck. One event reaching both listeners is handled only once.
+    const ownKeyUp = !!scope && (scope as unknown) !== window;
+    let lastKeyUp: Event | undefined;
+    const handleKeyUp = (e: Event) => {
+      if (ownKeyUp) {
+        if (e === lastKeyUp) return;
+        lastKeyUp = e;
+      }
+      onKeyUp(e as KeyboardEvent);
+    };
+    window.addEventListener("keyup", handleKeyUp, keyupCapture);
+    if (ownKeyUp) scope!.addEventListener("keyup", handleKeyUp, keyupCapture);
+    scope?.addEventListener("focusout", onFocusOut as (e: Event) => void);
+    window.addEventListener("blur", resetState);
+    window.addEventListener("contextmenu", onContextMenu as (e: Event) => void);
+    removeListeners = () => {
+      keydownTarget.removeEventListener("keydown", onKeyDown as (e: Event) => void);
+      window.removeEventListener("keyup", handleKeyUp, keyupCapture);
+      if (ownKeyUp) scope!.removeEventListener("keyup", handleKeyUp, keyupCapture);
+      scope?.removeEventListener("focusout", onFocusOut as (e: Event) => void);
+      window.removeEventListener("blur", resetState);
+      window.removeEventListener("contextmenu", onContextMenu as (e: Event) => void);
+    };
+  };
+
+  const detach = () => {
+    removeListeners?.();
+    removeListeners = undefined;
+    resetState();
+  };
+
+  const clear = () => {
+    entries.length = 0;
+    detach();
+  };
+
+  const register = (def: ShortcutDefinition): VoidFunction => {
+    const keys = normalizeShortcutKeys(def.keys);
+    if (!keys.length) return () => {};
+    const entry: RegistryEntry = { keys: new Set(keys), def, fired: false };
+    entries.push(entry);
+    if (!removeListeners) attach();
+    return () => {
+      const i = entries.indexOf(entry);
+      if (i === -1) return;
+      entries.splice(i, 1);
+      if (!entries.length) detach();
+    };
+  };
+
+  tryOnCleanup(clear);
+
+  return { register, clear };
+}
+
+export type ShortcutOptions = Omit<ShortcutDefinition, "keys" | "handler">;
+/** Shortcuts as a list, or as a map of key combination to handler / handler + options. */
+export type ShortcutsInput =
+  | ShortcutDefinition[]
+  | Record<
+      string,
+      ShortcutDefinition["handler"] | (ShortcutOptions & Pick<ShortcutDefinition, "handler">)
+    >;
+
+function toDefinitions(input: ShortcutsInput | undefined): ShortcutDefinition[] {
+  if (!input) return [];
+  if (Array.isArray(input)) return input;
+  return Object.entries(input).map(([keys, value]) =>
+    typeof value === "function" ? { keys, handler: value } : { ...value, keys },
+  );
+}
+
+/**
+ * Registers many keyboard shortcuts at once through a single listener pair
+ * (see {@link makeShortcutRegistry} for the conflict policy: most recently registered eligible
+ * shortcut wins, which here means the **last matching entry** of the list / map).
+ *
+ * The shortcuts may be an accessor; when it changes, the shortcuts are re-registered.
+ * Do not read signals from `handler`/`enabled` expecting tracking — they run on key events.
+ * Prefer an `enabled` accessor over swapping the list for toggling a shortcut.
+ *
+ * @param shortcuts A list of {@link ShortcutDefinition}, or a map of `"Control+K"` to handler or `{ handler, ...options }`; or an accessor of either.
+ * @param options `scope` — element to listen on instead of `window` (may be an accessor).
+ *
+ * @example
+ * ```ts
+ * createShortcuts({
+ *   "Control+K": () => openPalette(),
+ *   "Escape": { handler: close, enabled: isOpen },
+ * });
+ * ```
+ */
+export function createShortcuts(
+  shortcuts: MaybeAccessor<ShortcutsInput>,
+  options: { scope?: MaybeAccessor<EventTarget | undefined> } = {},
+): void {
+  if (isServer) return;
+
+  createEffect(
+    () => ({ defs: toDefinitions(access(shortcuts)), scope: access(options.scope) }),
+    ({ defs, scope }) => {
+      const registry = makeShortcutRegistry({ scope });
+      for (const def of defs) registry.register(def);
+      return () => registry.clear();
     },
     { transparent: true },
   );

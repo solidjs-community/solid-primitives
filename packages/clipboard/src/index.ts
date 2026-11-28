@@ -1,4 +1,4 @@
-import { access, type MaybeAccessor } from "@solid-primitives/utils";
+import { access, INTERNAL_OPTIONS, type MaybeAccessor } from "@solid-primitives/utils";
 import { type Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
 import { isServer } from "@solidjs/web";
@@ -197,6 +197,122 @@ export const copyToClipboard = (
     el.addEventListener("click", setValue);
   };
 };
+
+export type CopyStatus = "idle" | "copied" | "error";
+
+export type CreateCopyToClipboardOptions = {
+  /** Milliseconds until the status returns to `"idle"`. `0`/`Infinity` disables auto-reset. Default `2000`. */
+  resetAfter?: number;
+  /** Called after a successful write. */
+  onCopied?: (data: string | ClipboardItem[]) => void;
+  /** Called when the write rejects. */
+  onError?: (error: unknown) => void;
+};
+
+export type CopyToClipboardReturn = {
+  /** Writes to the clipboard. Resolves `true` on success, `false` on failure (never rejects). */
+  copy: (data: string | ClipboardItem[]) => Promise<boolean>;
+  status: Accessor<CopyStatus>;
+  copied: Accessor<boolean>;
+  error: Accessor<unknown>;
+  /** Cancels the pending auto-reset and returns to `"idle"` immediately. */
+  reset: VoidFunction;
+};
+
+/**
+ * Copy-to-clipboard with a transient "copied" status, e.g. for a copy button.
+ *
+ * Re-copying restarts the reset timer; the timer is cleared on disposal and
+ * results that arrive after disposal are ignored. On the server `copy`
+ * resolves `false` and the status stays `"idle"`.
+ *
+ * @example
+ * ```tsx
+ * const { copy, copied } = createCopyToClipboard({ resetAfter: 1500 });
+ * <button onClick={() => copy(code)}>{copied() ? "Copied!" : "Copy"}</button>
+ * ```
+ */
+export function createCopyToClipboard(
+  options: CreateCopyToClipboardOptions = {},
+): CopyToClipboardReturn {
+  if (isServer) {
+    return {
+      copy: async () => false,
+      status: () => "idle",
+      copied: () => false,
+      error: () => undefined,
+      reset: () => void 0,
+    };
+  }
+
+  const [status, setStatus] = createSignal<CopyStatus>("idle", INTERNAL_OPTIONS);
+  const [error, setError] = createSignal<unknown>(undefined, INTERNAL_OPTIONS);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let disposed = false;
+  let current = 0;
+
+  const clearTimer = () => {
+    if (timer !== undefined) clearTimeout(timer);
+    timer = undefined;
+  };
+
+  const reset = () => {
+    current++;
+    clearTimer();
+    setStatus("idle");
+    setError(undefined);
+  };
+
+  const scheduleReset = () => {
+    const ms = options.resetAfter ?? 2000;
+    if (!(ms > 0) || ms === Infinity) return;
+    timer = setTimeout(() => {
+      timer = undefined;
+      setStatus("idle");
+      setError(undefined);
+    }, ms);
+  };
+
+  onCleanup(() => {
+    disposed = true;
+    current++;
+    clearTimer();
+  });
+
+  const copy = async (data: string | ClipboardItem[]): Promise<boolean> => {
+    const id = ++current;
+    clearTimer();
+    let failure: unknown;
+    let ok = true;
+    try {
+      await writeClipboard(data);
+    } catch (e) {
+      ok = false;
+      failure = e;
+    }
+    // Disposed, reset or superseded by a newer copy: report the result only.
+    if (disposed || id !== current) return ok;
+    if (ok) {
+      setError(undefined);
+      setStatus("copied");
+    } else {
+      setError(failure);
+      setStatus("error");
+    }
+    scheduleReset();
+    // User callbacks run last and are isolated so a throw can't break `copy`'s never-rejects contract.
+    try {
+      if (ok) options.onCopied?.(data);
+      else options.onError?.(failure);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
+    return ok;
+  };
+
+  return { copy, status, copied: () => status() === "copied", error, reset };
+}
 
 /**
  * newClipboardItem is a wrapper method around creating new ClipboardItems.

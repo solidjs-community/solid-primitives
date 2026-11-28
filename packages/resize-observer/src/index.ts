@@ -152,6 +152,140 @@ export function createWindowSize(): Readonly<Size> {
 export const useWindowSize: typeof createWindowSize =
   /*#__PURE__*/ createHydratableSingletonRoot(createWindowSize);
 
+export type VisualViewportState = {
+  /** Width of the visual viewport in CSS pixels. */
+  width: number;
+  /** Height of the visual viewport in CSS pixels. */
+  height: number;
+  /** Offset of the visual viewport from the top of the layout viewport. */
+  offsetTop: number;
+  /** Offset of the visual viewport from the left of the layout viewport. */
+  offsetLeft: number;
+  /** Offset of the visual viewport from the top of the page. */
+  pageTop: number;
+  /** Offset of the visual viewport from the left of the page. */
+  pageLeft: number;
+  /** Pinch-zoom scale factor. */
+  scale: number;
+};
+
+export type VisualViewportOptions = {
+  /** Coalesce bursts of `resize`/`scroll` events into one update per animation frame. */
+  raf?: boolean;
+};
+
+const VISUAL_VIEWPORT_FALLBACK = {
+  width: 0,
+  height: 0,
+  offsetTop: 0,
+  offsetLeft: 0,
+  pageTop: 0,
+  pageLeft: 0,
+  scale: 1,
+} as const satisfies VisualViewportState;
+
+/**
+ * @returns the current state of `window.visualViewport`. Falls back to `window.innerWidth/innerHeight`
+ * (scale 1, zero offsets) when the Visual Viewport API is unsupported, and to zeros on the server.
+ */
+export function getVisualViewport(): VisualViewportState {
+  if (isServer) return { ...VISUAL_VIEWPORT_FALLBACK };
+  const vv = window.visualViewport;
+  if (!vv) {
+    return {
+      ...VISUAL_VIEWPORT_FALLBACK,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      pageLeft: window.scrollX || 0,
+      pageTop: window.scrollY || 0,
+    };
+  }
+  return {
+    width: vv.width,
+    height: vv.height,
+    offsetTop: vv.offsetTop,
+    offsetLeft: vv.offsetLeft,
+    pageTop: vv.pageTop,
+    pageLeft: vv.pageLeft,
+    scale: vv.scale,
+  };
+}
+
+/**
+ * Listens to visual viewport `resize` and `scroll` events (or window `resize` when unsupported).
+ * Does not call the callback initially. Auto-cleans on owner disposal.
+ *
+ * @param callback receives the new {@link VisualViewportState}
+ * @returns manual cleanup function
+ */
+export function makeVisualViewportListener(
+  callback: (state: VisualViewportState) => void,
+  options: VisualViewportOptions = {},
+): VoidFunction {
+  if (isServer) return noop;
+  let frame: number | undefined;
+  const notify = () => callback(getVisualViewport());
+  const handler = options.raf
+    ? () => {
+        if (frame === undefined)
+          frame = requestAnimationFrame(() => {
+            frame = undefined;
+            notify();
+          });
+      }
+    : notify;
+  const vv = window.visualViewport;
+  const clears: VoidFunction[] = vv
+    ? [
+        makeEventListener(vv, "resize", handler) as VoidFunction,
+        makeEventListener(vv, "scroll", handler) as VoidFunction,
+      ]
+    : [makeEventListener(window, "resize", handler) as VoidFunction];
+  let cleared = false;
+  const clear = () => {
+    if (cleared) return;
+    cleared = true;
+    clears.forEach(c => c());
+    if (frame !== undefined) cancelAnimationFrame(frame);
+    frame = undefined;
+  };
+  onCleanup(clear);
+  return clear;
+}
+
+/**
+ * Creates a reactive store-like object of the current visual viewport (size, offsets, pinch-zoom scale).
+ * Useful for on-screen keyboard avoidance and pinch-zoom aware overlays.
+ * @example
+ * const vv = createVisualViewport();
+ * createEffect(
+ *   () => vv.height,
+ *   height => console.log(height),
+ * );
+ */
+export function createVisualViewport(
+  options?: VisualViewportOptions,
+): Readonly<VisualViewportState> {
+  const [state, setState] = createStaticStore<VisualViewportState>(
+    isServer || sharedConfig.hydrating ? VISUAL_VIEWPORT_FALLBACK : getVisualViewport(),
+  );
+  if (isServer) return state;
+  if (sharedConfig.hydrating)
+    onSettled(() => {
+      setState(getVisualViewport());
+    });
+  makeVisualViewportListener(next => {
+    setState(next);
+  }, options);
+  return state;
+}
+
+/**
+ * Returns a shared reactive visual viewport object. Singleton root version of {@link createVisualViewport}.
+ */
+export const useVisualViewport: () => Readonly<VisualViewportState> =
+  /*#__PURE__*/ createHydratableSingletonRoot(() => createVisualViewport());
+
 const ELEMENT_SIZE_FALLBACK = {
   width: null,
   height: null,

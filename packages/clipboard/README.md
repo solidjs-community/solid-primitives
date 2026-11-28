@@ -14,6 +14,7 @@ Primitives for reading and writing to the [Clipboard API](https://developer.mozi
 - [`readClipboard`](#readclipboard) - One-shot async read of clipboard items.
 - [`writeClipboard`](#writeclipboard) - One-shot async write to the clipboard.
 - [`createClipboard`](#createclipboard) - Reactive clipboard backed by an async memo. Reads on demand, writes reactively from a signal.
+- [`createCopyToClipboard`](#createcopytoclipboard) - Copy with a transient `copied` status that auto-resets, ideal for copy buttons.
 - [`copyToClipboard`](#copytoclipboard) - `ref` directive factory that copies an element's value to clipboard on click.
 
 ## Installation
@@ -124,6 +125,37 @@ No `<Suspense>` needed — `clipboard()` never suspends before the first `refetc
 import { isPending } from "solid-js";
 
 <p>{isPending(() => clipboard()) ? "Reading…" : `${clipboard().length} items`}</p>;
+```
+
+## `createCopyToClipboard`
+
+Writes to the clipboard and tracks a short-lived status (`"idle"`, `"copied"`, `"error"`) that returns to `"idle"` after `resetAfter` milliseconds. Copying again restarts the timer, the timer is cleared on disposal, and results arriving after disposal are ignored. On the server `copy` resolves `false` and the status stays `"idle"`.
+
+```ts
+// Type
+function createCopyToClipboard(options?: {
+  resetAfter?: number; // default 2000; 0 or Infinity disables auto-reset
+  onCopied?: (data: string | ClipboardItem[]) => void;
+  onError?: (error: unknown) => void;
+}): {
+  copy: (data: string | ClipboardItem[]) => Promise<boolean>; // never rejects
+  status: Accessor<"idle" | "copied" | "error">;
+  copied: Accessor<boolean>;
+  error: Accessor<unknown>;
+  reset: VoidFunction;
+};
+
+// Example: a copy button
+import { createCopyToClipboard } from "@solid-primitives/clipboard";
+
+function CopyButton(props: { text: string }) {
+  const { copy, copied, status } = createCopyToClipboard({ resetAfter: 1500 });
+  return (
+    <button onClick={() => copy(props.text)} disabled={copied()}>
+      {status() === "copied" ? "Copied!" : status() === "error" ? "Failed" : "Copy"}
+    </button>
+  );
+}
 ```
 
 ## `copyToClipboard`

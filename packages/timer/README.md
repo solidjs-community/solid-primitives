@@ -16,6 +16,8 @@ Timer primitives related to [`setInterval`](https://developer.mozilla.org/en-US/
 - [`createTimeoutLoop`](#createtimeoutloop) - Like `createTimer` with `setInterval`, but the delay only updates between executions.
 - [`createPolled`](#createpolled) - Polls a function periodically and returns an accessor to its latest value.
 - [`createIntervalCounter`](#createintervalcounter) - A counter that increments periodically.
+- [`makePausableTimer`](#makepausabletimer) - One-shot timeout that keeps its remaining time across pause/resume. Manual cleanup.
+- [`createPausableTimer`](#createpausabletimer) - Reactive pausable timeout with signal accessors, a reactive delay and an opt-in `pauseWhenHidden`.
 
 ## Installation
 
@@ -252,6 +254,81 @@ const [delay, setDelay] = createSignal(1000);
 const count = createIntervalCounter(delay);
 setDelay(500);
 ```
+
+### makePausableTimer
+
+A one-shot timeout that tracks the time REMAINING. Pausing and resuming continues the countdown instead of restarting the full delay (which is what toggling a `createTimer` delay to `false` and back does). It uses `performance.now()` for the arithmetic and does nothing until `start()` is called. `stop()` (alias `clear()`) is the manual cleanup. On the server every control is a no-op.
+
+```ts
+// Type
+type PausableTimer = {
+  start: VoidFunction; // (re)start from the full delay
+  pause: VoidFunction; // keep the remaining time; no-op unless running
+  resume: VoidFunction; // continue with what was left; no-op unless paused
+  stop: VoidFunction; // cancel, back to idle with the full delay (alias: clear)
+  clear: VoidFunction;
+  reset: VoidFunction; // full delay again; running restarts, paused stays paused, idle stays idle
+  setDelay: (delay: number | false) => void; // elapsed fraction carries over
+  remaining: () => number; // live while running, frozen while paused, 0 after it fired
+  isActive: () => boolean;
+  isPaused: () => boolean;
+};
+function makePausableTimer(fn: VoidFunction, delay: number | false): PausableTimer;
+
+// Example
+const timer = makePausableTimer(() => dismiss(), 5000);
+onCleanup(timer.stop);
+timer.start();
+// 3s later
+timer.pause();
+timer.remaining(); // 2000
+timer.resume(); // fires 2s after resuming, not 5s
+```
+
+A `delay` of `false`, a negative number or `Infinity` never fires (it can still be paused and resumed). Calling `pause()` before `start()`, `pause()` twice, or `resume()` after the timer fired are all no-ops.
+
+### createPausableTimer
+
+Reactive `makePausableTimer`: starts on creation, is cleaned up with the owner and accepts an accessor delay. Changing the delay carries the elapsed fraction over (the same rule as [`createTimer`](#createtimer)) and keeps a paused timer paused.
+
+```ts
+// Type
+type PausableTimerOptions = {
+  autoStart?: boolean; // default true
+  pauseWhenHidden?: boolean; // pause while document.visibilityState === "hidden"; default false
+};
+function createPausableTimer(
+  fn: VoidFunction,
+  delay: number | false | Accessor<number | false>,
+  options?: PausableTimerOptions,
+): {
+  start; pause; resume; stop; clear; reset: VoidFunction;
+  remaining: Accessor<number>;
+  isActive: Accessor<boolean>;
+  isPaused: Accessor<boolean>;
+};
+
+// Example: a toast that pauses while hovered or focused
+function Toast(props: { onDismiss: () => void }) {
+  const timer = createPausableTimer(props.onDismiss, 5000, { pauseWhenHidden: true });
+  return (
+    <div
+      role="status"
+      onPointerEnter={timer.pause}
+      onPointerLeave={timer.resume}
+      onFocusIn={timer.pause}
+      onFocusOut={timer.resume}
+    >
+      Saved
+    </div>
+  );
+}
+```
+
+- `isActive`, `isPaused` and `remaining` are signals that update whenever the timer changes state (start, pause, resume, reset, delay change, fire). While running, `remaining()` returns the live value on each read but does not tick; drive a progress bar with your own `requestAnimationFrame`.
+- `pauseWhenHidden` only resumes a pause it caused itself, so a hover pause is never undone by the tab becoming visible, and a timer created in a hidden tab starts paused.
+- Pointer and focus handling is left to the caller via `pause` and `resume`, so the same timer can be driven by any combination of events.
+- On the server the controls are no-ops and nothing is ever scheduled.
 
 ## Note on Reactive Delays
 

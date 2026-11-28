@@ -19,6 +19,7 @@ A library of reactive primitives for handling user keyboard input.
 - [`createKeyHold`](#createkeyhold) — Provides a signal indicating if provided key is currently being held down.
 - [`createShortcut`](#createshortcut) — Creates a keyboard shortcut observer.
 - [`createKeyDown`](#createkeydown) — Listens for a keydown event for a specific key on a document.
+- [`createShortcuts`](#createshortcuts) / [`makeShortcutRegistry`](#makeshortcutregistry) — Register many shortcuts through a single listener pair, with dynamic add/remove and a deterministic conflict policy.
 
 ## Installation
 
@@ -261,8 +262,8 @@ render(() => <Demo />, document.getElementById("app")!);
 - `callback` — callback to call when the specified keys are pressed
 - `options` — additional configuration:
   - `preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified key is pressed. _(Defaults to `true`)_
-  - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
-  - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`, or `contenteditable` element, so it doesn't interrupt typing. Disabled by default.
+  - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default. A modifier with two physical keys (for example both Control keys) counts as held until the last one is released.
+  - `ignoreWithinInputs` — If `true`, the shortcut is ignored while focus is on an `input`, `textarea`, `select`, or `contenteditable` element, so it doesn't interrupt typing. Inputs that never accept typed characters (`type` of `checkbox`, `button`, `submit`, `reset` or `image`) are not treated as editable, so the shortcut still fires there. Disabled by default.
   - `anyOrder` — If `true`, the keys can be pressed in any order (e.g. `Shift + Control` as well as `Control + Shift`), as long as they all end up held down together. Disabled by default, requiring `keys` to be pressed in order.
 
 ```tsx
@@ -293,6 +294,17 @@ createShortcut(["S"], () => console.log("S was pressed"), { ignoreWithinInputs: 
 ```
 
 Combos that include a modifier (e.g. `Control + S`) don't have this problem, since the modifier itself prevents a character from being typed — `ignoreWithinInputs` is usually unnecessary for those.
+
+Inputs whose `type` never accepts typed characters (`checkbox`, `button`, `submit`, `reset`, `image`; case-insensitive) are **not** treated as editable, so a plain-key shortcut still fires while one of them has focus. All other inputs stay ignored: text-like types (`text`, `search`, `email`, `url`, `tel`, `password`, `number`, the date and time types, and an input with a missing or unknown `type`) as well as `radio`, `range`, `file` and `color`, which consume arrow and other keys. `textarea`, `select` and `contenteditable` are always ignored. The same rules apply to the registry's `ignoreInputs`.
+
+The check works for inputs inside **open** shadow roots (the real target is taken from `event.composedPath()`), and for inputs inside iframes whenever the key event reaches the listener's scope. Note that `createShortcut` listens for `keydown` on the calling `window` only: keys pressed while focus is inside an iframe never reach the parent window, so the shortcut does not fire there at all. For shortcuts that must work inside an iframe, use `createShortcuts` or `makeShortcutRegistry` with `scope` set to the iframe's `contentDocument` or `contentWindow`. **Closed** shadow roots hide their contents from the page, so inputs inside them cannot be detected.
+
+### Ignored keys and platform quirks
+
+- **Lock keys are ignored.** `CapsLock`, `NumLock` and `ScrollLock` are skipped by `useKeyDownList`, `createShortcut` and the shortcut registry (keydown and keyup). On macOS CapsLock sends only a keydown when switched on and only a keyup when switched off, so tracking it would leave it "held" and stop every exact-match shortcut from firing. They cannot be part of a shortcut.
+- **Option/Alt on macOS.** Matching uses `event.key`, and with Option held macOS reports the composed character (`Option+E` gives `Dead`, `Option+S` gives `ß`) instead of the letter. A shortcut written as `["Alt", "S"]` therefore does not match on macOS. If you need such a shortcut, match the composed character, or use your own `keydown` listener and compare `event.code` (`"KeyS"`). `createKeyDown` is not an option here: it matches `event.key` too, so its callback never runs for `Option+S`.
+- **Meta keyup.** macOS never sends keyup for keys pressed while Meta (Cmd) is held, only Meta's own. Releasing Meta therefore clears every tracked key.
+- **Keyup is always observed on `window` in the capture phase**, so an app handler calling `stopPropagation()` on keyup cannot leave a key stuck.
 
 ### Matching keys in any order
 
@@ -327,6 +339,64 @@ createKeyDown("Escape", e => close(), {
   disabled: () => !isOpen(),
   ownerDocument: () => iframeEl.contentDocument ?? document,
 });
+```
+
+## `createShortcuts`
+
+Registers many shortcuts at once through a single `keydown`/`keyup` listener pair. Accepts a list, a map of key combination to handler, or an accessor of either; when the accessor changes, the shortcuts are re-registered. `createShortcut` is unchanged.
+
+```ts
+// Type
+function createShortcuts(
+  shortcuts: MaybeAccessor<
+    ShortcutDefinition[] | Record<string, Handler | (Options & { handler: Handler })>
+  >,
+  options?: { scope?: MaybeAccessor<EventTarget | undefined> },
+): void;
+
+// Example
+createShortcuts({
+  "Control+K": () => openPalette(),
+  Escape: { handler: () => close(), enabled: isOpen, preventDefault: false },
+});
+
+createShortcuts(
+  () => [{ keys: ["Control", "S"], handler: save, ignoreInputs: false }],
+  { scope: () => panelEl }, // only while focus is inside the element
+);
+```
+
+Each definition is `{ keys, handler, preventDefault?, requireReset?, ignoreInputs?, enabled? }`:
+
+- `keys` — an array (`["Control", "K"]`) or a `+`-joined string (`"Ctrl+Shift+K"`, `"Control++"` for the plus key). A `+` right after a key name is a separator; a `+` right after a separator is the literal plus key, so `"Control+++K"` is Control, `+` and K, and `"+"` alone is the plus key. Case-insensitive; `Ctrl`, `Cmd`/`Command`, `Option` and `Space` are aliases. Matching is **exact and order-independent**: `Control+K` does not fire for `Control+Shift+K`.
+- `handler(event)` — called with the `KeyboardEvent`.
+- `preventDefault` — defaults to `true`.
+- `requireReset` — fire once until all keys are released. Defaults to `false`.
+- `ignoreInputs` — skip while focus is in an `input`, `textarea`, `select` or `contenteditable`. Like `ignoreWithinInputs`, it does not apply to `checkbox`, `button`, `submit`, `reset` and `image` inputs. Defaults to `false` (same as `createShortcut`'s `ignoreWithinInputs`).
+- `enabled` — boolean or accessor, read at key time. A disabled shortcut never matches.
+
+Key repeat is ignored. Modifier state is taken from the event's `ctrlKey`/`shiftKey`/`altKey`/`metaKey` flags, and releasing `Meta` clears all held keys (macOS sends no keyup for keys held with Meta).
+
+### Conflict policy
+
+At most **one** shortcut fires per keydown. Because matching is on the exact key set, all candidates are equally specific, so the **most recently registered eligible shortcut wins** (for lists and maps: the last matching entry). "Eligible" means enabled, not suppressed by `ignoreInputs` and not blocked by `requireReset`, so a disabled or input-ignoring newer shortcut never shadows an older one. Only the winner's `preventDefault` applies.
+
+## `makeShortcutRegistry`
+
+The non-reactive base of `createShortcuts`. Listeners are attached when the first shortcut is registered and removed when the last is unregistered or on `clear()`. When `scope` is set, key releases are also observed on `window` (so a release after focus leaves the scope is seen) and on the scope itself, also in the capture phase (so a scope whose events never reach `window`, such as an iframe, still sees them even when an app handler stops keyup propagation). A `scope` may also be an iframe's `contentDocument` or `contentWindow`. It also clears itself when its owner is disposed. On the server it returns an inert registry.
+
+```ts
+// Type
+function makeShortcutRegistry(options?: { scope?: EventTarget }): {
+  register(definition: ShortcutDefinition): VoidFunction; // returns unregister
+  clear(): void;
+};
+
+// Example
+const registry = makeShortcutRegistry({ scope: dialogEl });
+const unregister = registry.register({ keys: "Escape", handler: close });
+unregister(); // remove one
+registry.clear(); // remove all and detach listeners
 ```
 
 ## Changelog
