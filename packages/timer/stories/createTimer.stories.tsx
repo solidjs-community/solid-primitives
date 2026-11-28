@@ -1,6 +1,11 @@
 import { createSignal, onCleanup } from "solid-js";
 import preview from "../../../.storybook/preview.js";
-import { makeTimer, createTimer, createTimeoutLoop } from "@solid-primitives/timer";
+import {
+  makeTimer,
+  createTimer,
+  createTimeoutLoop,
+  createPausableTimer,
+} from "@solid-primitives/timer";
 import readme from "../README.md?raw";
 import { Stat, Button, Container } from "../../../.storybook/ui/index.js";
 
@@ -157,6 +162,58 @@ export const CreateTimeoutLoop = meta.story({
           Change the delay mid-tick — it takes effect on the <em>next</em> execution, not the
           current one.
         </p>
+      </Container>
+    );
+  },
+});
+
+export const PausableTimer = meta.story({
+  name: "Pausable toast",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`createPausableTimer` keeps the remaining time across pause/resume. Hover or focus the toast to pause it; leaving resumes with what was left, not the full delay.",
+      },
+    },
+  },
+  render: () => {
+    const [dismissed, setDismissed] = createSignal(0);
+    const [now, setNow] = createSignal(0);
+    const timer = createPausableTimer(() => setDismissed(d => d + 1), 5000, {
+      pauseWhenHidden: true,
+    });
+    const id = setInterval(() => setNow(n => n + 1), 100);
+    onCleanup(() => clearInterval(id));
+
+    return (
+      <Container minWidth={320}>
+        <h3 style={{ margin: 0 }}>createPausableTimer</h3>
+
+        <div
+          tabindex={0}
+          role="status"
+          style={{ padding: "1rem", border: "1px solid #cbd5e1", "border-radius": "0.5rem" }}
+          onPointerEnter={timer.pause}
+          onPointerLeave={timer.resume}
+          onFocusIn={timer.pause}
+          onFocusOut={timer.resume}
+        >
+          Hover or focus me
+        </div>
+
+        <Stat label="Remaining">{(now(), Math.round(timer.remaining()))}ms</Stat>
+        <Stat label="State">
+          {timer.isPaused() ? "paused" : timer.isActive() ? "running" : "idle"}
+        </Stat>
+        <Stat label="Dismissed">{dismissed()}</Stat>
+
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Button onClick={timer.start}>Restart</Button>
+          <Button onClick={timer.reset} variant="outline">
+            Reset
+          </Button>
+        </div>
       </Container>
     );
   },

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scroll",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Reactive primitives to react to element/window scrolling, and to prevent scroll outside of a given element.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -25,10 +25,12 @@
     "list": [
       "createScrollPosition",
       "useWindowScrollPosition",
+      "useWindowScrollPositionRaf",
+      "makeScrollPositionListener",
       "createPreventScroll"
     ],
     "category": "Inputs",
-    "gzip": 2367
+    "gzip": 2487
   },
   "files": [
     "dist"

@@ -30,3 +30,14 @@ describe("createPreventScroll", () => {
     expect(() => createPreventScroll({ enabled: true, hideScrollbar: true })).not.toThrow();
   });
 });
+
+describe("raf throttling (SSR)", () => {
+  it("is a no-op on the server", async () => {
+    const { makeScrollPositionListener, useWindowScrollPositionRaf } =
+      await import("../src/index.js");
+    expect(createScrollPosition(undefined, { throttle: "raf" })).toEqual({ x: 0, y: 0 });
+    expect(useWindowScrollPositionRaf()).toEqual({ x: 0, y: 0 });
+    const stop = makeScrollPositionListener({} as Element, () => {}, { throttle: "raf" });
+    expect(() => stop()).not.toThrow();
+  });
+});

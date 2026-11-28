@@ -1,4 +1,5 @@
-import { onCleanup, onSettled } from "solid-js";
+// @ts-expect-error createOwner is exported at runtime but missing from the solid-js 2.0.0 types
+import { createOwner, onCleanup, onSettled } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, asArray, type MaybeAccessor } from "@solid-primitives/utils";
 
@@ -89,6 +90,9 @@ export function createMutationObserver(
   if (isSupported) {
     onSettled(start);
     onCleanup(stop);
+  } else {
+    // Match the client's onSettled owner so later siblings keep the same hydration ids.
+    createOwner();
   }
 
   return [
@@ -119,9 +123,12 @@ export function createMutationObserver(
  * <div ref={mutationObserver({ childList: true }, records => console.log(records))} />
  * ```
  */
-export const mutationObserver =
-  (options: MutationObserverInit, callback: MutationCallback) =>
-  (target: Element): void => {
-    const [add] = createMutationObserver([], callback);
-    add(target, options);
-  };
+export const mutationObserver = (
+  options: MutationObserverInit,
+  callback: MutationCallback,
+): ((target: Element) => void) => {
+  // Created here, not in the ref callback, where Solid 2 forbids primitives (#1143).
+  // Disconnects with the factory's owner; the ref's return value is ignored by the runtime.
+  const [add] = createMutationObserver([], callback);
+  return target => add(target, options);
+};

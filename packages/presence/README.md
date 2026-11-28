@@ -4,7 +4,7 @@
 
 # @solid-primitives/presence
 
-[![size](https://img.shields.io/badge/size-872_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/presence)
+[![size](https://img.shields.io/badge/size-1.28_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/presence)
 [![version](https://img.shields.io/npm/v/@solid-primitives/presence?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/presence)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -271,6 +271,51 @@ const FadingPanel = (props: { open: boolean }) => {
 
 `bindDone()` binds to the state as of the last flush, so call it once the transition has started (as above, in an effect on `isEntering()` / `isExiting()`). Called right after changing the item, before that change is flushed, it binds to the previous transition and its callback is ignored; the duration then still ends the transition.
 
+### Waiting for CSS and Web animations
+
+Set `animations: true` to have the transition end when the element's animations do, instead of after a fixed duration. When an enter or exit starts, `createPresence` waits for `element.getAnimations({ subtree: true })` to settle (CSS transitions, CSS animations and Web Animations, on the element and its descendants; cancelled animations count as settled, infinite ones are ignored). Give it the element with the returned `ref`, or the `element` option.
+
+Spread `attrs()` on the element to get `data-starting-style` (before it becomes visible) and `data-ending-style` (while exiting) to target from CSS.
+
+```tsx
+// Type
+type Options = {
+  // ...
+  animations?: boolean;
+  element?: Accessor<Element | null | undefined>;
+};
+type PresenceResult<TItem> = {
+  // ...
+  ref: (el: Element | null) => void;
+  attrs: Accessor<{ "data-starting-style": "" | undefined; "data-ending-style": "" | undefined }>;
+};
+
+// Example
+const Panel = () => {
+  const [open, setOpen] = createSignal(false);
+  const presence = createPresence(open, { transitionDuration: 300, animations: true });
+
+  return (
+    <>
+      <button onClick={() => setOpen(o => !o)}>Toggle</button>
+      <Show when={presence.isMounted()}>
+        <div class="panel" ref={presence.ref} {...presence.attrs()}>
+          Unmounts once its CSS transition has finished.
+        </div>
+      </Show>
+    </>
+  );
+};
+// .panel { transition: opacity 300ms; }
+// .panel[data-starting-style], .panel[data-ending-style] { opacity: 0; }
+```
+
+- `transitionDuration` (or `enterDuration` / `exitDuration`) is ignored while the animations can be observed, and is the timer used otherwise: when no element is known, the element is detached, or the environment has no `getAnimations` (e.g. jsdom).
+- Showing the element again mid-exit cancels the wait; the element stays mounted.
+- Animations that start while waiting (for example a second transition that begins after the first) are waited for too.
+- Paused animations (`playState: "paused"` or `playbackRate: 0`) never finish, so they are not waited for. The whole wait is also capped at the greater of 10x the duration and 10 seconds, after which the transition ends anyway.
+- `done` / `bindDone` still end a transition early.
+
 ### `createPresence` options API
 
 ```ts
@@ -288,6 +333,10 @@ type Options = {
   exitDuration: MaybeAccessor<number>;
   /** Opt-in to animating the entering of an element if `isVisible` is `true` during the initial mount. */
   initialEnter?: boolean;
+  /** Wait for the element's animations to settle instead of the duration. */
+  animations?: boolean;
+  /** The element to observe when `animations` is enabled (alternative to `ref`). */
+  element?: Accessor<Element | null | undefined>;
 };
 
 type PresenceResult<TItem> = {
@@ -303,6 +352,10 @@ type PresenceResult<TItem> = {
   isEntering: Accessor<boolean>;
   /** Is the component exiting currently? */
   isExiting: Accessor<boolean>;
+  /** `ref` for the animated element, used when `animations` is enabled. */
+  ref: (el: Element | null) => void;
+  /** `data-starting-style` / `data-ending-style` attributes to spread on the element. */
+  attrs: Accessor<{ "data-starting-style": "" | undefined; "data-ending-style": "" | undefined }>;
   /** Ends the current enter or exit transition now; the duration then only acts as a fallback. */
   done: (event?: Event) => void;
   /** Returns a `done` bound to the current transition; it does nothing once the item has changed again. */

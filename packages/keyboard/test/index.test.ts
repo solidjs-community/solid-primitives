@@ -38,6 +38,121 @@ const dispatchKeyEventOn = (
   return ev as KeyboardEvent;
 };
 
+describe("keys with an unavailable physical code (virtual/IME keyboards)", () => {
+  for (const code of ["Unidentified", ""]) {
+    for (const order of ["same", "reverse"] as const) {
+      const tag = `code=${JSON.stringify(code)}, release ${order}`;
+      const release = () => {
+        if (order === "same") {
+          dispatchKeyEvent("a", "keyup", { code });
+          dispatchKeyEvent("b", "keyup", { code });
+        } else {
+          dispatchKeyEvent("b", "keyup", { code });
+          dispatchKeyEvent("a", "keyup", { code });
+        }
+      };
+
+      test(`useKeyDownList leaves an empty list: ${tag}`, () =>
+        createRoot(dispose => {
+          const keys = useKeyDownList();
+          dispatchKeyEvent("a", "keydown", { code });
+          flush();
+          dispatchKeyEvent("b", "keydown", { code });
+          flush();
+          expect(keys()).toEqual(["A", "B"]);
+          if (order === "same") {
+            dispatchKeyEvent("a", "keyup", { code });
+            flush();
+            dispatchKeyEvent("b", "keyup", { code });
+          } else {
+            dispatchKeyEvent("b", "keyup", { code });
+            flush();
+            dispatchKeyEvent("a", "keyup", { code });
+          }
+          flush();
+          expect(keys()).toEqual([]);
+          dispose();
+        }));
+
+      test(`createShortcut state is clean afterwards: ${tag}`, () =>
+        createRoot(dispose => {
+          let fired = 0;
+          createShortcut(["B"], () => fired++);
+          dispatchKeyEvent("a", "keydown", { code });
+          dispatchKeyEvent("b", "keydown", { code });
+          release();
+          // a stuck "A" would make the held set [A, B] and block a lone B
+          dispatchKeyEvent("b", "keydown", { code });
+          dispatchKeyEvent("b", "keyup", { code });
+          expect(fired).toBe(1);
+          dispose();
+        }));
+    }
+  }
+});
+
+describe("key value changes between keydown and keyup", () => {
+  const releaseCases: [string, "shift-first" | "digit-first", string, string, string, string][] = [
+    ["Shift+1", "shift-first", "!", "1", "Digit1", "!"],
+    ["Shift+1", "digit-first", "!", "1", "Digit1", "!"],
+    ["Shift+A", "shift-first", "A", "a", "KeyA", "A"],
+    ["Shift+A", "digit-first", "A", "a", "KeyA", "A"],
+  ];
+
+  for (const [name, order, downKey, upKey, code, expected] of releaseCases) {
+    test(`useKeyDownList: ${name}, ${order}`, () =>
+      createRoot(dispose => {
+        const keys = useKeyDownList();
+        dispatchKeyEvent("Shift", "keydown", { code: "ShiftLeft", shiftKey: true });
+        dispatchKeyEvent(downKey, "keydown", { code, shiftKey: true });
+        flush();
+        expect(keys()).toEqual(["SHIFT", expected]);
+        if (order === "shift-first") {
+          dispatchKeyEvent("Shift", "keyup", { code: "ShiftLeft" });
+          dispatchKeyEvent(upKey, "keyup", { code });
+        } else {
+          dispatchKeyEvent(downKey, "keyup", { code, shiftKey: true });
+          dispatchKeyEvent("Shift", "keyup", { code: "ShiftLeft" });
+        }
+        flush();
+        expect(keys()).toEqual([]);
+        dispose();
+      }));
+
+    test(`createShortcut: ${name}, ${order}`, () =>
+      createRoot(dispose => {
+        let fired = 0;
+        createShortcut(["X"], () => fired++);
+        dispatchKeyEvent("Shift", "keydown", { code: "ShiftLeft", shiftKey: true });
+        dispatchKeyEvent(downKey, "keydown", { code, shiftKey: true });
+        if (order === "shift-first") {
+          dispatchKeyEvent("Shift", "keyup", { code: "ShiftLeft" });
+          dispatchKeyEvent(upKey, "keyup", { code });
+        } else {
+          dispatchKeyEvent(downKey, "keyup", { code, shiftKey: true });
+          dispatchKeyEvent("Shift", "keyup", { code: "ShiftLeft" });
+        }
+        dispatchKeyEvent("x", "keydown", { code: "KeyX" });
+        dispatchKeyEvent("x", "keyup", { code: "KeyX" });
+        expect(fired).toBe(1);
+        dispose();
+      }));
+  }
+
+  test("useKeyDownList: Meta keyup still clears all keys", () =>
+    createRoot(dispose => {
+      const keys = useKeyDownList();
+      dispatchKeyEvent("Meta", "keydown", { code: "MetaLeft", metaKey: true });
+      dispatchKeyEvent("k", "keydown", { code: "KeyK", metaKey: true });
+      flush();
+      expect(keys()).toEqual(["META", "K"]);
+      dispatchKeyEvent("Meta", "keyup", { code: "MetaLeft" });
+      flush();
+      expect(keys()).toEqual([]);
+      dispose();
+    }));
+});
+
 describe("useKeyDownList", () => {
   test("returns a list of currently held keys", () =>
     createRoot(dispose => {

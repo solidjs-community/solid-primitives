@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/lifecycle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Package providing extra layer of lifecycle primitives.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -19,10 +19,11 @@
     "list": [
       "createIsMounted",
       "isHydrated",
-      "onElementConnect"
+      "onElementConnect",
+      "createConnectRef"
     ],
     "category": "Reactivity",
-    "gzip": 306
+    "gzip": 403
   },
   "keywords": [
     "solid",

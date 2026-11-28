@@ -4,7 +4,7 @@
 
 # @solid-primitives/lifecycle
 
-[![size](https://img.shields.io/badge/size-306_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/lifecycle)
+[![size](https://img.shields.io/badge/size-403_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/lifecycle)
 [![version](https://img.shields.io/npm/v/@solid-primitives/lifecycle?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/lifecycle)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -15,6 +15,7 @@ Package providing extra layer of lifecycle primitives for Solid.
 - [`createIsMounted`](#createismounted) - Returns a boolean signal indicating whether the component is mounted or not.
 - [`isHydrated`](#ishydrated) - A signal with the same behavior as [`isHydrating`](#ishydrating) but this one focused only on client-side updates.
 - [`onElementConnect`](#onelementconnect) - Calls the given callback when the target element is connected to the DOM.
+- [`createConnectRef`](#createconnectref) - `ref` factory that calls the callback when each element is connected to the DOM.
 
 ## Installation
 
@@ -146,7 +147,7 @@ export const ClientOnly: FlowComponent = props => {
 ```tsx repl
 import { render } from "@solidjs/web";
 import { createSignal, Show } from "solid-js";
-import { onElementConnect } from "@solid-primitives/lifecycle";
+import { createConnectRef } from "@solid-primitives/lifecycle";
 
 function Demo() {
   const [show, setShow] = createSignal(true);
@@ -156,7 +157,7 @@ function Demo() {
       <button onClick={() => setShow(v => !v)}>{show() ? "Unmount" : "Remount"}</button>
       <p>connected {connects()} times</p>
       <Show when={show()}>
-        <div ref={el => onElementConnect(el, () => setConnects(n => n + 1))}>Connected element</div>
+        <div ref={createConnectRef(() => setConnects(n => n + 1))}>Connected element</div>
       </Show>
     </>
   );
@@ -174,16 +175,15 @@ However, it is not certain that the elements are actually connected to the DOM w
 >
 > If you are not sure, you can use `onElementConnect` instead of `onSettled` to make sure that you are caling your callback when the elements are connected to the DOM.
 
+Solid does not allow `onCleanup` (or creating primitives) inside a `ref` callback, so `onElementConnect` never calls it.
+The observer disconnects itself once the element connects, and the function returns a disposer to stop waiting earlier.
+In a `ref`, use [`createConnectRef`](#createconnectref), which also stops waiting when the owner is disposed.
+
 ```tsx
 <div
   ref={el => {
     // often false, but will be true during hydration
     el.isConnected;
-
-    onSettled(() => {
-      // often true, but will be false if the executed component is not actually getting rendered
-      el.isConnected;
-    });
 
     onElementConnect(el, () => {
       // always true
@@ -191,6 +191,21 @@ However, it is not certain that the elements are actually connected to the DOM w
     });
   }}
 />
+```
+
+In an owned scope (component body, effect), tie the wait to the owner yourself:
+
+```tsx
+onCleanup(onElementConnect(el, () => {}));
+```
+
+## `createConnectRef`
+
+Creates a `ref` callback that calls the given function with each element once it is connected to the DOM.
+Call it in the component body: the pending observers are disconnected when the component is disposed.
+
+```tsx
+<div ref={createConnectRef(el => el.isConnected /* always true */)} />
 ```
 
 ## Changelog

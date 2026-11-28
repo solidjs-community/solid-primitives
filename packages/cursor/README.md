@@ -4,7 +4,7 @@
 
 # @solid-primitives/cursor
 
-[![size](https://img.shields.io/badge/size-658_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/cursor)
+[![size](https://img.shields.io/badge/size-772_B-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/cursor)
 [![version](https://img.shields.io/npm/v/@solid-primitives/cursor?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/cursor)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -229,7 +229,7 @@ createDragCursor(el, { grab: "crosshair", grabbing: "move" });
 
 ## `cursorRef`
 
-A ref factory for setting a cursor inline in JSX. Accepts a static cursor value or a reactive signal. The cursor is removed when the component unmounts.
+A ref factory for setting a cursor inline in JSX. Accepts a static cursor value or a reactive signal. Call it in the component body. The cursor is restored when the element unmounts or the component is disposed, and one `cursorRef` value can be attached to several elements.
 
 ```tsx repl
 import { render } from "@solidjs/web";

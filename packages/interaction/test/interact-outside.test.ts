@@ -1,7 +1,11 @@
 import { renderHydrationRoundTrip } from "../../../scripts/test-utils/hydration-harness.ts";
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from "vitest";
 import { createRoot, createSignal, flush } from "solid-js";
-import { createInteractOutside, type CreateInteractOutsideProps } from "../src/index.js";
+import {
+  createInteractOutside,
+  makeInteractOutside,
+  type CreateInteractOutsideProps,
+} from "../src/index.js";
 
 beforeAll(() => {
   if (!("PointerEvent" in window)) {
@@ -694,4 +698,123 @@ it("hydrates primitive output and its following sibling", async () => {
   } finally {
     result.cleanup();
   }
+});
+
+describe("makeInteractOutside touch press lifecycle", () => {
+  let inside: HTMLElement;
+  let outside: HTMLElement;
+  let cleanup: () => void;
+  let onPointerDownOutside: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    inside = document.createElement("button");
+    outside = document.createElement("div");
+    document.body.append(inside, outside);
+    onPointerDownOutside = vi.fn();
+    cleanup = makeInteractOutside(inside, { onPointerDownOutside });
+    vi.runAllTimers();
+  });
+  afterEach(() => {
+    cleanup();
+    inside.remove();
+    outside.remove();
+    vi.useRealTimers();
+  });
+
+  const down = (target: Element, x = 100, y = 100, type = "touch") =>
+    target.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        composed: true,
+        pointerType: type,
+        pointerId: 1,
+        clientX: x,
+        clientY: y,
+      }),
+    );
+  const pointer = (type: string, target: Element, x = 100, y = 100) =>
+    target.dispatchEvent(
+      new PointerEvent(type, {
+        bubbles: true,
+        pointerId: 1,
+        pointerType: "touch",
+        clientX: x,
+        clientY: y,
+      }),
+    );
+  const click = (target: Element, x = 100, y = 100, detail = 1) =>
+    target.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, composed: true, clientX: x, clientY: y, detail }),
+    );
+
+  it("a tap (down, up, click on the same target) reports once", () => {
+    down(outside);
+    pointer("pointerup", outside);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+    click(outside);
+    expect(onPointerDownOutside).toHaveBeenCalledTimes(1);
+  });
+
+  it("a touch cancelled by a scroll does not dismiss on the next click", () => {
+    down(outside);
+    pointer("pointercancel", outside);
+    click(inside, 5, 5, 0);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+  });
+
+  it("a touchcancel drops the pending press", () => {
+    down(outside);
+    document.dispatchEvent(new Event("touchcancel", { bubbles: true }));
+    click(outside);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+  });
+
+  it("a touch that moved beyond the threshold is not a tap", () => {
+    down(outside);
+    pointer("pointermove", outside, 100, 140);
+    click(outside);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+  });
+
+  it("a small drift still counts as a tap", () => {
+    down(outside);
+    pointer("pointermove", outside, 103, 102);
+    click(outside, 103, 102);
+    expect(onPointerDownOutside).toHaveBeenCalledTimes(1);
+  });
+
+  it("a click that never follows the release expires", () => {
+    down(outside);
+    pointer("pointerup", outside);
+    vi.advanceTimersByTime(2000);
+    click(outside);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+  });
+
+  it("a keyboard-generated click after the touch does not dismiss", () => {
+    down(outside);
+    pointer("pointerup", outside);
+    inside.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    click(inside, 0, 0, 0);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+  });
+
+  it("a click on a different target at a different position is not this press", () => {
+    down(outside, 100, 100);
+    click(inside, 400, 400);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+  });
+
+  it("the pending press is dropped by cleanup", () => {
+    down(outside);
+    cleanup();
+    click(outside);
+    expect(onPointerDownOutside).not.toHaveBeenCalled();
+  });
+
+  it("mouse presses still report immediately", () => {
+    down(outside, 100, 100, "mouse");
+    expect(onPointerDownOutside).toHaveBeenCalledTimes(1);
+  });
 });

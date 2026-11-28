@@ -4,7 +4,7 @@
 
 # @solid-primitives/scroll
 
-[![size](https://img.shields.io/badge/size-2.37_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
+[![size](https://img.shields.io/badge/size-2.49_kB-blue?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
 [![size](https://img.shields.io/npm/v/@solid-primitives/scroll?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scroll)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 [![tested with vitest](https://img.shields.io/badge/tested_with-vitest-6E9F18?style=for-the-badge&logo=vitest)](https://vitest.dev)
@@ -13,6 +13,7 @@ Reactive primitives to react to element/window scrolling, and to prevent scroll 
 
 - [`createScrollPosition`](#createscrollposition) - Reactive primitive providing a store-like object with current scroll position of specified target.
 - [`useWindowScrollPosition`](#usewindowscrollposition) - Returns a reactive object with current window scroll position.
+- [`makeScrollPositionListener`](#makescrollpositionlistener) - Non-reactive scroll listener with optional rAF throttling.
 - [`createPreventScroll`](#createpreventscroll) - Prevents scrolling outside of a given element.
 
 ## Installation
@@ -122,6 +123,39 @@ x(); // => number
 y(); // => number
 ```
 
+#### Throttling to animation frames
+
+Pass `{ throttle: "raf" }` to coalesce scroll events to at most one update per animation frame. The position is read when the frame fires, so the final settled position is always delivered. A pending frame is cancelled on cleanup. Default behavior (no options) is unchanged.
+
+```ts
+// Type
+function createScrollPosition(
+  target?: Accessor<Element | Window | undefined> | Element | Window,
+  options?: { throttle?: "raf" | false },
+): Readonly<Position>;
+
+// Example
+const scroll = createScrollPosition(box, { throttle: "raf" });
+```
+
+## `makeScrollPositionListener`
+
+Non-reactive base of `createScrollPosition`. Returns a cleanup function that removes the listener and cancels any pending frame. Does nothing on the server.
+
+```ts
+// Type
+function makeScrollPositionListener(
+  target: Element | Window,
+  callback: (position: Position) => void,
+  options?: { throttle?: "raf" | false },
+): VoidFunction;
+
+// Example
+const stop = makeScrollPositionListener(window, ({ x, y }) => console.log(x, y), {
+  throttle: "raf",
+});
+```
+
 ## `useWindowScrollPosition`
 
 Returns a reactive object with current window scroll position.
@@ -163,6 +197,14 @@ createEffect(() => {
 ### `getScrollPosition`
 
 Get an `{ x: number, y: number }` object of element/window scroll position.
+
+### `useWindowScrollPositionRaf`
+
+A separate singleton root like `useWindowScrollPosition`, with updates coalesced to one per animation frame.
+
+```ts
+const scroll = useWindowScrollPositionRaf();
+```
 
 ## `createPreventScroll`
 

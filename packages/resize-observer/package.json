@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/resize-observer",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Reactive primitives for observing resizing of HTML elements.",
   "author": "Moshe Udimar",
   "contributors": [
@@ -18,10 +18,11 @@
     "list": [
       "createResizeObserver",
       "createWindowSize",
+      "createVisualViewport",
       "createElementSize"
     ],
     "category": "Display & Media",
-    "gzip": 1519
+    "gzip": 1846
   },
   "files": [
     "dist"

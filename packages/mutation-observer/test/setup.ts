@@ -1,3 +1,9 @@
+// Tests run without isolation, so the mock must not outlive this file's tests.
+const NativeMutationObserver = globalThis.MutationObserver;
+export const restoreMutationObserver = () => {
+  globalThis.MutationObserver = NativeMutationObserver;
+};
+
 export const instances: MutationObserver[] = [];
 
 export const getLastInstance = () => instances[instances.length - 1];

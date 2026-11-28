@@ -1,7 +1,9 @@
-import { MutationObserver, getLastInstance, instances } from "./setup.js";
+import { MutationObserver, getLastInstance, instances, restoreMutationObserver } from "./setup.js";
 import { createMutationObserver, mutationObserver } from "../src/index.js";
 import { createRoot } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
+
+afterAll(restoreMutationObserver);
 
 describe("mutation-observer", () => {
   const config = { childList: true },

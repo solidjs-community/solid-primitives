@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 4.1.0
+
+### Minor Changes
+
+- a176399: Add `getVisualViewport`, `makeVisualViewportListener`, `createVisualViewport` and `useVisualViewport` for tracking `window.visualViewport` (size, offsets, pinch-zoom scale) with a `window.innerWidth/innerHeight` fallback and SSR/hydration-safe defaults.
+
 ## 4.0.0
 
 ### Major Changes

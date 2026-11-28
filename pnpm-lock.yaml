@@ -402,6 +402,25 @@ importers:
         specifier: catalog:peer
         version: 2.0.0
 
+  packages/dismissable:
+    dependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
+      '@solid-primitives/interaction':
+        specifier: workspace:^
+        version: link:../interaction
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0(solid-js@2.0.0)
+      solid-js:
+        specifier: catalog:peer
+        version: 2.0.0
+
   packages/drag-drop:
     dependencies:
       '@solid-primitives/utils':
@@ -497,6 +516,19 @@ importers:
         specifier: catalog:peer
         version: 2.0.0
 
+  packages/floating:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0(solid-js@2.0.0)
+      solid-js:
+        specifier: catalog:peer
+        version: 2.0.0
+
   packages/flux-store:
     devDependencies:
       solid-js:
@@ -524,9 +556,6 @@ importers:
       '@solid-primitives/a11y':
         specifier: workspace:^
         version: link:../a11y
-      '@solid-primitives/event-listener':
-        specifier: workspace:^
-        version: link:../event-listener
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
@@ -995,6 +1024,19 @@ importers:
       '@solid-primitives/rootless':
         specifier: workspace:^
         version: link:../rootless
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0(solid-js@2.0.0)
+      solid-js:
+        specifier: catalog:peer
+        version: 2.0.0
+
+  packages/post-message:
+    dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils

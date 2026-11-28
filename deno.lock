@@ -2038,23 +2038,11 @@
         "react"
       ]
     },
-    "@napi-rs/wasm-runtime@1.2.6_@emnapi+core@1.11.0_@emnapi+runtime@1.11.0": {
-      "integrity": "sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==",
-      "dependencies": [
-        "@tybys/wasm-util"
-      ]
-    },
     "@napi-rs/wasm-runtime@1.2.6_@emnapi+core@1.11.1_@emnapi+runtime@1.11.1": {
       "integrity": "sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==",
       "dependencies": [
         "@emnapi/core@1.11.1",
         "@emnapi/runtime@1.11.1",
-        "@tybys/wasm-util"
-      ]
-    },
-    "@napi-rs/wasm-runtime@1.2.6_@emnapi+core@1.11.3_@emnapi+runtime@1.11.3": {
-      "integrity": "sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==",
-      "dependencies": [
         "@tybys/wasm-util"
       ]
     },
@@ -2535,7 +2523,7 @@
       "dependencies": [
         "@emnapi/core@1.11.0",
         "@emnapi/runtime@1.11.0",
-        "@napi-rs/wasm-runtime@1.2.6_@emnapi+core@1.11.0_@emnapi+runtime@1.11.0"
+        "@napi-rs/wasm-runtime@1.2.6_@emnapi+core@1.9.2_@emnapi+runtime@1.9.2"
       ],
       "cpu": ["wasm32"]
     },
@@ -3173,7 +3161,7 @@
       "dependencies": [
         "@emnapi/core@1.11.3",
         "@emnapi/runtime@1.11.3",
-        "@napi-rs/wasm-runtime@1.2.6_@emnapi+core@1.11.3_@emnapi+runtime@1.11.3"
+        "@napi-rs/wasm-runtime@1.2.6_@emnapi+core@1.9.2_@emnapi+runtime@1.9.2"
       ]
     },
     "@solidjs/compiler-win32-x64-msvc@2.0.0": {
@@ -8791,6 +8779,14 @@
           ]
         }
       },
+      "packages/dismissable": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@solidjs/web@2.0.0",
+            "npm:solid-js@2"
+          ]
+        }
+      },
       "packages/drag-drop": {
         "packageJson": {
           "dependencies": [
@@ -8852,6 +8848,14 @@
             "npm:@tauri-apps/api@^1.6.0",
             "npm:@types/wicg-file-system-access@2023.10.7",
             "npm:chokidar@^3.6.0",
+            "npm:solid-js@2"
+          ]
+        }
+      },
+      "packages/floating": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@solidjs/web@2.0.0",
             "npm:solid-js@2"
           ]
         }
@@ -9142,6 +9146,14 @@
         }
       },
       "packages/pointer": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@solidjs/web@2.0.0",
+            "npm:solid-js@2"
+          ]
+        }
+      },
+      "packages/post-message": {
         "packageJson": {
           "dependencies": [
             "npm:@solidjs/web@2.0.0",

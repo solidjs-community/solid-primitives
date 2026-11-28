@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mutation-observer",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Primitive providing the ability to watch for changes made to the DOM tree.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -16,7 +16,7 @@
       "createMutationObserver"
     ],
     "category": "Browser APIs",
-    "gzip": 464
+    "gzip": 470
   },
   "keywords": [
     "mutationObserver",

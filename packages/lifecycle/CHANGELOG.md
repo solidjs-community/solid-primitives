@@ -1,5 +1,11 @@
 # @solid-primitives/lifecycle
 
+## 1.0.1
+
+### Patch Changes
+
+- 6457c24: Fix `onElementConnect` throwing `CLEANUP_IN_FORBIDDEN_SCOPE` inside a `ref` callback (#1143). It no longer calls `onCleanup` and now returns a disposer. Add `createConnectRef` for `ref` usage that also cleans up with the owner.
+
 ## 1.0.0
 
 ### Major Changes

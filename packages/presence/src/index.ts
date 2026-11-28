@@ -36,7 +36,67 @@ export type Options = (
 ) & {
   /** Opt-in to animating the entering of an element if `isVisible` is `true` during the initial mount. */
   initialEnter?: boolean;
+  /**
+   * Opt-in to animation-aware transitions. When `true`, instead of waiting for the duration, the
+   * transition is over once every finite animation of the element and its descendants
+   * (`element.getAnimations({ subtree: true })`: CSS transitions, CSS animations and Web Animations)
+   * has finished or been cancelled (paused ones are not waited for, and the wait is capped at the
+   * greater of 10x the duration and 10s). The duration is otherwise ignored, and only used when the
+   * animations cannot be observed: no element is known (see `element` / `ref`) or the environment
+   * lacks `getAnimations` (e.g. jsdom). Defaults to `false` (timer only).
+   */
+  animations?: boolean;
+  /**
+   * The element to observe when `animations` is enabled, as an alternative to passing
+   * {@link PresenceResult.ref} as the element's `ref`. Read when a transition starts.
+   */
+  element?: Accessor<Element | null | undefined>;
 };
+
+type AnimationHost = Element & { getAnimations: (options?: { subtree?: boolean }) => Animation[] };
+
+const canObserveAnimations = (el: Element | null | undefined): el is AnimationHost =>
+  !!el && el.isConnected && typeof (el as Partial<AnimationHost>).getAnimations === "function";
+
+const pendingAnimations = (el: AnimationHost) =>
+  el.getAnimations({ subtree: true }).filter(
+    a =>
+      a.effect?.getComputedTiming().endTime !== Infinity &&
+      // a paused animation (or one with playbackRate 0) never finishes, so it cannot be waited for
+      a.playState !== "paused" &&
+      a.playbackRate !== 0,
+  );
+
+/** Upper bound for waiting on animations: generous relative to the duration, never below 10s. */
+const animationWaitLimit = (duration: number) => Math.max(10 * duration, 10_000);
+
+/**
+ * Resolves once the animations of `el` (and its descendants) have settled. Animations started
+ * while waiting (e.g. a transition that begins after the first one ended) are awaited too.
+ */
+async function settleAnimations(
+  el: AnimationHost,
+  isCancelled: () => boolean,
+  duration: number,
+): Promise<void> {
+  // Hard wall-clock bound for the whole wait, so an animation that never settles (e.g. paused
+  // mid-wait) or an element that keeps starting animations cannot keep itself mounted forever.
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<void>(resolve => {
+    timeoutId = setTimeout(resolve, animationWaitLimit(duration));
+  });
+  let expired = false;
+  void deadline.then(() => (expired = true));
+  try {
+    for (let round = 0; round < 10 && !expired && !isCancelled(); round++) {
+      const running = pendingAnimations(el);
+      if (!running.length) return;
+      await Promise.race([Promise.allSettled(running.map(a => a.finished)), deadline]);
+    }
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 /**
  * Animates the appearance of its children.
@@ -56,6 +116,18 @@ function createPresenceBase(
   const enterDuration = asAccessor(
     "enterDuration" in options ? options.enterDuration : options.transitionDuration,
   );
+
+  // Not a signal: it is only read when a transition starts, never reactively.
+  let refElement: Element | null | undefined;
+  const ref = (el: Element | null) => {
+    refElement = el;
+  };
+  /** The element to observe for this transition, if animations can be observed at all. */
+  const observableElement = (): AnimationHost | undefined => {
+    if (!options.animations) return;
+    const el = (options.element && untrack(options.element)) || refElement;
+    return canObserveAnimations(el) ? el : undefined;
+  };
 
   const initialSource = untrack(source);
   const initialState = options.initialEnter ? false : initialSource;
@@ -91,11 +163,23 @@ function createPresenceBase(
     () => (source() ? undefined : generation()),
     exitingIn => {
       if (exitingIn === undefined) return;
-      const timeoutId = setTimeout(() => {
+      const finishExit = () => {
         if (untrack(exitedIn) === exitingIn) return;
         setExitedIn(exitingIn);
         onExited?.();
-      }, exitDuration());
+      };
+      const el = observableElement();
+      if (el) {
+        // Cleanup runs when `source` comes back (or on dispose), which cancels the wait.
+        let cancelled = false;
+        settleAnimations(el, () => cancelled, exitDuration()).then(
+          () => !cancelled && finishExit(),
+        );
+        return () => {
+          cancelled = true;
+        };
+      }
+      const timeoutId = setTimeout(finishExit, exitDuration());
       return () => clearTimeout(timeoutId);
     },
   );
@@ -120,6 +204,16 @@ function createPresenceBase(
     shouldTrackEnter => {
       if (!shouldTrackEnter) return;
       const enteringIn = untrack(generation);
+      const el = observableElement();
+      if (el) {
+        let cancelled = false;
+        settleAnimations(el, () => cancelled, enterDuration()).then(
+          () => !cancelled && setEnteredIn(enteringIn),
+        );
+        return () => {
+          cancelled = true;
+        };
+      }
       const timeoutId = setTimeout(() => setEnteredIn(enteringIn), enterDuration());
       return () => clearTimeout(timeoutId);
     },
@@ -160,10 +254,24 @@ function createPresenceBase(
     };
   };
 
+  /**
+   * Attributes for styling hooks, to spread onto the element: `data-starting-style` while it
+   * should render its initial (pre-enter) style, `data-ending-style` while it is exiting.
+   */
+  const attrs = createMemo(() => {
+    const starting = source() && !isVisible();
+    return {
+      "data-starting-style": starting ? ("" as const) : undefined,
+      "data-ending-style": isExiting() ? ("" as const) : undefined,
+    };
+  });
+
   return {
     isMounted,
     isVisible,
     isAnimating,
+    ref,
+    attrs,
     isEntering,
     isExiting,
     done,
@@ -189,6 +297,17 @@ export type PresenceResult<TItem> = {
   isEntering: Accessor<boolean>;
   /** Is the component exiting currently? */
   isExiting: Accessor<boolean>;
+  /**
+   * A `ref` for the animated element, used when `animations` is enabled to observe its animations.
+   * Not needed when the `element` option is given.
+   */
+  ref: (el: Element | null) => void;
+  /**
+   * Attributes to spread onto the element (`{...presence.attrs()}`): `data-starting-style` before
+   * the element becomes visible, `data-ending-style` while it exits. Target them from CSS, e.g.
+   * `.panel[data-starting-style] { opacity: 0 }`.
+   */
+  attrs: Accessor<{ "data-starting-style": "" | undefined; "data-ending-style": "" | undefined }>;
   /**
    * Ends the current enter or exit transition right away instead of waiting for its duration, which
    * then only acts as a fallback timeout. Pass it as an `onTransitionEnd` / `onAnimationEnd` handler,

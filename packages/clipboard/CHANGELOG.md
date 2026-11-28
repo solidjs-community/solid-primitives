@@ -1,5 +1,11 @@
 # @solid-primitives/clipboard
 
+## 2.1.0
+
+### Minor Changes
+
+- a176399: Add `createCopyToClipboard`: copy with a transient, auto-resetting `copied`/`error` status (copy-button helper).
+
 ## 2.0.0
 
 ### Major Changes

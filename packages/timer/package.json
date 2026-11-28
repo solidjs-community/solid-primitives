@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/timer",
-  "version": "1.4.5",
+  "version": "1.5.0",
   "description": "Primitives to manage timeout and interval",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -24,10 +24,12 @@
       "createTimer",
       "createTimeoutLoop",
       "createPolled",
-      "createIntervalCounter"
+      "createIntervalCounter",
+      "makePausableTimer",
+      "createPausableTimer"
     ],
     "category": "Browser APIs",
-    "gzip": 577
+    "gzip": 1244
   },
   "private": false,
   "sideEffects": false,

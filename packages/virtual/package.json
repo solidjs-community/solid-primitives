@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/virtual",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A virtualized list component for performantly rendering lists with many elements",
   "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
   "contributors": [],
@@ -21,7 +21,7 @@
       "VirtualList"
     ],
     "category": "UI Patterns",
-    "gzip": 658
+    "gzip": 1728
   },
   "keywords": [
     "solid",

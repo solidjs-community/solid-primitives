@@ -1,7 +1,6 @@
 import {
   access,
   createServerSafeSignal,
-  tryOnCleanup,
   noop,
   wrapSetter,
   type MaybeAccessor,
@@ -443,7 +442,7 @@ export function createInfiniteScroll<T>(
   options?: { initialPageCount?: number },
 ): [
   pages: Accessor<InfiniteScrollPage<T>[]>,
-  loader: (el: Element) => void,
+  loader: (el: Element) => void | (() => void),
   options: {
     pageCount: Accessor<number>;
     setPageCount: Setter<number>;
@@ -555,7 +554,7 @@ export function createInfiniteScroll<T>(
     setPageCount(initialPageCount);
   }
 
-  let add: (el: Element) => void = noop;
+  let add: (el: Element) => void | (() => void) = noop;
   if (!isServer) {
     let sentinelEl: Element | null = null;
     const io = new IntersectionObserver(e => {
@@ -567,13 +566,21 @@ export function createInfiniteScroll<T>(
       setPageCount(p => p + 1);
     });
     onCleanup(() => io.disconnect());
+    let current: object | null = null;
     add = (el: Element) => {
+      // The ref callback can't call onCleanup; io.disconnect() above covers owner disposal.
+      if (sentinelEl && sentinelEl !== el) io.unobserve(sentinelEl);
+      const attachment = {};
+      current = attachment;
       sentinelEl = el;
       io.observe(el);
-      tryOnCleanup(() => {
+      return () => {
+        // One-shot, and a no-op once a newer attachment has taken over.
+        if (current !== attachment) return;
+        current = null;
         io.unobserve(el);
-        if (sentinelEl === el) sentinelEl = null;
-      });
+        sentinelEl = null;
+      };
     };
     reobserve = () => {
       const el = sentinelEl;

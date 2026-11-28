@@ -30,3 +30,26 @@ describe("VirtualList", () => {
     );
   });
 });
+
+describe("variable and measured modes", () => {
+  test("rowHeight function renders in SSR", () => {
+    const str = renderToString(() => (
+      <VirtualList each={TEST_LIST} rootHeight={30} rowHeight={(i: number) => (i % 2 ? 20 : 10)}>
+        {item => <div>{item()}</div>}
+      </VirtualList>
+    ));
+    expect(str).toContain("height:15000px");
+    expect(str).toContain(">0<");
+    expect(str).toContain(">2<");
+  });
+
+  test("measured mode renders estimated layout and measureElement is a no-op", () => {
+    const str = renderToString(() => (
+      <VirtualList each={TEST_LIST} rootHeight={30} estimatedRowHeight={10}>
+        {item => <span>{item()}</span>}
+      </VirtualList>
+    ));
+    expect(str).toContain("height:10000px");
+    expect(str).toContain('data-index="0"');
+  });
+});
