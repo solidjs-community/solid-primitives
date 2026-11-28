@@ -83,7 +83,7 @@ const [stream, { mute, stop }] = createScreen(screenSource);
 
 Same controls as `createStream` but uses `getDisplayMedia` instead of `getUserMedia`. The stream stops automatically when the reactive owner is disposed.
 
-`getDisplayMedia` needs a user gesture, so start the capture from a click. `createScreen` does nothing while its source is `undefined`:
+`getDisplayMedia` needs a user gesture, so start the capture from a click. `createScreen` does nothing while its source is `undefined`. Like `createStream`, `stream()` is a plain signal, so show your own waiting state (it stays until a stream arrives, so a cancelled picker leaves it in place):
 
 ```tsx
 function Screen() {
@@ -101,6 +101,9 @@ function Screen() {
   return (
     <>
       <button onClick={() => setConstraints({ video: true })}>Share screen</button>
+      <Show when={constraints() && !stream()}>
+        <p>Waiting for screen selection...</p>
+      </Show>
       <video ref={setVideo} autoplay />
     </>
   );
