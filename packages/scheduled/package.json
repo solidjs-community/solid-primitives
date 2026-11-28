@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scheduled",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Primitives for creating scheduled — throttled or debounced — callbacks and derived values.",
   "contributors": [
     "David Di Biase <dave@solidjs.com>",
