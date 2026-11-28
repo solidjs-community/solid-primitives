@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/post-message",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Secure window, iframe and MessagePort messaging with origin, source and channel checks.",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
