@@ -140,6 +140,38 @@ describe("createForm as JSX ref callbacks", () => {
     expect(input.value).toBe("y");
   });
 
+  it("tears down an ownerless attachment when the owner that mounted it is disposed", async () => {
+    let form!: ReturnType<typeof createForm<{ email: { initial: string } }>>;
+    createRoot(d => {
+      form = createForm({ fields: { email: { initial: "x" } } });
+      return d;
+    });
+    const attach = form.bind("email"); // no owner here
+
+    const first = mount(() => <input ref={attach} />);
+    await Promise.resolve(); // the teardown is registered right after the ref callback returns
+    const a = first.container.querySelector("input")!;
+    first.unmount();
+
+    form.fields.email.setValue("after");
+    flush();
+    expect(a.value).not.toBe("after");
+    a.value = "typed";
+    a.dispatchEvent(new Event("input", { bubbles: true }));
+    flush();
+    expect(form.fields.email.value()).toBe("after");
+
+    // the same callback can be mounted again and only the new element is kept in sync
+    const second = mount(() => <input ref={attach} />);
+    await Promise.resolve();
+    const b = second.container.querySelector("input")!;
+    expect(b.value).toBe("after");
+    form.fields.email.setValue("again");
+    flush();
+    expect(b.value).toBe("again");
+    expect(a.value).not.toBe("again");
+  });
+
   it("removes every listener when the ref is cleaned up", () => {
     let form!: ReturnType<typeof createForm<{ email: { initial: string } }>>;
     const onSubmit = vi.fn();

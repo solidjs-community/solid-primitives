@@ -1,4 +1,4 @@
-import { onCleanup, onSettled } from "solid-js";
+import { createOwner, onCleanup, onSettled } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, asArray, type MaybeAccessor } from "@solid-primitives/utils";
 
@@ -89,6 +89,9 @@ export function createMutationObserver(
   if (isSupported) {
     onSettled(start);
     onCleanup(stop);
+  } else {
+    // Match the client's onSettled owner so later siblings keep the same hydration ids.
+    createOwner();
   }
 
   return [

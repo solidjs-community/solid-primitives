@@ -1,4 +1,4 @@
-import { type Accessor, createEffect, createSignal } from "solid-js";
+import { type Accessor, createEffect, createOwner, createSignal } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
 import { type CursorProperty } from "./types.ts";
@@ -205,7 +205,11 @@ export function createDragCursor(
 export function cursorRef(
   cursor: MaybeAccessor<CursorProperty>,
 ): (el: HTMLElement) => VoidFunction {
-  if (isServer) return () => noop;
+  if (isServer) {
+    // Match the client's effect owner so later siblings keep the same hydration ids.
+    createOwner();
+    return () => noop;
+  }
 
   // The ref callback can't create primitives, so the effect lives here and the callback only edits this list.
   const [els, setEls] = createSignal<HTMLElement[]>([], { ownedWrite: true });

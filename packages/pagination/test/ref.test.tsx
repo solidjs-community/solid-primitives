@@ -114,6 +114,28 @@ describe("createInfiniteScroll as a JSX ref", () => {
     expect(io.observed.has(b)).toBe(true);
   });
 
+  it("a stale teardown does not stop a newer attachment of the same element", () => {
+    let loader!: (el: Element) => void | (() => void);
+    mount(() => {
+      loader = createInfiniteScroll(fetcher)[1];
+      return <div />;
+    });
+    const io = MockIO.instances.at(-1)!;
+    const a = document.createElement("div");
+    const b = document.createElement("div");
+    const firstA = loader(a) as () => void;
+    loader(b);
+    const secondA = loader(a) as () => void;
+    expect(io.observed.has(a)).toBe(true);
+
+    firstA();
+    expect(io.observed.has(a)).toBe(true);
+
+    secondA();
+    secondA();
+    expect(io.observed.has(a)).toBe(false);
+  });
+
   it("returned teardown unobserves the element and is idempotent", () => {
     let loader!: (el: Element) => void | (() => void);
     mount(() => {

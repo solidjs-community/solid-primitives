@@ -446,6 +446,14 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
       };
       active.add(attachment);
 
+      // Ownerless factory: once this callback returns (onCleanup is forbidden inside it), tie the
+      // attachment to the owner that mounted the ref.
+      if (!owned) {
+        const mounting = getOwner();
+        if (mounting)
+          queueMicrotask(() => runWithOwner(mounting, () => onCleanup(attachment.teardown)));
+      }
+
       // Detached (null owner): a root can't be created under the ref callback's owner, and only
       // the last teardown should dispose it.
       if (!owned && !disposeRoot)

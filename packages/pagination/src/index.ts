@@ -566,14 +566,20 @@ export function createInfiniteScroll<T>(
       setPageCount(p => p + 1);
     });
     onCleanup(() => io.disconnect());
+    let current: object | null = null;
     add = (el: Element) => {
       // The ref callback can't call onCleanup; io.disconnect() above covers owner disposal.
       if (sentinelEl && sentinelEl !== el) io.unobserve(sentinelEl);
+      const attachment = {};
+      current = attachment;
       sentinelEl = el;
       io.observe(el);
       return () => {
+        // One-shot, and a no-op once a newer attachment has taken over.
+        if (current !== attachment) return;
+        current = null;
         io.unobserve(el);
-        if (sentinelEl === el) sentinelEl = null;
+        sentinelEl = null;
       };
     };
     reobserve = () => {

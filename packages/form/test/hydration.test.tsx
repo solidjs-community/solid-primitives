@@ -108,3 +108,38 @@ describe("createForm ref callbacks during hydration", () => {
     expect(result.container.querySelector("#value")!.textContent).toBe("ada@example.com");
   });
 });
+
+// A client-side effect owner created by bind() needs a matching server owner, or later hydration
+// ids shift and elements miss their server-rendered twins.
+describe("form.bind() hydration ids", () => {
+  let result: HydrationRoundTripResult | undefined;
+
+  afterEach(() => {
+    result?.cleanup();
+    result = undefined;
+  });
+
+  it("stay aligned for elements after the bound input", async () => {
+    result = await renderHydrationRoundTrip(
+      `
+import { createUniqueId } from "solid-js";
+import { createForm } from "@solid-primitives/form";
+export default function App() {
+  const form = createForm({ fields: { email: { initial: "" } } });
+  const ref = form.bind("email");
+  const id = createUniqueId();
+  return (
+    <div>
+      <input id="a" ref={ref} />
+      <span id="uid">{id}</span>
+    </div>
+  );
+}
+`,
+      import.meta.dirname,
+    );
+    const serverId = /id="uid">([^<]*)</.exec(result.html)?.[1];
+    expect(result.container.querySelector("#uid")!.textContent).toBe(serverId);
+    expect(result.consoleMessages).toEqual([]);
+  });
+});

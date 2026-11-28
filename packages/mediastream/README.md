@@ -41,10 +41,10 @@ const [stream, { mute, stop }] = createStream(streamSource);
 - `mute(muted?)` — mutes the stream; pass `false` to unmute
 - `stop()` — stops the stream immediately
 
-The stream stops automatically when the reactive owner is disposed. Wrap in `<Loading>` to handle the loading state:
+The stream stops automatically when the reactive owner is disposed. `stream()` is `undefined` until the request resolves. It is a plain signal, not a pending computation, so `<Loading>` shows no fallback; render your own loading state:
 
 ```tsx
-import { createEffect, createSignal, Loading } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 
 function Camera() {
   const [stream] = createStream({ video: true });
@@ -58,12 +58,15 @@ function Camera() {
     },
   );
 
-  return <video ref={setVideo} autoplay />;
+  return (
+    <>
+      <Show when={!stream()}>
+        <p>Requesting camera...</p>
+      </Show>
+      <video ref={setVideo} autoplay />
+    </>
+  );
 }
-
-<Loading fallback={<p>Requesting camera...</p>}>
-  <Camera />
-</Loading>;
 ```
 
 ### `createScreen`
@@ -80,9 +83,12 @@ const [stream, { mute, stop }] = createScreen(screenSource);
 
 Same controls as `createStream` but uses `getDisplayMedia` instead of `getUserMedia`. The stream stops automatically when the reactive owner is disposed.
 
+`getDisplayMedia` needs a user gesture, so start the capture from a click. `createScreen` does nothing while its source is `undefined`:
+
 ```tsx
 function Screen() {
-  const [stream] = createScreen({ video: true });
+  const [constraints, setConstraints] = createSignal<DisplayMediaStreamConstraints>();
+  const [stream] = createScreen(constraints);
   const [video, setVideo] = createSignal<HTMLVideoElement>();
 
   createEffect(
@@ -92,12 +98,13 @@ function Screen() {
     },
   );
 
-  return <video ref={setVideo} autoplay />;
+  return (
+    <>
+      <button onClick={() => setConstraints({ video: true })}>Share screen</button>
+      <video ref={setVideo} autoplay />
+    </>
+  );
 }
-
-<Loading fallback={<p>Requesting screen capture...</p>}>
-  <Screen />
-</Loading>;
 ```
 
 ### `createAmplitudeStream`
@@ -180,7 +187,7 @@ This package replaces `@solid-primitives/stream` with full Solid.js v2 compatibi
 - **`createStream` / `createScreen`**: return type changed from `[Resource<MediaStream>, ResourceActions & { stop, mute }]` to `[Accessor<MediaStream | undefined>, { stop, mute }]`. The `mutate` and `refetch` controls are removed; reactivity is driven by the source accessor directly.
 - **`createAmplitudeStream`**: return type simplified — second element is now `{ stream, stop }` (no `mutate` / `refetch`).
 - **`isServer`**: now imported from `@solidjs/web` internally.
-- **Async loading state**: use `<Loading>` from `@solidjs/web` instead of inspecting `stream.loading`.
+- **Async loading state**: `stream()` is a plain signal that is `undefined` until the request resolves; render your own loading state instead of inspecting `stream.loading`.
 - **Error handling**: wrap in `<Errored>` from `@solidjs/web` instead of inspecting `stream.error`.
 
 ## Changelog
