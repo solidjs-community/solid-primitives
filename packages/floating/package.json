@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/floating",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Floating element positioning — placement, offset, flip, shift, size and arrow, with auto-updating",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],

@@ -1,5 +1,11 @@
 # @solid-primitives/scroll
 
+## 3.1.0
+
+### Minor Changes
+
+- a176399: Add opt-in `requestAnimationFrame` throttling: `createScrollPosition(target, { throttle: "raf" })`, a non-reactive `makeScrollPositionListener`, and `useWindowScrollPositionRaf`. Default behavior is unchanged.
+
 ## 3.0.0
 
 ### Major Changes
