@@ -19,7 +19,8 @@
     "list": [
       "createIsMounted",
       "isHydrated",
-      "onElementConnect"
+      "onElementConnect",
+      "createConnectRef"
     ],
     "category": "Reactivity",
     "gzip": 306

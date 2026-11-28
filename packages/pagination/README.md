@@ -323,7 +323,7 @@ function createInfiniteScroll<T>(
   options?: { initialPageCount?: number },
 ): [
   pages: Accessor<InfiniteScrollPage<T>[]>,
-  loader: (el: Element) => void,
+  loader: (el: Element) => void | (() => void),
   options: {
     pageCount: Accessor<number>;
     setPageCount: Setter<number>;

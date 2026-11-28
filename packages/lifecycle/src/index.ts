@@ -1,4 +1,4 @@
-import { type Accessor, createSignal, getObserver, onCleanup, onSettled } from "solid-js";
+import { type Accessor, createSignal, getObserver, getOwner, onCleanup, onSettled } from "solid-js";
 import { sharedConfig } from "solid-js/internal";
 import { isServer } from "@solidjs/web";
 
@@ -39,28 +39,66 @@ export const isHydrated = (): boolean =>
 
 /**
  * Calls the {@link fn} callback when the {@link el} is connected to the DOM.
+ *
+ * Safe inside a ref callback: it never calls `onCleanup`, which Solid forbids there.
+ * The observer disconnects itself once the element connects.
+ * To also stop waiting when the owner is disposed, use {@link createConnectRef} or `onCleanup(onElementConnect(...))`.
  * @param el target element
  * @param fn callback
+ * @returns a function that stops waiting for the connection
  * @example
  * ```tsx
- * <div ref={el => {
- *   el.isConnected // => often false
- *   onMount(() => {
- *     el.isConnected // => often true
- *   })
- *   onConnect(el, () => {
- *     el.isConnected // => always true
- *   })
- * }} />
+ * <div ref={createConnectRef(el => {
+ *   el.isConnected // => always true
+ * })} />
  * ```
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#onConnect
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#onElementConnect
  */
-export function onElementConnect(el: Element, fn: VoidFunction): void {
-  if (isServer) return;
-  if (el.isConnected) return fn();
+export function onElementConnect(el: Element, fn: VoidFunction): VoidFunction {
+  if (isServer) return noop;
+  if (el.isConnected) {
+    fn();
+    return noop;
+  }
   const observer: ResizeObserver = new ResizeObserver(
     () => el.isConnected && (observer.disconnect(), fn()),
   );
   observer.observe(el);
-  onCleanup(() => observer.disconnect());
+  return () => observer.disconnect();
 }
+
+/**
+ * Creates a `ref` callback that calls {@link fn} with each element once it is connected to the DOM.
+ * Call it in the component body: pending observers are disconnected when the owner is disposed.
+ * @example
+ * ```tsx
+ * <div ref={createConnectRef(el => console.log(el.isConnected))} />
+ * ```
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#createConnectRef
+ */
+export function createConnectRef<T extends Element = Element>(
+  fn: (el: T) => void,
+): (el: T) => void {
+  if (isServer) return noop;
+  const stops = new Map<object, VoidFunction>();
+  // The ref callback can't call onCleanup, so the factory registers the teardown.
+  if (getOwner()) {
+    onCleanup(() => {
+      stops.forEach(stop => stop());
+      stops.clear();
+    });
+  }
+  return el => {
+    if (el.isConnected) return fn(el);
+    const key = {};
+    stops.set(
+      key,
+      onElementConnect(el, () => {
+        stops.delete(key);
+        fn(el);
+      }),
+    );
+  };
+}
+
+const noop = (): void => {};

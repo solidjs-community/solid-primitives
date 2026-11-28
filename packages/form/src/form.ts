@@ -2,12 +2,13 @@ import {
   createSignal,
   createMemo,
   createRoot,
+  getOwner,
   onCleanup,
+  runWithOwner,
   untrack,
   createEffect,
   type Accessor,
 } from "solid-js";
-import { makeEventListener } from "@solid-primitives/event-listener";
 import type {
   ValidatorFn,
   FieldsConfig,
@@ -393,48 +394,105 @@ export function createForm<C extends FieldsConfig>(config: FormConfig<C>): FormR
     }
   };
 
-  // bind() returns a Phase 2 ref callback. The DOM-sync effect lives inside a createRoot
-  // scoped to the element's lifetime so it disposes automatically on unmount.
+  // A ref callback can't use onCleanup or create primitives (#1143), so bind() sets up everything
+  // reactive here, in the component body; the callback it returns only touches the DOM.
   const bind = (name: string) => {
     const f = internalFields[name];
     if (!f) throw new Error(`createForm: unknown field "${name}"`);
 
-    return (nextEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => {
-      const el = nextEl as HTMLInputElement;
-      const checkable = el.type === "checkbox" || el.type === "radio";
-
-      if (checkable) el.checked = Boolean(untrack(f.value));
-      else el.value = untrack(() => String(f.value() ?? ""));
-
-      const disposeEffect = createRoot(d => {
-        createEffect(f.value, v => {
-          if (checkable) el.checked = Boolean(v);
-          else if (el.value !== String(v ?? "")) el.value = String(v ?? "");
-        });
-        return d;
-      });
-
-      const off1 = makeEventListener(el, checkable ? "change" : "input", () =>
-        f._setValue(checkable ? el.checked : el.value),
-      );
-      const off2 = makeEventListener(el, "blur", () => f._setTouched(true));
-
-      return () => {
-        off1();
-        off2();
-        disposeEffect();
-      };
+    // One callback can be attached to several elements; each keeps its own state.
+    type Attachment = {
+      input: HTMLInputElement;
+      checkable: boolean;
+      teardown: () => void;
     };
+    const active = new Set<Attachment>();
+
+    // field -> DOM for every attached element
+    const syncOne = (a: Attachment, v: unknown) => {
+      if (a.checkable) a.input.checked = Boolean(v);
+      else if (a.input.value !== String(v ?? "")) a.input.value = String(v ?? "");
+    };
+    const syncAll = (v: unknown) => active.forEach(a => syncOne(a, v));
+
+    // Owned by the component; with no owner, a root that lives while an element is attached.
+    const owned = !!getOwner();
+    let disposeRoot: (() => void) | undefined;
+    if (owned) createEffect(f.value, syncAll);
+
+    const refCallback = (nextEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => {
+      const input = nextEl as HTMLInputElement;
+      const checkable = input.type === "checkbox" || input.type === "radio";
+
+      // Plain listeners: makeEventListener would call onCleanup, forbidden in a ref callback.
+      const valueEvent = checkable ? "change" : "input";
+      const onValue = () => f._setValue(checkable ? input.checked : input.value);
+      const onBlur = () => f._setTouched(true);
+      input.addEventListener(valueEvent, onValue);
+      input.addEventListener("blur", onBlur);
+
+      const attachment: Attachment = {
+        input,
+        checkable,
+        teardown: () => {
+          if (!active.delete(attachment)) return;
+          input.removeEventListener(valueEvent, onValue);
+          input.removeEventListener("blur", onBlur);
+          if (!owned && active.size === 0) {
+            disposeRoot?.();
+            disposeRoot = undefined;
+          }
+        },
+      };
+      active.add(attachment);
+
+      // Ownerless factory: once this callback returns (onCleanup is forbidden inside it), tie the
+      // attachment to the owner that mounted the ref.
+      if (!owned) {
+        const mounting = getOwner();
+        if (mounting)
+          queueMicrotask(() => runWithOwner(mounting, () => onCleanup(attachment.teardown)));
+      }
+
+      // Detached (null owner): a root can't be created under the ref callback's owner, and only
+      // the last teardown should dispose it.
+      if (!owned && !disposeRoot)
+        disposeRoot = runWithOwner(null, () =>
+          createRoot(d => {
+            createEffect(f.value, syncAll);
+            return d;
+          }),
+        );
+
+      syncOne(attachment, untrack(f.value));
+
+      return attachment.teardown;
+    };
+
+    // The runtime ignores a ref's returned cleanup, so also tear down with the owner.
+    if (owned) onCleanup(() => [...active].forEach(a => a.teardown()));
+    return refCallback;
   };
 
-  const ref = (el: HTMLFormElement) =>
-    makeEventListener(el, "submit", (e: SubmitEvent) => {
+  // Same as bind(): also remove the submit listeners with createForm's owner.
+  const submitTeardowns = new Set<() => void>();
+  const ref = (el: HTMLFormElement) => {
+    const onSubmit = (e: SubmitEvent) => {
       e.preventDefault();
       void submit();
-    });
+    };
+    el.addEventListener("submit", onSubmit);
+    const teardown = () => {
+      if (!submitTeardowns.delete(teardown)) return;
+      el.removeEventListener("submit", onSubmit);
+    };
+    submitTeardowns.add(teardown);
+    return teardown;
+  };
 
   onCleanup(() => {
     _isSubmitting = false;
+    [...submitTeardowns].forEach(t => t());
   });
 
   return {

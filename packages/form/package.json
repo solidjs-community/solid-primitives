@@ -35,7 +35,6 @@
   ],
   "dependencies": {
     "@solid-primitives/a11y": "workspace:^",
-    "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "private": false,

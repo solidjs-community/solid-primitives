@@ -1,4 +1,4 @@
-import { type Accessor, onCleanup } from "solid-js";
+import { type Accessor, getOwner, onCleanup } from "solid-js";
 import { isServer } from "@solidjs/web";
 import { createHydratableSignal } from "@solid-primitives/utils";
 import { makeEventListener } from "@solid-primitives/event-listener";
@@ -55,17 +55,24 @@ export function createActiveElement(): Accessor<Element | null> {
  * const [active, setActive] = createSignal(false)
  * <input ref={focus(setActive)} />
  */
-export function focus(callback: (isActive: boolean) => void): (target: Element) => void {
-  if (isServer) return () => {};
-  let cleanup: (() => void) | null = null;
-  onCleanup(() => cleanup?.());
+export function focus(callback: (isActive: boolean) => void): (target: Element) => VoidFunction {
+  if (isServer) return () => () => {};
+  // One teardown per element, so a single focus() value can be attached to several elements.
+  const teardowns = new Set<VoidFunction>();
+  // The runtime ignores a ref callback's return value, so the factory owner tears down too.
+  if (getOwner()) onCleanup(() => [...teardowns].forEach(t => t()));
   return (target: Element) => {
     callback(document.activeElement === target);
-    const c1 = makeEventListener(target, "blur", () => callback(false), true);
-    const c2 = makeEventListener(target, "focus", () => callback(true), true);
-    cleanup = () => {
-      c1();
-      c2();
+    const onBlur = () => callback(false);
+    const onFocus = () => callback(true);
+    target.addEventListener("blur", onBlur, true);
+    target.addEventListener("focus", onFocus, true);
+    const teardown = () => {
+      target.removeEventListener("blur", onBlur, true);
+      target.removeEventListener("focus", onFocus, true);
+      teardowns.delete(teardown);
     };
+    teardowns.add(teardown);
+    return teardown;
   };
 }
