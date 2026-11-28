@@ -29,7 +29,7 @@
       "createPausableTimer"
     ],
     "category": "Browser APIs",
-    "gzip": 577
+    "gzip": 1244
   },
   "private": false,
   "sideEffects": false,
