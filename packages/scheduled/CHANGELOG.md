@@ -1,5 +1,11 @@
 # @solid-primitives/scheduled
 
+## 2.1.0
+
+### Minor Changes
+
+- 4046354: Add `createDebounced` and `createThrottled` derived accessors. They are built on Solid 2's `createDeferred`, so a held-back value stays visible while `isPending()` reports the wait, and the landing participates in the normal reactive graph. Both support `leading` / `trailing` edge options; `createDebounced` also supports `maxWait`.
+
 ## 2.0.1
 
 ### Patch Changes
